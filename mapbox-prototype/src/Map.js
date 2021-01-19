@@ -592,6 +592,7 @@ const Map = () => {
       <div className="jumbotron jumbotron-fluid p-4">
         <h1 className="display-4">WSWC POD Water Allocation Map</h1>
         <p className="lead">A web tool used to summarize aggregated annual water use for a given area across the Western United States.</p>
+        <p className="lead danger"><b>DISCLAIMER:</b> This application is under construction, not for public use, and has not yet been fully approved by our member states. Individual states have unique water rights administration systems. Please check metadata before making any comparisons. The purpose of WaDE is to support regional water data and availability analysis. This data is not meant for localized decisions. Before drawing any conclusions or making comparisons, please consult the state's water rights agency and their used methods. Please also consult with the WaDE team before using this tool. We look forward to hear your feedback.</p>
         <div className="p-4">
           <div className="form-group">
             <label>Filter by Beneficial Use</label>

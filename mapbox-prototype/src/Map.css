@@ -51,3 +51,6 @@
   min-height: 25vh !important;
 }
 
+.danger{
+  color: red;
+}
