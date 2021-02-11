@@ -21,17 +21,15 @@ namespace MapboxPrototypeAPI.Controllers
         private readonly ILogger<WaterAllocationController> _logger;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
 
-        private readonly string[] WaDEClassifications = new string[] { "Agricultural", "Aquaculture", "Commercial", "Domestic", "Environmental", "Fire",
-        "Fish", "Flood Control", "Heating and Cooling", "Industrial", "Instream Flow", "Livestock", "Mining", "Municipal", "Other", "Power", "Recharge",
-        "Recreation", "Snow Making", "Storage", "Unknown", "Wildlife" };
-
-        public WaterAllocationController(ILogger<WaterAllocationController> logger,
-            IWaterAllocationAccessor waterAllocationAccessor)
+        public WaterAllocationController(ILogger<WaterAllocationController> logger, IWaterAllocationAccessor waterAllocationAccessor)
         {
             _logger = logger;
             _waterAllocationAccessor = waterAllocationAccessor;
         }
 
+        private readonly string[] WaDEClassifications = new string[] { "Agricultural", "Aquaculture", "Commercial", "Domestic", "Environmental", "Fire",
+        "Fish", "Flood Control", "Heating and Cooling", "Industrial", "Instream Flow", "Livestock", "Mining", "Municipal", "Other", "Power", "Recharge",
+        "Recreation", "Snow Making", "Storage", "Unknown", "Wildlife" };
 
         [FunctionName(nameof(GetWaterAllocationData))]
         public async Task<OkObjectResult> GetWaterAllocationData([HttpTrigger("post", Route = "GetWaterAllocationData")]HttpRequest request)

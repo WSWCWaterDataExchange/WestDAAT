@@ -16,11 +16,6 @@ namespace MapboxPrototypeAPI.Accessors
             _dbContext = dbContext;
         }
 
-        public SitesDim GetSiteById(int id)
-        {
-            return _dbContext.SitesDims.FirstOrDefault(x => x.SiteId == id);
-        }
-
         public IEnumerable<AllocationAmountsFact> GetWaterAllocationDataById(IEnumerable<long> ids)
         {
             var allocations = _dbContext.AllocationAmountsFacts

@@ -71,7 +71,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=[YOUR DATABASE SERVER];Database=[YOUR DATABASE NAME];User ID=[YOUR DATABASE USER ID];password=[YOUR DATABASE PASSWORD];MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=90;");
+                optionsBuilder.UseSqlServer("Server=wade-qa-server.database.windows.net;Database=WaDE_QA_Server;User ID=wade-admin;password=Orange2019!;MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=30;");
             }
         }
 

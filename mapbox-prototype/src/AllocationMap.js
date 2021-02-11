@@ -7,7 +7,7 @@ import moment from 'moment';
 
 import DateRangeSelect from './DateRangeSelect';
 
-import './Map.css';
+import './AllocationMap.css';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYW1hYmRhbGxhaCIsImEiOiJjazJnbno5ZHIwazVqM21xZzMwaWpsc2hqIn0.j6BmkJdp5O_9ITGm4Gwe0w';
@@ -38,7 +38,7 @@ const beneficialUses = [
   { key: 'wildlife', label: 'Wildlife' },
 ]
 
-const Map = () => {
+const AllocationMap = () => {
   const mapContainerRef = useRef(null);
   const [allocationData, setAllocationData] = React.useState([]);
   const [mapData, setMapData] = React.useState(null);
@@ -569,6 +569,7 @@ const Map = () => {
   function fetchAllocationData(allocationArr) {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("x-functions-key", "gbPgxR/Femue08YsLtEnmpAukABhpT26AxBPO6wavTkczFFoYJgdSA==");
 
     var raw = JSON.stringify(allocationArr);
 
@@ -579,7 +580,7 @@ const Map = () => {
       redirect: 'follow'
     };
 
-    fetch("http://localhost:7071/api/GetWaterAllocationData", requestOptions)
+    fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetWaterAllocationData", requestOptions)
       .then(response => response.text())
       .then(result => {
         setAllocationData(JSON.parse(result));
@@ -588,12 +589,9 @@ const Map = () => {
   }
 
   return (
-    <div className="container-fluid overflow-hidden">
-      <div className="jumbotron jumbotron-fluid p-4">
-        <h1 className="display-4">WSWC POD Water Allocation Map</h1>
-        <p className="lead">A web tool used to summarize aggregated annual water use for a given area across the Western United States.</p>
-        <p className="lead danger"><b>DISCLAIMER:</b> This application is under construction, not for public use, and has not yet been fully approved by our member states. Individual states have unique water rights administration systems. Please check metadata before making any comparisons. The purpose of WaDE is to support regional water data and availability analysis. This data is not meant for localized decisions. Before drawing any conclusions or making comparisons, please consult the state's water rights agency and their used methods. Please also consult with the WaDE team before using this tool. We look forward to hear your feedback.</p>
-        <div className="p-4">
+    <div className="map-content">
+      <div className="row p-4">
+        <div className="p-4 w-100">
           <div className="form-group">
             <label>Filter by Beneficial Use</label>
             <DropdownMultiselect
@@ -688,4 +686,4 @@ const Map = () => {
   );
 };
 
-export default Map;
+export default AllocationMap;

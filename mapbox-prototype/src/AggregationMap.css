@@ -27,30 +27,9 @@
   width: 10px;
 }
 
+.map-content,
+.table-container,
 .filter-sidebar-style{
-  background-color: #222222;
+  background-color: #2e2e2e;
   color: #ffffff;
-}
-
-.table-container{
-  background-color: #404040;
-  color: #ffffff;
-}
-
-.jumbotron {
-  margin: -15px !important;
-  background-color: #404040 !important;
-  color: #ffffff;
-}
-
-.min-vh-75{
-  min-height: 75vh !important;
-}
-
-.min-vh-25{
-  min-height: 25vh !important;
-}
-
-.danger{
-  color: red;
 }
