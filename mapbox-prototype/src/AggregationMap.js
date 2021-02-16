@@ -63,10 +63,7 @@ const AggregationMap = () => {
 
         // Calculate color values for each area based on 'amount'
         data.aggregationData.forEach((agg) => {
-          var blue = agg.amount * 255;
-          var color = 'rgb(0, 0, ' + colorScalar(agg.amount) + ')';
-
-          matchExpression.push(agg.reportingUnit.reportingUnitUuid, color);
+          matchExpression.push(agg.reportingUnit.reportingUnitUuid, 'rgb(0, 0, ' + colorScalar(agg.amount) + ')');
         });
 
         // Push default color
