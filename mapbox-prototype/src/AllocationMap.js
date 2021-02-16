@@ -4,9 +4,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap"; // https://www.npmjs.com/package/react-multiselect-dropdown-bootstrap
 import * as turf from '@turf/turf';
 import moment from 'moment';
-
 import DateRangeSelect from './DateRangeSelect';
-
 import './AllocationMap.css';
 
 mapboxgl.accessToken =
@@ -580,7 +578,7 @@ const AllocationMap = () => {
       redirect: 'follow'
     };
 
-    fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetWaterAllocationData", requestOptions)
+    fetch("http://localhost:7071/api/GetWaterAllocationData", requestOptions)
       .then(response => response.text())
       .then(result => {
         setAllocationData(JSON.parse(result));

@@ -80,7 +80,7 @@ const DateRangeSelect = (props) => {
                 }}
                 {...getHandleProps(id)}
             >
-                <div style={{ fontFamily: 'Roboto', fontSize: 11, marginTop: -25, marginLeft: -15, color: '#fff' }}>
+                <div style={{ fontFamily: 'Arial, san-serif', fontSize: 11, marginTop: -25, marginLeft: -15, color: '#fff' }}>
                     {formatTime(value)}
                 </div>
             </div>

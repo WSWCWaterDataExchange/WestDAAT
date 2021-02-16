@@ -10,6 +10,6 @@ namespace MapboxPrototypeAPI.Accessors
     public interface IWaterAggregationAccessor
     {
         IEnumerable<AggregatedAmountsFact> GetAggregatedAmounts();
-        IEnumerable<AggregatedAmountsFact> GetWaterAggregationById(WaterAggregationRequest request);
+        IEnumerable<AggregatedAmountsFact> GetWaterAggregationByFilterValues(WaterAggregationRequest request);
     }
 }

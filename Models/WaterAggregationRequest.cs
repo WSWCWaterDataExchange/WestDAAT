@@ -1,15 +1,22 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MapboxPrototypeAPI.Models
 {
     public class WaterAggregationRequest
     {
-        [JsonProperty("UUID")]
-        public long Id { get; set; }
-        [JsonProperty("Year")]
-        public string Year { get; set; }
+        [JsonProperty("ReportingUnitUuid")]
+        public string ReportingUnitUuid { get; set; }
+
+        [JsonProperty("ReportYearCv")]
+        public string ReportYearCv { get; set; }
+
+        [JsonProperty("BeneficialUseCv")]
+        public string BeneficialUseCv { get; set; }
+
+        [JsonProperty("VariableCv")]
+        public string VariableCv { get; set; }
+
+        [JsonProperty("ReportingUnitTypeCv")]
+        public string ReportingUnitTypeCv { get; set; }
     }
 }

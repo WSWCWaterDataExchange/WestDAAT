@@ -18,10 +18,12 @@
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)microsoft.net.sdk.functions\3.0.11\build\Microsoft.NET.Sdk.Functions.props" Condition="Exists('$(NuGetPackageRoot)microsoft.net.sdk.functions\3.0.11\build\Microsoft.NET.Sdk.Functions.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.entityframeworkcore.design\3.1.11\build\netcoreapp2.0\Microsoft.EntityFrameworkCore.Design.props" Condition="Exists('$(NuGetPackageRoot)microsoft.entityframeworkcore.design\3.1.11\build\netcoreapp2.0\Microsoft.EntityFrameworkCore.Design.props')" />
+    <Import Project="$(NuGetPackageRoot)entityframework\6.3.0\buildTransitive\EntityFramework.props" Condition="Exists('$(NuGetPackageRoot)entityframework\6.3.0\buildTransitive\EntityFramework.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgMicrosoft_Azure_WebJobs_Script_ExtensionsMetadataGenerator Condition=" '$(PkgMicrosoft_Azure_WebJobs_Script_ExtensionsMetadataGenerator)' == '' ">C:\Users\rmcmanaman\.nuget\packages\microsoft.azure.webjobs.script.extensionsmetadatagenerator\1.2.0</PkgMicrosoft_Azure_WebJobs_Script_ExtensionsMetadataGenerator>
     <PkgMicrosoft_NET_Sdk_Functions Condition=" '$(PkgMicrosoft_NET_Sdk_Functions)' == '' ">C:\Users\rmcmanaman\.nuget\packages\microsoft.net.sdk.functions\3.0.11</PkgMicrosoft_NET_Sdk_Functions>
     <PkgMicrosoft_EntityFrameworkCore_Tools Condition=" '$(PkgMicrosoft_EntityFrameworkCore_Tools)' == '' ">C:\Users\rmcmanaman\.nuget\packages\microsoft.entityframeworkcore.tools\3.1.11</PkgMicrosoft_EntityFrameworkCore_Tools>
+    <PkgEntityFramework Condition=" '$(PkgEntityFramework)' == '' ">C:\Users\rmcmanaman\.nuget\packages\entityframework\6.3.0</PkgEntityFramework>
   </PropertyGroup>
 </Project>

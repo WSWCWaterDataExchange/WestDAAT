@@ -1,9 +1,10 @@
 ﻿using MapboxPrototypeAPI.Accessors.EF.DatabaseModels;
 using MapboxPrototypeAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using LinqKit;
 
 namespace MapboxPrototypeAPI.Accessors
 {
@@ -24,14 +25,48 @@ namespace MapboxPrototypeAPI.Accessors
             return aggregatedAmounts;
         }
 
-        public IEnumerable<AggregatedAmountsFact> GetWaterAggregationById(WaterAggregationRequest request)
+        public IEnumerable<AggregatedAmountsFact> GetWaterAggregationByFilterValues(WaterAggregationRequest request)
         {
+            var predicate = GetAggregateDataPredicate(request);
+
             var aggregate = _dbContext.AggregatedAmountsFacts
-                .Select(x => x)
-                .Where(x => x.ReportingUnitId == request.Id && x.ReportYearCv == request.Year)
+                .Include(x => x.ReportingUnit)
+                .Where(predicate)
                 .ToList();
 
             return aggregate;
+        }
+                
+        private static ExpressionStarter<AggregatedAmountsFact> GetAggregateDataPredicate(WaterAggregationRequest request)
+        {
+            var predicate = PredicateBuilder.New<AggregatedAmountsFact>();
+
+            if (!string.IsNullOrWhiteSpace(request.ReportingUnitUuid))
+            {
+                predicate.And(x => x.ReportingUnit.ReportingUnitUuid == request.ReportingUnitUuid);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.ReportingUnitTypeCv))
+            {
+                predicate.And(x => x.ReportingUnit.ReportingUnitTypeCv == request.ReportingUnitTypeCv);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.ReportYearCv))
+            {
+                predicate.And(x => x.ReportYearCv == request.ReportYearCv);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.VariableCv))
+            {
+                predicate.And(x => x.VariableSpecific.VariableCv == request.VariableCv);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.BeneficialUseCv))
+            {
+                predicate.And(x => x.AggBridgeBeneficialUsesFacts.FirstOrDefault().BeneficialUseCv == request.BeneficialUseCv);
+            }
+
+            return predicate;
         }
     }
 }
