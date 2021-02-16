@@ -62,7 +62,7 @@ In order to generate GeoJSON, compile `.mbtiles` files, and upload tiles to mapb
 ### Updating Mabpox Tiles
 1. Open the MapboxPrototypeAPI solution in Visual Studio
 2. Ensure the following variables are set within the API:
-    -  Line 71 of `WaterAllocationController.cs` should specify a directory and naming scheme for the GeoJSON files to be written to (replace "`C:\Your\Preferred\Directory`" with a folder you've created somewhere on your disk)
+    -  Line 71 of `WaterAllocationController.cs` should specify a directory with no spaces and naming scheme for the GeoJSON files to be written to (replace "`C:\Your\Preferred\Directory`" with a folder you've created somewhere on your disk)
     - Line 74 of `WaDE_QA_ServerContext.cs` and Line 39 of `Startup.cs` should both contain a [connection string](https://www.connectionstrings.com/sql-server/) to WaDE's desired database
 3. Run the API by clicking the green play button in the toolbar
 4. Using a tool such as [Postman](https://www.postman.com/), send a GET request to the `GetWaterAllocations` endpoint of your API instance (the URL will be displayed in a console window). Depending on the speed of your computer and your connection to the database, this request will run for 30-60 minutes.![enter image description here](https://i.imgur.com/2IbHEnV.png)
