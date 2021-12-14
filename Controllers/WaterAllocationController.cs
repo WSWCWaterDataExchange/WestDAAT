@@ -29,7 +29,7 @@ namespace MapboxPrototypeAPI.Controllers
 
         private readonly string[] WaDEClassifications = new string[] { "Agricultural", "Aquaculture", "Commercial", "Domestic", "Environmental", "Fire",
         "Fish", "Flood Control", "Heating and Cooling", "Industrial", "Instream Flow", "Livestock", "Mining", "Municipal", "Other", "Power", "Recharge",
-        "Recreation", "Snow Making", "Storage", "Unknown", "Wildlife" };
+        "Recreation", "Snow Making", "Storage", "Unspecified", "Wildlife" };
 
         [FunctionName(nameof(GetWaterAllocationData))]
         public async Task<OkObjectResult> GetWaterAllocationData([HttpTrigger("post", Route = "GetWaterAllocationData")]HttpRequest request)
@@ -46,8 +46,11 @@ namespace MapboxPrototypeAPI.Controllers
         public IActionResult GetWaterAllocations([HttpTrigger("get", Route = "GetWaterAllocations")]HttpRequest request)
         {
             var allocations = _waterAllocationAccessor.GetAllocations().ToList();
+            var allAllocationsGeoJson = generateAllocation(allocations);
 
-            foreach(var classification in WaDEClassifications)
+            System.IO.File.WriteAllText(@"C:\DPL\_ProjectFiles\Wade\Compiled Data\_allAllocations.geojson", JsonConvert.SerializeObject(allAllocationsGeoJson));
+
+            foreach (var classification in WaDEClassifications)
             {
                 var allocationsByClassification = allocations
                     .Select(x => x)
@@ -68,10 +71,39 @@ namespace MapboxPrototypeAPI.Controllers
 
                 var serializedData = JsonConvert.SerializeObject(geoJsonData);
 
-                System.IO.File.WriteAllText(@"C:\Your\Preferred\Directory\_" + classification + " Allocations.geojson", serializedData);
+                System.IO.File.WriteAllText(@"C:\DPL\_ProjectFiles\Wade\Compiled Data\_" + classification + " Allocations.geojson", serializedData);
             }
 
             return Ok();
+        }
+
+        [FunctionName(nameof(GetWaterAllocationSiteDetails))]
+        public async Task<OkObjectResult> GetWaterAllocationSiteDetails([HttpTrigger("post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
+        {
+            var siteUuid = await System.Text.Json.JsonSerializer.DeserializeAsync<string>(request.Body);
+
+            var result = _waterAllocationAccessor.GetWaterAllocationSiteDetailsById(siteUuid);
+
+            return Ok(JsonConvert.SerializeObject(result));
+        }
+
+        [FunctionName(nameof(GetBasinPolygonByNames))]
+        public async Task<OkObjectResult> GetBasinPolygonByNames([HttpTrigger("post", Route = "GetBasinPolygonByNames")] HttpRequest request, ExecutionContext context)
+        {
+            var basinNames = await System.Text.Json.JsonSerializer.DeserializeAsync<List<string>>(request.Body);
+
+            var result = _waterAllocationAccessor.GetBasinPolygonByNames(basinNames, context);
+
+            return Ok(JsonConvert.SerializeObject(result));
+        }
+
+        [FunctionName(nameof(GetWaterAllocationsMetaData))]
+        public async Task<OkObjectResult> GetWaterAllocationsMetaData([HttpTrigger("post", Route = "GetWaterAllocationsMetaData")] HttpRequest request, ExecutionContext context)
+        {
+            var filterValues = await System.Text.Json.JsonSerializer.DeserializeAsync<WaterAllocationMetaDataFilter>(request.Body);
+            var result = _waterAllocationAccessor.GetWaterAllocationsMetaData(filterValues, context);
+
+            return Ok(JsonConvert.SerializeObject(result));
         }
 
         private WaterAllocation[] generateAllocation(List<AllocationAmountsFact> allocations)
@@ -91,14 +123,30 @@ namespace MapboxPrototypeAPI.Controllers
                         site.Latitude = 110.0;
                     }
 
-                    if (allocation.AllocationPriorityDate == null)
-                        allocation.AllocationPriorityDate = new DateDim() { Date = new DateTime() };
-
-                    if (allocation.WaterSource == null)
-                        allocation.WaterSource = new WaterSourcesDim() { WaterSourceTypeCv = "Unspecified " };
-
                     if (allocation.AllocationOwner == null)
                         allocation.AllocationOwner = "Unknown";
+
+                    if(allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceTypeCvNavigation == null)
+                    {
+                        allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceTypeCvNavigation = new WaterSourceType()
+                        {
+                            WaDename = "Unknown"
+                        };
+                    }
+
+                    if (string.IsNullOrEmpty(allocation.OwnerClassificationCV))
+                    {
+                        allocation.OwnerClassificationCV = "Unspecified";
+                    }
+
+                    if (site.SiteUuid == null)
+                        site.SiteUuid = "Unknown";
+
+                    if (site.SiteName == null)
+                        site.SiteName = "Unknown";
+
+                    if (allocation.AllocationPriorityDate == null)
+                        allocation.AllocationPriorityDate = new DateDim() { Date = new DateTime() };
 
                     var feature = new WaterAllocation()
                     {
@@ -111,15 +159,22 @@ namespace MapboxPrototypeAPI.Controllers
                         Properties = new WaterAllocationProperties()
                         {
                             AllocationId = allocation.AllocationAmountId,
-                            SiteId = site.SiteId,
+                            AllocationFlowCfs = Convert.ToDouble(allocation.AllocationFlowCfs),
+                            AllocationVolumeAf = Convert.ToDouble(allocation.AllocationVolumeAf),
+                            SiteUuid = site.SiteUuid,
+                            SiteName = site.SiteName,
                             AllocationOwner = allocation.AllocationOwner,
-                            WaterSourceType = allocation.WaterSource.WaterSourceTypeCv,
+                            OwnerClassification = allocation.OwnerClassificationCV,
+                            WaterSourceType = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceTypeCvNavigation.WaDename,
                             BeneficialUseCV = beneficialUse.BeneficialUseCvNavigation.WaDename,
                             PriorityDate = (long)(allocation.AllocationPriorityDate.Date - new DateTime(1970, 1, 1)).TotalMilliseconds
                         }
                     };
 
-                    features.Add(feature);
+                    if(site.PodorPousite == "POD" && !site.SiteUuid.StartsWith("TX") && !site.SiteUuid.StartsWith("NM"))
+                    {
+                        features.Add(feature);
+                    }
                 }
             }
 
@@ -133,6 +188,7 @@ namespace MapboxPrototypeAPI.Controllers
             foreach (var allocation in allocations)
             {
                 var beneficialUse = allocation.AllocationBridgeBeneficialUsesFacts.FirstOrDefault();
+                var site = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site;
 
                 allocation.AllocationOwner = allocation.AllocationOwner ?? "Unspecified";
 
@@ -149,6 +205,8 @@ namespace MapboxPrototypeAPI.Controllers
                 {
                     AllocationId = allocation.AllocationAmountId,
                     AllocationExpiration = expirationDate,
+                    AllocationOwner = allocation.AllocationOwner ?? "",
+                    BeneficialUseCV = beneficialUse.BeneficialUseCvNavigation.WaDename ?? "",
                     OrganizationName = allocation.Organization.OrganizationName ?? "",
                     OrganizationPurview = allocation.Organization.OrganizationPurview ?? "",
                     OrganizationWebsite = allocation.Organization.OrganizationWebsite ?? "",
@@ -156,15 +214,21 @@ namespace MapboxPrototypeAPI.Controllers
                     OrganizationContactName = allocation.Organization.OrganizationContactName ?? "",
                     OrganizationContactEmail = allocation.Organization.OrganizationContactEmail ?? "",
                     OrganizationState = allocation.Organization.State ?? "",
-                    WaterSourceName = allocation.WaterSource.WaterSourceName ?? "",
-                    WaterSourceUUID = allocation.WaterSource.WaterSourceUuid ?? "",
-                    WaterSourceType = allocation.WaterSource.WaterSourceTypeCv ?? "",
+                    WaterSourceName = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceName ?? "",
+                    WaterSourceUUID = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceUuid ?? "",
+                    WaterSourceType = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceTypeCv ?? "",
                     VariableType = allocation.VariableSpecific.VariableCv ?? "",
                     VariableAmountUnit = allocation.VariableSpecific.AmountUnitCv ?? "",
                     VariableAggregationInterval = allocation.VariableSpecific.AggregationInterval.ToString() ?? "",
                     VariableAggregationIntervalUnit = allocation.VariableSpecific.AggregationIntervalUnitCv ?? "",
-                    AllocationOwner = allocation.AllocationOwner ?? "",
-                    BeneficialUseCV = beneficialUse.BeneficialUseCvNavigation.WaDename ?? ""
+                    SiteUuid = site.SiteUuid,
+                    SiteName = site.SiteName,
+                    SiteTypeCV = site.SiteTypeCv,
+                    SiteEpsgCodeCV = site.EpsgcodeCv,
+                    SiteCounty = site.County,
+                    SitePOD = site.PodorPousite,
+                    SiteLat = site.Latitude,
+                    SiteLng = site.Longitude
                 };
 
                 result.Add(feature);

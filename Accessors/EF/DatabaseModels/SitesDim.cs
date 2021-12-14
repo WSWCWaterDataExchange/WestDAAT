@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NetTopologySuite.Geometries;
+using System;
 using System.Collections.Generic;
-
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
 {
@@ -21,6 +21,9 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public string SiteTypeCv { get; set; }
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
+        [Column(TypeName = "geometry")]
+        public Geometry SitePoint { get; set; }
+        //public Geometry Geometry { get; set; }
         public string CoordinateMethodCv { get; set; }
         public string CoordinateAccuracy { get; set; }
         public string GniscodeCv { get; set; }
@@ -32,6 +35,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public string Huc12 { get; set; }
         public string County { get; set; }
         public string PodorPousite { get; set; }
+        public long WaterSourceId { get; set; }
 
         public virtual CoordinateMethod CoordinateMethodCvNavigation { get; set; }
         public virtual Epsgcode EpsgcodeCvNavigation { get; set; }
@@ -40,6 +44,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public virtual Nhdproduct NhdproductCvNavigation { get; set; }
         public virtual SiteType SiteTypeCvNavigation { get; set; }
         public virtual State StateCvNavigation { get; set; }
+        public virtual WaterSourcesDim WaterSource { get; set; }
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFacts { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFacts { get; set; }
     }

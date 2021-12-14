@@ -16,7 +16,6 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public long AllocationAmountId { get; set; }
         public long OrganizationId { get; set; }
         public long VariableSpecificId { get; set; }
-        public long WaterSourceId { get; set; }
         public long MethodId { get; set; }
         public string PrimaryUseCategoryCv { get; set; }
         public long DataPublicationDateId { get; set; }
@@ -50,6 +49,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public string AllocationTimeframeStart { get; set; }
         public string AllocationTimeframeEnd { get; set; }
         public bool? ExemptOfVolumeFlowPriority { get; set; }
+        public string OwnerClassificationCV { get; set; }
 
         public virtual DateDim AllocationApplicationDate { get; set; }
         public virtual WaterAllocationBasis AllocationBasisCvNavigation { get; set; }
@@ -67,7 +67,6 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public virtual BeneficialUse PrimaryUseCategoryCvNavigation { get; set; }
         public virtual Sdwisidentifier SdwisidentifierCvNavigation { get; set; }
         public virtual VariablesDim VariableSpecific { get; set; }
-        public virtual WaterSourcesDim WaterSource { get; set; }
         public virtual ICollection<AllocationBridgeBeneficialUsesFact> AllocationBridgeBeneficialUsesFacts { get; set; }
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFacts { get; set; }
     }

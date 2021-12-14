@@ -15,6 +15,9 @@ namespace MapboxPrototypeAPI.Models
 
         [JsonProperty("VariableCv")]
         public string VariableCv { get; set; }
+        
+        [JsonProperty("WaterSourceTypeCV")]
+        public string WaterSourceTypeCV { get; set; }
 
         [JsonProperty("ReportingUnitTypeCv")]
         public string ReportingUnitTypeCv { get; set; }

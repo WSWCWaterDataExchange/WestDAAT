@@ -27,6 +27,16 @@
   width: 10px;
 }
 
+.legend-gradient{
+  height:50vh;
+  width:50px;
+  margin-left:22px;
+  margin-right:22px;
+  background-image: linear-gradient(rgb(0,0,0), rgb(0,0,255), rgb(255,255,255))
+  /* background:linear-gradient(rgb(0,0,0),transparent);
+  background-color:rgb(0,0,255) this your primary color */
+}
+
 .map-content,
 .table-container,
 .filter-sidebar-style{

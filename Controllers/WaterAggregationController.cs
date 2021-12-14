@@ -53,21 +53,62 @@ namespace MapboxPrototypeAPI.Controllers
 
         private WaterAggregationResponse FormatAggregationData(List<AggregatedAmountsFact> aggregationData)
         {
-            if(aggregationData.Count == 0)
-            {
-                return new WaterAggregationResponse()
-                {
-                    AggregationData = aggregationData,
-                    MinimumAmount = 0,
-                    MaximumAmount = 0
-                };
-            }
 
-            return new WaterAggregationResponse() { 
-                AggregationData = aggregationData.GroupBy(x => x.ReportingUnit.ReportingUnitUuid).Select(y => y.OrderBy(z => z.Amount).FirstOrDefault()).ToList(),
+            return new WaterAggregationResponse()
+            {
+                AggregationData = aggregationData,
                 MinimumAmount = aggregationData.Aggregate((curMin, x) => (curMin == null || x.Amount < curMin.Amount ? x : curMin)).Amount,
                 MaximumAmount = aggregationData.Aggregate((curMin, x) => (curMin == null || x.Amount > curMin.Amount ? x : curMin)).Amount
             };
+
+            //return new WaterAggregationResponse() {
+            //    //AggregationData = aggregationData.GroupBy(x => x.ReportingUnit.ReportingUnitUuid).Select(y => y.OrderBy(z => z.Amount).FirstOrDefault()).ToList(),
+            //    AggregationData = aggregationData.GroupBy(x => x.ReportingUnit.ReportingUnitUuid).Select(y => new AggregatedAmountsFact {
+            //        AggregatedAmountId = y.FirstOrDefault().AggregatedAmountId ,
+            //        OrganizationId = y.FirstOrDefault().OrganizationId,
+            //        ReportingUnitId = y.FirstOrDefault().ReportingUnitId,
+            //        VariableSpecificId = y.FirstOrDefault().VariableSpecificId,
+            //        PrimaryUseCategoryCv = y.FirstOrDefault().PrimaryUseCategoryCv,
+            //        WaterSourceId = y.FirstOrDefault().WaterSourceId,
+            //        MethodId = y.FirstOrDefault().MethodId,
+            //        TimeframeStartId = y.FirstOrDefault().TimeframeStartId,
+            //        TimeframeEndId = y.FirstOrDefault().TimeframeEndId,
+            //        DataPublicationDateId = y.FirstOrDefault().DataPublicationDateId,
+            //        DataPublicationDoi = y.FirstOrDefault().DataPublicationDoi,
+            //        ReportYearCv = y.FirstOrDefault().ReportYearCv,
+            //        Amount = y.Sum(z => z.Amount),
+            //        PopulationServed = y.FirstOrDefault().PopulationServed,
+            //        PowerGeneratedGwh = y.FirstOrDefault().PowerGeneratedGwh,
+            //        IrrigatedAcreage = y.FirstOrDefault().IrrigatedAcreage,
+            //        InterbasinTransferToId = y.FirstOrDefault().InterbasinTransferToId,
+            //        InterbasinTransferFromId = y.FirstOrDefault().InterbasinTransferFromId,
+            //        CropTypeCv = y.FirstOrDefault().CropTypeCv,
+            //        IrrigationMethodCv = y.FirstOrDefault().IrrigationMethodCv,
+            //        CustomerTypeCv = y.FirstOrDefault().CustomerTypeCv,
+            //        SdwisidentifierCv = y.FirstOrDefault().SdwisidentifierCv,
+            //        CommunityWaterSupplySystem = y.FirstOrDefault().CommunityWaterSupplySystem,
+            //        AllocationCropDutyAmount = y.FirstOrDefault().AllocationCropDutyAmount,
+            //        PowerType = y.FirstOrDefault().PowerType,
+            //        CropTypeCvNavigation = y.FirstOrDefault().CropTypeCvNavigation,
+            //        CustomerTypeCvNavigation = y.FirstOrDefault().CustomerTypeCvNavigation,
+            //        DataPublicationDate = y.FirstOrDefault().DataPublicationDate,
+            //        IrrigationMethodCvNavigation = y.FirstOrDefault().IrrigationMethodCvNavigation,
+            //        Method = y.FirstOrDefault().Method,
+            //        Organization = y.FirstOrDefault().Organization,
+            //        PowerTypeNavigation = y.FirstOrDefault().PowerTypeNavigation,
+            //        PrimaryUseCategoryCvNavigation = y.FirstOrDefault().PrimaryUseCategoryCvNavigation,
+            //        ReportYearCvNavigation = y.FirstOrDefault().ReportYearCvNavigation,
+            //        ReportingUnit = y.FirstOrDefault().ReportingUnit,
+            //        SdwisidentifierCvNavigation = y.FirstOrDefault().SdwisidentifierCvNavigation,
+            //        TimeframeEnd = y.FirstOrDefault().TimeframeEnd,
+            //        TimeframeStart = y.FirstOrDefault().TimeframeStart,
+            //        VariableSpecific = y.FirstOrDefault().VariableSpecific,
+            //        WaterSource = y.FirstOrDefault().WaterSource,
+            //        AggBridgeBeneficialUsesFacts = y.FirstOrDefault().AggBridgeBeneficialUsesFacts,
+            //    }).ToList(),
+            //    MinimumAmount = aggregationData.Aggregate((curMin, x) => (curMin == null || x.Amount < curMin.Amount ? x : curMin)).Amount,
+            //    MaximumAmount = aggregationData.Aggregate((curMin, x) => (curMin == null || x.Amount > curMin.Amount ? x : curMin)).Amount
+            //};
         }
     }
 }

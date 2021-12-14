@@ -61,5 +61,29 @@ namespace MapboxPrototypeAPI.Models
 
         [JsonProperty("beneficialUseCV")]
         public string BeneficialUseCV;
+
+        [JsonProperty("siteUuid")]
+        public string SiteUuid;
+
+        [JsonProperty("siteName")]
+        public string SiteName;
+
+        [JsonProperty("siteTypeCV")]
+        public string SiteTypeCV;
+
+        [JsonProperty("siteEpsgCodeCV")]
+        public string SiteEpsgCodeCV;
+
+        [JsonProperty("siteCounty")]
+        public string SiteCounty;
+
+        [JsonProperty("sitePOD")]
+        public string SitePOD;
+
+        [JsonProperty("siteLng")]
+        public double? SiteLng;
+
+        [JsonProperty("siteLat")]
+        public double? SiteLat;
     }
 }

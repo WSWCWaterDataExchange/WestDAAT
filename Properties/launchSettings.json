@@ -18,6 +18,7 @@
     },
     "MapboxPrototypeAPI": {
       "commandName": "Project",
+      "commandLineArgs": "host start --build --port 7071 --cors * --pause-on-error",
       "launchBrowser": true,
       "launchUrl": "weatherforecast",
       "environmentVariables": {

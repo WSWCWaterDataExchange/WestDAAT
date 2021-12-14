@@ -1,8 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-
-
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
 {
@@ -67,12 +64,16 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public virtual DbSet<WaterSourceType> WaterSourceTypes { get; set; }
         public virtual DbSet<WaterSourcesDim> WaterSourcesDims { get; set; }
 
+        private ILoggerFactory loggerFactory = LoggerFactory.Create(b =>
+        {
+            b.AddFilter("*", LogLevel.Debug).AddConsole();
+        });
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=wade-qa-server.database.windows.net;Database=WaDE_QA_Server;User ID=wade-admin;password=Orange2019!;MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=30;");
-            }
+            // Uncomment me for logging!
+            //optionsBuilder.UseLoggerFactory(loggerFactory);
+            optionsBuilder.UseSqlServer("Server=wade-qa-server.database.windows.net;Database=WaDE_QA_Server;User ID=wade-admin;password=Orange2019!;MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=30;", x => x.UseNetTopologySuite());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -412,8 +413,6 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
                     .HasMaxLength(250)
                     .HasColumnName("WaterAllocationNativeURL");
 
-                entity.Property(e => e.WaterSourceId).HasColumnName("WaterSourceID");
-
                 entity.HasOne(d => d.AllocationApplicationDate)
                     .WithMany(p => p.AllocationAmountsFactAllocationApplicationDates)
                     .HasForeignKey(d => d.AllocationApplicationDateId)
@@ -497,12 +496,6 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
                     .HasForeignKey(d => d.VariableSpecificId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_AllocationAmounts_fact_Variables_dim");
-
-                entity.HasOne(d => d.WaterSource)
-                    .WithMany(p => p.AllocationAmountsFacts)
-                    .HasForeignKey(d => d.WaterSourceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_AllocationAmounts_fact_WaterSources_dim");
             });
 
             modelBuilder.Entity<AllocationBridgeBeneficialUsesFact>(entity =>
@@ -1754,6 +1747,14 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
                 entity.Property(e => e.UsgssiteId)
                     .HasMaxLength(250)
                     .HasColumnName("USGSSiteID");
+
+                entity.Property(e => e.WaterSourceId).HasColumnName("WaterSourceID");
+
+                entity.HasOne(d => d.WaterSource)
+                    .WithMany(p => p.Sites)
+                    .HasForeignKey(d => d.WaterSourceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_Sites_dim_WaterSource_dim");
 
                 entity.HasOne(d => d.CoordinateMethodCvNavigation)
                     .WithMany(p => p.SitesDims)

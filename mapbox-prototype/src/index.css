@@ -27,8 +27,15 @@ code {
   color:black;
 }
 
+.mapboxgl-popup-close-button{
+  width: 20px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: bold;
+}
+
 .jumbotron {
-  margin: -15px !important;
+  margin-bottom: -15px !important;
   background-color: #404040 !important;
   color: #ffffff;
 }

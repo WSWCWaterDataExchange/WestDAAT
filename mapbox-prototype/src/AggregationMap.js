@@ -2,13 +2,18 @@ import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import moment from 'moment';
 import DateSelect from './DateSelect';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import './AggregationMap.css';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYW1hYmRhbGxhaCIsImEiOiJjazJnbno5ZHIwazVqM21xZzMwaWpsc2hqIn0.j6BmkJdp5O_9ITGm4Gwe0w';
 
-const beneficialUses = ["Agricultural", "Agricultural Consumptive Use", "Agriculture", "Commercial (self-supplied)", "Domestic (self-supplied)", "Domestic Use", "Exports/Imports", "Fish & Wildlife", "Indian", "Industrial", "Industrial (self-supplied)", "Industrial Use", "Instream Flow Requirements", "Irrigated Agriculture", "Irrigated agriculture_ground", "Irrigated agriculture_reuse", "Irrigated agriculture_surface", "Livestock", "Livestock (self-supplied)", "Livestock_ground", "Livestock_reuse", "Livestock_surface", "M & I", "Major and Minor Reservoirs", "Managed Wetlands", "Manufacturing_ground", "Manufacturing_reuse", "Manufacturing_surface", "Minerals", "Mining (self-supplied)", "Mining_ground", "Mining_reuse", "Mining_surface", "Municipal", "Municipal  Use", "Municipal/Industrial", "Municipal_ground", "Municipal_reuse", "Municipal_surface", "Power", "Power (self-supplied)", "Public Water Supply", "Required Delta Outflow", "Reservoir Evaporation", "Steam-Electric Power_ground", "Steam-Electric Power_reuse", "Steam-Electric Power_surface", "Stockpond", "Unspecified", "Urban", "Wild And Scenic River"];
-const variableTypes = ["Consumptive Use", "Demand", "Supply", "Withdrawal"]
+const waterSourceTypes = ["Effluent", "Groundwater", "Lost", "Other", "Recharge", "Reservoir / Storage", "Surface and Groundwater", "Surface Water", "Unspecified"];
+const beneficialUses = ["Agricultural", "Aquaculture", "Commercial", "Domestic", "Environmental", "Fire", "Fish", "Flood Control", "Heating", "Heating and Cooling", "Industrial", "Instream Flow", "Livestock", "Mining", "Municipal", "Other", "Power", "Recharge", "Recreation", "Snow Making", "Storage", "Unspecified", "Wildlife"];
+const variableTypes = ["Consumptive Use", "Demand", "Supply", "Withdrawal"];
+
+const dataSelectionTypes = ["Counties", "Basin", "DAUCO", "HUC8", "HR"];
 
 const AggregationMap = () => {
   const mapContainerRef = useRef(null);
@@ -16,16 +21,28 @@ const AggregationMap = () => {
   // Data
   const [aggregateData, setAggregateData] = React.useState([]);
   const [timeSeriesData, setTimeSeriesData] = React.useState([]);
+  const [highChartsData, setHighChartsData] = React.useState({});
 
   // Filters
   const [dateFilter, setDateFilter] = React.useState([moment().year().valueOf()]);
   const [variableTypeFilter, setVariableTypeFilter] = React.useState("Withdrawal");
-  const [beneficialUseFilter, setBeneficialUseFilter] = React.useState("Irrigated Agriculture");
+  const [beneficialUseFilter, setBeneficialUseFilter] = React.useState("Agricultural");
+  const [waterSourceTypeFilter, setWaterSourceTypeFilter] = React.useState("Groundwater");
 
+  // Data selection
+  const [dataSelection, setDataSelection] = React.useState("Counties");
+
+  // Re-Apply Filter On Change
   useEffect(() => {
     applyFilters();
-  }, [dateFilter, variableTypeFilter, beneficialUseFilter]);
+  }, [dateFilter, variableTypeFilter, beneficialUseFilter, waterSourceTypeFilter]);
 
+  // Load Highcharts Data
+  useEffect(() => {
+    loadHighChartsData();
+  }, [timeSeriesData]);
+
+  // Initialize Map / Render New Data
   useEffect(() => {
     let map = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -41,86 +58,181 @@ const AggregationMap = () => {
     loadPolygonOnClick(map);
 
     return () => map.remove();
-  }, [aggregateData]);
+  }, [aggregateData, dataSelection]);
 
   function loadData(map) {
     let data = aggregateData;
-
-    console.log(data);
+    let selection = dataSelection;
+    let matchExpression = null;
 
     map.on('load', function () {
-      map.addSource('county-data', {
+      map.addSource('WaDE_County', {
         type: 'vector',
-        url: 'mapbox://amabdallah.3cyxf07t'
+        url: 'mapbox://amabdallah.3n378lz8'
       });
 
+      map.addSource('WaDE_CustomBasin', {
+        type: 'vector',
+        url: 'mapbox://amabdallah.0oieb16i'
+      });
+
+      map.addSource('WaDE_DAUCO', {
+        type: 'vector',
+        url: 'mapbox://amabdallah.5493exu9'
+      });
+
+      map.addSource('WaDE_HUC8', {
+        type: 'vector',
+        url: 'mapbox://amabdallah.9liel9wd'
+      });
+
+      map.addSource('WaDE_HR', {
+        type: 'vector',
+        url: 'mapbox://amabdallah.9tzwqsd3'
+      });
+
+      // Build Match Expression for Color Interpolation
       if (typeof data.aggregationData != 'undefined' && typeof data.aggregationData[0] != 'undefined') {
-        // Build match expression to paint color
         var matchExpression = ['match', ['get', 'UnitUUID']];
 
-        // Interpolate color range scalar function
-        var colorScalar = generateColorInterpolation(data.minimumAmount, data.maximumAmount)
-
-        // Calculate color values for each area based on 'amount'
         data.aggregationData.forEach((agg) => {
-          matchExpression.push(agg.reportingUnit.reportingUnitUuid, 'rgb(0, 0, ' + colorScalar(agg.amount) + ')');
+          matchExpression.push(agg.reportingUnit.reportingUnitUuid, generateColor(data.minimumAmount, data.maximumAmount, agg.amount));
         });
 
-        // Push default color
-        matchExpression.push('rgb(128, 128, 128)');
-
-        map.addLayer({
-          id: 'counties',
-          type: 'fill',
-          source: 'county-data',
-          'source-layer': 'WaDE_Counties-2ql4dy',
-          'paint': {
-            'fill-color': matchExpression,
-            'fill-opacity': 0.75,
-            'fill-outline-color': '#fff'
-          }
-        });
-      } else {
-        map.addLayer({
-          id: 'counties',
-          type: 'fill',
-          source: 'county-data',
-          'source-layer': 'WaDE_Counties-2ql4dy',
-          'paint': {
-            'fill-color': 'rgb(128, 128, 128)',
-            'fill-opacity': 0.75,
-            'fill-outline-color': '#fff'
-          }
-        });
+        matchExpression.push('rgba(128, 128, 128, 0.25)');
       }
+
+      loadShapeFile(map, selection, matchExpression);
     });
-  }
+  };
+
+  function loadShapeFile(map, selection, matchExpression) {
+    var fillColor = matchExpression || 'rgb(128, 128, 128)';
+    var layer = {
+      'id': 'rendered-shapes',
+      'type': 'fill',
+      'source': '',
+      'source-layer': '',
+      'paint': {
+        'fill-color': fillColor,
+        'fill-opacity': 0.75,
+        'fill-outline-color': '#fff'
+      }
+    };
+
+    switch (selection) {
+      case "Counties":
+        layer['source'] = 'WaDE_County'
+        layer['source-layer'] = 'WaDE_County-4nxlg1';
+        break;
+      case "Basin":
+        layer['source'] = 'WaDE_CustomBasin';
+        layer['source-layer'] = 'CustomBasin';
+        break;
+      case "DAUCO":
+        layer['source'] = 'WaDE_DAUCO';
+        layer['source-layer'] = 'WaDE_CustomBasin3_DAUCO-01d4fk';
+        break;
+      case "HUC8":
+        layer['source'] = 'WaDE_HUC8';
+        layer['source-layer'] = 'WaDE_HUC8';
+        break;
+      case "HR":
+        layer['source'] = 'WaDE_HR';
+        layer['source-layer'] = 'WaDE_CustomBasin2_HR';
+        break;
+    }
+
+    map.addLayer(layer);
+  };
 
   function loadPolygonOnClick(map) {
     map.on('click', function (e) {
-      let feature = map.queryRenderedFeatures(e.point, ['counties'])[0];
+      let feature = map.queryRenderedFeatures(e.point, ['rendered-shapes'])[0];
 
-      fetchTimeSeriesData(feature.properties);
+      if (typeof (feature) !== 'undefined') {
+        fetchTimeSeriesData(feature.properties);
 
-      var coordinates = getPolygonCentroid(feature.geometry.coordinates[0]);
+        var coordinates = getPolygonCentroid(feature.geometry.coordinates[0]);
 
-      if (!isNaN(coordinates[0])) {
-        var description = "<div><div>" + feature.properties.Name + "</div><div>" + feature.properties.UnitUUID + "</div><div>" + feature.properties.StateCV + "</div></div>";
+        if (!isNaN(coordinates[0])) {
+          var description = "<div style=\"padding-right:15px;\"><b>UUID: " + feature.properties.UnitUUID + "</b><div>Name: " + feature.properties.Name + "</div><div>State: " + feature.properties.StateCV + "</div></div>";
 
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML(description)
-          .addTo(map);
+          new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+        }
       }
     });
-  }
-
-  function generateColorInterpolation(min, max) {
-    var scale = 255 / (max - min);
-    return function (x) {
-      return 255 - (scale * x);
-    };
   };
+
+  function loadHighChartsData() {
+    var data = timeSeriesData || [];
+
+    if (data.length == 0) {
+      return;
+    }
+
+    var reportingUnitName = data[0].reportingUnit.reportingUnitName;
+    var reportingUnitUuid = data[0].reportingUnit.reportingUnitUuid;
+
+    var variableType = variableTypeFilter;
+    var beneficialUse = beneficialUseFilter;
+    var waterSourceType = waterSourceTypeFilter;
+
+    var renderedData = data.map(agg => {
+      return [parseInt(agg.reportYearCv), agg.amount]
+    });
+
+    var highChartsData = {
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: variableType + ' Volume (Acre-Feet) For ' + reportingUnitName + " (" + reportingUnitUuid + ") " + waterSourceType + " for use in " + beneficialUse
+      },
+      xAxis: {
+        title: {
+          text: 'Year'
+        }
+      },
+      yAxis: {
+        title: {
+          text: 'Acre-Feet'
+        }
+      },
+      legend: {
+        enabled: false
+      },
+      series: [
+        {
+          "data": renderedData,
+          "name": "Acre-Feet / Year"
+        }
+      ]
+    };
+
+    setHighChartsData(highChartsData);
+  };
+
+  function generateColor(min, max, aggAmount) {
+    var mid = (min + max) / 2;
+
+    if (aggAmount > mid) {
+      var scale = 255 / (max - min);
+      var value = 255 - (scale * aggAmount);
+      return ('rgb(0, 0, ' + value + ')');
+    } else if (aggAmount == mid) {
+      return ('rgb(0, 0, 255)');
+    } else if (aggAmount === 0) {
+      return ('rgba(128, 128, 128, 0.25)')
+    } else {
+      var scale = 255 / (max - min);
+      var value = 255 - (scale * aggAmount);
+      return ('rgb(' + value + ', ' + value + ', 255)');
+    }
+  }
 
   function getPolygonCentroid(arr) {
     var minX, maxX, minY, maxY;
@@ -131,15 +243,23 @@ const AggregationMap = () => {
       maxY = (arr[i][1] > maxY || maxY == null) ? arr[i][1] : maxY;
     }
     return [(minX + maxX) / 2, (minY + maxY) / 2];
-  }
+  };
 
   function filterVariableType(e) {
     setVariableTypeFilter(e.target.value);
-  }
+  };
 
   function filterBeneficialUse(e) {
     setBeneficialUseFilter(e.target.value);
-  }
+  };
+
+  function filterWaterSourceType(e) {
+    setWaterSourceTypeFilter(e.target.value);
+  };
+
+  async function changeDataSelection(e) {
+    setDataSelection(e.target.value);
+  };
 
   async function applyFilters() {
     var myHeaders = new Headers();
@@ -151,7 +271,8 @@ const AggregationMap = () => {
       ReportYearCv: dateFilter[0].toString(),
       BeneficialUseCv: beneficialUseFilter,
       VariableCv: variableTypeFilter,
-      ReportingUnitTypeCv: "County"
+      WaterSourceTypeCV: waterSourceTypeFilter,
+      ReportingUnitTypeCv: ""
     });
 
     var requestOptions = {
@@ -161,13 +282,15 @@ const AggregationMap = () => {
       redirect: 'follow'
     };
 
-    await fetch("http://localhost:7071/api/GetWaterAggregationByFilterValues", requestOptions)
+    // await fetch("http://localhost:7071/api/GetWaterAggregationByFilterValues", requestOptions)
+    await fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetWaterAggregationByFilterValues", requestOptions)
       .then(response => response.text())
       .then(result => {
+        console.log(JSON.parse(result));
         setAggregateData(JSON.parse(result));
       })
       .catch(error => console.log('error', error));
-  }
+  };
 
   async function fetchTimeSeriesData(features) {
     if (features.UnitUUID) {
@@ -180,7 +303,8 @@ const AggregationMap = () => {
         ReportYearCv: "",
         BeneficialUseCv: beneficialUseFilter,
         VariableCv: variableTypeFilter,
-        ReportingUnitTypeCv: "County"
+        WaterSourceTypeCV: waterSourceTypeFilter,
+        ReportingUnitTypeCv: ""
       });
 
       var requestOptions = {
@@ -190,7 +314,8 @@ const AggregationMap = () => {
         redirect: 'follow'
       };
 
-      await fetch("http://localhost:7071/api/GetWaterAggregationTimeSeries", requestOptions)
+      // await fetch("http://localhost:7071/api/GetWaterAggregationTimeSeries", requestOptions)
+      await fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetWaterAggregationTimeSeries", requestOptions)
         .then(response => response.text())
         .then(result => {
           var data;
@@ -200,12 +325,21 @@ const AggregationMap = () => {
         })
         .catch(error => console.log('error', error));
     }
-  }
+  };
 
   return (
     <div className="map-content">
+      {/* Filters */}
       <div className="row p-4">
         <div className="p-4 w-100">
+          <div className="form-group w-100">
+            <label>Select Data Source</label>
+            <select className="form-control" value={dataSelection} onChange={changeDataSelection}>
+              {dataSelectionTypes.map((type) => (
+                <option value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
           <div className="form-group w-100">
             <label>Select Variable Type</label>
             <select className="form-control" value={variableTypeFilter} onChange={filterVariableType}>
@@ -223,46 +357,50 @@ const AggregationMap = () => {
             </select>
           </div>
           <div className="form-group w-100">
+            <label>Select Water Source Type</label>
+            <select className="form-control" value={waterSourceTypeFilter} onChange={filterWaterSourceType}>
+              {waterSourceTypes.map((waterSource) => (
+                <option value={waterSource}>{waterSource}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group w-100">
             <label>Select Date</label>
             <DateSelect filterDateRange={setDateFilter} />
           </div>
         </div>
       </div>
+      {/* Map */}
       <div className="row min-vh-75">
         <div className="col-md-12">
+          {
+            aggregateData.maximumAmount > 0 &&
+            <div className='legend'>
+              <div>
+                <p>Volume (AF)</p>
+                <div className="row">
+                  <div className="col-sm-12">
+                    {/* <div className="align-text-top text-center">{aggregateData.maximumAmount}</div> */}
+                    <div className="align-text-top text-center">{aggregateData.maximumAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })}</div>
+                    <div className="legend-gradient" />
+                    {/* <div className="align-text-bottom text-center">{aggregateData.minimumAmount}</div> */}
+                    <div className="align-text-bottom text-center">{aggregateData.minimumAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
           <div className='map-container' ref={mapContainerRef} />
         </div >
       </div >
+      {/* Data */}
       <div className="row min-vh-25 table-container">
-        {
-          timeSeriesData.length > 0 &&
-          <table className="table table-striped table-dark m-5">
-            <thead>
-              <tr>
-                <th scope="col">Aggregated Amount ID</th>
-                <th scope="col">Amount (AF)</th>
-                <th scope="col">Year</th>
-                <th scope="col">UUID</th>
-                <th scope="col">Name / Type</th>
-                <th scope="col">State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {timeSeriesData.map((t) => (
-                <>
-                  <tr key={t.aggregatedAmountId}>
-                    <th scope="row">{t.aggregatedAmountId}</th>
-                    <td>{t.amount}</td>
-                    <td>{t.reportYearCv}</td>
-                    <td>{t.reportingUnit.reportingUnitUuid}</td>
-                    <td>{t.reportingUnit.reportingUnitName + " " + t.reportingUnit.reportingUnitTypeCv}</td>
-                    <td>{t.reportingUnit.stateCv}</td>
-                  </tr>
-                </>
-              ))}
-            </tbody>
-          </table>
-        }
+        <div className="w-100 p-4 align-center">
+          {
+            timeSeriesData.length > 0 &&
+            <HighchartsReact highcharts={Highcharts} options={highChartsData} />
+          }
+        </div>
       </div>
     </div >
   );

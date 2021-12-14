@@ -26,7 +26,7 @@ const railStyle = {
 }
 
 const DateSelect = (props) => {
-    const domainMin = 1850;
+    const domainMin = 1985;
     const domainMax = moment().year().valueOf();
 
     const [selected, setSelected] = React.useState([domainMax]);

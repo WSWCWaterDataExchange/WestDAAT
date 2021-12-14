@@ -31,6 +31,7 @@ namespace MapboxPrototypeAPI.Accessors
 
             var aggregate = _dbContext.AggregatedAmountsFacts
                 .Include(x => x.ReportingUnit)
+                .Include(x => x.WaterSource)
                 .Where(predicate)
                 .ToList();
 
@@ -61,9 +62,14 @@ namespace MapboxPrototypeAPI.Accessors
                 predicate.And(x => x.VariableSpecific.VariableCv == request.VariableCv);
             }
 
+            if (!string.IsNullOrWhiteSpace(request.WaterSourceTypeCV))
+            {
+                predicate.And(x => x.WaterSource.WaterSourceTypeCvNavigation.WaDename == request.WaterSourceTypeCV);
+            }
+
             if (!string.IsNullOrWhiteSpace(request.BeneficialUseCv))
             {
-                predicate.And(x => x.AggBridgeBeneficialUsesFacts.FirstOrDefault().BeneficialUseCv == request.BeneficialUseCv);
+                predicate.And(x => x.AggBridgeBeneficialUsesFacts.FirstOrDefault().BeneficialUseCvNavigation.WaDename == request.BeneficialUseCv);
             }
 
             return predicate;

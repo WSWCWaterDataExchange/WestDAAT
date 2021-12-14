@@ -9,8 +9,8 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
     {
         public WaterSourcesDim()
         {
+            Sites = new HashSet<SitesDim>();
             AggregatedAmountsFacts = new HashSet<AggregatedAmountsFact>();
-            AllocationAmountsFacts = new HashSet<AllocationAmountsFact>();
             SiteVariableAmountsFacts = new HashSet<SiteVariableAmountsFact>();
         }
 
@@ -26,7 +26,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         public virtual WaterQualityIndicator WaterQualityIndicatorCvNavigation { get; set; }
         public virtual WaterSourceType WaterSourceTypeCvNavigation { get; set; }
         public virtual ICollection<AggregatedAmountsFact> AggregatedAmountsFacts { get; set; }
-        public virtual ICollection<AllocationAmountsFact> AllocationAmountsFacts { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFacts { get; set; }
+        public virtual ICollection<SitesDim> Sites { get; set; }
     }
 }

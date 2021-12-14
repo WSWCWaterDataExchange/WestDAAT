@@ -33,3 +33,8 @@
   background-color: #2e2e2e;
   color: #ffffff;
 }
+
+.nopadding {
+  padding: 0 !important;
+  margin: 0 !important;
+}
