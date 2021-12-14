@@ -22,13 +22,15 @@ namespace MapboxPrototypeAPI
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 NullValueHandling = NullValueHandling.Ignore
             };
 
             builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
+            builder.Services.AddTransient<IWaterAggregationAccessor, WaterAggregationAccessor>();
 
             builder.Services.AddDbContext<WaDE_QA_ServerContext>(options => options.UseSqlServer(
-                "Server=[YOUR DATABASE SERVER];Database=[YOUR DATABASE NAME];User ID=[YOUR DATABASE USER ID];password=[YOUR DATABASE PASSWORD];MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=90;",
+                "Server=wade-qa-server.database.windows.net;Database=WaDE_QA_Server;User ID=wade-admin;password=Orange2019!;MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=30;",
                 sqlServerOptions => sqlServerOptions.CommandTimeout(3000)));
 
             builder.Services.AddLogging();

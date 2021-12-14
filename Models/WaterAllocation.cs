@@ -34,9 +34,18 @@ namespace MapboxPrototypeAPI.Models
     {
         [JsonProperty("allocationId")]
         public long AllocationId;
+        
+        [JsonProperty("allocationFlowCfs")]
+        public double AllocationFlowCfs;
+        
+        [JsonProperty("allocationVolumeAf")]
+        public double AllocationVolumeAf;
 
-        [JsonProperty("siteId")]
-        public long SiteId;
+        [JsonProperty("siteUuid")]
+        public string SiteUuid;
+
+        [JsonProperty("siteName")]
+        public string SiteName;
 
         [JsonProperty("waterSourceType")]
         public string WaterSourceType;
@@ -46,6 +55,9 @@ namespace MapboxPrototypeAPI.Models
 
         [JsonProperty("allocationOwner")]
         public string AllocationOwner;
+        
+        [JsonProperty("ownerClassification")]
+        public string OwnerClassification;
 
         [JsonProperty("priorityDate")]
         public long PriorityDate;

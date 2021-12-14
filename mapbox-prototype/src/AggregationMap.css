@@ -1,0 +1,45 @@
+.map-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.legend {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  background-color: #404040;
+  color: #ffffff;
+  z-index: 1 !important;
+  padding: 6px;
+  font-weight: bold;
+}
+
+.legend div span {
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  margin-right: 5px;
+  width: 10px;
+}
+
+.legend-gradient{
+  height:50vh;
+  width:50px;
+  margin-left:22px;
+  margin-right:22px;
+  background-image: linear-gradient(rgb(0,0,0), rgb(0,0,255), rgb(255,255,255))
+  /* background:linear-gradient(rgb(0,0,0),transparent);
+  background-color:rgb(0,0,255) this your primary color */
+}
+
+.map-content,
+.table-container,
+.filter-sidebar-style{
+  background-color: #2e2e2e;
+  color: #ffffff;
+}

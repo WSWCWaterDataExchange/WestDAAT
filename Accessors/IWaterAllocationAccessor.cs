@@ -1,8 +1,8 @@
 ﻿using MapboxPrototypeAPI.Accessors.EF.DatabaseModels;
+using MapboxPrototypeAPI.Models;
+using Microsoft.Azure.WebJobs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MapboxPrototypeAPI.Accessors
 {
@@ -10,5 +10,8 @@ namespace MapboxPrototypeAPI.Accessors
     {
         IEnumerable<AllocationAmountsFact> GetWaterAllocationDataById(IEnumerable<long> ids);
         IEnumerable<AllocationAmountsFact> GetAllocations();
+        SitesDim GetWaterAllocationSiteDetailsById(string id);
+        IEnumerable<Feature> GetBasinPolygonByNames(IEnumerable<string> basinNames, ExecutionContext context);
+        IEnumerable<WaterAllocationsMetaData> GetWaterAllocationsMetaData(WaterAllocationMetaDataFilter filterValues, ExecutionContext context);
     }
 }

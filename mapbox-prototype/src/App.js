@@ -1,11 +1,25 @@
 import React from 'react';
-import Map from './Map';
+import { Switch, Route } from 'react-router-dom';
+
+import MapView from './MapView';
+import AllocationDetails from './AllocationDetails';
+import AllocationJsonLd from './AllocationJsonLd';
 
 function App() {
   return (
-    <div>
-      <Map />
+    <div className="App">
+      <Main />
     </div>
+  );
+}
+
+const Main = () => {
+  return (
+    <Switch>
+      <Route exact path='/' component={MapView}></Route>
+      <Route exact path='/details/:allocationId' component={AllocationDetails}></Route>
+      <Route exact path='/details/:allocationId/json-ld' component={AllocationJsonLd}></Route>
+    </Switch>
   );
 }
 

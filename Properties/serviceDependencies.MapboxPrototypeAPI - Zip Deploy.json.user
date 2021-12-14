@@ -1,0 +1,30 @@
+{
+  "dependencies": {},
+  "parameters": {
+    "MapboxPrototypeAPI.resourceName": {
+      "Name": "MapboxPrototypeAPI.resourceName",
+      "Type": null,
+      "Value": "MapboxPrototypeAPI"
+    },
+    "MapboxPrototypeAPI.subscriptionId": {
+      "Name": "MapboxPrototypeAPI.subscriptionId",
+      "Type": "subscription",
+      "Value": "7847533a-6a20-4b25-a2b5-f50e005985c5"
+    },
+    "MapboxPrototypeAPI.resourceGroupName": {
+      "Name": "MapboxPrototypeAPI.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "WaDE_MapboxPrototype"
+    },
+    "MapboxPrototypeAPI.resourceGroupLocation": {
+      "Name": "MapboxPrototypeAPI.resourceGroupLocation",
+      "Type": null,
+      "Value": "westus"
+    },
+    "subscriptionId": {
+      "Name": "subscriptionId",
+      "Type": "subscription",
+      "Value": "7847533a-6a20-4b25-a2b5-f50e005985c5"
+    }
+  }
+}

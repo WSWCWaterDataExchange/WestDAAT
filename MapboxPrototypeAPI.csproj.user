@@ -3,7 +3,7 @@
   <PropertyGroup>
     <NameOfLastUsedPublishProfile>mapbox-prototype-api - Web Deploy</NameOfLastUsedPublishProfile>
     <ActiveDebugProfile>MapboxPrototypeAPI</ActiveDebugProfile>
-    <_LastSelectedProfileId>C:\DPL\WaDE\MapboxPrototype\Properties\PublishProfiles\MapboxPrototypeAPI - Zip Deploy1.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\DPL\WaDE\WaDEPortal\Properties\PublishProfiles\MapboxPrototypeAPI - Zip Deploy2.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
