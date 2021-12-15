@@ -5,6 +5,6 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAycj9GDUH+kWYE0fO7vH0QQAAAAACAAAAAAADZgAAwAAAABAAAADgSq/CxPs8MJIN29uMlCGWAAAAAASAAACgAAAAEAAAALj4f53LZ7TrmIsJf3M4zkOAAAAAu0NNeKBem+BFaOCwpHBmz/u1ZvIn3EgFDa0gWqOMtlNa37OQKCdZnYIeRFSIsKYzumHHJ7b9AYwD/1TKeWlELMVBd6hyufikMgj/fxV6pwUwxRAlHdDLrPSYUsuVV72Znz95AvHPPJUwPurHwt/G/ddvMYBaWXMVddLxO+3dNMsUAAAAEOqcoLVqqOUsFpwkqTB4OzDYiwQ=</EncryptedPassword>
-    <History>True|2021-12-08T20:32:40.2900203Z;</History>
+    <History>True|2021-12-14T23:24:06.6367141Z;True|2021-12-14T17:21:02.2826375-06:00;True|2021-12-08T14:32:40.2900203-06:00;</History>
   </PropertyGroup>
 </Project>

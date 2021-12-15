@@ -61,5 +61,8 @@ namespace MapboxPrototypeAPI.Models
 
         [JsonProperty("priorityDate")]
         public long PriorityDate;
+
+        [JsonProperty("stateCv")]
+        public string StateCv;
     }
 }

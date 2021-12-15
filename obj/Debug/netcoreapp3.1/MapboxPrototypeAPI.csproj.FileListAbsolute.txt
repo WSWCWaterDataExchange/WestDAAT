@@ -289,3 +289,4 @@ C:\DPL\WaDE\WaDEPortal\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\Microsoft
 C:\DPL\WaDE\WaDEPortal\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 C:\DPL\WaDE\WaDEPortal\obj\Debug\netcoreapp3.1\MapboxPrototypeAPI.csproj.AssemblyReference.cache
 C:\DPL\WaDE\WaDEPortal\obj\Debug\netcoreapp3.1\MapboxPrototypeAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\DPL\WaDE\WaDEPortal\bin\Debug\netcoreapp3.1\Colorado.json

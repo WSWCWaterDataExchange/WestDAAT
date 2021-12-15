@@ -144,12 +144,14 @@ const AllocationMap = () => {
   const [allocationOwnerClassificationFilter, setAllocationOwnerClassificationFilter] = React.useState(null);
   const [dateRangeFilter, setDateRangeFilter] = React.useState(null);
   const [riverBasinFilter, setRiverBasinFilter] = React.useState(null);
+  const [stateFilter, setStateFilter] = React.useState(null);
 
   const [waterSourceFilterRaw, setWaterSourceFilterRaw] = React.useState(null);
   const [allocationOwnerFilterRaw, setAllocationOwnerFilterRaw] = React.useState(null);
   const [allocationOwnerClassificationFilterRaw, setAllocationOwnerClassificationFilterRaw] = React.useState(null);
   const [dateRangeFilterRaw, setDateRangeFilterRaw] = React.useState(null);
   const [riverBasinFilterRaw, setRiverBasinFilterRaw] = React.useState(null);
+  const [stateFilterRaw, setStateFilterRaw] = React.useState(["CO"]);
 
   // Rendered Feature Data
   const [highChartsAllocationTypeCount, setHighChartsAllocationTypeCount] = React.useState(null);
@@ -160,8 +162,8 @@ const AllocationMap = () => {
     let map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: 'mapbox://styles/mapbox/dark-v10',
-      center: [-100, 40],
-      zoom: 4
+      center: [-105.5, 39],
+      zoom: 6.25
     });
 
     // Load Data
@@ -171,16 +173,23 @@ const AllocationMap = () => {
     loadPolygonSelection(map);
     loadPointSelection(map);
 
-    return () => map.remove();
+    return () => {
+      map.remove()
+    };
   }, []);
 
   useEffect(() => {
-    fetchAllocationMetaData(beneficialUseFilter, waterSourceFilterRaw, allocationOwnerFilterRaw, allocationOwnerClassificationFilterRaw, dateRangeFilterRaw, riverBasinFilterRaw);
-  }, [beneficialUseFilter, waterSourceFilterRaw, allocationOwnerFilterRaw, allocationOwnerClassificationFilterRaw, dateRangeFilterRaw, riverBasinFilterRaw]);
+    fetchAllocationMetaData(beneficialUseFilter, waterSourceFilterRaw, allocationOwnerFilterRaw, allocationOwnerClassificationFilterRaw, dateRangeFilterRaw, riverBasinFilterRaw, stateFilterRaw);
+  }, [beneficialUseFilter, waterSourceFilterRaw, allocationOwnerFilterRaw, allocationOwnerClassificationFilterRaw, dateRangeFilterRaw, riverBasinFilterRaw, stateFilterRaw]);
+
+  useEffect(() => {
+    if (mapData != null) {
+      // Add default filter(s)
+      filterState(["CO"]);
+    }
+  }, [mapData]);
 
   function loadData(map) {
-    setMapData(map);
-
     map.on('load', function () {
       let circleRadius = {
         'base': 1.25,
@@ -195,12 +204,12 @@ const AllocationMap = () => {
 
       map.addSource('allocation-sites_1', {
         type: "vector",
-        url: "mapbox://amabdallah.70zvl3m1"
+        url: "mapbox://amabdallah.26ytwywc"
       });
 
       map.addSource('allocation-sites_2', {
         type: "vector",
-        url: "mapbox://amabdallah.3ghcfjn8"
+        url: "mapbox://amabdallah.4fs10lgf"
       });
 
       map.addLayer({
@@ -511,6 +520,10 @@ const AllocationMap = () => {
         }
       });
     });
+
+    map.on('load', function () {
+      setMapData(map);
+    });
   }
 
   function sortHighChartsData(data) {
@@ -588,9 +601,11 @@ const AllocationMap = () => {
 
         var container = document.createElement('div');
 
+        console.log(feature.properties);
+
         var jsx = <div>
           <b>{feature.properties.siteUuid}</b>
-          <div>{feature.properties.ownerClassification}</div>
+          <div>{feature.properties.stateCv}</div>
           <div>{feature.properties.beneficialUseCV}</div>
           <div>{feature.properties.waterSourceType}</div>
           <div>{moment(feature.properties.priorityDate).format('DD-MMM-YYYY')}</div>
@@ -721,198 +736,6 @@ const AllocationMap = () => {
     return filter;
   }
 
-  function filterRiverBasins(basinNames) {
-    let map = mapData;
-    let myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("x-functions-key", "gbPgxR/Femue08YsLtEnmpAukABhpT26AxBPO6wavTkczFFoYJgdSA==");
-
-    setRiverBasinFilterRaw(basinNames);
-
-    var raw = JSON.stringify(basinNames);
-
-    var requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw,
-      redirect: 'follow'
-    };
-
-    // fetch("http://localhost:7071/api/GetBasinPolygonByNames", requestOptions)
-    fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetBasinPolygonByNames", requestOptions)
-      .then(response => response.text())
-      .then(result => {
-        layers.layers.forEach((item) => {
-          map.setFilter(item, ["all"]);
-        });
-        setTimeout(() => { renderRiverBasins(JSON.parse(result)); }, 100);
-      })
-      .catch(error => console.log('error', error));
-  }
-
-  function filterDateRange(dateRange) {
-    if (dateRange == null || mapData == null) {
-      return;
-    }
-
-    setDateRangeFilterRaw(dateRange);
-
-    var map = mapData;
-    var min = dateRange[0];
-    var max = dateRange[1];
-
-    var allocationFilter = [
-      "all",
-      [">=", "priorityDate", min],
-      ["<=", "priorityDate", max]
-    ];
-
-    setDateRangeFilter(allocationFilter);
-
-    if (allocationOwnerFilter !== null) {
-      allocationFilter.push(allocationOwnerFilter);
-    }
-
-    if (waterSourceFilter !== null) {
-      allocationFilter.push(waterSourceFilter);
-    }
-
-    if (riverBasinFilter !== null) {
-      allocationFilter.push(riverBasinFilter);
-    }
-
-    if (allocationOwnerClassificationFilter !== null) {
-      allocationFilter.push(allocationOwnerClassificationFilter);
-    }
-
-    layers.layers.forEach((item) => {
-      map.setFilter(item, allocationFilter);
-    });
-  }
-
-  function filterWaterSource(sourceArr) {
-    var map = mapData;
-    var filterValue = sourceArr;
-
-    setWaterSourceFilterRaw(sourceArr);
-
-    var allocationFilter;
-    if (filterValue.length > 0) {
-      allocationFilter = [
-        "all",
-        ["in", "waterSourceType"]
-      ];
-      sourceArr.map(source => {
-        allocationFilter[1].push(source);
-      });
-    } else {
-      allocationFilter = ["all"];
-    }
-
-    setWaterSourceFilter(allocationFilter);
-
-    if (dateRangeFilter !== null) {
-      allocationFilter.push(dateRangeFilter);
-    }
-
-    if (allocationOwnerFilter !== null) {
-      allocationFilter.push(allocationOwnerFilter);
-    }
-
-    if (riverBasinFilter !== null) {
-      allocationFilter.push(riverBasinFilter);
-    }
-
-    if (allocationOwnerClassificationFilter !== null) {
-      allocationFilter.push(allocationOwnerClassificationFilter);
-    }
-
-    layers.layers.forEach((item) => {
-      map.setFilter(item, allocationFilter);
-    });
-  }
-
-  function filterAllocationOwnerClassification(sourceArr) {
-    var map = mapData;
-    var filterValue = sourceArr;
-
-    setAllocationOwnerClassificationFilterRaw(sourceArr)
-
-    var allocationFilter;
-    if (filterValue.length > 0) {
-      allocationFilter = [
-        "all",
-        ["in", "ownerClassification"]
-      ];
-      sourceArr.map(source => {
-        allocationFilter[1].push(source);
-      });
-    } else {
-      allocationFilter = ["all"];
-    }
-
-    setAllocationOwnerClassificationFilter(allocationFilter);
-
-    if (dateRangeFilter !== null) {
-      allocationFilter.push(dateRangeFilter);
-    }
-
-    if (waterSourceFilter !== null) {
-      allocationFilter.push(waterSourceFilter);
-    }
-
-    if (allocationOwnerFilter !== null) {
-      allocationFilter.push(allocationOwnerFilter);
-    }
-
-    if (riverBasinFilter !== null) {
-      allocationFilter.push(riverBasinFilter);
-    }
-
-    layers.layers.forEach((item) => {
-      map.setFilter(item, allocationFilter);
-    });
-  }
-
-  function filterAllocationOwner(e) {
-    var map = mapData;
-    var filterValue = e.target.value;
-
-    setAllocationOwnerFilterRaw(filterValue);
-
-    var allocationFilter;
-    if (filterValue !== "") {
-      allocationFilter = [
-        "all",
-        ["in", "allocationOwner", filterValue]
-      ];
-    } else {
-      allocationFilter = ["all"];
-    }
-
-    setAllocationOwnerFilter(allocationFilter);
-
-    if (dateRangeFilter !== null) {
-      allocationFilter.push(dateRangeFilter);
-    }
-
-    if (waterSourceFilter !== null) {
-      allocationFilter.push(waterSourceFilter);
-    }
-
-    if (riverBasinFilter !== null) {
-      allocationFilter.push(riverBasinFilter);
-    }
-
-    if (allocationOwnerClassificationFilter !== null) {
-      allocationFilter.push(allocationOwnerClassificationFilter);
-    }
-
-    layers.layers.forEach((item) => {
-      map.setFilter(item, allocationFilter);
-    });
-  }
-
   function fetchAllocationData(allocationArr) {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -936,7 +759,7 @@ const AllocationMap = () => {
       .catch(error => console.log('error', error));
   }
 
-  function fetchAllocationMetaData(beneficialUseFilter, waterSourceFilter, allocationOwnerFilter, allocationOwnerClassificationFilter, dateRangeFilter, riverBasinFilter) {
+  function fetchAllocationMetaData(beneficialUseFilter, waterSourceFilter, allocationOwnerFilter, allocationOwnerClassificationFilter, dateRangeFilter, riverBasinFilter, stateFilter) {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("x-functions-key", "gbPgxR/Femue08YsLtEnmpAukABhpT26AxBPO6wavTkczFFoYJgdSA==");
@@ -960,6 +783,7 @@ const AllocationMap = () => {
       AllocationOwnerClassification: allocationOwnerClassificationFilter ?? [],
       AllocationOwner: allocationOwnerFilter ?? "",
       BasinNames: riverBasinFilter ?? [],
+      States: stateFilter ?? [],
       StartDate: startDate,
       EndDate: endDate
     });
@@ -1142,6 +966,268 @@ const AllocationMap = () => {
         });
       })
       .catch(error => console.log('error', error));
+  }
+
+  function filterRiverBasins(basinNames) {
+    let map = mapData;
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("x-functions-key", "gbPgxR/Femue08YsLtEnmpAukABhpT26AxBPO6wavTkczFFoYJgdSA==");
+
+    setRiverBasinFilterRaw(basinNames);
+
+    var raw = JSON.stringify(basinNames);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    // fetch("http://localhost:7071/api/GetBasinPolygonByNames", requestOptions)
+    fetch("https://mapboxprototypeapi.azurewebsites.net/api/GetBasinPolygonByNames", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        layers.layers.forEach((item) => {
+          map.setFilter(item, ["all"]);
+        });
+        setTimeout(() => { renderRiverBasins(JSON.parse(result)); }, 100);
+      })
+      .catch(error => console.log('error', error));
+  }
+
+  function filterState(sourceArr) {
+    if (mapData == null) {
+      return;
+    }
+
+    var map = mapData;
+    var filterValue = sourceArr;
+
+    setStateFilterRaw(filterValue);
+
+    var allocationFilter;
+    if (filterValue.length > 0) {
+      allocationFilter = [
+        "all",
+        ["in", "stateCv"]
+      ];
+      sourceArr.map(source => {
+        allocationFilter[1].push(source);
+      });
+    } else {
+      allocationFilter = ["all"];
+    }
+
+    setStateFilter(allocationFilter);
+
+    if (dateRangeFilter !== null) {
+      allocationFilter.push(dateRangeFilter);
+    }
+
+    if (allocationOwnerFilter !== null) {
+      allocationFilter.push(allocationOwnerFilter);
+    }
+
+    if (riverBasinFilter !== null) {
+      allocationFilter.push(riverBasinFilter);
+    }
+
+    if (allocationOwnerClassificationFilter !== null) {
+      allocationFilter.push(allocationOwnerClassificationFilter);
+    }
+
+    if (waterSourceFilter !== null) {
+      allocationFilter.push(waterSourceFilter);
+    }
+
+    console.log(allocationFilter);
+
+    layers.layers.forEach((item) => {
+      map.setFilter(item, allocationFilter);
+    });
+  }
+
+  function filterDateRange(dateRange) {
+    if (dateRange == null || mapData == null) {
+      return;
+    }
+
+    setDateRangeFilterRaw(dateRange);
+
+    var map = mapData;
+    var min = dateRange[0];
+    var max = dateRange[1];
+
+    var allocationFilter = [
+      "all",
+      [">=", "priorityDate", min],
+      ["<=", "priorityDate", max]
+    ];
+
+    setDateRangeFilter(allocationFilter);
+
+    if (allocationOwnerFilter !== null) {
+      allocationFilter.push(allocationOwnerFilter);
+    }
+
+    if (waterSourceFilter !== null) {
+      allocationFilter.push(waterSourceFilter);
+    }
+
+    if (riverBasinFilter !== null) {
+      allocationFilter.push(riverBasinFilter);
+    }
+
+    if (allocationOwnerClassificationFilter !== null) {
+      allocationFilter.push(allocationOwnerClassificationFilter);
+    }
+
+    if (stateFilter !== null) {
+      allocationFilter.push(stateFilter);
+    }
+
+    console.log(allocationFilter);
+
+    layers.layers.forEach((item) => {
+      map.setFilter(item, allocationFilter);
+    });
+  }
+
+  function filterWaterSource(sourceArr) {
+    var map = mapData;
+    var filterValue = sourceArr;
+
+    setWaterSourceFilterRaw(sourceArr);
+
+    var allocationFilter;
+    if (filterValue.length > 0) {
+      allocationFilter = [
+        "all",
+        ["in", "waterSourceType"]
+      ];
+      sourceArr.map(source => {
+        allocationFilter[1].push(source);
+      });
+    } else {
+      allocationFilter = ["all"];
+    }
+
+    setWaterSourceFilter(allocationFilter);
+
+    if (dateRangeFilter !== null) {
+      allocationFilter.push(dateRangeFilter);
+    }
+
+    if (allocationOwnerFilter !== null) {
+      allocationFilter.push(allocationOwnerFilter);
+    }
+
+    if (riverBasinFilter !== null) {
+      allocationFilter.push(riverBasinFilter);
+    }
+
+    if (allocationOwnerClassificationFilter !== null) {
+      allocationFilter.push(allocationOwnerClassificationFilter);
+    }
+
+    if (stateFilter !== null) {
+      allocationFilter.push(stateFilter);
+    }
+
+    layers.layers.forEach((item) => {
+      map.setFilter(item, allocationFilter);
+    });
+  }
+
+  function filterAllocationOwnerClassification(sourceArr) {
+    var map = mapData;
+    var filterValue = sourceArr;
+
+    setAllocationOwnerClassificationFilterRaw(sourceArr)
+
+    var allocationFilter;
+    if (filterValue.length > 0) {
+      allocationFilter = [
+        "all",
+        ["in", "ownerClassification"]
+      ];
+      sourceArr.map(source => {
+        allocationFilter[1].push(source);
+      });
+    } else {
+      allocationFilter = ["all"];
+    }
+
+    setAllocationOwnerClassificationFilter(allocationFilter);
+
+    if (dateRangeFilter !== null) {
+      allocationFilter.push(dateRangeFilter);
+    }
+
+    if (waterSourceFilter !== null) {
+      allocationFilter.push(waterSourceFilter);
+    }
+
+    if (allocationOwnerFilter !== null) {
+      allocationFilter.push(allocationOwnerFilter);
+    }
+
+    if (riverBasinFilter !== null) {
+      allocationFilter.push(riverBasinFilter);
+    }
+
+    if (stateFilter !== null) {
+      allocationFilter.push(stateFilter);
+    }
+
+    layers.layers.forEach((item) => {
+      map.setFilter(item, allocationFilter);
+    });
+  }
+
+  function filterAllocationOwner(e) {
+    var map = mapData;
+    var filterValue = e.target.value;
+
+    setAllocationOwnerFilterRaw(filterValue);
+
+    var allocationFilter;
+    if (filterValue !== "") {
+      allocationFilter = [
+        "all",
+        ["in", "allocationOwner", filterValue]
+      ];
+    } else {
+      allocationFilter = ["all"];
+    }
+
+    setAllocationOwnerFilter(allocationFilter);
+
+    if (dateRangeFilter !== null) {
+      allocationFilter.push(dateRangeFilter);
+    }
+
+    if (waterSourceFilter !== null) {
+      allocationFilter.push(waterSourceFilter);
+    }
+
+    if (riverBasinFilter !== null) {
+      allocationFilter.push(riverBasinFilter);
+    }
+
+    if (allocationOwnerClassificationFilter !== null) {
+      allocationFilter.push(allocationOwnerClassificationFilter);
+    }
+
+    if (stateFilter !== null) {
+      allocationFilter.push(stateFilter);
+    }
+
+    layers.layers.forEach((item) => {
+      map.setFilter(item, allocationFilter);
+    });
   }
 
   return (

@@ -59,7 +59,7 @@ namespace MapboxPrototypeAPI.Accessors
                 .Include(x => x.AllocationBridgeSitesFacts).ThenInclude(x => x.Site).ThenInclude(x => x.WaterSource).ThenInclude(x => x.WaterSourceTypeCvNavigation)
                 .Include(x => x.AllocationBridgeBeneficialUsesFacts).ThenInclude(x => x.BeneficialUseCvNavigation)
                 .Include(x => x.AllocationPriorityDate)
-                .Where(x => !string.IsNullOrEmpty(x.OwnerClassificationCV))
+                .Where(x => !string.IsNullOrEmpty(x.OwnerClassificationCV) && x.AllocationBridgeSitesFacts.Any(y => y.Site.StateCv == "CO"))
                 .ToList();
 
             foreach (var allocation in allocations)
@@ -148,6 +148,15 @@ namespace MapboxPrototypeAPI.Accessors
                     .And(x => filterValues.AllocationOwnerClassification.Contains(x.AllocationAmount.OwnerClassificationCV));
             }
 
+            if (filterValues.States.Any())
+            {
+                foreach(var state in filterValues.States)
+                {
+                    metadataPredicate
+                        .And(x => x.AllocationAmount.Organization.State == state);
+                }
+            }
+
             if (!string.IsNullOrEmpty(filterValues.AllocationOwner))
             {
                 metadataPredicate
@@ -162,7 +171,7 @@ namespace MapboxPrototypeAPI.Accessors
 
             if (filterValues.BasinNames.Any())
             {
-                var basinGeometry = ParseGeoShapes(Path.Combine(context.FunctionDirectory, "..\\RiverBasinShapes.json"), filterValues.BasinNames);
+                var basinGeometry = ParseBasinGeoShapes(Path.Combine(context.FunctionDirectory, "..\\RiverBasinShapes.json"), filterValues.BasinNames);
                 
                 var simplifier = new DouglasPeuckerSimplifier(basinGeometry);
                 simplifier.EnsureValidTopology = true;
@@ -177,7 +186,7 @@ namespace MapboxPrototypeAPI.Accessors
             return metadataPredicate;
         }
 
-        public NetTopologySuite.Geometries.Geometry ParseGeoShapes(string filePath, List<string> basinNames)
+        public NetTopologySuite.Geometries.Geometry ParseBasinGeoShapes(string filePath, List<string> basinNames)
         {
             string json;
 

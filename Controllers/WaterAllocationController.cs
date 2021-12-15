@@ -101,6 +101,12 @@ namespace MapboxPrototypeAPI.Controllers
         public async Task<OkObjectResult> GetWaterAllocationsMetaData([HttpTrigger("post", Route = "GetWaterAllocationsMetaData")] HttpRequest request, ExecutionContext context)
         {
             var filterValues = await System.Text.Json.JsonSerializer.DeserializeAsync<WaterAllocationMetaDataFilter>(request.Body);
+
+            if (filterValues.States == null)
+            {
+                filterValues.States = new List<string>();
+            }
+
             var result = _waterAllocationAccessor.GetWaterAllocationsMetaData(filterValues, context);
 
             return Ok(JsonConvert.SerializeObject(result));
@@ -163,6 +169,7 @@ namespace MapboxPrototypeAPI.Controllers
                             AllocationVolumeAf = Convert.ToDouble(allocation.AllocationVolumeAf),
                             SiteUuid = site.SiteUuid,
                             SiteName = site.SiteName,
+                            StateCv = site.SiteUuid.Substring(0,2),
                             AllocationOwner = allocation.AllocationOwner,
                             OwnerClassification = allocation.OwnerClassificationCV,
                             WaterSourceType = allocation.AllocationBridgeSitesFacts.FirstOrDefault().Site.WaterSource.WaterSourceTypeCvNavigation.WaDename,

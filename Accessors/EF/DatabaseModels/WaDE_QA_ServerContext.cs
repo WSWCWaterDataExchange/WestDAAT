@@ -72,7 +72,7 @@ namespace MapboxPrototypeAPI.Accessors.EF.DatabaseModels
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Uncomment me for logging!
-            //optionsBuilder.UseLoggerFactory(loggerFactory);
+            optionsBuilder.UseLoggerFactory(loggerFactory);
             optionsBuilder.UseSqlServer("Server=wade-qa-server.database.windows.net;Database=WaDE_QA_Server;User ID=wade-admin;password=Orange2019!;MultipleActiveResultSets=False;TrustServerCertificate=False;Encrypt=True;Connection Timeout=30;", x => x.UseNetTopologySuite());
         }
 

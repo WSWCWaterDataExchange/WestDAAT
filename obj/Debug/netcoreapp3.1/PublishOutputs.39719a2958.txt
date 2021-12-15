@@ -1,4 +1,5 @@
 C:\DPL\WaDE\WaDEPortal\obj\Release\netcoreapp3.1\PubTmp\Out\RiverBasinShapes.json
+C:\DPL\WaDE\WaDEPortal\obj\Release\netcoreapp3.1\PubTmp\Out\Colorado.json
 C:\DPL\WaDE\WaDEPortal\obj\Release\netcoreapp3.1\PubTmp\Out\host.json
 C:\DPL\WaDE\WaDEPortal\obj\Release\netcoreapp3.1\PubTmp\Out\MapboxPrototypeAPI.dll
 C:\DPL\WaDE\WaDEPortal\obj\Release\netcoreapp3.1\PubTmp\Out\MapboxPrototypeAPI.runtimeconfig.json

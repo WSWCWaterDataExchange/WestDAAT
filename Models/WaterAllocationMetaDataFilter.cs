@@ -15,6 +15,8 @@ namespace MapboxPrototypeAPI.Models
 
         public List<string> AllocationOwnerClassification { get; set; }
 
+        public List<string> States { get; set; }
+
         public string AllocationOwner { get; set; }
 
         public DateTime? StartDate { get; set; }

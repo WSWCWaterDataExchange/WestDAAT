@@ -37,6 +37,9 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Colorado.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
