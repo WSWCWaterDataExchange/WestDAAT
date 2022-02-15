@@ -1,0 +1,54 @@
+trigger:
+  - none
+
+pool:
+  vmImage: ubuntu-20.04
+
+variables:
+  buildConfiguration: "Release"
+  slnPath: "BackendServices/OWCA.YOURPROJECT.sln"
+
+steps:
+  # Compose the containers first. They will need a few seconds to spin up.
+  - task: DockerCompose@0
+    displayName: "Compose MSSQL Docker Container"
+    inputs:
+      containerregistrytype: "Container Registry"
+      dockerComposeFile: "$(System.DefaultWorkingDirectory)/Pipelines/ci-compose.yml"
+      dockerComposeCommand: "up -d"
+
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: "SonarCloud Backend"
+      organization: "dplref"
+      scannerMode: "MSBuild"
+      projectKey: "dontpaniclabs_YOURPROJECT_Backend"
+      projectName: "YOURPROJECT Backend"
+
+  - script: dotnet build $(slnPath) --configuration $(buildConfiguration)
+    displayName: "dotnet build $(slnPath) $(buildConfiguration)"
+
+  - task: SonarCloudAnalyze@1
+
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: "300"
+
+  - script: docker exec -i mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database YOURPROJECT'
+    displayName: "Create YOURPROJECT database"
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: run
+      arguments: '"$(YOURPROJECT_Database_Connection_String)" --configuration $(buildConfiguration)'
+      workingDirectory: "$(System.DefaultWorkingDirectory)/BackendServices/OWCA.YOURPROJECT.DbUp"
+    displayName: "Run DbUp"
+
+  - script: dotnet test $(slnPath) --configuration $(buildConfiguration) --logger trx --collect "Code coverage"
+    displayName: "dotnet test $(slnPath) $(buildConfiguration)"
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: "**/*.trx"

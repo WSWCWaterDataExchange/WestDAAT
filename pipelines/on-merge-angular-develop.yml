@@ -1,0 +1,51 @@
+trigger:
+  branches:
+    include: 
+    - develop
+  paths:
+    include: 
+    - WebApp
+
+pool:
+  vmImage: ubuntu-20.04
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "12.x"
+    displayName: "Install Node.js"
+
+  - script: |
+      cd $(System.DefaultWorkingDirectory)/WebApp
+      npm install -g @angular/cli
+      npm install
+    displayName: "Install Node Packages"
+
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloud Frontend'
+      organization: 'dplref'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'dontpaniclabs_YOURPROJECT_Frontend'
+      cliProjectName: 'YOURPROJECT Frontend'
+      cliSources: '.'
+
+  - task: Npm@1
+    displayName: "(QA) Angular Build"
+    inputs:
+      command: "custom"
+      workingDir: "$(System.DefaultWorkingDirectory)/WebApp"
+      customCommand: "run build-qa --node-flag --max-old-space-size=8000"
+
+  - task: SonarCloudAnalyze@1
+
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: "300"
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: "$(System.DefaultWorkingDirectory)/WebApp/dist/qa"
+      ArtifactName: "qa_ng_drop"
+    displayName: "(QA) Publish Angular Distribution"

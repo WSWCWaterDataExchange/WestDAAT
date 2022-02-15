@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "YourDbConnectionNameHere": "Server=localhost; Initial Catalog=YourDbNameHere; User=sa; Password=DevP@ssw0rd!;"
+  },
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+  },
+  "Host": { "CORS": "http://localhost:4200" }
+}
