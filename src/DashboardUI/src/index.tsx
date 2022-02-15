@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './styles/custom.scss';
 import './index.scss';
 
