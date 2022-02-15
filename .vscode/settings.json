@@ -1,3 +1,13 @@
 {
-    "dotnet-test-explorer.testProjectPath": "**/*Tests.@(csproj|vbproj|fsproj)"
+  "dotnet-test-explorer.testProjectPath": "**/*Tests.@(csproj)",
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
 }
