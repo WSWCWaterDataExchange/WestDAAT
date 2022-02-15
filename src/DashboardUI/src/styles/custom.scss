@@ -1,5 +1,8 @@
+@import "_colors.scss";
+
 // Override default variables before the import
-$body-bg: #e1e1e1;
+$body-bg: #e4e4e4;
+$navbar-light-color: $primary-color;
 
 // Import Bootstrap and its default variables
 @import '~bootstrap/scss/bootstrap.scss';
