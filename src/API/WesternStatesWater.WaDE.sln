@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Clients", "1. Clients", "{49ED5613-E256-4FDF-BA66-9924B7BDA830}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Client.ConsoleApp", "WesternStatesWater.WaDE.Client.ConsoleApp\WesternStatesWater.WaDE.Client.ConsoleApp.csproj", "{84EFC5AB-7461-464A-977C-183A863E9B45}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Client.Web", "WesternStatesWater.WaDE.Client.Web\WesternStatesWater.WaDE.Client.Web.csproj", "{49166C42-9133-47BF-9154-82881CEF1942}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Client.WebApi", "WesternStatesWater.WaDE.Client.WebApi\WesternStatesWater.WaDE.Client.WebApi.csproj", "{6B5222EC-20AB-4FD1-A322-FA19A1BFC3CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Managers", "2. Managers", "{DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}"
 EndProject
@@ -45,8 +43,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Tests.IntegrationTests", "WesternStatesWater.WaDE.Tests.IntegrationTests\WesternStatesWater.WaDE.Tests.IntegrationTests.csproj", "{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Client.WebApi", "WesternStatesWater.WaDE.Client.WebApi\WesternStatesWater.WaDE.Client.WebApi.csproj", "{6B5222EC-20AB-4FD1-A322-FA19A1BFC3CA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WaDE.Client.Functions", "WesternStatesWater.WaDE.Client.Functions\WesternStatesWater.WaDE.Client.Functions.csproj", "{9AAA8E06-CB84-4B28-B475-29A4E666045E}"
 EndProject
 Global
@@ -55,14 +51,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{84EFC5AB-7461-464A-977C-183A863E9B45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84EFC5AB-7461-464A-977C-183A863E9B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84EFC5AB-7461-464A-977C-183A863E9B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84EFC5AB-7461-464A-977C-183A863E9B45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49166C42-9133-47BF-9154-82881CEF1942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49166C42-9133-47BF-9154-82881CEF1942}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49166C42-9133-47BF-9154-82881CEF1942}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49166C42-9133-47BF-9154-82881CEF1942}.Release|Any CPU.Build.0 = Release|Any CPU
 		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -120,8 +108,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{84EFC5AB-7461-464A-977C-183A863E9B45} = {49ED5613-E256-4FDF-BA66-9924B7BDA830}
-		{49166C42-9133-47BF-9154-82881CEF1942} = {49ED5613-E256-4FDF-BA66-9924B7BDA830}
 		{12CCCE43-3DE7-43DE-AC09-2DA824312527} = {DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}
 		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4} = {DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}
 		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4} = {D5C8B58F-19F9-4FC8-B5F6-84679D879291}

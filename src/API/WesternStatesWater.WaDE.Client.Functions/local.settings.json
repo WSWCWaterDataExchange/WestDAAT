@@ -1,6 +1,6 @@
 {
   "ConnectionStrings": {
-    "YourDbConnectionNameHere": "Server=localhost; Initial Catalog=YourDbNameHere; User=sa; Password=DevP@ssw0rd!;"
+    "WaDEDatabase": "Server=localhost; Initial Catalog=WaDE; User=sa; Password=DevP@ssw0rd!;"
   },
   "IsEncrypted": false,
   "Values": {

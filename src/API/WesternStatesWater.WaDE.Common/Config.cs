@@ -5,7 +5,7 @@ namespace WesternStatesWater.WaDE.Common
 {
     public static class Config
     {
-        public static string SqlServerConnectionString => GetConfigValue("ConnectionStrings:YourDbConnectionNameHere");
+        public static string SqlServerConnectionString => GetConfigValue("ConnectionStrings:WaDEDatabase");
 
         public static string CorsOrigin => GetConfigValue("AppSettings:CorsOrigin");
 
