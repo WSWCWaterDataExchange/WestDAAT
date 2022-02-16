@@ -6,17 +6,20 @@ on:
   pull_request:
     branches: [ develop, master ]
 
-defaults:
-  run:
-    working-directory: ./src/API
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/API
 
     steps:
     - uses: actions/checkout@v2
+    - name: Create Database Container
+      run: docker-compose up -d -f ci-compose.yml
+      working-directory: ./github/workflows
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
