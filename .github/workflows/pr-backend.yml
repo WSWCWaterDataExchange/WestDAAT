@@ -4,11 +4,11 @@ on:
   push:
     branches: [ develop, master ]
     paths:
-    - "src/API/**/*"
+    - "src/API/**"
   pull_request:
     branches: [ develop, master ]
     paths:
-    - "src/API/**/*"
+    - "src/API/**"
 
 
 jobs:
