@@ -2,13 +2,14 @@ name: PR Backend
 
 on:
   push:
-    branches: [ develop, master ]
     paths:
       - src/API/**
+    branches: [ develop, master ]
+
   pull_request:
-    branches: [ develop, master ]
     paths:
       - src/API/**
+    branches: [ develop, master ]
 
 
 jobs:
