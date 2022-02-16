@@ -16,7 +16,7 @@ az group create -l centralus -n <YOUR-RESOURCE-GROUP>
 
 ### Create azure deployment
 ```
-az deployment group create --name AzureDeploy --resource-group <resource-group-name> --template-file <path-to-azuredeploy.json>
+az deployment group create --name AzureDeploy --resource-group <resource-group-name> --template-file <path-to-azuredeploy.json or bicep file>
 ```
 
 
@@ -46,7 +46,6 @@ az deployment group create --name AzureDeploy --resource-group <resource-group-n
 az storage account list --output table
 az storage blob service-properties update --account-name <account-name> --static-website --404-document index.html --index-document index.html
 ```
-
 
 ### Create Azure AD Group + Member Assignment     
 
