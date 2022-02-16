@@ -10,9 +10,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: src/DashboardUI
 
     strategy:
       matrix:
@@ -25,9 +22,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        working-directory: src/DashboardUI
+        cache: 'npm'      
     - run: npm ci
-      working-directory: src/DashboardUI
+      working-directory: ./src/DashboardUI
     - run: npm run build --if-present
+      working-directory: ./src/DashboardUI
     - run: npm test
+      working-directory: ./src/DashboardUI
