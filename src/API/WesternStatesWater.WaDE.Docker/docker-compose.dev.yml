@@ -5,6 +5,6 @@ services:
     container_name: mssql
     environment:
       ACCEPT_EULA: 'Y'
-      SA_PASSWORD: DevP@ssw0rd!
+      SA_PASSWORD: DevP@ssw0rd!!!!
     ports:
       - 1433:1433
