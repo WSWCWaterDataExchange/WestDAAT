@@ -1,0 +1,55 @@
+trigger:
+  - none
+
+pool:
+  vmImage: ubuntu-20.04
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "12.x"
+    displayName: "Install Node.js"
+
+  - script: |
+      cd $(System.DefaultWorkingDirectory)/WebApp
+      npm install -g @angular/cli
+      npm install
+    displayName: "Install Packages"
+
+  - task: CmdLine@2
+    inputs:
+      script: ng lint
+      workingDirectory: "$(System.DefaultWorkingDirectory)/WebApp"
+    displayName: "Run Lint"
+
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: "SonarCloud Frontend"
+      organization: "dplref"
+      scannerMode: "CLI"
+      configMode: "manual"
+      cliProjectKey: "dontpaniclabs_YOURPROJECT_Frontend"
+      cliProjectName: "YOURPROJECT Frontend"
+      cliSources: "."
+
+  - task: CmdLine@2
+    inputs:
+      script: ng test --karma-config karma.conf.ci.js --code-coverage
+      workingDirectory: "$(System.DefaultWorkingDirectory)/WebApp"
+    displayName: "Run Tests"
+
+  - task: SonarCloudAnalyze@1
+
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: "300"
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: "JUnit"
+      testResultsFiles: |
+        WebApp/karma-results/*.xml
+        WebApp/protractor-results/*.xml
+      testRunTitle: "karma tests"
+    displayName: "Publish Test Results"

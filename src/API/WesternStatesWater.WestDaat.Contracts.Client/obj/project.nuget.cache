@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "qfhuPq1JGcAifyT1pamYte/kEok63FbFc2ekEIpbil+6g6MmG7CV+TdHZvLS6GhNh3dMDlFCVrDPUGzhTRh4Mw==",
+  "success": true,
+  "projectFilePath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj",
+  "expectedPackageFiles": [
+    "/Users/bbarber/.nuget/packages/microsoft.codequality.analyzers/3.3.0/microsoft.codequality.analyzers.3.3.0.nupkg.sha512",
+    "/Users/bbarber/.nuget/packages/microsoft.netcore.analyzers/3.3.0/microsoft.netcore.analyzers.3.3.0.nupkg.sha512",
+    "/Users/bbarber/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
+    "/Users/bbarber/.nuget/packages/stylecop.analyzers/1.1.118/stylecop.analyzers.1.1.118.nupkg.sha512"
+  ],
+  "logs": []
+}

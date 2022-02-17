@@ -1,0 +1,16 @@
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/bin/Debug/net6.0/WesternStatesWater.WestDaat.Common.deps.json
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/bin/Debug/net6.0/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/bin/Debug/net6.0/ref/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/bin/Debug/net6.0/WesternStatesWater.WestDaat.Common.pdb
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.csproj.AssemblyReference.cache
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.GeneratedMSBuildEditorConfig.editorconfig
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.AssemblyInfoInputs.cache
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.AssemblyInfo.cs
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.csproj.CoreCompileInputs.cache
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/ref/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/Debug/net6.0/WesternStatesWater.WestDaat.Common.pdb
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Common.deps.json
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/ref/WesternStatesWater.WestDaat.Common.dll
+/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Common.pdb
