@@ -40,5 +40,5 @@ jobs:
       working-directory: source/WesternStatesWater.WaDE.DbUp
     - uses: actions/checkout@v2
     - name: .NET Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test
       working-directory: src/API
