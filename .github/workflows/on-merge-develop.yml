@@ -26,7 +26,7 @@ env:
   AZURE_STORAGE_ACCOUNT_NAME: wadewestdaatqa  # set the storage account of static site
   AZURE_CDN_ENDPOINT_NAME: wadewestdaatqa     # set the storage account of static site
   AZURE_CDN_PROFILE_NAME: wadewestdaatqa      # set the cdn profile name
-  DOTNET_VERSION: '6'                         # set this to the .NET Core version to use
+  DOTNET_VERSION: '6.0.x'                     # set this to the .NET Core version to use
   NODE_VERSION: '16.x'                        # set this to the node version to use
 
 
