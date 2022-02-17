@@ -35,10 +35,13 @@ jobs:
       with:
         repository: WSWCWaterDataExchange/WaDE2.0
         ref: develop
-        working-directory: .
+    - name: Build DbUp
+      run: dotnet build -c Release
+      working-directory: source/WesternStatesWater.WaDE.DbUp
     - name: DbUp
       run: dotnet run
-      working-directory: source/WesternStatesWater.WaDE.DbUp/
+      working-directory: source/WesternStatesWater.WaDE.DbUp
+    - uses: actions/checkout@v2
     - name: .NET Test
       run: dotnet test --no-build --verbosity normal
       working-directory: src/API
