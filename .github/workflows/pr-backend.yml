@@ -34,7 +34,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: WSWCWaterDataExchange/WaDE2.0
-        ref: DbUpFileRenameTest
+        ref: develop
     - name: Tree
       run: tree
       working-directory: source/WesternStatesWater.WaDE.DbUp
