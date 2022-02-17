@@ -20,9 +20,15 @@
 name: Deploy QA
 
 env:
-  AZURE_WEBAPP_NAME: wade-westdaat-qa    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: 'src/API'   # set this to the path to your web app project
-  DOTNET_VERSION: '6'                    # set this to the .NET Core version to use
+  AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource grou name
+  AZURE_WEBAPP_NAME: wade-westdaat-qa         # set this to the name of your Azure Web App
+  AZURE_WEBAPP_PACKAGE_PATH: src/API          # set this to the path to your web app project
+  AZURE_STORAGE_ACCOUNT_NAME: wadewestdaatqa  # set the storage account of static site
+  AZURE_CDN_ENDPOINT_NAME: wadewestdaatqa     # set the storage account of static site
+  AZURE_CDN_PROFILE_NAME: wadewestdaatqa      # set the cdn profile name
+  DOTNET_VERSION: '6'                         # set this to the .NET Core version to use
+  NODE_VERSION: '16.x'                        # set this to the node version to use
+
 
 on:
   push:
@@ -85,3 +91,42 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+  build-site:
+    runs-on: ubuntu-latest
+    needs: build-api
+    defaults:
+      run:
+        working-directory: src/DashboardUI
+
+    steps:
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache-dependency-path: ./src/DashboardUI/package-lock.json
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build
+
+    - uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+
+    - name: Upload to blob storage
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ./build
+    - name: Purge CDN endpoint
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+           az cdn endpoint purge --content-paths  "/*" --profile-name ${{ env.AZURE_CDN_PROFILE_NAME }} --name ${{ env.AZURE_CDN_ENDPOINT_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+
+  # Azure logout
+    - name: logout
+      run: |
+            az logout
+      if: always()
