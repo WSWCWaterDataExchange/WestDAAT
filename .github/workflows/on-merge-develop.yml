@@ -56,13 +56,14 @@ jobs:
 
       - name: 'Build Function App'
         run: dotnet build --configuration Release --output ./fnapp
-
+      - name: Tree
+        run: tree
       - name: 'Deploy Function App'
         uses: Azure/functions-action@v1
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: './fnapp'
+          package: 'fnapp'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
 
   build-static-site:
