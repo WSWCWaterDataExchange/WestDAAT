@@ -1,0 +1,641 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests/WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj": {}
+  },
+  "projects": {
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Accessors",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.Azure.Services.AppAuthentication": {
+              "target": "Package",
+              "version": "[1.6.2, )"
+            },
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[6.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[6.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[6.0.2, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Common",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.EnvironmentVariables": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Json": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Logging.ApplicationInsights": {
+              "target": "Package",
+              "version": "[2.20.0, )"
+            },
+            "Microsoft.Extensions.Logging.Console": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Contracts.Client",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/WesternStatesWater.WestDaat.Engines.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/WesternStatesWater.WestDaat.Engines.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Engines",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/WesternStatesWater.WestDaat.Engines.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/WesternStatesWater.WestDaat.Managers.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/WesternStatesWater.WestDaat.Managers.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Managers",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/WesternStatesWater.WestDaat.Managers.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Accessors/WesternStatesWater.WestDaat.Accessors.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/WesternStatesWater.WestDaat.Engines.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Engines/WesternStatesWater.WestDaat.Engines.csproj"
+              },
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests/WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests/WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Tests.IntegrationTests",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests/WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/WesternStatesWater.WestDaat.Managers.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Managers/WesternStatesWater.WestDaat.Managers.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "FluentAssertions": {
+              "target": "Package",
+              "version": "[5.10.3, )"
+            },
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.6.0-preview-20200318-01, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.16.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Utilities",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/WesternStatesWater.WestDaat.Utilities.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Utilities/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj": {
+                "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Common/WesternStatesWater.WestDaat.Common.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

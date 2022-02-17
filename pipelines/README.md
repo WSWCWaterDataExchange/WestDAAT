@@ -22,7 +22,7 @@ agent: windows-2019
 artifactDownload: CD-Backend-Develop
 
 variables:
-  ConnectionStrings:YourDbConnectionNameHere: 'Server=tcp:dpl-owca-dev.database.windows.net,1433;Initial Catalog=dpl-owca-dev;'
+  ConnectionStrings:WadeDatabase: 'Server=tcp:dpl-owca-dev.database.windows.net,1433;Initial Catalog=dpl-owca-dev;'
 
 steps:
 - task: AzureRmWebAppDeployment@4
@@ -40,7 +40,7 @@ steps:
     azureSubscription: 'DPL-OWCA Azure Service Connection'
     scriptType: batch
     scriptLocation: inlineScript
-    inlineScript: 'dotnet WesternStatesWater.WaDE.DbUp.dll "$(ConnectionStrings:YourDbConnectionNameHere)"'
+    inlineScript: 'dotnet WesternStatesWater.WaDE.DbUp.dll "$(ConnectionStrings:WadeDatabase)"'
     workingDirectory: '$(System.DefaultWorkingDirectory)/CD-Backend-Develop/qa_dotnet_drop/DbUp/Application'
 agent: vs2017-win2016
 artifactDownload: CD-Frontend-Develop
