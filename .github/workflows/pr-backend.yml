@@ -29,9 +29,16 @@ jobs:
     - name: .NET Build
       run: dotnet build --no-restore
     - name: Create Database
-      run: docker exec -i mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE'
+      run: docker exec -i mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
+    - name: Check out my other private repo
+      uses: actions/checkout@v2
+      with:
+        repository: WSWCWaterDataExchange/WaDE2.0
+        ref: develop
+        working-directory: .
     - name: DbUp
       run: dotnet run
-      working-directory: src/API/WesternStatesWater.WaDE.DbUp
+      working-directory: source/WesternStatesWater.WaDE.DbUp/
     - name: .NET Test
       run: dotnet test --no-build --verbosity normal
+      working-directory: src/API
