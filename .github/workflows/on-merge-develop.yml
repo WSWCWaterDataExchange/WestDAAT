@@ -21,7 +21,7 @@ name: Deploy QA
 
 env:
   AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource grou name
-  AZURE_WEBAPP_NAME: wade-westdaat-qa         # set this to the name of your Azure Web App
+  AZURE_FUNCTIONAPP_NAME: wade-westdaat-qa-fn # set this to the name of your Azure Web App
   AZURE_WEBAPP_PACKAGE_PATH: src/API          # set this to the path to your web app project
   AZURE_STORAGE_ACCOUNT_NAME: wadewestdaatqa  # set the storage account of static site
   AZURE_CDN_ENDPOINT_NAME: wadewestdaatqa     # set the storage account of static site
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: src/API/WesternStatesWater.WaDE.Client.WebApi
+        working-directory: src/API/WesternStatesWater.WaDE.Client.Functions
 
     steps:
       - uses: actions/checkout@v2
@@ -54,47 +54,17 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      
-      - name: Set up dependency caching for faster builds
-        uses: actions/cache@v2
+
+      - name: 'Build Function App'
+        run: dotnet build --configuration Release --output ./output
+
+      - name: 'Deploy Function App'
+        uses: Azure/functions-action@v1
+        id: fa
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
-
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/WestDAATApi
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: WestDAATApi
-          path: ${{env.DOTNET_ROOT}}/WestDAATApi
-
-  deploy-api:
-    runs-on: ubuntu-latest
-    needs: build-api
-    environment:
-      name: 'QA'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: WestDAATApi
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: '/output'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   dbup:
     runs-on: ubuntu-latest
