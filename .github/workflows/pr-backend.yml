@@ -35,9 +35,6 @@ jobs:
       with:
         repository: WSWCWaterDataExchange/WaDE2.0
         ref: develop
-    - name: Tree
-      run: tree
-      working-directory: source/WesternStatesWater.WaDE.DbUp
     - name: Build DbUp
       run: dotnet build -c Release
       working-directory: source/WesternStatesWater.WaDE.DbUp
