@@ -1,0 +1,88 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj": {}
+  },
+  "projects": {
+    "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj",
+        "projectName": "WesternStatesWater.WestDaat.Contracts.Client",
+        "projectPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/WesternStatesWater.WestDaat.Contracts.Client.csproj",
+        "packagesPath": "/Users/bbarber/.nuget/packages/",
+        "outputPath": "/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Contracts.Client/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/bbarber/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.CodeQuality.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Microsoft.NetCore.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
