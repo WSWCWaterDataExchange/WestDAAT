@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: src/API
+        working-directory: src/API/WesternStatesWater.WaDE.Client.WebApi
 
     steps:
       - uses: actions/checkout@v2
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-api
     environment:
-      name: 'Development'
+      name: 'QA'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -91,6 +91,33 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+  dbup:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/API/WesternStatesWater.WaDE.DbUp
+
+    steps:
+      - uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Run DbUp
+        run: dotnet run --configuration Release
 
   build-site:
     runs-on: ubuntu-latest
@@ -110,23 +137,32 @@ jobs:
     - run: npm ci
     - run: npm run build
 
-    - uses: azure/login@v1
-      with:
-          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+  deploy-site:
+    runs-on: ubuntu-latest
+    needs: build-site
+    defaults:
+      run:
+        working-directory: src/DashboardUI
 
-    - name: Upload to blob storage
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ./build
-    - name: Purge CDN endpoint
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-           az cdn endpoint purge --content-paths  "/*" --profile-name ${{ env.AZURE_CDN_PROFILE_NAME }} --name ${{ env.AZURE_CDN_ENDPOINT_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+    steps:
 
-  # Azure logout
-    - name: logout
-      run: |
-            az logout
-      if: always()
+      - uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ./build
+      - name: Purge CDN endpoint
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az cdn endpoint purge --content-paths  "/*" --profile-name ${{ env.AZURE_CDN_PROFILE_NAME }} --name ${{ env.AZURE_CDN_ENDPOINT_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+
+      - name: Azure cli logout
+        run: |
+              az logout
+        if: always()
+
