@@ -55,7 +55,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 'Build Function App'
-        run: dotnet build --configuration Release --output fnapp
+        run: dotnet build --configuration Release --output ./fnapp
 
       - name: 'Deploy Function App'
         uses: Azure/functions-action@v1
