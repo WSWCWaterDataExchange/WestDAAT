@@ -1,11 +1,8 @@
 @description('Specifies the location for resources.')
 param location string = 'westus'
 
-@description('Org name. Example (\'dpl\')')
-param Organization string
-
 @description('Product name. (Example \'tenzing\')')
-param Product string
+param Product string = 'WestDAAT'
 
 @description('Used to determine naming convention for resources')
 @allowed([
@@ -16,16 +13,11 @@ param Product string
 ])
 param Environment string
 
-@description('Connection string name as found in appsettings.json (Example: \'DPLDatabase\')')
-param sql_server_connection_name string
 
-@description('Initial database password. User defaults to server name. This password is required for server creation, but is not used otherwise')
-@secure()
-param sql_server_sa_password string
+var resource_name_dashes_var = '${toLower(Product)}-${toLower(Environment)}'
+var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
+var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
-var resource_name_dashes_var = '${toLower(Organization)}-${toLower(Product)}-${toLower(Environment)}'
-var resource_name_var = '${toLower(Organization)}${toLower(Product)}${toLower(Environment)}'
-var serverfarms_name_var = 'ASP-${resource_name_var}-b115'
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
@@ -69,18 +61,6 @@ resource resource_name_dashes 'microsoft.insights/components@2018-05-01-preview'
   }
 }
 
-resource Microsoft_Sql_servers_resource_name_dashes 'Microsoft.Sql/servers@2019-06-01-preview' = {
-  name: resource_name_dashes_var
-  location: location
-  kind: 'v12.0'
-  properties: {
-    administratorLogin: resource_name_dashes_var
-    administratorLoginPassword: sql_server_sa_password
-    version: '12.0'
-    publicNetworkAccess: 'Enabled'
-  }
-}
-
 resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: resource_name_var
   location: location
@@ -116,35 +96,12 @@ resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/stor
   }
 }
 
-resource serverfarms_name 'Microsoft.Web/serverfarms@2018-02-01' = {
-  name: serverfarms_name_var
-  location: location
-  sku: {
-    name: 'F1'
-    tier: 'Free'
-    size: 'F1'
-    family: 'F'
-    capacity: 0
-  }
-  kind: 'app'
-  properties: {
-    perSiteScaling: false
-    maximumElasticWorkerCount: 1
-    isSpot: false
-    reserved: false
-    isXenon: false
-    hyperV: false
-    targetWorkerCount: 0
-    targetWorkerSizeId: 0
-  }
-}
-
 resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-15' = {
   parent: resource_name
   name: resource_name_var
   location: 'Global'
   properties: {
-    originHostHeader: '${resource_name_var}.z19.web.core.windows.net'
+    originHostHeader: '${resource_name_var}.z22.web.core.windows.net'
     contentTypesToCompress: [
       'text/plain'
       'text/html'
@@ -163,7 +120,7 @@ resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-1
       {
         name: '${resource_name_var}-blob-core-windows-net'
         properties: {
-          hostName: '${resource_name_var}.z19.web.core.windows.net'
+          hostName: '${resource_name_var}.z22.web.core.windows.net'
           enabled: true
         }
       }
@@ -171,221 +128,6 @@ resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-1
     originGroups: []
     geoFilters: []
     urlSigningKeys: []
-  }
-}
-
-resource resource_name_dashes_CreateIndex 'Microsoft.Sql/servers/advisors@2014-04-01' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'CreateIndex'
-  properties: {
-    autoExecuteValue: 'Disabled'
-  }
-}
-
-resource resource_name_dashes_DropIndex 'Microsoft.Sql/servers/advisors@2014-04-01' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'DropIndex'
-  properties: {
-    autoExecuteValue: 'Disabled'
-  }
-}
-
-resource resource_name_dashes_ForceLastGoodPlan 'Microsoft.Sql/servers/advisors@2014-04-01' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'ForceLastGoodPlan'
-  properties: {
-    autoExecuteValue: 'Enabled'
-  }
-}
-
-resource resource_name_dashes_Default 'Microsoft.Sql/servers/auditingPolicies@2014-04-01' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'default'
-  location: location
-  properties: {
-    auditingState: 'Disabled'
-  }
-}
-
-resource Microsoft_Sql_servers_auditingSettings_resource_name_dashes_Default 'Microsoft.Sql/servers/auditingSettings@2017-03-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'default'
-  properties: {
-    retentionDays: 0
-    auditActionsAndGroups: []
-    isStorageSecondaryKeyInUse: false
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-}
-
-resource resource_name_dashes_resource_name_dashes 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: resource_name_dashes_var
-  location: location
-  sku: {
-    name: 'Basic'
-    tier: 'Basic'
-    capacity: 5
-  }
-  kind: 'v12.0,user'
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    maxSizeBytes: 2147483648
-    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
-    zoneRedundant: false
-    readScale: 'Disabled'
-    storageAccountType: 'GRS'
-    maintenanceConfigurationId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default'
-  }
-}
-
-resource resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/auditingPolicies@2014-04-01' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  location: location
-  properties: {
-    auditingState: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_auditingSettings_resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/auditingSettings@2017-03-01-preview' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  properties: {
-    retentionDays: 0
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_extendedAuditingSettings_resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2017-03-01-preview' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  properties: {
-    retentionDays: 0
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_geoBackupPolicies_resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/geoBackupPolicies@2014-04-01' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  location: location
-  properties: {
-    state: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_securityAlertPolicies_resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/securityAlertPolicies@2020-02-02-preview' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  properties: {
-    state: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_master_current 'Microsoft.Sql/servers/databases/transparentDataEncryption@2014-04-01' = {
-  name: '${resource_name_dashes_var}/master/current'
-  location: location
-  properties: {
-    status: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_vulnerabilityAssessments_resource_name_dashes_master_Default 'Microsoft.Sql/servers/databases/vulnerabilityAssessments@2017-03-01-preview' = {
-  name: '${resource_name_dashes_var}/master/Default'
-  properties: {
-    recurringScans: {
-      isEnabled: false
-      emailSubscriptionAdmins: true
-    }
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_current 'Microsoft.Sql/servers/encryptionProtector@2015-05-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'current'
-  kind: 'servicemanaged'
-  properties: {
-    serverKeyName: 'ServiceManaged'
-    serverKeyType: 'ServiceManaged'
-  }
-}
-
-resource Microsoft_Sql_servers_extendedAuditingSettings_resource_name_dashes_Default 'Microsoft.Sql/servers/extendedAuditingSettings@2017-03-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'default'
-  properties: {
-    retentionDays: 0
-    auditActionsAndGroups: []
-    isStorageSecondaryKeyInUse: false
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-}
-
-resource resource_name_dashes_AllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@2015-05-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'AllowAllWindowsAzureIps'
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
-  }
-}
-
-resource resource_name_dashes_ServiceManaged 'Microsoft.Sql/servers/keys@2015-05-01-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'ServiceManaged'
-  kind: 'servicemanaged'
-  properties: {
-    serverKeyType: 'ServiceManaged'
-  }
-}
-
-resource Microsoft_Sql_servers_securityAlertPolicies_resource_name_dashes_Default 'Microsoft.Sql/servers/securityAlertPolicies@2020-02-02-preview' = {
-  parent: Microsoft_Sql_servers_resource_name_dashes
-  name: 'Default'
-  properties: {
-    state: 'Disabled'
-  }
-}
-
-resource resource_name_default 'Microsoft.Storage/storageAccounts/blobServices@2020-08-01-preview' = {
-  parent: Microsoft_Storage_storageAccounts_resource_name
-  name: 'default'
-  sku: {
-    name: 'Standard_RAGRS'
-    tier: 'Standard'
-  }
-  properties: {
-    cors: {
-      corsRules: []
-    }
-    deleteRetentionPolicy: {
-      enabled: false
-    }
   }
 }
 
@@ -409,63 +151,47 @@ resource Microsoft_Storage_storageAccounts_tableServices_resource_name_default '
   }
 }
 
-resource Microsoft_Web_sites_resource_name_dashes 'Microsoft.Web/sites@2018-11-01' = {
-  name: '${resource_name_dashes_var}-fn'
-  kind: 'functionapp'
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
+resource resource_name_resource_name_resource_name_blob_core_windows_net 'Microsoft.Cdn/profiles/endpoints/origins@2020-04-15' = {
+  parent: resource_name_resource_name
+  name: '${resource_name_var}-blob-core-windows-net'
   properties: {
-    name: '${resource_name_dashes_var}-fn'
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
-        }
-        {
-          name: 'AzureWebJobsSecretStorageType'
-          value: 'files'
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
-        }
-        {
-          name: 'AppSettings:AccessTokenDatabaseTenantId'
-          value: subscription().tenantId
-        }
-        {
-          name: 'AppSettings:AccessTokenDatabaseResource'
-          value: 'https://database.windows.net/'
-        }
-      ]
-      connectionStrings: [
-        {
-          name: sql_server_connection_name
-          connectionString: 'Server=tcp:${resource_name_dashes_var}.database.windows.net,1433;Initial Catalog=${resource_name_dashes_var};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-          type: 'SQLServer'
-        }
-      ]
-    }
-    serverFarmId: serverfarms_name.id
-    clientAffinityEnabled: false
+    hostName: '${resource_name_var}.z22.web.core.windows.net'
+    enabled: true
+  }
+  dependsOn: [
+    resource_name
+  ]
+}
+
+resource serverfarms_ASP_resource 'Microsoft.Web/serverfarms@2021-03-01' = {
+  name: serverfarms_ASP_name
+  location: location
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+    size: 'Y1'
+    family: 'Y'
+    capacity: 0
+  }
+  kind: 'functionapp'
+  properties: {
+    perSiteScaling: false
+    elasticScaleEnabled: false
+    maximumElasticWorkerCount: 1
+    isSpot: false
+    reserved: false
+    isXenon: false
+    hyperV: false
+    targetWorkerCount: 0
+    targetWorkerSizeId: 0
+    zoneRedundant: false
   }
 }
 
-resource resource_name_dashes_fn 'Microsoft.Web/sites@2018-11-01' = {
+resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
   name: resource_name_dashes_var
   location: location
-  kind: 'app'
+  kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
   }
@@ -483,42 +209,53 @@ resource resource_name_dashes_fn 'Microsoft.Web/sites@2018-11-01' = {
         hostType: 'Repository'
       }
     ]
-    serverFarmId: serverfarms_name.id
+    serverFarmId: serverfarms_ASP_resource.id
     reserved: false
     isXenon: false
     hyperV: false
     siteConfig: {
-      appSettings: [
-        {
-          name: 'AppSettings:AccessTokenDatabaseTenantId'
-          value: subscription().tenantId
-        }
-        {
-          name: 'AppSettings:AccessTokenDatabaseResource'
-          value: 'https://database.windows.net/'
-        }
-      ]
-      connectionStrings: [
-        {
-          name: sql_server_connection_name
-          connectionString: 'Server=tcp:${resource_name_dashes_var}.database.windows.net,1433;Initial Catalog=${resource_name_dashes_var};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-          type: 'SQLServer'
-        }
-      ]
+      numberOfWorkers: 1
+      acrUseManagedIdentityCreds: false
+      alwaysOn: false
+      http20Enabled: false
+      functionAppScaleLimit: 200
+      minimumElasticInstanceCount: 0
     }
     scmSiteAlsoStopped: false
-    clientAffinityEnabled: true
+    clientAffinityEnabled: false
     clientCertEnabled: false
+    clientCertMode: 'Required'
     hostNamesDisabled: false
-    containerSize: 0
+    customDomainVerificationId: '75389B719DA59678F1098C249250F0B8A809C221B35834D21FAC4A6DBC83D421'
+    containerSize: 1536
     dailyMemoryTimeQuota: 0
     httpsOnly: false
     redundancyMode: 'None'
+    storageAccountRequired: false
+    keyVaultReferenceIdentity: 'SystemAssigned'
   }
 }
 
-resource resource_name_dashes_web 'Microsoft.Web/sites/config@2018-11-01' = {
-  parent: Microsoft_Web_sites_resource_name_dashes
+resource sites_fn_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2021-03-01' = {
+  parent: sites_fn_resource
+  name: 'ftp'
+  location: location
+  properties: {
+    allow: true
+  }
+}
+
+resource sites_fn_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2021-03-01' = {
+  parent: sites_fn_resource
+  name: 'scm'
+  location: location
+  properties: {
+    allow: true
+  }
+}
+
+resource sites_fn_web 'Microsoft.Web/sites/config@2021-03-01' = {
+  parent: sites_fn_resource
   name: 'web'
   location: location
   properties: {
@@ -532,17 +269,16 @@ resource resource_name_dashes_web 'Microsoft.Web/sites/config@2018-11-01' = {
       'iisstart.htm'
       'default.aspx'
       'index.php'
-      'hostingstart.html'
     ]
-    netFrameworkVersion: 'v5.0'
+    netFrameworkVersion: 'v6.0'
     requestTracingEnabled: false
     remoteDebuggingEnabled: false
     httpLoggingEnabled: false
+    acrUseManagedIdentityCreds: false
     logsDirectorySizeLimit: 35
     detailedErrorLoggingEnabled: false
-    publishingUsername: '$${resource_name_dashes_var}'
-    azureStorageAccounts: {}
-    scmType: 'VSTSRM'
+    publishingUsername: '$wade-westdaat-qa-fn'
+    scmType: 'None'
     use32BitWorkerProcess: true
     webSocketsEnabled: false
     alwaysOn: false
@@ -559,13 +295,16 @@ resource resource_name_dashes_web 'Microsoft.Web/sites/config@2018-11-01' = {
       rampUpRules: []
     }
     autoHealEnabled: false
+    vnetRouteAllEnabled: false
+    vnetPrivatePortsCount: 0
     cors: {
       allowedOrigins: [
-        'https://${resource_name_var}.azureedge.net'
+        'https://portal.azure.com'
       ]
-      supportCredentials: true
+      supportCredentials: false
     }
     localMySqlEnabled: false
+    managedServiceIdentityId: 14903
     ipSecurityRestrictions: [
       {
         ipAddress: 'Any'
@@ -587,192 +326,22 @@ resource resource_name_dashes_web 'Microsoft.Web/sites/config@2018-11-01' = {
     scmIpSecurityRestrictionsUseMain: false
     http20Enabled: false
     minTlsVersion: '1.2'
+    scmMinTlsVersion: '1.0'
     ftpsState: 'AllAllowed'
-    reservedInstanceCount: 0
+    preWarmedInstanceCount: 0
+    functionAppScaleLimit: 200
+    functionsRuntimeScaleMonitoringEnabled: false
+    minimumElasticInstanceCount: 0
+    azureStorageAccounts: {}
   }
 }
 
-resource resource_name_dashes_resource_name_dashes_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2018-11-01' = {
-  parent: Microsoft_Web_sites_resource_name_dashes
+resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2021-03-01' = {
+  parent: sites_fn_resource
   name: '${resource_name_dashes_var}.azurewebsites.net'
   location: location
   properties: {
-    siteName: resource_name_dashes_var
+    siteName: 'wade-westdaat-qa-fn'
     hostNameType: 'Verified'
   }
-}
-
-resource resource_name_dashes_Microsoft_AspNetCore_AzureAppServices_SiteExtension 'Microsoft.Web/sites/siteextensions@2018-11-01' = {
-  parent: Microsoft_Web_sites_resource_name_dashes
-  name: 'Microsoft.AspNetCore.AzureAppServices.SiteExtension'
-  location: location
-}
-
-resource resource_name_resource_name_resource_name_blob_core_windows_net 'Microsoft.Cdn/profiles/endpoints/origins@2020-04-15' = {
-  parent: resource_name_resource_name
-  name: '${resource_name_var}-blob-core-windows-net'
-  properties: {
-    hostName: '${resource_name_var}.z19.web.core.windows.net'
-    enabled: true
-  }
-  dependsOn: [
-    resource_name
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_CreateIndex 'Microsoft.Sql/servers/databases/advisors@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'CreateIndex'
-  properties: {
-    autoExecuteValue: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_DefragmentIndex 'Microsoft.Sql/servers/databases/advisors@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'DefragmentIndex'
-  properties: {
-    autoExecuteValue: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_DropIndex 'Microsoft.Sql/servers/databases/advisors@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'DropIndex'
-  properties: {
-    autoExecuteValue: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_ForceLastGoodPlan 'Microsoft.Sql/servers/databases/advisors@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'ForceLastGoodPlan'
-  properties: {
-    autoExecuteValue: 'Enabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/auditingPolicies@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  location: location
-  properties: {
-    auditingState: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_auditingSettings_resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/auditingSettings@2017-03-01-preview' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  properties: {
-    retentionDays: 0
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_backupShortTermRetentionPolicies_resource_name_dashes_resource_name_dashes_default 'Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies@2017-10-01-preview' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  properties: {
-    retentionDays: 7
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_extendedAuditingSettings_resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2017-03-01-preview' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  properties: {
-    retentionDays: 0
-    isAzureMonitorTargetEnabled: false
-    state: 'Disabled'
-    storageAccountSubscriptionId: '00000000-0000-0000-0000-000000000000'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_geoBackupPolicies_resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/geoBackupPolicies@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'Default'
-  location: location
-  properties: {
-    state: 'Enabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_securityAlertPolicies_resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/securityAlertPolicies@2020-02-02-preview' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  properties: {
-    state: 'Disabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_dashes_resource_name_dashes_current 'Microsoft.Sql/servers/databases/transparentDataEncryption@2014-04-01' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'current'
-  location: location
-  properties: {
-    status: 'Enabled'
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource Microsoft_Sql_servers_databases_vulnerabilityAssessments_resource_name_dashes_resource_name_dashes_Default 'Microsoft.Sql/servers/databases/vulnerabilityAssessments@2017-03-01-preview' = {
-  parent: resource_name_dashes_resource_name_dashes
-  name: 'default'
-  properties: {
-    recurringScans: {
-      isEnabled: false
-      emailSubscriptionAdmins: true
-    }
-  }
-  dependsOn: [
-    Microsoft_Sql_servers_resource_name_dashes
-  ]
-}
-
-resource resource_name_default_web 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
-  parent: resource_name_default
-  name: '$web'
-  properties: {
-    defaultEncryptionScope: '$account-encryption-key'
-    denyEncryptionScopeOverride: false
-    publicAccess: 'None'
-  }
-  dependsOn: [
-    Microsoft_Storage_storageAccounts_resource_name
-  ]
 }

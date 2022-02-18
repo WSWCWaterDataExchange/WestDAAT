@@ -22,10 +22,10 @@ name: Deploy QA
 env:
   FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
   AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource grou name
-  AZURE_FUNCTIONAPP_NAME: wade-westdaat-qa-fn # set this to the name of your Azure Web App
-  AZURE_STORAGE_ACCOUNT_NAME: wadewestdaatqa  # set the storage account of static site
-  AZURE_CDN_ENDPOINT_NAME: wadewestdaatqa     # set the storage account of static site
-  AZURE_CDN_PROFILE_NAME: wadewestdaatqa      # set the cdn profile name
+  AZURE_FUNCTIONAPP_NAME: westdaat-qa         # set this to the name of your Azure Web App
+  AZURE_STORAGE_ACCOUNT_NAME: westdaatqa      # set the storage account of static site
+  AZURE_CDN_ENDPOINT_NAME: westdaatqa         # set the storage account of static site
+  AZURE_CDN_PROFILE_NAME: westdaatqa          # set the cdn profile name
   DOTNET_VERSION: '6.0.x'                     # set this to the .NET Core version to use
   NODE_VERSION: '16.x'                        # set this to the node version to use
 
@@ -41,33 +41,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  # deploy-funtion-app:
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ${{ env.FUNCTION_APP_DIR }}
+  deploy-funtion-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FUNCTION_APP_DIR }}
 
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: Set up .NET Core
-  #       uses: actions/setup-dotnet@v1
-  #       with:
-  #         dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-  #     - name: 'Build Function App'
-  #       run: dotnet build --configuration Release --output ./fnapp
-  #     - name: 'Deploy Function App'
-  #       uses: Azure/functions-action@v1
-  #       id: fa
-  #       with:
-  #         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-  #         package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
-  #         publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
+      - name: 'Build Function App'
+        run: dotnet build --configuration Release --output ./fnapp
+      - name: 'Deploy Function App'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
+          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
 
   deploy-static-site:
     runs-on: ubuntu-latest
-    #needs: deploy-funtion-app
+    needs: deploy-funtion-app
     defaults:
       run:
         working-directory: src/DashboardUI
@@ -93,7 +93,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --debug
+            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key
     
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
