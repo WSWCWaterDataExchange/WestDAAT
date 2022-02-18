@@ -67,7 +67,7 @@ jobs:
 
   deploy-static-site:
     runs-on: ubuntu-latest
-    needs: deploy-funtion-app
+    #needs: deploy-funtion-app
     defaults:
       run:
         working-directory: src/DashboardUI
