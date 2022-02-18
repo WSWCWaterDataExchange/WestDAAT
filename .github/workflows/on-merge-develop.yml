@@ -96,7 +96,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web/foo' -s '${{ FUNCTION_APP_DIR }}/build'
+            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web/foo' -s '${{ env.FUNCTION_APP_DIR }}/build'
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
       with:
