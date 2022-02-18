@@ -88,13 +88,15 @@ jobs:
       uses: azure/login@v1
       with:
           creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
-    - name: Tree
-      run: tree
+    - name: PWD
+      run: pwd
+
     - name: Upload to blob storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s build --pattern ""
+            az storage blob upload-batch -d '$web' -s build --pattern "" --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key
+    
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
       with:
