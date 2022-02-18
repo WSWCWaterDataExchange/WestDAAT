@@ -91,9 +91,9 @@ jobs:
 
     - name: Upload to blob storage
       uses: azure/CLI@v1
-      working-directory: src/DashboardUI/build
-      run: 
-        az storage blob upload-batch -d '$web' -s . --pattern "" --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --debug
+      with:
+        inlineScript: |
+            az storage blob upload-batch -d '$web' -s ./debug --pattern * --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --debug
     
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
