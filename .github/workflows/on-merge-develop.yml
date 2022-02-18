@@ -20,6 +20,7 @@
 name: Deploy QA
 
 env:
+  FUNCTION_APP_DIR: src/API/WesternStatesWater.WestDaat.Client.Functions 
   AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource grou name
   AZURE_FUNCTIONAPP_NAME: wade-westdaat-qa-fn # set this to the name of your Azure Web App
   AZURE_STORAGE_ACCOUNT_NAME: wadewestdaatqa  # set the storage account of static site
@@ -44,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: src/API/WesternStatesWater.WestDaat.Client.Functions
+        working-directory: ${{ FUNCTION_APP_DIR }}
 
     steps:
       - uses: actions/checkout@v2
@@ -64,7 +65,8 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: 'fnapp'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
+          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
+          working-directory: ${{ FUNCTION_APP_DIR }}
 
   build-static-site:
     runs-on: ubuntu-latest
