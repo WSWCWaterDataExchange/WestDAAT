@@ -64,9 +64,8 @@ jobs:
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: 'fnapp'
+          package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
           publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
-          working-directory: ${{ env.FUNCTION_APP_DIR }}
 
   build-static-site:
     runs-on: ubuntu-latest
