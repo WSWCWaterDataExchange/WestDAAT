@@ -1,4 +1,0 @@
-/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Utilities.deps.json
-/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Utilities.dll
-/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/ref/WesternStatesWater.WestDaat.Utilities.dll
-/Users/bbarber/workspaces/WaDE/WestDAAT/src/API/WesternStatesWater.WestDaat.Client.Functions/bin/output/WesternStatesWater.WestDaat.Utilities.pdb

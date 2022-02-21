@@ -19,6 +19,10 @@ var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
 var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
 
+var wadedbserver = ((Environment == 'prod')) ? 'todo' : 'wade-qa-server.database.windows.net'
+var wadedbname = ((Environment == 'prod')) ? 'todo' : 'WaDE_QA_Server'
+
+
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
   location: 'Global'
@@ -195,6 +199,9 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
   identity: {
     type: 'SystemAssigned'
   }
+  dependsOn: [
+    Microsoft_Storage_storageAccounts_resource_name
+  ]
   properties: {
     enabled: true
     hostNameSslStates: [
@@ -213,13 +220,44 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
     reserved: false
     isXenon: false
     hyperV: false
-    siteConfig: {
-      numberOfWorkers: 1
-      acrUseManagedIdentityCreds: false
-      alwaysOn: false
-      http20Enabled: false
-      functionAppScaleLimit: 200
-      minimumElasticInstanceCount: 0
+siteConfig: {
+      appSettings: [
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet'
+        }
+        {
+          name: 'AzureWebJobsSecretStorageType'
+          value: 'files'
+        }
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
+        }
+        {
+          name: 'AppSettings:AccessTokenDatabaseTenantId'
+          value: subscription().tenantId
+        }
+        {
+          name: 'AppSettings:AccessTokenDatabaseResource'
+          value: 'https://database.windows.net/'
+        }
+      ]
+      connectionStrings: [
+        {
+          name: 'WadeDatabase'
+          connectionString: 'Server=tcp:${wadedbserver}.database.windows.net,1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          type: 'SQLServer'
+        }
+      ]
     }
     scmSiteAlsoStopped: false
     clientAffinityEnabled: false
