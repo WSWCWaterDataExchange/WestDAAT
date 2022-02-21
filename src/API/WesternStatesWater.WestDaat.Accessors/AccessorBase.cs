@@ -22,7 +22,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error in Database Context");
+                Logger.LogError(e, "Error in Database Context. " + e);
                 throw;
             }
         }
