@@ -1,5 +1,10 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect } from 'react';
+import SidePanel from '../components/SidePanel';
+import SiteFooter from '../components/SiteFooter';
+import SiteNavbar from '../components/SiteNavbar';
+
+import '../styles/home-page.scss';
 
 function HomePage() {
 
@@ -14,13 +19,18 @@ function HomePage() {
   });
 
   return (
-    <>
-      <h1>
-        Home Page
-      </h1>
-      {/* Just a placeholder for now to test mapbox package */}
-      <div id="map" style={{width: 500, height: 500}}></div>
-    </>
+    <div className="home-page">
+      <SiteNavbar />
+      <div className="main-container">
+        <SidePanel />
+        <h1>
+          Home Page
+        </h1>
+        {/* Just a placeholder for now to test mapbox package */}
+        <div id="map" style={{ width: 500, height: 500 }}></div>
+      </div>
+      <SiteFooter />
+    </div>
   );
 }
 

@@ -6,7 +6,7 @@ import './../styles/footer.scss';
 
 function SiteFooter() {
   return (
-    <Navbar className="footer" bg="dark" variant="dark" fixed="bottom">
+    <Navbar className="footer" bg="dark" variant="dark">
       <Container fluid>
         <div>
           <Nav>
