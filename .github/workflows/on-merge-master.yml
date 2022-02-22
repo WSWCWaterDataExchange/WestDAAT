@@ -17,15 +17,15 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-name: Deploy QA
+name: Deploy Prod
 
 env:
   FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
-  AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource group name
-  AZURE_FUNCTIONAPP_NAME: westdaat-qa         # set this to the name of your Azure Web App
-  AZURE_STORAGE_ACCOUNT_NAME: westdaatqa      # set the storage account of static site
-  AZURE_CDN_ENDPOINT_NAME: westdaatqa         # set the storage account of static site
-  AZURE_CDN_PROFILE_NAME: westdaatqa          # set the cdn profile name
+  AZURE_RESOURCE_GROUP: WestDAAT_Prod         # set the resource group name
+  AZURE_FUNCTIONAPP_NAME: westdaat-prod       # set this to the name of your Azure Web App
+  AZURE_STORAGE_ACCOUNT_NAME: westdaatprod    # set the storage account of static site
+  AZURE_CDN_ENDPOINT_NAME: westdaatprod       # set the storage account of static site
+  AZURE_CDN_PROFILE_NAME: westdaatprod        # set the cdn profile name
   DOTNET_VERSION: '6.0.x'                     # set this to the .NET Core version to use
   NODE_VERSION: '16.x'                        # set this to the node version to use
 
@@ -33,7 +33,7 @@ env:
 on:
   push:
     branches:
-      - develop
+      - master
   workflow_dispatch:
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
-          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
+          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_PROD }}
 
   deploy-static-site:
     runs-on: ubuntu-latest
@@ -83,7 +83,7 @@ jobs:
     - name: Azure login
       uses: azure/login@v1
       with:
-          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_PROD }}
 
     - name: Upload to blob storage
       uses: azure/CLI@v1

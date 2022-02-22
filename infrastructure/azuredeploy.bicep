@@ -19,8 +19,8 @@ var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
 var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
 
-var wadedbserver = ((Environment == 'prod')) ? 'todo' : 'wade-qa-server.database.windows.net'
-var wadedbname = ((Environment == 'prod')) ? 'todo' : 'WaDE_QA_Server'
+var wadedbserver = ((Environment == 'prod')) ? 'wade-production-server.database.windows.net' : 'wade-qa-server.database.windows.net'
+var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA_Server'
 
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
