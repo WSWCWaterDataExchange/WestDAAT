@@ -23,12 +23,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
             catch (Exception e)
             {
-                Logger.LogError("Connection string: " + Config.SqlServerConnectionString);
-                Logger.LogError("AccessTokenDatabaseTenantId: " + Config.AccessTokenDatabaseTenantId);
-                Logger.LogError("AccessTokenDatabaseResource: " + Config.AccessTokenDatabaseResource);
-                Logger.LogError("ShouldUseToken: " + DatabaseContext.ShouldUseAzureAccessTokenAuth());
-                Logger.LogError("Token: " + DatabaseContext.GetAzureAccessToken());
-                Logger.LogError(e, "Error in Database Context. " + e);
+                Logger.LogError(e, "Error in Database Context.");
                 throw;
             }
         }

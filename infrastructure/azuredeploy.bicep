@@ -254,7 +254,7 @@ siteConfig: {
       connectionStrings: [
         {
           name: 'WadeDatabase'
-          connectionString: 'Server=tcp:${wadedbserver}.database.windows.net,1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          connectionString: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
           type: 'SQLServer'
         }
       ]
