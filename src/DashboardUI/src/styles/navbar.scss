@@ -4,7 +4,9 @@
   color: $text-color-light;
   background-color: $bs-gray-800;
 
-  .tabs.navbar-nav {
-    gap: 40px;
+  .navbar-nav .active-tab.nav-link,
+  .navbar-nav .active-tab.nav-link:focus {
+    color: $text-color-dark;
+    border-bottom: 2px solid $text-color-dark;
   }
 }
