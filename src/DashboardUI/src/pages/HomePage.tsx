@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect, useState } from 'react';
 import AboutModal from '../components/AboutModal';
+import ContactModal from '../components/ContactModal';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
@@ -50,7 +51,7 @@ function HomePage() {
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} showAboutModal={shouldShowAboutModal} showContactModal={shouldShowContactModal} showTermsModal={shouldShowContactModal} />
+      <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} showAboutModal={shouldShowAboutModal} showContactModal={shouldShowContactModal} showTermsModal={shouldShowTermsModal} />
       <div className="d-flex flex-grow-1">
         <SidePanel currentTab={currentTab} />
 
@@ -61,8 +62,8 @@ function HomePage() {
       <SiteFooter />
 
       <AboutModal show={shouldAboutShowModal} setShow={shouldShowAboutModal} />
-      <TermsModal show={showContactModal} setShow={shouldShowContactModal} />
-      <AboutModal show={showTermsModal} setShow={shouldShowTermsModal} />
+      <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
+      <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
     </div>
   );
 }
