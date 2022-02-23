@@ -3,4 +3,8 @@
 .navbar {
   color: $text-color-light;
   background-color: $bs-gray-800;
+
+  .tabs.navbar-nav {
+    gap: 40px;
+  }
 }

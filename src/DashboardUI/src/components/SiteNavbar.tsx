@@ -28,7 +28,7 @@ function SiteNavbar() {
 
       <Navbar bg="light">
         <Container fluid>
-          <Nav>
+          <Nav className="tabs">
             <Nav.Link href="#">Water Rights</Nav.Link>
             <Nav.Link href="#">Aggregations</Nav.Link>
             <Nav.Link href="#">Site Specific</Nav.Link>
