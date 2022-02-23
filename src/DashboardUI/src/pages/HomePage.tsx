@@ -21,13 +21,12 @@ function HomePage() {
   return (
     <div className="home-page">
       <SiteNavbar />
-      <div className="main-container">
+      <div className="main-container d-flex">
         <SidePanel />
-        <h1>
-          Home Page
-        </h1>
+
         {/* Just a placeholder for now to test mapbox package */}
-        <div id="map" style={{ width: 500, height: 500 }}></div>
+        <div id="map" className="w-100 h-100">
+        </div>
       </div>
       <SiteFooter />
     </div>

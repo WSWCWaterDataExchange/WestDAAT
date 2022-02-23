@@ -7,7 +7,7 @@ import './../styles/footer.scss';
 function SiteFooter() {
   return (
     <Navbar className="footer" variant="dark">
-      <Container fluid>
+      <Container fluid className="ms-2 me-2">
         <div>
           <Nav>
             <Nav.Link className="p-0" href="#">License Name</Nav.Link>
