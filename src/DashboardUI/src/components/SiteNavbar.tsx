@@ -3,21 +3,23 @@ import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
+import '../styles/navbar.scss';
+
 function SiteNavbar() {
   return (
     <div>
-      <Navbar bg="dark" variant="dark" expand={false}>
+      <Navbar variant="dark" expand={false}>
         <Container fluid>
           <div>
             <Button className="navbar-toggler visible">
               <span className="navbar-toggler-icon"></span>
             </Button>
-            <Navbar.Brand>Western States Water Council</Navbar.Brand>
+            <span className="p-2">Western States Water Council</span>
           </div>
 
-          <Navbar.Brand>Water Data Exchange Data (WaDE) Dashboard</Navbar.Brand>
+          <span>Water Data Exchange Data (WaDE) Dashboard</span>
 
-          <Nav>
+          <Nav className="me-2">
             <Nav.Link href="#" active>Log In</Nav.Link>
           </Nav>
         </Container>
