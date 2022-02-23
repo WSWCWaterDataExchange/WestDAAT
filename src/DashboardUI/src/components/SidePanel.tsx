@@ -1,12 +1,9 @@
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-
-import './../styles/side-panel.scss';
 import { HomePageTab } from '../pages/HomePage';
 import WaterRightsTab from './WaterRightsTab';
 import AggregationsTab from './AggregationsTab';
 import SiteSpecificTab from './SiteSpecificTab';
+
+import './../styles/side-panel.scss';
 
 interface SidePanelProps {
   currentTab: HomePageTab;
