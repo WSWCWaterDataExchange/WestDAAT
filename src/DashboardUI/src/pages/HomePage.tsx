@@ -1,8 +1,10 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect, useState } from 'react';
+import AboutModal from '../components/AboutModal';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
+import TermsModal from '../components/TermsModal';
 
 import '../styles/home-page.scss';
 
@@ -15,6 +17,10 @@ export enum HomePageTab {
 function HomePage() {
 
   const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
+
+  const [shouldAboutShowModal, setShowAboutModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
@@ -30,9 +36,21 @@ function HomePage() {
     setCurrentTab(tab);
   }
 
+  const shouldShowAboutModal = (show: boolean) => {
+    setShowAboutModal(show);
+  }
+
+  const shouldShowContactModal = (show: boolean) => {
+    setShowContactModal(show);
+  }
+
+  const shouldShowTermsModal = (show: boolean) => {
+    setShowTermsModal(show);
+  }
+
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} />
+      <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} showAboutModal={shouldShowAboutModal} showContactModal={shouldShowContactModal} showTermsModal={shouldShowContactModal} />
       <div className="d-flex flex-grow-1">
         <SidePanel currentTab={currentTab} />
 
@@ -41,6 +59,10 @@ function HomePage() {
         </div>
       </div>
       <SiteFooter />
+
+      <AboutModal show={shouldAboutShowModal} setShow={shouldShowAboutModal} />
+      <TermsModal show={showContactModal} setShow={shouldShowContactModal} />
+      <AboutModal show={showTermsModal} setShow={shouldShowTermsModal} />
     </div>
   );
 }

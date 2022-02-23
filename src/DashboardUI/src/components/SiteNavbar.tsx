@@ -2,22 +2,33 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
+import { useState } from 'react';
 
 interface SiteNavbarProps {
   currentTab: HomePageTab;
   onTabClick: (tab: HomePageTab) => void;
+  showAboutModal: (show: boolean) => void;
+  showContactModal(show: boolean): void;
+  showTermsModal(show: boolean): void;
 }
 
 function SiteNavbar(props: SiteNavbarProps) {
+
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+
+  const handleClose = () => setShowHamburgerMenu(false);
+  const handleShow = () => setShowHamburgerMenu(true);
+
   return (
     <div>
       <Navbar variant="dark" expand={false}>
         <Container fluid>
           <div className="d-flex">
-            <Button className="navbar-toggler visible">
+            <Button variant="link" onClick={handleShow}>
               <span className="navbar-toggler-icon"></span>
             </Button>
 
@@ -54,6 +65,20 @@ function SiteNavbar(props: SiteNavbarProps) {
           </div>
         </Container>
       </Navbar>
+
+      <Offcanvas show={showHamburgerMenu} onHide={handleClose} className="ham-menu">
+        <Offcanvas.Header closeButton>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Nav defaultActiveKey="/" className="flex-column gap(10px)">
+            <Nav.Link onClick={() => props.showAboutModal(true)}>About</Nav.Link>
+            <Nav.Link onClick={() => {}}>Water Rights Data</Nav.Link>
+            <Nav.Link onClick={() => {}}>Aggregate Water Use Data</Nav.Link>
+            <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
+            <Nav.Link onClick={() => props.showTermsModal(true)}>Terms and Conditions</Nav.Link>
+          </Nav>
+        </Offcanvas.Body>
+      </Offcanvas>
     </div>
   );
 }

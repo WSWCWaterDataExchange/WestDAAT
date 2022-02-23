@@ -17,3 +17,19 @@
     margin-right: 4px;
   }
 }
+
+.ham-menu a {
+  color: $text-color-dark;
+  margin-bottom: 10px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:hover, 
+  &:active,
+  &:focus,
+  &:visited {
+    color: $text-color-dark;
+  }
+}
