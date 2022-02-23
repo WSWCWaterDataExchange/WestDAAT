@@ -40,7 +40,9 @@ function SiteNavbar(props: SiteNavbarProps) {
             </Nav>
           </div>
 
-          <a>Water Data Exchange Data (WaDE) Dashboard</a>
+          <Nav className="mx-2">
+            <Nav.Link href="/" active>Water Data Exchange Data (WaDE) Dashboard</Nav.Link>
+          </Nav>
 
           <Nav className="mx-2">
             <Nav.Link href="#" active>Log In</Nav.Link>
@@ -72,8 +74,8 @@ function SiteNavbar(props: SiteNavbarProps) {
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
             <Nav.Link onClick={() => props.showAboutModal(true)}>About</Nav.Link>
-            <Nav.Link onClick={() => {}}>Water Rights Data</Nav.Link>
-            <Nav.Link onClick={() => {}}>Aggregate Water Use Data</Nav.Link>
+            <Nav.Link onClick={() => { }}>Water Rights Data</Nav.Link>
+            <Nav.Link onClick={() => { }}>Aggregate Water Use Data</Nav.Link>
             <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
             <Nav.Link onClick={() => props.showTermsModal(true)}>Terms and Conditions</Nav.Link>
           </Nav>
