@@ -16,16 +16,22 @@ function SiteNavbar(props: SiteNavbarProps) {
     <div>
       <Navbar variant="dark" expand={false}>
         <Container fluid>
-          <div>
+          <div className="d-flex">
             <Button className="navbar-toggler visible">
               <span className="navbar-toggler-icon"></span>
             </Button>
-            <span className="p-2">Western States Water Council</span>
+
+            <Nav className="mx-2">
+              <Nav.Link target="_blank" href="https://westernstateswater.org/" active>
+                <img src="/logo32x32.png" />
+                Western States Water Council
+              </Nav.Link>
+            </Nav>
           </div>
 
-          <span>Water Data Exchange Data (WaDE) Dashboard</span>
+          <a>Water Data Exchange Data (WaDE) Dashboard</a>
 
-          <Nav className="me-2">
+          <Nav className="mx-2">
             <Nav.Link href="#" active>Log In</Nav.Link>
           </Nav>
         </Container>
