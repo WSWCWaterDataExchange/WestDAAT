@@ -55,7 +55,7 @@ function SiteNavbar(props: SiteNavbarProps) {
         <Container fluid className="p-0">
           <Nav>
             {(Object.values(HomePageTab)).map(tab =>
-              <Nav.Link onClick={() => props.onTabClick(tab)} className={`py-3 px-4 ${props.currentTab === tab ? 'active-tab' : ''}`}>
+              <Nav.Link onClick={() => props.onTabClick(tab)} className={`py-3 px-4 ${props.currentTab === tab ? 'active-tab' : ''}`} key={tab}>
                 {tab}
               </Nav.Link>
             )}
