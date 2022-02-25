@@ -21,6 +21,7 @@ name: Deploy Prod
 
 env:
   FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
+  REACT_APP_WEBAPI_URL: 'https://westdaat-prod.azurewebsites.net'
   AZURE_RESOURCE_GROUP: WestDAAT_Prod         # set the resource group name
   AZURE_FUNCTIONAPP_NAME: westdaat-prod       # set this to the name of your Azure Web App
   AZURE_STORAGE_ACCOUNT_NAME: westdaatprod    # set the storage account of static site
