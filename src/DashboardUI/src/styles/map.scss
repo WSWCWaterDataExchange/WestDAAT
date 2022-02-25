@@ -7,7 +7,8 @@
   margin: 26px 8px;
   background-color: $bs-gray-900;
   color: $text-color-light;
-  z-index: 100;
+  // Just behind the geocode search results
+  z-index: 2; 
   padding: 6px;
   border-radius: 5px;
 }
