@@ -32,7 +32,7 @@ function SiteNavbar(props: SiteNavbarProps) {
 
             <Nav className="mx-2">
               <Nav.Link target="_blank" href="https://westernstateswater.org/" active>
-                <img src="/logo32x32.png" />
+                <img alt="Wade Logo" src="/logo32x32.png" />
                 Western States Water Council
               </Nav.Link>
             </Nav>
