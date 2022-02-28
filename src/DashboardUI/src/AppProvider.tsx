@@ -1,14 +1,18 @@
 import './App.scss';
 import { createContext, FC, useState } from "react";
 
+export interface User {
+  username: string;
+}
+
 interface AppContextState {
-  user?: { username: string },
+  user: User | null,
   setCurrentUser: (username: string) => void,
 };
 
 const defaultAppContextState: AppContextState = {
   // User will get set on user login
-  user: undefined,
+  user: null,
   setCurrentUser: () => {}
 };
 

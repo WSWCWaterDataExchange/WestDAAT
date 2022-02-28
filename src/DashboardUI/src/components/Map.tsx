@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceData, CircleLayer, NavigationControl, VectorSource } from "mapbox-gl";
+import mapboxgl, { CircleLayer, NavigationControl, VectorSource } from "mapbox-gl";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -7,7 +7,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { HomePageTab } from "../pages/HomePage";
-import { AppContext } from "../AppProvider";
+import { AppContext, User } from "../AppProvider";
 
 enum MapTypes {
   WaterRights = "waterRights",
@@ -44,13 +44,13 @@ function Map(props: MapProps) {
       zoom: 4,
     });
 
-    updateMapControls();
+    updateMapControls(user);
 
-    loadData();
-  }, [mapData]);
+    loadData(mapData);
+  }, [mapData, user]);
 
   useEffect(() => {
-    updateMapControls();
+    updateMapControls(user);
   }, [user]);
 
 
@@ -63,9 +63,8 @@ function Map(props: MapProps) {
     setMapData((mapConfig as any)[newMapType]);
   }, [props.currentTab]);
 
-  const updateMapControls = () => {
+  const updateMapControls = (user: User | null) => {
     if (!map.current) return;
-
 
     if (map.current.hasControl(geocoderControl.current)) {
       map.current.removeControl(geocoderControl.current);
@@ -87,7 +86,7 @@ function Map(props: MapProps) {
     map.current.addControl(navControl.current);
   }
 
-  const loadData = () => {
+  const loadData = (mapData: MapData) => {
     if (!map || !map.current) return;
     var myMap = map.current;
 
