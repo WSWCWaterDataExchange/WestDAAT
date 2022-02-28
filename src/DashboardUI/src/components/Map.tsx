@@ -1,5 +1,5 @@
 import mapboxgl, { AnyLayer, AnySourceData, CircleLayer, NavigationControl, VectorSource } from "mapbox-gl";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -7,7 +7,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { HomePageTab } from "../pages/HomePage";
-import { AppContext } from "../App";
+import { AppContext } from "../AppProvider";
 
 enum MapTypes {
   WaterRights = "waterRights",
@@ -23,55 +23,34 @@ interface MapProps {
   currentTab: HomePageTab;
 }
 
-let map: mapboxgl.Map | null = null;
-
-let geocoderControl = new MapboxGeocoder({
-  accessToken: mapboxgl.accessToken
-});
-
-const navControl = new NavigationControl();
-
-
 function Map(props: MapProps) {
 
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
+
+  const map = useRef<mapboxgl.Map | null>(null);
+  const navControl = useRef(new NavigationControl());
+  let geocoderControl = useRef(new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken
+  }));
 
   const { user } = useContext(AppContext);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
-    map = new mapboxgl.Map({
+    map.current = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/light-v10",
       center: [-100, 40],
       zoom: 4,
     });
 
-    loadData(map);
+    updateMapControls();
+
+    loadData();
   }, [mapData]);
 
   useEffect(() => {
-    if (!map) return;
-
-    if (map.hasControl(geocoderControl)) {
-      map.removeControl(geocoderControl);
-    }
-
-    if (map.hasControl(navControl)) {
-      map.removeControl(navControl);
-    }
-
-    // Only allow location search for logged in users
-    if (user) {
-      geocoderControl = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: map
-      });
-      map.addControl(geocoderControl);
-    }
-
-    map.addControl(navControl);
-
+    updateMapControls();
   }, [user]);
 
 
@@ -84,14 +63,41 @@ function Map(props: MapProps) {
     setMapData((mapConfig as any)[newMapType]);
   }, [props.currentTab]);
 
-  const loadData = (map: mapboxgl.Map) => {
-    map.on("load", function () {
+  const updateMapControls = () => {
+    if (!map.current) return;
+
+
+    if (map.current.hasControl(geocoderControl.current)) {
+      map.current.removeControl(geocoderControl.current);
+    }
+
+    if (map.current.hasControl(navControl.current)) {
+      map.current.removeControl(navControl.current);
+    }
+
+    // Only allow location search for logged in users
+    if (user) {
+      geocoderControl.current = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: map.current
+      });
+      map.current.addControl(geocoderControl.current);
+    }
+
+    map.current.addControl(navControl.current);
+  }
+
+  const loadData = () => {
+    if (!map || !map.current) return;
+    var myMap = map.current;
+
+    myMap.on("load", function () {
       mapData.sources.forEach(s =>
-        map.addSource(s.id, s.source)
+        myMap.addSource(s.id, s.source)
       );
 
       mapData.layers.forEach(layer =>
-        map.addLayer(layer)
+        myMap.addLayer(layer)
       );
     });
   }

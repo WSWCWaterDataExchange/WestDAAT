@@ -7,7 +7,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
 import { useContext, useState } from 'react';
-import { AppContext } from '../App';
+import { AppContext } from '../AppProvider';
 
 interface SiteNavbarProps {
   currentTab: HomePageTab;
