@@ -17,6 +17,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped<ITestEngine, TestEngine>();
             builder.Services.AddScoped<ITestAccessor, TestAccessor>();
 
+            builder.Services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
+            builder.Services.AddScoped<ISiteAccessor, SiteAccessor>();
+
             builder.Services.AddLogging(logging =>
             {
                 logging.AddApplicationInsights();
