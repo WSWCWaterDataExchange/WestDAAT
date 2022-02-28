@@ -740,44 +740,6 @@
         }
       },
       {
-        "id": "unspecified",
-        "source-layer": "unspecified",
-        "legendValue": "Unspecified",
-        "source": "allocation-sites_2",
-        "layout": {
-          "visibility": "visible"
-        },
-        "type": "circle",
-        "paint": {
-          "circle-radius": {
-            "base": 1.25,
-            "stops": [
-              [
-                0,
-                2
-              ],
-              [
-                7,
-                2
-              ],
-              [
-                10,
-                4
-              ],
-              [
-                15,
-                20
-              ],
-              [
-                20,
-                40
-              ]
-            ]
-          },
-          "circle-color": "#D3D3D3"
-        }
-      },
-      {
         "id": "wildlife",
         "source-layer": "wildlife",
         "legendValue": "Wildlife",
@@ -854,5 +816,9 @@
         }
       }
     ]
+  },
+  "aggregate": {
+    "sources": [],
+    "layers": []
   }
 }

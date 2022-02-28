@@ -33,7 +33,7 @@ function HomePage() {
       <div className="d-flex flex-grow-1">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">
-          <Map />
+          <Map currentTab={currentTab} />
         </div>
       </div>
 

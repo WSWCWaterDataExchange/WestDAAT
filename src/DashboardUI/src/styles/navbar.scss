@@ -16,6 +16,11 @@
     margin-top: -5px;
     margin-right: 4px;
   }
+
+  &.second-nav {
+    box-shadow: 0px 3px 6px #00000029;
+    z-index: 100;
+  }
 }
 
 .ham-menu a {
@@ -26,7 +31,7 @@
     text-decoration: underline;
   }
 
-  &:hover, 
+  &:hover,
   &:active,
   &:focus,
   &:visited {
