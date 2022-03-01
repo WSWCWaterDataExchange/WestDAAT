@@ -9,6 +9,11 @@ import mapConfig from "../config/maps.json";
 import { HomePageTab } from "../pages/HomePage";
 import { AppContext, User } from "../AppProvider";
 
+// Fix transpile errors. Mapbox is working on a fix for this
+// eslint-disable-next-line import/no-webpack-loader-syntax
+(mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
+
 enum MapTypes {
   WaterRights = "waterRights",
   Aggregate = "aggregate",
