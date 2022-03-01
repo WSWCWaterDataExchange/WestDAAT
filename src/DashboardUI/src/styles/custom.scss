@@ -4,5 +4,10 @@
 $body-bg: #e4e4e4;
 $navbar-light-color: $primary-color;
 
+$primary: $primary-color;
+
+// Determines the text color for a given background. Default is 4.5
+$min-contrast-ratio: 3.9;
+
 // Import Bootstrap and its default variables
-@import '~bootstrap/scss/bootstrap.scss';
+@import "~bootstrap/scss/bootstrap.scss";

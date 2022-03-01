@@ -1,0 +1,12 @@
+@import "_colors.scss";
+
+.navbar {
+  color: $text-color-light;
+  background-color: $bs-gray-800;
+
+  .navbar-nav .active-tab.nav-link,
+  .navbar-nav .active-tab.nav-link:focus {
+    color: $text-color-dark;
+    border-bottom: 2px solid $text-color-dark;
+  }
+}

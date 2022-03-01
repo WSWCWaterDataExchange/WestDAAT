@@ -1,4 +1,10 @@
+@import "_colors.scss";
+
 .footer {
+  .navbar {
+    background-color: $bs-gray-800;
+  }
+
   .navbar-nav {
     a:not(:last-child):after {
       content: " |";

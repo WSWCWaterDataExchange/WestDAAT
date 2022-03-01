@@ -1,0 +1,13 @@
+@import "_colors.scss";
+
+.side-panel {
+  width: 352px;
+  background-color: $bs-gray-100;
+  box-shadow: 0px 3px 6px #00000029;
+  z-index: 100;
+
+  .map-info {
+    color: $text-color-light;
+    background-color: $bs-gray-600;
+  }
+}

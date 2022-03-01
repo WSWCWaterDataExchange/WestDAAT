@@ -1,0 +1,17 @@
+@import "_colors.scss";
+
+.home-page {
+  position: relative;
+  height: 100%;
+
+  .map {
+    .legend {
+      height: 200px;
+      width: 100px;
+      color: $text-color-light;
+      background-color: $bs-gray-900;
+      border-radius: 5px;
+      padding: 10px;
+    }
+  }
+}

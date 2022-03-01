@@ -3,36 +3,46 @@ import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
-function SiteNavbar() {
+import { HomePageTab } from '../pages/HomePage';
+import '../styles/navbar.scss';
+
+interface SiteNavbarProps {
+  currentTab: HomePageTab;
+  onTabClick: (tab: HomePageTab) => void;
+}
+
+function SiteNavbar(props: SiteNavbarProps) {
   return (
     <div>
-      <Navbar bg="dark" variant="dark" expand={false}>
+      <Navbar variant="dark" expand={false}>
         <Container fluid>
           <div>
             <Button className="navbar-toggler visible">
               <span className="navbar-toggler-icon"></span>
             </Button>
-            <Navbar.Brand>Western States Water Council</Navbar.Brand>
+            <span className="p-2">Western States Water Council</span>
           </div>
 
-          <Navbar.Brand>Water Data Exchange Data (WaDE) Dashboard</Navbar.Brand>
+          <span>Water Data Exchange Data (WaDE) Dashboard</span>
 
-          <Nav>
+          <Nav className="me-2">
             <Nav.Link href="#" active>Log In</Nav.Link>
           </Nav>
         </Container>
 
       </Navbar>
 
-      <Navbar bg="light">
-        <Container fluid>
+      <Navbar bg="light" className="p-0">
+        <Container fluid className="p-0">
           <Nav>
-            <Nav.Link href="#">Water Rights</Nav.Link>
-            <Nav.Link href="#">Aggregations</Nav.Link>
-            <Nav.Link href="#">Site Specific</Nav.Link>
+            {(Object.values(HomePageTab)).map(tab =>
+              <Nav.Link onClick={() => props.onTabClick(tab)} className={`py-3 px-4 ${props.currentTab === tab ? 'active-tab' : ''}`}>
+                {tab}
+              </Nav.Link>
+            )}
           </Nav>
 
-          <div>
+          <div className="mx-2">
             <Button className="ms-1">View Table Results</Button>
             <Button className="ms-1">Download Data</Button>
           </div>
