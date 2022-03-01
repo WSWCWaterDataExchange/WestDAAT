@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Azure.WebJobs;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using WesternStatesWater.WestDaat.Managers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -26,8 +27,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             _waterAllocationManager = waterAllocationManager;
         }
 
-        [FunctionName(nameof(GetWaterAllocationSiteDetails))]
-        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger("post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
+        [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
+        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
         {
             var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
 
