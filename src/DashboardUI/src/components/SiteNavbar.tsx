@@ -6,7 +6,8 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { AppContext } from '../AppProvider';
 
 interface SiteNavbarProps {
   currentTab: HomePageTab;
@@ -20,6 +21,8 @@ function SiteNavbar(props: SiteNavbarProps) {
 
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
+
+  const { user, setCurrentUser } = useContext(AppContext);
 
   return (
     <div>
@@ -43,17 +46,18 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <Nav className="mx-2">
-            <Nav.Link href="#" active>Log In</Nav.Link>
+            <Nav.Link active onClick={() => setCurrentUser("wadeuser")}>
+              {user ? `Hello, ${user.username}` : "Log In"}
+            </Nav.Link>
           </Nav>
         </Container>
-
       </Navbar>
 
-      <Navbar bg="light" className="p-0">
+      <Navbar bg="light" className="p-0 second-nav">
         <Container fluid className="p-0">
           <Nav>
             {(Object.values(HomePageTab)).map(tab =>
-              <Nav.Link onClick={() => props.onTabClick(tab)} className={`py-3 px-4 ${props.currentTab === tab ? 'active-tab' : ''}`}>
+              <Nav.Link onClick={() => props.onTabClick(tab)} className={`py-3 px-4 ${props.currentTab === tab ? 'active-tab' : ''}`} key={tab}>
                 {tab}
               </Nav.Link>
             )}

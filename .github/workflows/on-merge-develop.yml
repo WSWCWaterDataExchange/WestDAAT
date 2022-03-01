@@ -21,6 +21,7 @@ name: Deploy QA
 
 env:
   FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
+  REACT_APP_WEBAPI_URL: 'https://westdaat-qa.azurewebsites.net'
   AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource group name
   AZURE_FUNCTIONAPP_NAME: westdaat-qa         # set this to the name of your Azure Web App
   AZURE_STORAGE_ACCOUNT_NAME: westdaatqa      # set the storage account of static site
@@ -28,7 +29,6 @@ env:
   AZURE_CDN_PROFILE_NAME: westdaatqa          # set the cdn profile name
   DOTNET_VERSION: '6.0.x'                     # set this to the .NET Core version to use
   NODE_VERSION: '16.x'                        # set this to the node version to use
-
 
 on:
   push:

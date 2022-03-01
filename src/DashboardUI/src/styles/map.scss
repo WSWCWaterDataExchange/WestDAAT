@@ -1,0 +1,22 @@
+@import './colors.scss';
+
+.legend {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 26px 8px;
+  background-color: $bs-gray-900;
+  color: $text-color-light;
+  // Just behind the geocode search results
+  z-index: 2; 
+  padding: 6px;
+  border-radius: 5px;
+}
+
+.legend div span {
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  margin: 0 6px 0 3px;
+  width: 10px;
+}

@@ -6,20 +6,23 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import SideDetailsPage from "./pages/SiteDetailsPage";
 
 import './App.scss';
+import AppProvider from "./AppProvider";
 
 function App() {
   const queryClient = new QueryClient();
-  
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="site-details" element={<SideDetailsPage />} />
-        </Route>
-      </Routes>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <AppProvider>
+      <QueryClientProvider client={queryClient}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="site-details" element={<SideDetailsPage />} />
+          </Route>
+        </Routes>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </AppProvider>
   );
 }
 
