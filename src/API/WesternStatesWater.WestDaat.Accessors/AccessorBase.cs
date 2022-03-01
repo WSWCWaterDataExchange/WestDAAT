@@ -2,6 +2,7 @@
 using WesternStatesWater.WestDaat.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -22,7 +23,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error in Database Context");
+                Logger.LogError(e, "Error in Database Context.");
                 throw;
             }
         }

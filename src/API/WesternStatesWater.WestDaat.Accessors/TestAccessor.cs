@@ -15,7 +15,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 // Blow up if we can't connect to database
                 db.Database.OpenConnection();
-                return $"{nameof(TestAccessor)} : {input}";
+                return $"{nameof(TestAccessor)} : Database : {input}";
             });
         }
     }

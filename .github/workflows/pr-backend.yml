@@ -1,0 +1,44 @@
+name: PR Backend
+
+on:
+  push:
+    branches: [ develop, master ]
+  pull_request:
+    branches: [ develop, master ]
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/API
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create Database Container
+      run: docker-compose -f ci-compose.yml up -d
+      working-directory: .github
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: .NET Build
+      run: dotnet build --no-restore
+    - name: Create Database
+      run: docker exec -i mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
+    - name: Check out WaDE2.0
+      uses: actions/checkout@v2
+      with:
+        repository: WSWCWaterDataExchange/WaDE2.0
+        ref: develop
+    - name: DbUp
+      run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
+      working-directory: source/WesternStatesWater.WaDE.DbUp
+    - uses: actions/checkout@v2
+    - name: .NET Test
+      run: dotnet test
+      working-directory: src/API

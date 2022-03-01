@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            var result = _testManager.TestMe("Function app");
+            var result = _testManager.TestMe("Test Me");
 
             return new OkObjectResult(result);
         }
