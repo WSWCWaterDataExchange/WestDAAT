@@ -21,8 +21,8 @@ function HomePage() {
   const [showContactModal, setShowContactModal] = useState(false);
 
 
-  const handleTabClick = (tab: HomePageTab) => {
-    setUrlParams({ ...urlParams, tab });
+  const handleTabClick = (map: HomePageTab) => {
+    setUrlParams({ ...urlParams, map });
   }
 
   const shouldShowContactModal = (show: boolean) => {
@@ -30,7 +30,7 @@ function HomePage() {
   }
 
   useEffect(() => {
-    const tab = urlParams.get("tab")
+    const tab = urlParams.get("map")
     if (tab) {
       setCurrentTab(tab as HomePageTab);
     }
