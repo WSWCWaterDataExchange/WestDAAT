@@ -2,30 +2,47 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
+import { useState } from 'react';
 
 interface SiteNavbarProps {
   currentTab: HomePageTab;
   onTabClick: (tab: HomePageTab) => void;
+  showContactModal(show: boolean): void;
 }
 
 function SiteNavbar(props: SiteNavbarProps) {
+
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+
+  const handleClose = () => setShowHamburgerMenu(false);
+  const handleShow = () => setShowHamburgerMenu(true);
+
   return (
     <div>
       <Navbar variant="dark" expand={false}>
         <Container fluid>
-          <div>
-            <Button className="navbar-toggler visible">
+          <div className="d-flex">
+            <Button variant="link" onClick={handleShow}>
               <span className="navbar-toggler-icon"></span>
             </Button>
-            <span className="p-2">Western States Water Council</span>
+
+            <Nav className="mx-2">
+              <Nav.Link target="_blank" href="https://westernstateswater.org/" active>
+                <img alt="Wade Logo" src="/logo32x32.png" />
+                Western States Water Council
+              </Nav.Link>
+            </Nav>
           </div>
 
-          <span>Water Data Exchange Data (WaDE) Dashboard</span>
+          <Nav className="mx-2">
+            <Nav.Link href="/" active>Water Data Exchange Data (WaDE) Dashboard</Nav.Link>
+          </Nav>
 
-          <Nav className="me-2">
+          <Nav className="mx-2">
             <Nav.Link href="#" active>Log In</Nav.Link>
           </Nav>
         </Container>
@@ -48,6 +65,20 @@ function SiteNavbar(props: SiteNavbarProps) {
           </div>
         </Container>
       </Navbar>
+
+      <Offcanvas show={showHamburgerMenu} onHide={handleClose} className="ham-menu">
+        <Offcanvas.Header closeButton>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Nav defaultActiveKey="/" className="flex-column gap(10px)">
+            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/about ">About</Nav.Link>
+            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
+            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/Aggregate-Water-Data">Aggregate Water Use Data</Nav.Link>
+            <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
+            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/terms-of-service">Terms and Conditions</Nav.Link>
+          </Nav>
+        </Offcanvas.Body>
+      </Offcanvas>
     </div>
   );
 }

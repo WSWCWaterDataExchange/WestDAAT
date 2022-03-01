@@ -9,4 +9,27 @@
     color: $text-color-dark;
     border-bottom: 2px solid $text-color-dark;
   }
+
+  .navbar-nav .nav-link img {
+    width: 23px;
+    height: 26px;
+    margin-top: -5px;
+    margin-right: 4px;
+  }
+}
+
+.ham-menu a {
+  color: $text-color-dark;
+  margin-bottom: 10px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:hover, 
+  &:active,
+  &:focus,
+  &:visited {
+    color: $text-color-dark;
+  }
 }
