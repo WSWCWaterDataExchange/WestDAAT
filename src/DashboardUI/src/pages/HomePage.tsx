@@ -22,7 +22,7 @@ function HomePage() {
 
 
   const handleTabClick = (tab: HomePageTab) => {
-    setUrlParams({ ...urlParams, tab});
+    setUrlParams({ ...urlParams, tab });
   }
 
   const shouldShowContactModal = (show: boolean) => {
@@ -31,10 +31,11 @@ function HomePage() {
 
   useEffect(() => {
     const tab = urlParams.get("tab")
-    if(tab) {
+    if (tab) {
       setCurrentTab(tab as HomePageTab);
     }
-  })
+
+  }, [urlParams])
 
   return (
     <div className="home-page d-flex flex-column">
