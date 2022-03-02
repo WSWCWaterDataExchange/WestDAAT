@@ -21,9 +21,13 @@ namespace WesternStatesWater.WestDaat.Engines
             var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
                 data.Longitude,
                 data.Latitude,
-                data.AllocationBridgeSitesFact.First().AllocationAmount.Organization.State,
-                data.AllocationBridgeSitesFact.First().AllocationAmount.Organization.OrganizationUuid,
-                data.SiteUuid
+                data.HUC8,
+                data.HUC12,
+                data.County,
+                data.SiteTypeCv,
+                data.SiteUuid,
+                data.GniscodeCv,
+                data.SiteName
             );
 
             return geoConnexJson;

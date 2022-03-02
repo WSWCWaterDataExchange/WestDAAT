@@ -1,49 +1,82 @@
 {{
   "@context": [
     {{
-      "schema": "https://schema.org/",
-      "geojson": "https://purl.org/geojson/vocab#",
-      "Feature": "geojson:Feature",
-      "FeatureCollection": "geojson:FeatureCollection",
-      "Point": "geojson:Point",
-      "bbox": {{
-      "@container": "@list",
-      "@id": "geojson:bbox"
-    }},
-    "coordinates": {{
-      "@container": "@list",
-      "@id": "geojson:coordinates"
-    }},
-    "features": {{
-      "@container": "@set",
-      "@id": "geojson:features"
-    }},
-    "geometry": "geojson:geometry",
-    "id": "@id",
-    "properties": "geojson:properties",
-    "type": "@type"
-    }},
-    {{
-      "schema": "https://schema.org/",
-      "id": "schema:name",
-      "LINK": "schema:url"
-    }},
-    {{
-      "uri": "@id"
+      "schema": "http://schema.org/",
+      "skos": "https://www.w3.org/TR/skos-reference/",
+      "sosa": "http://www.w3.org/ns/sosa/",
+      "hyf": "https://www.opengis.net/def/schema/hy_features/hyf/",
+      "gsp": "http://www.opengeospatial.org/standards/geosparql/",
+      "name": "schema:name",
+      "sameAs": "schema:sameAs",
+      "related": "skos:related",
+      "description": "schema:description",
+      "geo": "schema:geo",
+      "image": {{
+        "@id": "schema:image",
+        "@type": "@id"
+      }}
     }}
   ],
-  "type": "Feature",
-  "geometry": {{
-  "type": "Point",
-  "coordinates": [ {0} , {1} ]
+  "@id": "https://geoconnex.us/wade/sites/{6}",
+  "@type": [
+    "https://www.opengis.net/def/schema/hy_features/hyf/HY_HydrometricFeature",
+    "https://www.opengis.net/def/schema/hy_features/hyf/HY_HydroLocation"
+  ],
+  "name": "{8}",
+  "description": "",
+  "sameAs": "",
+  "schema:about": [
+    {{
+      "schema:url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/{7}"
+    }},
+    {{
+      "schema:url": "",
+      "schema:provider": "https://schema.westernstateswater.org/columns/Core_Organizations_dim_OrganizationDataMappingURL.html"
+    }}
+  ],
+  "hyf:referencedPosition": [
+    {{
+      "hyf:HY_IndirectPosition": {{
+        "hyf:distanceExpression": {{
+          "hyf:HY_DistanceFromReferent": {{
+            "hyf:interpolative": ""
+          }}
+        }},
+        "hyf:distanceDescription": {{
+          "hyf:HY_DistanceDescription": ""
+        }},
+        "hyf:linearElement": ""
+      }}
+    }},
+    {{
+      "hyf:HY_IndirectPosition": {{
+        "hyf:linearElement": ""
+      }}
+    }}
+  ],
+  "sosa:isFeatureOfInterestOf": {{
+    "@id": "https://wade-api-qa.azure-api.net/v1/SiteAllocationAmounts/{6}",
+    "@type": "sosa:ObservationCollection",
+    "schema:format": [
+      "application/json"
+    ],
+    "schema:provider": "https://westernstateswater.org/wade"
   }},
-    "properties": {{
-    "fid": 101913,
-    "StateID": "{2}",
-    "DataSourceOrganizationID": "{3}",
-    "id": "https://geoconnex.us/wade/sites/{4}",
-    "uri": "https://geoconnex.us/wade/sites/{4}",
-    "LINK": "https://wade-api-qa.azure-api.net/v1/SiteAllocationAmounts?SiteUUID={4}"
+  "schema:geoWithin": [
+    "https://geoconnex.us/counties/{4}",
+    "https://geoconnex.us/nhdplusv2/huc12/{3}",
+    "https://geoconnex.us/ref/hu08/{2}"
+  ],
+  "hyf:HY_HydroLocationType": [
+    "{5}"
+  ],
+  "geo": {{
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude": "{1}",
+    "schema:longitude": "{0}"
   }},
-  "id": "https://geoconnex.us/wade/sites/{4}"
+  "gsp:hasGeometry": {{
+    "@type": "gsp:Geometry",
+    "gsp:asWKT": "POINT ({0} {1})"
+  }}
 }}
