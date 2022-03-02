@@ -7,21 +7,21 @@ namespace WesternStatesWater.WestDaat.Managers
 {
     public class WaterAllocationManager : ManagerBase, IWaterAllocationManager
     {
-        private readonly IWaterAllocationEngine _waterAllocationEngine;
+        private readonly IGeoConnexEngine _geoConnexEngine;
         private readonly ISiteAccessor _siteAccessor;
 
-        public WaterAllocationManager(ISiteAccessor siteAccessor, IWaterAllocationEngine waterAllocationEngine,
+        public WaterAllocationManager(ISiteAccessor siteAccessor, IGeoConnexEngine geoConnexEngine,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _siteAccessor = siteAccessor;
-            _waterAllocationEngine = waterAllocationEngine;
+            _geoConnexEngine = geoConnexEngine;
         }
 
         public string GetWaterAllocationSiteDetailsById(string siteUuid)
         {
             var data = _siteAccessor.GetWaterAllocationSiteDetailsById(siteUuid);
 
-            var json = _waterAllocationEngine.BuildGeoconnexJson(data);
+            var json = _geoConnexEngine.BuildGeoconnexJson(data);
 
             return json;
         }

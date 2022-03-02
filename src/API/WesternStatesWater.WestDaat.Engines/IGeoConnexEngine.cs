@@ -2,7 +2,7 @@
 using WesternStatesWater.WestDaat.Common;
 namespace WesternStatesWater.WestDaat.Engines
 {
-    public interface IWaterAllocationEngine : IServiceContractBase
+    public interface IGeoConnexEngine : IServiceContractBase
     {
         string BuildGeoconnexJson(SitesDim sitesDim);
     }
