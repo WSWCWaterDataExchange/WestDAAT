@@ -13,9 +13,9 @@ namespace WesternStatesWater.WestDaat.Accessors
             base.Logger = logger;
         }
         
-        internal T UsingDatabaseContext<T>(Func<EntityFramework.DatabaseContext, T> func)
+        internal T UsingDatabaseContext<T>(Func<DatabaseContext, T> func)
         {
-            using var db = new EntityFramework.DatabaseContext();
+            using var db = new DatabaseContext();
 
             try
             {
