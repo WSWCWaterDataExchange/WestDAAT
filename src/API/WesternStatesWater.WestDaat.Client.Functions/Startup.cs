@@ -36,11 +36,17 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddSingleton(configuration.GetDatabaseConfiguration());
             builder.Services.AddSingleton(configuration.GetNldiConfiguration());
 
+            builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
+            {
+                a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
+            });
             builder.Services.AddTransient<ITestManager, TestManager>();
 
             builder.Services.AddTransient<ITestEngine, TestEngine>();
 
             builder.Services.AddTransient<ITestAccessor, TestAccessor>();
+            builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
+            builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
             builder.Services.AddLogging(logging =>
             {
                 logging.AddApplicationInsights();
