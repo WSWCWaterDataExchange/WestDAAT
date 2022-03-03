@@ -18,12 +18,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                                         .Build();
         }
 
-        public static Dictionary<string, string> DefaultTestConfiguration => new Dictionary<string, string>
+        public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
 
         };
 
-        private ILoggerFactory _loggerFactory;
+        private ILoggerFactory? _loggerFactory;
         public static IConfiguration Configuration { get; private set; }
 
         [TestInitialize]
@@ -39,12 +39,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [TestCleanup]
         public void BaseTestCleanup()
         {
-            _loggerFactory.Dispose();
+            _loggerFactory?.Dispose();
         }
 
         public ILogger<T> CreateLogger<T>()
         {
-            return _loggerFactory.CreateLogger<T>();
+            return _loggerFactory!.CreateLogger<T>();
         }
 
         protected virtual void Dispose(bool disposing)
