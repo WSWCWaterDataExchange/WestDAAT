@@ -1,9 +1,9 @@
-﻿using WesternStatesWater.WestDaat.Accessors;
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Engines;
@@ -29,6 +29,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                                         .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                                         .AddEnvironmentVariables();
         }
+
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var configuration = builder.GetContext().Configuration;
@@ -40,13 +41,17 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
             });
+
             builder.Services.AddTransient<ITestManager, TestManager>();
 
             builder.Services.AddTransient<ITestEngine, TestEngine>();
 
+            builder.Services.AddTransient<INldiAccessor, NldiAccessor>();
             builder.Services.AddTransient<ITestAccessor, TestAccessor>();
+
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
+
             builder.Services.AddLogging(logging =>
             {
                 logging.AddApplicationInsights();
