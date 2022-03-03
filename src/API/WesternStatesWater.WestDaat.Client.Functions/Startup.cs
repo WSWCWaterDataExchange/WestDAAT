@@ -27,6 +27,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                                         .AddInMemoryCollection(AzureFunctionConfiguration)
                                         .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
                                         .AddEnvironmentVariables();
         }
 

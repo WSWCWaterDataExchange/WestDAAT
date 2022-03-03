@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                                         .AddInMemoryCollection(DefaultTestConfiguration)
                                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
                                         .AddEnvironmentVariables()
                                         .Build();
         }
