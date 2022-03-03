@@ -7,7 +7,10 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
     {
         public AllocationAmountFactFaker()
         {
-            this.RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate());
+            this.RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate())
+                .RuleFor(a => a.DataPublicationDate, b => new DateDimFaker().Generate())
+                .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
+                .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate());
         }
     }
 }

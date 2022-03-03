@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]
 
 namespace WesternStatesWater.WestDaat.Accessors.Mapping
 {

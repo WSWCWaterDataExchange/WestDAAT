@@ -18,10 +18,9 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (var db = _databaseContextFactory.Create())
             {
-                throw new WestDaatException(db.Database.GetDbConnection().ConnectionString);
                 // Blow up if we can't connect to database
-                // db.Database.OpenConnection();
-                // return $"{nameof(TestAccessor)} : Database : {input}";
+                db.Database.OpenConnection();
+                return $"{nameof(TestAccessor)} : Database : {input}";
             }
         }
     }

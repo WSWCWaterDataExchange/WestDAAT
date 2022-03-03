@@ -1,5 +1,3 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests

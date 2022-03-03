@@ -1,7 +1,6 @@
-﻿using WesternStatesWater.WestDaat.Engines;
 using Microsoft.Extensions.Logging;
-using System;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Engines;
 
 namespace WesternStatesWater.WestDaat.Managers
 {

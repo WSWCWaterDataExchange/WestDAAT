@@ -1,8 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.ManagerTests")]
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {

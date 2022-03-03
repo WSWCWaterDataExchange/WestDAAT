@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using WesternStatesWater.WestDaat.Common.Configuration;
 

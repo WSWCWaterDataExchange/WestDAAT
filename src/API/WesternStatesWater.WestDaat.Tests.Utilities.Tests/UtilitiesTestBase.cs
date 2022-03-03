@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests

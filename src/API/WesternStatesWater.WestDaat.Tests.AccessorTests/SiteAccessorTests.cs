@@ -23,12 +23,19 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             }
 
             var accessor = new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
-            
+
             // Act
-            var result = accessor.GetSiteByUuid(siteDims.First().SiteUuid);
+            var searchSite = siteDims.First();
+            var result = accessor.GetSiteByUuid(searchSite.SiteUuid);
             
 
             // Assert
+            result.Should().NotBeNull();
+            result.County.Should().Be(searchSite.County);
+            result.Latitude.Should().Be(searchSite.Latitude);
+            result.Longitude.Should().Be(searchSite.Longitude);
+            result.AllocationIds.Should().HaveCountGreaterThan(0);
+            result.AllocationIds.First().Should().Be(searchSite.AllocationBridgeSitesFact.First().AllocationBridgeId);
         }
     }
 }

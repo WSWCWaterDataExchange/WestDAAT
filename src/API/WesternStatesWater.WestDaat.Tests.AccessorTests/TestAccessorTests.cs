@@ -1,9 +1,5 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
