@@ -10,8 +10,20 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     [TestClass]
     public abstract class AccessorTestBase : IDisposable
     {
-        private ILoggerFactory _loggerFactory;
+        static AccessorTestBase()
+        {
+            Configuration = new ConfigurationBuilder()
+                                        .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                                        .AddInMemoryCollection(DefaultTestConfiguration)
+                                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                                        .AddEnvironmentVariables()
+                                        .Build();
+        }
 
+
+        private ILoggerFactory _loggerFactory;
+        public static IConfiguration Configuration { get; private set; }
         private TransactionScope _transactionScopeFixture;
 
         [TestInitialize]
@@ -26,11 +38,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 TransactionScopeOption.Required,
                 transactionOptions);
 
-            var services = new ServiceCollection()
-                .AddLogging(config => config.AddConsole())
-                .BuildServiceProvider();
-
-            _loggerFactory = services.GetRequiredService<ILoggerFactory>();
+            _loggerFactory = LoggerFactory.Create(a =>
+            {
+                a.AddConfiguration(Configuration.GetSection("Logging"));
+                a.AddConsole();
+            });
         }
 
         [TestCleanup]
@@ -44,6 +56,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             return _loggerFactory.CreateLogger<T>();
         }
+
+
 
         protected AmbientContext Context { get; } = new AmbientContext();
 
