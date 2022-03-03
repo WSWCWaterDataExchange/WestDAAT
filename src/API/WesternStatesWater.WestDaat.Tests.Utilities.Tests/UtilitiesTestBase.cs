@@ -3,51 +3,35 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Transactions;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
-namespace WesternStatesWater.WestDaat.Tests.AccessorTests
+namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 {
     [TestClass]
-    public abstract class AccessorTestBase : IDisposable
+    public abstract class UtilitiesTestBase : IDisposable
     {
-        static AccessorTestBase()
+        static UtilitiesTestBase()
         {
             Configuration = new ConfigurationBuilder()
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                                         .AddInMemoryCollection(DefaultTestConfiguration)
                                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                                         .AddEnvironmentVariables()
                                         .Build();
         }
 
         public static Dictionary<string, string> DefaultTestConfiguration => new Dictionary<string, string>
         {
-            { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "5" },
-            { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "4" },
-            { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "3" },
-            { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "2" }
+
         };
 
         private ILoggerFactory _loggerFactory;
         public static IConfiguration Configuration { get; private set; }
-        private TransactionScope _transactionScopeFixture;
 
         [TestInitialize]
         public void BaseTestInitialize()
         {
-            var transactionOptions = new TransactionOptions
-            {
-                IsolationLevel = IsolationLevel.ReadCommitted,
-                Timeout = TransactionManager.MaximumTimeout
-            };
-            _transactionScopeFixture = new TransactionScope(
-                TransactionScopeOption.Required,
-                transactionOptions);
-
             _loggerFactory = LoggerFactory.Create(a =>
             {
                 a.AddConfiguration(Configuration.GetSection("Logging"));
@@ -58,21 +42,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [TestCleanup]
         public void BaseTestCleanup()
         {
-            _transactionScopeFixture.Dispose();
             _loggerFactory.Dispose();
         }
 
-        protected ILogger<T> CreateLogger<T>()
+        public ILogger<T> CreateLogger<T>()
         {
             return _loggerFactory.CreateLogger<T>();
         }
-
-        internal IDatabaseContextFactory CreateDatabaseContextFactory()
-        {
-            return new DatabaseContextFactory(Configuration.GetDatabaseConfiguration());
-        }
-
-        protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)
         {

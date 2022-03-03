@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Clients", "1. Clients", "{49ED5613-E256-4FDF-BA66-9924B7BDA830}"
 EndProject
@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.IntegrationTests", "WesternStatesWater.WestDaat.Tests.IntegrationTests\WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj", "{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Client.Functions", "WesternStatesWater.WestDaat.Client.Functions\WesternStatesWater.WestDaat.Client.Functions.csproj", "{9AAA8E06-CB84-4B28-B475-29A4E666045E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Client.Functions", "WesternStatesWater.WestDaat.Client.Functions\WesternStatesWater.WestDaat.Client.Functions.csproj", "{9AAA8E06-CB84-4B28-B475-29A4E666045E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tests.UtilitiesTests", "WesternStatesWater.WestDaat.Tests.Utilities.Tests\WesternStatesWater.WestDaat.Tests.UtilitiesTests.csproj", "{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 		{9AAA8E06-CB84-4B28-B475-29A4E666045E} = {49ED5613-E256-4FDF-BA66-9924B7BDA830}
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76EF2099-5BC9-4F48-8EBA-524560067EC3}

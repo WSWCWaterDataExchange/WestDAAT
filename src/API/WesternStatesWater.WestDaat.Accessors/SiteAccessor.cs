@@ -6,26 +6,28 @@ using System.Linq;
 using AutoMapper.QueryableExtensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
-    public class SiteAccessor : AccessorBase, ISiteAccessor
+    internal class SiteAccessor : AccessorBase, ISiteAccessor
     {
-        public SiteAccessor(ILogger<SiteAccessor> logger) : base(logger)
+        public SiteAccessor(ILogger<SiteAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
         {
+            _databaseContextFactory = databaseContextFactory;
         }
+
+        private readonly IDatabaseContextFactory _databaseContextFactory;
 
         public Site GetSiteByUuid(string siteUuid)
         {
-            var site = UsingDatabaseContext<Site>(db =>
+            using (var db = _databaseContextFactory.Create())
             {
                 return db.SitesDim
                     .Where(x => x.SiteUuid == siteUuid)
-                    .ProjectTo<Site>(DTOMapper.Configuration)
+                    .ProjectTo<Site>(DtoMapper.Configuration)
                     .Single();
-            });
-
-            return site;
+            }
         }
     }
 }

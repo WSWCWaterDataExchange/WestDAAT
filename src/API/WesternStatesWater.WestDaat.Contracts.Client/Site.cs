@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NetTopologySuite.Geometries;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
@@ -13,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string SiteUuid { get; set; }
         public string GniscodeCv { get; set; }
         public string SiteName { get; set; }
-        public string GeometryWKT { get; set; }
+        public Geometry Geometry { get; set; }
 
         public List<long> AllocationIds { get; set; }
     }

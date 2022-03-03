@@ -1,0 +1,51 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.524407104,
+            38.406847097
+          ],
+          [
+            -95.522487603,
+            38.407234497
+          ],
+          [
+            -95.521353602,
+            38.407302193
+          ],
+          [
+            -95.519783802,
+            38.407209396
+          ],
+          [
+            -95.518417805,
+            38.406842194
+          ],
+          [
+            -95.516819805,
+            38.406062998
+          ],
+          [
+            -95.516064301,
+            38.405787796
+          ]
+        ]
+      },
+      "properties": {
+        "type": "",
+        "source": "comid",
+        "sourceName": "NHDPlus comid",
+        "identifier": "10124108",
+        "name": "",
+        "uri": "",
+        "comid": "10124108",
+        "navigation": "https://labs.waterdata.usgs.gov/api/nldi/linked-data/comid/10124108/navigation"
+      }
+    }
+  ]
+}

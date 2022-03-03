@@ -5,13 +5,13 @@ using WesternStatesWater.WestDaat.Accessors.Mapping;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    public class DTOMapperTests
+    public class DtoMapperTests
     {
         [TestMethod]
         [TestCategory("Accessor Tests")]
-        public void DTOMapper_IsDTOMapperConfigValid()
+        public void DtoMapper_IsDtoMapperConfigValid()
         {
-            DTOMapper.Configuration.AssertConfigurationIsValid();
+            DtoMapper.Configuration.AssertConfigurationIsValid();
         }
     }
 }

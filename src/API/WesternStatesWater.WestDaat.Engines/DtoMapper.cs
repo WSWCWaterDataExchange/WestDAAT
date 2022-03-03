@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.ManagerTests")]
+[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.EngineTests")]
 
-namespace WesternStatesWater.WestDaat.Managers.Mapping
+namespace WesternStatesWater.WestDaat.Engines
 {
     internal static class DtoMapper
     {
@@ -21,7 +20,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 {
                     var config = new MapperConfiguration(cfg =>
                     {
-                        cfg.AddProfile<ApiProfile>();
+                        // NOTE: CreateMap<Source, Destination>()
+                        // ForMember(destination member, source mapping/member option)
+                        //cfg.CreateMap<WebStoreCatalog, WSCatContract.WebStoreCatalog>()
+                        //    .ForMember(a => a.Products, b => b.Ignore());
                     });
                     _config = config;
                 }
@@ -29,14 +31,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             }
         }
 
-        public static T Map<T>(this object source, Action<IMappingOperationOptions> opts = null)
+        public static void Map(object source, object dest)
         {
-            return Mapper.Map<T>(source, opts ?? (a => { }));
+            Mapper.Map(source, dest, source.GetType(), dest.GetType());
         }
 
-        public static void Map(this object source, object dest, Action<IMappingOperationOptions> opts = null)
+        public static T Map<T>(object source)
         {
-            Mapper.Map(source, dest, opts ?? (a => { }));
+            return Mapper.Map<T>(source);
         }
     }
 }

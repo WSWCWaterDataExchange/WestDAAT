@@ -3,10 +3,11 @@ using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
+[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]
 
 namespace WesternStatesWater.WestDaat.Accessors.Mapping
 {
-    internal static class DTOMapper
+    internal static class DtoMapper
     {
         static IMapper _mapper;
         private static IConfigurationProvider _config;

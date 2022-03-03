@@ -1,8 +1,7 @@
-﻿using WesternStatesWater.WestDaat.Common;
-using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -44,7 +43,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 Utilities = utilityResults.ToArray()
             };
 
-            return JsonConvert.SerializeObject(result);
+            return System.Text.Json.JsonSerializer.Serialize(result);
         }
     }
 }
