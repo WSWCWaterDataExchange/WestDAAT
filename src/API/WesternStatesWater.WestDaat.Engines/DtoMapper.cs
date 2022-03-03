@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.ManagerTests")]
+[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.EngineTests")]
 
-namespace WesternStatesWater.WestDaat.Managers
+namespace WesternStatesWater.WestDaat.Engines
 {
-    internal static class DTOMapper
+    internal static class DtoMapper
     {
         static IMapper _mapper;
         private static IConfigurationProvider _config;

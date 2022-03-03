@@ -16,10 +16,16 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class Startup : FunctionsStartup
     {
+        private readonly Dictionary<string, string> AzureFunctionConfiguration = new Dictionary<string, string>
+        {
+            {"Value:FUNCTIONS_WORKER_RUNTIME", "dotnet" }
+        };
+
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
         {
             builder.ConfigurationBuilder.SetBasePath(Environment.CurrentDirectory)
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                                        .AddInMemoryCollection(AzureFunctionConfiguration)
                                         .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                                         .AddEnvironmentVariables();
         }

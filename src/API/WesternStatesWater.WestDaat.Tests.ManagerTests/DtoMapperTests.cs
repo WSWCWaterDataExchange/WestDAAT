@@ -4,13 +4,13 @@ using WesternStatesWater.WestDaat.Managers;
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
     [TestClass]
-    public class DTOMapperTests
+    public class DtoMapperTests
     {
         [TestMethod]
         [TestCategory("Manager Tests")]
-        public void DTOMapper_IsDTOMApperConfigValid()
+        public void DtoMapper_IsDtoMApperConfigValid()
         {
-            DTOMapper.Configuration.AssertConfigurationIsValid();
+            DtoMapper.Configuration.AssertConfigurationIsValid();
         }
     }
 }

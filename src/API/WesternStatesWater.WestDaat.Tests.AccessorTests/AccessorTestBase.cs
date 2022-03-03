@@ -52,12 +52,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             _loggerFactory.Dispose();
         }
 
-        public ILogger<T> CreateLogger<T>()
+        protected ILogger<T> CreateLogger<T>()
         {
             return _loggerFactory.CreateLogger<T>();
         }
 
-
+        internal IDatabaseContextFactory CreateDatabaseContextFactory()
+        {
+            return new DatabaseContextFactory(Configuration.GetDatabaseConfiguration());
+        }
 
         protected AmbientContext Context { get; } = new AmbientContext();
 
