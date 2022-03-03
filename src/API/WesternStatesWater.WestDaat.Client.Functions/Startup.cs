@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Engines;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Contracts.Client;
 
 [assembly: FunctionsStartup(typeof(WesternStatesWater.WestDaat.Client.Functions.Startup))]
 

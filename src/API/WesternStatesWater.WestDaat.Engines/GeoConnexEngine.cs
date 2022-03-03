@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Engines.Resources;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Engines
 {
@@ -16,21 +17,27 @@ namespace WesternStatesWater.WestDaat.Engines
         {
         }
 
-        public string BuildGeoconnexJson(SitesDim data)
+        public string BuildGeoconnexJson(Site data)
         {
-            var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
-                data.Longitude,
-                data.Latitude,
-                data.HUC8,
-                data.HUC12,
-                data.County,
-                data.SiteTypeCv,
-                data.SiteUuid,
-                data.GniscodeCv,
-                data.SiteName
-            );
+            // var orgMappingUrl = data.AllocationBridgeSitesFact.FirstOrDefault()?.AllocationAmount?.Organization?.OrganizationDataMappingUrl ?? string.Empty;
+            
+            // var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
+            //     data.Longitude,         // {0}
+            //     data.Latitude,          // {1}
+            //     data.HUC8,              // {2}
+            //     data.HUC12,             // {3}
+            //     data.County,            // {4}
+            //     data.SiteTypeCv,        // {5}
+            //     data.SiteUuid,          // {6}
+            //     data.GniscodeCv,        // {7}
+            //     data.SiteName,          // {8}
+            //     orgMappingUrl,          // {9}
+            //     data.Geometry?.AsText() // {10}
+            // );
 
-            return geoConnexJson;
+            // return geoConnexJson;
+
+            return "todo";
         }
     }
 }

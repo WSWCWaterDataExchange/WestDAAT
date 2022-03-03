@@ -1,7 +1,10 @@
-﻿using WesternStatesWater.WestDaat.Engines;
+﻿using System;
+using WesternStatesWater.WestDaat.Engines;
 using Microsoft.Extensions.Logging;
-using System;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Managers.Mappings;
+using DC = WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -17,11 +20,14 @@ namespace WesternStatesWater.WestDaat.Managers
             _geoConnexEngine = geoConnexEngine;
         }
 
-        public string GetWaterAllocationSiteDetailsById(string siteUuid)
+        public string GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
-            var data = _siteAccessor.GetWaterAllocationSiteDetailsById(siteUuid);
+            var site = _siteAccessor.GetSiteByUuid(siteUuid).Map<DC.Site>();
 
-            var json = _geoConnexEngine.BuildGeoconnexJson(data);
+            // Call accessor to get Allocation -> Organization -> OrganizationDataMappingUrl
+            // Pass into engine to build json
+
+            var json = _geoConnexEngine.BuildGeoconnexJson(site);
 
             return json;
         }

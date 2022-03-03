@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using WesternStatesWater.WestDaat.Managers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -32,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
 
-            var result = _waterAllocationManager.GetWaterAllocationSiteDetailsById(siteUuid);
+            var result = _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return new OkObjectResult(result);
         }

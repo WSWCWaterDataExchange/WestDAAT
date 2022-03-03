@@ -31,7 +31,7 @@
     }},
     {{
       "schema:url": "",
-      "schema:provider": "https://schema.westernstateswater.org/columns/Core_Organizations_dim_OrganizationDataMappingURL.html"
+      "schema:provider": "{9}"
     }}
   ],
   "hyf:referencedPosition": [
@@ -77,6 +77,6 @@
   }},
   "gsp:hasGeometry": {{
     "@type": "gsp:Geometry",
-    "gsp:asWKT": "POINT ({0} {1})"
+    "gsp:asWKT": "{10}"
   }}
 }}

@@ -1,9 +1,10 @@
-﻿using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common;
+﻿using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+
 namespace WesternStatesWater.WestDaat.Engines
 {
     public interface IGeoConnexEngine : IServiceContractBase
     {
-        string BuildGeoconnexJson(SitesDim sitesDim);
+        string BuildGeoconnexJson(Site site);
     }
 }
