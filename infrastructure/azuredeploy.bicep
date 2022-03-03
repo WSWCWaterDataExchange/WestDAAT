@@ -243,19 +243,16 @@ siteConfig: {
           value: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
         }
         {
-          name: 'AppSettings:AccessTokenDatabaseTenantId'
+          name: 'Database:AccessTokenDatabaseTenantId'
           value: subscription().tenantId
         }
         {
-          name: 'AppSettings:AccessTokenDatabaseResource'
+          name: 'Database:AccessTokenDatabaseResource'
           value: 'https://database.windows.net/'
         }
-      ]
-      connectionStrings: [
         {
-          name: 'WadeDatabase'
-          connectionString: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-          type: 'SQLServer'
+          name: 'Database:ConnectionString'
+          value: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
       ]
     }
