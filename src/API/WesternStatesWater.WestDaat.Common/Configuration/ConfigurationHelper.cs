@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             {
                 { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                 { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2;Integrated Security=true;" },
-                { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi" },
+                { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi/" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
