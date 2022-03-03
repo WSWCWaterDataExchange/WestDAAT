@@ -2,9 +2,9 @@
 using WesternStatesWater.WestDaat.Engines;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Managers.Mappings;
 using DC = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers
 {

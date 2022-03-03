@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.ManagerTests")]
 
-namespace WesternStatesWater.WestDaat.Managers.Mappings
+namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
     internal static class DTOMapper
     {

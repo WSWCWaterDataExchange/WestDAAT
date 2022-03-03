@@ -13,8 +13,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         public ApiProfile()
         {
             CreateMap<EF.SitesDim, Site>()
-                .ForMember(s => s.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
-                .ForMember(s => s.GeometryWKT, b => b.MapFrom(c => c.Geometry != null ? c.Geometry.ToString() : null));
+                .ForMember(s => s.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)));
         }
     }
 }

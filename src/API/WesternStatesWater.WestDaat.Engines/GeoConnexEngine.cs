@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Engines
             //     data.GniscodeCv,        // {7}
             //     data.SiteName,          // {8}
             //     orgMappingUrl,          // {9}
-            //     data.Geometry?.AsText() // {10}
+            //     data.Geometry.ToString()// {10}
             // );
 
             // return geoConnexJson;

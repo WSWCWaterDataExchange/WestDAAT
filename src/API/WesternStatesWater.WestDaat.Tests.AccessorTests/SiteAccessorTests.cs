@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -12,8 +14,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public void SiteAccessor_TestMe()
         {
             // Arrange
+            var siteDims = new SitesDimFaker().Generate(10);
+            using(var db = new DatabaseContext())
+            {
+                db.SitesDim.AddRange(siteDims);
+                db.SaveChanges();
+            }
+
             var accessor = new SiteAccessor(CreateLogger<SiteAccessor>());
-            throw new NotImplementedException();
             
             // Act
 
