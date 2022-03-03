@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public static Dictionary<string, string> DefaultConfiguration => new Dictionary<string, string>
             {
                 { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                { $"{ConfigurationRootNames.Databases}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2;Integrated Security=true;" },
+                { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2;Integrated Security=true;" },
                 { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Databases).Get<DatabaseConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Database).Get<DatabaseConfiguration>();
         }
 
         public static UsgsNldiServiceConfiguration GetUsgsNldiServiceConfiguration(this IConfiguration config)
@@ -35,7 +35,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
 
     public static class ConfigurationRootNames
     {
-        public const string Databases = "Databases";
+        public const string Database = "Database";
         public const string UsgsNldiService = "UsgsNldiService";
         public const string Nldi = "Nldi";
     }
