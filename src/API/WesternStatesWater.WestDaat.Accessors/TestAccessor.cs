@@ -1,22 +1,28 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Data.SqlClient;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
-    public class TestAccessor : AccessorBase, ITestAccessor
+    internal class TestAccessor : AccessorBase, ITestAccessor
     {
-        public TestAccessor(ILogger<TestAccessor> logger) : base(logger) { }
+        public TestAccessor(ILogger<TestAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        {
+            _databaseContextFactory = databaseContextFactory;
+        }
+
+        private readonly IDatabaseContextFactory _databaseContextFactory;
 
         public override string TestMe(string input)
         {
-            return UsingDatabaseContext(db =>
+            using (var db = _databaseContextFactory.Create())
             {
                 // Blow up if we can't connect to database
                 db.Database.OpenConnection();
                 return $"{nameof(TestAccessor)} : Database : {input}";
-            });
+            }
         }
     }
+
+
 }

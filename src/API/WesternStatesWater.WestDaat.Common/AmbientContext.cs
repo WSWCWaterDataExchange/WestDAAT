@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WesternStatesWater.WestDaat.Common
+﻿namespace WesternStatesWater.WestDaat.Common
 {
     public class AmbientContext
     {

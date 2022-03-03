@@ -1,8 +1,6 @@
-using System;
-using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Transactions;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using WesternStatesWater.WestDaat.Common;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace WesternStatesWater.WestDaat.Common
 {

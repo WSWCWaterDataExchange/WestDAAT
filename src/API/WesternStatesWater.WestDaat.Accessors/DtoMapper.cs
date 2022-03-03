@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using System.Runtime.CompilerServices;
-using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
-
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
-    internal static class DTOMapper
+    internal static class DtoMapper
     {
         static IMapper _mapper;
         private static IConfigurationProvider _config;

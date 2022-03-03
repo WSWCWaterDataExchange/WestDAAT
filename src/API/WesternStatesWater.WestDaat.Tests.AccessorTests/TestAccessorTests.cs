@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using WesternStatesWater.WestDaat.Accessors;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
@@ -12,13 +11,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public void TestAccessor_TestMe()
         {
             // Arrange
-            var accessor = new TestAccessor(CreateLogger<TestAccessor>());
+            var accessor = new TestAccessor(NullLogger<TestAccessor>.Instance, CreateDatabaseContextFactory());
 
             // Act
             var result = accessor.TestMe("Unit test");
 
             // Assert
-            result.Contains("Unit test", StringComparison.InvariantCultureIgnoreCase);
+            result.Should().ContainEquivalentOf("Unit test");
         }
     }
 }

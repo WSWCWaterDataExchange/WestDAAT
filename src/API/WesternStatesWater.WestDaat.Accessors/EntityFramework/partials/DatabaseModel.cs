@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-
-namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
+﻿namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
     public abstract class DatabaseModel
     {
