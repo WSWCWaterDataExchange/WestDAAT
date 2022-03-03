@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using WesternStatesWater.WestDaat.Common.Configuration;
+﻿using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {

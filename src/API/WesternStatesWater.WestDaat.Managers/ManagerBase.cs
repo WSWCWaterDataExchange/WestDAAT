@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
 

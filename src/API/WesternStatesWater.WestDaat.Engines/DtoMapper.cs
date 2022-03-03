@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.EngineTests")]
 
 namespace WesternStatesWater.WestDaat.Engines
 {

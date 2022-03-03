@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WesternStatesWater.WestDaat.Managers;
+﻿using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {

@@ -1,14 +1,6 @@
-﻿using Bogus;
-using FluentAssertions;
-using GeoJSON.Text.Feature;
+﻿using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Exceptions;
@@ -132,7 +124,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             if (shouldError)
             {
                 Func<Task> call = async () => await sut.GetNldiFeatures(latitude, longitude, NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.None);
-                call.Should().Throw<WestDaatException>();
+                await call.Should().ThrowAsync<WestDaatException>();
             }
             else
             {

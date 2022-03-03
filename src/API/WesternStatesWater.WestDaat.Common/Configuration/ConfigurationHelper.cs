@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 
 namespace WesternStatesWater.WestDaat.Common.Configuration
 {
