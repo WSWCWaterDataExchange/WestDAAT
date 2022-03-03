@@ -35,8 +35,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var configuration = builder.GetContext().Configuration;
 
-            builder.Services.AddSingleton(configuration.GetDatabaseConfiguration());
-            builder.Services.AddSingleton(configuration.GetNldiConfiguration());
+            builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
+            builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
 
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {
