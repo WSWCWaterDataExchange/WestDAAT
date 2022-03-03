@@ -60,10 +60,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         }
 
         [DataTestMethod]
-        [DataRow("")]
-        [DataRow(" ")]
-        [DataRow("\t")]
         [DataRow("I'm not JSON")]
+        [DataRow("{I'm not JSON}")]
+        [DataRow("1234")]
         public async Task GetFeatureByCoordinates_ReturnsSuccess_InvalidJsonString(string invalidJsonString)
         {
             var mockHttp = new MockHttpMessageHandler();
@@ -137,9 +136,6 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         }
 
         [DataTestMethod]
-        [DataRow("")]
-        [DataRow(" ")]
-        [DataRow("\t")]
         [DataRow("I'm not JSON")]
         [DataRow("{I'm not JSON}")]
         [DataRow("1234")]
@@ -215,9 +211,6 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         }
 
         [DataTestMethod]
-        [DataRow("")]
-        [DataRow(" ")]
-        [DataRow("\t")]
         [DataRow("I'm not JSON")]
         [DataRow("{I'm not JSON}")]
         [DataRow("1234")]
@@ -262,6 +255,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
             public IEnumerable<object[]> GetData(MethodInfo methodInfo)
             {
                 yield return new object[] { "{}", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { "", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { " ", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { "\t", Array.Empty<int>(), Array.Empty<int>() };
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
@@ -276,6 +272,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
             public IEnumerable<object[]> GetData(MethodInfo methodInfo)
             {
                 yield return new object[] { "{}", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { "", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { " ", Array.Empty<int>(), Array.Empty<int>() };
+                yield return new object[] { "\t", Array.Empty<int>(), Array.Empty<int>() };
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
@@ -290,6 +289,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
             public IEnumerable<object[]> GetData(MethodInfo methodInfo)
             {
                 yield return new object[] { "{}", Array.Empty<int>() };
+                yield return new object[] { "", Array.Empty<int>() };
+                yield return new object[] { " ", Array.Empty<int>() };
+                yield return new object[] { "\t", Array.Empty<int>() };
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFeaturesResponse, new[] { 10, 10, 10, 10 } };
             }
 
@@ -303,13 +305,21 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         {
             public string CleanupJsonForDisplay(string jsonValue)
             {
-                var cleanJson = JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(jsonValue));
-                if (cleanJson.Length > 50)
+                try
                 {
-                    cleanJson = cleanJson.Substring(0, 47) + "...";
+                    jsonValue = JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(jsonValue));
                 }
-                return cleanJson;
+                catch (JsonException)
+                {
+                    //do nothing
+                }
+                if (jsonValue.Length > 50)
+                {
+                    jsonValue = jsonValue.Substring(0, 47) + "...";
+                }
+                return jsonValue;
             }
+
             public string CleanupForDisplay(int[] values)
             {
                 return JsonSerializer.Serialize(values);
