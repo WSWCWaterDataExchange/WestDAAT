@@ -27,7 +27,7 @@ namespace WesternStatesWater.WestDaat.Utilities
         };
         private readonly Dictionary<FeatureDataSource, string> _featureDataSourceStrings = new Dictionary<FeatureDataSource, string>()
         {
-            { FeatureDataSource.UsgsSurgaceWaterSites, "nwissite" },
+            { FeatureDataSource.UsgsSurfaceWaterSites, "nwissite" },
             { FeatureDataSource.EpaWaterQualitySite, "WQP" },
             { FeatureDataSource.Wade, "wade" }
         };

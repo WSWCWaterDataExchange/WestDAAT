@@ -2,7 +2,7 @@
 {
     public enum FeatureDataSource
     {
-        UsgsSurgaceWaterSites,
+        UsgsSurfaceWaterSites,
         EpaWaterQualitySite,
         Wade
     }

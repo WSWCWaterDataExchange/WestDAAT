@@ -174,10 +174,10 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         }
 
         [DataTestMethod]
-        [DataRow("comidvalue", NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurgaceWaterSites, 9, "linked-data/comid/comidvalue/navigation/UM/nwissite?distance=9")]
+        [DataRow("comidvalue", NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, 9, "linked-data/comid/comidvalue/navigation/UM/nwissite?distance=9")]
         [DataRow("<>", NavigationMode.UpstreamTributaries, FeatureDataSource.EpaWaterQualitySite, 0, "linked-data/comid/%3C%3E/navigation/UT/WQP?distance=0")]
         [DataRow("<bananas&oranges>", NavigationMode.DownstreamMain, FeatureDataSource.Wade, -1, "linked-data/comid/%3Cbananas&oranges%3E/navigation/DM/wade?distance=-1")]
-        [DataRow("@home", NavigationMode.DownstreamDiversions, FeatureDataSource.UsgsSurgaceWaterSites, 15, "linked-data/comid/@home/navigation/DD/nwissite?distance=15")]
+        [DataRow("@home", NavigationMode.DownstreamDiversions, FeatureDataSource.UsgsSurfaceWaterSites, 15, "linked-data/comid/@home/navigation/DD/nwissite?distance=15")]
         public async Task GetFeatures_Parametertizes(string comid, NavigationMode navigationMode, FeatureDataSource featureDataSource, int distanceInKm, string expectedUrl)
         {
             var mockHttp = new MockHttpMessageHandler();
