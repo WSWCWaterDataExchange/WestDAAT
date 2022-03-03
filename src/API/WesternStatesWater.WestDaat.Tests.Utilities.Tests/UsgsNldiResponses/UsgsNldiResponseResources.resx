@@ -121,6 +121,9 @@
   <data name="ValidGetFeatureByCoordinatesResponse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ValidGetFeatureByCoordinatesResponse.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="ValidGetFeaturesResponse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ValidGetFeaturesResponse.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="ValidGetFlowlinesResponse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ValidGetFlowlinesResponse.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

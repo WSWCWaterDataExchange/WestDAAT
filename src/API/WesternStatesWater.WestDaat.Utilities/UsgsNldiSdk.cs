@@ -23,7 +23,13 @@ namespace WesternStatesWater.WestDaat.Utilities
             { NavigationMode.UpstreamMain, "UM" },
             { NavigationMode.UpstreamTributaries, "UT" },
             { NavigationMode.DownstreamMain, "DM" },
-            { NavigationMode.DownstreamDiversions, "DD" },
+            { NavigationMode.DownstreamDiversions, "DD" }
+        };
+        private readonly Dictionary<FeatureDataSource, string> _featureDataSourceStrings = new Dictionary<FeatureDataSource, string>()
+        {
+            { FeatureDataSource.UsgsSurgaceWaterSites, "nwissite" },
+            { FeatureDataSource.EpaWaterQualitySite, "WQP" },
+            { FeatureDataSource.Wade, "wade" }
         };
 
         public async Task<FeatureCollection> GetFeatureByCoordinates(double latitude, double longitude)
@@ -48,6 +54,17 @@ namespace WesternStatesWater.WestDaat.Utilities
             }
         }
 
+        public async Task<FeatureCollection> GetFeatures(string comid, NavigationMode navigationMode, FeatureDataSource featureDataSource, int distanceInKm)
+        {
+            using (new TimerLogger($"Getting flowlines [{comid}] [{navigationMode}] [{featureDataSource}] [{distanceInKm}]", _logger))
+            {
+                var query = new QueryBuilder();
+                query.Add("distance", distanceInKm.ToString());
+                var response = await _httpClient.GetAsync(new Uri($"linked-data/comid/{comid}/navigation/{_navigationModeStrings[navigationMode]}/{_featureDataSourceStrings[featureDataSource]}{query}", UriKind.Relative));
+                return await ProcessFeatureCollectionResponse(response);
+            }
+        }
+
         private async Task<FeatureCollection> ProcessFeatureCollectionResponse(HttpResponseMessage response)
         {
             if (!response.IsSuccessStatusCode)
@@ -64,13 +81,5 @@ namespace WesternStatesWater.WestDaat.Utilities
                 throw;
             }
         }
-    }
-
-    public enum NavigationMode
-    {
-        UpstreamMain,
-        UpstreamTributaries,
-        DownstreamMain,
-        DownstreamDiversions
     }
 }
