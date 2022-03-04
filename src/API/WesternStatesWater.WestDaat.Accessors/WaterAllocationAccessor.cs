@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
-        public Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId)
+        Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {
             using (var db = _databaseContextFactory.Create())
             {

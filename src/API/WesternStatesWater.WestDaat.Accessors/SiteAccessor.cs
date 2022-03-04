@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
-        public Site GetSiteByUuid(string siteUuid)
+        Site ISiteAccessor.GetSiteByUuid(string siteUuid)
         {
             using (var db = _databaseContextFactory.Create())
             {

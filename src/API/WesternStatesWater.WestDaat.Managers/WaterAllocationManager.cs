@@ -18,7 +18,6 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
 
-
         public WaterAllocationManager(
             INldiAccessor nldiAccessor,
             ISiteAccessor siteAccessor,

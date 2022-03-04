@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Engines
         {
         }
 
-        public string BuildGeoConnexJson(Site site, Organization org)
+        string IGeoConnexEngine.BuildGeoConnexJson(Site site, Organization org)
         {
             var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
                 JsonEncode(
