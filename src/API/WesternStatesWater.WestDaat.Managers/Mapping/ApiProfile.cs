@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
     {
         public ApiProfile()
         {
-            CreateMap<Client.Site, DC.Site>();
+            
         }
     }
 }

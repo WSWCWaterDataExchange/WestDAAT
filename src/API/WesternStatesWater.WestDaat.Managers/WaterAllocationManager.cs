@@ -1,13 +1,10 @@
-using System;
-using WesternStatesWater.WestDaat.Engines;
+using GeoJSON.Text.Feature;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
-using DC = WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Managers.Mapping;
-using WesternStatesWater.WestDaat.Common.Exceptions;
-using GeoJSON.Text.Feature;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Engines;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
