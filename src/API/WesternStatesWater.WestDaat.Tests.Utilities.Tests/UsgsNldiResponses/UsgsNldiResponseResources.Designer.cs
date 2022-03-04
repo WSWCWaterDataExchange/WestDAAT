@@ -102,6 +102,33 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests.UsgsNldiResponses {
         ///    {
         ///      &quot;type&quot;: &quot;Feature&quot;,
         ///      &quot;geometry&quot;: {
+        ///        &quot;type&quot;: &quot;Point&quot;,
+        ///        &quot;coordinates&quot;: [
+        ///          -96.9025278,
+        ///          40.39111344
+        ///        ]
+        ///      },
+        ///      &quot;properties&quot;: {
+        ///        &quot;type&quot;: &quot;hydrolocation&quot;,
+        ///        &quot;source&quot;: &quot;nwissite&quot;,
+        ///        &quot;sourceName&quot;: &quot;NWIS Surface Water Sites&quot;,
+        ///        &quot;identifier&quot;: &quot;USGS-402328096540801&quot;,
+        ///        &quot;name&quot;: &quot;  5N  5E19ABCB1&quot;,
+        ///        &quot;uri&quot;: &quot;https://waterdata.usgs.gov/monitoring-location/4 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ValidGetFeaturesResponse {
+            get {
+                return ResourceManager.GetString("ValidGetFeaturesResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;type&quot;: &quot;FeatureCollection&quot;,
+        ///  &quot;features&quot;: [
+        ///    {
+        ///      &quot;type&quot;: &quot;Feature&quot;,
+        ///      &quot;geometry&quot;: {
         ///        &quot;type&quot;: &quot;LineString&quot;,
         ///        &quot;coordinates&quot;: [
         ///          [
