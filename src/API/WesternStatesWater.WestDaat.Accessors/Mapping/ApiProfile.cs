@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;

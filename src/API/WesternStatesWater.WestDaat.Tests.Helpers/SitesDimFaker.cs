@@ -1,6 +1,4 @@
-﻿using System;
-using Bogus;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers

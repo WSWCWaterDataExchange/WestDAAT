@@ -1,5 +1,3 @@
-using System;
-using Bogus;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers

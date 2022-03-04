@@ -1,10 +1,10 @@
 ﻿using GeoJSON.Text.Feature;
 using WesternStatesWater.WestDaat.Accessors;
-using DC = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
+using DC = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {

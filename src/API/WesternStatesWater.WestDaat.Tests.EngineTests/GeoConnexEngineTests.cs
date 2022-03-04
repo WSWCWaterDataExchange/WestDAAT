@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Engines;
-using WesternStatesWater.WestDaat.Tests.Helpers;
+using NetTopologySuite.Geometries;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using System.Text.Json.Nodes;
-using WesternStatesWater.WestDaat.Common.Exceptions;
-using System.Text.Json;
-using NetTopologySuite.Geometries;
+using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.EngineTests
 {

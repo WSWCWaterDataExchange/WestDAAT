@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
+﻿namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
     public partial class LegalStatus
     {

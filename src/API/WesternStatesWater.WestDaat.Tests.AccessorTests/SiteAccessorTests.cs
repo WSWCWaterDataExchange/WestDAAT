@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {

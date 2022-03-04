@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using NetTopologySuite.Geometries;
-
 namespace WesternStatesWater.WestDaat.Common.DataContracts
 {
     public class Organization
