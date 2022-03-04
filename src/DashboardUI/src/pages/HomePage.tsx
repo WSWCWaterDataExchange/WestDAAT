@@ -10,6 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export enum HomePageTab {
   WaterRights = "Water Rights",
+  TempNldi = "Temp NLDI",
   Aggregations = "Aggregations",
   SiteSpecific = "Site Specific"
 }

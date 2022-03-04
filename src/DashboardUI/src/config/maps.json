@@ -820,5 +820,68 @@
   "aggregate": {
     "sources": [],
     "layers": []
+  },
+  "tempNldi": {
+    "sources": [
+      {
+        "id": "nldi",
+        "source": {
+          "type": "geojson",
+          "data": "http://localhost:7071/api/NldiFeatures/@36.859496562,-111.585164326?dir=3&points=7"
+        }
+      }
+    ],
+    "layers": [{
+      "id": "nldi-flowlines",
+      "source": "nldi",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "line",
+      "paint": {
+        "line-color": ["case", ["==", ["get", "westdaat_channeltype"], "Main"], "#0000ff", "#3333ff"],
+        "line-opacity": 1,
+        "line-width": ["case", ["==", ["get", "westdaat_channeltype"], "Main"], 2, 1]
+      },
+      "filter": ["==", ["get", "westdaat_featuredatatype"], "Flowline"]
+    },
+    {
+      "id": "nldi-usgs-points",
+      "source": "nldi",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "circle",
+      "paint": {
+        "circle-radius": {
+          "base": 1.25,
+          "stops": [
+            [
+              0,
+              2
+            ],
+            [
+              7,
+              2
+            ],
+            [
+              10,
+              4
+            ],
+            [
+              15,
+              20
+            ],
+            [
+              20,
+              40
+            ]
+          ]
+        },
+        "circle-color": ["case", ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], "#ff0000", ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], "#00ff00", ["==", ["get", "westdaat_pointdatasource"], "Wade"], "#ffff00", "#000000"]
+      },
+      "filter": ["==", ["get", "westdaat_featuredatatype"], "Point"]
+    }
+  ]
   }
 }

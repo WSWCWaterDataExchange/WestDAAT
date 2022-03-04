@@ -17,6 +17,7 @@ import { AppContext, User } from "../AppProvider";
 enum MapTypes {
   WaterRights = "waterRights",
   Aggregate = "aggregate",
+  TempNldi = "tempNldi",
 }
 
 interface MapData {
@@ -63,7 +64,7 @@ function Map(props: MapProps) {
     // Swap maps out if user switches tabs
     let newMapType = props.currentTab === HomePageTab.WaterRights
       ? MapTypes.WaterRights
-      : MapTypes.Aggregate;
+      : MapTypes.TempNldi;
 
     setMapData((mapConfig as any)[newMapType]);
   }, [props.currentTab]);
