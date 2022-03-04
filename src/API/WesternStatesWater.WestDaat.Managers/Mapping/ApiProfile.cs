@@ -8,7 +8,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
     {
         public ApiProfile()
         {
-            
         }
     }
 }
