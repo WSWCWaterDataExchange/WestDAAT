@@ -15,7 +15,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.MaximumAmountUnitCvNavigation, b => new UnitsFaker().Generate())
                 .RuleFor(a => a.AmountUnitCvNavigation, b => new UnitsFaker().Generate())
                 .RuleFor(a => a.ReportYearStartMonth, b => b.Random.Number(1, 11).ToString())
-                .RuleFor(a => a.VariableSpecificUuid, b => b.Random.String(10));
+                .RuleFor(a => a.VariableSpecificUuid, b => b.Random.String(10, 'A', 'z'));
         }
     }
 }

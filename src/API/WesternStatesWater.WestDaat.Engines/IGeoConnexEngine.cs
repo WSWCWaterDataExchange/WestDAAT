@@ -5,6 +5,6 @@ namespace WesternStatesWater.WestDaat.Engines
 {
     public interface IGeoConnexEngine : IServiceContractBase
     {
-        string BuildGeoconnexJson(Site site);
+        string BuildGeoConnexJson(Site site, Organization organization);
     }
 }

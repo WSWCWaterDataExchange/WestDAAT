@@ -17,27 +17,32 @@ namespace WesternStatesWater.WestDaat.Engines
         {
         }
 
-        public string BuildGeoconnexJson(Site data)
+        public string BuildGeoConnexJson(Site site, Organization org)
         {
-            // var orgMappingUrl = data.AllocationBridgeSitesFact.FirstOrDefault()?.AllocationAmount?.Organization?.OrganizationDataMappingUrl ?? string.Empty;
-            
-            // var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
-            //     data.Longitude,         // {0}
-            //     data.Latitude,          // {1}
-            //     data.HUC8,              // {2}
-            //     data.HUC12,             // {3}
-            //     data.County,            // {4}
-            //     data.SiteTypeCv,        // {5}
-            //     data.SiteUuid,          // {6}
-            //     data.GniscodeCv,        // {7}
-            //     data.SiteName,          // {8}
-            //     orgMappingUrl,          // {9}
-            //     data.Geometry.ToString()// {10}
-            // );
+            var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
+                JsonEncode(
+                    site.Longitude,                 // {0}
+                    site.Latitude,                  // {1}
+                    site.HUC8,                      // {2}
+                    site.HUC12,                     // {3}
+                    site.County,                    // {4}
+                    site.SiteTypeCv,                // {5}
+                    site.SiteUuid,                  // {6}
+                    site.GniscodeCv,                // {7}
+                    site.SiteName,                  // {8}
+                    org.OrganizationDataMappingUrl, // {9}
+                    site.Geometry?.ToString()       // {10}
+                )
+            );
 
-            // return geoConnexJson;
-
-            return "todo";
+            return geoConnexJson;
         }
+        private string[] JsonEncode(params object[] args)
+        {
+            return args.Select(arg =>
+                JsonEncodedText.Encode(arg?.ToString() ?? string.Empty).ToString()
+            ).ToArray();
+        }
+
     }
 }

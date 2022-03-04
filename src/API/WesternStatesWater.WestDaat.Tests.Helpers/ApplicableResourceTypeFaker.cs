@@ -7,7 +7,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
     {
         public ApplicableResourceTypeFaker()
         {
-            this.RuleFor(a => a.Name, b => b.Random.String(10));
+            this.RuleFor(a => a.Name, b => b.Random.String(10, 'A', 'z'));
         }
     }
 }

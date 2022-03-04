@@ -55,6 +55,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
             builder.Services.AddScoped<IGeoConnexEngine, GeoConnexEngine>();
             builder.Services.AddScoped<ISiteAccessor, SiteAccessor>();
+            builder.Services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
             builder.Services.AddLogging(logging =>
             {
