@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
         string IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
-            var site = _siteAccessor.GetSiteByUuid(siteUuid).Map<DC.Site>();
+            var site = _siteAccessor.GetSiteByUuid(siteUuid);
             if (site.AllocationIds == null || !site.AllocationIds.Any())
             {
                 throw new WestDaatException($"No AllocationAmounts found for site uuid ${siteUuid}");
