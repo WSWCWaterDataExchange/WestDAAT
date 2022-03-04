@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Managers
             var site = _siteAccessor.GetSiteByUuid(siteUuid);
             if (site.AllocationIds == null || !site.AllocationIds.Any())
             {
-                throw new WestDaatException($"No AllocationAmounts found for site uuid ${siteUuid}");
+                throw new WestDaatException($"No AllocationAmounts found for site uuid [{siteUuid}]");
             }
 
             var organization = _waterAllocationAccessor.GetWaterAllocationAmountOrganizationById(site.AllocationIds.First());
