@@ -48,10 +48,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
 
+            builder.Services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
+            builder.Services.AddTransient<ISiteAccessor, SiteAccessor>();
+            builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
+
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {
                 a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
             });
+
             builder.Services.AddLogging(logging =>
             {
                 logging.AddApplicationInsights();

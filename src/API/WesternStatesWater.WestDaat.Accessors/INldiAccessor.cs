@@ -1,5 +1,5 @@
 ﻿using GeoJSON.Text.Feature;
-using WesternStatesWater.WestDaat.Common.Contracts;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {

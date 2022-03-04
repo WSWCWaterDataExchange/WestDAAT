@@ -3,7 +3,7 @@ using GeoJSON.Text.Geometry;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Common.Contracts;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 

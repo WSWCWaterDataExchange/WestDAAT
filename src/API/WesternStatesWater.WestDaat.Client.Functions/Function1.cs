@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
-using WesternStatesWater.WestDaat.Managers;
+using WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
