@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Client.Functions", "WesternStatesWater.WestDaat.Client.Functions\WesternStatesWater.WestDaat.Client.Functions.csproj", "{9AAA8E06-CB84-4B28-B475-29A4E666045E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tests.UtilitiesTests", "WesternStatesWater.WestDaat.Tests.Utilities.Tests\WesternStatesWater.WestDaat.Tests.UtilitiesTests.csproj", "{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.UtilitiesTests", "WesternStatesWater.WestDaat.Tests.Utilities.Tests\WesternStatesWater.WestDaat.Tests.UtilitiesTests.csproj", "{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

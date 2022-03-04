@@ -21,9 +21,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                         .Build();
         }
 
-        public static Dictionary<string, string> DefaultTestConfiguration => new Dictionary<string, string>
+        public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
-            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2_Test;Integrated Security=true;" },
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2Test;Integrated Security=true;" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "5" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "4" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "3" },

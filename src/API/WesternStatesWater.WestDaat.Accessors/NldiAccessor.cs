@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -67,22 +68,5 @@ namespace WesternStatesWater.WestDaat.Accessors
             result.Features.ForEach(a => a.Properties["westdaat_featuretype"] = _featureTypes[navigationMode]);
             return result;
         }
-    }
-
-    [Flags]
-    public enum NldiDirections
-    {
-        None = 0,
-        Upsteam = 1 << 1,
-        Downsteam = 1 << 2
-    }
-
-    [Flags]
-    public enum NldiDataPoints
-    {
-        None = 0,
-        Wade = 1 << 1,
-        Usgs = 1 << 2,
-        Epa = 1 << 3
     }
 }

@@ -6,26 +6,39 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using Newtonsoft.Json;
 using Microsoft.Azure.WebJobs;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using WesternStatesWater.WestDaat.Managers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class WaterAllocation
+    public class WaterAllocation : FunctionBase
     {
-        private readonly ILogger<WaterAllocation> _logger;
-        private readonly IWaterAllocationManager _waterAllocationManager;
-
-        public WaterAllocation(ILogger<WaterAllocation> logger, IWaterAllocationManager waterAllocationManager)
+        public WaterAllocation(IWaterAllocationManager waterAllocationMangager, ILogger<WaterAllocation> logger)
         {
+            _waterAllocationManager = waterAllocationMangager;
             _logger = logger;
-            _waterAllocationManager = waterAllocationManager;
+        }
+
+        private readonly IWaterAllocationManager _waterAllocationManager;
+        private readonly ILogger _logger;
+
+        [FunctionName(nameof(NldiFeatures))]
+        public async Task<IActionResult> NldiFeatures([HttpTrigger(AuthorizationLevel.Function, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequest req, double latitude, double longitude)
+        {
+
+            _logger.LogInformation("Getting NLDI Features []");
+
+            var directions = Enum.Parse<NldiDirections>(req.Query["dir"]);
+            var dataPoints = Enum.Parse<NldiDataPoints>(req.Query["points"]);
+
+            var results = await _waterAllocationManager.GetNldiFeatures(latitude, longitude, directions, dataPoints);
+
+            return JsonResult(results);
         }
 
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]

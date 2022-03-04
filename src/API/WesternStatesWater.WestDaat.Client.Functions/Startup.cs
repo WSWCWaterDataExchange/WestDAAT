@@ -37,11 +37,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
 
-            builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
-            {
-                a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
-            });
-
+            builder.Services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
             builder.Services.AddTransient<ITestManager, TestManager>();
 
             builder.Services.AddTransient<ITestEngine, TestEngine>();
@@ -52,10 +48,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
 
-            builder.Services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
             builder.Services.AddScoped<IGeoConnexEngine, GeoConnexEngine>();
             builder.Services.AddScoped<ISiteAccessor, SiteAccessor>();
             builder.Services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
+
+            builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
+            {
+                a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
+            });
 
             builder.Services.AddLogging(logging =>
             {

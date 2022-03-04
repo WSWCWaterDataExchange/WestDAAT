@@ -3,6 +3,7 @@ using GeoJSON.Text.Geometry;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -40,25 +41,24 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             if (directions.HasFlag(NldiDirections.Upsteam))
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamMain, config.MaxUpstreamMainDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(1))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(1))
+                                .Verifiable();
 
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamTributaries, config.MaxUpstreamTributaryDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(5))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(5))
+                                .Verifiable();
                 expectedFeatureCount += 6;
             }
 
             if (directions.HasFlag(NldiDirections.Downsteam))
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamMain, config.MaxDownstreamMainDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(2))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(2))
+                                .Verifiable();
 
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamDiversions, config.MaxDownstreamDiversionDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(3))
-                            .Verifiable();
-
+                                .ReturnsAsync(CreateFlowlinesResult(3))
+                                .Verifiable();
                 expectedFeatureCount += 5;
             }
 
@@ -74,7 +74,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 result.Features.Count(a => a.Properties["westdaat_featuretype"] as string == "UpstreamMain").Should().Be(1);
                 result.Features.Count(a => a.Properties["westdaat_featuretype"] as string == "UpstreamTributaries").Should().Be(5);
             }
-
             if (directions.HasFlag(NldiDirections.Downsteam))
             {
                 result.Features.Count(a => a.Properties["westdaat_featuretype"] as string == "DownstreamMain").Should().Be(2);
@@ -96,7 +95,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var config = Configuration.GetNldiConfiguration();
 
             var featureByCoordinatesResult = CreateFeatureByCoordinatesResult(comid);
-
             _usgsNldiSdkMock.Setup(a => a.GetFeatureByCoordinates(latitude, longitude))
                             .ReturnsAsync(featureByCoordinatesResult)
                             .Verifiable();
@@ -104,23 +102,24 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             if (!shouldError)
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamMain, config.MaxUpstreamMainDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(1))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(1))
+                                .Verifiable();
 
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamTributaries, config.MaxUpstreamTributaryDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(5))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(5))
+                                .Verifiable();
 
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamMain, config.MaxDownstreamMainDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(2))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(2))
+                                .Verifiable();
 
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamDiversions, config.MaxDownstreamDiversionDistance))
-                            .ReturnsAsync(CreateFlowlinesResult(3))
-                            .Verifiable();
+                                .ReturnsAsync(CreateFlowlinesResult(3))
+                                .Verifiable();
             }
 
             var sut = CreateNldiAccessor();
+
             if (shouldError)
             {
                 Func<Task> call = async () => await sut.GetNldiFeatures(latitude, longitude, NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.None);
@@ -129,10 +128,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             else
             {
                 var result = await sut.GetNldiFeatures(latitude, longitude, NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.None);
-
                 result.Should().NotBeNull();
             }
-
             _usgsNldiSdkMock.VerifyAll();
         }
 
@@ -143,7 +140,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 properties.Add("comid", JsonSerializer.SerializeToElement(comid));
             }
-
             return new FeatureCollection(
                 new List<Feature>
                 {
@@ -158,8 +154,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         private FeatureCollection CreateFlowlinesResult(int featureCount)
         {
             var features = Enumerable.Range(0, featureCount)
-                    .Select(i => new Feature(new LineString(GetLineStringCoordinates(5))))
-                    .ToList();
+                                     .Select(i => new Feature(new LineString(GetLineStringCoordinates(5))))
+                                     .ToList();
             return new FeatureCollection(features);
         }
 
