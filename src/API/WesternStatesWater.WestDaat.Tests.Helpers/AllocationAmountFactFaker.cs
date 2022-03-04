@@ -2,7 +2,7 @@ using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {
-    internal class AllocationAmountFactFaker : Faker<AllocationAmountsFact>
+    public class AllocationAmountFactFaker : Faker<AllocationAmountsFact>
     {
         public AllocationAmountFactFaker()
         {

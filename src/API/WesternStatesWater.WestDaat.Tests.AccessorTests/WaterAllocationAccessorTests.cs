@@ -11,15 +11,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange
-            var site = new SitesDimFaker().Generate();
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
             using(var db = CreateDatabaseContextFactory().Create())
             {
-                db.SitesDim.Add(site);
+                db.AllocationAmountsFact.Add(allocationAmount);
                 db.SaveChanges();
             }
 
-            var expectedOrg = site.AllocationBridgeSitesFact.First().AllocationAmount.Organization;
-            var allocationAmountId = site.AllocationBridgeSitesFact.First().AllocationAmountId;
+            var expectedOrg = allocationAmount.Organization;
+            var allocationAmountId = allocationAmount.AllocationAmountId;
 
             // Act
             var accessor = CreateWaterAllocationAccessor();
