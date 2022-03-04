@@ -5,26 +5,26 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
+    [TestCategory("Accessor Tests")]
     public class SiteAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void SiteAccessor_GetSiteByUuid_ShouldReturnSite()
         {
             // Arrange
             var siteDims = new SitesDimFaker().Generate(10);
-            using(var db = CreateDatabaseContextFactory().Create())
+            using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.SitesDim.AddRange(siteDims);
                 db.SaveChanges();
             }
 
-            var accessor = new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
 
             // Act
             var searchSite = siteDims.First();
+            var accessor = CreateSiteAccessor();
             var result = accessor.GetSiteByUuid(searchSite.SiteUuid);
-            
+
 
             // Assert
             result.Should().NotBeNull();
@@ -33,6 +33,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Longitude.Should().Be(searchSite.Longitude);
             result.AllocationIds.Should().HaveCountGreaterThan(0);
             result.AllocationIds.First().Should().Be(searchSite.AllocationBridgeSitesFact.First().AllocationBridgeId);
+        }
+
+        private ISiteAccessor CreateSiteAccessor()
+        {
+            return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
         }
     }
 }

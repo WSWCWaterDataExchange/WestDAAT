@@ -21,7 +21,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
         public void GeoConnexEngineTests_BuildGeoConnexJson_ShouldFormatJson()
         {
             // ARRANGE 
-            var engine = new GeoConnexEngine(NullLogger<GeoConnexEngine>.Instance);
             var efSite = new SitesDimFaker().Generate();
 
             efSite.SiteTypeCv = efSite.SiteTypeCvNavigation.Name;
@@ -33,6 +32,7 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             var org = efOrg.Map<Organization>();
 
             // ACT
+            var engine = CreateGeoConnexEngine();
             var result = engine.BuildGeoConnexJson(site, org);
 
             // ASSERT
@@ -60,17 +60,22 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             CheckValidJson(result);
         }
 
+        private static IGeoConnexEngine CreateGeoConnexEngine()
+        {
+            return new GeoConnexEngine(NullLogger<GeoConnexEngine>.Instance);
+        }
+
         [TestMethod]
         public void GeoConnexEngineTests_BuildGeoConnexJson_EmptyValues()
         {
             // ARRANGE 
-            var engine = new GeoConnexEngine(NullLogger<GeoConnexEngine>.Instance);
             var site = new Site();
             site.Geometry = new Point(0, 0);
 
             var org = new Organization();
 
             // ACT
+            var engine = CreateGeoConnexEngine();
             var result = engine.BuildGeoConnexJson(site, org);
 
             // ASSERT
@@ -84,7 +89,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
         public void GeoConnexEngineTests_BuildGeoConnexJson_SpecialCharacters()
         {
             // ARRANGE 
-            var engine = new GeoConnexEngine(NullLogger<GeoConnexEngine>.Instance);
             var site = new Site();
             site.SiteUuid = "`~=-><./,';:[]{}/!@#$%^&*(),\r\n\"";
             site.SiteName = "`~=-><./,';:[]{}/!@#$%^&*(),\r\n\"";
@@ -93,6 +97,7 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             var org = new Organization();
 
             // ACT
+            var engine = CreateGeoConnexEngine();
             var result = engine.BuildGeoConnexJson(site, org);
 
             // ASSERT

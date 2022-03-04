@@ -18,13 +18,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 db.SaveChanges();
             }
 
-            var accessor = new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory());
             var expectedOrg = site.AllocationBridgeSitesFact.First().AllocationAmount.Organization;
+            var allocationAmountId = site.AllocationBridgeSitesFact.First().AllocationAmountId;
 
             // Act
-            var allocationAmountId = site.AllocationBridgeSitesFact.First().AllocationAmountId;
+            var accessor = CreateWaterAllocationAccessor();
             var result = accessor.GetWaterAllocationAmountOrganizationById(allocationAmountId);
-            
 
             // Assert
             result.Should().NotBeNull();
@@ -32,6 +31,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.OrganizationDataMappingUrl.Should().Be(expectedOrg.OrganizationDataMappingUrl);
             result.OrganizationName.Should().Be(expectedOrg.OrganizationName);
             result.OrganizationId.Should().Be(expectedOrg.OrganizationId);
+        }
+
+        private IWaterAllocationAccessor CreateWaterAllocationAccessor()
+        {
+            return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory());
         }
     }
 }
