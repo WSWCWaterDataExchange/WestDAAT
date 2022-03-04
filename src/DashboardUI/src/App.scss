@@ -3,3 +3,8 @@
 a {
   color: $text-color-light;
 }
+
+.scroll-vertical {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
