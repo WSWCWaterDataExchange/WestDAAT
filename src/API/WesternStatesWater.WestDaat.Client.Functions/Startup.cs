@@ -48,9 +48,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
 
-            builder.Services.AddScoped<IGeoConnexEngine, GeoConnexEngine>();
-            builder.Services.AddScoped<ISiteAccessor, SiteAccessor>();
-            builder.Services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
+            builder.Services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
+            builder.Services.AddTransient<ISiteAccessor, SiteAccessor>();
+            builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {
