@@ -1,4 +1,4 @@
-﻿using WesternStatesWater.WestDaat.Managers;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {

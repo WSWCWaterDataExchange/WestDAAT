@@ -33,6 +33,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Engines\WesternStatesWater.WestDaat.Engines.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Accessors\WesternStatesWater.WestDaat.Accessors.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Managers\WesternStatesWater.WestDaat.Managers.csproj" />
   </ItemGroup>
 </Project>

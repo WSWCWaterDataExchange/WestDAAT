@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Common.Contracts;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 
 namespace WesternStatesWater.WestDaat.Managers

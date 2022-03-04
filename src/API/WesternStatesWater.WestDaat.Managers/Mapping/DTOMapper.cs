@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace WesternStatesWater.WestDaat.Engines
+namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
     internal static class DtoMapper
     {
@@ -17,10 +17,7 @@ namespace WesternStatesWater.WestDaat.Engines
                 {
                     var config = new MapperConfiguration(cfg =>
                     {
-                        // NOTE: CreateMap<Source, Destination>()
-                        // ForMember(destination member, source mapping/member option)
-                        //cfg.CreateMap<WebStoreCatalog, WSCatContract.WebStoreCatalog>()
-                        //    .ForMember(a => a.Products, b => b.Ignore());
+                        cfg.AddProfile<ApiProfile>();
                     });
                     _config = config;
                 }
@@ -28,14 +25,14 @@ namespace WesternStatesWater.WestDaat.Engines
             }
         }
 
-        public static void Map(object source, object dest)
+        public static T Map<T>(this object source, Action<IMappingOperationOptions> opts = null)
         {
-            Mapper.Map(source, dest, source.GetType(), dest.GetType());
+            return Mapper.Map<T>(source, opts ?? (a => { }));
         }
 
-        public static T Map<T>(object source)
+        public static void Map(this object source, object dest, Action<IMappingOperationOptions> opts = null)
         {
-            return Mapper.Map<T>(source);
+            Mapper.Map(source, dest, opts ?? (a => { }));
         }
     }
 }
