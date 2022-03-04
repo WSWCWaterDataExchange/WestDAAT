@@ -5,7 +5,7 @@ using WesternStatesWater.WestDaat.Engines.Resources;
 
 namespace WesternStatesWater.WestDaat.Engines
 {
-    public class GeoConnexEngine : EngineBase, IGeoConnexEngine
+    public sealed class GeoConnexEngine : EngineBase, IGeoConnexEngine
     {
         public GeoConnexEngine(ILogger<GeoConnexEngine> logger) : base(logger)
         {
