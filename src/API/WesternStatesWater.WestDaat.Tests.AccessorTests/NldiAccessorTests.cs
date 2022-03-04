@@ -66,6 +66,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             }
 
             var expectedFeatureCount = 0;
+            var expectedFlowlineCount = 0;
+            var expectedPointCount = 0;
+            var expectedMainCount = 0;
+            var expectedArmCount = 0;
+            var expectedUpstreamCount = 0;
+            var expectedDownstreamCount = 0;
+            var expectedUsgsCount = 0;
+            var expectedEpaCount = 0;
+            var expectedWadeCount = 0;
             if (directions.HasFlag(NldiDirections.Upsteam))
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamMain, config.MaxUpstreamMainDistance))
@@ -76,6 +85,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                 .ReturnsAsync(CreateFlowlinesResult(5))
                                 .Verifiable();
                 expectedFeatureCount += 6;
+                expectedFlowlineCount += 6;
+                expectedMainCount += 1;
+                expectedArmCount += 5;
+                expectedUpstreamCount += 6;
+
                 if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxUpstreamMainDistance))
@@ -85,6 +99,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(7))
                                     .Verifiable();
                     expectedFeatureCount += 13;
+                    expectedPointCount += 13;
+                    expectedMainCount += 6;
+                    expectedArmCount += 7;
+                    expectedUpstreamCount += 13;
+                    expectedUsgsCount += 13;
                 }
                 if (dataPoints.HasFlag(NldiDataPoints.Epa))
                 {
@@ -95,6 +114,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(9))
                                     .Verifiable();
                     expectedFeatureCount += 17;
+                    expectedPointCount += 17;
+                    expectedMainCount += 8;
+                    expectedArmCount += 9;
+                    expectedUpstreamCount += 17;
+                    expectedEpaCount += 17;
                 }
                 if (dataPoints.HasFlag(NldiDataPoints.Wade))
                 {
@@ -105,6 +129,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(11))
                                     .Verifiable();
                     expectedFeatureCount += 21;
+                    expectedPointCount += 21;
+                    expectedMainCount += 10;
+                    expectedArmCount += 11;
+                    expectedUpstreamCount += 21;
+                    expectedWadeCount += 21;
                 }
             }
 
@@ -118,6 +147,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                 .ReturnsAsync(CreateFlowlinesResult(3))
                                 .Verifiable();
                 expectedFeatureCount += 5;
+                expectedFlowlineCount += 5;
+                expectedMainCount += 2;
+                expectedArmCount += 3;
+                expectedDownstreamCount += 5;
+
                 if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxDownstreamMainDistance))
@@ -127,6 +161,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(13))
                                     .Verifiable();
                     expectedFeatureCount += 25;
+                    expectedPointCount += 25;
+                    expectedMainCount += 12;
+                    expectedArmCount += 13;
+                    expectedDownstreamCount += 25;
+                    expectedUsgsCount += 25;
                 }
                 if (dataPoints.HasFlag(NldiDataPoints.Epa))
                 {
@@ -137,6 +176,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(15))
                                     .Verifiable();
                     expectedFeatureCount += 29;
+                    expectedPointCount += 29;
+                    expectedMainCount += 14;
+                    expectedArmCount += 15;
+                    expectedDownstreamCount += 29;
+                    expectedEpaCount += 29;
                 }
                 if (dataPoints.HasFlag(NldiDataPoints.Wade))
                 {
@@ -147,6 +191,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                     .ReturnsAsync(CreateFlowlinesResult(17))
                                     .Verifiable();
                     expectedFeatureCount += 33;
+                    expectedPointCount += 33;
+                    expectedMainCount += 16;
+                    expectedArmCount += 17;
+                    expectedDownstreamCount += 33;
+                    expectedWadeCount += 33;
                 }
             }
 
@@ -157,46 +206,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             result.Should().NotBeNull();
             result.Features.Should().HaveCount(expectedFeatureCount);
-            if (directions.HasFlag(NldiDirections.Upsteam))
-            {
-                result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Flowline.Main.Upstream").Should().Be(1);
-                result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Flowline.Tributary.Upstream").Should().Be(5);
-                if (dataPoints.HasFlag(NldiDataPoints.Usgs))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.UsgsSurfaceWaterSite.Main.Upstream").Should().Be(6);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.UsgsSurfaceWaterSite.Tributary.Upstream").Should().Be(7);
-                }
-                if (dataPoints.HasFlag(NldiDataPoints.Epa))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.EpaWaterQualitySite.Main.Upstream").Should().Be(8);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.EpaWaterQualitySite.Tributary.Upstream").Should().Be(9);
-                }
-                if (dataPoints.HasFlag(NldiDataPoints.Wade))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.Wade.Main.Upstream").Should().Be(10);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.Wade.Tributary.Upstream").Should().Be(11);
-                }
-            }
-            if (directions.HasFlag(NldiDirections.Downsteam))
-            {
-                result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Flowline.Main.Downstream").Should().Be(2);
-                result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Flowline.Tributary.Downstream").Should().Be(3);
-                if (dataPoints.HasFlag(NldiDataPoints.Usgs))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.UsgsSurfaceWaterSite.Main.Downstream").Should().Be(12);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.UsgsSurfaceWaterSite.Tributary.Downstream").Should().Be(13);
-                }
-                if (dataPoints.HasFlag(NldiDataPoints.Epa))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.EpaWaterQualitySite.Main.Downstream").Should().Be(14);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.EpaWaterQualitySite.Tributary.Downstream").Should().Be(15);
-                }
-                if (dataPoints.HasFlag(NldiDataPoints.Wade))
-                {
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.Wade.Main.Downstream").Should().Be(16);
-                    result.Features.Count(a => a.Properties["westdaat_feature"] as string == "Point.Wade.Tributary.Downstream").Should().Be(17);
-                }
-            }
+            result.Features.Count(a => a.Properties["westdaat_featuredatatype"] as string == "Flowline").Should().Be(expectedFlowlineCount);
+            result.Features.Count(a => a.Properties["westdaat_featuredatatype"] as string == "Point").Should().Be(expectedPointCount);
+            result.Features.Count(a => a.Properties["westdaat_direction"] as string == "Upstream").Should().Be(expectedUpstreamCount);
+            result.Features.Count(a => a.Properties["westdaat_direction"] as string == "Downstream").Should().Be(expectedDownstreamCount);
+            result.Features.Count(a => a.Properties["westdaat_channeltype"] as string == "Main").Should().Be(expectedMainCount);
+            result.Features.Count(a => a.Properties["westdaat_channeltype"] as string == "Arm").Should().Be(expectedArmCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "UsgsSurfaceWaterSite").Should().Be(expectedUsgsCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "EpaWaterQualitySite").Should().Be(expectedEpaCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "Wade").Should().Be(expectedWadeCount);
         }
 
         [DataTestMethod]
