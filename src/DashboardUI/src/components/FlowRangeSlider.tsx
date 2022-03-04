@@ -4,11 +4,6 @@ import { SliderRail, Handle, Track, Tick } from "./SliderComponents";
 
 function FlowRangeSlider() {
 
-  const sliderStyle = {
-    position: "relative" as "relative",
-    width: "100%",
-  };
-
   const domain = [100, 500];
   const defaultValues = [150, 300, 400, 450];
 
@@ -18,16 +13,14 @@ function FlowRangeSlider() {
     setSliderValues(update as any);
   };
 
-
   return (
     <Slider
       mode={2}
       step={5}
       domain={domain}
-      rootStyle={sliderStyle}
       onUpdate={onUpdate}
       values={sliderValues}
-      className="pt-4 mb-5"
+      className="pt-4 mb-5 position-relative w-100"
     >
       <Rail>
         {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
