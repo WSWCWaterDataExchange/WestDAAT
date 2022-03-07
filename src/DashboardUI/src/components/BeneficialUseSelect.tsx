@@ -1,10 +1,6 @@
-import { useContext, useState } from "react";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import ToggleButton from "react-bootstrap/ToggleButton";
-import FlowRangeSlider from "./FlowRangeSlider";
-import { MapContext } from "./MapProvider";
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import chroma from "chroma-js";
+import { Layer } from './MapProvider';
 
 export interface BeneficialUseChangeOption {
   value: string; // layerId
@@ -12,19 +8,14 @@ export interface BeneficialUseChangeOption {
   color: string;
 }
 
-function BeneficialUseSelect() {
-  const { layers, setLayerVisibility } = useContext(MapContext);
+interface BeneficialUseSelectProps {
+  layers: Layer[];
+  onChange: (selectedOptions: MultiValue<BeneficialUseChangeOption>) => void;
+}
 
-  const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
-    layers.forEach(layer => {
-      if (layer.layout) {
-        const selectedLayers = selectedOptions.map(o => o.value);
-        setLayerVisibility(layer.id, selectedLayers.includes(layer.id));
-      }
-    })
-  };
-
-  const layerOptions = layers.map(layer => ({
+function BeneficialUseSelect(props: BeneficialUseSelectProps) {
+  
+  const layerOptions = props.layers.map(layer => ({
     value: layer.id,
     label: layer.friendlyName,
     color: layer.paint?.["circle-color"] as string
@@ -34,6 +25,7 @@ function BeneficialUseSelect() {
     display: 'none'
   });
 
+  // Can't use CSS, must use JS for these styles
   const layerOptionStyles: StylesConfig<BeneficialUseChangeOption, true> = {
     dropdownIndicator: displayNone,
     placeholder: displayNone,
@@ -61,7 +53,7 @@ function BeneficialUseSelect() {
 
   return (
     <Select
-      onChange={handleBeneficialUseChange}
+      onChange={props.onChange}
       closeMenuOnSelect={false}
       defaultValue={layerOptions}
       options={layerOptions}

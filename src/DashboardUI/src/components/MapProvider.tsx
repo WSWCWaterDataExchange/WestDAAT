@@ -11,7 +11,7 @@ interface Source {
   source: VectorSource
 };
 
-interface Layer extends CircleLayer {
+export interface Layer extends CircleLayer {
   friendlyName: string
 }
 

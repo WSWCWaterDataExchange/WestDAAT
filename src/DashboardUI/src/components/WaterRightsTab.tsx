@@ -3,8 +3,8 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext } from "./MapProvider";
-import Select, { MultiValue, StylesConfig } from 'react-select';
-import chroma from "chroma-js";
+import { MultiValue } from 'react-select';
+import BeneficialUseSelect from "./BeneficialUseSelect";
 
 interface BeneficialUseChangeOption {
   value: string,
@@ -27,56 +27,10 @@ function WaterRightsTab() {
     layers.forEach(layer => {
       if (layer.layout) {
         const selectedLayers = selectedOptions.map(o => o.value);
-        setLayerVisibility(layer.id, selectedLayers.includes(layer.id));
+        const isVisible = selectedLayers.includes(layer.id) || selectedOptions.length === 0;
+        setLayerVisibility(layer.id, isVisible);
       }
     })
-  };
-
-  const layerOptions = layers.map(layer => ({
-    value: layer.id,
-    label: layer.friendlyName,
-    color: layer.paint?.["circle-color"] as string
-  }));
-
-  const displayNone = () => ({
-    display: 'none'
-  });
-
-  const layerOptionStyles: StylesConfig<BeneficialUseChangeOption, true> = {
-    control: (styles) => ({
-      ...styles, 
-      backgroundColor: 'white', 
-      color: 'black'
-    }),
-    dropdownIndicator: displayNone,
-    placeholder:  displayNone,
-    indicatorSeparator: displayNone,
-    clearIndicator: (styles) => ({
-      ...styles, 
-      color: 'ced4da',
-      ':hover': {
-        color: 'ced4da'
-      }
-    }),
-    multiValue: (styles, { data }) => {
-      const color = chroma(data.color);
-      return {
-        ...styles,
-        backgroundColor: color.darken().alpha(0.3).css(),
-      };
-    },
-    multiValueLabel: (styles) => ({
-      ...styles,
-      color: 'black',
-    }),
-    multiValueRemove: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-      ':hover': {
-        backgroundColor: data.color,
-        color: 'white',
-      },
-    }),
   };
 
   return (
@@ -131,21 +85,7 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Beneficial Use</label>
-        <Select
-          onChange={handleBeneficialUseChange}
-          closeMenuOnSelect={false}
-          defaultValue={layerOptions}
-          options={layerOptions}
-          styles={layerOptionStyles}
-          theme={(theme) => ({
-            ...theme,
-            colors: {
-              ...theme.colors,
-              neutral20: "#ced4da"
-            }
-          })}
-          isMulti
-        />
+        <BeneficialUseSelect layers={layers} onChange={handleBeneficialUseChange} />
       </div>
 
       <div className="mb-3">
