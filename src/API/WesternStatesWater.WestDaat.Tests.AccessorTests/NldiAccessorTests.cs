@@ -58,16 +58,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var featureByCoordinatesResult = CreateFeatureByCoordinatesResult(comid);
 
-            if (directions != NldiDirections.None)
-            {
-                _usgsNldiSdkMock.Setup(a => a.GetFeatureByCoordinates(latitude, longitude))
+            _usgsNldiSdkMock.Setup(a => a.GetFeatureByCoordinates(latitude, longitude))
                             .ReturnsAsync(featureByCoordinatesResult)
                             .Verifiable();
-            }
 
-            var expectedFeatureCount = 0;
+            var expectedFeatureCount = 1; //1 for main point
             var expectedFlowlineCount = 0;
-            var expectedPointCount = 0;
+            var expectedPointCount = 1; //1 for main point
             var expectedMainCount = 0;
             var expectedArmCount = 0;
             var expectedUpstreamCount = 0;
@@ -208,10 +205,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Features.Should().HaveCount(expectedFeatureCount);
             result.Features.Count(a => a.Properties["westdaat_featuredatatype"] as string == "Flowline").Should().Be(expectedFlowlineCount);
             result.Features.Count(a => a.Properties["westdaat_featuredatatype"] as string == "Point").Should().Be(expectedPointCount);
-            result.Features.Count(a => a.Properties["westdaat_direction"] as string == "Upstream").Should().Be(expectedUpstreamCount);
-            result.Features.Count(a => a.Properties["westdaat_direction"] as string == "Downstream").Should().Be(expectedDownstreamCount);
-            result.Features.Count(a => a.Properties["westdaat_channeltype"] as string == "Main").Should().Be(expectedMainCount);
-            result.Features.Count(a => a.Properties["westdaat_channeltype"] as string == "Arm").Should().Be(expectedArmCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_direction") && a.Properties["westdaat_direction"] as string == "Upstream").Should().Be(expectedUpstreamCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_direction") && a.Properties["westdaat_direction"] as string == "Downstream").Should().Be(expectedDownstreamCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_channeltype") && a.Properties["westdaat_channeltype"] as string == "Main").Should().Be(expectedMainCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_channeltype") && a.Properties["westdaat_channeltype"] as string == "Arm").Should().Be(expectedArmCount);
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "UsgsSurfaceWaterSite").Should().Be(expectedUsgsCount);
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "EpaWaterQualitySite").Should().Be(expectedEpaCount);
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "Wade").Should().Be(expectedWadeCount);
@@ -271,20 +268,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         private FeatureCollection CreateFeatureByCoordinatesResult(string comid)
         {
-            var properties = new Dictionary<string, object>();
+            var result = CreateFlowlinesResult(1);
             if (comid != null)
             {
-                properties.Add("comid", JsonSerializer.SerializeToElement(comid));
+                result.Features[0].Properties.Add("comid", JsonSerializer.SerializeToElement(comid));
             }
-            return new FeatureCollection(
-                new List<Feature>
-                {
-                    new Feature
-                    {
-                        Properties = properties
-                    }
-                }
-            );
+            return result;
         }
 
         private FeatureCollection CreateFlowlinesResult(int featureCount)
