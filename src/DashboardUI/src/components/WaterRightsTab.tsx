@@ -21,16 +21,27 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility } = useContext(MapContext);
+  const { layers, setLayerVisibility, setVisibleMapLayersFilter } = useContext(MapContext);
 
   const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
+    let visibleLayerIds: string[] = [];
     layers.forEach(layer => {
       if (layer.layout) {
         const selectedLayers = selectedOptions.map(o => o.value);
         const isVisible = selectedLayers.includes(layer.id) || selectedOptions.length === 0;
         setLayerVisibility(layer.id, isVisible);
+        if (isVisible) {
+          visibleLayerIds.push(layer.id)
+        }
       }
-    })
+    });
+
+    if(selectedOptions.length === 0) {
+      visibleLayerIds = [];
+    }
+
+    // Persist filters in url
+    setVisibleMapLayersFilter(visibleLayerIds);
   };
 
   return (

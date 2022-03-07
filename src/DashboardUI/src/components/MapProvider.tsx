@@ -1,5 +1,6 @@
 import mapboxgl, { CircleLayer, VectorSource } from "mapbox-gl";
-import { createContext, FC, useState } from "react";
+import { createContext, FC, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -20,6 +21,10 @@ export interface MapData {
   layers: Layer[];
 }
 
+export interface MapFilters {
+  visibleLayerIds: string[];
+}
+
 interface MapContextState {
   map: mapboxgl.Map | null,
   setCurrentMap: (map: mapboxgl.Map) => void,
@@ -30,6 +35,7 @@ interface MapContextState {
   layers: Layer[];
   setCurrentLayers: (layers: Layer[]) => void;
   setLayerVisibility: (layerId: string, visible: boolean) => void;
+  setVisibleMapLayersFilter: (visibleLayerIds: string[]) => void;
 };
 
 const defaultState: MapContextState = {
@@ -41,7 +47,8 @@ const defaultState: MapContextState = {
   setCurrentSources: () => { },
   layers: [],
   setCurrentLayers: () => { },
-  setLayerVisibility: () => { }
+  setLayerVisibility: () => { },
+  setVisibleMapLayersFilter: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -50,6 +57,28 @@ const MapProvider: FC = ({ children }) => {
 
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
+
+  const [mapFilters, setMapFilters] = useState<MapFilters>();
+
+  let [urlParams, setUrlParams] = useSearchParams();
+
+  const setVisibleMapLayersFilter = (visibleLayerIds: string[]) => {
+    setMapFilters({
+      ...mapFilters,
+      visibleLayerIds
+    });
+  }
+
+  useEffect(() => {
+    updateFilterUrlParams();
+  }, [mapFilters])
+
+  const updateFilterUrlParams = () => {
+    setUrlParams({
+      ...urlParams,
+      mapFilters: JSON.stringify(mapFilters)
+    });
+  };
 
   const [baseMap, setBaseMap] = useState(defaultState.baseMap);
   const setCurrentBaseMap = (mapType: MapTypes) => setBaseMap(mapType);
@@ -75,7 +104,8 @@ const MapProvider: FC = ({ children }) => {
     setCurrentSources,
     layers,
     setCurrentLayers,
-    setLayerVisibility
+    setLayerVisibility,
+    setVisibleMapLayersFilter
   };
 
   return (
