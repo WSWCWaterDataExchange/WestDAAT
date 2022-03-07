@@ -11,6 +11,7 @@ import { MapContext, MapTypes } from '../components/MapProvider';
 
 export enum HomePageTab {
   WaterRights = "Water Rights",
+  TempNldi = "Temp NLDI",
   Aggregations = "Aggregations",
   SiteSpecific = "Site Specific"
 }
