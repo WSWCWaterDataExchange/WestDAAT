@@ -27,7 +27,14 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
 
   // Can't use CSS, must use JS for these styles
   const layerOptionStyles: StylesConfig<BeneficialUseChangeOption, true> = {
-    dropdownIndicator: displayNone,
+    // dropdownIndicator: displayNone,
+    dropdownIndicator: (styles) => ({
+      ...styles,
+      color: "#3a4046",
+      ":hover": {
+        color: "#3a4046",
+      },
+    }),
     placeholder: displayNone,
     indicatorSeparator: displayNone,
     multiValue: (styles, { data }) => {
