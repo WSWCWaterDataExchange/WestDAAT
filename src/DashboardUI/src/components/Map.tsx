@@ -22,11 +22,11 @@ function Map() {
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
+  const setMap = useRef(setCurrentMap);
   const navControl = useRef(new NavigationControl());
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
   }));
-
 
   useEffect(() => {
     setIsMapLoaded(false);
@@ -38,10 +38,10 @@ function Map() {
       zoom: 4,
     });
 
-    setCurrentMap(map);
+    setMap.current(map);
 
     map.on("load", () => setIsMapLoaded(true));
-  }, [mapData, user, setCurrentMap]);
+  }, [mapData]);
 
   useEffect(() => {
     if (!map) return;
