@@ -4,7 +4,7 @@ function SideDetailsPage() {
   return (
     <>
       <h1>
-        Side Details Page
+        Site Details Page
       </h1>
     </>
   );
