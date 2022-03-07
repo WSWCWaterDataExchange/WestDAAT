@@ -1,4 +1,5 @@
 ﻿using GeoJSON.Text.Feature;
+using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Common;
@@ -44,10 +45,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (new TimerLogger($"Getting NLDI Features [{latitude}] [{longitude}]", base.Logger))
             {
-                if (directions == NldiDirections.None)
-                {
-                    return new FeatureCollection();
-                }
                 var coordinateFeatures = await _usgsNldiSdk.GetFeatureByCoordinates(latitude, longitude);
                 if (!coordinateFeatures.Features[0].Properties.TryGetValue("comid", out var comidVal))
                 {
@@ -99,6 +96,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                         tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.Wade, _configuration.MaxDownstreamDiversionDistance));
                     }
                 }
+                tasks.Add(GetMainPoint(coordinateFeatures));
                 var featureCollections = await Task.WhenAll(tasks);
                 return new FeatureCollection(featureCollections.SelectMany(a => a.Features).ToList());
             }
@@ -132,6 +130,33 @@ namespace WesternStatesWater.WestDaat.Accessors
                 a.Properties["westdaat_pointdatasource"] = dataSource;
             });
             return result;
+        }
+
+        private Task<FeatureCollection> GetMainPoint(FeatureCollection coordinateFeatures)
+        {
+            var result = new FeatureCollection();
+            if (coordinateFeatures.Features[0].Geometry is LineString ls)
+            {
+                var geoJsonlineString = JsonSerializer.Serialize(ls);
+                var g1 = GeometryHelpers.GetGeometryByGeoJson(geoJsonlineString) as NetTopologySuite.Geometries.LineString;
+
+                var ll = NetTopologySuite.LinearReferencing.LengthLocationMap.GetLocation(g1, g1.Length / 2);
+                var c = ll.GetCoordinate(g1);
+                result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
+                result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
+            }
+            else
+            {
+                var geoJsonString = JsonSerializer.Serialize(coordinateFeatures.Features[0].Geometry);
+                var g1 = GeometryHelpers.GetGeometryByGeoJson(geoJsonString);
+
+                var c = g1.Centroid;
+                result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
+                result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
+            }
+            return Task.FromResult(result);
         }
     }
 }

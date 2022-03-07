@@ -4,6 +4,7 @@ import { createContext, FC, useState } from "react";
 export enum MapTypes {
   WaterRights = "waterRights",
   Aggregate = "aggregate",
+  TempNldi = "tempNldi",
 }
 
 interface Source {
