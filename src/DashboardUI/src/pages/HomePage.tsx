@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ContactModal from '../components/ContactModal';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
@@ -7,6 +7,7 @@ import Map from '../components/Map';
 
 import '../styles/home-page.scss';
 import { useSearchParams } from 'react-router-dom';
+import { MapContext, MapTypes } from '../components/MapProvider';
 
 export enum HomePageTab {
   WaterRights = "Water Rights",
@@ -15,6 +16,8 @@ export enum HomePageTab {
 }
 
 function HomePage() {
+
+  const { setCurrentBaseMap } = useContext(MapContext);
 
   let [urlParams, setUrlParams] = useSearchParams();
   const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
@@ -30,20 +33,25 @@ function HomePage() {
   }
 
   useEffect(() => {
-    const tab = urlParams.get("map")
-    if (tab) {
-      setCurrentTab(tab as HomePageTab);
+    const tabParam = urlParams.get("map")
+    if (tabParam) {
+      const tab = tabParam as HomePageTab;
+      setCurrentTab(tab);
+      setCurrentBaseMap(
+        tab === HomePageTab.WaterRights
+          ? MapTypes.WaterRights
+          : MapTypes.Aggregate
+      );
     }
-
-  }, [urlParams])
+  }, [urlParams, setCurrentBaseMap])
 
   return (
     <div className="home-page d-flex flex-column">
       <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} showContactModal={shouldShowContactModal} />
-      <div className="d-flex flex-grow-1">
+      <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">
-          <Map currentTab={currentTab} />
+          <Map />
         </div>
       </div>
 

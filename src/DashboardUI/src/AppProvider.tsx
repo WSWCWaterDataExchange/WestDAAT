@@ -1,4 +1,3 @@
-import './App.scss';
 import { createContext, FC, useState } from "react";
 
 export interface User {

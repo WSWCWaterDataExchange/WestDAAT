@@ -1,14 +1,18 @@
 @import "_colors.scss";
+@import "_sizes.scss";
 
 // Override default variables before the import
 $body-bg: #e4e4e4;
 $navbar-light-color: $primary-color;
-$nav-link-font-weight: 600;
+$nav-link-font-weight: $semi-bold;
 
 $primary: $primary-color;
+$input-bg: $white;
 
 // Determines the text color for a given background. Default is 4.5
 $min-contrast-ratio: 3.9;
+
+$form-check-min-height: 20px;
 
 // Import Bootstrap and its default variables
 @import "~bootstrap/scss/bootstrap.scss";
