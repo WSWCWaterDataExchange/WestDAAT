@@ -3,6 +3,14 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext } from "./MapProvider";
+import Select, { MultiValue, StylesConfig } from 'react-select';
+import chroma from "chroma-js";
+
+interface BeneficialUseChangeOption {
+  value: string,
+  label: string,
+  color: string
+}
 
 function WaterRightsTab() {
 
@@ -15,13 +23,60 @@ function WaterRightsTab() {
 
   const { layers, setLayerVisibility } = useContext(MapContext);
 
-  const handleBenefitUseChange = (layerId: string) => {
-    // Filter to current layer only (will be multi-select eventually)
+  const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
     layers.forEach(layer => {
       if (layer.layout) {
-        setLayerVisibility(layer.id, layer.id === layerId);
+        const selectedLayers = selectedOptions.map(o => o.value);
+        setLayerVisibility(layer.id, selectedLayers.includes(layer.id));
       }
     })
+  };
+
+  const layerOptions = layers.map(layer => ({
+    value: layer.id,
+    label: layer.friendlyName,
+    color: layer.paint?.["circle-color"] as string
+  }));
+
+  const displayNone = () => ({
+    display: 'none'
+  });
+
+  const layerOptionStyles: StylesConfig<BeneficialUseChangeOption, true> = {
+    control: (styles) => ({
+      ...styles, 
+      backgroundColor: 'white', 
+      color: 'black'
+    }),
+    dropdownIndicator: displayNone,
+    placeholder:  displayNone,
+    indicatorSeparator: displayNone,
+    clearIndicator: (styles) => ({
+      ...styles, 
+      color: 'ced4da',
+      ':hover': {
+        color: 'ced4da'
+      }
+    }),
+    multiValue: (styles, { data }) => {
+      const color = chroma(data.color);
+      return {
+        ...styles,
+        backgroundColor: color.darken().alpha(0.3).css(),
+      };
+    },
+    multiValueLabel: (styles) => ({
+      ...styles,
+      color: 'black',
+    }),
+    multiValueRemove: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+      ':hover': {
+        backgroundColor: data.color,
+        color: 'white',
+      },
+    }),
   };
 
   return (
@@ -76,13 +131,21 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Beneficial Use</label>
-        <select className="form-select" onChange={(event) => handleBenefitUseChange(event.target.value)}>
-          {
-            layers.map(layer =>
-              <option key={layer.id} value={layer.id}>{layer.friendlyName}</option>
-            )
-          }
-        </select>
+        <Select
+          onChange={handleBeneficialUseChange}
+          closeMenuOnSelect={false}
+          defaultValue={layerOptions}
+          options={layerOptions}
+          styles={layerOptionStyles}
+          theme={(theme) => ({
+            ...theme,
+            colors: {
+              ...theme.colors,
+              neutral20: "#ced4da"
+            }
+          })}
+          isMulti
+        />
       </div>
 
       <div className="mb-3">
