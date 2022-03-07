@@ -2,6 +2,7 @@ import { HomePageTab } from '../pages/HomePage';
 import WaterRightsTab from './WaterRightsTab';
 import AggregationsTab from './AggregationsTab';
 import SiteSpecificTab from './SiteSpecificTab';
+import NldiTab from './NldiTab';
 
 import './../styles/side-panel.scss';
 
@@ -10,10 +11,14 @@ interface SidePanelProps {
 }
 
 function SidePanel(props: SidePanelProps) {
-
-  var tabComponent = props.currentTab === HomePageTab.WaterRights ? <WaterRightsTab />
-    : props.currentTab === HomePageTab.Aggregations ? <AggregationsTab />
-      : <SiteSpecificTab />;
+  const tabs: Record<HomePageTab, JSX.Element> = {
+    [HomePageTab.WaterRights]: <WaterRightsTab />,
+    [HomePageTab.Aggregations]: <AggregationsTab />,
+    [HomePageTab.SiteSpecific]: <SiteSpecificTab />,
+    [HomePageTab.TempNldi]: <NldiTab />,
+  }
+  
+  var tabComponent = tabs[props.currentTab];
 
   return (
     <div className="side-panel">

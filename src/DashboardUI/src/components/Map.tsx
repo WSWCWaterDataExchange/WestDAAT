@@ -1,4 +1,4 @@
-import mapboxgl, { CircleLayer, NavigationControl, VectorSource } from "mapbox-gl";
+import mapboxgl, { AnySourceImpl, CircleLayer, GeoJSONSource, NavigationControl, VectorSource } from "mapbox-gl";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -8,6 +8,7 @@ import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { HomePageTab } from "../pages/HomePage";
 import { AppContext, User } from "../AppProvider";
+import { DataPoints, Directions } from "../data-contracts/nldi";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -58,6 +59,27 @@ function Map(props: MapProps) {
   useEffect(() => {
     updateMapControls(user);
   }, [user]);
+
+  const nldiUpdated = (e: CustomEvent<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints }>) => {
+    const source = map.current?.getSource('nldi');
+    if(isGeoJsonSource(source)){
+      source.setData(`http://localhost:7071/api/NldiFeatures/@${e.detail.latitude},${e.detail.longitude}?dir=${e.detail.directions as number}&points=${e.detail.dataPoints as number}`);
+    }
+      //
+  }
+
+  const isGeoJsonSource = (mapSource: AnySourceImpl | undefined): mapSource is GeoJSONSource => {
+    return (mapSource as GeoJSONSource)?.setData !== undefined;
+ }
+
+  useEffect(() => {
+    if (props.currentTab === HomePageTab.TempNldi) {
+      document.addEventListener('nldiUpdated',nldiUpdated as EventListener);
+    } else {
+      document.removeEventListener('nldiUpdated',nldiUpdated as EventListener);
+    }
+  }, [props.currentTab]);
+
 
 
   useEffect(() => {
