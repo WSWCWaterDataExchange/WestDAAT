@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
+import { MapContext } from "./MapProvider";
 
 function WaterRightsTab() {
 
@@ -12,13 +13,17 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
+  const { layers, setCurrentLayers } = useContext(MapContext);
 
-  const onUpdate = () => {
-    console.log("On slider update");
-  };
-
-  const onChange = () => {
-    console.log("On slider change");
+  const handleBenefitUseChange = (layerId: string) => {
+    // Filter to current layer only (will be multi-select eventually)
+    const filteredLayers = layers.map(layer => {
+      if(layer.layout) {
+        layer.layout.visibility = layer.id === layerId ? 'visible' : 'none'
+      }
+      return layer;
+    });
+    setCurrentLayers(filteredLayers);
   };
 
   return (
@@ -73,7 +78,12 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Beneficial Use</label>
-        <select className="form-select">
+        <select className="form-select" onChange={(event) => handleBenefitUseChange(event.target.value)}>
+          {
+            layers.map(layer =>
+              <option key={layer.id} value={layer.id}>{layer.friendlyName}</option>
+            )
+          }
         </select>
       </div>
 

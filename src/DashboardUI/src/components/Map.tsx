@@ -1,4 +1,4 @@
-import mapboxgl, { CircleLayer, NavigationControl, VectorSource } from "mapbox-gl";
+import mapboxgl, { NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -7,24 +7,20 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { AppContext, User } from "../AppProvider";
-import { MapContext, MapTypes } from "./MapProvider";
+import { MapContext, MapData, MapTypes } from "./MapProvider";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 
-interface MapData {
-  sources: { id: string, source: VectorSource }[];
-  layers: ({ legendValue: string } & CircleLayer)[];
-}
-
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { baseMap } = useContext(MapContext);
+  const { baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
 
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   const map = useRef<mapboxgl.Map | null>(null);
   const navControl = useRef(new NavigationControl());
@@ -34,6 +30,7 @@ function Map() {
 
 
   useEffect(() => {
+    setIsMapLoaded(false);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
     map.current = new mapboxgl.Map({
       container: "map",
@@ -41,6 +38,8 @@ function Map() {
       center: [-100, 40],
       zoom: 4,
     });
+
+    map.current.on("load", () => setIsMapLoaded(true));
 
     updateMapControls(user);
   }, [mapData, user]);
@@ -50,19 +49,33 @@ function Map() {
   }, [user]);
 
   useEffect(() => {
-    if (!map || !map.current || !mapData) return;
+    setCurrentSources(mapData.sources);
+    setCurrentLayers(mapData.layers);
+  }, [mapData]);
+
+  useEffect(() => {
+    if (!isMapLoaded || !map.current) return;
     var myMap = map.current;
 
-    myMap.on("load", function () {
-      mapData.sources.forEach(s =>
-        myMap.addSource(s.id, s.source)
-      );
-
-      mapData.layers.forEach(layer =>
-        myMap.addLayer(layer)
-      );
+    sources.forEach(source => {
+      if (myMap.getSource(source.id)) {
+        myMap.removeSource(source.id);
+      }
+      myMap.addSource(source.id, source.source);
     });
-  }, [mapData]);
+  }, [sources, isMapLoaded]);
+
+  useEffect(() => {
+    if (!isMapLoaded || !map.current) return;
+    var myMap = map.current;
+
+    layers.forEach(layer => {
+      if (myMap.getLayer(layer.id)) {
+        myMap.removeLayer(layer.id);
+      }
+      myMap.addLayer(layer);
+    });
+  }, [layers, isMapLoaded]);
 
   useEffect(() => {
     setMapData((mapConfig as any)[baseMap]);
@@ -98,14 +111,14 @@ function Map() {
           {
             // Sort legend items alphabetically
             mapData && mapData.layers.sort((a, b) =>
-              a.legendValue > b.legendValue ? 1 : -1
+              a.friendlyName > b.friendlyName ? 1 : -1
             ).map(layer => {
               // Null check for layer paint property
               let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
               return (
                 <div key={layer.id}>
                   <span style={{ "backgroundColor": color }}></span>
-                  {layer.legendValue}
+                  {layer.friendlyName}
                 </div>
               );
             }
