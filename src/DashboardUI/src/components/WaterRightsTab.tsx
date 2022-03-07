@@ -1,10 +1,6 @@
 import { useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import { Handles, Rail, Slider, Ticks, Tracks } from "react-compound-slider";
-import { Handle, SliderRail, Tick, Track } from "./SliderComponents";
 import FlowRangeSlider from "./FlowRangeSlider";
 
 function WaterRightsTab() {
@@ -16,8 +12,6 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const domain = [100, 500];
-  const defaultValues = [450, 400, 300, 150];
 
   const onUpdate = () => {
     console.log("On slider update");
@@ -97,7 +91,7 @@ function WaterRightsTab() {
       <div className="mb-3">
         <label>Flow Range</label>
         <span>- CFS to - CFS</span>
-        <FlowRangeSlider />
+        <FlowRangeSlider handleChange={(values) => console.log(values)} />
       </div>
     </>
   );

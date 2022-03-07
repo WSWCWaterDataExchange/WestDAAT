@@ -2,15 +2,20 @@ import { useState } from "react";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { SliderRail, Handle, Track, Tick } from "./SliderComponents";
 
-function FlowRangeSlider() {
+export interface FlowRangeSliderProps {
+  handleChange: (values: ReadonlyArray<number>) => void;
+}
+
+function FlowRangeSlider(props: FlowRangeSliderProps) {
 
   const domain = [100, 500];
-  const defaultValues = [150, 300, 400, 450];
+  const defaultValues = [150, 450];
 
   const [sliderValues, setSliderValues] = useState(defaultValues);
 
-  const onUpdate = (update: ReadonlyArray<number>) => {
-    setSliderValues(update as any);
+  const onChange = (values: ReadonlyArray<number>) => {
+    setSliderValues(values as any);
+    props.handleChange(values);
   };
 
   return (
@@ -18,7 +23,7 @@ function FlowRangeSlider() {
       mode={2}
       step={5}
       domain={domain}
-      onUpdate={onUpdate}
+      onChange={onChange}
       values={sliderValues}
       className="pt-4 mb-5 position-relative w-100"
     >

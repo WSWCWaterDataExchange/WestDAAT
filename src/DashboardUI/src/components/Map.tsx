@@ -6,29 +6,23 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
-import { HomePageTab } from "../pages/HomePage";
 import { AppContext, User } from "../AppProvider";
+import { MapContext, MapTypes } from "./MapProvider";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 
-enum MapTypes {
-  WaterRights = "waterRights",
-  Aggregate = "aggregate",
-}
-
 interface MapData {
   sources: { id: string, source: VectorSource }[];
   layers: ({ legendValue: string } & CircleLayer)[];
 }
 
-interface MapProps {
-  currentTab: HomePageTab;
-}
+function Map() {
 
-function Map(props: MapProps) {
+  const { user } = useContext(AppContext);
+  const { baseMap } = useContext(MapContext);
 
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
 
@@ -38,7 +32,6 @@ function Map(props: MapProps) {
     accessToken: mapboxgl.accessToken
   }));
 
-  const { user } = useContext(AppContext);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
@@ -50,23 +43,30 @@ function Map(props: MapProps) {
     });
 
     updateMapControls(user);
-
-    loadData(mapData);
   }, [mapData, user]);
 
   useEffect(() => {
     updateMapControls(user);
   }, [user]);
 
+  useEffect(() => {
+    if (!map || !map.current || !mapData) return;
+    var myMap = map.current;
+
+    myMap.on("load", function () {
+      mapData.sources.forEach(s =>
+        myMap.addSource(s.id, s.source)
+      );
+
+      mapData.layers.forEach(layer =>
+        myMap.addLayer(layer)
+      );
+    });
+  }, [mapData]);
 
   useEffect(() => {
-    // Swap maps out if user switches tabs
-    let newMapType = props.currentTab === HomePageTab.WaterRights
-      ? MapTypes.WaterRights
-      : MapTypes.Aggregate;
-
-    setMapData((mapConfig as any)[newMapType]);
-  }, [props.currentTab]);
+    setMapData((mapConfig as any)[baseMap]);
+  }, [baseMap]);
 
   const updateMapControls = (user: User | null) => {
     if (!map.current) return;
@@ -91,28 +91,13 @@ function Map(props: MapProps) {
     map.current.addControl(navControl.current);
   }
 
-  const loadData = (mapData: MapData) => {
-    if (!map || !map.current) return;
-    var myMap = map.current;
-
-    myMap.on("load", function () {
-      mapData.sources.forEach(s =>
-        myMap.addSource(s.id, s.source)
-      );
-
-      mapData.layers.forEach(layer =>
-        myMap.addLayer(layer)
-      );
-    });
-  }
-
   return (
     <div className="position-relative h-100">
       <div className="legend">
         <div>
           {
             // Sort legend items alphabetically
-            mapData.layers.sort((a, b) =>
+            mapData && mapData.layers.sort((a, b) =>
               a.legendValue > b.legendValue ? 1 : -1
             ).map(layer => {
               // Null check for layer paint property
