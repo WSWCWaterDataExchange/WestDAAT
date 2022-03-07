@@ -19,14 +19,21 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IUsgsNldiSdk _usgsNldiSdk;
         private readonly NldiConfiguration _configuration;
-        private readonly Dictionary<NavigationMode, string> _navigationModeName = new Dictionary<NavigationMode, string>()
+        private readonly Dictionary<NavigationMode, string> _directionNames = new Dictionary<NavigationMode, string>()
         {
-            { NavigationMode.UpstreamMain, "Main.Upstream" },
-            { NavigationMode.UpstreamTributaries, "Tributary.Upstream" },
-            { NavigationMode.DownstreamMain, "Main.Downstream" },
-            { NavigationMode.DownstreamDiversions, "Tributary.Downstream" }
+            { NavigationMode.UpstreamMain, "Upstream" },
+            { NavigationMode.UpstreamTributaries, "Upstream" },
+            { NavigationMode.DownstreamMain, "Downstream" },
+            { NavigationMode.DownstreamDiversions, "Downstream" }
         };
-        private readonly Dictionary<FeatureDataSource, string> _featureDataSourceName = new Dictionary<FeatureDataSource, string>()
+        private readonly Dictionary<NavigationMode, string> _channelTypes = new Dictionary<NavigationMode, string>()
+        {
+            { NavigationMode.UpstreamMain, "Main" },
+            { NavigationMode.UpstreamTributaries, "Arm" },
+            { NavigationMode.DownstreamMain, "Main" },
+            { NavigationMode.DownstreamDiversions, "Arm" }
+        };
+        private readonly Dictionary<FeatureDataSource, string> _pointFeatureDataSourceNames = new Dictionary<FeatureDataSource, string>()
         {
             { FeatureDataSource.UsgsSurfaceWaterSites, "UsgsSurfaceWaterSite" },
             { FeatureDataSource.EpaWaterQualitySite, "EpaWaterQualitySite" },
@@ -97,39 +104,33 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
-        private string GetFlowlineFeatureName(NavigationMode navigationMode)
-        {
-            return $"Flowline.{GetNavigationModeName(navigationMode)}";
-        }
-
-        private string GetPointFeatureName(NavigationMode navigationMode, FeatureDataSource featureDataSource)
-        {
-            return $"Point.{GetFeatureDataSourceName(featureDataSource)}.{GetNavigationModeName(navigationMode)}";
-        }
-
-        private string GetNavigationModeName(NavigationMode navigationMode)
-        {
-            return _navigationModeName[navigationMode];
-        }
-
-        private string GetFeatureDataSourceName(FeatureDataSource featureDataSource)
-        {
-            return _featureDataSourceName[featureDataSource];
-        }
-
         private async Task<FeatureCollection> GetFlowlines(string comid, NavigationMode navigationMode, int distanceInKm)
         {
-            var featureName = GetFlowlineFeatureName(navigationMode);
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
             var result = await _usgsNldiSdk.GetFlowlines(comid, navigationMode, distanceInKm);
-            result.Features.ForEach(a => a.Properties["westdaat_feature"] = featureName);
+            result.Features.ForEach(a =>
+            {
+                a.Properties["westdaat_featuredatatype"] = "Flowline";
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
+            });
             return result;
         }
 
         private async Task<FeatureCollection> GetPointFeatures(string comid, NavigationMode navigationMode, FeatureDataSource featureDataSource, int distanceInKm)
         {
-            var featureName = GetPointFeatureName(navigationMode, featureDataSource);
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
+            var dataSource = _pointFeatureDataSourceNames[featureDataSource];
             var result = await _usgsNldiSdk.GetFeatures(comid, navigationMode, featureDataSource, distanceInKm);
-            result.Features.ForEach(a => a.Properties["westdaat_feature"] = featureName);
+            result.Features.ForEach(a =>
+            {
+                a.Properties["westdaat_featuredatatype"] = "Point";
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
+                a.Properties["westdaat_pointdatasource"] = dataSource;
+            });
             return result;
         }
     }
