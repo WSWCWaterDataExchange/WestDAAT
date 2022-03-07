@@ -41,7 +41,7 @@ function Map() {
     setCurrentMap(map);
 
     map.on("load", () => setIsMapLoaded(true));
-  }, [mapData, user]);
+  }, [mapData, user, setCurrentMap]);
 
   useEffect(() => {
     if (!map) return;
@@ -51,7 +51,7 @@ function Map() {
   useEffect(() => {
     setCurrentSources(mapData.sources);
     setCurrentLayers(mapData.layers);
-  }, [mapData]);
+  }, [mapData, setCurrentSources, setCurrentLayers]);
 
   useEffect(() => {
     if (!isMapLoaded || !map) return;
@@ -62,7 +62,7 @@ function Map() {
       }
       map.addSource(source.id, source.source);
     });
-  }, [sources, isMapLoaded]);
+  }, [sources, isMapLoaded, map]);
 
   useEffect(() => {
     if (!isMapLoaded || !map) return;
@@ -73,7 +73,7 @@ function Map() {
       }
       map.addLayer(layer);
     });
-  }, [layers, isMapLoaded]);
+  }, [layers, isMapLoaded, map]);
 
   useEffect(() => {
     setMapData((mapConfig as any)[baseMap]);

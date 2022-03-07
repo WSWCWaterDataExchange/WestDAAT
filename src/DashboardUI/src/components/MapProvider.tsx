@@ -34,7 +34,7 @@ interface MapContextState {
 
 const defaultState: MapContextState = {
   map: null as mapboxgl.Map | null,
-  setCurrentMap: () => {},
+  setCurrentMap: () => { },
   baseMap: MapTypes.WaterRights,
   setCurrentBaseMap: () => { },
   sources: [],
@@ -61,7 +61,7 @@ const MapProvider: FC = ({ children }) => {
   const setCurrentLayers = (layers: Layer[]) => setLayers(layers);
 
   const setLayerVisibility = (layerId: string, visible: boolean) => {
-    if(map) {
+    if (map) {
       map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
     }
   };

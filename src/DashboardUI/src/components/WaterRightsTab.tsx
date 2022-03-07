@@ -28,7 +28,7 @@ function WaterRightsTab() {
     <>
       <div className="mb-3">
         <label>FILTERS</label>
-        <a href="#" target="_blank">Learn about WaDE filters</a>
+        <a href="/filters" target="_blank">Learn about WaDE filters</a>
       </div>
 
       <div className="mb-3">
