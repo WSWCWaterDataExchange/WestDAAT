@@ -1,30 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
-using Newtonsoft.Json;
-using Microsoft.Azure.WebJobs;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using WesternStatesWater.WestDaat.Managers;
+using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class WaterAllocation
+    public class WaterAllocation : FunctionBase
     {
-        private readonly ILogger<WaterAllocation> _logger;
-        private readonly IWaterAllocationManager _waterAllocationManager;
-
-        public WaterAllocation(ILogger<WaterAllocation> logger, IWaterAllocationManager waterAllocationManager)
+        public WaterAllocation(IWaterAllocationManager waterAllocationManager, ILogger<WaterAllocation> logger)
         {
-            _logger = logger;
             _waterAllocationManager = waterAllocationManager;
+            _logger = logger;
+        }
+
+        private readonly IWaterAllocationManager _waterAllocationManager;
+        private readonly ILogger _logger;
+
+        [FunctionName(nameof(NldiFeatures))]
+        public async Task<IActionResult> NldiFeatures([HttpTrigger(AuthorizationLevel.Function, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequest req, double latitude, double longitude)
+        {
+
+            _logger.LogInformation("Getting NLDI Features []");
+
+            var directions = Enum.Parse<NldiDirections>(req.Query["dir"]);
+            var dataPoints = Enum.Parse<NldiDataPoints>(req.Query["points"]);
+
+            var results = await _waterAllocationManager.GetNldiFeatures(latitude, longitude, directions, dataPoints);
+
+            return JsonResult(results);
         }
 
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
@@ -32,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
 
-            var result = _waterAllocationManager.GetWaterAllocationSiteDetailsById(siteUuid);
+            var result = _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return new OkObjectResult(result);
         }

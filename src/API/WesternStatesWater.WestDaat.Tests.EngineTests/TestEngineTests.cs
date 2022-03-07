@@ -1,7 +1,5 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Engines;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace WesternStatesWater.WestDaat.Tests.EngineTests
 {

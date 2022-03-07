@@ -41,4 +41,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: .NET Test
       run: dotnet test
+      env:
+          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
       working-directory: src/API

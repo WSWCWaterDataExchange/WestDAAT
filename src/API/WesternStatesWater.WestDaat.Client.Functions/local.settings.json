@@ -1,11 +1,25 @@
 {
-  "ConnectionStrings": {
-    "WadeDatabase": "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
-  },
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet"
   },
-  "Host": { "CORS": "http://localhost:3000" }
+  "Host": { "CORS": "http://localhost:3000" },
+  "Logging": {
+    "Console": {
+      "LogLevel": {
+        "Default": "Information",
+        "WesternStatesWater": "Debug"
+      },
+      "FormatterName": "simple",
+      "FormatterOptions": {
+        "SingleLine": true,
+        "TimestampFormat": "HH:mm:ss ",
+        "UseUtcTimestamp": true
+      }
+    },
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
 }

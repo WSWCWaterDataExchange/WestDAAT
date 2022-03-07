@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
+﻿namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
     public class RegulatoryOverlayType
     {

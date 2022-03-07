@@ -1,0 +1,93 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.9025278,
+          40.39111344
+        ]
+      },
+      "properties": {
+        "type": "hydrolocation",
+        "source": "nwissite",
+        "sourceName": "NWIS Surface Water Sites",
+        "identifier": "USGS-402328096540801",
+        "name": "  5N  5E19ABCB1",
+        "uri": "https://waterdata.usgs.gov/monitoring-location/402328096540801",
+        "comid": "18821794",
+        "reachcode": "10270202000107",
+        "measure": "1.9939000000",
+        "navigation": "https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-402328096540801/navigation"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.6622425,
+          39.8419463
+        ]
+      },
+      "properties": {
+        "type": "hydrolocation",
+        "source": "nwissite",
+        "sourceName": "NWIS Surface Water Sites",
+        "identifier": "USGS-06882510",
+        "name": "BIG BLUE R AT MARYSVILLE, KS",
+        "uri": "https://waterdata.usgs.gov/monitoring-location/06882510",
+        "comid": "2277309",
+        "reachcode": "10270205000086",
+        "measure": "34.2020000000",
+        "navigation": "https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-06882510/navigation"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.5872222,
+          40.0447222
+        ]
+      },
+      "properties": {
+        "type": "hydrolocation",
+        "source": "nwissite",
+        "sourceName": "NWIS Surface Water Sites",
+        "identifier": "USGS-06882000",
+        "name": "Big Blue River at Barneston, Nebr.",
+        "uri": "https://waterdata.usgs.gov/monitoring-location/06882000",
+        "comid": "2275923",
+        "reachcode": "10270205000570",
+        "measure": "96.2724468074",
+        "navigation": "https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-06882000/navigation"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.6461172,
+          39.30916315
+        ]
+      },
+      "properties": {
+        "type": "hydrolocation",
+        "source": "nwissite",
+        "sourceName": "NWIS Surface Water Sites",
+        "identifier": "USGS-391833096384500",
+        "name": "TUTTLE CREEK RESERVOIR, KS  SITE 5",
+        "uri": "https://waterdata.usgs.gov/monitoring-location/391833096384500",
+        "comid": "2281165",
+        "reachcode": "10270205010984",
+        "measure": "35.1305000000",
+        "navigation": "https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-391833096384500/navigation"
+      }
+    }
+  ]
+}

@@ -1,36 +1,30 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
+﻿using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
-using System.Data.SqlClient;
-using System.Linq;
+using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
-    public class SiteAccessor : AccessorBase, ISiteAccessor
+    internal class SiteAccessor : AccessorBase, ISiteAccessor
     {
-        public SiteAccessor(ILogger<TestAccessor> logger) : base(logger)
+        public SiteAccessor(ILogger<SiteAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
         {
+            _databaseContextFactory = databaseContextFactory;
         }
 
-        public SitesDim GetWaterAllocationSiteDetailsById(string siteUuid)
+        private readonly IDatabaseContextFactory _databaseContextFactory;
+
+        Site ISiteAccessor.GetSiteByUuid(string siteUuid)
         {
-            var siteData = UsingDatabaseContext<SitesDim>(db =>
+            using (var db = _databaseContextFactory.Create())
             {
                 return db.SitesDim
                     .Where(x => x.SiteUuid == siteUuid)
-                    .Include(x => x.WaterSourceBridgeSitesFact)
-                    .Include(x => x.SiteVariableAmountsFact)
-                    .Include(x => x.AllocationBridgeSitesFact).ThenInclude(x => x.AllocationAmount)
-                    .ThenInclude(x => x.Organization)
-                    .Include(x => x.AllocationBridgeSitesFact).ThenInclude(x => x.AllocationAmount)
-                    .ThenInclude(x => x.AllocationBridgeBeneficialUsesFact)
-                    .ThenInclude(x => x.BeneficialUse)
-                    .FirstOrDefault();
-            });
-
-            return siteData;
+                    .ProjectTo<Site>(DtoMapper.Configuration)
+                    .Single();
+            }
         }
     }
 }
