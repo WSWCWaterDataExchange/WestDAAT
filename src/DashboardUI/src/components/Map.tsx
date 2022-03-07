@@ -17,12 +17,11 @@ import { MapContext, MapData, MapTypes } from "./MapProvider";
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
+  const { map, setCurrentMap, baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
 
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  const map = useRef<mapboxgl.Map | null>(null);
   const navControl = useRef(new NavigationControl());
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
@@ -32,21 +31,22 @@ function Map() {
   useEffect(() => {
     setIsMapLoaded(false);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
-    map.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/light-v10",
       center: [-100, 40],
       zoom: 4,
     });
 
-    map.current.on("load", () => setIsMapLoaded(true));
+    setCurrentMap(map);
 
-    updateMapControls(user);
+    map.on("load", () => setIsMapLoaded(true));
   }, [mapData, user]);
 
   useEffect(() => {
-    updateMapControls(user);
-  }, [user]);
+    if (!map) return;
+    updateMapControls(map, user);
+  }, [user, map]);
 
   useEffect(() => {
     setCurrentSources(mapData.sources);
@@ -54,26 +54,24 @@ function Map() {
   }, [mapData]);
 
   useEffect(() => {
-    if (!isMapLoaded || !map.current) return;
-    var myMap = map.current;
+    if (!isMapLoaded || !map) return;
 
     sources.forEach(source => {
-      if (myMap.getSource(source.id)) {
-        myMap.removeSource(source.id);
+      if (map.getSource(source.id)) {
+        map.removeSource(source.id);
       }
-      myMap.addSource(source.id, source.source);
+      map.addSource(source.id, source.source);
     });
   }, [sources, isMapLoaded]);
 
   useEffect(() => {
-    if (!isMapLoaded || !map.current) return;
-    var myMap = map.current;
+    if (!isMapLoaded || !map) return;
 
     layers.forEach(layer => {
-      if (myMap.getLayer(layer.id)) {
-        myMap.removeLayer(layer.id);
+      if (map.getLayer(layer.id)) {
+        map.removeLayer(layer.id);
       }
-      myMap.addLayer(layer);
+      map.addLayer(layer);
     });
   }, [layers, isMapLoaded]);
 
@@ -81,27 +79,27 @@ function Map() {
     setMapData((mapConfig as any)[baseMap]);
   }, [baseMap]);
 
-  const updateMapControls = (user: User | null) => {
-    if (!map.current) return;
+  const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
+    if (!map) return;
 
-    if (map.current.hasControl(geocoderControl.current)) {
-      map.current.removeControl(geocoderControl.current);
+    if (map.hasControl(geocoderControl.current)) {
+      map.removeControl(geocoderControl.current);
     }
 
-    if (map.current.hasControl(navControl.current)) {
-      map.current.removeControl(navControl.current);
+    if (map.hasControl(navControl.current)) {
+      map.removeControl(navControl.current);
     }
 
     // Only allow location search for logged in users
     if (user) {
       geocoderControl.current = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
-        mapboxgl: map.current
+        mapboxgl: map
       });
-      map.current.addControl(geocoderControl.current);
+      map.addControl(geocoderControl.current);
     }
 
-    map.current.addControl(navControl.current);
+    map.addControl(navControl.current);
   }
 
   return (

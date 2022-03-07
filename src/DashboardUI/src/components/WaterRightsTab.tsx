@@ -13,17 +13,15 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setCurrentLayers } = useContext(MapContext);
+  const { layers, setLayerVisibility } = useContext(MapContext);
 
   const handleBenefitUseChange = (layerId: string) => {
     // Filter to current layer only (will be multi-select eventually)
-    const filteredLayers = layers.map(layer => {
-      if(layer.layout) {
-        layer.layout.visibility = layer.id === layerId ? 'visible' : 'none'
+    layers.forEach(layer => {
+      if (layer.layout) {
+        setLayerVisibility(layer.id, layer.id === layerId);
       }
-      return layer;
-    });
-    setCurrentLayers(filteredLayers);
+    })
   };
 
   return (
