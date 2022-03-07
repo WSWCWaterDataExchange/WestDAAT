@@ -19,7 +19,7 @@
     "layers": [
       {
         "id": "aquaculture",
-        "legendValue": "Aquaculture",
+        "friendlyName": "Aquaculture",
         "source-layer": "aquaculture",
         "source": "allocation-sites_1",
         "layout": {
@@ -58,7 +58,7 @@
       {
         "id": "commercial",
         "source-layer": "commercial",
-        "legendValue": "Commercial",
+        "friendlyName": "Commercial",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -96,7 +96,7 @@
       {
         "id": "domestic",
         "source-layer": "domestic",
-        "legendValue": "Domestic",
+        "friendlyName": "Domestic",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -134,7 +134,7 @@
       {
         "id": "environmental",
         "source-layer": "environmental",
-        "legendValue": "Environmental",
+        "friendlyName": "Environmental",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -172,7 +172,7 @@
       {
         "id": "fire",
         "source-layer": "fire",
-        "legendValue": "Fire",
+        "friendlyName": "Fire",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -210,7 +210,7 @@
       {
         "id": "fish",
         "source-layer": "fish",
-        "legendValue": "Fish",
+        "friendlyName": "Fish",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -248,7 +248,7 @@
       {
         "id": "flood",
         "source-layer": "flood",
-        "legendValue": "Flood Control",
+        "friendlyName": "Flood Control",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -286,7 +286,7 @@
       {
         "id": "heating",
         "source-layer": "heating",
-        "legendValue": "Heating and Cooling",
+        "friendlyName": "Heating and Cooling",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -324,7 +324,7 @@
       {
         "id": "industrial",
         "source-layer": "industrial",
-        "legendValue": "Industrial",
+        "friendlyName": "Industrial",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
@@ -362,7 +362,7 @@
       {
         "id": "instream",
         "source-layer": "instream",
-        "legendValue": "Instream Flow",
+        "friendlyName": "Instream Flow",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -400,7 +400,7 @@
       {
         "id": "livestock",
         "source-layer": "livestock",
-        "legendValue": "Livestock",
+        "friendlyName": "Livestock",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -438,7 +438,7 @@
       {
         "id": "mining",
         "source-layer": "mining",
-        "legendValue": "Mining",
+        "friendlyName": "Mining",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -476,7 +476,7 @@
       {
         "id": "municipal",
         "source-layer": "municipal",
-        "legendValue": "Municipal",
+        "friendlyName": "Municipal",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -514,7 +514,7 @@
       {
         "id": "other",
         "source-layer": "other",
-        "legendValue": "Other",
+        "friendlyName": "Other",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -552,7 +552,7 @@
       {
         "id": "power",
         "source-layer": "power",
-        "legendValue": "Power",
+        "friendlyName": "Power",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -590,7 +590,7 @@
       {
         "id": "recharge",
         "source-layer": "recharge",
-        "legendValue": "Recharge",
+        "friendlyName": "Recharge",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -628,7 +628,7 @@
       {
         "id": "recreation",
         "source-layer": "recreation",
-        "legendValue": "Recreation",
+        "friendlyName": "Recreation",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -666,7 +666,7 @@
       {
         "id": "snow",
         "source-layer": "snow",
-        "legendValue": "Snow Making",
+        "friendlyName": "Snow Making",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -704,7 +704,7 @@
       {
         "id": "storage",
         "source-layer": "storage",
-        "legendValue": "Storage",
+        "friendlyName": "Storage",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -742,7 +742,7 @@
       {
         "id": "wildlife",
         "source-layer": "wildlife",
-        "legendValue": "Wildlife",
+        "friendlyName": "Wildlife",
         "source": "allocation-sites_2",
         "layout": {
           "visibility": "visible"
@@ -780,7 +780,7 @@
       {
         "id": "agricultural",
         "source-layer": "agricultural",
-        "legendValue": "Agricultural",
+        "friendlyName": "Agricultural",
         "source": "allocation-sites_1",
         "layout": {
           "visibility": "visible"
