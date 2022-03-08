@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { CustomSlider } from "./SliderComponents";
 
-export interface FlowRangeSliderProps {
+export interface VolumeRangeSliderProps {
   handleChange: (values: ReadonlyArray<number>) => void;
 }
 
-function FlowRangeSlider(props: FlowRangeSliderProps) {
+function VolumeRangeSlider(props: VolumeRangeSliderProps) {
 
   const domain = [100, 500];
   const defaultValues = [150, 450];
@@ -29,4 +29,4 @@ function FlowRangeSlider(props: FlowRangeSliderProps) {
   );
 }
 
-export default FlowRangeSlider;
+export default VolumeRangeSlider;

@@ -7,7 +7,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { AppContext, User } from "../AppProvider";
-import { MapContext, MapData, MapTypes } from "./MapProvider";
+import { MapContext, MapData, MapTheme, MapTypes } from "./MapProvider";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -17,7 +17,7 @@ import { MapContext, MapData, MapTypes } from "./MapProvider";
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { map, setCurrentMap, baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
+  const { map, mapTheme, setCurrentMap, baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
 
   const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -30,10 +30,11 @@ function Map() {
 
   useEffect(() => {
     setIsMapLoaded(false);
+
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
     const map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/mapbox/light-v10",
+      style: `mapbox://styles/mapbox/${mapTheme}`,
       center: [-100, 40],
       zoom: 4,
     });
@@ -42,6 +43,10 @@ function Map() {
 
     map.on("load", () => setIsMapLoaded(true));
   }, [mapData]);
+
+  useEffect(() => {
+    map?.setStyle(`mapbox://styles/mapbox/${mapTheme}`);
+  }, [mapTheme]);
 
   useEffect(() => {
     if (!map) return;
@@ -56,24 +61,26 @@ function Map() {
   useEffect(() => {
     if (!isMapLoaded || !map) return;
 
-    sources.forEach(source => {
-      if (map.getSource(source.id)) {
-        map.removeSource(source.id);
-      }
-      map.addSource(source.id, source.source);
-    });
-  }, [sources, isMapLoaded, map]);
-
-  useEffect(() => {
-    if (!isMapLoaded || !map) return;
-
     layers.forEach(layer => {
       if (map.getLayer(layer.id)) {
         map.removeLayer(layer.id);
       }
+    });
+
+    sources.forEach(source => {
+      if (map.getSource(source.id)) {
+        map.removeSource(source.id);
+      }
+    });
+
+    sources.forEach(source => {
+      map.addSource(source.id, source.source);
+    });
+
+    layers.forEach(layer => {
       map.addLayer(layer);
     });
-  }, [layers, isMapLoaded, map]);
+  }, [layers, sources, isMapLoaded, map, mapTheme]);
 
   useEffect(() => {
     setMapData((mapConfig as any)[baseMap]);

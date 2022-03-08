@@ -7,6 +7,14 @@ export enum MapTypes {
   Aggregate = "aggregate",
 }
 
+export enum MapTheme {
+  Light = "light-v10",
+  Dark = "dark-v10",
+  Street = "streets-v11",
+  Outdoor = "outdoors-v11",
+  Satellite = "satellite-v9"
+}
+
 interface Source {
   id: string,
   source: VectorSource
@@ -28,6 +36,8 @@ export interface MapFilters {
 interface MapContextState {
   map: mapboxgl.Map | null,
   setCurrentMap: (map: mapboxgl.Map) => void,
+  mapTheme: MapTheme;
+  setCurrentMapTheme: (theme: MapTheme) => void;
   baseMap: MapTypes;
   setCurrentBaseMap: (mapType: MapTypes) => void;
   sources: Source[];
@@ -41,6 +51,8 @@ interface MapContextState {
 const defaultState: MapContextState = {
   map: null as mapboxgl.Map | null,
   setCurrentMap: () => { },
+  mapTheme: MapTheme.Light,
+  setCurrentMapTheme: () => { },
   baseMap: MapTypes.WaterRights,
   setCurrentBaseMap: () => { },
   sources: [],
@@ -57,6 +69,9 @@ const MapProvider: FC = ({ children }) => {
 
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
+
+  const [mapTheme, setMapTheme] = useState(MapTheme.Light);
+  const setCurrentMapTheme = (mapTheme: MapTheme) => setMapTheme(mapTheme);
 
   const [mapFilters, setMapFilters] = useState<MapFilters>();
 
@@ -95,9 +110,12 @@ const MapProvider: FC = ({ children }) => {
     }
   };
 
+
   const mapContextProviderValue = {
     map,
     setCurrentMap,
+    mapTheme,
+    setCurrentMapTheme,
     baseMap,
     setCurrentBaseMap,
     sources,
