@@ -118,25 +118,32 @@ function NldiTab() {
     });
   }
 
-  const [isLoaded, setIsLoaded] = useState(false);
   const { map, layers, setCurrentSources, setCurrentLayers, setLegend } = useContext(MapContext);
-  const { data: nldiGeoJsonData } = useQuery(['nldiGeoJsonData', nldiData.latitude, nldiData.longitude], retrieveNldiGeoJsonData, { enabled: !!nldiData.latitude && !!nldiData.longitude, refetchOnWindowFocus: false, refetchOnMount: false, refetchOnReconnect: false, cacheTime: 8600000, staleTime: Infinity });
+  const { data: nldiGeoJsonData } = useQuery(
+    ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
+    retrieveNldiGeoJsonData,
+    {
+      enabled: !!nldiData.latitude && !!nldiData.longitude,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      cacheTime: 8600000,
+      staleTime: Infinity,
+    }
+  );
 
   useEffect(() => {
     const source = map?.getSource('nldi');
     if (isGeoJsonSource(source) && nldiGeoJsonData !== undefined) {
       source.setData(nldiGeoJsonData);
     }
-  }, [nldiGeoJsonData]);
+  }, [nldiGeoJsonData, map]);
 
   useEffect(() => {
-    if (!isLoaded) {
-      setCurrentSources((mapConfig as any).tempNldi.sources);
-      setCurrentLayers((mapConfig as any).tempNldi.layers);
-      setLegend(null);
-      setIsLoaded(true);
-    }
-  }, [isLoaded]);
+    setCurrentSources((mapConfig as any).tempNldi.sources);
+    setCurrentLayers((mapConfig as any).tempNldi.layers);
+    setLegend(null);
+  }, [setCurrentSources, setCurrentLayers, setLegend]);
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];

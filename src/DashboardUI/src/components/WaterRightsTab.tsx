@@ -15,15 +15,11 @@ function WaterRightsTab() {
   ];
 
   const { layers, setLayerVisibility, setCurrentSources, setCurrentLayers, setLegend } = useContext(MapContext);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded) {
-      setCurrentSources((mapConfig as any).waterRights.sources);
-      setCurrentLayers((mapConfig as any).waterRights.layers);
-      setIsLoaded(true);
-    }
-  }, [isLoaded])
+    setCurrentSources((mapConfig as any).waterRights.sources);
+    setCurrentLayers((mapConfig as any).waterRights.layers);
+  }, [setCurrentSources, setCurrentLayers])
 
   useEffect(() => {
     const mapData = (mapConfig as any).waterRights.layers;

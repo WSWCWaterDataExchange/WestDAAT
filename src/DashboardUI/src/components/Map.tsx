@@ -17,8 +17,8 @@ function Map() {
 
   const { user } = useContext(AppContext);
   const { map, setCurrentMap, layers, sources, legend } = useContext(MapContext);
-  const prevSources = usePrevious(sources);
-  const prevLayers = usePrevious(layers);
+  const prevSources = usePrevious(sources?.map(a => a.id));
+  const prevLayers = usePrevious(layers?.map(a => a.id));
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -55,23 +55,32 @@ function Map() {
   useEffect(() => {
     if (!isMapLoaded || !map) return;
 
-    prevLayers?.forEach(layer => {
-      if (map.getLayer(layer.id)) {
-        map.removeLayer(layer.id);
+    const removedLayers = prevLayers?.filter(a => !layers.find(b => b.id === a));
+    removedLayers?.forEach(layerId => {
+      if (map.getLayer(layerId)) {
+        map.removeLayer(layerId);
       }
     });
-    prevSources?.forEach(source => {
-      if (map.getSource(source.id)) {
-        map.removeSource(source.id);
+
+    const removedSources = prevSources?.filter(a => !sources.find(b => b.id === a));
+    removedSources?.forEach(sourceId => {
+      if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
       }
     });
+
     sources?.forEach(source => {
-      map.addSource(source.id, source.source);
+      if (!map.getSource(source.id)) {
+        map.addSource(source.id, source.source);
+      }
     });
+
     layers?.forEach(layer => {
-      map.addLayer(layer);
+      if (!map.getLayer(layer.id)) {
+        map.addLayer(layer);
+      }
     });
-  }, [layers, sources, map, isMapLoaded]);
+  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers]);
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (!map) return;
