@@ -46,7 +46,7 @@ function WaterRightsTab() {
       </div>);
     }
 
-  })
+  }, [setLegend])
 
   const handleBenefitUseChange = (layerId: string) => {
     // Filter to current layer only (will be multi-select eventually)
