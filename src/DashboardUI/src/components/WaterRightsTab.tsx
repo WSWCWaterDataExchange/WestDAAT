@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
-import { MapContext, MapTheme } from "./MapProvider";
+import { MapContext, MapStyle } from "./MapProvider";
 import { MultiValue } from 'react-select';
 import BeneficialUseSelect from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
@@ -23,7 +23,7 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapTheme, setCurrentMapTheme, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
+  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapStyle, setCurrentMapStyle: setCurrentMapStyle, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
 
   useEffect(() => {
     setCurrentSources((mapConfig as any).waterRights.sources);
@@ -33,26 +33,26 @@ function WaterRightsTab() {
   useEffect(() => {
     const mapData = (mapConfig as any).waterRights.layers;
     if (mapData) {
-      setLegend(<div className="legend">
-        <div>
-          {
-            //Sort legend items alphabetically
-            mapData.sort((a: any, b: any) =>
-              a.friendlyName > b.friendlyName ? 1 : -1
-            ).map((layer: any) => {
-              // Null check for layer paint property
-              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
-              return (
-                <div key={layer.id}>
-                  <span style={{ "backgroundColor": color }}></span>
-                  {layer.friendlyName}
-                </div>
-              );
-            }
-            )
-          }
-        </div>
-      </div>);
+      // setLegend(<div className="legend">
+      //   <div>
+      //     {
+      //       //Sort legend items alphabetically
+      //       mapData.sort((a: any, b: any) =>
+      //         a.friendlyName > b.friendlyName ? 1 : -1
+      //       ).map((layer: any) => {
+      //         // Null check for layer paint property
+      //         let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
+      //         return (
+      //           <div key={layer.id}>
+      //             <span style={{ "backgroundColor": color }}></span>
+      //             {layer.friendlyName}
+      //           </div>
+      //         );
+      //       }
+      //       )
+      //     }
+      //   </div>
+      // </div>);
     }
   })
 
@@ -164,13 +164,13 @@ function WaterRightsTab() {
         <div className="map-themes">
           {
             (() => {
-              const isActive = (theme: MapTheme) => theme === mapTheme ? "active" : "";
+              const isActive = (style: MapStyle) => style === mapStyle ? "active" : "";
               return <>
-                <img onClick={() => setCurrentMapTheme(MapTheme.Light)} className={isActive(MapTheme.Light)} alt="light map" src="/map-themes/light.png" />
-                <img onClick={() => setCurrentMapTheme(MapTheme.Dark)} className={isActive(MapTheme.Dark)} alt="dark map" src="/map-themes/dark.png" />
-                <img onClick={() => setCurrentMapTheme(MapTheme.Street)} className={isActive(MapTheme.Street)} alt="streets map" src="/map-themes/streets.png" />
-                <img onClick={() => setCurrentMapTheme(MapTheme.Outdoor)} className={isActive(MapTheme.Outdoor)} alt="outdoors map" src="/map-themes/outdoor.png" />
-                <img onClick={() => setCurrentMapTheme(MapTheme.Satellite)} className={isActive(MapTheme.Satellite)} alt="satelite map" src="/map-themes/satelite.png" />
+                <img onClick={() => setCurrentMapStyle(MapStyle.Light)} className={isActive(MapStyle.Light)} alt="light map" src="/map-themes/light.png" />
+                <img onClick={() => setCurrentMapStyle(MapStyle.Dark)} className={isActive(MapStyle.Dark)} alt="dark map" src="/map-themes/dark.png" />
+                <img onClick={() => setCurrentMapStyle(MapStyle.Street)} className={isActive(MapStyle.Street)} alt="streets map" src="/map-themes/streets.png" />
+                <img onClick={() => setCurrentMapStyle(MapStyle.Outdoor)} className={isActive(MapStyle.Outdoor)} alt="outdoors map" src="/map-themes/outdoor.png" />
+                <img onClick={() => setCurrentMapStyle(MapStyle.Satellite)} className={isActive(MapStyle.Satellite)} alt="satelite map" src="/map-themes/satelite.png" />
               </>
             })()
           }

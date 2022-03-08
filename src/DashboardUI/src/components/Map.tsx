@@ -8,6 +8,7 @@ import "../styles/map.scss";
 import { AppContext, User } from "../AppProvider";
 import { MapContext } from "./MapProvider";
 import usePrevious from "../hooks/usePrevious";
+import { on } from "stream";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -16,7 +17,7 @@ import usePrevious from "../hooks/usePrevious";
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { map, setCurrentMap, mapTheme, layers, sources, legend } = useContext(MapContext);
+  const { map, setCurrentMap, mapStyle: mapStyle, layers, sources, legend } = useContext(MapContext);
   const prevSources = usePrevious(sources?.map(a => a.id));
   const prevLayers = usePrevious(layers?.map(a => a.id));
 
@@ -33,7 +34,7 @@ function Map() {
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
       const map = new mapboxgl.Map({
         container: "map",
-        style: `mapbox://styles/mapbox/${mapTheme}`,
+        style: `mapbox://styles/mapbox/${mapStyle}`,
         center: [-100, 40],
         zoom: 4,
       });
@@ -45,11 +46,6 @@ function Map() {
       });
     }
   });
-
-  useEffect(() => {
-    console.log("Map theme changed...", mapTheme);
-    // map?.setStyle(`mapbox://styles/mapbox/${mapTheme}`);
-  }, [mapTheme]);
 
   useEffect(() => {
     if (!map) return;
@@ -64,32 +60,48 @@ function Map() {
   useEffect(() => {
     if (!isMapLoaded || !map) return;
 
-    const removedLayers = prevLayers?.filter(a => !layers.find(b => b.id === a));
-    removedLayers?.forEach(layerId => {
-      if (map.getLayer(layerId)) {
-        map.removeLayer(layerId);
+    const stylesLoaded = new Promise((resolve, reject) => {
+      // If the map style is changed, wait for it to load before continuing
+      const prevStyle = map.getStyle().metadata["mapbox:origin"];
+      if (mapStyle !== prevStyle) {
+        map.once("styledata", () => {
+          resolve(true);
+        });
+        map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
+      }
+      else {
+        resolve(true);
       }
     });
 
-    const removedSources = prevSources?.filter(a => !sources.find(b => b.id === a));
-    removedSources?.forEach(sourceId => {
-      if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-      }
-    });
+    stylesLoaded.then(() => {
+      const removedLayers = prevLayers?.filter(a => !layers.find(b => b.id === a));
+      removedLayers?.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+      });
 
-    sources?.forEach(source => {
-      if (!map.getSource(source.id)) {
-        map.addSource(source.id, source.source);
-      }
-    });
+      const removedSources = prevSources?.filter(a => !sources.find(b => b.id === a));
+      removedSources?.forEach(sourceId => {
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+      });
 
-    layers?.forEach(layer => {
-      if (!map.getLayer(layer.id)) {
-        map.addLayer(layer);
-      }
+      sources?.forEach(source => {
+        if (!map.getSource(source.id)) {
+          map.addSource(source.id, source.source);
+        }
+      });
+
+      layers?.forEach(layer => {
+        if (!map.getLayer(layer.id)) {
+          map.addLayer(layer);
+        }
+      });
     });
-  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers, mapTheme]);
+  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers, mapStyle]);
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (!map) return;

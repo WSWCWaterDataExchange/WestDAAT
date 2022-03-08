@@ -8,7 +8,7 @@ export enum MapTypes {
   TempNldi = "tempNldi",
 }
 
-export enum MapTheme {
+export enum MapStyle {
   Light = "light-v10",
   Dark = "dark-v10",
   Street = "streets-v11",
@@ -37,8 +37,8 @@ export interface MapFilters {
 interface MapContextState {
   map: mapboxgl.Map | null,
   setCurrentMap: (map: mapboxgl.Map) => void,
-  mapTheme: MapTheme;
-  setCurrentMapTheme: (theme: MapTheme) => void;
+  mapStyle: MapStyle;
+  setCurrentMapStyle: (style: MapStyle) => void;
   baseMap: MapTypes;
   setCurrentBaseMap: (mapType: MapTypes) => void;
   sources: Source[];
@@ -54,8 +54,8 @@ interface MapContextState {
 const defaultState: MapContextState = {
   map: null as mapboxgl.Map | null,
   setCurrentMap: () => { },
-  mapTheme: MapTheme.Light,
-  setCurrentMapTheme: () => { },
+  mapStyle: MapStyle.Light,
+  setCurrentMapStyle: () => { },
   baseMap: MapTypes.WaterRights,
   setCurrentBaseMap: () => { },
   sources: [],
@@ -74,8 +74,8 @@ const MapProvider: FC = ({ children }) => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
 
-  const [mapTheme, setMapTheme] = useState(MapTheme.Light);
-  const setCurrentMapTheme = (mapTheme: MapTheme) => setMapTheme(mapTheme);
+  const [mapStyle, setMapStyle] = useState(MapStyle.Light);
+  const setCurrentMapStyle = (mapStyle: MapStyle) => setMapStyle(mapStyle);
 
   const [mapFilters, setMapFilters] = useState<MapFilters>();
 
@@ -120,8 +120,8 @@ const MapProvider: FC = ({ children }) => {
   const mapContextProviderValue = {
     map,
     setCurrentMap,
-    mapTheme,
-    setCurrentMapTheme,
+    mapStyle,
+    setCurrentMapStyle,
     baseMap,
     setCurrentBaseMap,
     sources,
