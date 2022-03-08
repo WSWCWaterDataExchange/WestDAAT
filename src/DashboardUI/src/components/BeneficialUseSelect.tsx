@@ -55,6 +55,10 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
         color: 'white',
       },
     }),
+    menu: (styles) => ({
+      ...styles,
+      zIndex: 10
+    })
   };
 
   return (
