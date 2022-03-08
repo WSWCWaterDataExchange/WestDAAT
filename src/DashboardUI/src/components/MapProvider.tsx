@@ -32,6 +32,7 @@ export interface MapData {
 
 export interface MapFilters {
   visibleLayerIds: string[];
+  mapStyle: MapStyle;
 }
 
 interface MapContextState {
@@ -49,6 +50,7 @@ interface MapContextState {
   setVisibleMapLayersFilter: (visibleLayerIds: string[]) => void;
   legend: ReactElement | null;
   setLegend: (legend: ReactElement | null) => void;
+  mapFilters: MapFilters;
 };
 
 const defaultState: MapContextState = {
@@ -65,7 +67,11 @@ const defaultState: MapContextState = {
   setLayerVisibility: () => { },
   setVisibleMapLayersFilter: () => { },
   legend: null as ReactElement | null,
-  setLegend: () => { }
+  setLegend: () => { },
+  mapFilters: {
+    visibleLayerIds: [],
+    mapStyle: MapStyle.Light
+  },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -75,9 +81,15 @@ const MapProvider: FC = ({ children }) => {
   const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
 
   const [mapStyle, setMapStyle] = useState(MapStyle.Light);
-  const setCurrentMapStyle = (mapStyle: MapStyle) => setMapStyle(mapStyle);
+  const setCurrentMapStyle = (mapStyle: MapStyle) => {
+    setMapFilters({
+      ...mapFilters,
+      mapStyle
+    });
+    setMapStyle(mapStyle);
+  }
 
-  const [mapFilters, setMapFilters] = useState<MapFilters>();
+  const [mapFilters, setMapFilters] = useState<MapFilters>(defaultState.mapFilters);
 
   let [urlParams, setUrlParams] = useSearchParams();
 
@@ -91,6 +103,17 @@ const MapProvider: FC = ({ children }) => {
   useEffect(() => {
     updateFilterUrlParams();
   }, [mapFilters])
+
+  useEffect(() => {
+    // Restore mapFilter state from URL params
+    const mapFilters = JSON.parse(urlParams.get("mapFilters") as string) as MapFilters;
+    setMapFilters({
+      visibleLayerIds: mapFilters.visibleLayerIds || [],
+      mapStyle: mapFilters.mapStyle || MapStyle.Light
+    });
+    console.log("Grabbing data from url...", mapFilters.visibleLayerIds || []);
+    
+  }, []);
 
   const updateFilterUrlParams = () => {
     setUrlParams({
@@ -131,7 +154,8 @@ const MapProvider: FC = ({ children }) => {
     setLayerVisibility,
     setVisibleMapLayersFilter,
     legend,
-    setLegend
+    setLegend,
+    mapFilters
   };
 
   return (

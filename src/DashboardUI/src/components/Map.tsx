@@ -17,7 +17,7 @@ import { on } from "stream";
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { map, setCurrentMap, mapStyle: mapStyle, layers, sources, legend } = useContext(MapContext);
+  const { map, setCurrentMap, mapStyle, layers, sources, legend, mapFilters } = useContext(MapContext);
   const prevSources = usePrevious(sources?.map(a => a.id));
   const prevLayers = usePrevious(layers?.map(a => a.id));
 
@@ -34,7 +34,7 @@ function Map() {
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
       const map = new mapboxgl.Map({
         container: "map",
-        style: `mapbox://styles/mapbox/${mapStyle}`,
+        style: `mapbox://styles/mapbox/${mapFilters?.mapStyle}`,
         center: [-100, 40],
         zoom: 4,
       });
@@ -63,11 +63,11 @@ function Map() {
     const stylesLoaded = new Promise((resolve, reject) => {
       // If the map style is changed, wait for it to load before continuing
       const prevStyle = map.getStyle().metadata["mapbox:origin"];
-      if (mapStyle !== prevStyle) {
+      if (mapFilters?.mapStyle !== prevStyle) {
         map.once("styledata", () => {
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
+        map.setStyle(`mapbox://styles/mapbox/${mapFilters?.mapStyle}`);
       }
       else {
         resolve(true);
@@ -101,7 +101,7 @@ function Map() {
         }
       });
     });
-  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers, mapStyle]);
+  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers, mapFilters]);
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (!map) return;

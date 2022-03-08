@@ -1,6 +1,7 @@
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import chroma from "chroma-js";
 import { Layer } from './MapProvider';
+import { useEffect, useState } from 'react';
 
 export interface BeneficialUseChangeOption {
   value: string; // layerId
@@ -9,17 +10,19 @@ export interface BeneficialUseChangeOption {
 }
 
 interface BeneficialUseSelectProps {
+  defaultValue: string[];
   layers: Layer[];
   onChange: (selectedOptions: MultiValue<BeneficialUseChangeOption>) => void;
 }
 
 function BeneficialUseSelect(props: BeneficialUseSelectProps) {
-  
+
   const layerOptions = props.layers.map(layer => ({
     value: layer.id,
     label: layer.friendlyName,
     color: layer.paint?.["circle-color"] as string
   }));
+
 
   const displayNone = () => ({
     display: 'none'
@@ -61,15 +64,24 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     })
   };
 
+  const selectedOptions: BeneficialUseChangeOption[] = layerOptions
+    .filter(o => props.defaultValue.includes(o.value));
+
   return (
-    <Select
-      onChange={props.onChange}
-      closeMenuOnSelect={false}
-      defaultValue={layerOptions}
-      options={layerOptions}
-      styles={layerOptionStyles}
-      isMulti
-    />
+    <>
+      {
+        props.layers.length && (
+          <Select
+            defaultValue={selectedOptions}
+            isMulti
+            onChange={props.onChange}
+            closeMenuOnSelect={false}
+            options={layerOptions}
+            styles={layerOptionStyles}
+          />
+        )
+      }
+    </>
   );
 }
 

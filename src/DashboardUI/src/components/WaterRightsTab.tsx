@@ -23,7 +23,8 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapStyle, setCurrentMapStyle: setCurrentMapStyle, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
+  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapFilters, setCurrentMapStyle, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
+  const { mapStyle, visibleLayerIds } = mapFilters;
 
   useEffect(() => {
     setCurrentSources((mapConfig as any).waterRights.sources);
@@ -127,7 +128,7 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Beneficial Use</label>
-        <BeneficialUseSelect layers={layers} onChange={handleBeneficialUseChange} />
+        <BeneficialUseSelect defaultValue={visibleLayerIds} layers={layers} onChange={handleBeneficialUseChange} />
       </div>
 
       <div className="mb-3">
