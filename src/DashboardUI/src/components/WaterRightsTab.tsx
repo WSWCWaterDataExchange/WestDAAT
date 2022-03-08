@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
@@ -7,6 +7,7 @@ import { MultiValue } from 'react-select';
 import BeneficialUseSelect from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
 import AllocationDateSlider from "./AllocationDateRangeSlider";
+import mapConfig from "../config/maps.json";
 
 interface BeneficialUseChangeOption {
   value: string,
@@ -15,7 +16,6 @@ interface BeneficialUseChangeOption {
 }
 
 function WaterRightsTab() {
-
   const [radioValue, setRadioValue] = useState('1');
   const radios = [
     { name: 'Both', value: '1' },
@@ -23,7 +23,38 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapTheme, setCurrentMapTheme } = useContext(MapContext);
+  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapTheme, setCurrentMapTheme, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
+
+  useEffect(() => {
+    setCurrentSources((mapConfig as any).waterRights.sources);
+    setCurrentLayers((mapConfig as any).waterRights.layers);
+  }, [setCurrentSources, setCurrentLayers])
+
+  useEffect(() => {
+    const mapData = (mapConfig as any).waterRights.layers;
+    if (mapData) {
+      setLegend(<div className="legend">
+        <div>
+          {
+            //Sort legend items alphabetically
+            mapData.sort((a: any, b: any) =>
+              a.friendlyName > b.friendlyName ? 1 : -1
+            ).map((layer: any) => {
+              // Null check for layer paint property
+              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
+              return (
+                <div key={layer.id}>
+                  <span style={{ "backgroundColor": color }}></span>
+                  {layer.friendlyName}
+                </div>
+              );
+            }
+            )
+          }
+        </div>
+      </div>);
+    }
+  })
 
   const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
     let visibleLayerIds: string[] = [];

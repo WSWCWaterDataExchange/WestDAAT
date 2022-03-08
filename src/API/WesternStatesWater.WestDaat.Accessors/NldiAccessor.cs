@@ -1,4 +1,5 @@
 ﻿using GeoJSON.Text.Feature;
+using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Common;
@@ -19,14 +20,21 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IUsgsNldiSdk _usgsNldiSdk;
         private readonly NldiConfiguration _configuration;
-        private readonly Dictionary<NavigationMode, string> _navigationModeName = new Dictionary<NavigationMode, string>()
+        private readonly Dictionary<NavigationMode, string> _directionNames = new Dictionary<NavigationMode, string>()
         {
-            { NavigationMode.UpstreamMain, "Main.Upstream" },
-            { NavigationMode.UpstreamTributaries, "Tributary.Upstream" },
-            { NavigationMode.DownstreamMain, "Main.Downstream" },
-            { NavigationMode.DownstreamDiversions, "Tributary.Downstream" }
+            { NavigationMode.UpstreamMain, "Upstream" },
+            { NavigationMode.UpstreamTributaries, "Upstream" },
+            { NavigationMode.DownstreamMain, "Downstream" },
+            { NavigationMode.DownstreamDiversions, "Downstream" }
         };
-        private readonly Dictionary<FeatureDataSource, string> _featureDataSourceName = new Dictionary<FeatureDataSource, string>()
+        private readonly Dictionary<NavigationMode, string> _channelTypes = new Dictionary<NavigationMode, string>()
+        {
+            { NavigationMode.UpstreamMain, "Main" },
+            { NavigationMode.UpstreamTributaries, "Arm" },
+            { NavigationMode.DownstreamMain, "Main" },
+            { NavigationMode.DownstreamDiversions, "Arm" }
+        };
+        private readonly Dictionary<FeatureDataSource, string> _pointFeatureDataSourceNames = new Dictionary<FeatureDataSource, string>()
         {
             { FeatureDataSource.UsgsSurfaceWaterSites, "UsgsSurfaceWaterSite" },
             { FeatureDataSource.EpaWaterQualitySite, "EpaWaterQualitySite" },
@@ -37,10 +45,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (new TimerLogger($"Getting NLDI Features [{latitude}] [{longitude}]", base.Logger))
             {
-                if (directions == NldiDirections.None)
-                {
-                    return new FeatureCollection();
-                }
                 var coordinateFeatures = await _usgsNldiSdk.GetFeatureByCoordinates(latitude, longitude);
                 if (!coordinateFeatures.Features[0].Properties.TryGetValue("comid", out var comidVal))
                 {
@@ -92,45 +96,67 @@ namespace WesternStatesWater.WestDaat.Accessors
                         tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.Wade, _configuration.MaxDownstreamDiversionDistance));
                     }
                 }
+                tasks.Add(GetMainPoint(coordinateFeatures));
                 var featureCollections = await Task.WhenAll(tasks);
                 return new FeatureCollection(featureCollections.SelectMany(a => a.Features).ToList());
             }
         }
 
-        private string GetFlowlineFeatureName(NavigationMode navigationMode)
-        {
-            return $"Flowline.{GetNavigationModeName(navigationMode)}";
-        }
-
-        private string GetPointFeatureName(NavigationMode navigationMode, FeatureDataSource featureDataSource)
-        {
-            return $"Point.{GetFeatureDataSourceName(featureDataSource)}.{GetNavigationModeName(navigationMode)}";
-        }
-
-        private string GetNavigationModeName(NavigationMode navigationMode)
-        {
-            return _navigationModeName[navigationMode];
-        }
-
-        private string GetFeatureDataSourceName(FeatureDataSource featureDataSource)
-        {
-            return _featureDataSourceName[featureDataSource];
-        }
-
         private async Task<FeatureCollection> GetFlowlines(string comid, NavigationMode navigationMode, int distanceInKm)
         {
-            var featureName = GetFlowlineFeatureName(navigationMode);
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
             var result = await _usgsNldiSdk.GetFlowlines(comid, navigationMode, distanceInKm);
-            result.Features.ForEach(a => a.Properties["westdaat_feature"] = featureName);
+            result.Features.ForEach(a =>
+            {
+                a.Properties["westdaat_featuredatatype"] = "Flowline";
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
+            });
             return result;
         }
 
         private async Task<FeatureCollection> GetPointFeatures(string comid, NavigationMode navigationMode, FeatureDataSource featureDataSource, int distanceInKm)
         {
-            var featureName = GetPointFeatureName(navigationMode, featureDataSource);
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
+            var dataSource = _pointFeatureDataSourceNames[featureDataSource];
             var result = await _usgsNldiSdk.GetFeatures(comid, navigationMode, featureDataSource, distanceInKm);
-            result.Features.ForEach(a => a.Properties["westdaat_feature"] = featureName);
+            result.Features.ForEach(a =>
+            {
+                a.Properties["westdaat_featuredatatype"] = "Point";
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
+                a.Properties["westdaat_pointdatasource"] = dataSource;
+            });
             return result;
+        }
+
+        private Task<FeatureCollection> GetMainPoint(FeatureCollection coordinateFeatures)
+        {
+            var result = new FeatureCollection();
+            if (coordinateFeatures.Features[0].Geometry is LineString ls)
+            {
+                var geoJsonlineString = JsonSerializer.Serialize(ls);
+                var g1 = GeometryHelpers.GetGeometryByGeoJson(geoJsonlineString) as NetTopologySuite.Geometries.LineString;
+
+                var ll = NetTopologySuite.LinearReferencing.LengthLocationMap.GetLocation(g1, g1.Length / 2);
+                var c = ll.GetCoordinate(g1);
+                result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
+                result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
+            }
+            else
+            {
+                var geoJsonString = JsonSerializer.Serialize(coordinateFeatures.Features[0].Geometry);
+                var g1 = GeometryHelpers.GetGeometryByGeoJson(geoJsonString);
+
+                var c = g1.Centroid;
+                result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
+                result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
+            }
+            return Task.FromResult(result);
         }
     }
 }

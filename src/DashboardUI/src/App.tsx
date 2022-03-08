@@ -11,6 +11,7 @@ import MapProvider from "./components/MapProvider";
 
 function App() {
   const queryClient = new QueryClient();
+  
 
   return (
     <AppProvider>

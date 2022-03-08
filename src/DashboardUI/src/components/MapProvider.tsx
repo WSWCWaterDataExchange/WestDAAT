@@ -1,10 +1,11 @@
 import mapboxgl, { CircleLayer, VectorSource } from "mapbox-gl";
-import { createContext, FC, useEffect, useState } from "react";
+import { createContext, FC, ReactElement, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export enum MapTypes {
   WaterRights = "waterRights",
   Aggregate = "aggregate",
+  TempNldi = "tempNldi",
 }
 
 export enum MapTheme {
@@ -46,6 +47,8 @@ interface MapContextState {
   setCurrentLayers: (layers: Layer[]) => void;
   setLayerVisibility: (layerId: string, visible: boolean) => void;
   setVisibleMapLayersFilter: (visibleLayerIds: string[]) => void;
+  legend: ReactElement | null;
+  setLegend: (legend: ReactElement | null) => void;
 };
 
 const defaultState: MapContextState = {
@@ -61,12 +64,13 @@ const defaultState: MapContextState = {
   setCurrentLayers: () => { },
   setLayerVisibility: () => { },
   setVisibleMapLayersFilter: () => { },
+  legend: null as ReactElement | null,
+  setLegend: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
 
 const MapProvider: FC = ({ children }) => {
-
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
 
@@ -104,6 +108,8 @@ const MapProvider: FC = ({ children }) => {
   const [layers, setLayers] = useState<Layer[]>([]);
   const setCurrentLayers = (layers: Layer[]) => setLayers(layers);
 
+  const [legend, setLegend] = useState<ReactElement | null>(null);
+
   const setLayerVisibility = (layerId: string, visible: boolean) => {
     if (map) {
       map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
@@ -123,7 +129,9 @@ const MapProvider: FC = ({ children }) => {
     layers,
     setCurrentLayers,
     setLayerVisibility,
-    setVisibleMapLayersFilter
+    setVisibleMapLayersFilter,
+    legend,
+    setLegend
   };
 
   return (
