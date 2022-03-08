@@ -6,6 +6,7 @@ import { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
+import { Form } from "react-bootstrap";
 
 function NldiTab() {
   const precision = 5;
@@ -194,39 +195,34 @@ function NldiTab() {
           <h1>NLDI Site Search Tool</h1>
         </div>
       </div>
-      <div className="form-group">
-        <label htmlFor='nldiLatitude'>Latitude</label>
-        <input id='nldiLatitude' type='number' className="form-control" placeholder="Enter Latitude" max={90} min={-90} step={.001} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
-      </div>
-      <div className="form-group">
-        <label htmlFor='nldiLongitude'>Longitude</label>
-        <input id='nldiLongitude' type='number' className="form-control" placeholder="Enter Longitude" max={180} min={-180} step={.001} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
-      </div>
+      <Form.Group>
+        <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
+        <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
+        <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+      </Form.Group>
       <div>
         Direction
-        <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} />
-          <label className="form-check-label" htmlFor="nldiUpstream">Upstream</label>
-        </div>
-        <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} />
-          <label className="form-check-label" htmlFor="nldiDownstream">Downstream</label>
-        </div>
+        <Form.Group>
+          <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream"/>
+        </Form.Group>
       </div>
       <div>
         Data Type
-        <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} />
-          <label className="form-check-label" htmlFor="nldiWade">WaDE</label>
-        </div>
-        <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} />
-          <label className="form-check-label" htmlFor="nldiUsgs">USGS</label>
-        </div>
-        <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} />
-          <label className="form-check-label" htmlFor="nldiEpa">EPA</label>
-        </div>
+        <Form.Group>
+          <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA" />
+        </Form.Group>
       </div>
     </>
   );
