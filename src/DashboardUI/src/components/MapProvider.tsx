@@ -1,5 +1,5 @@
 import mapboxgl, { CircleLayer, VectorSource } from "mapbox-gl";
-import { createContext, FC, useState } from "react";
+import { createContext, FC, ReactElement, useState } from "react";
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -31,6 +31,8 @@ interface MapContextState {
   layers: Layer[];
   setCurrentLayers: (layers: Layer[]) => void;
   setLayerVisibility: (layerId: string, visible: boolean) => void;
+  legend: ReactElement | null;
+  setLegend: (legend: ReactElement | null) => void;
 };
 
 const defaultState: MapContextState = {
@@ -42,7 +44,9 @@ const defaultState: MapContextState = {
   setCurrentSources: () => { },
   layers: [],
   setCurrentLayers: () => { },
-  setLayerVisibility: () => { }
+  setLayerVisibility: () => { },
+  legend: null as ReactElement | null,
+  setLegend: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -61,6 +65,8 @@ const MapProvider: FC = ({ children }) => {
   const [layers, setLayers] = useState<Layer[]>([]);
   const setCurrentLayers = (layers: Layer[]) => setLayers(layers);
 
+  const [legend, setLegend] = useState<ReactElement | null>(null);
+
   const setLayerVisibility = (layerId: string, visible: boolean) => {
     if (map) {
       map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
@@ -76,7 +82,9 @@ const MapProvider: FC = ({ children }) => {
     setCurrentSources,
     layers,
     setCurrentLayers,
-    setLayerVisibility
+    setLayerVisibility,
+    legend,
+    setLegend
   };
 
   return (

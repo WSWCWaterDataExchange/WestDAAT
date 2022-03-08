@@ -5,21 +5,21 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import "../styles/map.scss";
-import mapConfig from "../config/maps.json";
 import { AppContext, User } from "../AppProvider";
-import { MapContext, MapData, MapTypes } from "./MapProvider";
+import { MapContext } from "./MapProvider";
+import usePrevious from "../hooks/usePrevious";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
-
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { map, setCurrentMap, baseMap, layers, sources, setCurrentLayers, setCurrentSources } = useContext(MapContext);
+  const { map, setCurrentMap, layers, sources, legend } = useContext(MapContext);
+  const prevSources = usePrevious(sources);
+  const prevLayers = usePrevious(layers);
 
-  const [mapData, setMapData] = useState((mapConfig as any)[MapTypes.WaterRights] as MapData);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   const setMap = useRef(setCurrentMap);
@@ -29,55 +29,49 @@ function Map() {
   }));
 
   useEffect(() => {
-    setIsMapLoaded(false);
-    mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
-    const map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/mapbox/light-v10",
-      center: [-100, 40],
-      zoom: 4,
-    });
+    if (!map) {
+      mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
+      const map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/light-v10",
+        center: [-100, 40],
+        zoom: 4,
+      });
 
-    setMap.current(map);
+      setMap.current(map);
 
-    map.on("load", () => setIsMapLoaded(true));
-  }, [mapData]);
+      map.on("load", () => {
+        setIsMapLoaded(true);
+      });
+    }
+
+  }, [map]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!isMapLoaded || !map) return;
     updateMapControls(map, user);
-  }, [user, map]);
-
-  useEffect(() => {
-    setCurrentSources(mapData.sources);
-    setCurrentLayers(mapData.layers);
-  }, [mapData, setCurrentSources, setCurrentLayers]);
+  }, [user, map, sources, layers, isMapLoaded]);
 
   useEffect(() => {
     if (!isMapLoaded || !map) return;
 
-    sources.forEach(source => {
-      if (map.getSource(source.id)) {
-        map.removeSource(source.id);
-      }
-      map.addSource(source.id, source.source);
-    });
-  }, [sources, isMapLoaded, map]);
-
-  useEffect(() => {
-    if (!isMapLoaded || !map) return;
-
-    layers.forEach(layer => {
+    prevLayers?.forEach(layer => {
       if (map.getLayer(layer.id)) {
         map.removeLayer(layer.id);
       }
+    });
+    prevSources?.forEach(source => {
+      if (map.getSource(source.id)) {
+        map.removeSource(source.id);
+      }
+    });
+    sources?.forEach(source => {
+      map.addSource(source.id, source.source);
+    });
+    layers?.forEach(layer => {
       map.addLayer(layer);
     });
-  }, [layers, isMapLoaded, map]);
-
-  useEffect(() => {
-    setMapData((mapConfig as any)[baseMap]);
-  }, [baseMap]);
+  }, [layers, sources, map, isMapLoaded]);
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (!map) return;
@@ -104,26 +98,7 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
-      <div className="legend">
-        <div>
-          {
-            // Sort legend items alphabetically
-            mapData && mapData.layers.sort((a, b) =>
-              a.friendlyName > b.friendlyName ? 1 : -1
-            ).map(layer => {
-              // Null check for layer paint property
-              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
-              return (
-                <div key={layer.id}>
-                  <span style={{ "backgroundColor": color }}></span>
-                  {layer.friendlyName}
-                </div>
-              );
-            }
-            )
-          }
-        </div>
-      </div>
+      {legend}
       <div id="map" className="map h-100"></div>
     </div>
   );

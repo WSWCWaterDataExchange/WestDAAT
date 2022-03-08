@@ -827,7 +827,10 @@
         "id": "nldi",
         "source": {
           "type": "geojson",
-          "data": "http://localhost:7071/api/NldiFeatures/@36.859496562,-111.585164326?dir=3&points=7"
+          "data": {
+            "type": "FeatureCollection",
+            "features": []
+          }
         }
       }
     ],
@@ -878,7 +881,11 @@
             ]
           ]
         },
-        "circle-color": ["case", ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], "#ff0000", ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], "#00ff00", ["==", ["get", "westdaat_pointdatasource"], "Wade"], "#ffff00", "#000000"]
+        "circle-color": ["case", 
+          ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], "#ff0000", 
+          ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], "#00ff00",
+          ["==", ["get", "westdaat_pointdatasource"], "Wade"], "#ffff00",
+          "#000000"]
       },
       "filter": ["==", ["get", "westdaat_featuredatatype"], "Point"]
     }
