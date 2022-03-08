@@ -7,6 +7,7 @@ import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Form } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 function NldiTab() {
   const precision = 5;
@@ -23,7 +24,12 @@ function NldiTab() {
   });
 
   const retrieveNldiGeoJsonData = async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
-    return getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa);
+    const promise = getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa);
+    toast.promise(promise, {
+      pending: 'Retrieving NLDI Data',
+      error: 'Error Retrieving NLDI Data'
+    })
+    return promise;
   }
 
   const isGeoJsonSource = (mapSource: AnySourceImpl | undefined): mapSource is GeoJSONSource => {
