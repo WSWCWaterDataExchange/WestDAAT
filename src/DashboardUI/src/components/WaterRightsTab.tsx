@@ -1,8 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext } from "./MapProvider";
+import mapConfig from "../config/maps.json";
 
 function WaterRightsTab() {
 
@@ -13,7 +14,39 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility } = useContext(MapContext);
+  const { layers, setLayerVisibility, setCurrentSources, setCurrentLayers, setLegend } = useContext(MapContext);
+
+  useEffect(() => {
+    setCurrentSources((mapConfig as any).waterRights.sources);
+    setCurrentLayers((mapConfig as any).waterRights.layers);
+  }, [setCurrentSources, setCurrentLayers])
+
+  useEffect(() => {
+    const mapData = (mapConfig as any).waterRights.layers;
+    if (mapData) {
+      setLegend(<div className="legend">
+        <div>
+          {
+            //Sort legend items alphabetically
+            mapData.sort((a: any, b: any) =>
+              a.friendlyName > b.friendlyName ? 1 : -1
+            ).map((layer: any) => {
+              // Null check for layer paint property
+              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
+              return (
+                <div key={layer.id}>
+                  <span style={{ "backgroundColor": color }}></span>
+                  {layer.friendlyName}
+                </div>
+              );
+            }
+            )
+          }
+        </div>
+      </div>);
+    }
+
+  })
 
   const handleBenefitUseChange = (layerId: string) => {
     // Filter to current layer only (will be multi-select eventually)
