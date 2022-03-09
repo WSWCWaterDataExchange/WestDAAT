@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
@@ -9,6 +10,7 @@ import BeneficialUseSelect from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
 import AllocationDateSlider from "./AllocationDateRangeSlider";
 import mapConfig from "../config/maps.json";
+import { ownerClassifications } from "../config/waterRights";
 
 interface BeneficialUseChangeOption {
   value: string,
@@ -25,6 +27,7 @@ function WaterRightsTab() {
   ];
 
   const {
+    map,
     layers,
     setLayerVisibility,
     setVisibleMapLayersFilter,
@@ -90,6 +93,28 @@ function WaterRightsTab() {
     setVisibleMapLayersFilter(visibleLayerIds);
   };
 
+  const filterAllocationOwnerClassification = (sourceArr: any) => {
+
+    var filterValue = sourceArr as any;
+    var allocationFilter: any;
+
+    if (filterValue.length > 0) {
+      allocationFilter = [
+        "all",
+        ["in", "ownerClassification"]
+      ];
+      sourceArr.map((source: any) => {
+        allocationFilter[1].push(source as any);
+      });
+    } else {
+      allocationFilter = ["all"];
+    }
+
+    layers.forEach((item) => {
+      map?.setFilter(item as any, allocationFilter);
+    });
+  }
+
   return (
     <>
       <div className="mb-3">
@@ -134,8 +159,13 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Owner Classification</label>
-        <select className="form-select">
-        </select>
+        <DropdownMultiselect
+          className="form-control"
+          options={ownerClassifications}
+          selected={ownerClassifications.map(x => x.key)}
+          handleOnChange={(selected: any) => filterAllocationOwnerClassification(selected)}
+          name="ownerClassification"
+        />
       </div>
 
       <div className="mb-3">

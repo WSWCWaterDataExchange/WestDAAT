@@ -57,4 +57,20 @@
       }
     }
   }
+
+  .dropdown {
+    > button {
+      background-color: white;
+      border: 1px solid $border-color;
+    }
+
+    .btn-group {
+      width: 100%;
+    }
+
+    .dropdown-menu {
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
 }
