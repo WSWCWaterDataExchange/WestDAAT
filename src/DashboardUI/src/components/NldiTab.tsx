@@ -155,7 +155,7 @@ function NldiTab() {
   }, [setCurrentSources, setCurrentLayers, mapConfig]);
 
   useEffect(() => {
-    setLegend(<div className="legend legend-light legend-nldi">
+    setLegend(<div className="legend legend-nldi">
         <div>
           <span>
             <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
