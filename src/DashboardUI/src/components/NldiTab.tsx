@@ -151,39 +151,44 @@ function NldiTab() {
     setCurrentLayers((mapConfig as any).tempNldi.layers);
     setLegend(null);
   }, [setCurrentSources, setCurrentLayers, setLegend]);
+  const pointFeatureDataSourceNameKeys = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const;
+  const pointFeatureDataSourceNames: Record<DataPoints, string> = {
+    [DataPoints.Wade]: "Wade",
+    [DataPoints.Usgs]: "UsgsSurfaceWaterSite",
+    [DataPoints.Epa]: "EpaWaterQualitySite"
+  }
+
+  const directionNameKeys = [Directions.Upsteam, Directions.Downsteam] as const;
+  const directionNames: Record<Directions, string> = {
+    [Directions.Upsteam]: "Upstream",
+    [Directions.Downsteam]: "Downstream"
+  }
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];
-    if (nldiData.dataPoints & DataPoints.Wade) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "Wade"])
-    }
-    if (nldiData.dataPoints & DataPoints.Usgs) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"])
-    }
-    if (nldiData.dataPoints & DataPoints.Epa) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"])
+    for (const key of pointFeatureDataSourceNameKeys) {
+      if (nldiData.dataPoints & key) {
+        pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], pointFeatureDataSourceNames[key]])
+      }
     }
 
     let directionFilters: any[] = ["any"];
-    if (nldiData.directions & Directions.Upsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Upstream"])
-    }
-    if (nldiData.directions & Directions.Downsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Downstream"])
+    for (const key of directionNameKeys) {
+      if (nldiData.directions & key) {
+        directionFilters.push(["==", ["get", "westdaat_direction"], directionNames[key]])
+      }
     }
 
     let pointsLayer = map?.getLayer('nldi-usgs-points');
     if (pointsLayer) {
       map?.setFilter(pointsLayer.id,
-        ["any",
-          ["all",
-            ["==", ["get", "westdaat_featuredatatype"], "Point"],
-            pointsTypeFilters,
-            directionFilters
-          ],
-          ["==", ["get", "westdaat_pointdatasource"], "Location"]
+        ["all",
+          ["==", ["get", "westdaat_featuredatatype"], "Point"],
+          pointsTypeFilters,
+          directionFilters
         ]);
     }
+
     let flowlinesLayer = map?.getLayer('nldi-flowlines');
     if (flowlinesLayer) {
       map?.setFilter(flowlinesLayer.id,
@@ -215,7 +220,7 @@ function NldiTab() {
           <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream"/>
+          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
       </div>
       <div>
