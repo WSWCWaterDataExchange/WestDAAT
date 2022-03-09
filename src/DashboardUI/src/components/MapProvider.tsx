@@ -108,11 +108,10 @@ const MapProvider: FC = ({ children }) => {
     // Restore mapFilter state from URL params
     const mapFilters = JSON.parse(urlParams.get("mapFilters") as string) as MapFilters;
     setMapFilters({
-      visibleLayerIds: mapFilters.visibleLayerIds || [],
-      mapStyle: mapFilters.mapStyle || MapStyle.Light
+      visibleLayerIds: mapFilters?.visibleLayerIds || [],
+      mapStyle: mapFilters?.mapStyle || MapStyle.Light
     });
-    console.log("Grabbing data from url...", mapFilters.visibleLayerIds || []);
-    
+    console.log("Initial map filters from url:", mapFilters);
   }, []);
 
   const updateFilterUrlParams = () => {
@@ -129,7 +128,15 @@ const MapProvider: FC = ({ children }) => {
   const setCurrentSources = (sources: Source[]) => setSources(sources);
 
   const [layers, setLayers] = useState<Layer[]>([]);
-  const setCurrentLayers = (layers: Layer[]) => setLayers(layers);
+  const setCurrentLayers = (layers: Layer[]) => {
+    layers.forEach(layer => {
+      if (layer.layout) {
+        const isVisible = mapFilters.visibleLayerIds.includes(layer.id) || mapFilters.visibleLayerIds.length === 0;
+        layer.layout.visibility = isVisible ? "visible" : "none";
+      }
+    });
+    setLayers(layers);
+  }
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
 
