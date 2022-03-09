@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
@@ -23,7 +24,18 @@ function WaterRightsTab() {
     { name: 'POU', value: '3' },
   ];
 
-  const { layers, setLayerVisibility, setVisibleMapLayersFilter, mapFilters, setCurrentMapStyle, setLegend, setCurrentSources, setCurrentLayers } = useContext(MapContext);
+  const {
+    layers,
+    setLayerVisibility,
+    setVisibleMapLayersFilter,
+    mapFilters,
+    setCurrentMapStyle,
+    setLegend,
+    setCurrentSources,
+    setCurrentLayers,
+    clearMapFilters
+  } = useContext(MapContext);
+
   const { mapStyle, visibleLayerIds } = mapFilters;
 
   useEffect(() => {
@@ -176,6 +188,12 @@ function WaterRightsTab() {
             })()
           }
         </div>
+      </div>
+
+      <div className="mt-4">
+        <Button className="w-100" onClick={clearMapFilters}>
+          Reset All Filters
+        </Button>
       </div>
     </>
   );

@@ -22,7 +22,6 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     color: layer.paint?.["circle-color"] as string
   }));
 
-
   const displayNone = () => ({
     display: 'none'
   });
@@ -68,18 +67,14 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
 
   return (
     <>
-      {
-        props.layers.length && (
-          <Select
-            defaultValue={selectedOptions}
-            isMulti
-            onChange={props.onChange}
-            closeMenuOnSelect={false}
-            options={layerOptions}
-            styles={layerOptionStyles}
-          />
-        )
-      }
+      <Select
+        value={selectedOptions}
+        isMulti
+        onChange={props.onChange}
+        closeMenuOnSelect={false}
+        options={layerOptions}
+        styles={layerOptionStyles}
+      />
     </>
   );
 }

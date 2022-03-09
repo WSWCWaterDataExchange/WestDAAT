@@ -49,6 +49,7 @@ interface MapContextState {
   legend: ReactElement | null;
   setLegend: (legend: ReactElement | null) => void;
   mapFilters: MapFilters;
+  clearMapFilters: () => void;
 };
 
 const defaultState: MapContextState = {
@@ -68,6 +69,7 @@ const defaultState: MapContextState = {
     visibleLayerIds: [],
     mapStyle: MapStyle.Light
   },
+  clearMapFilters: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -78,7 +80,6 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapStyle, setMapStyle] = useState(MapStyle.Light);
   const setCurrentMapStyle = (mapStyle: MapStyle) => {
-    console.log("setCurrentMapStyle + setMapStyle", mapStyle);
     setMapFilters({
       ...mapFilters,
       mapStyle
@@ -87,6 +88,10 @@ const MapProvider: FC = ({ children }) => {
   }
 
   const [mapFilters, setMapFilters] = useState<MapFilters>(defaultState.mapFilters);
+  const clearMapFilters = () => {
+    setMapFilters(defaultState.mapFilters);
+    layers.forEach(layer => setLayerVisibility(layer.id, true));
+  };
 
   let [urlParams, setUrlParams] = useSearchParams();
 
@@ -161,7 +166,8 @@ const MapProvider: FC = ({ children }) => {
     setVisibleMapLayersFilter,
     legend,
     setLegend,
-    mapFilters
+    mapFilters,
+    clearMapFilters
   };
 
   return (
