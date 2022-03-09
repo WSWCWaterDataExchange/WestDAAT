@@ -8,6 +8,9 @@ import "../styles/map.scss";
 import { AppContext, User } from "../AppProvider";
 import { MapContext } from "./MapProvider";
 import usePrevious from "../hooks/usePrevious";
+import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import { Canvg, presets } from "canvg";
+import { nldi } from "../config/constants";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -28,6 +31,22 @@ function Map() {
     accessToken: mapboxgl.accessToken
   }));
 
+  const addSvgImage = async (map: mapboxgl.Map, id: string, svg: string): Promise<void> => {
+    const canvas = new OffscreenCanvas(24, 24);
+    const ctx = canvas.getContext('2d');
+    if (ctx != null) {
+      const v = await Canvg.from(ctx, svg, presets.offscreen())
+      await v.render()
+      const blob = await canvas.convertToBlob()
+      const pngUrl = URL.createObjectURL(blob);
+      map.loadImage(pngUrl, (err, result) => {
+        if (result) {
+          map.addImage(id, result);
+        }
+      });
+    }
+  }
+
   useEffect(() => {
     if (!map) {
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
@@ -41,6 +60,11 @@ function Map() {
       setMap.current(map);
 
       map.on("load", () => {
+        addSvgImage(map, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 20px; height: 20px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
+        addSvgImage(map, 'mapNldiUsgs', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiRhombus}" style="fill: ${nldi.colors.usgs};"></path></svg>`);
+        addSvgImage(map, 'mapNldiEpa', `<svg viewBox="0 0 24 24" role="presentation" style="width: 13px; height: 13px;"><path d="${mdiCircleOutline}" style="fill: ${nldi.colors.epa};"></path></svg>`);
+        addSvgImage(map, 'mapNldiWade', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiCircle}" style="fill: ${nldi.colors.wade};"></path></svg>`);
+
         setIsMapLoaded(true);
       });
     }
@@ -111,6 +135,8 @@ function Map() {
       <div id="map" className="map h-100"></div>
     </div>
   );
+
+
 }
 
 export default Map;

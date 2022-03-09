@@ -1,13 +1,16 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import mapConfig from "../config/maps.json";
+import mapConfig from "../config/maps";
 import { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Form } from "react-bootstrap";
 import { toast } from "react-toastify";
+import Icon from '@mdi/react';
+import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import {nldi} from '../config/constants';
 
 function NldiTab() {
   const precision = 5;
@@ -149,8 +152,49 @@ function NldiTab() {
   useEffect(() => {
     setCurrentSources((mapConfig as any).tempNldi.sources);
     setCurrentLayers((mapConfig as any).tempNldi.layers);
-    setLegend(null);
-  }, [setCurrentSources, setCurrentLayers, setLegend]);
+  }, [setCurrentSources, setCurrentLayers, mapConfig]);
+
+  useEffect(() => {
+    setLegend(<div className="legend legend-light legend-nldi">
+        <div>
+          <span>
+            <Icon path={mdiMapMarker} size={1} style={{ color: nldi.colors.mapMarker }} />
+          </span>
+          Starting Point of Interest
+        </div>
+        <div>
+          <span>
+            <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+          </span>
+          Mainstem
+        </div>
+        <div>
+          <span>
+            <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+          </span>
+          Tributaries
+        </div>
+        <div>
+          <span>
+            <Icon path={mdiCircle} size={1} style={{ color: nldi.colors.wade }} />
+          </span>
+          WaDE Sites
+        </div>
+        <div>
+          <span>
+            <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size={1} style={{ color: nldi.colors.usgs }} />
+          </span>
+          USGS NWIS Sites
+        </div>
+        <div>
+          <span>
+            <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size={1} style={{ color: nldi.colors.epa }} />
+          </span>
+          EPA Water Quality Portal<br /> Sites OSM Standard
+        </div>
+    </div>);
+  }, [setLegend])
+
   const pointFeatureDataSourceNameKeys = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const;
   const pointFeatureDataSourceNames: Record<DataPoints, string> = {
     [DataPoints.Wade]: "Wade",
