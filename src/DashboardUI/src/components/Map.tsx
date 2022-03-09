@@ -8,7 +8,6 @@ import "../styles/map.scss";
 import { AppContext, User } from "../AppProvider";
 import { MapContext } from "./MapProvider";
 import usePrevious from "../hooks/usePrevious";
-import { on } from "stream";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -17,7 +16,7 @@ import { on } from "stream";
 function Map() {
 
   const { user } = useContext(AppContext);
-  const { map, setCurrentMap, mapStyle, layers, sources, legend, mapFilters } = useContext(MapContext);
+  const { map, setCurrentMap, layers, sources, legend, mapFilters } = useContext(MapContext);
   const prevSources = usePrevious(sources?.map(a => a.id));
   const prevLayers = usePrevious(layers?.map(a => a.id));
 
@@ -101,7 +100,8 @@ function Map() {
         }
       });
     });
-  }, [layers, sources, map, isMapLoaded, prevSources, prevLayers, mapFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layers, sources, map, isMapLoaded, mapFilters.mapStyle]);
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (!map) return;

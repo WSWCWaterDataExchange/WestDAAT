@@ -82,6 +82,7 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapStyle, setMapStyle] = useState(MapStyle.Light);
   const setCurrentMapStyle = (mapStyle: MapStyle) => {
+    console.log("setCurrentMapStyle + setMapStyle", mapStyle);
     setMapFilters({
       ...mapFilters,
       mapStyle
@@ -102,6 +103,7 @@ const MapProvider: FC = ({ children }) => {
 
   useEffect(() => {
     updateFilterUrlParams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapFilters])
 
   useEffect(() => {
@@ -112,6 +114,7 @@ const MapProvider: FC = ({ children }) => {
       mapStyle: mapFilters?.mapStyle || MapStyle.Light
     });
     console.log("Initial map filters from url:", mapFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateFilterUrlParams = () => {

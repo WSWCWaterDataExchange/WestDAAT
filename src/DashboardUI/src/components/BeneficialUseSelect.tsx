@@ -1,7 +1,6 @@
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import chroma from "chroma-js";
 import { Layer } from './MapProvider';
-import { useEffect, useState } from 'react';
 
 export interface BeneficialUseChangeOption {
   value: string; // layerId
