@@ -15,9 +15,9 @@
   .legend-circle {
     border-radius: 50%;
     display: inline-block;
-    height: 10px;
+    height: 14px;
     margin: 0 6px 0 3px;
-    width: 10px;
+    width: 14px;
   }
 }
 
@@ -34,6 +34,7 @@
       display: inline-block;
       width: 25px;
       margin-right: 6px;
+      text-align: center;
       > span{
         display: inline-block;
         width: 100%;

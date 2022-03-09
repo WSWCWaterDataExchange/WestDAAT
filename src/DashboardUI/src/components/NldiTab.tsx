@@ -158,7 +158,7 @@ function NldiTab() {
     setLegend(<div className="legend legend-light legend-nldi">
         <div>
           <span>
-            <Icon path={mdiMapMarker} size={1} style={{ color: nldi.colors.mapMarker }} />
+            <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
           </span>
           Starting Point of Interest
         </div>
@@ -176,19 +176,19 @@ function NldiTab() {
         </div>
         <div>
           <span>
-            <Icon path={mdiCircle} size={1} style={{ color: nldi.colors.wade }} />
+            <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
           </span>
           WaDE Sites
         </div>
         <div>
           <span>
-            <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size={1} style={{ color: nldi.colors.usgs }} />
+            <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
           </span>
           USGS NWIS Sites
         </div>
         <div>
           <span>
-            <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size={1} style={{ color: nldi.colors.epa }} />
+            <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
           </span>
           EPA Water Quality Portal<br /> Sites OSM Standard
         </div>
