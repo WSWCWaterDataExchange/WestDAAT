@@ -34,28 +34,28 @@ function WaterRightsTab() {
   useEffect(() => {
     const mapData = (mapConfig as any).waterRights.layers;
     if (mapData) {
-      // setLegend(<div className="legend">
-      //   <div>
-      //     {
-      //       //Sort legend items alphabetically
-      //       mapData.sort((a: any, b: any) =>
-      //         a.friendlyName > b.friendlyName ? 1 : -1
-      //       ).map((layer: any) => {
-      //         // Null check for layer paint property
-      //         let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
-      //         return (
-      //           <div key={layer.id}>
-      //             <span style={{ "backgroundColor": color }}></span>
-      //             {layer.friendlyName}
-      //           </div>
-      //         );
-      //       }
-      //       )
-      //     }
-      //   </div>
-      // </div>);
+      setLegend(<div className="legend">
+        <div>
+          {
+            //Sort legend items alphabetically
+            mapData.sort((a: any, b: any) =>
+              a.friendlyName > b.friendlyName ? 1 : -1
+            ).map((layer: any) => {
+              // Null check for layer paint property
+              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
+              return (
+                <div key={layer.id}>
+                  <span style={{ "backgroundColor": color }}></span>
+                  {layer.friendlyName}
+                </div>
+              );
+            }
+            )
+          }
+        </div>
+      </div>);
     }
-  })
+  }, [setLegend])
 
   const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
     let visibleLayerIds: string[] = [];

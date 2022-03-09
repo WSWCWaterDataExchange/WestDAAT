@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ContactModal from '../components/ContactModal';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
@@ -7,7 +7,6 @@ import Map from '../components/Map';
 
 import '../styles/home-page.scss';
 import { useSearchParams } from 'react-router-dom';
-import { MapContext, MapTypes } from '../components/MapProvider';
 
 export enum HomePageTab {
   WaterRights = "Water Rights",
@@ -18,15 +17,18 @@ export enum HomePageTab {
 
 function HomePage() {
 
-  const { setCurrentBaseMap } = useContext(MapContext);
-
   let [urlParams, setUrlParams] = useSearchParams();
   const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
 
 
   const handleTabClick = (map: HomePageTab) => {
-    setUrlParams({ ...urlParams, map });
+    let prevParams: any = {}
+    urlParams.forEach((value, key) => {
+      prevParams[key] = value;
+    });
+
+    setUrlParams({ ...prevParams, map });
   }
 
   const shouldShowContactModal = (show: boolean) => {
@@ -38,13 +40,9 @@ function HomePage() {
     if (tabParam) {
       const tab = tabParam as HomePageTab;
       setCurrentTab(tab);
-      setCurrentBaseMap(
-        tab === HomePageTab.WaterRights
-          ? MapTypes.WaterRights
-          : MapTypes.Aggregate
-      );
     }
-  }, [urlParams, setCurrentBaseMap])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlParams])
 
   return (
     <div className="home-page d-flex flex-column">

@@ -40,8 +40,6 @@ interface MapContextState {
   setCurrentMap: (map: mapboxgl.Map) => void,
   mapStyle: MapStyle;
   setCurrentMapStyle: (style: MapStyle) => void;
-  baseMap: MapTypes;
-  setCurrentBaseMap: (mapType: MapTypes) => void;
   sources: Source[];
   setCurrentSources: (sources: Source[]) => void;
   layers: Layer[];
@@ -58,8 +56,6 @@ const defaultState: MapContextState = {
   setCurrentMap: () => { },
   mapStyle: MapStyle.Light,
   setCurrentMapStyle: () => { },
-  baseMap: MapTypes.WaterRights,
-  setCurrentBaseMap: () => { },
   sources: [],
   setCurrentSources: () => { },
   layers: [],
@@ -118,14 +114,16 @@ const MapProvider: FC = ({ children }) => {
   }, []);
 
   const updateFilterUrlParams = () => {
+    let prevParams: any = {}
+    urlParams.forEach((value, key) => {
+      prevParams[key] = value;
+    });
+
     setUrlParams({
-      ...urlParams,
+      ...prevParams,
       mapFilters: JSON.stringify(mapFilters)
     });
   };
-
-  const [baseMap, setBaseMap] = useState(defaultState.baseMap);
-  const setCurrentBaseMap = (mapType: MapTypes) => setBaseMap(mapType);
 
   const [sources, setSources] = useState<Source[]>([]);
   const setCurrentSources = (sources: Source[]) => setSources(sources);
@@ -155,8 +153,6 @@ const MapProvider: FC = ({ children }) => {
     setCurrentMap,
     mapStyle,
     setCurrentMapStyle,
-    baseMap,
-    setCurrentBaseMap,
     sources,
     setCurrentSources,
     layers,
