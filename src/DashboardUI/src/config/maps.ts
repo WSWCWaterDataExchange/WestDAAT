@@ -98,7 +98,7 @@ const nldiPointsCircleMapConfig = {
   ]
 };
 
-export default {
+const mapsJson = {
   "waterRights": {
     "sources": [
       {
@@ -498,3 +498,5 @@ export default {
     ]
   }
 }
+
+export default mapsJson;

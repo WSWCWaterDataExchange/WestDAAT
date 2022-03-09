@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import mapConfig from "../config/maps";
@@ -152,7 +152,7 @@ function NldiTab() {
   useEffect(() => {
     setCurrentSources((mapConfig as any).tempNldi.sources);
     setCurrentLayers((mapConfig as any).tempNldi.layers);
-  }, [setCurrentSources, setCurrentLayers, mapConfig]);
+  }, [setCurrentSources, setCurrentLayers]);
 
   useEffect(() => {
     setLegend(<div className="legend legend-nldi">
@@ -195,18 +195,18 @@ function NldiTab() {
     </div>);
   }, [setLegend])
 
-  const pointFeatureDataSourceNameKeys = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const;
-  const pointFeatureDataSourceNames: Record<DataPoints, string> = {
+  const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
+  const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
     [DataPoints.Wade]: "Wade",
     [DataPoints.Usgs]: "UsgsSurfaceWaterSite",
     [DataPoints.Epa]: "EpaWaterQualitySite"
-  }
+  }), []);
 
-  const directionNameKeys = [Directions.Upsteam, Directions.Downsteam] as const;
-  const directionNames: Record<Directions, string> = {
+  const directionNameKeys = useMemo(() => [Directions.Upsteam, Directions.Downsteam] as const, []);
+  const directionNames: Record<Directions, string> = useMemo(() => ({
     [Directions.Upsteam]: "Upstream",
     [Directions.Downsteam]: "Downstream"
-  }
+  }), [])
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];
@@ -241,7 +241,7 @@ function NldiTab() {
           directionFilters
         ]);
     }
-  }, [layers, map, nldiData.dataPoints, nldiData.directions]);
+  }, [layers, map, nldiData.dataPoints, nldiData.directions, directionNameKeys, directionNames, pointFeatureDataSourceNameKeys, pointFeatureDataSourceNames]);
 
   return (
     <>
