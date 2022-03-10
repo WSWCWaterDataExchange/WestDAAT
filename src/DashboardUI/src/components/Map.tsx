@@ -59,6 +59,7 @@ function Map() {
   useEffect(() => {
     if (!isMapLoaded || !map) return;
 
+    // Apply new style first, before sources/layers
     const stylesLoaded = new Promise((resolve, reject) => {
       // If the map style is changed, wait for it to load before continuing
       const prevStyle = map.getStyle().metadata["mapbox:origin"];

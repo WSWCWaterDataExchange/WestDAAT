@@ -9,12 +9,17 @@ import {
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 
 
-export const CustomSlider: React.FC<SliderProps> = ({
+interface CustomSliderProps extends SliderProps {
+  ticks: number;
+}
+
+export const CustomSlider: React.FC<CustomSliderProps> = ({
   domain,
   onChange,
   values,
   mode,
   step,
+  ticks,
   className
 }) => {
   return (
@@ -57,7 +62,7 @@ export const CustomSlider: React.FC<SliderProps> = ({
           </div>
         )}
       </Tracks>
-      <Ticks count={5}>
+      <Ticks count={ticks}>
         {({ ticks }) => (
           <div className="slider-ticks">
             {ticks.map(tick => (

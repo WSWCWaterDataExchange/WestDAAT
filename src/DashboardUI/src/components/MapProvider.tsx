@@ -35,6 +35,7 @@ export interface MapFilters {
   visibleLayerIds: string[];
   mapStyle: MapStyle;
   ownerClassifications: string[];
+  allocationDates: number[];
 }
 
 interface MapContextState {
@@ -53,6 +54,7 @@ interface MapContextState {
   mapFilters: MapFilters;
   clearMapFilters: () => void;
   setOwnerClassificationFilter: (filter: any[]) => void;
+  setAllocationDateFilter: (dates: number[]) => void;
 };
 
 const defaultState: MapContextState = {
@@ -73,9 +75,11 @@ const defaultState: MapContextState = {
     visibleLayerIds: [],
     mapStyle: MapStyle.Light,
     ownerClassifications: [],
+    allocationDates: [1850, new Date().getFullYear()]
   },
   clearMapFilters: () => { },
-  setOwnerClassificationFilter: () => {},
+  setOwnerClassificationFilter: () => { },
+  setAllocationDateFilter: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -99,6 +103,13 @@ const MapProvider: FC = ({ children }) => {
       ownerClassifications
     });
   };
+
+  const setAllocationDateFilter = (allocationDates: number[]) => {
+    setMapFilters({
+      ...mapFilters,
+      allocationDates
+    });
+  }
 
   const [mapFilters, setMapFilters] = useState<MapFilters>(defaultState.mapFilters);
   const clearMapFilters = () => {
@@ -127,7 +138,8 @@ const MapProvider: FC = ({ children }) => {
       isLoaded: true,
       visibleLayerIds: mapFilters?.visibleLayerIds || defaultState.mapFilters.visibleLayerIds,
       mapStyle: mapFilters?.mapStyle || defaultState.mapFilters.mapStyle,
-      ownerClassifications: mapFilters?.ownerClassifications || defaultState.mapFilters.ownerClassifications
+      ownerClassifications: mapFilters?.ownerClassifications || defaultState.mapFilters.ownerClassifications,
+      allocationDates: mapFilters?.allocationDates || defaultState.mapFilters.allocationDates,
     });
     console.log("Initial map filters from url:", mapFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,7 +195,8 @@ const MapProvider: FC = ({ children }) => {
     setLegend,
     mapFilters,
     clearMapFilters,
-    setOwnerClassificationFilter
+    setOwnerClassificationFilter,
+    setAllocationDateFilter
   };
 
   return (

@@ -37,10 +37,16 @@ function WaterRightsTab() {
     setCurrentSources,
     setCurrentLayers,
     clearMapFilters,
-    setOwnerClassificationFilter
+    setOwnerClassificationFilter,
+    setAllocationDateFilter,
   } = useContext(MapContext);
 
-  const { isLoaded, mapStyle, visibleLayerIds, ownerClassifications } = mapFilters;
+  const {
+    mapStyle,
+    visibleLayerIds,
+    ownerClassifications,
+    allocationDates
+  } = mapFilters;
 
 
 
@@ -96,10 +102,26 @@ function WaterRightsTab() {
     setVisibleMapLayersFilter(visibleLayerIds);
   };
 
-  const filterAllocationOwnerClassification = (sourceArr: string[]) => {
+  const handleAllocationDateChange = (dates: ReadonlyArray<number>) => {
+    // milliseconds since 1970 (can be negative)
+    const startDate = new Date(dates[0], 0).getTime();
+    const endDate = new Date(dates[1], 11, 31, 23, 59).getTime();
 
+    var filter: any = [
+      "all",
+      [">=", "priorityDate", startDate],
+      ["<=", "priorityDate", endDate]
+    ];
+
+    layers.forEach((layer) => {
+      map?.setFilter(layer.id, filter);
+    });
+
+    setAllocationDateFilter(dates as number[]);
+  };
+
+  const handleOwnerClassificationChange = (sourceArr: string[]) => {
     var filter: any;
-
     if (sourceArr.length > 0) {
       filter = [
         "all",
@@ -119,8 +141,26 @@ function WaterRightsTab() {
     setOwnerClassificationFilter(sourceArr);
   }
 
+  const [hasAppliedFilters, setHasAppliedFilters] = useState(false);
+
+  useEffect(() => {
+    if (mapFilters.isLoaded && !hasAppliedFilters) {
+      map?.once("styledata", () => {
+        console.log("DEBUG: Remove setTimeout once you figure out how to wait for layers to exist...");
+        setTimeout(() => {
+
+          // Restore map filters on page
+          handleAllocationDateChange(allocationDates);
+          handleOwnerClassificationChange(ownerClassifications);
+
+          setHasAppliedFilters(true);
+        }, 1000)
+      })
+    }
+  }, [allocationDates, ownerClassifications])
+
   // Wait for mapFilters to be loaded before rendering the panel
-  if (!isLoaded) {
+  if (!mapFilters.isLoaded) {
     return <></>;
   }
 
@@ -172,7 +212,7 @@ function WaterRightsTab() {
           className="form-control"
           options={ownerClassificationsList}
           selected={ownerClassifications}
-          handleOnChange={(selected: string[]) => filterAllocationOwnerClassification(selected)}
+          handleOnChange={(selected: string[]) => handleOwnerClassificationChange(selected)}
           name="ownerClassification"
         />
       </div>
@@ -207,8 +247,8 @@ function WaterRightsTab() {
 
       <div className="mb-3">
         <label>Allocation Priority Date</label>
-        <span>1850 to {new Date().getFullYear()}</span>
-        <AllocationDateSlider handleChange={(values) => console.log(values)} />
+        <span>{allocationDates[0]} to {allocationDates[1]}</span>
+        <AllocationDateSlider handleChange={handleAllocationDateChange} dates={allocationDates} />
       </div>
 
       <div className="mb-3">

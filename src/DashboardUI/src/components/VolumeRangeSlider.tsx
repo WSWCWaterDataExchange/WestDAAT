@@ -21,6 +21,7 @@ function VolumeRangeSlider(props: VolumeRangeSliderProps) {
     <CustomSlider
       mode={2}
       step={5}
+      ticks={8}
       domain={domain}
       onChange={onChange}
       values={sliderValues}
