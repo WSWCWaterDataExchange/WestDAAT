@@ -1,13 +1,16 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import mapConfig from "../config/maps.json";
+import mapConfig from "../config/maps";
 import { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Form } from "react-bootstrap";
 import { toast } from "react-toastify";
+import Icon from '@mdi/react';
+import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import {nldi} from '../config/constants';
 
 function NldiTab() {
   const precision = 5;
@@ -149,41 +152,87 @@ function NldiTab() {
   useEffect(() => {
     setCurrentSources((mapConfig as any).tempNldi.sources);
     setCurrentLayers((mapConfig as any).tempNldi.layers);
-    setLegend(null);
-  }, [setCurrentSources, setCurrentLayers, setLegend]);
+  }, [setCurrentSources, setCurrentLayers]);
+
+  useEffect(() => {
+    setLegend(<div className="legend legend-nldi">
+        <div>
+          <span>
+            <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
+          </span>
+          Starting Point of Interest
+        </div>
+        <div>
+          <span>
+            <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+          </span>
+          Mainstem
+        </div>
+        <div>
+          <span>
+            <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+          </span>
+          Tributaries
+        </div>
+        <div>
+          <span>
+            <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
+          </span>
+          WaDE Sites
+        </div>
+        <div>
+          <span>
+            <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
+          </span>
+          USGS NWIS Sites
+        </div>
+        <div>
+          <span>
+            <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
+          </span>
+          EPA Water Quality Portal<br /> Sites OSM Standard
+        </div>
+    </div>);
+  }, [setLegend])
+
+  const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
+  const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
+    [DataPoints.Wade]: "Wade",
+    [DataPoints.Usgs]: "UsgsSurfaceWaterSite",
+    [DataPoints.Epa]: "EpaWaterQualitySite"
+  }), []);
+
+  const directionNameKeys = useMemo(() => [Directions.Upsteam, Directions.Downsteam] as const, []);
+  const directionNames: Record<Directions, string> = useMemo(() => ({
+    [Directions.Upsteam]: "Upstream",
+    [Directions.Downsteam]: "Downstream"
+  }), [])
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];
-    if (nldiData.dataPoints & DataPoints.Wade) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "Wade"])
-    }
-    if (nldiData.dataPoints & DataPoints.Usgs) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"])
-    }
-    if (nldiData.dataPoints & DataPoints.Epa) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"])
+    for (const key of pointFeatureDataSourceNameKeys) {
+      if (nldiData.dataPoints & key) {
+        pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], pointFeatureDataSourceNames[key]])
+      }
     }
 
     let directionFilters: any[] = ["any"];
-    if (nldiData.directions & Directions.Upsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Upstream"])
-    }
-    if (nldiData.directions & Directions.Downsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Downstream"])
+    for (const key of directionNameKeys) {
+      if (nldiData.directions & key) {
+        directionFilters.push(["==", ["get", "westdaat_direction"], directionNames[key]])
+      }
     }
 
     let pointsLayer = map?.getLayer('nldi-usgs-points');
     if (pointsLayer) {
       map?.setFilter(pointsLayer.id,
-        ["any",
-          ["all",
-            ["==", ["get", "westdaat_featuredatatype"], "Point"],
-            pointsTypeFilters,
-            directionFilters
-          ],
-          ["==", ["get", "westdaat_pointdatasource"], "Location"]
+        ["all",
+          ["==", ["get", "westdaat_featuredatatype"], "Point"],
+          pointsTypeFilters,
+          directionFilters
         ]);
     }
+
     let flowlinesLayer = map?.getLayer('nldi-flowlines');
     if (flowlinesLayer) {
       map?.setFilter(flowlinesLayer.id,
@@ -192,7 +241,7 @@ function NldiTab() {
           directionFilters
         ]);
     }
-  }, [layers, map, nldiData.dataPoints, nldiData.directions]);
+  }, [layers, map, nldiData.dataPoints, nldiData.directions, directionNameKeys, directionNames, pointFeatureDataSourceNameKeys, pointFeatureDataSourceNames]);
 
   return (
     <>
@@ -215,7 +264,7 @@ function NldiTab() {
           <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream"/>
+          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
       </div>
       <div>

@@ -3,7 +3,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext } from "./MapProvider";
-import mapConfig from "../config/maps.json";
+import mapConfig from "../config/maps";
 
 function WaterRightsTab() {
 
@@ -35,7 +35,7 @@ function WaterRightsTab() {
               let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
               return (
                 <div key={layer.id}>
-                  <span style={{ "backgroundColor": color }}></span>
+                  <span className="legend-circle" style={{ "backgroundColor": color }}></span>
                   {layer.friendlyName}
                 </div>
               );
