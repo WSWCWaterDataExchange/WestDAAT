@@ -56,6 +56,7 @@ function Map() {
         center: [-100, 40],
         zoom: 4,
       });
+      map.addControl(new mapboxgl.ScaleControl());
 
       setMap.current(map);
 
