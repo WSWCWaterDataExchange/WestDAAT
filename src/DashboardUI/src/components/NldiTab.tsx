@@ -2,18 +2,18 @@ import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import mapConfig from "../config/maps";
-import { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
+import mapboxgl, { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Icon from '@mdi/react';
 import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
-import {nldi} from '../config/constants';
+import { nldi } from '../config/constants';
+import { useDrag } from 'react-dnd';
 
 function NldiTab() {
-  const precision = 5;
   const [nldiData, setNldiData] = useState({
     latitude: null as number | null,
     longitude: null as number | null,
@@ -53,63 +53,54 @@ function NldiTab() {
     });
   }
 
-  const handleLatitudeBlurred = () => {
-    let lat = parseFloat(pointData.latitude);
-    if (isNaN(lat)) {
+  const setLatLongData = (latValue: string, longValue: string) => {
+    let lat = parseFloat(latValue);
+    let long = parseFloat(longValue);
+    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+    if (isNaN(lat) || isNaN(long)) {
       setPointData({
         ...pointData,
-        latitude: ""
+        latitude: pointLat,
+        longitude: pointLong
       });
       setNldiData({
         ...nldiData,
-        latitude: null
+        latitude: null,
+        longitude: null
       });
       return;
     }
-
     if (lat > 90) {
       lat = 90;
     } else if (lat < -90) {
       lat = -90
-    }
-    lat = parseFloat(lat.toFixed(precision));
-    setNldiData({
-      ...nldiData,
-      latitude: lat
-    });
-    setPointData({
-      ...pointData,
-      latitude: lat.toFixed(precision)
-    });
-  }
-
-  const handleLongitudeBlurred = () => {
-    let long = parseFloat(pointData.longitude);
-    if (isNaN(long)) {
-      setPointData({
-        ...pointData,
-        longitude: ""
-      });
-      setNldiData({
-        ...nldiData,
-        longitude: null
-      });
-      return;
     }
     if (long > 180) {
       long = 180;
     } else if (long < -180) {
       long = -180
     }
-    long = parseFloat(long.toFixed(precision));
+    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+    long = parseFloat(long.toFixed(nldi.latLongPrecision));
     setNldiData({
       ...nldiData,
+      latitude: lat,
       longitude: long
     });
     setPointData({
       ...pointData,
-      longitude: long.toFixed(precision)
+      latitude: lat.toFixed(nldi.latLongPrecision),
+      longitude: long.toFixed(nldi.latLongPrecision)
     });
+  }
+
+  const handleLatitudeBlurred = () => {
+    setLatLongData(pointData.latitude, pointData.longitude);
+  }
+
+  const handleLongitudeBlurred = () => {
+    setLatLongData(pointData.latitude, pointData.longitude);
   }
 
   const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
@@ -156,42 +147,42 @@ function NldiTab() {
 
   useEffect(() => {
     setLegend(<div className="legend legend-nldi">
-        <div>
-          <span>
-            <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
-          </span>
-          Starting Point of Interest
-        </div>
-        <div>
-          <span>
-            <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
-          </span>
-          Mainstem
-        </div>
-        <div>
-          <span>
-            <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
-          </span>
-          Tributaries
-        </div>
-        <div>
-          <span>
-            <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
-          </span>
-          WaDE Sites
-        </div>
-        <div>
-          <span>
-            <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
-          </span>
-          USGS NWIS Sites
-        </div>
-        <div>
-          <span>
-            <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
-          </span>
-          EPA Water Quality Portal<br /> Sites OSM Standard
-        </div>
+      <div>
+        <span>
+          <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
+        </span>
+        Starting Point of Interest
+      </div>
+      <div>
+        <span>
+          <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+        </span>
+        Mainstem
+      </div>
+      <div>
+        <span>
+          <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+        </span>
+        Tributaries
+      </div>
+      <div>
+        <span>
+          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
+        </span>
+        WaDE Sites
+      </div>
+      <div>
+        <span>
+          <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
+        </span>
+        USGS NWIS Sites
+      </div>
+      <div>
+        <span>
+          <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
+        </span>
+        EPA Water Quality Portal<br /> Sites OSM Standard
+      </div>
     </div>);
   }, [setLegend])
 
@@ -250,6 +241,7 @@ function NldiTab() {
           <h1>NLDI Site Search Tool</h1>
         </div>
       </div>
+      <NldiDragAndDropButton setLatLong={setLatLongData} />
       <Form.Group>
         <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
         <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
@@ -284,3 +276,30 @@ function NldiTab() {
 }
 
 export default NldiTab;
+
+
+function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
+  const [{ dropResult }, dragRef] = useDrag({
+    type: 'nldiMapPoint',
+    item: {},
+    collect: monitor => ({
+      isDragging: monitor.isDragging(),
+      dropResult: monitor.getDropResult<mapboxgl.LngLat | null>()
+    })
+  });
+  const { setLatLong } = props;
+  useEffect(() => {
+    if (dropResult) {
+      setLatLong(dropResult.lat.toString(), dropResult.lng.toString());
+    }
+
+  }, [dropResult, setLatLong])
+
+  return (<div className="d-inline-flex flex-row align-items-center">
+    <Button type="button" ref={dragRef} variant="outline-primary" className="grabbable me-2" >
+      <Icon path={mdiMapMarker} size="14px" />
+    </Button>
+    <span>Drag and drop pin on map</span>
+  </div>
+  );
+}

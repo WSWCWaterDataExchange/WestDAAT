@@ -11,6 +11,7 @@ import usePrevious from "../hooks/usePrevious";
 import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
+import { useDrop } from "react-dnd";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -133,11 +134,17 @@ function Map() {
     map.addControl(navControl.current);
   }
 
+  const [, dropRef] = useDrop({
+    accept: 'nldiMapPoint',
+    drop: () => coords,
+    collect: () => { }
+  })
+
   return (
     <div className="position-relative h-100">
       <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
       {legend}
-      <div id="map" className="map h-100"></div>
+      <div id="map" className="map h-100" ref={dropRef}></div>
     </div>
   );
 

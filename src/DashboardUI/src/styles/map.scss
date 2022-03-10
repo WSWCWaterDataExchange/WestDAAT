@@ -57,3 +57,8 @@
     }
   }
 }
+
+.grabbable:hover {
+  cursor: crosshair !important; /* fallback if grab cursor is unsupported */
+  cursor: crosshair !important;
+}
