@@ -33,6 +33,10 @@ function HomePage() {
     setShowContactModal(show);
   }
 
+  useEffect(()=>{
+    document.title = `WestDAAT - ${currentTab}`
+  }, [currentTab]);
+
   useEffect(() => {
     const tabParam = urlParams.get("map")
     if (tabParam) {
