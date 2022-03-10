@@ -1,4 +1,4 @@
-import mapboxgl, { NavigationControl } from "mapbox-gl";
+import mapboxgl, { LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -22,6 +22,7 @@ function Map() {
   const { map, setCurrentMap, layers, sources, legend } = useContext(MapContext);
   const prevSources = usePrevious(sources?.map(a => a.id));
   const prevLayers = usePrevious(layers?.map(a => a.id));
+  const [coords, setCoords] = useState(null as LngLat | null);
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -57,7 +58,9 @@ function Map() {
         zoom: 4,
       });
       map.addControl(new mapboxgl.ScaleControl());
-
+      map.on('mousemove', (e) => {
+        setCoords(e.lngLat.wrap());
+      });
       setMap.current(map);
 
       map.on("load", () => {
@@ -70,7 +73,7 @@ function Map() {
       });
     }
 
-  }, [map]);
+  }, [map, setCoords]);
 
   useEffect(() => {
     if (!isMapLoaded || !map) return;
@@ -132,6 +135,7 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
+      <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
       {legend}
       <div id="map" className="map h-100"></div>
     </div>
