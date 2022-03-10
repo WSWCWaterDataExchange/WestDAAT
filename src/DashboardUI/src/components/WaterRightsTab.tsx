@@ -10,7 +10,7 @@ import BeneficialUseSelect from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
 import AllocationDateSlider from "./AllocationDateRangeSlider";
 import mapConfig from "../config/maps.json";
-import { ownerClassifications } from "../config/waterRights";
+import { ownerClassificationsList } from "../config/waterRights";
 
 interface BeneficialUseChangeOption {
   value: string,
@@ -36,10 +36,13 @@ function WaterRightsTab() {
     setLegend,
     setCurrentSources,
     setCurrentLayers,
-    clearMapFilters
+    clearMapFilters,
+    setOwnerClassificationFilter
   } = useContext(MapContext);
 
-  const { mapStyle, visibleLayerIds } = mapFilters;
+  const { isLoaded, mapStyle, visibleLayerIds, ownerClassifications } = mapFilters;
+
+
 
   useEffect(() => {
     setCurrentSources((mapConfig as any).waterRights.sources);
@@ -93,26 +96,32 @@ function WaterRightsTab() {
     setVisibleMapLayersFilter(visibleLayerIds);
   };
 
-  const filterAllocationOwnerClassification = (sourceArr: any) => {
+  const filterAllocationOwnerClassification = (sourceArr: string[]) => {
 
-    var filterValue = sourceArr as any;
-    var allocationFilter: any;
+    var filter: any;
 
-    if (filterValue.length > 0) {
-      allocationFilter = [
+    if (sourceArr.length > 0) {
+      filter = [
         "all",
         ["in", "ownerClassification"]
       ];
-      sourceArr.map((source: any) => {
-        allocationFilter[1].push(source as any);
+      sourceArr.forEach((source) => {
+        filter[1].push(source);
       });
     } else {
-      allocationFilter = ["all"];
+      filter = ["all"];
     }
 
-    layers.forEach((item) => {
-      map?.setFilter(item as any, allocationFilter);
+    layers.forEach((layer) => {
+      map?.setFilter(layer.id, filter);
     });
+
+    setOwnerClassificationFilter(sourceArr);
+  }
+
+  // Wait for mapFilters to be loaded before rendering the panel
+  if (!isLoaded) {
+    return <></>;
   }
 
   return (
@@ -161,9 +170,9 @@ function WaterRightsTab() {
         <label>Owner Classification</label>
         <DropdownMultiselect
           className="form-control"
-          options={ownerClassifications}
-          selected={ownerClassifications.map(x => x.key)}
-          handleOnChange={(selected: any) => filterAllocationOwnerClassification(selected)}
+          options={ownerClassificationsList}
+          selected={ownerClassifications}
+          handleOnChange={(selected: string[]) => filterAllocationOwnerClassification(selected)}
           name="ownerClassification"
         />
       </div>

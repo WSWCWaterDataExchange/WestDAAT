@@ -6,7 +6,7 @@ import SiteNavbar from '../components/SiteNavbar';
 import Map from '../components/Map';
 
 import '../styles/home-page.scss';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 export enum HomePageTab {
   WaterRights = "Water Rights",

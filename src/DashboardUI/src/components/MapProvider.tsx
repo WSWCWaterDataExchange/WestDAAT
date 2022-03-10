@@ -31,8 +31,10 @@ export interface MapData {
 }
 
 export interface MapFilters {
+  isLoaded: boolean;
   visibleLayerIds: string[];
   mapStyle: MapStyle;
+  ownerClassifications: string[];
 }
 
 interface MapContextState {
@@ -50,6 +52,7 @@ interface MapContextState {
   setLegend: (legend: ReactElement | null) => void;
   mapFilters: MapFilters;
   clearMapFilters: () => void;
+  setOwnerClassificationFilter: (filter: any[]) => void;
 };
 
 const defaultState: MapContextState = {
@@ -66,10 +69,13 @@ const defaultState: MapContextState = {
   legend: null as ReactElement | null,
   setLegend: () => { },
   mapFilters: {
+    isLoaded: false,
     visibleLayerIds: [],
-    mapStyle: MapStyle.Light
+    mapStyle: MapStyle.Light,
+    ownerClassifications: [],
   },
   clearMapFilters: () => { },
+  setOwnerClassificationFilter: () => {},
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -86,6 +92,13 @@ const MapProvider: FC = ({ children }) => {
     });
     setMapStyle(mapStyle);
   }
+
+  const setOwnerClassificationFilter = (ownerClassifications: string[]) => {
+    setMapFilters({
+      ...mapFilters,
+      ownerClassifications
+    });
+  };
 
   const [mapFilters, setMapFilters] = useState<MapFilters>(defaultState.mapFilters);
   const clearMapFilters = () => {
@@ -111,8 +124,10 @@ const MapProvider: FC = ({ children }) => {
     // Restore mapFilter state from URL params
     const mapFilters = JSON.parse(urlParams.get("mapFilters") as string) as MapFilters;
     setMapFilters({
-      visibleLayerIds: mapFilters?.visibleLayerIds || [],
-      mapStyle: mapFilters?.mapStyle || MapStyle.Light
+      isLoaded: true,
+      visibleLayerIds: mapFilters?.visibleLayerIds || defaultState.mapFilters.visibleLayerIds,
+      mapStyle: mapFilters?.mapStyle || defaultState.mapFilters.mapStyle,
+      ownerClassifications: mapFilters?.ownerClassifications || defaultState.mapFilters.ownerClassifications
     });
     console.log("Initial map filters from url:", mapFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,7 +182,8 @@ const MapProvider: FC = ({ children }) => {
     legend,
     setLegend,
     mapFilters,
-    clearMapFilters
+    clearMapFilters,
+    setOwnerClassificationFilter
   };
 
   return (

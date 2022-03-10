@@ -1,4 +1,9 @@
-export const ownerClassifications = [
+export interface OwnerClassification {
+  key: string;
+  label: string;
+};
+
+export const ownerClassificationsList: OwnerClassification[] = [
   { key: 'Army (USA)', label: 'Army (USA)' },
   { key: 'Bureau of Indian Affairs (USBIA)', label: 'Bureau of Indian Affairs (USBIA)' },
   { key: 'Bureau of Land Management (USBLM)', label: 'Bureau of Land Management (USBLM)' },
