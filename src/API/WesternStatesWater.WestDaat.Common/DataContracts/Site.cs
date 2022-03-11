@@ -4,6 +4,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
 {
     public class Site
     {
+        public long SiteId { get; set; }
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
         public string HUC8 { get; set; }
@@ -14,6 +15,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string GniscodeCv { get; set; }
         public string SiteName { get; set; }
         public Geometry Geometry { get; set; }
+        public List<string> WaterSourceTypes { get; set; }
 
         public List<long> AllocationIds { get; set; }
     }

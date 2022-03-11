@@ -9,5 +9,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         string GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
         
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
+
+        Task<string> GetWaterAllocationAmountsGeoJson();
     }
 }

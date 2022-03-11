@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,13 +36,24 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
+        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(GetWaterAllocationSiteDetails))] HttpRequest request)
         {
             var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
 
             var result = _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return new OkObjectResult(result);
+        }
+
+        [FunctionName(nameof(GenerateAllocationGeoJson))]
+        public async Task<IActionResult> GenerateAllocationGeoJson([HttpTrigger("post", Route = nameof(GenerateAllocationGeoJson))] HttpRequest request)
+        {
+            var result = await _waterAllocationManager.GetWaterAllocationAmountsGeoJson();
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Allocations.geojson");
+            await File.WriteAllTextAsync(filePath, result);
+
+            return new OkObjectResult($"Success - geojson file writen to {filePath}.");
         }
     }
 }

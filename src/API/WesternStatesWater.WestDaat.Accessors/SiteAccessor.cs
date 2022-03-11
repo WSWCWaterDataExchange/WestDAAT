@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
@@ -24,6 +25,17 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .Where(x => x.SiteUuid == siteUuid)
                     .ProjectTo<Site>(DtoMapper.Configuration)
                     .Single();
+            }
+        }
+
+        async Task<List<Site>> ISiteAccessor.GetSitesBySiteIds(List<long> siteIds)
+        {
+            using (var db = _databaseContextFactory.Create())
+            {
+                return await db.SitesDim
+                    .Where(x => siteIds.Contains(x.SiteId))
+                    .ProjectTo<Site>(DtoMapper.Configuration)
+                    .ToListAsync();
             }
         }
     }
