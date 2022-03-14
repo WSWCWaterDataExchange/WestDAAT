@@ -466,7 +466,8 @@ const mapsJson = {
       "layout": {
         "visibility": "visible",
         "icon-image": "mapMarker",
-        "icon-anchor": "bottom"
+          "icon-anchor": "bottom",
+          "icon-size": ["interpolate", ["linear"], ["zoom"], 5, .5, 15, 1]
       },
       "type": "symbol",
       "filter": [

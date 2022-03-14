@@ -1,36 +1,28 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
+import { LngLat } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Icon from '@mdi/react';
-import { AppContext } from "../AppProvider";
 import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
 import { nldi } from '../config/constants';
+import { useDrag } from 'react-dnd';
 
 function NldiTab() {
-  const precision = 5;
-  const { setUrlParam, getUrlParam } = useContext(AppContext);
-  const [nldiData, setNldiData] = useState(getUrlParam<NldiData>("nldi") ?? {
+  const [nldiData, setNldiData] = useState({
     latitude: null as number | null,
     longitude: null as number | null,
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
   });
 
-  interface NldiData {
-    latitude: number | null,
-    longitude: number | null,
-    directions: Directions,
-    dataPoints: DataPoints
-  }
-
   const [pointData, setPointData] = useState({
-    latitude: nldiData.latitude?.toFixed(precision) ?? "",
-    longitude: nldiData.longitude?.toFixed(precision) ?? ""
+    latitude: "",
+    longitude: ""
   });
 
   const retrieveNldiGeoJsonData = useCallback(async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
@@ -47,102 +39,89 @@ function NldiTab() {
       ...s,
       latitude: e.target.value
     }));
-  }, [])
+  }, [setPointData])
 
   const handleLongitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setPointData(s => ({
       ...s,
       longitude: e.target.value
     }));
-  }, [])
+  }, [setPointData])
 
-  const handleLatitudeBlurred = useCallback(() => {
-    let lat = parseFloat(pointData.latitude);
-    if (isNaN(lat)) {
+  const setLatLongData = useCallback((latValue: string, longValue: string) => {
+    let lat = parseFloat(latValue);
+    let long = parseFloat(longValue);
+    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+    if (isNaN(lat) || isNaN(long)) {
       setPointData(s => ({
         ...s,
-        latitude: ""
+        latitude: pointLat,
+        longitude: pointLong
       }));
       setNldiData(s => ({
         ...s,
-        latitude: null
+        latitude: null,
+        longitude: null
       }));
       return;
     }
-
     if (lat > 90) {
       lat = 90;
     } else if (lat < -90) {
       lat = -90
-    }
-    lat = parseFloat(lat.toFixed(precision));
-    setNldiData(s => ({
-      ...s,
-      latitude: lat
-    }));
-    setPointData(s => ({
-      ...s,
-      latitude: lat.toFixed(precision)
-    }));
-  }, [])
-
-  const handleLongitudeBlurred = useCallback(() => {
-    let long = parseFloat(pointData.longitude);
-    if (isNaN(long)) {
-      setPointData({
-        ...pointData,
-        longitude: ""
-      });
-      setNldiData({
-        ...nldiData,
-        longitude: null
-      });
-      return;
     }
     if (long > 180) {
       long = 180;
     } else if (long < -180) {
       long = -180
     }
-    long = parseFloat(long.toFixed(precision));
+    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+    long = parseFloat(long.toFixed(nldi.latLongPrecision));
+    setNldiData(s => ({
+      ...s,
+      latitude: lat,
+      longitude: long
+    }));
+    setPointData(s => ({
+      ...s,
+      latitude: lat.toFixed(nldi.latLongPrecision),
+      longitude: long.toFixed(nldi.latLongPrecision)
+    }));
+  }, [])
+
+  const handleLatitudeBlurred = () => {
+    setLatLongData(pointData.latitude, pointData.longitude);
+  }
+
+  const handleLongitudeBlurred = () => {
+    setLatLongData(pointData.latitude, pointData.longitude);
+  }
+
+  const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
+    const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
     setNldiData({
       ...nldiData,
-      longitude: long
-    });
-    setPointData({
-      ...pointData,
-      longitude: long.toFixed(precision)
-    });
-  }, [])
-
-  const handleDirectionsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
-    const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
-    setNldiData(s => ({
-      ...s,
       directions: val
-    }));
-  }, [])
+    });
+  }
 
-  const handleDataPointsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
+  const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
     const val = e.target.checked ? nldiData.dataPoints | dataPoint : nldiData.dataPoints & ~dataPoint;
-    setNldiData(s => ({
-      ...s,
+    setNldiData({
+      ...nldiData,
       dataPoints: val
-    }));
-  }, [])
+    });
+  }
 
-  const { setVisibleLayers, setLegend, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  useEffect(() => {
-    setVisibleLayers(['nldi-flowlines', 'nldi-usgs-points']);
-    setLegend(null);
-  }, [setLegend, setVisibleLayers]);
-
+  const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
   const { data: nldiGeoJsonData } = useQuery(
     ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
     retrieveNldiGeoJsonData,
     {
       enabled: !!nldiData.latitude && !!nldiData.longitude,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
       refetchOnReconnect: false,
       cacheTime: 8600000,
       staleTime: Infinity,
@@ -150,16 +129,15 @@ function NldiTab() {
   );
 
   useEffect(() => {
-    setGeoJsonData('nldi', nldiGeoJsonData ?? {
-      "type": "FeatureCollection",
-      "features": []
-    })
-
+    if (nldiGeoJsonData) {
+      setGeoJsonData('nldi', nldiGeoJsonData)
+    }
   }, [nldiGeoJsonData, setGeoJsonData]);
 
   useEffect(() => {
-    setUrlParam("nldi", nldiData);
-  }, [nldiData, setUrlParam]);
+    setVisibleLayers(['nldi-flowlines', 'nldi-usgs-location', 'nldi-usgs-points'])
+  }, [setVisibleLayers]);
+
   useEffect(() => {
     setLegend(<div className="legend legend-nldi">
       <div>
@@ -229,24 +207,21 @@ function NldiTab() {
       }
     }
 
-    setMapLayerFilters([
-      {
-        layer: 'nldi-usgs-points', filter: ["any",
-          ["all",
-            ["==", ["get", "westdaat_featuredatatype"], "Point"],
-            pointsTypeFilters,
-            directionFilters
-          ]
-        ]
-      },
-      {
-        layer: 'nldi-flowlines', filter: ["all",
-          ["==", ["get", "westdaat_featuredatatype"], "Flowline"],
-          directionFilters
-        ]
-      }
-    ])
-  }, [nldiData.dataPoints, nldiData.directions, setMapLayerFilters]);
+    setMapLayerFilters([{
+      layer: 'nldi-usgs-points',
+      filter: ["all",
+        ["==", ["get", "westdaat_featuredatatype"], "Point"],
+        pointsTypeFilters,
+        directionFilters
+      ]
+    }, {
+      layer: 'nldi-flowlines',
+      filter: ["all",
+        ["==", ["get", "westdaat_featuredatatype"], "Flowline"],
+        directionFilters
+      ]
+    }])
+  }, [nldiData.dataPoints, nldiData.directions, setMapLayerFilters, directionNameKeys, directionNames, pointFeatureDataSourceNameKeys, pointFeatureDataSourceNames]);
 
   return (
     <>
@@ -255,6 +230,7 @@ function NldiTab() {
           <h1>NLDI Site Search Tool</h1>
         </div>
       </div>
+      <NldiDragAndDropButton setLatLong={setLatLongData} />
       <Form.Group>
         <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
         <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
@@ -289,3 +265,30 @@ function NldiTab() {
 }
 
 export default NldiTab;
+
+
+function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
+  const [{ dropResult }, dragRef] = useDrag({
+    type: 'nldiMapPoint',
+    item: {},
+    collect: monitor => ({
+      isDragging: monitor.isDragging(),
+      dropResult: monitor.getDropResult<LngLat | null>()
+    })
+  });
+  const { setLatLong } = props;
+  useEffect(() => {
+    if (dropResult) {
+      setLatLong(dropResult.lat.toString(), dropResult.lng.toString());
+    }
+
+  }, [dropResult, setLatLong])
+
+  return (<div className="d-inline-flex flex-row align-items-center">
+    <Button type="button" ref={dragRef} variant="outline-primary" className="grabbable me-2" >
+      <Icon path={mdiMapMarker} size="14px" />
+    </Button>
+    <span>Drag and drop pin on map</span>
+  </div>
+  );
+}

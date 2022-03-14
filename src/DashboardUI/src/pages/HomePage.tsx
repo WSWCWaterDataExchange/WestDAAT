@@ -9,10 +9,10 @@ import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
 
 export enum HomePageTab {
-  WaterRights = "Water Rights",
+  WaterRights = "Water Rights Data",
   TempNldi = "Temp NLDI",
-  Aggregations = "Aggregations",
-  SiteSpecific = "Site Specific"
+  Aggregations = "Aggregate Area Time Series Water Data",
+  SiteSpecific = "Water Use Site-Specific Time Series Data"
 }
 
 function HomePage() {
@@ -24,6 +24,10 @@ function HomePage() {
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
   }
+
+  useEffect(()=>{
+    document.title = `WestDAAT - ${currentTab}`
+  }, [currentTab]);
 
   useEffect(() => {
     setUrlParam("tab", currentTab)

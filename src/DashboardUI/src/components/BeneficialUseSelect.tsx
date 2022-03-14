@@ -1,4 +1,4 @@
-import Select, { MultiValue, StylesConfig } from 'react-select';
+import Select, { StylesConfig } from 'react-select';
 import chroma from "chroma-js";
 
 export interface BeneficialUseChangeOption {

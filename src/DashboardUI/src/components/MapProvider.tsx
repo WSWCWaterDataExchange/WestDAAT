@@ -59,23 +59,30 @@ const MapProvider: FC = ({ children }) => {
   const [filters, setFilters] = useState<MapLayerFiltersType>({});
 
   const setLayerFilters = useCallback((updatedFilters: setFiltersParamType): void => {
-    const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
-    const updatedFilterSet = { ...filters };
-    filterArray.forEach(value => {
-      updatedFilterSet[value.layer] = value.filter
+    setFilters(s => {
+      const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+      const updatedFilterSet = { ...s };
+      filterArray.forEach(value => {
+        updatedFilterSet[value.layer] = value.filter
+      })
+      if (!deepEqual(s, updatedFilterSet)) {
+        return updatedFilterSet;
+      }
+      return s;
     })
-    if (!deepEqual(filters, updatedFilterSet)) {
-      setFilters(updatedFilterSet)
-    }
-
-  }, [setFilters, filters]);
+  }, [setFilters]);
   const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
-  const setGeoJsonData = (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
+  const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
     setAllGeoJsonData(s => {
       const unchangedData = s.filter(a => a.source !== source);
-      return [...unchangedData, { source, data }]
+      const updatedData = [...unchangedData, { source, data }];
+
+      if (!deepEqual(s, updatedData)) {
+        return updatedData;
+      }
+      return s;
     });
-  }
+  }, [setAllGeoJsonData])
 
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 

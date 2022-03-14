@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -11,6 +11,7 @@ import mapConfig from "../config/maps";
 import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
+import { useDrop } from "react-dnd";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -20,6 +21,7 @@ function Map() {
   const { user } = useContext(AppContext);
   const { legend, mapStyle, visibleLayers, geoJsonData, filters } = useContext(MapContext);
   const [ map, setMap] = useState<mapboxgl.Map | null>(null);
+  const [coords, setCoords] = useState(null as LngLat | null);
 
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
@@ -65,13 +67,16 @@ function Map() {
       center: [-100, 40],
       zoom: 4,
     });
-
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
-      addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 20px; height: 20px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
+      addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
       addSvgImage(mapInstance, 'mapNldiUsgs', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiRhombus}" style="fill: ${nldi.colors.usgs};"></path></svg>`);
       addSvgImage(mapInstance, 'mapNldiEpa', `<svg viewBox="0 0 24 24" role="presentation" style="width: 13px; height: 13px;"><path d="${mdiCircleOutline}" style="fill: ${nldi.colors.epa};"></path></svg>`);
       addSvgImage(mapInstance, 'mapNldiWade', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiCircle}" style="fill: ${nldi.colors.wade};"></path></svg>`);
+      mapInstance.addControl(new mapboxgl.ScaleControl());
+      mapInstance.on('mousemove', (e) => {
+        setCoords(e.lngLat.wrap());
+      });
       mapConfig.sources.forEach(a => {
         var { id, ...src } = a;
         mapInstance.addSource(id, src as AnySourceImpl)
@@ -152,10 +157,17 @@ function Map() {
     }
   }, [map, filters]);
 
+  const [, dropRef] = useDrop({
+    accept: 'nldiMapPoint',
+    drop: () => coords,
+    collect: () => { }
+  })
+
   return (
     <div className="position-relative h-100">
+      <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
       {legend}
-      <div id="map" className="map h-100"></div>
+      <div id="map" className="map h-100" ref={dropRef}></div>
     </div>
   );
 
