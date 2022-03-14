@@ -7,7 +7,7 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Icon from '@mdi/react';
-import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import { mdiMapMarker, mdiCircle } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 
