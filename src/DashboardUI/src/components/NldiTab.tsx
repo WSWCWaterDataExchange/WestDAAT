@@ -1,7 +1,6 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import { LngLat } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
@@ -273,13 +272,13 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
     item: {},
     collect: monitor => ({
       isDragging: monitor.isDragging(),
-      dropResult: monitor.getDropResult<LngLat | null>()
+      dropResult: monitor.getDropResult<{ latitude: number, longitude: number } | undefined>()
     })
   });
   const { setLatLong } = props;
   useEffect(() => {
     if (dropResult) {
-      setLatLong(dropResult.lat.toString(), dropResult.lng.toString());
+      setLatLong(dropResult.latitude.toString(), dropResult.longitude.toString());
     }
 
   }, [dropResult, setLatLong])

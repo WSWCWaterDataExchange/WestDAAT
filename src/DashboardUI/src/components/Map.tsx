@@ -159,7 +159,7 @@ function Map() {
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
-    drop: () => coords,
+    drop: () => (coords ? {latitude: coords.lat, longitude: coords.lng} : undefined),
     collect: () => { }
   })
 
