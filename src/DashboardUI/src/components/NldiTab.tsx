@@ -1,66 +1,69 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import mapConfig from "../config/maps.json";
-import { AnySourceImpl, GeoJSONSource } from "mapbox-gl";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Form } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { AppContext } from "../AppProvider";
 
 function NldiTab() {
   const precision = 5;
-  const [nldiData, setNldiData] = useState({
+  const { setUrlParam, getUrlParam } = useContext(AppContext);
+  const [nldiData, setNldiData] = useState(getUrlParam<NldiData>("nldi") ?? {
     latitude: null as number | null,
     longitude: null as number | null,
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
   });
 
+  interface NldiData {
+    latitude: number | null,
+    longitude: number | null,
+    directions: Directions,
+    dataPoints: DataPoints
+  }
+
   const [pointData, setPointData] = useState({
-    latitude: "",
-    longitude: ""
+    latitude: nldiData.latitude?.toFixed(precision) ?? "",
+    longitude: nldiData.longitude?.toFixed(precision) ?? ""
   });
 
-  const retrieveNldiGeoJsonData = async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
+  const retrieveNldiGeoJsonData = useCallback(async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
     const promise = getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa);
     toast.promise(promise, {
       pending: 'Retrieving NLDI Data',
       error: 'Error Retrieving NLDI Data'
     })
     return promise;
-  }
+  }, [])
 
-  const isGeoJsonSource = (mapSource: AnySourceImpl | undefined): mapSource is GeoJSONSource => {
-    return (mapSource as GeoJSONSource)?.setData !== undefined;
-  }
-
-  const handleLatitudeChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    setPointData({
-      ...pointData,
+  const handleLatitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setPointData(s=>({
+      ...s,
       latitude: e.target.value
-    });
-  }
+    }));
+  }, [])
 
-  const handleLongitudeChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    setPointData({
-      ...pointData,
+  const handleLongitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setPointData(s=>({
+      ...s,
       longitude: e.target.value
-    });
-  }
+    }));
+  }, [])
 
-  const handleLatitudeBlurred = () => {
+  const handleLatitudeBlurred = useCallback(() => {
     let lat = parseFloat(pointData.latitude);
     if (isNaN(lat)) {
-      setPointData({
-        ...pointData,
+      setPointData(s=>({
+        ...s,
         latitude: ""
-      });
-      setNldiData({
-        ...nldiData,
+      }));
+      setNldiData(s=>({
+        ...s,
         latitude: null
-      });
+      }));
       return;
     }
 
@@ -70,17 +73,17 @@ function NldiTab() {
       lat = -90
     }
     lat = parseFloat(lat.toFixed(precision));
-    setNldiData({
-      ...nldiData,
+    setNldiData(s=>({
+      ...s,
       latitude: lat
-    });
-    setPointData({
-      ...pointData,
+    }));
+    setPointData(s=>({
+      ...s,
       latitude: lat.toFixed(precision)
-    });
-  }
+    }));
+  }, [])
 
-  const handleLongitudeBlurred = () => {
+  const handleLongitudeBlurred = useCallback(() => {
     let long = parseFloat(pointData.longitude);
     if (isNaN(long)) {
       setPointData({
@@ -107,32 +110,36 @@ function NldiTab() {
       ...pointData,
       longitude: long.toFixed(precision)
     });
-  }
+  }, [])
 
-  const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
+  const handleDirectionsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
     const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s=>({
+      ...s,
       directions: val
-    });
-  }
+    }));
+  }, [])
 
-  const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
+  const handleDataPointsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
     const val = e.target.checked ? nldiData.dataPoints | dataPoint : nldiData.dataPoints & ~dataPoint;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s=>({
+      ...s,
       dataPoints: val
-    });
-  }
+    }));
+  }, [])
 
-  const { map, layers, setCurrentSources, setCurrentLayers, setLegend } = useContext(MapContext);
+  const { setVisibleLayers, setLegend, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
+  useEffect(() => {
+    setVisibleLayers(['nldi-flowlines', 'nldi-usgs-points']);
+    setLegend(null);
+  }, [setLegend, setVisibleLayers]);
+
   const { data: nldiGeoJsonData } = useQuery(
     ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
     retrieveNldiGeoJsonData,
     {
       enabled: !!nldiData.latitude && !!nldiData.longitude,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
       refetchOnReconnect: false,
       cacheTime: 8600000,
       staleTime: Infinity,
@@ -140,17 +147,16 @@ function NldiTab() {
   );
 
   useEffect(() => {
-    const source = map?.getSource('nldi');
-    if (isGeoJsonSource(source) && nldiGeoJsonData !== undefined) {
-      source.setData(nldiGeoJsonData);
-    }
-  }, [nldiGeoJsonData, map]);
+    setGeoJsonData('nldi', nldiGeoJsonData ?? {
+      "type": "FeatureCollection",
+      "features": []
+    })
+
+  }, [nldiGeoJsonData, setGeoJsonData]);
 
   useEffect(() => {
-    setCurrentSources((mapConfig as any).tempNldi.sources);
-    setCurrentLayers((mapConfig as any).tempNldi.layers);
-    setLegend(null);
-  }, [setCurrentSources, setCurrentLayers, setLegend]);
+    setUrlParam("nldi", nldiData);
+  }, [nldiData, setUrlParam]);
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];
@@ -172,27 +178,25 @@ function NldiTab() {
       directionFilters.push(["==", ["get", "westdaat_direction"], "Downstream"])
     }
 
-    let pointsLayer = map?.getLayer('nldi-usgs-points');
-    if (pointsLayer) {
-      map?.setFilter(pointsLayer.id,
-        ["any",
+    setMapLayerFilters([
+      {
+        layer: 'nldi-usgs-points', filter: ["any",
           ["all",
             ["==", ["get", "westdaat_featuredatatype"], "Point"],
             pointsTypeFilters,
             directionFilters
           ],
           ["==", ["get", "westdaat_pointdatasource"], "Location"]
-        ]);
-    }
-    let flowlinesLayer = map?.getLayer('nldi-flowlines');
-    if (flowlinesLayer) {
-      map?.setFilter(flowlinesLayer.id,
-        ["all",
+        ]
+      },
+      {
+        layer: 'nldi-flowlines', filter: ["all",
           ["==", ["get", "westdaat_featuredatatype"], "Flowline"],
           directionFilters
-        ]);
-    }
-  }, [layers, map, nldiData.dataPoints, nldiData.directions]);
+        ]
+      }
+    ])
+  }, [nldiData.dataPoints, nldiData.directions, setMapLayerFilters]);
 
   return (
     <>
@@ -215,7 +219,7 @@ function NldiTab() {
           <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream"/>
+          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
       </div>
       <div>

@@ -1,25 +1,51 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext, MapStyle } from "./MapProvider";
-import { MultiValue } from 'react-select';
-import BeneficialUseSelect from "./BeneficialUseSelect";
+import BeneficialUseSelect, { BeneficialUseChangeOption } from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
-import AllocationDateSlider from "./AllocationDateRangeSlider";
 import mapConfig from "../config/maps.json";
 import { ownerClassificationsList } from "../config/waterRights";
-
-interface BeneficialUseChangeOption {
-  value: string,
-  label: string,
-  color: string
-}
+import { AppContext } from "../AppProvider";
 
 function WaterRightsTab() {
   const [radioValue, setRadioValue] = useState('1');
+  const { setUrlParam, getUrlParam } = useContext(AppContext);
+
+  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? {});
+
+  const allWaterRightsLayers = useMemo(() => [
+    'agricultural',
+    'aquaculture',
+    'commercial',
+    'domestic',
+    'environmental',
+    'fire',
+    'fish',
+    'flood',
+    'heating',
+    'industrial',
+    'instream',
+    'livestock',
+    'mining',
+    'municipal',
+    'other',
+    'power',
+    'recharge',
+    'recreation',
+    'snow',
+    'storage',
+    'wildlife',
+  ], []);
+
+  interface WaterRightsFilters {
+    beneficialUses?: string[],
+    ownerClassifications?: string[]
+  }
+
   const radios = [
     { name: 'Both', value: '1' },
     { name: 'POD', value: '2' },
@@ -27,141 +53,127 @@ function WaterRightsTab() {
   ];
 
   const {
-    map,
-    layers,
-    setLayerVisibility,
-    setVisibleMapLayersFilter,
-    mapFilters,
-    setCurrentMapStyle,
     setLegend,
-    setCurrentSources,
-    setCurrentLayers,
-    clearMapFilters,
-    setOwnerClassificationFilter,
-    setAllocationDateFilter,
+    setLayerFilters: setMapLayerFilters,
+    setVisibleLayers
   } = useContext(MapContext);
 
-  const {
-    mapStyle,
-    visibleLayerIds,
-    ownerClassifications,
-    allocationDates
-  } = mapFilters;
-
-
-
-  useEffect(() => {
-    setCurrentSources((mapConfig as any).waterRights.sources);
-    setCurrentLayers((mapConfig as any).waterRights.layers);
-  }, [setCurrentSources, setCurrentLayers])
-
-  useEffect(() => {
-    const mapData = (mapConfig as any).waterRights.layers;
-    if (mapData) {
-      setLegend(<div className="legend">
-        <div>
-          {
-            //Sort legend items alphabetically
-            mapData.sort((a: any, b: any) =>
-              a.friendlyName > b.friendlyName ? 1 : -1
-            ).map((layer: any) => {
-              // Null check for layer paint property
-              let color = layer?.paint ? layer.paint["circle-color"] as string : "#000000";
-              return (
-                <div key={layer.id}>
-                  <span style={{ "backgroundColor": color }}></span>
-                  {layer.friendlyName}
-                </div>
-              );
-            }
-            )
-          }
-        </div>
-      </div>);
-    }
-  }, [setLegend])
-
-  const handleBeneficialUseChange = (selectedOptions: MultiValue<BeneficialUseChangeOption>) => {
-    let visibleLayerIds: string[] = [];
-    layers.forEach(layer => {
-      if (layer.layout) {
-        const selectedLayers = selectedOptions.map(o => o.value);
-        const isVisible = selectedLayers.includes(layer.id) || selectedOptions.length === 0;
-        setLayerVisibility(layer.id, isVisible);
-        if (isVisible) {
-          visibleLayerIds.push(layer.id)
-        }
+  const convertLayersToBeneficialUseOptions = useCallback((beneficialUses: string[]) => {
+    const convertMapLayerToBeneficialUseChangeOption = (layer: { id: string, friendlyName: string, paint: any }): BeneficialUseChangeOption => {
+      return {
+        value: layer.id,
+        label: layer.friendlyName,
+        color: layer.paint?.["circle-color"] as string
       }
-    });
-
-    if (selectedOptions.length === 0) {
-      visibleLayerIds = [];
     }
 
-    // Persist filters in url
-    setVisibleMapLayersFilter(visibleLayerIds);
-  };
+    return beneficialUses.map(a => {
+      let layer = mapConfig.layers.find(b => b.id === a);
+      if (layer) {
+        return convertMapLayerToBeneficialUseChangeOption(layer as { id: string, friendlyName: string, paint: any });
+      }
+      return undefined;
+    }).filter(a => a !== undefined) as BeneficialUseChangeOption[];
+  }, []);
 
-  const handleAllocationDateChange = (dates: ReadonlyArray<number>) => {
-    // milliseconds since 1970 (can be negative)
-    const startDate = new Date(dates[0], 0).getTime();
-    const endDate = new Date(dates[1], 11, 31, 23, 59).getTime();
-
-    var filter: any = [
-      "all",
-      [">=", "priorityDate", startDate],
-      ["<=", "priorityDate", endDate]
-    ];
-
-    layers.forEach((layer) => {
-      map?.setFilter(layer.id, filter);
-    });
-
-    setAllocationDateFilter(dates as number[]);
-  };
-
-  const handleOwnerClassificationChange = (sourceArr: string[]) => {
-    var filter: any;
-    if (sourceArr.length > 0) {
-      filter = [
-        "all",
-        ["in", "ownerClassification"]
-      ];
-      sourceArr.forEach((source) => {
-        filter[1].push(source);
-      });
-    } else {
-      filter = ["all"];
-    }
-
-    layers.forEach((layer) => {
-      map?.setFilter(layer.id, filter);
-    });
-
-    setOwnerClassificationFilter(sourceArr);
-  }
-
-  const [hasAppliedFilters, setHasAppliedFilters] = useState(false);
+  const availableOptions = useMemo(() => {
+    return convertLayersToBeneficialUseOptions(allWaterRightsLayers);
+  }, [allWaterRightsLayers, convertLayersToBeneficialUseOptions]);
 
   useEffect(() => {
-    if (mapFilters.isLoaded && !hasAppliedFilters) {
-      map?.once("styledata", () => {
-        console.log("DEBUG: Remove setTimeout once you figure out how to wait for layers to exist...");
-        setTimeout(() => {
+    setLegend(<div className="legend">
+      <div>
+        {
+          //Sort legend items alphabetically
+          availableOptions.map(layer => {
+            return (
+              <div key={layer.value}>
+                <span style={{ "backgroundColor": layer.color }}></span>
+                {layer.label}
+              </div>
+            );
+          }
+          )
+        }
+      </div>
+    </div>);
+  }, [setLegend, availableOptions])
 
-          // Restore map filters on page
-          handleAllocationDateChange(allocationDates);
-          handleOwnerClassificationChange(ownerClassifications);
-
-          setHasAppliedFilters(true);
-        }, 1000)
-      })
+  useEffect(() => {
+    let visibleLayers = allWaterRightsLayers;
+    if (filters.beneficialUses && filters.beneficialUses.length > 0) {
+      visibleLayers = filters.beneficialUses;
     }
-  }, [allocationDates, ownerClassifications])
+    setVisibleLayers(visibleLayers)
+  }, [filters, allWaterRightsLayers, setVisibleLayers])
 
-  // Wait for mapFilters to be loaded before rendering the panel
-  if (!mapFilters.isLoaded) {
-    return <></>;
+  useEffect(() => {
+    if (!filters.ownerClassifications && !filters.beneficialUses) {
+      setUrlParam("wr", undefined)
+    }
+    setUrlParam("wr", filters)
+  }, [filters, setUrlParam])
+
+  const handleBeneficialUseChange = useCallback((selectedOptions: BeneficialUseChangeOption[]) => {
+    setFilters(s=>({
+      ...s,
+      beneficialUses: selectedOptions.length > 0 ? selectedOptions.map(a => a.value) : undefined
+    }));
+  }, [setFilters]);
+
+  const handleOwnerClassificationChange = useCallback((selectedOptions: string[]) => {
+    setFilters(s=>({
+      ...s,
+      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
+    }));
+  }, [setFilters]);
+
+  useEffect(() => {
+    const filterSet = [] as any[];
+    if (filters.ownerClassifications && filters.ownerClassifications.length > 0) {
+      filterSet.push(["in", "ownerClassification", ...filters.ownerClassifications]);
+    }
+    setMapLayerFilters(allWaterRightsLayers.map(a=>{
+      return {layer: a, filter: ["all", ...filterSet]}
+    }))
+  }, [filters, allWaterRightsLayers, setMapLayerFilters])
+
+  // const handleAllocationDateChange = (dates: ReadonlyArray<number>) => {
+  //   // milliseconds since 1970 (can be negative)
+  //   const startDate = new Date(dates[0], 0).getTime();
+  //   const endDate = new Date(dates[1], 11, 31, 23, 59).getTime();
+
+  //   var filter: any = [
+  //     "all",
+  //     [">=", "priorityDate", startDate],
+  //     ["<=", "priorityDate", endDate]
+  //   ];
+
+  //   layers.forEach((layer) => {
+  //     map?.setFilter(layer.id, filter);
+  //   });
+
+  //   setAllocationDateFilter(dates as number[]);
+  // };
+
+  // useEffect(() => {
+  //   if (mapFilters.isLoaded && !hasAppliedFilters) {
+  //     map?.once("styledata", () => {
+  //       console.log("DEBUG: Remove setTimeout once you figure out how to wait for layers to exist...");
+  //       setTimeout(() => {
+
+  //         // Restore map filters on page
+  //         handleAllocationDateChange(allocationDates);
+  //         handleOwnerClassificationChange(ownerClassifications);
+
+  //         setHasAppliedFilters(true);
+  //       }, 1000)
+  //     })
+  //   }
+  // }, [allocationDates, ownerClassifications])
+
+  const clearMapFilters = () => {
+    setFilters({});
   }
 
   return (
@@ -211,15 +223,15 @@ function WaterRightsTab() {
         <DropdownMultiselect
           className="form-control"
           options={ownerClassificationsList}
-          selected={ownerClassifications}
-          handleOnChange={(selected: string[]) => handleOwnerClassificationChange(selected)}
+          selected={filters.ownerClassifications ?? []}
+          handleOnChange={handleOwnerClassificationChange}
           name="ownerClassification"
         />
       </div>
 
       <div className="mb-3">
         <label>Beneficial Use</label>
-        <BeneficialUseSelect defaultValue={visibleLayerIds} layers={layers} onChange={handleBeneficialUseChange} />
+        <BeneficialUseSelect selectedOptions={convertLayersToBeneficialUseOptions(filters.beneficialUses ?? [])} options={availableOptions} onChange={handleBeneficialUseChange} />
       </div>
 
       <div className="mb-3">
@@ -245,28 +257,15 @@ function WaterRightsTab() {
         <VolumeRangeSlider handleChange={(values) => console.log(values)} />
       </div>
 
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <label>Allocation Priority Date</label>
         <span>{allocationDates[0]} to {allocationDates[1]}</span>
         <AllocationDateSlider handleChange={handleAllocationDateChange} dates={allocationDates} />
-      </div>
+      </div> */}
 
       <div className="mb-3">
         <label>MAP THEME</label>
-        <div className="map-themes">
-          {
-            (() => {
-              const isActive = (style: MapStyle) => style === mapStyle ? "active" : "";
-              return <>
-                <img onClick={() => setCurrentMapStyle(MapStyle.Light)} className={isActive(MapStyle.Light)} alt="light map" src="/map-themes/light.png" />
-                <img onClick={() => setCurrentMapStyle(MapStyle.Dark)} className={isActive(MapStyle.Dark)} alt="dark map" src="/map-themes/dark.png" />
-                <img onClick={() => setCurrentMapStyle(MapStyle.Street)} className={isActive(MapStyle.Street)} alt="streets map" src="/map-themes/streets.png" />
-                <img onClick={() => setCurrentMapStyle(MapStyle.Outdoor)} className={isActive(MapStyle.Outdoor)} alt="outdoors map" src="/map-themes/outdoor.png" />
-                <img onClick={() => setCurrentMapStyle(MapStyle.Satellite)} className={isActive(MapStyle.Satellite)} alt="satelite map" src="/map-themes/satelite.png" />
-              </>
-            })()
-          }
-        </div>
+        <MapThemeSelector />
       </div>
 
       <div className="mt-4">
@@ -279,3 +278,26 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
+
+function MapThemeSelector() {
+  const {
+    mapStyle,
+    setMapStyle
+  } = useContext(MapContext);
+
+  return (
+    <div className="map-themes">
+      {
+        (() => {
+          const isActive = (style: MapStyle) => style === mapStyle ? "active" : "";
+          return <>
+            <img onClick={() => setMapStyle(MapStyle.Light)} className={isActive(MapStyle.Light)} alt="light map" src="/map-themes/light.png" />
+            <img onClick={() => setMapStyle(MapStyle.Dark)} className={isActive(MapStyle.Dark)} alt="dark map" src="/map-themes/dark.png" />
+            <img onClick={() => setMapStyle(MapStyle.Street)} className={isActive(MapStyle.Street)} alt="streets map" src="/map-themes/streets.png" />
+            <img onClick={() => setMapStyle(MapStyle.Outdoor)} className={isActive(MapStyle.Outdoor)} alt="outdoors map" src="/map-themes/outdoor.png" />
+            <img style={{ pointerEvents: "none" }} onClick={() => setMapStyle(MapStyle.Satellite)} className={isActive(MapStyle.Satellite)} alt="satelite map" src="/map-themes/satelite.png" />
+          </>
+        })()
+      }
+    </div>);
+}

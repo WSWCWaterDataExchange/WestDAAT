@@ -1,26 +1,19 @@
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import chroma from "chroma-js";
-import { Layer } from './MapProvider';
 
 export interface BeneficialUseChangeOption {
   value: string; // layerId
   label: string;
-  color: string;
+  color: string | undefined;
 }
 
 interface BeneficialUseSelectProps {
-  defaultValue: string[];
-  layers: Layer[];
-  onChange: (selectedOptions: MultiValue<BeneficialUseChangeOption>) => void;
+  options: BeneficialUseChangeOption[];
+  selectedOptions: BeneficialUseChangeOption[];
+  onChange: (selectedOptions: BeneficialUseChangeOption[]) => void;
 }
 
 function BeneficialUseSelect(props: BeneficialUseSelectProps) {
-
-  const layerOptions = props.layers.map(layer => ({
-    value: layer.id,
-    label: layer.friendlyName,
-    color: layer.paint?.["circle-color"] as string
-  }));
 
   const displayNone = () => ({
     display: 'none'
@@ -38,11 +31,14 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     placeholder: displayNone,
     indicatorSeparator: displayNone,
     multiValue: (styles, { data }) => {
-      const color = chroma(data.color);
-      return {
-        ...styles,
-        backgroundColor: color.darken().alpha(0.3).css(),
-      };
+      if(data.color){
+        const color = chroma(data.color);
+        return {
+          ...styles,
+          backgroundColor: color.darken().alpha(0.3).css(),
+        };
+      }
+      return styles;
     },
     multiValueLabel: (styles) => ({
       ...styles,
@@ -62,17 +58,14 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     })
   };
 
-  const selectedOptions: BeneficialUseChangeOption[] = layerOptions
-    .filter(o => props.defaultValue.includes(o.value));
-
   return (
     <>
       <Select
-        value={selectedOptions}
+        value={props.selectedOptions}
         isMulti
-        onChange={props.onChange}
+        onChange={a=>props.onChange([...a])}
         closeMenuOnSelect={false}
-        options={layerOptions}
+        options={props.options}
         styles={layerOptionStyles}
       />
     </>

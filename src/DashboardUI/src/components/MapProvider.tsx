@@ -1,6 +1,6 @@
-import mapboxgl, { CircleLayer, VectorSource } from "mapbox-gl";
-import { createContext, FC, ReactElement, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { createContext, FC, ReactElement, useCallback, useContext, useState } from "react";
+import { AppContext } from "../AppProvider";
+import deepEqual from 'fast-deep-equal/es6';
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -16,187 +16,80 @@ export enum MapStyle {
   Satellite = "satellite-v9"
 }
 
-interface Source {
-  id: string,
-  source: VectorSource
-};
-
-export interface Layer extends CircleLayer {
-  friendlyName: string
-}
-
-export interface MapData {
-  sources: Source[];
-  layers: Layer[];
-}
-
-export interface MapFilters {
-  isLoaded: boolean;
-  visibleLayerIds: string[];
-  mapStyle: MapStyle;
-  ownerClassifications: string[];
-  allocationDates: number[];
-}
+export type MapLayerFilterType = any[] | boolean | null | undefined;
+export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
+type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 
 interface MapContextState {
-  map: mapboxgl.Map | null,
-  setCurrentMap: (map: mapboxgl.Map) => void,
   mapStyle: MapStyle;
-  setCurrentMapStyle: (style: MapStyle) => void;
-  sources: Source[];
-  setCurrentSources: (sources: Source[]) => void;
-  layers: Layer[];
-  setCurrentLayers: (layers: Layer[]) => void;
-  setLayerVisibility: (layerId: string, visible: boolean) => void;
-  setVisibleMapLayersFilter: (visibleLayerIds: string[]) => void;
+  setMapStyle: (style: MapStyle) => void;
   legend: ReactElement | null;
   setLegend: (legend: ReactElement | null) => void;
-  mapFilters: MapFilters;
-  clearMapFilters: () => void;
-  setOwnerClassificationFilter: (filter: any[]) => void;
-  setAllocationDateFilter: (dates: number[]) => void;
+  filters: MapLayerFiltersType;
+  setLayerFilters: (filters: setFiltersParamType) => void;
+  geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
+  setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
+  visibleLayers: string[],
+  setVisibleLayers: (layers: string[]) => void,
 };
 
 const defaultState: MapContextState = {
-  map: null as mapboxgl.Map | null,
-  setCurrentMap: () => { },
   mapStyle: MapStyle.Light,
-  setCurrentMapStyle: () => { },
-  sources: [],
-  setCurrentSources: () => { },
-  layers: [],
-  setCurrentLayers: () => { },
-  setLayerVisibility: () => { },
-  setVisibleMapLayersFilter: () => { },
+  setMapStyle: () => { },
   legend: null as ReactElement | null,
   setLegend: () => { },
-  mapFilters: {
-    isLoaded: false,
-    visibleLayerIds: [],
-    mapStyle: MapStyle.Light,
-    ownerClassifications: [],
-    allocationDates: [1850, new Date().getFullYear()]
-  },
-  clearMapFilters: () => { },
-  setOwnerClassificationFilter: () => { },
-  setAllocationDateFilter: () => { },
+  filters: {},
+  setLayerFilters: () => { },
+  geoJsonData: [],
+  setGeoJsonData: () => { },
+  visibleLayers: [],
+  setVisibleLayers: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
 
 const MapProvider: FC = ({ children }) => {
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
+  const { getUrlParam, setUrlParam } = useContext(AppContext)
 
-  const [mapStyle, setMapStyle] = useState(MapStyle.Light);
-  const setCurrentMapStyle = (mapStyle: MapStyle) => {
-    setMapFilters({
-      ...mapFilters,
-      mapStyle
-    });
+  const [mapStyle, setMapStyle] = useState(getUrlParam<MapStyle>("ms") ?? MapStyle.Light);
+  const setMapStyleInternal = (mapStyle: MapStyle): void => {
+    setUrlParam("ms", mapStyle);
     setMapStyle(mapStyle);
   }
+  const [filters, setFilters] = useState<MapLayerFiltersType>({});
 
-  const setOwnerClassificationFilter = (ownerClassifications: string[]) => {
-    setMapFilters({
-      ...mapFilters,
-      ownerClassifications
-    });
-  };
+  const setLayerFilters = useCallback((updatedFilters: setFiltersParamType): void => {
+    const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+    const updatedFilterSet = { ...filters };
+    filterArray.forEach(value => {
+      updatedFilterSet[value.layer] = value.filter
+    })
+    if (!deepEqual(filters, updatedFilterSet)) {
+      setFilters(updatedFilterSet)
+    }
 
-  const setAllocationDateFilter = (allocationDates: number[]) => {
-    setMapFilters({
-      ...mapFilters,
-      allocationDates
-    });
+  }, [setFilters, filters]);
+  const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
+  const setGeoJsonData = (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
+    const unchangedData = geoJsonData.filter(a => a.source !== source);
+    setAllGeoJsonData([...unchangedData, { source, data }]);
   }
 
-  const [mapFilters, setMapFilters] = useState<MapFilters>(defaultState.mapFilters);
-  const clearMapFilters = () => {
-    setMapFilters(defaultState.mapFilters);
-    layers.forEach(layer => setLayerVisibility(layer.id, true));
-  };
-
-  let [urlParams, setUrlParams] = useSearchParams();
-
-  const setVisibleMapLayersFilter = (visibleLayerIds: string[]) => {
-    setMapFilters({
-      ...mapFilters,
-      visibleLayerIds
-    });
-  }
-
-  useEffect(() => {
-    updateFilterUrlParams();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapFilters])
-
-  useEffect(() => {
-    // Restore mapFilter state from URL params
-    const mapFilters = JSON.parse(urlParams.get("mapFilters") as string) as MapFilters;
-    setMapFilters({
-      isLoaded: true,
-      visibleLayerIds: mapFilters?.visibleLayerIds || defaultState.mapFilters.visibleLayerIds,
-      mapStyle: mapFilters?.mapStyle || defaultState.mapFilters.mapStyle,
-      ownerClassifications: mapFilters?.ownerClassifications || defaultState.mapFilters.ownerClassifications,
-      allocationDates: mapFilters?.allocationDates || defaultState.mapFilters.allocationDates,
-    });
-    console.log("Initial map filters from url:", mapFilters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const updateFilterUrlParams = () => {
-    let prevParams: any = {}
-    urlParams.forEach((value, key) => {
-      prevParams[key] = value;
-    });
-
-    setUrlParams({
-      ...prevParams,
-      mapFilters: JSON.stringify(mapFilters)
-    });
-  };
-
-  const [sources, setSources] = useState<Source[]>([]);
-  const setCurrentSources = (sources: Source[]) => setSources(sources);
-
-  const [layers, setLayers] = useState<Layer[]>([]);
-  const setCurrentLayers = (layers: Layer[]) => {
-    layers.forEach(layer => {
-      if (layer.layout) {
-        const isVisible = mapFilters.visibleLayerIds.includes(layer.id) || mapFilters.visibleLayerIds.length === 0;
-        layer.layout.visibility = isVisible ? "visible" : "none";
-      }
-    });
-    setLayers(layers);
-  }
+  const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
 
-  const setLayerVisibility = (layerId: string, visible: boolean) => {
-    if (map) {
-      map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
-    }
-  };
-
-
   const mapContextProviderValue = {
-    map,
-    setCurrentMap,
     mapStyle,
-    setCurrentMapStyle,
-    sources,
-    setCurrentSources,
-    layers,
-    setCurrentLayers,
-    setLayerVisibility,
-    setVisibleMapLayersFilter,
+    setMapStyle: setMapStyleInternal,
     legend,
     setLegend,
-    mapFilters,
-    clearMapFilters,
-    setOwnerClassificationFilter,
-    setAllocationDateFilter
+    filters,
+    setLayerFilters,
+    geoJsonData,
+    setGeoJsonData,
+    visibleLayers,
+    setVisibleLayers,
   };
 
   return (
