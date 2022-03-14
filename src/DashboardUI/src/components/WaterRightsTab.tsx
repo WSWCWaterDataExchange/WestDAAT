@@ -82,22 +82,20 @@ function WaterRightsTab() {
   }, [allWaterRightsLayers, convertLayersToBeneficialUseOptions]);
 
   useEffect(() => {
-    setLegend(<div className="legend">
-      <div>
-        {
-          //Sort legend items alphabetically
-          availableOptions.map(layer => {
-            return (
-              <div key={layer.value}>
-                <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
-                {layer.label}
-              </div>
-            );
-          }
-          )
+    setLegend(<>
+      {
+        //Sort legend items alphabetically
+        availableOptions.map(layer => {
+          return (
+            <div key={layer.value} className="legend-item">
+              <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
+              {layer.label}
+            </div>
+          );
         }
-      </div>
-    </div>);
+        )
+      }
+    </>);
   }, [setLegend, availableOptions])
 
   useEffect(() => {
@@ -116,14 +114,14 @@ function WaterRightsTab() {
   }, [filters, setUrlParam])
 
   const handleBeneficialUseChange = useCallback((selectedOptions: BeneficialUseChangeOption[]) => {
-    setFilters(s=>({
+    setFilters(s => ({
       ...s,
       beneficialUses: selectedOptions.length > 0 ? selectedOptions.map(a => a.value) : undefined
     }));
   }, [setFilters]);
 
   const handleOwnerClassificationChange = useCallback((selectedOptions: string[]) => {
-    setFilters(s=>({
+    setFilters(s => ({
       ...s,
       ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
@@ -134,8 +132,8 @@ function WaterRightsTab() {
     if (filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       filterSet.push(["in", "ownerClassification", ...filters.ownerClassifications]);
     }
-    setMapLayerFilters(allWaterRightsLayers.map(a=>{
-      return {layer: a, filter: ["all", ...filterSet]}
+    setMapLayerFilters(allWaterRightsLayers.map(a => {
+      return { layer: a, filter: ["all", ...filterSet] }
     }))
   }, [filters, allWaterRightsLayers, setMapLayerFilters])
 

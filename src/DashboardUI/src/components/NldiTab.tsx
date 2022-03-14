@@ -7,7 +7,7 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Icon from '@mdi/react';
-import { mdiMapMarker, mdiCircle } from '@mdi/js';
+import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 
@@ -138,41 +138,35 @@ function NldiTab() {
   }, [setVisibleLayers]);
 
   useEffect(() => {
-    setLegend(<div className="legend legend-nldi">
-      <div>
+    setLegend(<div className="legend-nldi">
+      <div className="legend-item">
         <span>
           <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
         </span>
         Starting Point of Interest
       </div>
-      <div>
-        <span>
-          <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+      <div className="legend-item">
+        <span className="legend-flowline">
+          <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
         </span>
         Mainstem
       </div>
-      <div>
+      <div className="legend-item">
         <span>
-          <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+          <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
         </span>
         Tributaries
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
         WaDE Sites
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
         USGS NWIS Sites
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
         EPA Water Quality Portal<br /> Sites OSM Standard
       </div>
     </div>);

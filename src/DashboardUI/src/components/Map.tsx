@@ -1,14 +1,12 @@
 import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-
 import "../styles/map.scss";
 import { AppContext, User } from "../AppProvider";
 import { MapContext, MapStyle } from "./MapProvider";
 import mapConfig from "../config/maps";
-import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
@@ -20,7 +18,7 @@ import { useDrop } from "react-dnd";
 function Map() {
   const { user } = useContext(AppContext);
   const { legend, mapStyle, visibleLayers, geoJsonData, filters } = useContext(MapContext);
-  const [ map, setMap] = useState<mapboxgl.Map | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
   let geocoderControl = useRef(new MapboxGeocoder({
@@ -70,9 +68,6 @@ function Map() {
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
       addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
-      addSvgImage(mapInstance, 'mapNldiUsgs', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiRhombus}" style="fill: ${nldi.colors.usgs};"></path></svg>`);
-      addSvgImage(mapInstance, 'mapNldiEpa', `<svg viewBox="0 0 24 24" role="presentation" style="width: 13px; height: 13px;"><path d="${mdiCircleOutline}" style="fill: ${nldi.colors.epa};"></path></svg>`);
-      addSvgImage(mapInstance, 'mapNldiWade', `<svg viewBox="0 0 24 24" role="presentation" style="width: 12px; height: 12px;"><path d="${mdiCircle}" style="fill: ${nldi.colors.wade};"></path></svg>`);
       mapInstance.addControl(new mapboxgl.ScaleControl());
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
@@ -152,21 +147,35 @@ function Map() {
 
   useEffect(() => {
     if (!map) return;
-    for(let key in filters){
+    for (let key in filters) {
       map.setFilter(key, filters[key]);
     }
   }, [map, filters]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
-    drop: () => (coords ? {latitude: coords.lat, longitude: coords.lng} : undefined),
+    drop: () => (coords ? { latitude: coords.lat, longitude: coords.lng } : undefined),
     collect: () => { }
   })
+
+  const legendClass = useMemo(() => {
+    return {
+      [MapStyle.Dark]: "legend-dark",
+      [MapStyle.Light]: "legend-light",
+      [MapStyle.Outdoor]: "legend-light",
+      [MapStyle.Street]: "legend-light",
+      [MapStyle.Satellite]: "legend-light",
+    }[mapStyle];
+  }, [mapStyle])
 
   return (
     <div className="position-relative h-100">
       <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
-      {legend}
+      {legend &&
+        <div className={`legend ${legendClass}`}>
+          {legend}
+        </div>
+      }
       <div id="map" className="map h-100" ref={dropRef}></div>
     </div>
   );

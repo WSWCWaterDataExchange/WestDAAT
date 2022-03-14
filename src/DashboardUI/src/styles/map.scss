@@ -12,12 +12,18 @@
   z-index: 2; 
   padding: 6px;
   border-radius: 5px;
-  .legend-circle {
-    border-radius: 50%;
-    display: inline-block;
-    height: 14px;
-    margin: 0 6px 0 3px;
-    width: 14px;
+  .legend-item{
+    display: flex;
+    align-items: center;
+    .legend-circle {
+      border-radius: 50%;
+      display: inline-block;
+      height: 14px;
+      margin: 0 6px 0 3px;
+      width: 14px;
+      padding: -1px;
+      border: 1px solid rgba($bs-gray-200, .4);
+    }
   }
 }
 
@@ -39,24 +45,40 @@
   background-color: $white;
   border-color: $bs-gray-100;
   color: $text-color-dark;
+  .legend-circle {
+    border-color: rgba($bs-gray-800, .4);
+  }
 }
 
 .legend-nldi{
-  > div{
     display: flex;
-    align-items: center;
-    > span{
-      display: inline-block;
-      width: 25px;
-      margin-right: 6px;
-      text-align: center;
-      > span{
+    align-items: flex-start;
+    flex-direction: column;
+    
+    .legend-item {
+      & > span{
         display: inline-block;
-        width: 100%;
-        vertical-align: middle;
+        width: 25px;
+        margin-right: 6px;
+        text-align: center;
+        
+        &.legend-circle{
+          width: 14px;
+          margin-right: 17px;
+        }
+        .legend-flowline{
+          display: inline-block;
+          width: 100%;
+          vertical-align: middle;
+          &.legend-flowline-main{
+            height: 4px
+          }
+          &.legend-flowline-tributary{
+            height: 2px
+          }
+        }
       }
     }
-  }
 }
 
 .grabbable:hover {
