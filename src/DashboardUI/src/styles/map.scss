@@ -6,17 +6,41 @@
   right: 0;
   margin: 26px 8px;
   background-color: $bs-gray-900;
+  border: 1px solid $bs-gray-800;
   color: $text-color-light;
   // Just behind the geocode search results
   z-index: 2; 
   padding: 6px;
   border-radius: 5px;
+  .legend-circle {
+    border-radius: 50%;
+    display: inline-block;
+    height: 14px;
+    margin: 0 6px 0 3px;
+    width: 14px;
+  }
 }
 
-.legend div span {
-  border-radius: 50%;
-  display: inline-block;
-  height: 10px;
-  margin: 0 6px 0 3px;
-  width: 10px;
+.legend-light {
+  background-color: $white;
+  border-color: $bs-gray-100;
+  color: $text-color-dark;
+}
+
+.legend-nldi{
+  > div{
+    display: flex;
+    align-items: center;
+    > span{
+      display: inline-block;
+      width: 25px;
+      margin-right: 6px;
+      text-align: center;
+      > span{
+        display: inline-block;
+        width: 100%;
+        vertical-align: middle;
+      }
+    }
+  }
 }

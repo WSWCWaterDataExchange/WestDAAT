@@ -6,7 +6,6 @@ import SiteNavbar from '../components/SiteNavbar';
 import Map from '../components/Map';
 
 import '../styles/home-page.scss';
-import { useSearchParams } from 'react-router-dom';
 import { AppContext } from '../AppProvider';
 
 export enum HomePageTab {
@@ -28,7 +27,7 @@ function HomePage() {
 
   useEffect(() => {
     setUrlParam("tab", currentTab)
-  }, [currentTab])
+  }, [currentTab, setUrlParam])
 
   return (
     <div className="home-page d-flex flex-column">

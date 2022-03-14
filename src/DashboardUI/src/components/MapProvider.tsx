@@ -71,8 +71,10 @@ const MapProvider: FC = ({ children }) => {
   }, [setFilters, filters]);
   const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
   const setGeoJsonData = (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
-    const unchangedData = geoJsonData.filter(a => a.source !== source);
-    setAllGeoJsonData([...unchangedData, { source, data }]);
+    setAllGeoJsonData(s => {
+      const unchangedData = s.filter(a => a.source !== source);
+      return [...unchangedData, { source, data }]
+    });
   }
 
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);

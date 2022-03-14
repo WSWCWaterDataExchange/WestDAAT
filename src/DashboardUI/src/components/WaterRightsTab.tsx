@@ -7,9 +7,9 @@ import FlowRangeSlider from "./FlowRangeSlider";
 import { MapContext, MapStyle } from "./MapProvider";
 import BeneficialUseSelect, { BeneficialUseChangeOption } from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
-import mapConfig from "../config/maps.json";
 import { ownerClassificationsList } from "../config/waterRights";
 import { AppContext } from "../AppProvider";
+import mapConfig from "../config/maps";
 
 function WaterRightsTab() {
   const [radioValue, setRadioValue] = useState('1');
@@ -88,7 +88,7 @@ function WaterRightsTab() {
           availableOptions.map(layer => {
             return (
               <div key={layer.value}>
-                <span style={{ "backgroundColor": layer.color }}></span>
+                <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
                 {layer.label}
               </div>
             );

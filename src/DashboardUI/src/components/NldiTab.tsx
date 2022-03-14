@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
@@ -6,7 +6,10 @@ import { useQuery } from "react-query";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Form } from "react-bootstrap";
 import { toast } from "react-toastify";
+import Icon from '@mdi/react';
 import { AppContext } from "../AppProvider";
+import { mdiMapMarker, mdiRhombus, mdiCircleOutline, mdiCircle } from '@mdi/js';
+import { nldi } from '../config/constants';
 
 function NldiTab() {
   const precision = 5;
@@ -37,17 +40,17 @@ function NldiTab() {
       error: 'Error Retrieving NLDI Data'
     })
     return promise;
-  }, [])
+  }, [nldiData.latitude, nldiData.longitude])
 
   const handleLatitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setPointData(s=>({
+    setPointData(s => ({
       ...s,
       latitude: e.target.value
     }));
   }, [])
 
   const handleLongitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setPointData(s=>({
+    setPointData(s => ({
       ...s,
       longitude: e.target.value
     }));
@@ -56,11 +59,11 @@ function NldiTab() {
   const handleLatitudeBlurred = useCallback(() => {
     let lat = parseFloat(pointData.latitude);
     if (isNaN(lat)) {
-      setPointData(s=>({
+      setPointData(s => ({
         ...s,
         latitude: ""
       }));
-      setNldiData(s=>({
+      setNldiData(s => ({
         ...s,
         latitude: null
       }));
@@ -73,11 +76,11 @@ function NldiTab() {
       lat = -90
     }
     lat = parseFloat(lat.toFixed(precision));
-    setNldiData(s=>({
+    setNldiData(s => ({
       ...s,
       latitude: lat
     }));
-    setPointData(s=>({
+    setPointData(s => ({
       ...s,
       latitude: lat.toFixed(precision)
     }));
@@ -114,7 +117,7 @@ function NldiTab() {
 
   const handleDirectionsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
     const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
-    setNldiData(s=>({
+    setNldiData(s => ({
       ...s,
       directions: val
     }));
@@ -122,7 +125,7 @@ function NldiTab() {
 
   const handleDataPointsChanged = useCallback((e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
     const val = e.target.checked ? nldiData.dataPoints | dataPoint : nldiData.dataPoints & ~dataPoint;
-    setNldiData(s=>({
+    setNldiData(s => ({
       ...s,
       dataPoints: val
     }));
@@ -157,25 +160,73 @@ function NldiTab() {
   useEffect(() => {
     setUrlParam("nldi", nldiData);
   }, [nldiData, setUrlParam]);
+  useEffect(() => {
+    setLegend(<div className="legend legend-nldi">
+      <div>
+        <span>
+          <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
+        </span>
+        Starting Point of Interest
+      </div>
+      <div>
+        <span>
+          <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+        </span>
+        Mainstem
+      </div>
+      <div>
+        <span>
+          <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+        </span>
+        Tributaries
+      </div>
+      <div>
+        <span>
+          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
+        </span>
+        WaDE Sites
+      </div>
+      <div>
+        <span>
+          <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
+        </span>
+        USGS NWIS Sites
+      </div>
+      <div>
+        <span>
+          <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
+        </span>
+        EPA Water Quality Portal<br /> Sites OSM Standard
+      </div>
+    </div>);
+  }, [setLegend])
+
+  const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
+  const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
+    [DataPoints.Wade]: "Wade",
+    [DataPoints.Usgs]: "UsgsSurfaceWaterSite",
+    [DataPoints.Epa]: "EpaWaterQualitySite"
+  }), []);
+
+  const directionNameKeys = useMemo(() => [Directions.Upsteam, Directions.Downsteam] as const, []);
+  const directionNames: Record<Directions, string> = useMemo(() => ({
+    [Directions.Upsteam]: "Upstream",
+    [Directions.Downsteam]: "Downstream"
+  }), [])
 
   useEffect(() => {
     let pointsTypeFilters: any[] = ["any"];
-    if (nldiData.dataPoints & DataPoints.Wade) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "Wade"])
-    }
-    if (nldiData.dataPoints & DataPoints.Usgs) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"])
-    }
-    if (nldiData.dataPoints & DataPoints.Epa) {
-      pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"])
+    for (const key of pointFeatureDataSourceNameKeys) {
+      if (nldiData.dataPoints & key) {
+        pointsTypeFilters.push(["==", ["get", "westdaat_pointdatasource"], pointFeatureDataSourceNames[key]])
+      }
     }
 
     let directionFilters: any[] = ["any"];
-    if (nldiData.directions & Directions.Upsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Upstream"])
-    }
-    if (nldiData.directions & Directions.Downsteam) {
-      directionFilters.push(["==", ["get", "westdaat_direction"], "Downstream"])
+    for (const key of directionNameKeys) {
+      if (nldiData.directions & key) {
+        directionFilters.push(["==", ["get", "westdaat_direction"], directionNames[key]])
+      }
     }
 
     setMapLayerFilters([
@@ -185,8 +236,7 @@ function NldiTab() {
             ["==", ["get", "westdaat_featuredatatype"], "Point"],
             pointsTypeFilters,
             directionFilters
-          ],
-          ["==", ["get", "westdaat_pointdatasource"], "Location"]
+          ]
         ]
       },
       {
