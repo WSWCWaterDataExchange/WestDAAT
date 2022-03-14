@@ -4,12 +4,13 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import FlowRangeSlider from "./FlowRangeSlider";
-import { MapContext, MapStyle } from "./MapProvider";
+import { MapContext } from "./MapProvider";
 import BeneficialUseSelect, { BeneficialUseChangeOption } from "./BeneficialUseSelect";
 import VolumeRangeSlider from "./VolumeRangeSlider";
 import { ownerClassificationsList } from "../config/waterRights";
 import { AppContext } from "../AppProvider";
 import mapConfig from "../config/maps";
+import { MapThemeSelector } from "./MapThemeSelector";
 
 function WaterRightsTab() {
   const [radioValue, setRadioValue] = useState('1');
@@ -278,26 +279,3 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
-
-function MapThemeSelector() {
-  const {
-    mapStyle,
-    setMapStyle
-  } = useContext(MapContext);
-
-  return (
-    <div className="map-themes">
-      {
-        (() => {
-          const isActive = (style: MapStyle) => style === mapStyle ? "active" : "";
-          return <>
-            <img onClick={() => setMapStyle(MapStyle.Light)} className={isActive(MapStyle.Light)} alt="light map" src="/map-themes/light.png" />
-            <img onClick={() => setMapStyle(MapStyle.Dark)} className={isActive(MapStyle.Dark)} alt="dark map" src="/map-themes/dark.png" />
-            <img onClick={() => setMapStyle(MapStyle.Street)} className={isActive(MapStyle.Street)} alt="streets map" src="/map-themes/streets.png" />
-            <img onClick={() => setMapStyle(MapStyle.Outdoor)} className={isActive(MapStyle.Outdoor)} alt="outdoors map" src="/map-themes/outdoor.png" />
-            <img style={{ pointerEvents: "none" }} onClick={() => setMapStyle(MapStyle.Satellite)} className={isActive(MapStyle.Satellite)} alt="satelite map" src="/map-themes/satelite.png" />
-          </>
-        })()
-      }
-    </div>);
-}
