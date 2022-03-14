@@ -8,8 +8,6 @@ import "../styles/map.scss";
 import mapConfig from "../config/maps.json";
 import { HomePageTab } from "../pages/HomePage";
 import { AppContext, User } from "../AppProvider";
-import ReactDOM from 'react-dom';
-import MapPopUp from './MapPopUp';
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -36,7 +34,6 @@ function Map(props: MapProps) {
 
   const map = useRef<mapboxgl.Map | null>(null);
   const navControl = useRef(new NavigationControl());
-  const popUpRef = useRef(new mapboxgl.Popup());
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
   }));

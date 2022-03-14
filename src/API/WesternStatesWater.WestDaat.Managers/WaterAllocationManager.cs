@@ -46,5 +46,15 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return await _nldiAccessor.GetNldiFeatures(latitude, longitude, directions, dataPoints);
         }
+
+        public async Task<SiteDetails> GetSiteDetails(string siteUuid)
+        {
+            return await _siteAccessor.GetSiteDetailsByUuid(siteUuid);
+        }
+
+        public async Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId)
+        {
+            return await _waterAllocationAccessor.GetWaterRightDetailsById(waterRightsId);
+        }
     }
 }

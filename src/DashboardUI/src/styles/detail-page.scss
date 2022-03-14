@@ -1,0 +1,22 @@
+@import '_colors.scss';
+
+.detail-page {
+  position: relative;
+  height: 100%;
+  background-color: white;
+}
+
+.title-header {
+  padding: 10px;
+  border-bottom: 1px solid lightgray;
+}
+
+.property-name {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.property-value {
+  font-size: 12px;
+  margin-bottom: 15px;
+}
