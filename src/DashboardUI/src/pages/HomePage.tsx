@@ -25,12 +25,16 @@ function HomePage() {
     setShowContactModal(show);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = `WestDAAT - ${currentTab}`
   }, [currentTab]);
 
   useEffect(() => {
-    setUrlParam("tab", currentTab)
+    if (currentTab === HomePageTab.WaterRights) {
+      setUrlParam("tab", undefined);
+    } else {
+      setUrlParam("tab", currentTab)
+    }
   }, [currentTab, setUrlParam])
 
   return (

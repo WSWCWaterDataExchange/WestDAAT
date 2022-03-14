@@ -11,12 +11,18 @@ import { ownerClassificationsList } from "../config/waterRights";
 import { AppContext } from "../AppProvider";
 import mapConfig from "../config/maps";
 import { MapThemeSelector } from "./MapThemeSelector";
+import deepEqual from 'fast-deep-equal/es6';
 
 function WaterRightsTab() {
   const [radioValue, setRadioValue] = useState('1');
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
-  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? {});
+  const defaultFilters = useMemo<WaterRightsFilters>(() => ({
+    beneficialUses: undefined,
+    ownerClassifications: undefined
+  }), [])
+
+  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
 
   const allWaterRightsLayers = useMemo(() => [
     'agricultural',
@@ -107,11 +113,12 @@ function WaterRightsTab() {
   }, [filters, allWaterRightsLayers, setVisibleLayers])
 
   useEffect(() => {
-    if (!filters.ownerClassifications && !filters.beneficialUses) {
-      setUrlParam("wr", undefined)
+    if (deepEqual(filters, defaultFilters)) {
+      setUrlParam("wr", undefined);
+    } else {
+      setUrlParam("wr", filters);
     }
-    setUrlParam("wr", filters)
-  }, [filters, setUrlParam])
+  }, [filters, setUrlParam, defaultFilters])
 
   const handleBeneficialUseChange = useCallback((selectedOptions: BeneficialUseChangeOption[]) => {
     setFilters(s => ({

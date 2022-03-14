@@ -10,18 +10,28 @@ import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
+import { AppContext } from "../AppProvider";
+import deepEqual from 'fast-deep-equal/es6';
 
 function NldiTab() {
-  const [nldiData, setNldiData] = useState({
+  interface NldiDataType {
+    latitude: number | null,
+    longitude: number | null,
+    directions: Directions,
+    dataPoints: DataPoints
+  }
+  const defaultNldiData = useMemo(() => ({
     latitude: null as number | null,
     longitude: null as number | null,
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
-  });
+  }), [])
+  const { getUrlParam, setUrlParam } = useContext(AppContext);
+  const [nldiData, setNldiData] = useState(getUrlParam<NldiDataType>("nldi") ?? defaultNldiData);
 
   const [pointData, setPointData] = useState({
-    latitude: "",
-    longitude: ""
+    latitude: nldiData.latitude?.toFixed(nldi.latLongPrecision) ?? "",
+    longitude: nldiData.longitude?.toFixed(nldi.latLongPrecision) ?? ""
   });
 
   const retrieveNldiGeoJsonData = useCallback(async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
@@ -99,18 +109,18 @@ function NldiTab() {
 
   const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
     const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s => ({
+      ...s,
       directions: val
-    });
+    }));
   }
 
   const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
     const val = e.target.checked ? nldiData.dataPoints | dataPoint : nldiData.dataPoints & ~dataPoint;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s => ({
+      ...s,
       dataPoints: val
-    });
+    }));
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
@@ -215,6 +225,14 @@ function NldiTab() {
       ]
     }])
   }, [nldiData.dataPoints, nldiData.directions, setMapLayerFilters, directionNameKeys, directionNames, pointFeatureDataSourceNameKeys, pointFeatureDataSourceNames]);
+
+  useEffect(() => {
+    if (deepEqual(nldiData, defaultNldiData)) {
+      setUrlParam("nldi", undefined);
+    } else {
+      setUrlParam("nldi", nldiData);
+    }
+  }, [nldiData, setUrlParam, defaultNldiData])
 
   return (
     <>

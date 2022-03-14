@@ -30,32 +30,41 @@ const AppProvider: FC = ({ children }) => {
   const [user, setUser] = useState(null as User | null);
 
   const initUrlParams = () => {
-    const stateStr =urlParams.get("state");
-    if(stateStr)
-    {
+    const stateStr = urlParams.get("state");
+    if (stateStr) {
       return JSON.parse(stateStr) as Record<string, string>;
     }
-    return {} as Record<string, string>;
+    return {};
   }
 
   const [stateUrlParams, setStateUrlParams] = useState(initUrlParams());
 
-  const setUrlParam = useCallback((key: string, value: any): void => {
-    setStateUrlParams(s=>({
-      ...s,
-      [key]: JSON.stringify(value)
-    }))
+  const setUrlParam = useCallback((key: string, value: {} | undefined): void => {
+    setStateUrlParams(s => {
+      const updatedValues = { ...s };
+      if (value === undefined) {
+        delete updatedValues[key]
+      } else {
+        updatedValues[key] = JSON.stringify(value);
+      }
+      return updatedValues;
+    })
   }, [])
-  
+
   const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
     var param = stateUrlParams[key];
-    if(param){
+    if (param) {
       return JSON.parse(param) as T;
     }
   }, [stateUrlParams])
 
   useEffect(() => {
-    setUrlParams({state: JSON.stringify(stateUrlParams)})
+    if ((Object.keys(stateUrlParams).length ?? 0) > 0) {
+      setUrlParams({ state: JSON.stringify(stateUrlParams) })
+    } else {
+      setUrlParams({});
+    }
+
   }, [stateUrlParams, setUrlParams])
 
   const appContextProviderValue = {
