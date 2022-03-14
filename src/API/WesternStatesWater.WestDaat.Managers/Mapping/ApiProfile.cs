@@ -7,6 +7,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
     {
         public ApiProfile()
         {
+            // {BU: site.Allocations.SelectMany(BU).Distrinct()}
+
             CreateMap<(AllocationAmount allocation, IEnumerable<Site> sites), GeoJsonFeature>()
                 .ForMember(a => a.Geometry, b => b.MapFrom(c => new GeoJsonGeometry
                 {
@@ -24,7 +26,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     {"allocationVolumeAf", c.allocation.AllocationVolumeAf ?? 0},
                     {"allocationOwner", c.allocation.AllocationOwner},
                     {"ownerClassification", c.allocation.OwnerClassification},
-                    {"beneficialUses", string.Join(',', c.allocation.BeneficialUses)},
+                    {"beneficialUses", c.allocation.BeneficialUses},
                     {"allocationPriorityDate", (c.allocation.AllocationPriorityDate - new DateTime(1970, 1, 1)).TotalMilliseconds},
                     {"siteUuid", c.sites.FirstOrDefault().SiteUuid},
                     {"siteName", c.sites.FirstOrDefault().SiteName},

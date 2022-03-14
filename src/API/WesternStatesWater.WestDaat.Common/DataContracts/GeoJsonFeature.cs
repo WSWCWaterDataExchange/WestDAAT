@@ -12,6 +12,6 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public GeoJsonGeometry Geometry { get; set; }
 
         [JsonPropertyName("properties")]
-        public Dictionary<string, string> Properties { get; set; }
+        public Dictionary<string, object> Properties { get; set; }
     }
 }

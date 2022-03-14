@@ -10,15 +10,14 @@
    - May need to run this twice if using docker
 5. Start Web (Backend WebApi)
 6. Start React App
+   - Requires Node version 16+
 
 
-## Azure Deployment
+## Update Mapbox Vector Tileset
 
-1. Use supplied `azuredeploy.json` ARM template located in the `infrastructure/`
-2. Deploy resources using AzureCLI or Azure Portal
-3. Detailed instructions can be found in [infrastructure/README.md](infrastructure/README.md)
+1. Run Function App
+2. POST to http://localhost:7071/api/GenerateAllocationGeoJson
+3. A .geojson file will be in the Function bin/output directory of the function app
+4. Run `tippecanoe -zg -o out1.mbtiles --read-parallel --coalesce-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L allocations:"Allocations.geojson"`
+5. Upload to mapbox studio
 
-## Azure DevOps Pipelines
-
-1. Example pipelines can be found in `pipelines/`
-2. Detailed instructions can be found in [pipelines/README.md](pipelines/README.md)
