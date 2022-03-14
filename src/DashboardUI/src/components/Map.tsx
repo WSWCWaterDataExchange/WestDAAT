@@ -86,7 +86,7 @@ function Map() {
       })
       setMap(mapInstance);
     });
-  }, [setMap]);
+  }, [setMap, null]);/* eslint-disable-line *//* We don't want to run this when mapStyle updates */
 
   const sourceIds = useMemo(() => {
     return mapConfig.sources.map(a => a.id)
