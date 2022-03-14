@@ -46,16 +46,17 @@ const AppProvider: FC = ({ children }) => {
       [key]: JSON.stringify(value)
     }))
   }, [])
+  
   const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
     var param = stateUrlParams[key];
     if(param){
       return JSON.parse(param) as T;
     }
-  }, [])
+  }, [stateUrlParams])
 
   useEffect(() => {
     setUrlParams({state: JSON.stringify(stateUrlParams)})
-  }, [stateUrlParams])
+  }, [stateUrlParams, setUrlParams])
 
   const appContextProviderValue = {
     user,
