@@ -165,13 +165,13 @@ function NldiTab() {
       </div>
       <div>
         <span>
-          <Icon path={nldi.useSymbols ? mdiRhombus : mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
+          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
         </span>
         USGS NWIS Sites
       </div>
       <div>
         <span>
-          <Icon path={nldi.useSymbols ? mdiCircleOutline : mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
+          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
         </span>
         EPA Water Quality Portal<br /> Sites OSM Standard
       </div>

@@ -2,102 +2,6 @@ import { nldi } from "./constants";
 
 const pointCircleRadius = ["interpolate", ["linear"], ["zoom"], 5, 2, 20, 20];
 
-const nldiPointsSymbolMapConfig = {
-  "id": "nldi-usgs-points",
-  "source": "nldi",
-  "layout": {
-    "visibility": "visible",
-    "icon-allow-overlap": true,
-    "icon-image": [
-      "case",
-      [
-        "==",
-        [
-          "get",
-          "westdaat_pointdatasource"
-        ],
-        "UsgsSurfaceWaterSite"
-      ],
-      "mapNldiUsgs",
-      [
-        "==",
-        [
-          "get",
-          "westdaat_pointdatasource"
-        ],
-        "EpaWaterQualitySite"
-      ],
-      "mapNldiEpa",
-      [
-        "==",
-        [
-          "get",
-          "westdaat_pointdatasource"
-        ],
-        "Wade"
-      ],
-      "mapNldiWade",
-      ""
-    ],
-    "icon-size": ["interpolate", ["linear"], ["zoom"], 5, 0.25, 10, 1, 15, 3]
-  },
-  "type": "symbol",
-  "paint": {
-    "icon-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.8, 15, 1]
-  },
-  "filter": ["all", [
-    "==",
-    [
-      "get",
-      "westdaat_featuredatatype"
-    ],
-    "Point"
-  ],
-    [
-      "!=",
-      [
-        "get",
-        "westdaat_pointdatasource"
-      ],
-      "Location"
-    ]
-  ]
-};
-
-const nldiPointsCircleMapConfig = {
-  "id": "nldi-usgs-points",
-  "source": "nldi",
-  "layout": {
-    "visibility": "visible"
-  },
-  "type": "circle",
-  "paint": {
-    "circle-radius": pointCircleRadius,
-    "circle-color": ["case",
-      ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs,
-      ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa,
-      ["==", ["get", "westdaat_pointdatasource"], "Wade"], nldi.colors.wade,
-      nldi.colors.unknown]
-  },
-  "filter": ["all", [
-    "==",
-    [
-      "get",
-      "westdaat_featuredatatype"
-    ],
-    "Point"
-  ],
-    [
-      "!=",
-      [
-        "get",
-        "westdaat_pointdatasource"
-      ],
-      "Location"
-    ]
-  ]
-};
-
 const mapsJson = {
   "sources": [
     {
@@ -459,7 +363,39 @@ const mapsJson = {
         "Flowline"
       ]
     },
-    nldi.useSymbols ? nldiPointsSymbolMapConfig : nldiPointsCircleMapConfig,
+    {
+      "id": "nldi-usgs-points",
+      "source": "nldi",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "circle",
+      "paint": {
+        "circle-radius": pointCircleRadius,
+        "circle-color": ["case",
+          ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs,
+          ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa,
+          ["==", ["get", "westdaat_pointdatasource"], "Wade"], nldi.colors.wade,
+          nldi.colors.unknown]
+      },
+      "filter": ["all", [
+        "==",
+        [
+          "get",
+          "westdaat_featuredatatype"
+        ],
+        "Point"
+      ],
+        [
+          "!=",
+          [
+            "get",
+            "westdaat_pointdatasource"
+          ],
+          "Location"
+        ]
+      ]
+    },
     {
       "id": "nldi-usgs-location",
       "source": "nldi",
