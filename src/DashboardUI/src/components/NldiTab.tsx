@@ -7,21 +7,31 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Icon from '@mdi/react';
-import { mdiMapMarker, mdiCircle } from '@mdi/js';
+import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
+import { AppContext } from "../AppProvider";
+import deepEqual from 'fast-deep-equal/es6';
 
 function NldiTab() {
-  const [nldiData, setNldiData] = useState({
+  interface NldiDataType {
+    latitude: number | null,
+    longitude: number | null,
+    directions: Directions,
+    dataPoints: DataPoints
+  }
+  const defaultNldiData = useMemo(() => ({
     latitude: null as number | null,
     longitude: null as number | null,
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
-  });
+  }), [])
+  const { getUrlParam, setUrlParam } = useContext(AppContext);
+  const [nldiData, setNldiData] = useState(getUrlParam<NldiDataType>("nldi") ?? defaultNldiData);
 
   const [pointData, setPointData] = useState({
-    latitude: "",
-    longitude: ""
+    latitude: nldiData.latitude?.toFixed(nldi.latLongPrecision) ?? "",
+    longitude: nldiData.longitude?.toFixed(nldi.latLongPrecision) ?? ""
   });
 
   const retrieveNldiGeoJsonData = useCallback(async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
@@ -99,18 +109,18 @@ function NldiTab() {
 
   const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
     const val = e.target.checked ? nldiData.directions | dir : nldiData.directions & ~dir;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s => ({
+      ...s,
       directions: val
-    });
+    }));
   }
 
   const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
     const val = e.target.checked ? nldiData.dataPoints | dataPoint : nldiData.dataPoints & ~dataPoint;
-    setNldiData({
-      ...nldiData,
+    setNldiData(s => ({
+      ...s,
       dataPoints: val
-    });
+    }));
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
@@ -138,41 +148,35 @@ function NldiTab() {
   }, [setVisibleLayers]);
 
   useEffect(() => {
-    setLegend(<div className="legend legend-nldi">
-      <div>
+    setLegend(<div className="legend-nldi">
+      <div className="legend-item">
         <span>
           <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
         </span>
         Starting Point of Interest
       </div>
-      <div>
-        <span>
-          <span style={{ backgroundColor: nldi.colors.mainstem, height: "4px" }} />
+      <div className="legend-item">
+        <span className="legend-flowline">
+          <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
         </span>
         Mainstem
       </div>
-      <div>
+      <div className="legend-item">
         <span>
-          <span style={{ backgroundColor: nldi.colors.tributaries, height: "2px" }} />
+          <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
         </span>
         Tributaries
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.wade }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
         WaDE Sites
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.usgs }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
         USGS NWIS Sites
       </div>
-      <div>
-        <span>
-          <Icon path={mdiCircle} size="14px" style={{ color: nldi.colors.epa }} />
-        </span>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
         EPA Water Quality Portal<br /> Sites OSM Standard
       </div>
     </div>);
@@ -221,6 +225,14 @@ function NldiTab() {
       ]
     }])
   }, [nldiData.dataPoints, nldiData.directions, setMapLayerFilters, directionNameKeys, directionNames, pointFeatureDataSourceNameKeys, pointFeatureDataSourceNames]);
+
+  useEffect(() => {
+    if (deepEqual(nldiData, defaultNldiData)) {
+      setUrlParam("nldi", undefined);
+    } else {
+      setUrlParam("nldi", nldiData);
+    }
+  }, [nldiData, setUrlParam, defaultNldiData])
 
   return (
     <>

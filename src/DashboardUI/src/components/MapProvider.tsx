@@ -1,4 +1,4 @@
-import { createContext, FC, ReactElement, useCallback, useContext, useState } from "react";
+import { createContext, FC, ReactElement, useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 
@@ -53,9 +53,16 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapStyle, setMapStyle] = useState(getUrlParam<MapStyle>("ms") ?? MapStyle.Light);
   const setMapStyleInternal = (mapStyle: MapStyle): void => {
-    setUrlParam("ms", mapStyle);
+
     setMapStyle(mapStyle);
   }
+  useEffect(() => {
+    if (mapStyle === MapStyle.Light) {
+      setUrlParam("ms", undefined);
+    } else {
+      setUrlParam("ms", mapStyle);
+    }
+  }, [mapStyle, setUrlParam])
   const [filters, setFilters] = useState<MapLayerFiltersType>({});
 
   const setLayerFilters = useCallback((updatedFilters: setFiltersParamType): void => {

@@ -11,12 +11,18 @@ import { ownerClassificationsList } from "../config/waterRights";
 import { AppContext } from "../AppProvider";
 import mapConfig from "../config/maps";
 import { MapThemeSelector } from "./MapThemeSelector";
+import deepEqual from 'fast-deep-equal/es6';
 
 function WaterRightsTab() {
   const [radioValue, setRadioValue] = useState('1');
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
-  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? {});
+  const defaultFilters = useMemo<WaterRightsFilters>(() => ({
+    beneficialUses: undefined,
+    ownerClassifications: undefined
+  }), [])
+
+  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
 
   const allWaterRightsLayers = useMemo(() => [
     'agricultural',
@@ -82,22 +88,20 @@ function WaterRightsTab() {
   }, [allWaterRightsLayers, convertLayersToBeneficialUseOptions]);
 
   useEffect(() => {
-    setLegend(<div className="legend">
-      <div>
-        {
-          //Sort legend items alphabetically
-          availableOptions.map(layer => {
-            return (
-              <div key={layer.value}>
-                <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
-                {layer.label}
-              </div>
-            );
-          }
-          )
+    setLegend(<>
+      {
+        //Sort legend items alphabetically
+        availableOptions.map(layer => {
+          return (
+            <div key={layer.value} className="legend-item">
+              <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
+              {layer.label}
+            </div>
+          );
         }
-      </div>
-    </div>);
+        )
+      }
+    </>);
   }, [setLegend, availableOptions])
 
   useEffect(() => {
@@ -109,21 +113,22 @@ function WaterRightsTab() {
   }, [filters, allWaterRightsLayers, setVisibleLayers])
 
   useEffect(() => {
-    if (!filters.ownerClassifications && !filters.beneficialUses) {
-      setUrlParam("wr", undefined)
+    if (deepEqual(filters, defaultFilters)) {
+      setUrlParam("wr", undefined);
+    } else {
+      setUrlParam("wr", filters);
     }
-    setUrlParam("wr", filters)
-  }, [filters, setUrlParam])
+  }, [filters, setUrlParam, defaultFilters])
 
   const handleBeneficialUseChange = useCallback((selectedOptions: BeneficialUseChangeOption[]) => {
-    setFilters(s=>({
+    setFilters(s => ({
       ...s,
       beneficialUses: selectedOptions.length > 0 ? selectedOptions.map(a => a.value) : undefined
     }));
   }, [setFilters]);
 
   const handleOwnerClassificationChange = useCallback((selectedOptions: string[]) => {
-    setFilters(s=>({
+    setFilters(s => ({
       ...s,
       ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
@@ -134,8 +139,8 @@ function WaterRightsTab() {
     if (filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       filterSet.push(["in", "ownerClassification", ...filters.ownerClassifications]);
     }
-    setMapLayerFilters(allWaterRightsLayers.map(a=>{
-      return {layer: a, filter: ["all", ...filterSet]}
+    setMapLayerFilters(allWaterRightsLayers.map(a => {
+      return { layer: a, filter: ["all", ...filterSet] }
     }))
   }, [filters, allWaterRightsLayers, setMapLayerFilters])
 
