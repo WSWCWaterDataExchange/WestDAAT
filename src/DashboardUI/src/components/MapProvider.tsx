@@ -1,5 +1,6 @@
-import mapboxgl, { CircleLayer, VectorSource } from "mapbox-gl";
-import { createContext, FC, ReactElement, useState } from "react";
+import { createContext, FC, ReactElement, useCallback, useContext, useState } from "react";
+import { AppContext } from "../AppProvider";
+import deepEqual from 'fast-deep-equal/es6';
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -7,84 +8,97 @@ export enum MapTypes {
   TempNldi = "tempNldi",
 }
 
-interface Source {
-  id: string,
-  source: VectorSource
-};
-
-interface Layer extends CircleLayer {
-  friendlyName: string
+export enum MapStyle {
+  Light = "light-v10",
+  Dark = "dark-v10",
+  Street = "streets-v11",
+  Outdoor = "outdoors-v11",
+  Satellite = "satellite-v9"
 }
 
-export interface MapData {
-  sources: Source[];
-  layers: Layer[];
-}
+export type MapLayerFilterType = any[] | boolean | null | undefined;
+export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
+type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 
 interface MapContextState {
-  map: mapboxgl.Map | null,
-  setCurrentMap: (map: mapboxgl.Map) => void,
-  baseMap: MapTypes;
-  setCurrentBaseMap: (mapType: MapTypes) => void;
-  sources: Source[];
-  setCurrentSources: (sources: Source[]) => void;
-  layers: Layer[];
-  setCurrentLayers: (layers: Layer[]) => void;
-  setLayerVisibility: (layerId: string, visible: boolean) => void;
+  mapStyle: MapStyle;
+  setMapStyle: (style: MapStyle) => void;
   legend: ReactElement | null;
   setLegend: (legend: ReactElement | null) => void;
+  filters: MapLayerFiltersType;
+  setLayerFilters: (filters: setFiltersParamType) => void;
+  geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
+  setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
+  visibleLayers: string[],
+  setVisibleLayers: (layers: string[]) => void,
 };
 
 const defaultState: MapContextState = {
-  map: null as mapboxgl.Map | null,
-  setCurrentMap: () => { },
-  baseMap: MapTypes.WaterRights,
-  setCurrentBaseMap: () => { },
-  sources: [],
-  setCurrentSources: () => { },
-  layers: [],
-  setCurrentLayers: () => { },
-  setLayerVisibility: () => { },
+  mapStyle: MapStyle.Light,
+  setMapStyle: () => { },
   legend: null as ReactElement | null,
-  setLegend: () => { }
+  setLegend: () => { },
+  filters: {},
+  setLayerFilters: () => { },
+  geoJsonData: [],
+  setGeoJsonData: () => { },
+  visibleLayers: [],
+  setVisibleLayers: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
 
 const MapProvider: FC = ({ children }) => {
+  const { getUrlParam, setUrlParam } = useContext(AppContext)
 
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const setCurrentMap = (map: mapboxgl.Map) => setMap(map);
+  const [mapStyle, setMapStyle] = useState(getUrlParam<MapStyle>("ms") ?? MapStyle.Light);
+  const setMapStyleInternal = (mapStyle: MapStyle): void => {
+    setUrlParam("ms", mapStyle);
+    setMapStyle(mapStyle);
+  }
+  const [filters, setFilters] = useState<MapLayerFiltersType>({});
 
-  const [baseMap, setBaseMap] = useState(defaultState.baseMap);
-  const setCurrentBaseMap = (mapType: MapTypes) => setBaseMap(mapType);
+  const setLayerFilters = useCallback((updatedFilters: setFiltersParamType): void => {
+    setFilters(s => {
+      const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+      const updatedFilterSet = { ...s };
+      filterArray.forEach(value => {
+        updatedFilterSet[value.layer] = value.filter
+      })
+      if (!deepEqual(s, updatedFilterSet)) {
+        return updatedFilterSet;
+      }
+      return s;
+    })
+  }, [setFilters]);
+  const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
+  const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
+    setAllGeoJsonData(s => {
+      const unchangedData = s.filter(a => a.source !== source);
+      const updatedData = [...unchangedData, { source, data }];
 
-  const [sources, setSources] = useState<Source[]>([]);
-  const setCurrentSources = (sources: Source[]) => setSources(sources);
+      if (!deepEqual(s, updatedData)) {
+        return updatedData;
+      }
+      return s;
+    });
+  }, [setAllGeoJsonData])
 
-  const [layers, setLayers] = useState<Layer[]>([]);
-  const setCurrentLayers = (layers: Layer[]) => setLayers(layers);
+  const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
 
-  const setLayerVisibility = (layerId: string, visible: boolean) => {
-    if (map) {
-      map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
-    }
-  };
-
   const mapContextProviderValue = {
-    map,
-    setCurrentMap,
-    baseMap,
-    setCurrentBaseMap,
-    sources,
-    setCurrentSources,
-    layers,
-    setCurrentLayers,
-    setLayerVisibility,
+    mapStyle,
+    setMapStyle: setMapStyleInternal,
     legend,
-    setLegend
+    setLegend,
+    filters,
+    setLayerFilters,
+    geoJsonData,
+    setGeoJsonData,
+    visibleLayers,
+    setVisibleLayers,
   };
 
   return (

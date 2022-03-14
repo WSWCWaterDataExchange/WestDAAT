@@ -1,4 +1,5 @@
-import { createContext, FC, useState } from "react";
+import { createContext, FC, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export interface User {
   username: string;
@@ -6,25 +7,62 @@ export interface User {
 
 interface AppContextState {
   user: User | null,
-  setCurrentUser: (username: string) => void,
+  setUser: (user: User | null) => void,
+
+  setUrlParam: (key: string, value: any) => void,
+  getUrlParam: <T, >(key: string) => T | undefined,
 };
 
-const defaultAppContextState: AppContextState = {
-  // User will get set on user login
+let defaultAppContextState = {
   user: null,
-  setCurrentUser: () => {}
-};
+  setUser: (user: User | null) => { },
+
+  setUrlParam: (key: string, value: any) => { },
+  getUrlParam: <T,>(key: string): T | undefined => undefined,
+}
 
 export const AppContext = createContext<AppContextState>(defaultAppContextState);
 
 const AppProvider: FC = ({ children }) => {
 
-  const [user, setUser] = useState(defaultAppContextState.user);
-  const setCurrentUser = (username: string) => setUser({username});
+  let [urlParams, setUrlParams] = useSearchParams();
+
+  const [user, setUser] = useState(null as User | null);
+
+  const initUrlParams = () => {
+    const stateStr =urlParams.get("state");
+    if(stateStr)
+    {
+      return JSON.parse(stateStr) as Record<string, string>;
+    }
+    return {} as Record<string, string>;
+  }
+
+  const [stateUrlParams, setStateUrlParams] = useState(initUrlParams());
+
+  const setUrlParam = useCallback((key: string, value: any): void => {
+    setStateUrlParams(s=>({
+      ...s,
+      [key]: JSON.stringify(value)
+    }))
+  }, [])
+  
+  const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
+    var param = stateUrlParams[key];
+    if(param){
+      return JSON.parse(param) as T;
+    }
+  }, [stateUrlParams])
+
+  useEffect(() => {
+    setUrlParams({state: JSON.stringify(stateUrlParams)})
+  }, [stateUrlParams, setUrlParams])
 
   const appContextProviderValue = {
     user,
-    setCurrentUser
+    setUser,
+    setUrlParam,
+    getUrlParam
   };
 
   return (

@@ -6,49 +6,36 @@ import SiteNavbar from '../components/SiteNavbar';
 import Map from '../components/Map';
 
 import '../styles/home-page.scss';
-import { useSearchParams } from 'react-router-dom';
-import { MapContext, MapTypes } from '../components/MapProvider';
+import { AppContext } from '../AppProvider';
 
 export enum HomePageTab {
-  WaterRights = "Water Rights",
+  WaterRights = "Water Rights Data",
   TempNldi = "Temp NLDI",
-  Aggregations = "Aggregations",
-  SiteSpecific = "Site Specific"
+  Aggregations = "Aggregate Area Time Series Water Data",
+  SiteSpecific = "Water Use Site-Specific Time Series Data"
 }
 
 function HomePage() {
 
-  const { setCurrentBaseMap } = useContext(MapContext);
-
-  let [urlParams, setUrlParams] = useSearchParams();
-  const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
+  const { setUrlParam, getUrlParam } = useContext(AppContext);
+  const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
-
-
-  const handleTabClick = (map: HomePageTab) => {
-    setUrlParams({ ...urlParams, map });
-  }
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
   }
 
+  useEffect(()=>{
+    document.title = `WestDAAT - ${currentTab}`
+  }, [currentTab]);
+
   useEffect(() => {
-    const tabParam = urlParams.get("map")
-    if (tabParam) {
-      const tab = tabParam as HomePageTab;
-      setCurrentTab(tab);
-      setCurrentBaseMap(
-        tab === HomePageTab.WaterRights
-          ? MapTypes.WaterRights
-          : MapTypes.Aggregate
-      );
-    }
-  }, [urlParams, setCurrentBaseMap])
+    setUrlParam("tab", currentTab)
+  }, [currentTab, setUrlParam])
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar onTabClick={handleTabClick} currentTab={currentTab} showContactModal={shouldShowContactModal} />
+      <SiteNavbar onTabClick={setCurrentTab} currentTab={currentTab} showContactModal={shouldShowContactModal} />
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">

@@ -10,18 +10,18 @@ function SiteFooter() {
       <Container fluid className="ms-2 me-2">
         <div>
           <Nav>
-            <Nav.Link className="p-0" href="#">License Name</Nav.Link>
-            <Nav.Link className="p-0" href="#">{new Date().getFullYear()}</Nav.Link>
-            <Nav.Link className="p-0" href="#">Contact Us</Nav.Link>
-            <Nav.Link className="p-0" href="#">WaDE</Nav.Link>
-            <Nav.Link className="p-0" href="#">WSWC</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="#">License Name</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="#">{new Date().getFullYear()}</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="#">Contact Us</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="https://westernstateswater.org/wade/">WaDE</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="https://westernstateswater.org/">WSWC</Nav.Link>
           </Nav>
         </div>
 
         <div>
           <Nav>
-            <Nav.Link className="p-0" href="#">FAQ</Nav.Link>
-            <Nav.Link className="p-0" href="#">Feedback</Nav.Link>
+            <Nav.Link className="p-0" target="_blank"  href="#">FAQ</Nav.Link>
+            <Nav.Link className="p-0" target="_blank"  href="#">Feedback</Nav.Link>
           </Nav>
         </div>
       </Container>

@@ -1,4 +1,3 @@
-
 function AggregationsTab() {
   return (
     <h1>Aggregations</h1>
