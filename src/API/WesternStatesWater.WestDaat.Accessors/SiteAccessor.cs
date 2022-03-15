@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
@@ -17,23 +18,22 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
-        Site ISiteAccessor.GetSiteByUuid(string siteUuid)
-        {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return db.SitesDim
-                    .Where(x => x.SiteUuid == siteUuid)
-                    .ProjectTo<Site>(DtoMapper.Configuration)
-                    .Single();
-            }
-        }
-
-        async Task<List<Site>> ISiteAccessor.GetSitesBySiteIds(List<long> siteIds)
+        async Task<Site> ISiteAccessor.GetSiteByUuid(string siteUuid)
         {
             using (var db = _databaseContextFactory.Create())
             {
                 return await db.SitesDim
-                    .Where(x => siteIds.Contains(x.SiteId))
+                    .Where(x => x.SiteUuid == siteUuid)
+                    .ProjectTo<Site>(DtoMapper.Configuration)
+                    .SingleAsync();
+            }
+        }
+
+        async Task<List<Site>> ISiteAccessor.GetSites()
+        {
+            using (var db = _databaseContextFactory.Create())
+            {
+                return await db.SitesDim
                     .ProjectTo<Site>(DtoMapper.Configuration)
                     .ToListAsync();
             }

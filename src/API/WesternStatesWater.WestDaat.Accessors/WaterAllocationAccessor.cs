@@ -35,28 +35,15 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (var db = _databaseContextFactory.Create())
             {
-                // db.Database.SetCommandTimeout(int.MaxValue);
-                // var test = await db.AllocationAmountsFact
-                //     .Include(x => x.AllocationBridgeSitesFact)
-                //     .ThenInclude(x => x.Site)
-                //     .ThenInclude(x => x.WaterSourceBridgeSitesFact)
-                //     .ThenInclude(x => x.WaterSource)
-                //     .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                //     .ThenInclude(x => x.BeneficialUse)
-                //     .Include(x => x.AllocationPriorityDateNavigation)
-                //     .ToListAsync();
-                //     // .Take(1000) // To Debug, remove after
-                    
-
+                db.Database.SetCommandTimeout(int.MaxValue);
                 var waterAllocations = await db.AllocationAmountsFact
                     .Include(x => x.AllocationBridgeSitesFact)
-                    .ThenInclude(x => x.Site)
-                    .ThenInclude(x => x.WaterSourceBridgeSitesFact)
-                    .ThenInclude(x => x.WaterSource)
+                        .ThenInclude(x => x.Site)
+                        .ThenInclude(x => x.WaterSourceBridgeSitesFact)
+                        .ThenInclude(x => x.WaterSource)
                     .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                    .ThenInclude(x => x.BeneficialUse)
+                        .ThenInclude(x => x.BeneficialUse)
                     .Include(x => x.AllocationPriorityDateNavigation)
-                    .Take(100) // To Debug, remove after
                     .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
                     .ToListAsync();
 

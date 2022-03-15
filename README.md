@@ -15,9 +15,17 @@
 
 ## Update Mapbox Vector Tileset
 
-1. Run Function App
+1. Run Console App located in /tools
 2. POST to http://localhost:7071/api/GenerateAllocationGeoJson
 3. A .geojson file will be in the Function bin/output directory of the function app
 4. Run `tippecanoe -zg -o out1.mbtiles --read-parallel --coalesce-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L allocations:"Allocations.geojson"`
 5. Upload to mapbox studio
 
+
+
+// DROP
+// --coalesce-densest-as-needed --extend-zooms-if-still-dropping
+// ADD
+// -r1
+
+// Compare size of each mbtiles file
