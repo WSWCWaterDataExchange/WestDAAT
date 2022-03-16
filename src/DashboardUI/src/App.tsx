@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from 'react-query/devtools';
 import DetailLayout from './pages/DetailLayout';
 import DetailsPage from './pages/DetailsPage';
-import SideDetailsPage from "./pages/SiteDetailsPage";
 import AppProvider from "./AppProvider";
 import MapProvider from "./components/MapProvider";
 import { ToastContainer } from "react-toastify";
@@ -32,7 +31,6 @@ function App() {
                       <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
                       <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
                   </Route>
-                  <Route path="site-details" element={<SideDetailsPage />} />
                 </Route>
               </Routes>
               <ReactQueryDevtools initialIsOpen={false} />
