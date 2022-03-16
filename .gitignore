@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 personal.settings.json
 *.geojson
 *.geojson.zip
+*.mbtiles*

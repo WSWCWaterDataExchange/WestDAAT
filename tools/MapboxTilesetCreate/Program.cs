@@ -54,8 +54,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
             var siteAccessor = services.Services.GetService<ISiteAccessor>();
 
-            Console.WriteLine("Fetching sites and allocations...");
-
             Console.WriteLine("Fetching allocations...");
             var allocations = await waterAllocationAccessor!.GetAllWaterAllocations();
 
@@ -94,19 +92,19 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         Type = "Point",
                         Coordinates = new double[]
                         {
-                            site.Longitude ?? 0,
-                            site.Latitude ?? 0
+                            // http://wiki.gis.com/wiki/index.php/Decimal_degrees
+                            site.Longitude.HasValue ? Math.Round(site.Longitude.Value, 6) : 0,
+                            site.Latitude.HasValue ? Math.Round(site.Latitude.Value, 6) : 0
                         }
                     },
                     Properties = new Dictionary<string, object>
                     {
-                        {"allocationIds", siteAllocations.Select(a => a.AllocationAmountId).ToList()},
-                        {"allocationFlowCfs", siteAllocations.Select(a => a.AllocationFlowCfs).ToList()},
-                        {"allocationVolumeAf", siteAllocations.Select(a => a.AllocationVolumeAf).ToList() },
-                        {"allocationOwners", siteAllocations.Select(a => a.AllocationOwner).ToList()},
-                        {"ownerClassifications", siteAllocations.Select(a => a.OwnerClassification).ToList()},
-                        {"beneficialUses", siteAllocations.SelectMany(a => a.BeneficialUses).ToList()},
-                        {"allocationPriorityDate", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).ToList()},
+                        {"allocationFlowCfs", siteAllocations.Select(a => a.AllocationFlowCfs).Distinct().ToList()},
+                        {"allocationVolumeAf", siteAllocations.Select(a => a.AllocationVolumeAf).Distinct().ToList() },
+                        {"allocationOwners", siteAllocations.Select(a => a.AllocationOwner).Distinct().ToList()},
+                        {"ownerClassifications", siteAllocations.Select(a => a.OwnerClassification).Distinct().ToList()},
+                        {"beneficialUses", siteAllocations.SelectMany(a => a.BeneficialUses).Distinct().ToList()},
+                        {"allocationPriorityDate", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Distinct().ToList()},
                         {"siteUuid", site.SiteUuid},
                         {"siteName", site.SiteName},
                         {"waterSourceTypes", site.WaterSourceTypes},
@@ -115,17 +113,39 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
                 features.Add(feature);
             });
-            Console.WriteLine($"Done. Took {sw.Elapsed.TotalMinutes} minutes");
 
-            Console.WriteLine("Writing to geojson file...");
-            Directory.CreateDirectory("geojson");
-            var path = Path.Combine("geojson", $"Allocations.geojson");
+            Console.WriteLine("Writing to geojson files...");
+            var dir = "geojson";
+
+            var path = Path.Combine(dir, $"Allocations.geojson");
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 await JsonSerializer.SerializeAsync(stream, features, features.GetType());
             }
 
-            Console.WriteLine($"Done. Took {sw.Elapsed.TotalMinutes} minutes");
+
+            Console.WriteLine($"Done. Took {(int)sw.Elapsed.TotalMinutes} minutes");
+        }
+
+        private static async Task<int> SaveInChunks(List<GeoJsonFeature> randomFeatures, string dir)
+        {
+            // Split into seperate sources as workaround 500kb tile limit
+            // Otherwise features will be dropped from the tileset
+            var numberOfSources = 10;
+            var chunkSize = (int)Math.Ceiling(randomFeatures.Count / (double)numberOfSources);
+            Directory.CreateDirectory(dir);
+            var fileNumber = 0;
+
+            foreach (var chunk in randomFeatures.Chunk(chunkSize))
+            {
+                var path = Path.Combine(dir, $"Allocations_{++fileNumber}.geojson");
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await JsonSerializer.SerializeAsync(stream, chunk, chunk.GetType());
+                }
+            }
+
+            return fileNumber;
         }
     }
 }

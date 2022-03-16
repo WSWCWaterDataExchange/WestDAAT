@@ -44,16 +44,5 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             return new OkObjectResult(result);
         }
-
-        [FunctionName(nameof(GenerateAllocationGeoJson))]
-        public async Task<IActionResult> GenerateAllocationGeoJson([HttpTrigger("post", Route = nameof(GenerateAllocationGeoJson))] HttpRequest request)
-        {
-            var result = await _waterAllocationManager.GetWaterAllocationAmountsGeoJson();
-
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Allocations.geojson");
-            await File.WriteAllTextAsync(filePath, result);
-
-            return new OkObjectResult($"Success - geojson file writen to {filePath}. JSON: {result}");
-        }
     }
 }
