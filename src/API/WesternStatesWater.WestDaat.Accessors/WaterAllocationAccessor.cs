@@ -20,11 +20,11 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (var db = _databaseContextFactory.Create())
             {
-              var org = db.AllocationAmountsFact
-                .Where(a => a.AllocationAmountId == allocationAmountId)
-                .Select(a => a.Organization)
-                .ProjectTo<Organization>(DtoMapper.Configuration)
-                .Single();
+                var org = db.AllocationAmountsFact
+                  .Where(a => a.AllocationAmountId == allocationAmountId)
+                  .Select(a => a.Organization)
+                  .ProjectTo<Organization>(DtoMapper.Configuration)
+                  .Single();
 
                 return org;
             }

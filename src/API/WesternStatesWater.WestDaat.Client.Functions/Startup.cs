@@ -37,20 +37,21 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
 
-            builder.Services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
+            builder.Services.AddTransient<ISystemManager, SystemManager>();
             builder.Services.AddTransient<ITestManager, TestManager>();
+            builder.Services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
 
+            builder.Services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             builder.Services.AddTransient<ITestEngine, TestEngine>();
 
             builder.Services.AddTransient<INldiAccessor, NldiAccessor>();
+            builder.Services.AddTransient<ISiteAccessor, SiteAccessor>();
+            builder.Services.AddTransient<ISystemAccessor, SystemAccessor>();
             builder.Services.AddTransient<ITestAccessor, TestAccessor>();
+            builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
-
-            builder.Services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
-            builder.Services.AddTransient<ISiteAccessor, SiteAccessor>();
-            builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {
