@@ -7,7 +7,8 @@ const mapsJson = {
     {
       "id": "allocation-sites_1",
       "type": "vector",
-      "url": "mapbox://amabdallah.70zvl3m1"
+      "url": "mapbox://amabdallah.70zvl3m1",
+      "volatile": true
     },
     {
       "id": "allocation-sites_2",
@@ -316,6 +317,11 @@ const mapsJson = {
       "paint": {
         "circle-radius": pointCircleRadius,
         "circle-color": "#006400"
+      },
+      "tiles": {
+        "limit": [
+          ["lowest_where_in_distance", true, 5, "null"]
+        ]
       }
     },
     {
@@ -326,33 +332,13 @@ const mapsJson = {
       },
       "type": "line",
       "paint": {
-        "line-color": [
-          "case",
-          [
-            "==",
-            [
-              "get",
-              "westdaat_channeltype"
-            ],
-            "Main"
-          ],
-          nldi.colors.mainstem,
-          nldi.colors.tributaries
-        ],
+        "line-color": ["case",
+          ["==", ["get", "westdaat_channeltype"], "Main"], nldi.colors.mainstem,
+          nldi.colors.tributaries],
         "line-opacity": 1,
-        "line-width": [
-          "case",
-          [
-            "==",
-            [
-              "get",
-              "westdaat_channeltype"
-            ],
-            "Main"
-          ],
-          2,
-          1
-        ]
+        "line-width": ["case",
+          ["==", ["get", "westdaat_channeltype"], "Main"], 2,
+          1]
       },
       "filter": [
         "==",
@@ -378,22 +364,9 @@ const mapsJson = {
           ["==", ["get", "westdaat_pointdatasource"], "Wade"], nldi.colors.wade,
           nldi.colors.unknown]
       },
-      "filter": ["all", [
-        "==",
-        [
-          "get",
-          "westdaat_featuredatatype"
-        ],
-        "Point"
-      ],
-        [
-          "!=",
-          [
-            "get",
-            "westdaat_pointdatasource"
-          ],
-          "Location"
-        ]
+      "filter": ["all",
+        ["==", ["get", "westdaat_featuredatatype"], "Point"],
+        ["!=", ["get", "westdaat_pointdatasource"], "Location"]
       ]
     },
     {
@@ -406,14 +379,7 @@ const mapsJson = {
         "icon-size": ["interpolate", ["linear"], ["zoom"], 5, .5, 15, 1]
       },
       "type": "symbol",
-      "filter": [
-        "==",
-        [
-          "get",
-          "westdaat_pointdatasource"
-        ],
-        "Location"
-      ]
+      "filter": ["==", ["get", "westdaat_pointdatasource"], "Location"]
     }
   ]
 }

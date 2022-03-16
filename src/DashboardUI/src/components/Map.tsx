@@ -1,5 +1,5 @@
 import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, LngLat, NavigationControl } from "mapbox-gl";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
@@ -10,6 +10,7 @@ import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
+import deepEqual from 'fast-deep-equal/es6';
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -17,7 +18,7 @@ import { useDrop } from "react-dnd";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, setRenderedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -65,6 +66,7 @@ function Map() {
       center: [-100, 40],
       zoom: 4,
     });
+
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
       addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
@@ -90,6 +92,26 @@ function Map() {
     return mapConfig.layers.map(a => a.id)
   }, [])
 
+  const setMapRenderedFeatures = useCallback((map: mapboxgl.Map) => {
+    setRenderedFeatures(s => {
+      var sourceFeatures = map.queryRenderedFeatures().filter(a=> sourceIds.some(b=>a.source === b));
+      if (deepEqual(s, sourceFeatures)) {
+        return s;
+      } else {
+
+        return sourceFeatures;
+      }
+    })
+  }, [setRenderedFeatures, sourceIds])
+
+  useEffect(() => {
+    if (!map) return;
+    setMapRenderedFeatures(map);
+    map.on('idle', () => {
+      setMapRenderedFeatures(map);
+    });
+  }, [map, setMapRenderedFeatures])
+
   useEffect(() => {
     if (!map) return;
     updateMapControls(map, user);
@@ -100,7 +122,7 @@ function Map() {
     (mapConfig as any).layers.forEach((a: AnyLayer) => {
       map.setLayoutProperty(a.id, "visibility", visibleLayers.some(b => b === a.id) ? "visible" : "none")
     });
-  }, [map, visibleLayers]);
+  }, [map, visibleLayers, setMapRenderedFeatures]);
 
   useEffect(() => {
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
@@ -121,7 +143,6 @@ function Map() {
           resolve(true);
         });
         map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
-
       });
     }
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
@@ -142,7 +163,6 @@ function Map() {
         source.setData(a.data);
       }
     })
-
   }, [map, geoJsonData]);
 
   useEffect(() => {
@@ -151,6 +171,13 @@ function Map() {
       map.setFilter(key, filters[key]);
     }
   }, [map, filters]);
+
+  useEffect(() => {
+    if (!map) return;
+    for (let key in circleColors) {
+      map.setPaintProperty(key, "circle-color", circleColors[key]);
+    }
+  }, [map, circleColors]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

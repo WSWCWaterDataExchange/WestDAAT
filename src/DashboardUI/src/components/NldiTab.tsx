@@ -3,15 +3,14 @@ import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import { getNldiFeatures } from "../accessors/nldiAccessor";
 import { useQuery } from "react-query";
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Button, Form } from "react-bootstrap";
-import { toast } from "react-toastify";
 import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
+import useProgressIndicator from "../hooks/useProgressIndicator";
 
 function NldiTab() {
   interface NldiDataType {
@@ -33,15 +32,6 @@ function NldiTab() {
     latitude: nldiData.latitude?.toFixed(nldi.latLongPrecision) ?? "",
     longitude: nldiData.longitude?.toFixed(nldi.latLongPrecision) ?? ""
   });
-
-  const retrieveNldiGeoJsonData = useCallback(async (): Promise<FeatureCollection<Geometry, GeoJsonProperties> | undefined> => {
-    const promise = getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa);
-    toast.promise(promise, {
-      pending: 'Retrieving NLDI Data',
-      error: 'Error Retrieving NLDI Data'
-    })
-    return promise;
-  }, [nldiData.latitude, nldiData.longitude])
 
   const handleLatitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setPointData(s => ({
@@ -124,9 +114,9 @@ function NldiTab() {
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData } = useQuery(
+  const { data: nldiGeoJsonData, isFetching: isNldiDataLoading } = useQuery(
     ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
-    retrieveNldiGeoJsonData,
+    () => getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa),
     {
       enabled: !!nldiData.latitude && !!nldiData.longitude,
       refetchOnWindowFocus: false,
@@ -136,6 +126,8 @@ function NldiTab() {
       staleTime: Infinity,
     }
   );
+
+  useProgressIndicator([!isNldiDataLoading], "Loading NLDI Data");
 
   useEffect(() => {
     if (nldiGeoJsonData) {
