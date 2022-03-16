@@ -9,7 +9,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class SiteAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        public void SiteAccessor_GetSiteByUuid_ShouldReturnSite()
+        public async void SiteAccessor_GetSiteByUuid_ShouldReturnSite()
         {
             // Arrange
             var siteDims = new SitesDimFaker().Generate(10);
@@ -23,7 +23,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Act
             var searchSite = siteDims.First();
             var accessor = CreateSiteAccessor();
-            var result = accessor.GetSiteByUuid(searchSite.SiteUuid);
+            var result = await accessor.GetSiteByUuid(searchSite.SiteUuid);
 
 
             // Assert
@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [DataRow("POINT (10 20)", null, "POINT (10 20)")]
         [DataRow(null, "POINT (20 30)", "POINT (20 30)")]
         [DataRow("POINT (10 20)", "POINT (20 30)", "POINT (10 20)")]
-        public void SiteAccessor_GetSiteByUuid_Geography(string geometry, string sitePoint, string expectedGeography)
+        public async void SiteAccessor_GetSiteByUuid_Geography(string geometry, string sitePoint, string expectedGeography)
         {
             var siteDim = new SitesDimFaker()
                 .RuleFor(a => a.Geometry, b => GeometryHelpers.GetGeometry(geometry))
@@ -53,7 +53,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             }
 
             var accessor = CreateSiteAccessor();
-            var result = accessor.GetSiteByUuid(siteDim.SiteUuid);
+            var result = await accessor.GetSiteByUuid(siteDim.SiteUuid);
 
             result.Should().NotBeNull();
             result.Geometry?.AsText().Should().Be(expectedGeography);

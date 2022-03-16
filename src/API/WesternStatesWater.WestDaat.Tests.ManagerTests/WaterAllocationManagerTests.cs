@@ -22,11 +22,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
+        public async void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
         {
             // ARRANGE 
             _geoConnexEngineMock.Setup(x => x.BuildGeoConnexJson(It.IsAny<DC.Site>(), It.IsAny<DC.Organization>())).Returns("{Foo: \"bar\"}");
-            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).Returns(new DC.Site
+            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).ReturnsAsync(new DC.Site
             {
                 AllocationIds = new List<long> { 1, 2, 3 }
             });
@@ -35,7 +35,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
 
             // ACT 
-            var response = manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
+            var response = await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
 
             // ASSERT 
             _geoConnexEngineMock.Verify(t =>
@@ -46,10 +46,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
         [TestMethod]
         [ExpectedException(typeof(WestDaatException))]
-        public void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_MissingAllocations()
+        public async void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_MissingAllocations()
         {
             // ARRANGE 
-            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).Returns(new DC.Site
+            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).ReturnsAsync(new DC.Site
             {
                 AllocationIds = new List<long> { /* Empty */ }
             });
@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
 
             // ACT 
-            var response = manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
+            var response = await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
         }
 
         [TestMethod]
