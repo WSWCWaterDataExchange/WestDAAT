@@ -31,7 +31,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
                 .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint));
+            CreateMap<EF.SitesDim, SiteInfoListItem>();
             CreateMap<EF.OrganizationsDim, Organization>();
+            CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>();
         }
     }
 }

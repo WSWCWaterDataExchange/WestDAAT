@@ -1,8 +1,24 @@
 import { useQuery } from 'react-query';
-import { getWaterRightDetails } from '../accessors/waterAllocationAccessor';
+import {
+  getWaterRightDetails,
+  getWaterRightSiteInfoList,
+  getWaterRightSourceInfoList,
+} from '../accessors/waterAllocationAccessor';
 
-export default function useWaterRightDetails(waterRightId: number) {
+export function useWaterRightDetails(waterRightId: number) {
   return useQuery(['waterRightDetails', waterRightId], () =>
     getWaterRightDetails(waterRightId)
+  );
+}
+
+export function useWaterRightSiteInfoList(waterRightId: number) {
+  return useQuery(['waterRightSiteInfoList', waterRightId], () =>
+    getWaterRightSiteInfoList(waterRightId)
+  );
+}
+
+export function useWaterRightSourceInfoList(waterRightId: number) {
+  return useQuery(['waterRightSourceInfoList', waterRightId], () =>
+    getWaterRightSourceInfoList(waterRightId)
   );
 }

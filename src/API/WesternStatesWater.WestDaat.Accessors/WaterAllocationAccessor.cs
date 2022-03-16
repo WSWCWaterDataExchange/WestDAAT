@@ -33,15 +33,37 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         public async Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId)
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                var fact = await db.AllocationAmountsFact
-                    .Where(x => x.AllocationAmountId == waterRightId)
-                    .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
-                    .SingleAsync();
+            using var db = _databaseContextFactory.Create();
+            
+            return await db.AllocationAmountsFact
+                .Where(x => x.AllocationAmountId == waterRightId)
+                .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
+                .SingleAsync();
+        }
 
-                return fact;
-            }
+        public async Task<SiteInfoListItem[]> GetWaterRightSiteInfoById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+            
+            return await db.AllocationBridgeSitesFact
+                        .Where(x => x.AllocationAmountId == waterRightId)
+                        .Select(x => x.Site)
+                        .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
+                        .ToArrayAsync();
+        }
+
+        public async Task<WaterSourceInfoListItem[]> GetWaterRightSourceInfoById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+
+            var bridges = await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
+                .SelectMany(x => x.Site.WaterSourceBridgeSitesFact)
+                .Include(x => x.WaterSource)
+                .ToListAsync();
+                
+            var sources = bridges.Select(x => x.WaterSource).DistinctBy(x => x.WaterSourceUuid);
+
+            return DtoMapper.Map<WaterSourceInfoListItem[]>(sources);
         }
     }
 }

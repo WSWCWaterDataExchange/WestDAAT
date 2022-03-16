@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import useWaterRightDetails from '../hooks/waterAllocation';
+import { useWaterRightDetails } from '../hooks/waterAllocation';
 
 interface waterRightPropertiesProps {
     waterRightId: string;
@@ -25,7 +24,7 @@ function WaterRightProperties(props: waterRightPropertiesProps){
     <div className='d-flex flex-row'>
         {waterRightDetails && <>
             <div className='d-flex p-2 flex-column'>
-                <p>Water Right Info</p>
+                <h4>Water Right Info</h4>
 
                 
 
@@ -57,7 +56,7 @@ function WaterRightProperties(props: waterRightPropertiesProps){
                 <span className='property-value'>{waterRightDetails.beneficialUse}</span>
             </div>
             <div className='d-flex p-2 flex-column'>
-                <p>Variable</p>
+                <h4>Variable</h4>
                 <span className='property-name'>Interval</span>
                 <span className='property-value'>{waterRightDetails.aggregationInterval}</span>
                 
@@ -80,7 +79,7 @@ function WaterRightProperties(props: waterRightPropertiesProps){
                 <span className='property-value'>{waterRightDetails.variableCv}</span>
             </div>
             <div className='d-flex p-2 flex-column'>
-                <p>Organization</p>
+                <h4>Organization</h4>
                 <span className='property-name'>Organization Name</span>
                 <span className='property-value'>{waterRightDetails.organizationName}</span>
                 

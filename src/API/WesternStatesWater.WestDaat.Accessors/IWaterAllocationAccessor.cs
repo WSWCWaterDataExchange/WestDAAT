@@ -8,5 +8,9 @@ namespace WesternStatesWater.WestDaat.Accessors
         Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId);
 
         Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId);
+
+        Task<SiteInfoListItem[]> GetWaterRightSiteInfoById(long waterRightId);
+
+        Task<WaterSourceInfoListItem[]> GetWaterRightSourceInfoById(long waterRightId);
     }
 }
