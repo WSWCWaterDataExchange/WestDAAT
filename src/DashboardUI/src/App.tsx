@@ -27,11 +27,11 @@ function App() {
             <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
               <Routes>
                 <Route path="/" element={<Layout />}>
-                                  <Route index element={<HomePage />} />
-                                  <Route path="details" element={<DetailLayout />}>
-                                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
-                                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
-                                  </Route>
+                  <Route index element={<HomePage />} />
+                  <Route path="details" element={<DetailLayout />}>
+                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
+                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+                  </Route>
                   <Route path="site-details" element={<SideDetailsPage />} />
                 </Route>
               </Routes>
