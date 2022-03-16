@@ -22,9 +22,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         private readonly ILogger _logger;
 
         [FunctionName(nameof(NldiFeatures))]
-        public async Task<IActionResult> NldiFeatures([HttpTrigger(AuthorizationLevel.Function, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequest req, double latitude, double longitude)
+        public async Task<IActionResult> NldiFeatures([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequest req, double latitude, double longitude)
         {
-
             _logger.LogInformation("Getting NLDI Features []");
 
             var directions = Enum.Parse<NldiDirections>(req.Query["dir"]);
