@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { Tab, Table, Tabs } from 'react-bootstrap';
 import { useWaterRightSiteInfoList, useWaterRightSourceInfoList } from '../hooks/waterAllocation';
-
 
 interface waterRightTabsProps {
     waterRightId: string;
@@ -12,11 +10,8 @@ export enum WaterRightTab{
 }
 
 function WaterRightTabs(props: waterRightTabsProps){
-
     const siteInfoList = useWaterRightSiteInfoList(+props.waterRightId).data;
     const sourceInfoList = useWaterRightSourceInfoList(+props.waterRightId).data;
-    console.log("site info", siteInfoList);
-    console.log("source info", sourceInfoList);
 
     return (
     <>
@@ -77,7 +72,7 @@ function WaterRightTabs(props: waterRightTabsProps){
             </Tab>
         </Tabs>
     </>
-        )
+    )
 }
 
 export default WaterRightTabs;

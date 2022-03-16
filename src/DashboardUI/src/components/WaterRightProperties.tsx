@@ -4,30 +4,14 @@ interface waterRightPropertiesProps {
     waterRightId: string;
   }
 
-
-
 function WaterRightProperties(props: waterRightPropertiesProps){
-
-//     const [waterRight, setWaterRight] = useWaterRightDetails(+props.waterRightId).data;
-
-//     useEffect(() => {
-//         const waterRightDetails = useWaterRightDetails(+props.waterRightId).data;
-//         if(waterRightDetails){
-//             setWaterRight(waterRightDetails);
-//         }
-//   }, []); 
-
     const waterRightDetails = useWaterRightDetails(+props.waterRightId).data;
-    console.log(waterRightDetails);
 
     return (
     <div className='d-flex flex-row'>
         {waterRightDetails && <>
             <div className='d-flex p-2 flex-column'>
                 <h4>Water Right Info</h4>
-
-                
-
                 <span className='property-name'>WaDE ID</span>
                 <span className='property-value'>{waterRightDetails.allocationAmountId}</span>
                 

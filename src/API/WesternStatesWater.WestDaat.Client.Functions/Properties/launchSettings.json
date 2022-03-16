@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "WesternStatesWater.WestDaat.Client.Functions": {
-      "commandName": "Project",
-      "commandLineArgs": "host start --port 5001 --pause-on-error"
-    }
-  }
-}
