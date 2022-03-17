@@ -11,6 +11,8 @@ function NumericRange(props: NumericRangeProps) {
   const [minValue, setMinValue] = useState(props.initialMin);
   const [maxValue, setMaxValue] = useState(props.initialMax);
 
+  const {onChange} = props;
+
   const parseValue = (val: string): number | undefined =>{
     let value: number | undefined = parseInt(val);
     if(isNaN(value) || value < 0) value = undefined;
@@ -25,9 +27,8 @@ function NumericRange(props: NumericRangeProps) {
   };
 
   useEffect(() => {
-    props.onChange(minValue, maxValue);
-
-  }, [minValue, maxValue]);
+    onChange(minValue, maxValue);
+  }, [minValue, maxValue, onChange]);
 
   return (
     <div className="input-group mb-3">

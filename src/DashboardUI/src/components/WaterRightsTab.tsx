@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -275,7 +275,7 @@ function WaterRightsTab() {
     }));
   }
 
-  const handleFlowChange = useDebounceCallback((min: number| undefined, max: number| undefined) => {
+  const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
       ...s,
       minFlow: min,
@@ -283,7 +283,7 @@ function WaterRightsTab() {
     }));
   }, 400)
 
-  const handleVolumeChange = useDebounceCallback((min: number| undefined, max: number| undefined) => {
+  const handleVolumeChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
       ...s,
       minVolume: min,
@@ -292,23 +292,59 @@ function WaterRightsTab() {
   }, 400)
 
   useEffect(() => {
+    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
     const filterSet = ["all"] as any[];
-    if (filters.beneficialUses && filters.beneficialUses.length > 0) {
+    if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
       filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", "beneficialUses"]])]);
     }
-    if (filters.ownerClassifications && filters.ownerClassifications.length > 0) {
+    if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
       filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", "ownerClassifications"]])]);
     }
-    if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
+    if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", "waterSourceTypes"]])]);
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
-      filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", "allocationOwner"]]])
+      // not ready yet
+      // filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", "allocationOwner"]]])
     }
+    if (filters.maxFlow !== undefined) {
+      // not ready yet
+      // filterSet.push([
+      //   "<=",
+      //   ["min",
+      //     ["at",
+      //       0,
+      //       ["array", "number", ["get", "allocationFlowCfs"]]
+      //     ],
+      //     ["at",
+      //       1,
+      //       ["array", "number", ["get", "allocationFlowCfs"]]
+      //     ]
+      //   ]
+      //   , filters.maxFlow])
+    }
+    if (filters.minFlow !== undefined) {
+      // not ready yet
+      // filterSet.push(
+      //   [
+      //     ">=",
+      //     ["max",
+      //       ["at",
+      //         0,
+      //         ["array", "number", ["get", "allocationFlowCfs"]]
+      //       ],
+      //       ["at",
+      //         1,
+      //         ["array", "number", ["get", "allocationFlowCfs"]]
+      //       ]
+      //     ]
+      //     , filters.minFlow])
+    }
+    console.log(filterSet);
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
-  }, [filters, setMapLayerFilters])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
 
   const clearMapFilters = () => {
     setFilters(defaultFilters);
