@@ -5,6 +5,7 @@ interface waterRightPropertiesProps {
 }
 
 function WaterRightProperties(props: waterRightPropertiesProps){
+  // TODO: Update with loading screen after Dub update
   const waterRightDetails = useWaterRightDetails(+props.waterRightId).data;
 
   return (
@@ -31,7 +32,7 @@ function WaterRightProperties(props: waterRightPropertiesProps){
         <span className='property-value'>{waterRightDetails.allocationLegalStatus}</span>
         
         <span className='property-name'>Assigned Flow (CFS)</span>
-        <span className='property-value'>{waterRightDetails.allocationFlow_CFS}</span>
+        <span className='property-value'>{waterRightDetails.allocationFlow_Cfs}</span>
         
         <span className='property-name'>Assigned Volume (AF)</span>
         <span className='property-value'>{waterRightDetails.allocationVolume_AF}</span>

@@ -9,8 +9,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId);
 
-        Task<SiteInfoListItem[]> GetWaterRightSiteInfoById(long waterRightId);
+        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId);
 
-        Task<WaterSourceInfoListItem[]> GetWaterRightSourceInfoById(long waterRightId);
+        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId);
     }
 }

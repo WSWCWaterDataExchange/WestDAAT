@@ -109,7 +109,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById(99)).ReturnsAsync(new DC.SiteInfoListItem[] { }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById(99)).ReturnsAsync(new List<DC.SiteInfoListItem>{ }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSiteInfoList(99);
@@ -121,7 +121,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById(99)).ReturnsAsync(new DC.WaterSourceInfoListItem[] { }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById(99)).ReturnsAsync(new List<DC.WaterSourceInfoListItem>{ }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSourceInfoList(99);

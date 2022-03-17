@@ -88,7 +88,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Length.Should().Be(5);
+            result.Count().Should().Be(5);
             result.Any(x => x.SiteUuid == sites[0].SiteUuid).Should().BeTrue();
         }
 
@@ -134,7 +134,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Length.Should().Be(5);
+            result.Count().Should().Be(5);
             result.Any(x => x.WaterSourceUuid == waterSources[0].WaterSourceUuid).Should().BeTrue();
         }
 
