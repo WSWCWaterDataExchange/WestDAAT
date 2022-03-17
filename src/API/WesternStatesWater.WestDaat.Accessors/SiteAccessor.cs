@@ -28,11 +28,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
-        public Task<SiteDetails> GetSiteDetailsByUuid(string siteUuid)
+        public async Task<SiteDetails> GetSiteDetailsByUuid(string siteUuid)
         {
             using (var db = _databaseContextFactory.Create())
             {
-                return db.SitesDim
+                return await db.SitesDim
                     .Where(x => x.SiteUuid == siteUuid)
                     .ProjectTo<SiteDetails>(DtoMapper.Configuration)
                     .SingleAsync();
