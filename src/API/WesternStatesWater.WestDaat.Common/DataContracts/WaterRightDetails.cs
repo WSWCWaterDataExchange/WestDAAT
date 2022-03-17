@@ -8,8 +8,8 @@
         public DateTime PriorityDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string AllocationLegalStatus { get; set; }
-        public double? AllocationFlow_Cfs { get; set; }
-        public double? AllocationVolume_AF { get; set; }
+        public double? AllocationFlowCfs { get; set; }
+        public double? AllocationVolumeAF { get; set; }
         public string BeneficialUse { get; set; }
 
         public decimal AggregationInterval { get; set; }

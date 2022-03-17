@@ -32,10 +32,10 @@ function WaterRightProperties(props: waterRightPropertiesProps){
         <span className='property-value'>{waterRightDetails.allocationLegalStatus}</span>
         
         <span className='property-name'>Assigned Flow (CFS)</span>
-        <span className='property-value'>{waterRightDetails.allocationFlow_Cfs}</span>
+        <span className='property-value'>{waterRightDetails.allocationFlowCfs}</span>
         
         <span className='property-name'>Assigned Volume (AF)</span>
-        <span className='property-value'>{waterRightDetails.allocationVolume_AF}</span>
+        <span className='property-value'>{waterRightDetails.allocationVolumeAF}</span>
 
         <span className='property-name'>Beneficial Use</span>
         <span className='property-value'>{waterRightDetails.beneficialUse}</span>

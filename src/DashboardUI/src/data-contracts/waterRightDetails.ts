@@ -5,8 +5,8 @@ export interface waterRightDetails {
   priorityDate: Date;
   expirationDate: Date;
   allocationLegalStatus: string;
-  allocationFlow_Cfs: number;
-  allocationVolume_AF: number;
+  allocationFlowCfs: number;
+  allocationVolumeAF: number;
   beneficialUse: string;
 
   aggregationInterval: number;
