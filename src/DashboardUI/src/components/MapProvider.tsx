@@ -1,7 +1,6 @@
 import { createContext, FC, ReactElement, useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
-import { useLinkClickHandler } from "react-router-dom";
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -36,6 +35,8 @@ interface MapContextState {
   setLayerCircleColors: (circleColors: setCircleColorsParamType) => void;
   geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
   setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
+  vectorUrls: { source: string, url: string }[]
+  setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[],
   setVisibleLayers: (layers: string[]) => void,
   renderedFeatures: RenderedFeatureType[],
@@ -53,6 +54,8 @@ const defaultState: MapContextState = {
   setLayerCircleColors: () => { },
   geoJsonData: [],
   setGeoJsonData: () => { },
+  vectorUrls: [],
+  setVectorUrl: () => { },
   visibleLayers: [],
   setVisibleLayers: () => { },
   renderedFeatures: [],
@@ -119,6 +122,19 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllGeoJsonData])
 
+  const [vectorUrls, setAllVectorUrls] = useState<{ source: string, url: string }[]>([]);
+  const setVectorUrl = useCallback((source: string, url: string) => {
+    setAllVectorUrls(s => {
+      const unchangedData = s.filter(a => a.source !== source);
+      const updatedData = [...unchangedData, { source, url }];
+
+      if (!deepEqual(s, updatedData)) {
+        return updatedData;
+      }
+      return s;
+    });
+  }, [setAllVectorUrls])
+
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
@@ -136,6 +152,8 @@ const MapProvider: FC = ({ children }) => {
     setLayerCircleColors,
     geoJsonData,
     setGeoJsonData,
+    vectorUrls,
+    setVectorUrl,
     visibleLayers,
     setVisibleLayers,
     renderedFeatures,

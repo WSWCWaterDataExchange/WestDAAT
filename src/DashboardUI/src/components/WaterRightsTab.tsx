@@ -15,10 +15,10 @@ import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 
 enum MapGrouping {
-  BeneficialUse = "beneficialUseCV",
+  BeneficialUse = "beneficialUses",
   CustomerType = "2",
   SiteType = "3",
-  WaterSourceType = "waterSourceType"
+  WaterSourceType = "waterSourceTypes"
 }
 
 interface WaterRightsFilters {
@@ -28,6 +28,13 @@ interface WaterRightsFilters {
   allocationOwner?: string,
   mapGrouping: MapGrouping
 }
+
+const mapDataTiers = [
+  'https://api.maptiler.com/tiles/1e068efa-3cd5-4509-a1aa-286c135fc85c/tiles.json?key=IauIQDaqjd29nJc5kJse',
+  'https://api.maptiler.com/tiles/61b00cf0-537e-456c-9d6c-ad1d4a8ec597/tiles.json?key=IauIQDaqjd29nJc5kJse',
+  'https://api.maptiler.com/tiles/c03b0c46-b9c3-4574-8498-cbebca00b871/tiles.json?key=IauIQDaqjd29nJc5kJse',
+  'https://api.maptiler.com/tiles/6d61092a-7c8a-4cd1-8272-d92cf019730c/tiles.json?key=IauIQDaqjd29nJc5kJse'
+]
 
 const colors = [
   '#006400',
@@ -54,27 +61,7 @@ const colors = [
 ]
 
 const allWaterRightsLayers = [
-  'agricultural',
-  'aquaculture',
-  'commercial',
-  'domestic',
-  'environmental',
-  'fire',
-  'fish',
-  'flood',
-  'heating',
-  'industrial',
-  'instream',
-  'livestock',
-  'mining',
-  'municipal',
-  'other',
-  'power',
-  'recharge',
-  'recreation',
-  'snow',
-  'storage',
-  'wildlife'
+  'allocations'
 ]
 
 const defaultFilters = {
@@ -157,34 +144,62 @@ function WaterRightsTab() {
     setLayerFilters: setMapLayerFilters,
     setVisibleLayers,
     renderedFeatures,
-    setLayerCircleColors
+    setLayerCircleColors,
+    setVectorUrl
   } = useContext(MapContext);
 
   useEffect(() => {
-    let circleColorArray = ["case",
-      ...mapGrouping.colorMapping
-        .map(b => [["==", ["get", mapGrouping.property], b.key], b.color]).reduce((b, c) => b.concat(c), []),
-      "#000000"
-    ]
+    let params = (new URL(document.location.href)).searchParams;
+    let tier = parseInt(params.get("tier") ?? "");
+    if (!isNaN(tier) && tier >= 0 && tier < mapDataTiers.length) {
+      setVectorUrl('allocation-sites_1', mapDataTiers[tier])
+    }
+  }, [setVectorUrl])
+
+  const renderedMapGroupings = useMemo(() => {
+    let colorMappings = [...mapGrouping.colorMapping];
+    if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
+      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
+    }
+    if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
+      colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
+    }
+    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+    return {
+      property: mapGrouping.property,
+      colorMapping: colorMappings
+    }
+  }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes])
+
+  useEffect(() => {
+    let circleColorArray: any;
+    if (renderedMapGroupings.colorMapping.length > 0) {
+      circleColorArray = ["case"];
+      renderedMapGroupings.colorMapping.forEach(a => {
+        circleColorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
+        circleColorArray.push(a.color)
+      })
+      circleColorArray.push("#000000");
+    } else {
+      circleColorArray = "#000000"
+    }
+
     setLayerCircleColors(allWaterRightsLayers.map(a => {
       return {
         layer: a,
         circleColor: circleColorArray
       }
     }))
-  }, [setLayerCircleColors, mapGrouping])
+  }, [setLayerCircleColors, renderedMapGroupings])
 
   useEffect(() => {
-    const legendItems = mapGrouping.colorMapping
-      .filter(a => renderedFeatures.some(b => b.properties && a.key === b.properties[mapGrouping.property]));
-    if (legendItems.length === 0) {
+    if (renderedMapGroupings.colorMapping.length === 0) {
       setLegend(null);
     } else {
       setLegend(
         <>
           {
-
-            legendItems.map(layer => {
+            renderedMapGroupings.colorMapping.map(layer => {
               return (
                 <div key={layer.key} className="legend-item">
                   <span className="legend-circle" style={{ "backgroundColor": layer.color }}></span>
@@ -195,7 +210,7 @@ function WaterRightsTab() {
           }
         </>);
     }
-  }, [setLegend, mapGrouping, renderedFeatures])
+  }, [setLegend, renderedMapGroupings])
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
 
@@ -255,13 +270,13 @@ function WaterRightsTab() {
   useEffect(() => {
     const filterSet = ["all"] as any[];
     if (filters.beneficialUses && filters.beneficialUses.length > 0) {
-      filterSet.push(["in", ["get", "beneficialUseCV"], ["literal", filters.beneficialUses]]);
+      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", "beneficialUses"]])]);
     }
     if (filters.ownerClassifications && filters.ownerClassifications.length > 0) {
-      filterSet.push(["in", ["get", "ownerClassification"], ["literal", filters.ownerClassifications]]);
+      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", "ownerClassifications"]])]);
     }
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
-      filterSet.push(["in", ["get", "waterSourceType"], ["literal", filters.waterSourceTypes]]);
+      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", "waterSourceTypes"]])]);
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", "allocationOwner"]]])

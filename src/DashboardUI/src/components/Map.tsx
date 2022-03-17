@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, LngLat, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -18,7 +18,7 @@ import deepEqual from 'fast-deep-equal/es6';
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, setRenderedFeatures } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, setRenderedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -40,10 +40,6 @@ function Map() {
         }
       });
     }
-  }
-
-  const isGeoJsonSource = (mapSource: AnySourceImpl | undefined): mapSource is GeoJSONSource => {
-    return (mapSource as GeoJSONSource)?.setData !== undefined;
   }
 
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
@@ -159,11 +155,23 @@ function Map() {
     if (!map) return;
     geoJsonData.forEach(a => {
       var source = map.getSource(a.source);
-      if (isGeoJsonSource(source)) {
+      if (source.type === 'geojson') {
         source.setData(a.data);
       }
     })
   }, [map, geoJsonData]);
+
+  useEffect(() => {
+    if (!map) return;
+    vectorUrls.forEach(a => {
+      var source = map.getSource(a.source);
+      if (source.type === 'vector') {
+        if(source.url !== a.url){
+          source.setUrl(a.url);
+        }
+      }
+    })
+  }, [map, vectorUrls]);
 
   useEffect(() => {
     if (!map) return;
