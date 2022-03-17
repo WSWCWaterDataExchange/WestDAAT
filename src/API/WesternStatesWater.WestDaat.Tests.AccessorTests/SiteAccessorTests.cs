@@ -9,7 +9,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class SiteAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        public async void SiteAccessor_GetSiteByUuid_ShouldReturnSite()
+        public async Task SiteAccessor_GetSiteByUuid_ShouldReturnSite()
         {
             // Arrange
             var siteDims = new SitesDimFaker().Generate(10);
@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [DataRow("POINT (10 20)", null, "POINT (10 20)")]
         [DataRow(null, "POINT (20 30)", "POINT (20 30)")]
         [DataRow("POINT (10 20)", "POINT (20 30)", "POINT (10 20)")]
-        public async void SiteAccessor_GetSiteByUuid_Geography(string geometry, string sitePoint, string expectedGeography)
+        public async Task SiteAccessor_GetSiteByUuid_Geography(string geometry, string sitePoint, string expectedGeography)
         {
             var siteDim = new SitesDimFaker()
                 .RuleFor(a => a.Geometry, b => GeometryHelpers.GetGeometry(geometry))
