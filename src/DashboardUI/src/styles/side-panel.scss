@@ -40,4 +40,39 @@
       }
     }
   }
+
+  .map-themes {
+    margin-top: 10px;
+    gap: 12px;
+    display: flex;
+    justify-content: space-between;
+
+    img {
+      border-radius: 10px;
+      border: 1px solid $bs-gray-200;
+      cursor: pointer;
+
+      &.active {
+        border: 2px solid $primary-color;
+        margin: -2px;
+        cursor: default;
+      }
+    }
+  }
+
+  .dropdown {
+    > button {
+      background-color: white;
+      border: 1px solid $border-color;
+    }
+
+    .btn-group {
+      width: 100%;
+    }
+
+    .dropdown-menu {
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
 }

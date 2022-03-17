@@ -8,5 +8,5 @@ export const nldi = {
     epa: "#D55E00",
     unknown: "#CC79A7"
   },
-  useSymbols: false //todo: eventually get rid of this
+  latLongPrecision: 4
 }

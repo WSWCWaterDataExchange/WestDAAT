@@ -22,7 +22,7 @@ function SiteNavbar(props: SiteNavbarProps) {
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
 
-  const { user, setCurrentUser } = useContext(AppContext);
+  const { user, setUser } = useContext(AppContext);
 
   return (
     <div>
@@ -42,11 +42,11 @@ function SiteNavbar(props: SiteNavbarProps) {
           </div>
 
           <Nav className="mx-2">
-            <Nav.Link href="/" active>Water Data Exchange Data (WaDE) Dashboard</Nav.Link>
+            <Nav.Link href="/" active>Western States Water Data Access and Analysis Tool (WestDAAT)</Nav.Link>
           </Nav>
 
           <Nav className="mx-2">
-            <Nav.Link active onClick={() => setCurrentUser("wadeuser")}>
+            <Nav.Link active onClick={() => setUser({username: "WaDE User"})}>
               {user ? `Hello, ${user.username}` : "Log In"}
             </Nav.Link>
           </Nav>
