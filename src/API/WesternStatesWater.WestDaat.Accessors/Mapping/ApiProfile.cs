@@ -12,14 +12,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         public ApiProfile()
         {
             CreateMap<EF.AllocationAmountsFact, AllocationAmount>()
-                // .ForMember(a => a.BeneficialUses, b => b.Ignore())
-                // .ForMember(a => a.SiteIds, b => b.Ignore())
-                // .ForMember(a => a.OwnerClassification, b => b.Ignore())
-                // .ForMember(a => a.AllocationPriorityDate, b => b.Ignore())
-                // .ForMember(a => a.AllocationFlowCfs, b => b.Ignore())
-                // .ForMember(a => a.AllocationVolumeAf, b => b.Ignore())
-
-
                 .ForMember(a => a.BeneficialUses, b => b.MapFrom(c => c.AllocationBridgeBeneficialUsesFact.Select(d => d.BeneficialUse.WaDEName)))
                 .ForMember(a => a.SiteIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(d => d.SiteId)))
                 .ForMember(a => a.OwnerClassification, b => b.MapFrom(c => c.OwnerClassification.WaDEName))
