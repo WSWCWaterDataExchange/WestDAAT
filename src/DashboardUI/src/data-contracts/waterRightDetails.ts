@@ -4,17 +4,17 @@ export interface waterRightDetails {
   allocationOwner: string;
   priorityDate: Date;
   expirationDate: Date;
-  allocationLegalStatusCv: string;
+  allocationLegalStatus: string;
   allocationFlow_CFS: number;
   allocationVolume_AF: number;
   beneficialUse: string;
 
   aggregationInterval: number;
-  aggregationIntervalUnitCv: string;
-  aggregationStatisticCv: string;
+  aggregationIntervalUnit: string;
+  aggregationStatistic: string;
   amountUnitCv: string;
   reportYearStartMonth: string;
-  reportYearTypeCv: string;
+  reportYearType: string;
   variableCv: string;
 
   organizationName: string;

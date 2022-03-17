@@ -14,10 +14,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.AllocationAmountsFact, WaterRightDetails>()
                 .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateID.HasValue ? source.AllocationPriorityDateNavigation.Date : (DateTime?)null))
                 .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateID.HasValue ? source.AllocationExpirationDateNavigation.Date : (DateTime?)null))
-                .ForMember(dest => dest.BeneficialUse, opt => opt.MapFrom(source => source.PrimaryBeneficialUse.Name))
+                .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCv))
+                .ForMember(dest => dest.BeneficialUse, opt => opt.MapFrom(source => source.PrimaryBeneficialUse.WaDEName))
                 .ForMember(dest => dest.AggregationInterval, opt => opt.MapFrom(source => source.VariableSpecific.AggregationInterval))
-                .ForMember(dest => dest.AggregationIntervalUnitCv, opt => opt.MapFrom(source => source.VariableSpecific.AggregationIntervalUnitCv))
-                .ForMember(dest => dest.AggregationStatisticCv, opt => opt.MapFrom(source => source.VariableSpecific.AggregationStatisticCv))
+                .ForMember(dest => dest.AggregationIntervalUnit, opt => opt.MapFrom(source => source.VariableSpecific.AggregationIntervalUnitCv))
+                .ForMember(dest => dest.AggregationStatistic, opt => opt.MapFrom(source => source.VariableSpecific.AggregationStatisticCv))
                 .ForMember(dest => dest.AmountUnitCv, opt => opt.MapFrom(source => source.VariableSpecific.AmountUnitCv))
                 .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.VariableSpecific.ReportYearStartMonth))
                 .ForMember(dest => dest.ReportYearTypeCv, opt => opt.MapFrom(source => source.VariableSpecific.ReportYearTypeCv))
@@ -31,9 +32,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
                 .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint));
-            CreateMap<EF.SitesDim, SiteInfoListItem>();
+            CreateMap<EF.SitesDim, SiteInfoListItem>()
+                .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
             CreateMap<EF.OrganizationsDim, Organization>();
-            CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>();
+            CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>()
+                .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))
+                .ForMember(dest => dest.GnisfeatureName, opt => opt.MapFrom(source => source.GnisfeatureNameCv));
         }
     }
 }

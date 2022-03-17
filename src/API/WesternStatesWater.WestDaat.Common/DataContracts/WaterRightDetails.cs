@@ -7,14 +7,14 @@
         public string AllocationOwner { get; set; }
         public DateTime PriorityDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string AllocationLegalStatusCv { get; set; }
+        public string AllocationLegalStatus { get; set; }
         public double? AllocationFlow_CFS { get; set; }
         public double? AllocationVolume_AF { get; set; }
         public string BeneficialUse { get; set; }
 
         public decimal AggregationInterval { get; set; }
-        public string AggregationIntervalUnitCv { get; set; }
-        public string AggregationStatisticCv { get; set; }
+        public string AggregationIntervalUnit { get; set; }
+        public string AggregationStatistic { get; set; }
         public string AmountUnitCv { get; set; }
         public string ReportYearStartMonth { get; set; }
         public string ReportYearTypeCv { get; set; }
