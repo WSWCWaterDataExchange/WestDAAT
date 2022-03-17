@@ -8,7 +8,7 @@ export interface VolumeRangeProps {
 
 function VolumeRange(props: VolumeRangeProps) {
   return (
-    <NumericRange {...props} placeholderText="Volume" units="AF" />
+    <NumericRange {...props} placeholderText="Volume" units="" />
   );
 }
 
