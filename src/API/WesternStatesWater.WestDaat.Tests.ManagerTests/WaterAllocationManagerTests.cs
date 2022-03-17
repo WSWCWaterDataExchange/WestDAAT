@@ -16,11 +16,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-        }
-
         [TestMethod]
         public void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
         {

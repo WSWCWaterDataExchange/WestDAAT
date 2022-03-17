@@ -10,7 +10,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
         public SystemManager(
             ISystemAccessor systemAccessor,
-            ILogger<WaterAllocationManager> logger) : base(logger)
+            ILogger<SystemManager> logger) : base(logger)
         {
             _systemAccessor = systemAccessor;
         }
