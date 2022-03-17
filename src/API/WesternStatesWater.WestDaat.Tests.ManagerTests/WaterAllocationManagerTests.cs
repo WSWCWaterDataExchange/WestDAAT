@@ -41,7 +41,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(WestDaatException))]
         public async Task GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_MissingAllocations()
         {
             // ARRANGE 
