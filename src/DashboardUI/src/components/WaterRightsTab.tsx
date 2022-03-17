@@ -3,9 +3,9 @@ import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import FlowRangeSlider from "./FlowRangeSlider";
+import FlowRangeSlider from "./FlowRange";
 import { MapContext } from "./MapProvider";
-import VolumeRangeSlider from "./VolumeRangeSlider";
+import VolumeRange from "./VolumeRange";
 import { AppContext } from "../AppProvider";
 import { MapThemeSelector } from "./MapThemeSelector";
 import deepEqual from 'fast-deep-equal/es6';
@@ -26,7 +26,11 @@ interface WaterRightsFilters {
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
   allocationOwner?: string,
-  mapGrouping: MapGrouping
+  mapGrouping: MapGrouping,
+  minFlow: number | undefined,
+  maxFlow: number | undefined,
+  minVolume: number | undefined,
+  maxVolume: number | undefined
 }
 
 const mapDataTiers = [
@@ -69,7 +73,11 @@ const defaultFilters = {
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
-  mapGrouping: MapGrouping.BeneficialUse
+  mapGrouping: MapGrouping.BeneficialUse,
+  minFlow: undefined,
+  maxFlow: undefined,
+  minVolume: undefined,
+  maxVolume: undefined
 }
 
 function WaterRightsTab() {
@@ -226,26 +234,26 @@ function WaterRightsTab() {
     }
   }, [filters, setUrlParam])
 
-  const handleMapGroupingChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+  const handleMapGroupingChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilters(s => ({
       ...s,
       mapGrouping: e.target.value as MapGrouping
     }));
-  }, [setFilters]);
+  }
 
-  const handleBeneficialUseChange = useCallback((selectedOptions: string[]) => {
+  const handleBeneficialUseChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
       beneficialUses: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
-  }, [setFilters]);
+  }
 
-  const handleOwnerClassificationChange = useCallback((selectedOptions: string[]) => {
+  const handleOwnerClassificationChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
       ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
-  }, [setFilters]);
+  }
 
   const setAllocationOwner = useDebounceCallback((allocationOwnerValue: string) => {
     setFilters(s => ({
@@ -260,12 +268,28 @@ function WaterRightsTab() {
     setAllocationOwner(value)
   }
 
-  const handleWaterSourceTypeChange = useCallback((selectedOptions: string[]) => {
+  const handleWaterSourceTypeChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
       waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
-  }, [setFilters]);
+  }
+
+  const handleFlowChange = useDebounceCallback((min: number| undefined, max: number| undefined) => {
+    setFilters(s => ({
+      ...s,
+      minFlow: min,
+      maxFlow: max
+    }));
+  }, 400)
+
+  const handleVolumeChange = useDebounceCallback((min: number| undefined, max: number| undefined) => {
+    setFilters(s => ({
+      ...s,
+      minVolume: min,
+      maxVolume: max
+    }));
+  }, 400)
 
   useEffect(() => {
     const filterSet = ["all"] as any[];
@@ -380,14 +404,12 @@ function WaterRightsTab() {
 
           <div className="mb-3">
             <label>Flow Range</label>
-            <span>- CFS to - CFS</span>
-            <FlowRangeSlider handleChange={(values) => console.log(values)} />
+            <FlowRangeSlider onChange={handleFlowChange} initialMin={filters.minFlow} initialMax={filters.maxFlow} />
           </div>
 
           <div className="mb-3">
             <label>Volume Range</label>
-            <span>- AF to - AF</span>
-            <VolumeRangeSlider handleChange={(values) => console.log(values)} />
+            <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
           </div>
 
           {/* <div className="mb-3">
