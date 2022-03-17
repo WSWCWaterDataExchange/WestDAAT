@@ -37,13 +37,6 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 db.Database.SetCommandTimeout(int.MaxValue);
                 var waterAllocations = await db.AllocationAmountsFact
-                    .Include(x => x.AllocationBridgeSitesFact)
-                        .ThenInclude(x => x.Site)
-                        .ThenInclude(x => x.WaterSourceBridgeSitesFact)
-                        .ThenInclude(x => x.WaterSource)
-                    .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                        .ThenInclude(x => x.BeneficialUse)
-                    .Include(x => x.AllocationPriorityDateNavigation)
                     .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
                     .ToListAsync();
 
