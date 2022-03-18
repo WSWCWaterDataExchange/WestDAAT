@@ -1,4 +1,5 @@
 using AutoMapper;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
@@ -6,6 +7,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
     {
         public ApiProfile()
         {
+            // Mappings go here
         }
     }
 }

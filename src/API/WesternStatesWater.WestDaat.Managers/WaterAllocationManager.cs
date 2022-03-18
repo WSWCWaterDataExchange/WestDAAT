@@ -1,3 +1,6 @@
+using System.Collections.Concurrent;
+using System.IO;
+using System.Text.Json;
 using GeoJSON.Text.Feature;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
@@ -5,6 +8,7 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -28,9 +32,9 @@ namespace WesternStatesWater.WestDaat.Managers
             _geoConnexEngine = geoConnexEngine;
         }
 
-        string IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
+        async Task<string> IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
-            var site = _siteAccessor.GetSiteByUuid(siteUuid);
+            var site = await _siteAccessor.GetSiteByUuid(siteUuid);
             if (site.AllocationIds == null || !site.AllocationIds.Any())
             {
                 throw new WestDaatException($"No AllocationAmounts found for site uuid [{siteUuid}]");
@@ -45,6 +49,6 @@ namespace WesternStatesWater.WestDaat.Managers
         async Task<FeatureCollection> IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)
         {
             return await _nldiAccessor.GetNldiFeatures(latitude, longitude, directions, dataPoints);
-        }
+        }        
     }
 }
