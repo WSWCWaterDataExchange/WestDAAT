@@ -1,3 +1,4 @@
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -12,5 +13,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId);
 
         Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId);
+
+        Task<List<AllocationAmount>> GetAllWaterAllocations();
     }
 }

@@ -63,5 +63,18 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .Distinct()
                     .ToListAsync();
         }
+
+        async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
+        {
+            using (var db = _databaseContextFactory.Create())
+            {
+                db.Database.SetCommandTimeout(int.MaxValue);
+                var waterAllocations = await db.AllocationAmountsFact
+                    .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
+                    .ToListAsync();
+
+                return waterAllocations;
+            }
+        }
     }
 }

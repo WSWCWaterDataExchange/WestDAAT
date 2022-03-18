@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,11 +36,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
+        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequest request, string siteUuid)
         {
-            var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
-
-            var result = _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
+            var result = await _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return new OkObjectResult(result);
         }

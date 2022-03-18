@@ -11,6 +11,13 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
     {
         public ApiProfile()
         {
+            CreateMap<EF.AllocationAmountsFact, AllocationAmount>()
+                .ForMember(a => a.BeneficialUses, b => b.MapFrom(c => c.AllocationBridgeBeneficialUsesFact.Select(d => d.BeneficialUse.WaDEName)))
+                .ForMember(a => a.SiteIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(d => d.SiteId)))
+                .ForMember(a => a.OwnerClassification, b => b.MapFrom(c => c.OwnerClassification.WaDEName))
+                .ForMember(a => a.AllocationPriorityDate, b => b.MapFrom(c => c.AllocationApplicationDateNavigation != null ? c.AllocationApplicationDateNavigation.Date : default(DateTime)))
+                .ForMember(a => a.AllocationFlowCfs, b => b.MapFrom(c => c.AllocationFlow_CFS))
+                .ForMember(a => a.AllocationVolumeAf, b => b.MapFrom(c => c.AllocationVolume_AF));
             CreateMap<EF.AllocationAmountsFact, WaterRightDetails>()
                 .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateID.HasValue ? source.AllocationPriorityDateNavigation.Date : (DateTime?)null))
                 .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateID.HasValue ? source.AllocationExpirationDateNavigation.Date : (DateTime?)null))
@@ -33,7 +40,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.Organization.OrganizationWebsite));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
-                .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint));
+                .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint))
+                .ForMember(a => a.WaterSourceTypes, b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d => d.WaterSource.WaterSourceTypeCv)));
             CreateMap<EF.SitesDim, SiteInfoListItem>()
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
             CreateMap<EF.OrganizationsDim, Organization>();
