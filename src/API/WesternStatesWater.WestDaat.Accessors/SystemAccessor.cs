@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             using (var db = _databaseContextFactory.Create())
             {
                 return await db.BeneficialUsesCV
-                  .Select(a => a.WaDEName)
+                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
                   .Distinct()
                   .OrderBy(a => a)
                   .ToListAsync();
@@ -31,7 +31,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             using (var db = _databaseContextFactory.Create())
             {
                 return await db.WaterSourceType
-                  .Select(a => a.WaDEName)
+                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
                   .Distinct()
                   .OrderBy(a => a)
                   .ToListAsync();
@@ -43,7 +43,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             using (var db = _databaseContextFactory.Create())
             {
                 return await db.OwnerClassificationCv
-                  .Select(a => a.WaDEName)
+                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
                   .Distinct()
                   .OrderBy(a => a)
                   .ToListAsync();

@@ -13,7 +13,6 @@
         public string State { get; set; }
         public string Definition { get; set; }
         public string SourceVocabularyURI { get; set; }
-        public string WaDEName { get; set; }
 
         public virtual ICollection<AllocationAmountsFact> AllocationAmountsFact { get; set; }
     }
