@@ -78,6 +78,54 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _nldiAccessorMock.VerifyAll();
         }
 
+        [TestMethod]
+        public async Task WaterAllocationManager_GetSiteDetails()
+        {
+            _siteAccessorMock.Setup(x => x.GetSiteDetailsByUuid("TESTME")).ReturnsAsync(new DC.SiteDetails()).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetSiteDetails("TESTME");
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightDetails()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById(99)).ReturnsAsync(new DC.WaterRightDetails()).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightDetails(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById(99)).ReturnsAsync(new List<DC.SiteInfoListItem>{ }).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightSiteInfoList(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById(99)).ReturnsAsync(new List<DC.WaterSourceInfoListItem>{ }).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightSourceInfoList(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
         private IWaterAllocationManager CreateWaterAllocationManager()
         {
             return new WaterAllocationManager(

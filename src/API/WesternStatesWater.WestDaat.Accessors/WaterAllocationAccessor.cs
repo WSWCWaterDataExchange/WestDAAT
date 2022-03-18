@@ -31,6 +31,39 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
+        public async Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+            
+            return await db.AllocationAmountsFact
+                .Where(x => x.AllocationAmountId == waterRightId)
+                .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
+                .SingleAsync();
+        }
+
+        public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+            
+            return await db.AllocationBridgeSitesFact
+                        .Where(x => x.AllocationAmountId == waterRightId)
+                        .Select(x => x.Site)
+                        .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
+                        .ToListAsync();
+        }
+
+        public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+
+            return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
+                    .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
+                    .Select(a => a.WaterSource))
+                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                    .Distinct()
+                    .ToListAsync();
+        }
+
         async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
         {
             using (var db = _databaseContextFactory.Create())

@@ -7,5 +7,7 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         Task<Site> GetSiteByUuid(string siteUuid);
         Task<List<Site>> GetSites();
+
+        Task<SiteDetails> GetSiteDetailsByUuid(string siteUuid);
     }
 }
