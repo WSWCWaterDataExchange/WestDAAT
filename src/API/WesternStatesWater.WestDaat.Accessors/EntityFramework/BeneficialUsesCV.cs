@@ -24,7 +24,6 @@
 
         public string UsgscategoryNameCv { get; set; }
         public string NaicscodeNameCv { get; set; }
-        public string WaDEName { get; set; }
 
         
         public virtual ICollection<AggBridgeBeneficialUsesFact> AggBridgeBeneficialUsesFact { get; set; }
