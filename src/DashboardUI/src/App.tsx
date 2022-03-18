@@ -3,7 +3,8 @@ import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from 'react-query/devtools';
-import SideDetailsPage from "./pages/SiteDetailsPage";
+import DetailLayout from './pages/DetailLayout';
+import DetailsPage from './pages/DetailsPage';
 import AppProvider from "./AppProvider";
 import MapProvider from "./components/MapProvider";
 import { ToastContainer } from "react-toastify";
@@ -26,7 +27,10 @@ function App() {
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<HomePage />} />
-                  <Route path="site-details" element={<SideDetailsPage />} />
+                  <Route path="details" element={<DetailLayout />}>
+                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
+                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+                  </Route>
                 </Route>
               </Routes>
               <ReactQueryDevtools initialIsOpen={false} />
