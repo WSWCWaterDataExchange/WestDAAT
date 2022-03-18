@@ -35,10 +35,10 @@ function DetailsPage(props: detailPageProps) {
           </div>
         </div>
         <div className='d-flex flex-row'>
-          <div className='me-auto'>
+          <div className='p-2'>
             {detailsComponent}
           </div>
-          <div className=''>
+          <div className='p-2'>
             {mapComponent}
           </div>
         </div>

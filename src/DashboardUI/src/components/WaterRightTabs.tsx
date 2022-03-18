@@ -31,8 +31,8 @@ function WaterRightTabs(props: waterRightTabsProps){
                         </tr>
                     </thead>
                     <tbody>
-                        {siteInfoList?.map((site) =>
-                            <tr>
+                        {siteInfoList?.map((site, i) =>
+                            <tr key={i}>
                                 <td>{site.siteUuid}</td>
                                 <td>{site.siteNativeId}</td>
                                 <td>{site.siteName}</td>
@@ -58,8 +58,8 @@ function WaterRightTabs(props: waterRightTabsProps){
                         </tr>
                     </thead>
                     <tbody>
-                        {sourceInfoList?.map((source) =>
-                            <tr>
+                        {sourceInfoList?.map((source, i) =>
+                            <tr key={i}>
                                 <td>{source.waterSourceUuid}</td>
                                 <td>{source.waterSourceNativeId}</td>
                                 <td>{source.waterSourceName}</td>
