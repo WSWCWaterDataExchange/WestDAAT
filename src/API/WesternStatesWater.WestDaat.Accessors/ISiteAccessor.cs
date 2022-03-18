@@ -5,6 +5,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     public interface ISiteAccessor : IServiceContractBase
     {
-        Site GetSiteByUuid(string siteUuid);
+        Task<Site> GetSiteByUuid(string siteUuid);
+        Task<List<Site>> GetSites();
     }
 }

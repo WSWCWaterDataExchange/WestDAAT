@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
@@ -27,6 +28,19 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Single();
 
                 return org;
+            }
+        }
+
+        async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
+        {
+            using (var db = _databaseContextFactory.Create())
+            {
+                db.Database.SetCommandTimeout(int.MaxValue);
+                var waterAllocations = await db.AllocationAmountsFact
+                    .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
+                    .ToListAsync();
+
+                return waterAllocations;
             }
         }
     }

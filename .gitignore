@@ -454,3 +454,6 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 personal.settings.json
+*.geojson
+*.geojson.zip
+*.mbtiles*
