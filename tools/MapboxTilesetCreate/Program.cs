@@ -14,7 +14,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 {
-    public class Program
+    public static class Program
     {
         static async Task Main(string[] args)
         {
@@ -146,27 +146,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
 
             Console.WriteLine($"Done. Took {(int)sw.Elapsed.TotalMinutes} minutes");
-        }
-
-        private static async Task<int> SaveInChunks(List<GeoJsonFeature> randomFeatures, string dir)
-        {
-            // Split into seperate sources as workaround 500kb tile limit
-            // Otherwise features will be dropped from the tileset
-            var numberOfSources = 10;
-            var chunkSize = (int)Math.Ceiling(randomFeatures.Count / (double)numberOfSources);
-            Directory.CreateDirectory(dir);
-            var fileNumber = 0;
-
-            foreach (var chunk in randomFeatures.Chunk(chunkSize))
-            {
-                var path = Path.Combine(dir, $"Allocations_{++fileNumber}.geojson");
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await JsonSerializer.SerializeAsync(stream, chunk, chunk.GetType());
-                }
-            }
-
-            return fileNumber;
         }
     }
 }
