@@ -4,8 +4,15 @@ import { MapContext } from './MapProvider';
 import mapConfig from "../config/maps";
 import { BeneficialUseChangeOption } from './BeneficialUseSelect';
 import { AppContext } from '../AppProvider';
+import { useWaterRightSiteLocations } from '../hooks/waterAllocation';
 
-function WaterRightMap(){
+interface waterRightMapProps {
+  waterRightId: string;
+}
+
+function WaterRightMap(props: waterRightMapProps){
+  const waterRightSiteLocations = useWaterRightSiteLocations(+props.waterRightId);
+  console.log(waterRightSiteLocations);
 
   const defaultFilters = useMemo<WaterRightsFilters>(() => ({
     beneficialUses: undefined,
@@ -78,6 +85,10 @@ const allWaterRightsLayers = useMemo(() => [
     }
     setVisibleLayers(visibleLayers)
   }, [filters, allWaterRightsLayers, setVisibleLayers])
+
+  const onLoaded =(map: mapboxgl.Map) =>{
+    map.resize();
+}
 
   return (
     <Map />

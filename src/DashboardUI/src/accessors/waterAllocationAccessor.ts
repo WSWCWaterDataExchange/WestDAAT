@@ -1,5 +1,6 @@
 import {
   SiteInfoListItem,
+  SiteLocation,
   waterRightDetails,
   WaterSourceInfoListItem,
 } from '@data-contracts';
@@ -22,6 +23,13 @@ export const getWaterRightSiteInfoList = async (waterRightId: number) => {
 export const getWaterRightSourceInfoList = async (waterRightId: number) => {
   const { data } = await axios.get<WaterSourceInfoListItem[]>(
     `${process.env.REACT_APP_WEBAPI_URL}/GetWaterRightSourceInfoList/${waterRightId}`
+  );
+  return data;
+};
+
+export const getWaterRightSiteLocations = async (waterRightId: number) => {
+  const { data } = await axios.get<SiteLocation[]>(
+    `${process.env.REACT_APP_WEBAPI_URL}/Right/${waterRightId}/SiteLocations`
   );
   return data;
 };
