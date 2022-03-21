@@ -464,12 +464,12 @@ function WaterRightsTab() {
           </div>
 
           <div className="mb-3">
-            <label>Flow Range</label>
+            <label>Flow Range (CFS)</label>
             <FlowRangeSlider onChange={handleFlowChange} initialMin={filters.minFlow} initialMax={filters.maxFlow} />
           </div>
 
           <div className="mb-3">
-            <label>Volume Range</label>
+            <label>Volume Range (AF)</label>
             <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
           </div>
 
