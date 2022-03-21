@@ -16,38 +16,32 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<List<string>> ISystemAccessor.GetAvailableBeneficialUseNormalizedNames()
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.BeneficialUsesCV
-                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-                  .Distinct()
-                  .OrderBy(a => a)
-                  .ToListAsync();
-            }
+            using var db = _databaseContextFactory.Create();
+            return await db.BeneficialUsesCV
+              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
+              .Distinct()
+              .OrderBy(a => a)
+              .ToListAsync();
         }
 
         async Task<List<string>> ISystemAccessor.GetAvailableWaterSourceTypeNormalizedNames()
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.WaterSourceType
-                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-                  .Distinct()
-                  .OrderBy(a => a)
-                  .ToListAsync();
-            }
+            using var db = _databaseContextFactory.Create();
+            return await db.WaterSourceType
+              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
+              .Distinct()
+              .OrderBy(a => a)
+              .ToListAsync();
         }
 
         async Task<List<string>> ISystemAccessor.GetAvailableOwnerClassificationNormalizedNames()
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.OwnerClassificationCv
-                  .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-                  .Distinct()
-                  .OrderBy(a => a)
-                  .ToListAsync();
-            }
+            using var db = _databaseContextFactory.Create();
+            return await db.OwnerClassificationCv
+              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
+              .Distinct()
+              .OrderBy(a => a)
+              .ToListAsync();
         }
     }
 }
