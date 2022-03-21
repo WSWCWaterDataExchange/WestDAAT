@@ -8,7 +8,7 @@ export interface FlowRangeProps {
 
 export function FlowRange(props: FlowRangeProps) {
   return (
-    <NumericRange {...props} placeholderText="Flow" units="" />
+    <NumericRange {...props} placeholderText="Flow" units="" precision={2} />
   );
 }
 

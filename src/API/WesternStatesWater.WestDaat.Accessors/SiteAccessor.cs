@@ -33,6 +33,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using (var db = _databaseContextFactory.Create())
             {
+                db.Database.SetCommandTimeout(int.MaxValue);
                 return await db.SitesDim
                     .ProjectTo<Site>(DtoMapper.Configuration)
                     .ToListAsync();

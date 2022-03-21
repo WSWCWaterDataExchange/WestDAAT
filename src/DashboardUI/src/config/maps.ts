@@ -7,7 +7,7 @@ const mapsJson = {
     {
       "id": "allocation-sites_1",
       "type": "vector",
-      "url": "https://api.maptiler.com/tiles/6d61092a-7c8a-4cd1-8272-d92cf019730c/tiles.json?key=IauIQDaqjd29nJc5kJse",
+      "url": "https://api.maptiler.com/tiles/9edcc245-6749-42ff-a7b4-9063124b0837/tiles.json?key=IauIQDaqjd29nJc5kJse",
       "volatile": true
     },
     {

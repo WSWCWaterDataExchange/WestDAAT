@@ -14,11 +14,25 @@ import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from 
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 
+
+enum waterRightsProperties {
+  owners = "o",
+  ownerClassifications = "oClass",
+  beneficialUses = "bu",
+  priorityDates = "prrty",
+  siteUuid = "uuid",
+  sitePodOrPou = "podPou",
+  waterSourceTypes = "wsType",
+  minFlowRate = "minFlow",
+  maxFlowRate = "maxFlow",
+  minVolume = "minVol",
+  maxVolume = "maxVol",
+}
+
 enum MapGrouping {
-  BeneficialUse = "beneficialUses",
-  CustomerType = "2",
-  SiteType = "3",
-  WaterSourceType = "waterSourceTypes"
+  BeneficialUse = "bu",
+  OwnerClassification = "oClass",
+  WaterSourceType = "wsType"
 }
 
 interface WaterRightsFilters {
@@ -27,10 +41,12 @@ interface WaterRightsFilters {
   waterSourceTypes?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
+  includeNulls: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
   minVolume: number | undefined,
-  maxVolume: number | undefined
+  maxVolume: number | undefined,
+  podPou: "POD" | "POU" | undefined
 }
 
 const mapDataTiers = [
@@ -68,16 +84,18 @@ const allWaterRightsLayers = [
   'allocations'
 ]
 
-const defaultFilters = {
+const defaultFilters: WaterRightsFilters = {
   beneficialUses: undefined,
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
+  includeNulls: false,
   minFlow: undefined,
   maxFlow: undefined,
   minVolume: undefined,
-  maxVolume: undefined
+  maxVolume: undefined,
+  podPou: undefined
 }
 
 function WaterRightsTab() {
@@ -116,7 +134,6 @@ function WaterRightsTab() {
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading], "Loading Filter Data");
 
-  const [radioValue, setRadioValue] = useState('1');
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
@@ -128,23 +145,20 @@ function WaterRightsTab() {
       case MapGrouping.BeneficialUse:
         colorMapping = allBeneficialUses?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
-      case MapGrouping.CustomerType:
-        colorMapping = []
-        break;
-      case MapGrouping.SiteType:
-        colorMapping = []
+      case MapGrouping.OwnerClassification:
+        colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
       case MapGrouping.WaterSourceType:
         colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
     }
     return { property: filters.mapGrouping as string, colorMapping }
-  }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes])
+  }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
 
   const radios = [
-    { name: 'Both', value: '1' },
-    { name: 'POD', value: '2' },
-    { name: 'POU', value: '3' },
+    { name: 'Both', value: '' },
+    { name: 'POD', value: 'POD' },
+    { name: 'POU', value: 'POU' },
   ];
 
   const {
@@ -172,12 +186,15 @@ function WaterRightsTab() {
     if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
       colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
     }
+    if (mapGrouping.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
+      colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
+    }
     colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
     return {
       property: mapGrouping.property,
       colorMapping: colorMappings
     }
-  }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes])
+  }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
 
   useEffect(() => {
     let circleColorArray: any;
@@ -241,6 +258,13 @@ function WaterRightsTab() {
     }));
   }
 
+  const handlePodPouChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilters(s => ({
+      ...s,
+      podPou: e.target.value === "POD" || e.target.value === "POU" ? e.target.value : undefined
+    }));
+  }
+
   const handleBeneficialUseChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
@@ -275,6 +299,13 @@ function WaterRightsTab() {
     }));
   }
 
+  const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setFilters(s => ({
+      ...s,
+      includeNulls: e.target.checked
+    }));
+  }, 400)
+
   const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
       ...s,
@@ -292,53 +323,48 @@ function WaterRightsTab() {
   }, 400)
 
   useEffect(() => {
+    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume, value: number): any[] => {
+      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume;
+      const fieldStr = field as string;
+      const operator = isMin ? "<=" : ">=";
+
+      let coalesceValue;
+      if ((includeNulls && isMin)||(!includeNulls && !isMin)){
+        coalesceValue = 9999999
+      } else {
+        coalesceValue = -9999999
+      }
+
+      return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
+    }
     if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
     const filterSet = ["all"] as any[];
+    if (filters.podPou) {
+      filterSet.push(["==", waterRightsProperties.sitePodOrPou, filters.podPou]);
+    }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", "beneficialUses"]])]);
+      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
     }
     if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
-      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", "ownerClassifications"]])]);
+      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
     }
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
-      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", "waterSourceTypes"]])]);
+      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
-      // not ready yet
-      // filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", "allocationOwner"]]])
+      filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
     }
     if (filters.maxFlow !== undefined) {
-      // not ready yet
-      // filterSet.push([
-      //   "<=",
-      //   ["min",
-      //     ["at",
-      //       0,
-      //       ["array", "number", ["get", "allocationFlowCfs"]]
-      //     ],
-      //     ["at",
-      //       1,
-      //       ["array", "number", ["get", "allocationFlowCfs"]]
-      //     ]
-      //   ]
-      //   , filters.maxFlow])
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxFlowRate, filters.maxFlow));
     }
     if (filters.minFlow !== undefined) {
-      // not ready yet
-      // filterSet.push(
-      //   [
-      //     ">=",
-      //     ["max",
-      //       ["at",
-      //         0,
-      //         ["array", "number", ["get", "allocationFlowCfs"]]
-      //       ],
-      //       ["at",
-      //         1,
-      //         ["array", "number", ["get", "allocationFlowCfs"]]
-      //       ]
-      //     ]
-      //     , filters.minFlow])
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minFlowRate, filters.minFlow));
+    }
+    if (filters.maxVolume !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxVolume, filters.maxVolume));
+    }
+    if (filters.minVolume !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
     }
     console.log(filterSet);
     setMapLayerFilters(allWaterRightsLayers.map(a => {
@@ -347,7 +373,7 @@ function WaterRightsTab() {
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
 
   const clearMapFilters = () => {
-    setFilters(defaultFilters);
+    setFilters({...defaultFilters});
     setAllocationOwnerValue("");
   }
 
@@ -376,8 +402,8 @@ function WaterRightsTab() {
                   variant="outline-primary"
                   name="radio"
                   value={radio.value}
-                  checked={radioValue === radio.value}
-                  onChange={(e) => setRadioValue(e.currentTarget.value)}
+                  checked={(filters.podPou ?? '') === radio.value}
+                  onChange={handlePodPouChange}
                 >
                   {radio.name}
                 </ToggleButton>
@@ -389,8 +415,7 @@ function WaterRightsTab() {
             <label>Change Map Legend</label>
             <select className="form-select" onChange={handleMapGroupingChange} value={filters.mapGrouping}>
               <option value={MapGrouping.BeneficialUse}>Beneficial Use</option>
-              <option value={MapGrouping.CustomerType}>Customer Type</option>
-              <option value={MapGrouping.SiteType}>Site Type</option>
+              <option value={MapGrouping.OwnerClassification}>Owner Classification</option>
               <option value={MapGrouping.WaterSourceType}>Water Source Type</option>
             </select>
           </div>
@@ -434,7 +459,7 @@ function WaterRightsTab() {
           </div>
 
           <div className="mb-3 form-check form-switch">
-            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeNulls} onChange={handleIncludeNullChange} />
             <label className="form-check-label">Include Empty Amount and Priority Date Value</label>
           </div>
 

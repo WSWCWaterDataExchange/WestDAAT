@@ -10,7 +10,7 @@ import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
-import deepEqual from 'fast-deep-equal/es6';
+import { useDebounceCallback } from "@react-hook/debounce";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -88,17 +88,12 @@ function Map() {
     return mapConfig.layers.map(a => a.id)
   }, [])
 
-  const setMapRenderedFeatures = useCallback((map: mapboxgl.Map) => {
+  const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(s => {
-      var sourceFeatures = map.queryRenderedFeatures().filter(a=> sourceIds.some(b=>a.source === b));
-      if (deepEqual(s, sourceFeatures)) {
-        return s;
-      } else {
-
-        return sourceFeatures;
-      }
+      var sourceFeatures = map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
+      return sourceFeatures;
     })
-  }, [setRenderedFeatures, sourceIds])
+  }, 500)
 
   useEffect(() => {
     if (!map) return;
@@ -166,7 +161,7 @@ function Map() {
     vectorUrls.forEach(a => {
       var source = map.getSource(a.source);
       if (source.type === 'vector') {
-        if(source.url !== a.url){
+        if (source.url !== a.url) {
           source.setUrl(a.url);
         }
       }
@@ -205,7 +200,7 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
-      <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
+      {coords && <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>}
       {legend &&
         <div className={`legend ${legendClass}`}>
           {legend}
