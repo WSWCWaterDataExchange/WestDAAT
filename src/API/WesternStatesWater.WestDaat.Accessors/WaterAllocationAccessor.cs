@@ -41,7 +41,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .SingleAsync();
         }
 
-        public async Task<SiteInfoListItem[]> GetWaterRightSiteInfoById(long waterRightId)
+        public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
             
@@ -49,21 +49,32 @@ namespace WesternStatesWater.WestDaat.Accessors
                         .Where(x => x.AllocationAmountId == waterRightId)
                         .Select(x => x.Site)
                         .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
-                        .ToArrayAsync();
+                        .ToListAsync();
         }
 
-        public async Task<WaterSourceInfoListItem[]> GetWaterRightSourceInfoById(long waterRightId)
+        public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
 
-            var bridges = await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
-                .SelectMany(x => x.Site.WaterSourceBridgeSitesFact)
-                .Include(x => x.WaterSource)
-                .ToListAsync();
-                
-            var sources = bridges.Select(x => x.WaterSource).DistinctBy(x => x.WaterSourceUuid);
+            return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
+                    .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
+                    .Select(a => a.WaterSource))
+                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                    .Distinct()
+                    .ToListAsync();
+        }
 
-            return DtoMapper.Map<WaterSourceInfoListItem[]>(sources);
+        async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
+        {
+            using (var db = _databaseContextFactory.Create())
+            {
+                db.Database.SetCommandTimeout(int.MaxValue);
+                var waterAllocations = await db.AllocationAmountsFact
+                    .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
+                    .ToListAsync();
+
+                return waterAllocations;
+            }
         }
     }
 }

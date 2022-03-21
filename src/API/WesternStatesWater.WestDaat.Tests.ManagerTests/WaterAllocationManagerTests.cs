@@ -16,17 +16,12 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-        }
-
         [TestMethod]
-        public void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
+        public async Task GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
         {
             // ARRANGE 
             _geoConnexEngineMock.Setup(x => x.BuildGeoConnexJson(It.IsAny<DC.Site>(), It.IsAny<DC.Organization>())).Returns("{Foo: \"bar\"}");
-            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).Returns(new DC.Site
+            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).ReturnsAsync(new DC.Site
             {
                 AllocationIds = new List<long> { 1, 2, 3 }
             });
@@ -35,9 +30,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
 
             // ACT 
-            var response = manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
+            var response = await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
 
             // ASSERT 
+            response.Should().NotBeNull();
             _geoConnexEngineMock.Verify(t =>
                 t.BuildGeoConnexJson(It.IsAny<DC.Site>(), It.IsAny<DC.Organization>()),
                 Times.Once()
@@ -45,11 +41,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(WestDaatException))]
-        public void GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_MissingAllocations()
+        public async Task GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_MissingAllocations()
         {
             // ARRANGE 
-            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).Returns(new DC.Site
+            _siteAccessorMock.Setup(x => x.GetSiteByUuid(It.IsAny<string>())).ReturnsAsync(new DC.Site
             {
                 AllocationIds = new List<long> { /* Empty */ }
             });
@@ -57,7 +52,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
 
             // ACT 
-            var response = manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
+            Func<Task> call = async () => await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
+            await call.Should().ThrowAsync<WestDaatException>();
         }
 
         [TestMethod]
@@ -80,6 +76,54 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             result.Should().Be(resultFeatureCollection);
             _nldiAccessorMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetSiteDetails()
+        {
+            _siteAccessorMock.Setup(x => x.GetSiteDetailsByUuid("TESTME")).ReturnsAsync(new DC.SiteDetails()).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetSiteDetails("TESTME");
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightDetails()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById(99)).ReturnsAsync(new DC.WaterRightDetails()).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightDetails(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById(99)).ReturnsAsync(new List<DC.SiteInfoListItem>{ }).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightSiteInfoList(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById(99)).ReturnsAsync(new List<DC.WaterSourceInfoListItem>{ }).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightSourceInfoList(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
         }
 
         private IWaterAllocationManager CreateWaterAllocationManager()

@@ -6,7 +6,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
     {
-        string GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
+        Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
         
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
@@ -14,8 +14,8 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId);
 
-        Task<SiteInfoListItem[]> GetWaterRightSiteInfoList(long waterRightsId);
+        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(long waterRightsId);
 
-        Task<WaterSourceInfoListItem[]> GetWaterRightSourceInfoList(long waterRightsId);
+        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(long waterRightsId);
     }
 }

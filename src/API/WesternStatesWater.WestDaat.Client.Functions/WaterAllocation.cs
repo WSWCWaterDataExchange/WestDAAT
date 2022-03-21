@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,17 +36,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetWaterAllocationSiteDetails")] HttpRequest request)
+        public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequest request, string siteUuid)
         {
-            var siteUuid = await JsonSerializer.DeserializeAsync<string>(request.Body);
-
-            var result = _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
+            var result = await _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return new OkObjectResult(result);
         }
 
         [FunctionName(nameof(GetSiteDetails)), AllowAnonymous]
-        public async Task<IActionResult> GetSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSiteDetails/{siteUuid}")] HttpRequest request, string siteUuid)
+        public async Task<IActionResult> GetSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}")] HttpRequest request, string siteUuid)
         {
             var result = await _waterAllocationManager.GetSiteDetails(siteUuid);
 
@@ -53,7 +52,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterRightDetails)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterRightDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetWaterRightDetails/{waterRightId}")] HttpRequest request, long waterRightId)
+        public async Task<IActionResult> GetWaterRightDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{waterRightId}")] HttpRequest request, long waterRightId)
         {
             var result = await _waterAllocationManager.GetWaterRightDetails(waterRightId);
 
@@ -61,7 +60,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterRightSiteInfoList)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterRightSiteInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetWaterRightSiteInfoList/{waterRightId}")] HttpRequest request, long waterRightId)
+        public async Task<IActionResult> GetWaterRightSiteInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{waterRightId}/Sites")] HttpRequest request, long waterRightId)
         {
             var result = await _waterAllocationManager.GetWaterRightSiteInfoList(waterRightId);
 
@@ -69,7 +68,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(GetWaterRightSourceInfoList)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterRightSourceInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetWaterRightSourceInfoList/{waterRightId}")] HttpRequest request, long waterRightId)
+        public async Task<IActionResult> GetWaterRightSourceInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{waterRightId}/Sources")] HttpRequest request, long waterRightId)
         {
             var result = await _waterAllocationManager.GetWaterRightSourceInfoList(waterRightId);
 

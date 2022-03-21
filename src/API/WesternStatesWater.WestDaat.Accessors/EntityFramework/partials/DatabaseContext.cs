@@ -105,7 +105,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<WaterSourcesDim> WaterSourcesDim { get; set; }
         public virtual DbSet<PODSiteToPOUSiteFact> PODSiteToPOUSiteFact { get; set; }
 
-         protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 

@@ -9,7 +9,7 @@ import SiteProperties from '../components/SiteProperties';
 import SiteTabs from '../components/SiteTabs';
 
 interface detailPageProps {
-  detailType: string;
+  detailType: "site" | "right";
 }
 
 function DetailsPage(props: detailPageProps) {
