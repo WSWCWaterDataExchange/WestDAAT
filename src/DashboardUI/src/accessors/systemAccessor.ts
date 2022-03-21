@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const getBeneficialUses = async (): Promise<string[]> => {
-  const url = new URL('api/system/beneficialuses', process.env.REACT_APP_WEBAPI_URL);
+  const url = new URL('system/beneficialuses', process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<string[]>(
     url.toString()
   );
@@ -9,7 +9,7 @@ export const getBeneficialUses = async (): Promise<string[]> => {
 };
 
 export const getOwnerClassifications = async (): Promise<string[]> => {
-  const url = new URL('api/system/ownerclassifications', process.env.REACT_APP_WEBAPI_URL);
+  const url = new URL('system/ownerclassifications', process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<string[]>(
     url.toString()
   );
@@ -17,7 +17,7 @@ export const getOwnerClassifications = async (): Promise<string[]> => {
 };
 
 export const getWaterSourceTypes = async (): Promise<string[]> => {
-  const url = new URL('api/system/watersourcetypes', process.env.REACT_APP_WEBAPI_URL);
+  const url = new URL('system/watersourcetypes', process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<string[]>(
     url.toString()
   );
