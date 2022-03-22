@@ -20,7 +20,6 @@ enum waterRightsProperties {
   owners = "o",
   ownerClassifications = "oClass",
   beneficialUses = "bu",
-  priorityDates = "prrty",
   siteUuid = "uuid",
   sitePodOrPou = "podPou",
   waterSourceTypes = "wsType",
@@ -28,6 +27,8 @@ enum waterRightsProperties {
   maxFlowRate = "maxFlow",
   minVolume = "minVol",
   maxVolume = "maxVol",
+  minPriority = "minPri",
+  maxPriority = "maxPri",
 }
 
 enum MapGrouping {
@@ -81,8 +82,12 @@ const colors = [
   '#FF0000'
 ]
 
+const waterRightsPointsLayer = 'waterRightsPoints';
+const waterRightsPolygonsLayer = 'waterRightsPolygons';
+
 const allWaterRightsLayers = [
-  'allocations'
+  waterRightsPointsLayer,
+  waterRightsPolygonsLayer
 ]
 
 const defaultFilters: WaterRightsFilters = {
@@ -168,6 +173,7 @@ function WaterRightsTab() {
     setVisibleLayers,
     renderedFeatures,
     setLayerCircleColors,
+    setLayerFillColors,
     setVectorUrl
   } = useContext(MapContext);
 
@@ -198,25 +204,27 @@ function WaterRightsTab() {
   }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
 
   useEffect(() => {
-    let circleColorArray: any;
+    let colorArray: any;
     if (renderedMapGroupings.colorMapping.length > 0) {
-      circleColorArray = ["case"];
+      colorArray = ["case"];
       renderedMapGroupings.colorMapping.forEach(a => {
-        circleColorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
-        circleColorArray.push(a.color)
+        colorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
+        colorArray.push(a.color)
       })
-      circleColorArray.push("#000000");
+      colorArray.push("#000000");
     } else {
-      circleColorArray = "#000000"
+      colorArray = "#000000"
     }
 
-    setLayerCircleColors(allWaterRightsLayers.map(a => {
-      return {
-        layer: a,
-        circleColor: circleColorArray
-      }
-    }))
-  }, [setLayerCircleColors, renderedMapGroupings])
+    setLayerCircleColors({
+      layer: waterRightsPointsLayer,
+      circleColor: colorArray
+    })
+    setLayerFillColors({
+      layer: waterRightsPolygonsLayer,
+      fillColor: colorArray
+    })
+  }, [setLayerCircleColors, setLayerFillColors, renderedMapGroupings])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
@@ -244,7 +252,7 @@ function WaterRightsTab() {
     setVisibleLayers(allWaterRightsLayers)
   }, [setVisibleLayers])
 
-  const hasRenderedFeatures = useMemo(() =>renderedFeatures.length > 0, [renderedFeatures.length]);
+  const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   useNoMapResults(hasRenderedFeatures);
 
   useEffect(() => {
@@ -333,7 +341,7 @@ function WaterRightsTab() {
       const operator = isMin ? "<=" : ">=";
 
       let coalesceValue;
-      if ((includeNulls && isMin)||(!includeNulls && !isMin)){
+      if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
         coalesceValue = 9999999
       } else {
         coalesceValue = -9999999
@@ -370,14 +378,14 @@ function WaterRightsTab() {
     if (filters.minVolume !== undefined) {
       filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
     }
-    
+
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
 
   const clearMapFilters = () => {
-    setFilters({...defaultFilters});
+    setFilters({ ...defaultFilters });
     setAllocationOwnerValue("");
   }
 

@@ -19,8 +19,10 @@ export enum MapStyle {
 export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
+export type MapLayerFillColorsType = { [layer: string]: any };
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
+type setFillColorsParamType = { layer: string, fillColor: any } | { layer: string, fillColor: any }[]
 
 type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
 
@@ -33,6 +35,8 @@ interface MapContextState {
   setLayerFilters: (filters: setFiltersParamType) => void;
   circleColors: MapLayerCircleColorsType;
   setLayerCircleColors: (circleColors: setCircleColorsParamType) => void;
+  fillColors: MapLayerFillColorsType;
+  setLayerFillColors: (fillColors: setFillColorsParamType) => void;
   geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
   setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
   vectorUrls: { source: string, url: string }[]
@@ -54,6 +58,8 @@ const defaultState: MapContextState = {
   setLayerFilters: () => { },
   circleColors: {},
   setLayerCircleColors: () => { },
+  fillColors: {},
+  setLayerFillColors: () => { },
   geoJsonData: [],
   setGeoJsonData: () => { },
   vectorUrls: [],
@@ -113,6 +119,21 @@ const MapProvider: FC = ({ children }) => {
     })
   }, [setCircleColors]);
 
+  const [fillColors, setFillColors] = useState<MapLayerFillColorsType>({});
+  const setLayerFillColors = useCallback((updatedFilters: setFillColorsParamType): void => {
+    setFillColors(s => {
+      const fillColorArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+      const updatedFillColorSet = { ...s };
+      fillColorArray.forEach(value => {
+        updatedFillColorSet[value.layer] = value.fillColor
+      })
+      if (!deepEqual(s, updatedFillColorSet)) {
+        return updatedFillColorSet;
+      }
+      return s;
+    })
+  }, [setFillColors]);
+
   const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
   const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
     setAllGeoJsonData(s => {
@@ -156,6 +177,8 @@ const MapProvider: FC = ({ children }) => {
     setLayerFilters,
     circleColors,
     setLayerCircleColors,
+    fillColors,
+    setLayerFillColors,
     geoJsonData,
     setGeoJsonData,
     vectorUrls,
