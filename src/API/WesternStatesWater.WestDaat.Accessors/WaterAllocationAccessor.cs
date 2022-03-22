@@ -80,6 +80,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.AllocationBridgeSitesFact
                         .Where(x => x.AllocationAmountId == waterRightId)
                         .Select(x => x.Site)
+                        .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
                         .ProjectTo<SiteLocation>(DtoMapper.Configuration)
                         .ToListAsync();
         }
