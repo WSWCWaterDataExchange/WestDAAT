@@ -126,6 +126,18 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _siteAccessorMock.Verify();
         }
 
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightSiteLocations()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById(99)).ReturnsAsync(new List<DC.SiteLocation> { }).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightSiteLocations(99);
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+        }
+
         private IWaterAllocationManager CreateWaterAllocationManager()
         {
             return new WaterAllocationManager(

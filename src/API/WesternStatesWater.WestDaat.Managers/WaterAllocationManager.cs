@@ -70,5 +70,10 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return await _waterAllocationAccessor.GetWaterRightSourceInfoById(waterRightsId);
         }
+
+        public async Task<List<SiteLocation>> GetWaterRightSiteLocations(long waterRightsId)
+        {
+            return await _waterAllocationAccessor.GetWaterRightSiteLocationsById(waterRightsId);
+        }
     }
 }

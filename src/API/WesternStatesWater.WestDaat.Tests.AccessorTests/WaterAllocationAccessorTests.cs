@@ -138,6 +138,39 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Any(x => x.WaterSourceUuid == waterSources[0].WaterSourceUuid).Should().BeTrue();
         }
 
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetWaterRightSiteLocationsById()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(5);
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            foreach (var site in sites)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightSiteLocationsById(allocationAmount.AllocationAmountId);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count().Should().Be(5);
+            result.Any(x => x.Latitude == sites[0].Latitude).Should().BeTrue();
+        }
+
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
         {
             return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory());

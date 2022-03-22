@@ -21,7 +21,15 @@ const mapsJson = {
         "type": "FeatureCollection",
         "features": []
       }
-    }
+    },
+    {
+      "id": "site-locations",
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": []
+      }
+    },
   ],
   "layers": [
     {
@@ -317,6 +325,36 @@ const mapsJson = {
         "circle-radius": pointCircleRadius,
         "circle-color": "#006400"
       }
+    },
+    {
+      "id": "site-locations",
+      "friendlyName": "SiteLocations",
+      "source": "site-locations",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "circle",
+      "paint": {
+        "circle-radius": pointCircleRadius,
+        "circle-color": "#01579b"
+      }
+    },
+    {
+      "id": "site-locations-label",
+      "friendlyName": "SiteLocationsLabel",
+      "source": "site-locations",
+      "type": "symbol",
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["get", "siteUuid"],
+        "text-size": 16,
+        "text-offset": [0, -1.5],
+      },
+      "paint": {
+        "text-color": "#01579b",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 0.5,
+      },
     },
     {
       "id": "nldi-flowlines",

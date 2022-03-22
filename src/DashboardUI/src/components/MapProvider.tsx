@@ -31,6 +31,8 @@ interface MapContextState {
   setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
   visibleLayers: string[],
   setVisibleLayers: (layers: string[]) => void,
+  mapBounds: mapboxgl.LngLatLike[],
+  setMapBounds: (bounds: mapboxgl.LngLatLike[]) => void
 };
 
 const defaultState: MapContextState = {
@@ -44,6 +46,8 @@ const defaultState: MapContextState = {
   setGeoJsonData: () => { },
   visibleLayers: [],
   setVisibleLayers: () => { },
+  mapBounds: [],
+  setMapBounds: () => {}
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -95,6 +99,8 @@ const MapProvider: FC = ({ children }) => {
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
 
+  const [mapBounds, setMapBounds] = useState<mapboxgl.LngLatLike[]>([]);
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -106,6 +112,8 @@ const MapProvider: FC = ({ children }) => {
     setGeoJsonData,
     visibleLayers,
     setVisibleLayers,
+    mapBounds,
+    setMapBounds
   };
 
   return (

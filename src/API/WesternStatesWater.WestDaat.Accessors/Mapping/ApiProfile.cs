@@ -44,6 +44,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(a => a.WaterSourceTypes, b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d => d.WaterSource.WaterSourceTypeCv)));
             CreateMap<EF.SitesDim, SiteInfoListItem>()
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
+            CreateMap<EF.SitesDim, SiteLocation>();
             CreateMap<EF.OrganizationsDim, Organization>();
             CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>()
                 .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))

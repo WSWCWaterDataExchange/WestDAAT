@@ -17,7 +17,7 @@ import { useDrop } from "react-dnd";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, mapBounds } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -151,6 +151,18 @@ function Map() {
       map.setFilter(key, filters[key]);
     }
   }, [map, filters]);
+
+  useEffect(() => {
+    if (!map || mapBounds.length === 0) return;
+    const bounds = new mapboxgl.LngLatBounds(mapBounds[0], mapBounds[0]);
+    mapBounds.forEach(x => {
+      bounds.extend(x);
+    })
+    map.fitBounds(bounds, {
+      padding: 50,
+      maxZoom: 10
+      });
+  }, [map, mapBounds])
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

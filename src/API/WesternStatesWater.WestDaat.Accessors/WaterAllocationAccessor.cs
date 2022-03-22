@@ -76,5 +76,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                 return waterAllocations;
             }
         }
+
+        async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(long waterRightId)
+        {
+            using var db = _databaseContextFactory.Create();
+
+            return await db.AllocationBridgeSitesFact
+                        .Where(x => x.AllocationAmountId == waterRightId)
+                        .Select(x => x.Site)
+                        .ProjectTo<SiteLocation>(DtoMapper.Configuration)
+                        .ToListAsync();
+        }
     }
 }

@@ -1,94 +1,60 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect } from "react";
 import Map from './Map';
 import { MapContext } from './MapProvider';
-import mapConfig from "../config/maps";
-import { BeneficialUseChangeOption } from './BeneficialUseSelect';
-import { AppContext } from '../AppProvider';
 import { useWaterRightSiteLocations } from '../hooks/waterAllocation';
+import GeoJSON from 'geojson';
+import mapboxgl from 'mapbox-gl';
 
 interface waterRightMapProps {
   waterRightId: string;
 }
 
 function WaterRightMap(props: waterRightMapProps){
-  const waterRightSiteLocations = useWaterRightSiteLocations(+props.waterRightId);
-  console.log(waterRightSiteLocations);
-
-  const defaultFilters = useMemo<WaterRightsFilters>(() => ({
-    beneficialUses: undefined,
-    ownerClassifications: undefined
-  }), [])
-  const { setUrlParam, getUrlParam } = useContext(AppContext);
-
-  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const waterRightSiteLocations = useWaterRightSiteLocations(+props.waterRightId).data;
 
   const {
-    setVisibleLayers
+    setVisibleLayers, 
+    setGeoJsonData,
+    setMapBounds
   } = useContext(MapContext);
 
-  interface WaterRightsFilters {
-    beneficialUses?: string[],
-    ownerClassifications?: string[]
-  }
-
-const allWaterRightsLayers = useMemo(() => [
-    'agricultural',
-    'aquaculture',
-    'commercial',
-    'domestic',
-    'environmental',
-    'fire',
-    'fish',
-    'flood',
-    'heating',
-    'industrial',
-    'instream',
-    'livestock',
-    'mining',
-    'municipal',
-    'other',
-    'power',
-    'recharge',
-    'recreation',
-    'snow',
-    'storage',
-    'wildlife',
-  ], []);
-
-  const convertLayersToBeneficialUseOptions = useCallback((beneficialUses: string[]) => {
-    const convertMapLayerToBeneficialUseChangeOption = (layer: { id: string, friendlyName: string, paint: any }): BeneficialUseChangeOption => {
-      return {
-        value: layer.id,
-        label: layer.friendlyName,
-        color: layer.paint?.["circle-color"] as string
-      }
-    }
-
-    return beneficialUses.map(a => {
-      let layer = mapConfig.layers.find(b => b.id === a);
-      if (layer) {
-        return convertMapLayerToBeneficialUseChangeOption(layer as { id: string, friendlyName: string, paint: any });
-      }
-      return undefined;
-    }).filter(a => a !== undefined) as BeneficialUseChangeOption[];
-  }, []);
-
-  const availableOptions = useMemo(() => {
-    return convertLayersToBeneficialUseOptions(allWaterRightsLayers);
-  }, [allWaterRightsLayers, convertLayersToBeneficialUseOptions]);
-
+  useEffect(() => {
+    setVisibleLayers(["site-locations", "site-locations-label"]);
+  }, [setVisibleLayers])
 
   useEffect(() => {
-    let visibleLayers = allWaterRightsLayers;
-    if (filters.beneficialUses && filters.beneficialUses.length > 0) {
-      visibleLayers = filters.beneficialUses;
-    }
-    setVisibleLayers(visibleLayers)
-  }, [filters, allWaterRightsLayers, setVisibleLayers])
+    if(waterRightSiteLocations){
+      var features : GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[] = [];
+      waterRightSiteLocations.forEach(x => {
+        features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [x.longitude, x.latitude]
+          },
+          properties: {
+            "siteUuid": x.siteUuid,
+          }
+        })
+      })
 
-  const onLoaded =(map: mapboxgl.Map) =>{
-    map.resize();
-}
+      var featureCollection : GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> = {
+        type: 'FeatureCollection',
+        features: features
+      };
+
+      setGeoJsonData("site-locations", featureCollection);
+    }
+  }, [waterRightSiteLocations, setGeoJsonData])
+
+  useEffect(() => {
+    const mapBounds: mapboxgl.LngLatLike[] = [];
+    waterRightSiteLocations?.forEach(x => {
+      mapBounds.push(new mapboxgl.LngLat(x.longitude, x.latitude))
+    })
+
+    setMapBounds(mapBounds)
+  }, [waterRightSiteLocations, setMapBounds])
 
   return (
     <Map />
