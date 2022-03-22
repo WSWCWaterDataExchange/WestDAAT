@@ -366,7 +366,6 @@ function WaterRightsTab() {
     if (filters.minVolume !== undefined) {
       filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
     }
-    console.log(filterSet);
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))

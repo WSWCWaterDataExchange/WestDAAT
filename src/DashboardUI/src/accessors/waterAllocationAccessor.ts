@@ -29,7 +29,7 @@ export const getWaterRightSourceInfoList = async (waterRightId: number) => {
 
 export const getWaterRightSiteLocations = async (waterRightId: number) => {
   const { data } = await axios.get<SiteLocation[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}/WaterRights/${waterRightId}/SiteLocations`
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${waterRightId}/SiteLocations`
   );
   return data;
 };

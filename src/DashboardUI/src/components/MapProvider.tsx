@@ -61,7 +61,7 @@ const defaultState: MapContextState = {
   visibleLayers: [],
   setVisibleLayers: () => { },
   renderedFeatures: [],
-  setRenderedFeatures: () => { }
+  setRenderedFeatures: () => { },
   mapBounds: [],
   setMapBounds: () => {}
 };
@@ -163,7 +163,7 @@ const MapProvider: FC = ({ children }) => {
     visibleLayers,
     setVisibleLayers,
     renderedFeatures,
-    setRenderedFeatures
+    setRenderedFeatures,
     mapBounds,
     setMapBounds
   };
