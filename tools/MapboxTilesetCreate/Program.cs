@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using GeoJSON.Text.Feature;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Concurrent;
@@ -75,7 +76,9 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             Console.WriteLine("Fetched sites.");
 
             Console.WriteLine("Mapping to GeoJsonFeature...");
-            var features = new ConcurrentBag<GeoJsonFeature>();
+            var pointFeatures = new ConcurrentBag<Feature>();
+            var polygonFeatures = new ConcurrentBag<Feature>();
+            var unknownFeatures = new ConcurrentBag<Feature>();
             Parallel.ForEach(sites, site =>
             {
                 var hasAllocations = allSiteAllocations.TryGetValue(site.SiteId, out var siteAllocations);
@@ -89,12 +92,8 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         {"o", string.Join(" ", siteAllocations.Select(a => a.AllocationOwner).Distinct())},
                         {"oClass", siteAllocations.Select(a => a.OwnerClassification).Distinct()},
                         {"bu", siteAllocations.SelectMany(a => a.BeneficialUses).Distinct().ToList()},
-                        {"prrty", new long[] 
-                            {
-                                siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Min(),
-                                siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Max()
-                            }
-                        },
+                        {"minPri", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Min() },
+                        {"maxPri", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Max() },
                         {"uuid", site.SiteUuid},
                         {"podPou", site.PodPou},
                         {"wsType", site.WaterSourceTypes},
@@ -112,40 +111,59 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 var maxVolume = siteAllocations.Select(a => a.AllocationVolumeAf).Max();
                 if (maxVolume != null) properties.Add("maxVol", maxVolume.Value);
 
-                var feature = new GeoJsonFeature
-                {
-                    Geometry = new GeoJsonGeometry
-                    {
-                        Type = "Point",
-                        Coordinates = new double[]
-                        {
-                            // http://wiki.gis.com/wiki/index.php/Decimal_degrees
-                            site.Longitude.HasValue ? Math.Round(site.Longitude.Value, 6) : 0,
-                            site.Latitude.HasValue ? Math.Round(site.Latitude.Value, 6) : 0
-                        }
-                    },
-                    Properties = properties
-                };
+                var geometry = site.Geometry.AsGeoJsonGeometry();
 
-                features.Add(feature);
+                var feature = new Feature(geometry, properties);
+
+                switch (geometry.Type)
+                {
+                    case GeoJSON.Text.GeoJSONObjectType.Point:
+                    case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
+                        pointFeatures.Add(feature);
+                        break;
+                    case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                    case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                        polygonFeatures.Add(feature);
+                        break;
+                    default:
+                        unknownFeatures.Add(feature);
+                        break;
+                }
+
             });
 
-            Console.WriteLine("Writing to geojson files...");
 
-            var dir = "geojson";
+            var dir = Path.GetFullPath("geojson");
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
+            Console.WriteLine($"Writing to geojson files to {dir}...");
 
-            var path = Path.Combine(dir, $"Allocations.geojson");
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await JsonSerializer.SerializeAsync(stream, features, features.GetType());
-            }
+            var pointsTask = WriteFeatures(pointFeatures, Path.Combine(dir, $"Allocations.Points.geojson"));
+            var polygonsTask = WriteFeatures(polygonFeatures, Path.Combine(dir, $"Allocations.Polygons.geojson"));
+            var unknownTask = WriteFeatures(unknownFeatures, Path.Combine(dir, $"Allocations.Unknown.geojson"));
 
+            await pointsTask;
+            await polygonsTask;
+            await unknownTask;
 
             Console.WriteLine($"Done. Took {(int)sw.Elapsed.TotalMinutes} minutes");
+        }
+
+        private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
+        {
+            if (features.Any())
+            {
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await JsonSerializer.SerializeAsync(stream, features, features.GetType());
+                }
+            }
+            else if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
         }
     }
 }
