@@ -1,0 +1,16 @@
+.no-map-results-alert{
+  position: absolute;
+  z-index: 3;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  top: 30%;
+  width: 450px;
+  .card{
+    svg{
+      height: 24px;
+      cursor: pointer;
+    }
+  }
+}
