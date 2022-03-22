@@ -34,7 +34,7 @@ function Map() {
       await v.render()
       const blob = await canvas.convertToBlob()
       const pngUrl = URL.createObjectURL(blob);
-      map.loadImage(pngUrl, (err, result) => {
+      map.loadImage(pngUrl, (_, result) => {
         if (result) {
           map.addImage(id, result);
         }
