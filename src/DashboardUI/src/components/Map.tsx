@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceImpl, GeoJSONSource, LngLat, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -10,6 +10,7 @@ import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
+import { useDebounceCallback } from "@react-hook/debounce";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -17,7 +18,7 @@ import { useDrop } from "react-dnd";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, setRenderedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -41,10 +42,6 @@ function Map() {
     }
   }
 
-  const isGeoJsonSource = (mapSource: AnySourceImpl | undefined): mapSource is GeoJSONSource => {
-    return (mapSource as GeoJSONSource)?.setData !== undefined;
-  }
-
   const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
     if (map.hasControl(geocoderControl.current) && !user) {
       map.removeControl(geocoderControl.current);
@@ -65,6 +62,7 @@ function Map() {
       center: [-100, 40],
       zoom: 4,
     });
+
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
       addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
@@ -90,6 +88,21 @@ function Map() {
     return mapConfig.layers.map(a => a.id)
   }, [])
 
+  const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
+    setRenderedFeatures(s => {
+      var sourceFeatures = map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
+      return sourceFeatures;
+    })
+  }, 500)
+
+  useEffect(() => {
+    if (!map) return;
+    setMapRenderedFeatures(map);
+    map.on('idle', () => {
+      setMapRenderedFeatures(map);
+    });
+  }, [map, setMapRenderedFeatures])
+
   useEffect(() => {
     if (!map) return;
     updateMapControls(map, user);
@@ -100,7 +113,7 @@ function Map() {
     (mapConfig as any).layers.forEach((a: AnyLayer) => {
       map.setLayoutProperty(a.id, "visibility", visibleLayers.some(b => b === a.id) ? "visible" : "none")
     });
-  }, [map, visibleLayers]);
+  }, [map, visibleLayers, setMapRenderedFeatures]);
 
   useEffect(() => {
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
@@ -121,7 +134,6 @@ function Map() {
           resolve(true);
         });
         map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
-
       });
     }
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
@@ -138,12 +150,23 @@ function Map() {
     if (!map) return;
     geoJsonData.forEach(a => {
       var source = map.getSource(a.source);
-      if (isGeoJsonSource(source)) {
+      if (source.type === 'geojson') {
         source.setData(a.data);
       }
     })
-
   }, [map, geoJsonData]);
+
+  useEffect(() => {
+    if (!map) return;
+    vectorUrls.forEach(a => {
+      var source = map.getSource(a.source);
+      if (source.type === 'vector') {
+        if (source.url !== a.url) {
+          source.setUrl(a.url);
+        }
+      }
+    })
+  }, [map, vectorUrls]);
 
   useEffect(() => {
     if (!map) return;
@@ -151,6 +174,13 @@ function Map() {
       map.setFilter(key, filters[key]);
     }
   }, [map, filters]);
+
+  useEffect(() => {
+    if (!map) return;
+    for (let key in circleColors) {
+      map.setPaintProperty(key, "circle-color", circleColors[key]);
+    }
+  }, [map, circleColors]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
@@ -170,7 +200,7 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
-      <div className="map-coordinates">{coords?.lat.toFixed(4)} {coords?.lng.toFixed(4)}</div>
+      {coords && <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>}
       {legend &&
         <div className={`legend ${legendClass}`}>
           {legend}

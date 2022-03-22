@@ -15,12 +15,10 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         public override string TestMe(string input)
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                // Blow up if we can't connect to database
-                db.Database.OpenConnection();
-                return $"{nameof(TestAccessor)} : Database : {input}";
-            }
+            using var db = _databaseContextFactory.Create();
+            // Blow up if we can't connect to database
+            db.Database.OpenConnection();
+            return $"{nameof(TestAccessor)} : Database : {input}";
         }
     }
 

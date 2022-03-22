@@ -20,34 +20,29 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<Site> ISiteAccessor.GetSiteByUuid(string siteUuid)
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.SitesDim
-                    .Where(x => x.SiteUuid == siteUuid)
-                    .ProjectTo<Site>(DtoMapper.Configuration)
-                    .SingleAsync();
-            }
+            using var db = _databaseContextFactory.Create();
+            return await db.SitesDim
+                .Where(x => x.SiteUuid == siteUuid)
+                .ProjectTo<Site>(DtoMapper.Configuration)
+                .SingleAsync();
         }
 
         async Task<List<Site>> ISiteAccessor.GetSites()
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.SitesDim
-                    .ProjectTo<Site>(DtoMapper.Configuration)
-                    .ToListAsync();
-            }
+            var db = _databaseContextFactory.Create();
+            db.Database.SetCommandTimeout(int.MaxValue);
+            return await db.SitesDim
+                .ProjectTo<Site>(DtoMapper.Configuration)
+                .ToListAsync();
         }
 
         public async Task<SiteDetails> GetSiteDetailsByUuid(string siteUuid)
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                return await db.SitesDim
-                    .Where(x => x.SiteUuid == siteUuid)
-                    .ProjectTo<SiteDetails>(DtoMapper.Configuration)
-                    .SingleAsync();
-            }
+            using var db = _databaseContextFactory.Create();
+            return await db.SitesDim
+                .Where(x => x.SiteUuid == siteUuid)
+                .ProjectTo<SiteDetails>(DtoMapper.Configuration)
+                .SingleAsync();
         }
     }
 }
