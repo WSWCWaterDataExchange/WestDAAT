@@ -19,16 +19,14 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-              var org = db.AllocationAmountsFact
-                .Where(a => a.AllocationAmountId == allocationAmountId)
-                .Select(a => a.Organization)
-                .ProjectTo<Organization>(DtoMapper.Configuration)
-                .Single();
+            using var db = _databaseContextFactory.Create();
+            var org = db.AllocationAmountsFact
+              .Where(a => a.AllocationAmountId == allocationAmountId)
+              .Select(a => a.Organization)
+              .ProjectTo<Organization>(DtoMapper.Configuration)
+              .Single();
 
-                return org;
-            }
+            return org;
         }
 
         public async Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId)
@@ -66,15 +64,13 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
         {
-            using (var db = _databaseContextFactory.Create())
-            {
-                db.Database.SetCommandTimeout(int.MaxValue);
-                var waterAllocations = await db.AllocationAmountsFact
-                    .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
-                    .ToListAsync();
+            using var db = _databaseContextFactory.Create();
+            db.Database.SetCommandTimeout(int.MaxValue);
+            var waterAllocations = await db.AllocationAmountsFact
+                .ProjectTo<AllocationAmount>(DtoMapper.Configuration)
+                .ToListAsync();
 
-                return waterAllocations;
-            }
+            return waterAllocations;
         }
 
         async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(long waterRightId)

@@ -18,19 +18,29 @@ export enum MapStyle {
 
 export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
+export type MapLayerCircleColorsType = { [layer: string]: any };
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
+type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
+
+type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
 
 interface MapContextState {
   mapStyle: MapStyle;
   setMapStyle: (style: MapStyle) => void;
   legend: ReactElement | null;
-  setLegend: (legend: ReactElement | null) => void;
+  setLegend: React.Dispatch<React.SetStateAction<ReactElement | null>>;
   filters: MapLayerFiltersType;
   setLayerFilters: (filters: setFiltersParamType) => void;
+  circleColors: MapLayerCircleColorsType;
+  setLayerCircleColors: (circleColors: setCircleColorsParamType) => void;
   geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
   setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
+  vectorUrls: { source: string, url: string }[]
+  setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[],
   setVisibleLayers: (layers: string[]) => void,
+  renderedFeatures: RenderedFeatureType[],
+  setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>
   mapBounds: mapboxgl.LngLatLike[],
   setMapBounds: (bounds: mapboxgl.LngLatLike[]) => void
 };
@@ -42,10 +52,16 @@ const defaultState: MapContextState = {
   setLegend: () => { },
   filters: {},
   setLayerFilters: () => { },
+  circleColors: {},
+  setLayerCircleColors: () => { },
   geoJsonData: [],
   setGeoJsonData: () => { },
+  vectorUrls: [],
+  setVectorUrl: () => { },
   visibleLayers: [],
   setVisibleLayers: () => { },
+  renderedFeatures: [],
+  setRenderedFeatures: () => { }
   mapBounds: [],
   setMapBounds: () => {}
 };
@@ -57,7 +73,6 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapStyle, setMapStyle] = useState(getUrlParam<MapStyle>("ms") ?? MapStyle.Light);
   const setMapStyleInternal = (mapStyle: MapStyle): void => {
-
     setMapStyle(mapStyle);
   }
   useEffect(() => {
@@ -67,8 +82,8 @@ const MapProvider: FC = ({ children }) => {
       setUrlParam("ms", mapStyle);
     }
   }, [mapStyle, setUrlParam])
-  const [filters, setFilters] = useState<MapLayerFiltersType>({});
 
+  const [filters, setFilters] = useState<MapLayerFiltersType>({});
   const setLayerFilters = useCallback((updatedFilters: setFiltersParamType): void => {
     setFilters(s => {
       const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
@@ -82,6 +97,22 @@ const MapProvider: FC = ({ children }) => {
       return s;
     })
   }, [setFilters]);
+
+  const [circleColors, setCircleColors] = useState<MapLayerCircleColorsType>({});
+  const setLayerCircleColors = useCallback((updatedFilters: setCircleColorsParamType): void => {
+    setCircleColors(s => {
+      const circleColorArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+      const updatedCircleColorSet = { ...s };
+      circleColorArray.forEach(value => {
+        updatedCircleColorSet[value.layer] = value.circleColor
+      })
+      if (!deepEqual(s, updatedCircleColorSet)) {
+        return updatedCircleColorSet;
+      }
+      return s;
+    })
+  }, [setCircleColors]);
+
   const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
   const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
     setAllGeoJsonData(s => {
@@ -95,9 +126,24 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllGeoJsonData])
 
+  const [vectorUrls, setAllVectorUrls] = useState<{ source: string, url: string }[]>([]);
+  const setVectorUrl = useCallback((source: string, url: string) => {
+    setAllVectorUrls(s => {
+      const unchangedData = s.filter(a => a.source !== source);
+      const updatedData = [...unchangedData, { source, url }];
+
+      if (!deepEqual(s, updatedData)) {
+        return updatedData;
+      }
+      return s;
+    });
+  }, [setAllVectorUrls])
+
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
   const [legend, setLegend] = useState<ReactElement | null>(null);
+
+  const [renderedFeatures, setRenderedFeatures] = useState<RenderedFeatureType[]>([]);
 
   const [mapBounds, setMapBounds] = useState<mapboxgl.LngLatLike[]>([]);
 
@@ -108,10 +154,16 @@ const MapProvider: FC = ({ children }) => {
     setLegend,
     filters,
     setLayerFilters,
+    circleColors,
+    setLayerCircleColors,
     geoJsonData,
     setGeoJsonData,
+    vectorUrls,
+    setVectorUrl,
     visibleLayers,
     setVisibleLayers,
+    renderedFeatures,
+    setRenderedFeatures
     mapBounds,
     setMapBounds
   };

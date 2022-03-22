@@ -16,12 +16,10 @@ namespace WesternStatesWater.WestDaat.Utilities
                 return null;
             }
             var serializer = GeoJsonSerializer.Create();
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                serializer.Serialize(jsonWriter, geometry);
-                return System.Text.Json.JsonSerializer.Deserialize<FeatureCollection>(stringWriter.ToString());
-            }
+            using var stringWriter = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(stringWriter);
+            serializer.Serialize(jsonWriter, geometry);
+            return System.Text.Json.JsonSerializer.Deserialize<FeatureCollection>(stringWriter.ToString());
         }
 
         //Json can start with lots of characters but I _believe_ GeoJson can only start with "{"
@@ -59,11 +57,9 @@ namespace WesternStatesWater.WestDaat.Utilities
                 return null;
             }
             var serializer = GeoJsonSerializer.Create();
-            using (var stringReader = new StringReader(geoJson))
-            using (var jsonReader = new JsonTextReader(stringReader))
-            {
-                return serializer.Deserialize<Geometry>(jsonReader);
-            }
+            using var stringReader = new StringReader(geoJson);
+            using var jsonReader = new JsonTextReader(stringReader);
+            return serializer.Deserialize<Geometry>(jsonReader);
         }
 
         private static bool IsGeoJsonString(string geometry)

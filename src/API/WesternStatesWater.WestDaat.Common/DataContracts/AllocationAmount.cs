@@ -5,6 +5,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public long AllocationAmountId { get; set; }
         public List<string> BeneficialUses { get; set; }
         public string OwnerClassification { get; set; }
+        public string CustomerType { get; set; }
         public DateTime AllocationPriorityDate { get; set; }
         public double? AllocationFlowCfs { get; set; }
         public double? AllocationVolumeAf { get; set; }

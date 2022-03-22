@@ -1,5 +1,6 @@
 import { createContext, FC, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import * as compress from "lz-string";
 
 export interface User {
   username: string;
@@ -32,7 +33,10 @@ const AppProvider: FC = ({ children }) => {
   const initUrlParams = () => {
     const stateStr = urlParams.get("state");
     if (stateStr) {
-      return JSON.parse(stateStr) as Record<string, string>;
+      const decompressed = compress.decompressFromEncodedURIComponent(stateStr);
+      if (decompressed) {
+        return JSON.parse(decompressed) as Record<string, any>;
+      }
     }
     return {};
   }
@@ -45,7 +49,7 @@ const AppProvider: FC = ({ children }) => {
       if (value === undefined) {
         delete updatedValues[key]
       } else {
-        updatedValues[key] = JSON.stringify(value);
+        updatedValues[key] = value;
       }
       return updatedValues;
     })
@@ -54,13 +58,13 @@ const AppProvider: FC = ({ children }) => {
   const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
     var param = stateUrlParams[key];
     if (param) {
-      return JSON.parse(param) as T;
+      return param as T;
     }
   }, [stateUrlParams])
 
   useEffect(() => {
     if ((Object.keys(stateUrlParams).length ?? 0) > 0) {
-      setUrlParams({ state: JSON.stringify(stateUrlParams) })
+      setUrlParams({ state: compress.compressToEncodedURIComponent(JSON.stringify(stateUrlParams)) })
     } else {
       setUrlParams({});
     }

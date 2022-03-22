@@ -22,14 +22,7 @@ function SidePanel(props: SidePanelProps) {
 
   return (
     <div className="side-panel d-flex flex-column">
-      <div className="map-info text-center p-2">
-        19,241 Points of Diversions Displayed
-      </div>
-      <div className="position-relative flex-grow-1">
-        <div className="panel-content p-3">
-          {tabComponent}
-        </div>
-      </div>
+      {tabComponent}
     </div>
   );
 }
