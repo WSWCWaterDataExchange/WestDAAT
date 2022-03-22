@@ -18,7 +18,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, setRenderedFeatures } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, setRenderedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -200,11 +200,16 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
-      {coords && <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>}
-      {legend &&
+      {coords && map &&
+        <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>
+      }
+      {legend && map &&
         <div className={`legend ${legendClass}`}>
           {legend}
         </div>
+      }
+      {map &&
+        mapAlert
       }
       <div id="map" className="map h-100" ref={dropRef}></div>
     </div>

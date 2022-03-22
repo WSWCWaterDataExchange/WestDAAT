@@ -13,6 +13,7 @@ import { useQuery } from "react-query";
 import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from "../accessors/systemAccessor";
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
+import useNoMapResults from "../hooks/useNoMapResults";
 
 
 enum waterRightsProperties {
@@ -242,6 +243,9 @@ function WaterRightsTab() {
   useEffect(() => {
     setVisibleLayers(allWaterRightsLayers)
   }, [setVisibleLayers])
+
+  const hasRenderedFeatures = useMemo(() =>renderedFeatures.length > 0, [renderedFeatures.length]);
+  useNoMapResults(hasRenderedFeatures);
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {

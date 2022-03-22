@@ -27,8 +27,8 @@ type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: st
 interface MapContextState {
   mapStyle: MapStyle;
   setMapStyle: (style: MapStyle) => void;
-  legend: ReactElement | null;
-  setLegend: React.Dispatch<React.SetStateAction<ReactElement | null>>;
+  legend: JSX.Element | null;
+  setLegend: React.Dispatch<React.SetStateAction<JSX.Element | null>>;
   filters: MapLayerFiltersType;
   setLayerFilters: (filters: setFiltersParamType) => void;
   circleColors: MapLayerCircleColorsType;
@@ -40,13 +40,15 @@ interface MapContextState {
   visibleLayers: string[],
   setVisibleLayers: (layers: string[]) => void,
   renderedFeatures: RenderedFeatureType[],
-  setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>
+  setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>,
+  mapAlert: JSX.Element | null,
+  setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>
 };
 
 const defaultState: MapContextState = {
   mapStyle: MapStyle.Light,
   setMapStyle: () => { },
-  legend: null as ReactElement | null,
+  legend: null,
   setLegend: () => { },
   filters: {},
   setLayerFilters: () => { },
@@ -59,7 +61,9 @@ const defaultState: MapContextState = {
   visibleLayers: [],
   setVisibleLayers: () => { },
   renderedFeatures: [],
-  setRenderedFeatures: () => { }
+  setRenderedFeatures: () => { },
+  mapAlert: null,
+  setMapAlert: () => {}
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -137,9 +141,11 @@ const MapProvider: FC = ({ children }) => {
 
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
 
-  const [legend, setLegend] = useState<ReactElement | null>(null);
+  const [legend, setLegend] = useState<JSX.Element | null>(null);
 
   const [renderedFeatures, setRenderedFeatures] = useState<RenderedFeatureType[]>([]);
+
+  const [mapAlert, setMapAlert] = useState<JSX.Element | null>(null);
 
   const mapContextProviderValue = {
     mapStyle,
@@ -157,7 +163,9 @@ const MapProvider: FC = ({ children }) => {
     visibleLayers,
     setVisibleLayers,
     renderedFeatures,
-    setRenderedFeatures
+    setRenderedFeatures,
+    mapAlert,
+    setMapAlert
   };
 
   return (
