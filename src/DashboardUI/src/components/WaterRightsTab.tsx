@@ -343,7 +343,7 @@ function WaterRightsTab() {
     }
     if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
     const filterSet = ["all"] as any[];
-    if (filters.podPou) {
+    if (filters.podPou === "POD" || filters.podPou === "POU") {
       filterSet.push(["==", waterRightsProperties.sitePodOrPou, filters.podPou]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
@@ -370,7 +370,7 @@ function WaterRightsTab() {
     if (filters.minVolume !== undefined) {
       filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
     }
-    console.log(filterSet);
+    
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
