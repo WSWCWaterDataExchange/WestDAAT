@@ -7,7 +7,7 @@ const mapsJson = {
     {
       "id": "allocation-sites_1",
       "type": "vector",
-      "url": "https://api.maptiler.com/tiles/9edcc245-6749-42ff-a7b4-9063124b0837/tiles.json?key=IauIQDaqjd29nJc5kJse",
+      "url": "https://api.maptiler.com/tiles/acf2ef77-3afa-4100-9a97-13bdce51772b/tiles.json?key=IauIQDaqjd29nJc5kJse",
       "volatile": true
     },
     {
@@ -29,18 +29,32 @@ const mapsJson = {
   ],
   "layers": [
     {
-      "id": "allocations",
-      "friendlyName": "Aquaculture",
-      "source-layer": "allocations",
+      "id": "waterRightsPolygons",
+      "friendlyName": "Water Rights Polygons",
+      "source-layer": "polygons",
       "source": "allocation-sites_1",
       "layout": {
         "visibility": "visible"
+      },
+      "type": "fill",
+      "paint": {
+        "fill-color": "#ff0000",
+        "fill-opacity": .5
+      }
+    },
+    {
+      "id": "waterRightsPoints",
+      "friendlyName": "Water Rights Points",
+      "source-layer": "points",
+      "source": "allocation-sites_1",
+      "layout": {
+        "visibility": "none"
       },
       "type": "circle",
       "paint": {
         "circle-radius": pointCircleRadius,
         "circle-color": "#ff0000"
-      }
+      },
     },
     {
       "id": "site-locations",

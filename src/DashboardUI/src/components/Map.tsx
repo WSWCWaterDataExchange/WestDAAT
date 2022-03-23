@@ -18,7 +18,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, setRenderedFeatures, mapBoundSettings } = useContext(MapContext);
+    const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, setRenderedFeatures, mapBoundSettings } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -34,7 +34,7 @@ function Map() {
       await v.render()
       const blob = await canvas.convertToBlob()
       const pngUrl = URL.createObjectURL(blob);
-      map.loadImage(pngUrl, (err, result) => {
+      map.loadImage(pngUrl, (_, result) => {
         if (result) {
           map.addImage(id, result);
         }
@@ -183,6 +183,13 @@ function Map() {
   }, [map, circleColors]);
 
   useEffect(() => {
+    if (!map) return;
+    for (let key in fillColors) {
+      map.setPaintProperty(key, "fill-color", fillColors[key]);
+    }
+  }, [map, fillColors]);
+
+  useEffect(() => {
     if (!map || !mapBoundSettings || mapBoundSettings.LngLatBounds.length === 0) return;
     const bounds = new mapboxgl.LngLatBounds(mapBoundSettings.LngLatBounds[0], mapBoundSettings.LngLatBounds[0]);
     mapBoundSettings.LngLatBounds.forEach(x => {
@@ -212,11 +219,16 @@ function Map() {
 
   return (
     <div className="position-relative h-100">
-      {coords && <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>}
-      {legend &&
+      {coords && map &&
+        <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>
+      }
+      {legend && map &&
         <div className={`legend ${legendClass}`}>
           {legend}
         </div>
+      }
+      {map &&
+        mapAlert
       }
       <div id="map" className="map h-100" ref={dropRef}></div>
     </div>

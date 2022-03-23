@@ -1,4 +1,4 @@
-﻿using GeoJSON.Text.Feature;
+﻿using GeoJSON.Text.Geometry;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -9,17 +9,19 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public static class GeometryHelpers
     {
-        public static FeatureCollection AsGeoJson(this Geometry geometry)
+        public static IGeometryObject AsGeoJsonGeometry(this Geometry geometry)
         {
             if (geometry == null)
             {
                 return null;
             }
             var serializer = GeoJsonSerializer.Create();
-            using var stringWriter = new StringWriter();
-            using var jsonWriter = new JsonTextWriter(stringWriter);
-            serializer.Serialize(jsonWriter, geometry);
-            return System.Text.Json.JsonSerializer.Deserialize<FeatureCollection>(stringWriter.ToString());
+            using (var stringWriter = new StringWriter())
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                serializer.Serialize(jsonWriter, geometry);
+                return System.Text.Json.JsonSerializer.Deserialize<IGeometryObject>(stringWriter.ToString());
+            }
         }
 
         //Json can start with lots of characters but I _believe_ GeoJson can only start with "{"
