@@ -14,6 +14,7 @@ import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from 
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
+import { PriorityDateRange } from "./PriorityDateRange";
 
 
 enum waterRightsProperties {
@@ -27,8 +28,8 @@ enum waterRightsProperties {
   maxFlowRate = "maxFlow",
   minVolume = "minVol",
   maxVolume = "maxVol",
-  minPriority = "minPri",
-  maxPriority = "maxPri",
+  minPriorityDate = "minPri",
+  maxPriorityDate = "maxPri",
 }
 
 enum MapGrouping {
@@ -48,7 +49,9 @@ interface WaterRightsFilters {
   maxFlow: number | undefined,
   minVolume: number | undefined,
   maxVolume: number | undefined,
-  podPou: "POD" | "POU" | undefined
+  podPou: "POD" | "POU" | undefined,
+  minPriorityDate: number | undefined,
+  maxPriorityDate: number | undefined
 }
 
 const mapDataTiers = [
@@ -101,7 +104,9 @@ const defaultFilters: WaterRightsFilters = {
   maxFlow: undefined,
   minVolume: undefined,
   maxVolume: undefined,
-  podPou: undefined
+  podPou: undefined,
+  minPriorityDate: undefined,
+  maxPriorityDate: undefined
 }
 
 function WaterRightsTab() {
@@ -334,17 +339,25 @@ function WaterRightsTab() {
     }));
   }, 400)
 
+  const handlePriorityDateChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
+    setFilters(s => ({
+      ...s,
+      minPriorityDate: min,
+      maxPriorityDate: max
+    }));
+  }, 400)
+
   useEffect(() => {
-    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume, value: number): any[] => {
-      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume;
+    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
+      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
       const fieldStr = field as string;
       const operator = isMin ? "<=" : ">=";
 
       let coalesceValue;
       if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
-        coalesceValue = 9999999
+        coalesceValue = 999999999
       } else {
-        coalesceValue = -9999999
+        coalesceValue = -999999999
       }
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
@@ -377,6 +390,12 @@ function WaterRightsTab() {
     }
     if (filters.minVolume !== undefined) {
       filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
+    }
+    if (filters.minPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+    }
+    if (filters.maxPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
     }
 
     setMapLayerFilters(allWaterRightsLayers.map(a => {
@@ -485,11 +504,10 @@ function WaterRightsTab() {
             <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
           </div>
 
-          {/* <div className="mb-3">
-        <label>Allocation Priority Date</label>
-        <span>{allocationDates[0]} to {allocationDates[1]}</span>
-        <AllocationDateSlider handleChange={handleAllocationDateChange} dates={allocationDates} />
-      </div> */}
+          <div className="mb-3">
+            <label>Priority Date</label>
+            <PriorityDateRange onChange={handlePriorityDateChange} initialMin={filters.minPriorityDate} initialMax={filters.maxPriorityDate} />
+          </div>
 
           <div className="mb-3">
             <label>MAP THEME</label>
@@ -509,3 +527,5 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
+
+
