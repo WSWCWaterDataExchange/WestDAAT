@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 import Map from './Map';
 import { MapContext } from './MapProvider';
-import { useWaterRightSiteLocations } from '../hooks/waterAllocation';
 import mapboxgl from 'mapbox-gl';
 import useProgressIndicator from '../hooks/useProgressIndicator';
 import { getWaterRightSiteLocations } from '../accessors/waterAllocationAccessor';
