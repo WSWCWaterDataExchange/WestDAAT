@@ -52,7 +52,9 @@ const mapsJson = {
       "type": "circle",
       "paint": {
         "circle-radius": pointCircleRadius,
-        "circle-color": "#01579b"
+        "circle-color": ["case",
+          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
+          nldi.colors.sitePOU],
       }
     },
     {
@@ -67,7 +69,7 @@ const mapsJson = {
         "text-offset": [0, -1.5],
       },
       "paint": {
-        "text-color": "#01579b",
+        "text-color": "#000000",
         "text-halo-color": "#ffffff",
         "text-halo-width": 0.5,
       },
