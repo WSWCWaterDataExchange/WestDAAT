@@ -80,7 +80,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightSiteLocations(waterRightId);
 
-            return new OkObjectResult(result);
+            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
     }
 }
