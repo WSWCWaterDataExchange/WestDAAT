@@ -14,13 +14,13 @@ import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from 
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
+import { PriorityDateRange } from "./PriorityDateRange";
 
 
 enum waterRightsProperties {
   owners = "o",
   ownerClassifications = "oClass",
   beneficialUses = "bu",
-  priorityDates = "prrty",
   siteUuid = "uuid",
   sitePodOrPou = "podPou",
   waterSourceTypes = "wsType",
@@ -28,6 +28,8 @@ enum waterRightsProperties {
   maxFlowRate = "maxFlow",
   minVolume = "minVol",
   maxVolume = "maxVol",
+  minPriorityDate = "minPri",
+  maxPriorityDate = "maxPri",
 }
 
 enum MapGrouping {
@@ -47,7 +49,9 @@ interface WaterRightsFilters {
   maxFlow: number | undefined,
   minVolume: number | undefined,
   maxVolume: number | undefined,
-  podPou: "POD" | "POU" | undefined
+  podPou: "POD" | "POU" | undefined,
+  minPriorityDate: number | undefined,
+  maxPriorityDate: number | undefined
 }
 
 const mapDataTiers = [
@@ -81,8 +85,12 @@ const colors = [
   '#FF0000'
 ]
 
+const waterRightsPointsLayer = 'waterRightsPoints';
+const waterRightsPolygonsLayer = 'waterRightsPolygons';
+
 const allWaterRightsLayers = [
-  'allocations'
+  waterRightsPointsLayer,
+  waterRightsPolygonsLayer
 ]
 
 const defaultFilters: WaterRightsFilters = {
@@ -96,7 +104,9 @@ const defaultFilters: WaterRightsFilters = {
   maxFlow: undefined,
   minVolume: undefined,
   maxVolume: undefined,
-  podPou: undefined
+  podPou: undefined,
+  minPriorityDate: undefined,
+  maxPriorityDate: undefined
 }
 
 function WaterRightsTab() {
@@ -168,6 +178,7 @@ function WaterRightsTab() {
     setVisibleLayers,
     renderedFeatures,
     setLayerCircleColors,
+    setLayerFillColors,
     setVectorUrl
   } = useContext(MapContext);
 
@@ -198,25 +209,27 @@ function WaterRightsTab() {
   }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
 
   useEffect(() => {
-    let circleColorArray: any;
+    let colorArray: any;
     if (renderedMapGroupings.colorMapping.length > 0) {
-      circleColorArray = ["case"];
+      colorArray = ["case"];
       renderedMapGroupings.colorMapping.forEach(a => {
-        circleColorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
-        circleColorArray.push(a.color)
+        colorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
+        colorArray.push(a.color)
       })
-      circleColorArray.push("#000000");
+      colorArray.push("#000000");
     } else {
-      circleColorArray = "#000000"
+      colorArray = "#000000"
     }
 
-    setLayerCircleColors(allWaterRightsLayers.map(a => {
-      return {
-        layer: a,
-        circleColor: circleColorArray
-      }
-    }))
-  }, [setLayerCircleColors, renderedMapGroupings])
+    setLayerCircleColors({
+      layer: waterRightsPointsLayer,
+      circleColor: colorArray
+    })
+    setLayerFillColors({
+      layer: waterRightsPolygonsLayer,
+      fillColor: colorArray
+    })
+  }, [setLayerCircleColors, setLayerFillColors, renderedMapGroupings])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
@@ -244,7 +257,7 @@ function WaterRightsTab() {
     setVisibleLayers(allWaterRightsLayers)
   }, [setVisibleLayers])
 
-  const hasRenderedFeatures = useMemo(() =>renderedFeatures.length > 0, [renderedFeatures.length]);
+  const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   useNoMapResults(hasRenderedFeatures);
 
   useEffect(() => {
@@ -326,17 +339,25 @@ function WaterRightsTab() {
     }));
   }, 400)
 
+  const handlePriorityDateChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
+    setFilters(s => ({
+      ...s,
+      minPriorityDate: min,
+      maxPriorityDate: max
+    }));
+  }, 400)
+
   useEffect(() => {
-    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume, value: number): any[] => {
-      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume;
+    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
+      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
       const fieldStr = field as string;
       const operator = isMin ? "<=" : ">=";
 
       let coalesceValue;
-      if ((includeNulls && isMin)||(!includeNulls && !isMin)){
-        coalesceValue = 9999999
+      if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
+        coalesceValue = 999999999999
       } else {
-        coalesceValue = -9999999
+        coalesceValue = -999999999999
       }
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
@@ -344,7 +365,7 @@ function WaterRightsTab() {
     if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
-      filterSet.push(["==", waterRightsProperties.sitePodOrPou, filters.podPou]);
+      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
       filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
@@ -370,14 +391,20 @@ function WaterRightsTab() {
     if (filters.minVolume !== undefined) {
       filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
     }
-    
+    if (filters.minPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+    }
+    if (filters.maxPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+    }
+
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
 
   const clearMapFilters = () => {
-    setFilters({...defaultFilters});
+    setFilters({ ...defaultFilters });
     setAllocationOwnerValue("");
   }
 
@@ -477,11 +504,10 @@ function WaterRightsTab() {
             <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
           </div>
 
-          {/* <div className="mb-3">
-        <label>Allocation Priority Date</label>
-        <span>{allocationDates[0]} to {allocationDates[1]}</span>
-        <AllocationDateSlider handleChange={handleAllocationDateChange} dates={allocationDates} />
-      </div> */}
+          <div className="mb-3">
+            <label>Priority Date</label>
+            <PriorityDateRange onChange={handlePriorityDateChange} initialMin={filters.minPriorityDate} initialMax={filters.maxPriorityDate} />
+          </div>
 
           <div className="mb-3">
             <label>MAP THEME</label>
@@ -501,3 +527,5 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
+
+

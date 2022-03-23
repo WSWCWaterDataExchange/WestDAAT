@@ -18,7 +18,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, setRenderedFeatures } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, setRenderedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -181,6 +181,13 @@ function Map() {
       map.setPaintProperty(key, "circle-color", circleColors[key]);
     }
   }, [map, circleColors]);
+
+  useEffect(() => {
+    if (!map) return;
+    for (let key in fillColors) {
+      map.setPaintProperty(key, "fill-color", fillColors[key]);
+    }
+  }, [map, fillColors]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',

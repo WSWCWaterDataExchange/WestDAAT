@@ -34,7 +34,7 @@ function SiteNavbar(props: SiteNavbarProps) {
             </Button>
 
             <Nav className="mx-2">
-              <Nav.Link target="_blank" href="https://westernstateswater.org/" active>
+              <Nav.Link target="_blank" href="https://westernstateswater.org/">
                 <img alt="Wade Logo" src="/logo32x32.png" />
                 Western States Water Council
               </Nav.Link>
@@ -42,11 +42,11 @@ function SiteNavbar(props: SiteNavbarProps) {
           </div>
 
           <Nav className="mx-2">
-            <Nav.Link href="/" active>Western States Water Data Access and Analysis Tool (WestDAAT)</Nav.Link>
+            <Nav.Link href="/">Western States Water Data Access and Analysis Tool (WestDAAT)</Nav.Link>
           </Nav>
 
           <Nav className="mx-2">
-            <Nav.Link active onClick={() => setUser({username: "WaDE User"})}>
+            <Nav.Link onClick={() => setUser({username: "WaDE User"})}>
               {user ? `Hello, ${user.username}` : "Log In"}
             </Nav.Link>
           </Nav>
