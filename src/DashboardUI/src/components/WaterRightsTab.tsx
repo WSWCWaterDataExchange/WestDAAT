@@ -365,7 +365,7 @@ function WaterRightsTab() {
     if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
-      filterSet.push(["==", waterRightsProperties.sitePodOrPou, filters.podPou]);
+      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
       filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
