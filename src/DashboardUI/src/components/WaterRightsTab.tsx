@@ -200,18 +200,18 @@ function WaterRightsTab() {
 
   const renderedMapGroupings = useMemo(() => {
     let colorMappings = [...allMapGroupings.colorMapping];
-    if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
+    if (allMapGroupings.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
       colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
     }
-    if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
+    if (allMapGroupings.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
       colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
     }
-    if (mapGrouping.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
+    if (allMapGroupings.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
     }
-    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[allMapGroupings.property]).some((c: string) => c === a.key)));
     return {
-      property: mapGrouping.property,
+      property: allMapGroupings.property,
       colorMapping: colorMappings
     }
   }, [allMapGroupings, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
