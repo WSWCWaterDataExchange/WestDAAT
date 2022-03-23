@@ -183,7 +183,7 @@ function Map() {
   }, [map, circleColors]);
 
   useEffect(() => {
-    if (!map || !mapBoundSettings) return;
+    if (!map || !mapBoundSettings || mapBoundSettings.LngLatBounds.length === 0) return;
     const bounds = new mapboxgl.LngLatBounds(mapBoundSettings.LngLatBounds[0], mapBoundSettings.LngLatBounds[0]);
     mapBoundSettings.LngLatBounds.forEach(x => {
       bounds.extend(x);
