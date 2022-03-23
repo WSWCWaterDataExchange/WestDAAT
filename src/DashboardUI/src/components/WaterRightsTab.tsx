@@ -355,9 +355,9 @@ function WaterRightsTab() {
 
       let coalesceValue;
       if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
-        coalesceValue = 999999999
+        coalesceValue = 999999999999
       } else {
-        coalesceValue = -999999999
+        coalesceValue = -999999999999
       }
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
