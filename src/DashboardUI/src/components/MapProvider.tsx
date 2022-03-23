@@ -72,7 +72,7 @@ const defaultState: MapContextState = {
   renderedFeatures: [],
   setRenderedFeatures: () => { },
   mapAlert: null,
-  setMapAlert: () => {}
+  setMapAlert: () => {},
   mapBoundSettings: null,
   setMapBoundSettings: () => {}
 };
