@@ -92,8 +92,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         {"o", string.Join(" ", siteAllocations.Select(a => a.AllocationOwner).Distinct())},
                         {"oClass", siteAllocations.Select(a => a.OwnerClassification).Distinct()},
                         {"bu", siteAllocations.SelectMany(a => a.BeneficialUses).Distinct().ToList()},
-                        {"minPri", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Min() },
-                        {"maxPri", siteAllocations.Select(a => new DateTimeOffset(a.AllocationPriorityDate).ToUnixTimeSeconds()).Max() },
                         {"uuid", site.SiteUuid},
                         {"podPou", site.PodPou},
                         {"wsType", site.WaterSourceTypes},
@@ -110,6 +108,12 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
                 var maxVolume = siteAllocations.Select(a => a.AllocationVolumeAf).Max();
                 if (maxVolume != null) properties.Add("maxVol", maxVolume.Value);
+
+                var minPriorityDate = siteAllocations.Select(a=>GetUnixTime(a.AllocationPriorityDate)).Min();
+                if (minPriorityDate != null) properties.Add("minPri", minPriorityDate.Value);
+
+                var maxPriorityDate = siteAllocations.Select(a => GetUnixTime(a.AllocationPriorityDate)).Max();
+                if (maxPriorityDate != null) properties.Add("maxPri", maxPriorityDate.Value);
 
                 var geometry = site.Geometry.AsGeoJsonGeometry();
 
@@ -129,7 +133,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         unknownFeatures.Add(feature);
                         break;
                 }
-
             });
 
 
@@ -149,6 +152,15 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             await unknownTask;
 
             Console.WriteLine($"Done. Took {(int)sw.Elapsed.TotalMinutes} minutes");
+        }
+
+        private static long? GetUnixTime(DateTime? value)
+        {
+            if(value == null)
+            {
+                return null;
+            }
+            return new DateTimeOffset(value.Value).ToUnixTimeSeconds();
         }
 
         private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
