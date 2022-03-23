@@ -190,8 +190,16 @@ function WaterRightsTab() {
     }
   }, [setVectorUrl])
 
-  const renderedMapGroupings = useMemo(() => {
+  const allMapGroupings = useMemo(() => {
     let colorMappings = [...mapGrouping.colorMapping];
+    return {
+      property: mapGrouping.property,
+      colorMapping: colorMappings
+    }
+  }, [mapGrouping])
+
+  const renderedMapGroupings = useMemo(() => {
+    let colorMappings = [...allMapGroupings.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
       colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
     }
@@ -206,14 +214,14 @@ function WaterRightsTab() {
       property: mapGrouping.property,
       colorMapping: colorMappings
     }
-  }, [mapGrouping, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
+  }, [allMapGroupings, renderedFeatures, filters.beneficialUses, filters.waterSourceTypes, filters.ownerClassifications])
 
   useEffect(() => {
     let colorArray: any;
-    if (renderedMapGroupings.colorMapping.length > 0) {
+    if (allMapGroupings.colorMapping.length > 0) {
       colorArray = ["case"];
-      renderedMapGroupings.colorMapping.forEach(a => {
-        colorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
+      allMapGroupings.colorMapping.forEach(a => {
+        colorArray.push(["in", a.key, ["get", allMapGroupings.property]]);
         colorArray.push(a.color)
       })
       colorArray.push("#000000");
@@ -229,7 +237,7 @@ function WaterRightsTab() {
       layer: waterRightsPolygonsLayer,
       fillColor: colorArray
     })
-  }, [setLayerCircleColors, setLayerFillColors, renderedMapGroupings])
+  }, [setLayerCircleColors, setLayerFillColors, allMapGroupings])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
