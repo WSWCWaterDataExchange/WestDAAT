@@ -17,7 +17,15 @@ const mapsJson = {
         "type": "FeatureCollection",
         "features": []
       }
-    }
+    },
+    {
+      "id": "site-locations",
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": []
+      }
+    },
   ],
   "layers": [
     {
@@ -46,6 +54,38 @@ const mapsJson = {
       "paint": {
         "circle-radius": pointCircleRadius,
         "circle-color": "#ff0000"
+      },
+    },
+    {
+      "id": "site-locations",
+      "friendlyName": "SiteLocations",
+      "source": "site-locations",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "circle",
+      "paint": {
+        "circle-radius": pointCircleRadius,
+        "circle-color": ["case",
+          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
+          nldi.colors.sitePOU],
+      }
+    },
+    {
+      "id": "site-locations-label",
+      "friendlyName": "SiteLocationsLabel",
+      "source": "site-locations",
+      "type": "symbol",
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["get", "siteUuid"],
+        "text-size": 16,
+        "text-offset": [0, -1.5],
+      },
+      "paint": {
+        "text-color": "#000000",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 0.5,
       },
     },
     {

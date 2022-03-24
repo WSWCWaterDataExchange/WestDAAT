@@ -6,7 +6,9 @@ export const nldi = {
     wade: "#009E73",
     usgs: "#0072B2",
     epa: "#D55E00",
-    unknown: "#CC79A7"
+    unknown: "#CC79A7",
+    sitePOD: "#01579b",
+    sitePOU: "#7cb342"
   },
   latLongPrecision: 4
 }

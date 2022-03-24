@@ -1,6 +1,7 @@
 import { createContext, FC,  useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
+import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -46,7 +47,9 @@ interface MapContextState {
   renderedFeatures: RenderedFeatureType[],
   setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>,
   mapAlert: JSX.Element | null,
-  setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>
+  setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+  mapBoundSettings: MapBoundSettings | null,
+  setMapBoundSettings: (settings: MapBoundSettings) => void
 };
 
 const defaultState: MapContextState = {
@@ -69,7 +72,9 @@ const defaultState: MapContextState = {
   renderedFeatures: [],
   setRenderedFeatures: () => { },
   mapAlert: null,
-  setMapAlert: () => {}
+  setMapAlert: () => {},
+  mapBoundSettings: null,
+  setMapBoundSettings: () => {}
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -168,6 +173,8 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapAlert, setMapAlert] = useState<JSX.Element | null>(null);
 
+  const [mapBoundSettings, setMapBoundSettings] = useState<MapBoundSettings | null>(null);
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -187,6 +194,8 @@ const MapProvider: FC = ({ children }) => {
     setVisibleLayers,
     renderedFeatures,
     setRenderedFeatures,
+    mapBoundSettings,
+    setMapBoundSettings,
     mapAlert,
     setMapAlert
   };

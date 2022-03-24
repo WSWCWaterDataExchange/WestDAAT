@@ -25,3 +25,12 @@ export const getWaterRightSourceInfoList = async (waterRightId: number) => {
   );
   return data;
 };
+
+export const getWaterRightSiteLocations = async (waterRightId: number) => {
+  const { data } = await axios.get<
+    GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
+  >(
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${waterRightId}/SiteLocations`
+  );
+  return data;
+};

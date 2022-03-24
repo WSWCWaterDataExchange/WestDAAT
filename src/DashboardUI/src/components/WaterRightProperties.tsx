@@ -75,13 +75,13 @@ function WaterRightProperties(props: waterRightPropertiesProps){
         <span className='property-value'>{waterRightDetails.organizationContactName}</span>
         
         <span className='property-name'>Contact Email</span>
-        <span className='property-value'>{waterRightDetails.organizationContactEmail}</span>
+        <span className='property-value'><a href={`mailto:${waterRightDetails.organizationContactEmail}`}>{waterRightDetails.organizationContactEmail}</a></span>
         
         <span className='property-name'>Phone Number</span>
         <span className='property-value'>{waterRightDetails.organizationPhoneNumber}</span>
         
         <span className='property-name'>Website</span>
-        <span className='property-value'>{waterRightDetails.organizationWebsite}</span>
+        <span className='property-value'><a href={waterRightDetails.organizationWebsite}>{waterRightDetails.organizationWebsite}</a></span>
       </div>
     </>}
   </div>
