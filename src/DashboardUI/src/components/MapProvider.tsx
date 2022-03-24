@@ -1,4 +1,4 @@
-import { createContext, FC,  useCallback, useContext, useEffect, useState } from "react";
+import { createContext, FC,  ReactElement,  useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
@@ -22,7 +22,7 @@ export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
 export type MapLayerFillColorsType = { [layer: string]: any };
 export type MapClickType = { latitude: number, longitude: number, layer: string, features: GeoJSON.Feature[]};
-export type MapPopupType = { latitude: number, longitude: number, markup: string};
+export type MapPopupType = { latitude: number, longitude: number, element: ReactElement};
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
 type setFillColorsParamType = { layer: string, fillColor: any } | { layer: string, fillColor: any }[]

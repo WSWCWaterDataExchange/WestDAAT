@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -16,6 +16,11 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
 import { PriorityDateRange } from "./PriorityDateRange";
 import useMapPopupOnClick from "../hooks/useMapPopupOnClick";
+import { Link } from "react-router-dom";
+import Icon from "@mdi/react";
+import { mdiMenuLeft, mdiMenuRight } from '@mdi/js';
+import { Card } from "react-bootstrap";
+import CardHeader from "react-bootstrap/esm/CardHeader";
 
 
 enum waterRightsProperties {
@@ -412,30 +417,7 @@ function WaterRightsTab() {
     setAllocationOwnerValue("");
   }
 
-  const { updatePopup, clickedFeatures } = useMapPopupOnClick();
-  const clickedSiteUuid = useMemo(() => {
-    if (!clickedFeatures || clickedFeatures.length === 0) {
-      return undefined;
-    }
-    const feature = clickedFeatures.find(a => a.properties && a.properties[waterRightsProperties.siteUuid as string]);
-    if (!feature || !feature.properties) {
-      return undefined;
-    }
-    return feature.properties[waterRightsProperties.siteUuid as string];
-  }, [clickedFeatures])
-
-  const tempFakeQuery = async (siteUuid: string): Promise<{ waterRightsUrl: string, siteUuid: string }> => {
-    return { waterRightsUrl: 'https://google.com', siteUuid: siteUuid };
-  }
-  const { data: clickedSiteUuidData, isFetching: isFectchingClickedSiteUuid } = useQuery(['siteDigest', clickedSiteUuid], () => tempFakeQuery(clickedSiteUuid), { enabled: !!clickedSiteUuid });
-
-  useEffect(() => {
-    if(clickedSiteUuidData){
-      updatePopup(<WaterRightsMapPopup data={clickedSiteUuidData} isFetching={isFectchingClickedSiteUuid} />)
-    }
-  }, [clickedSiteUuid, isFectchingClickedSiteUuid])
-
-
+  useWaterRightsMapPopup();
 
   if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
 
@@ -557,19 +539,110 @@ function WaterRightsTab() {
 
 export default WaterRightsTab;
 
+function useWaterRightsMapPopup() {
+  const { updatePopup, clickedFeatures } = useMapPopupOnClick();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const clickedSiteUuid = useMemo(() => {
+    if (!clickedFeatures || clickedFeatures.length === 0) {
+      return undefined;
+    }
+    const feature = clickedFeatures.find(a => a.properties && a.properties[waterRightsProperties.siteUuid as string]);
+    if (!feature || !feature.properties) {
+      return undefined;
+    }
+    return feature.properties[waterRightsProperties.siteUuid as string];
+  }, [clickedFeatures])
+
+  const tempFakeQuery = async (siteUuid: string): Promise<{ waterRights: Array<{ id: string, nativeId: string, beneficialUses: string[], priorityDate: string }>, siteUuid: string }> => {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    return {
+      waterRights: [
+        {
+          id: "518",
+          nativeId: "nativeId-518",
+          beneficialUses: ["Livestock"],
+          priorityDate: "1981-10-05"
+        },
+        {
+          id: "519",
+          nativeId: "nativeId-519",
+          beneficialUses: ["Livestock2"],
+          priorityDate: "2022-03-24"
+        }
+      ], siteUuid: siteUuid
+    };
+  }
+
+  const { data, isFetching } = useQuery(['siteDigest', clickedSiteUuid], async () => await tempFakeQuery(clickedSiteUuid), {
+    enabled: !!clickedSiteUuid,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    cacheTime: 8600000,
+    staleTime: Infinity
+  });
+
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [data, setCurrentIndex]);
+  
+  const result = useMemo(() => {
+    if (isFetching) {
+      return <>Loading...</>;
+    }
+    if (!data) {
+      return <>No Data</>;
+    }
+    return <WaterRightsMapPopup data={data} onSelectedIndexChanged={setCurrentIndex} currentIndex={currentIndex} />
+  }, [isFetching, data, currentIndex, setCurrentIndex]);
+
+  useEffect(() => {
+    updatePopup(result);
+  }, [result])
+}
+
 interface WaterRightsMapPopupProps {
-  data: { 
-    waterRightsUrl: string,
+  data: {
+    waterRights: Array<{ id: string, nativeId: string, beneficialUses: string[], priorityDate: string }>,
     siteUuid: string
-   } | undefined,
-  isFetching: boolean,
+  },
+  currentIndex: number,
+  onSelectedIndexChanged: (index: number) => void
 }
 function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
-  if (props.isFetching) {
-    return <>Loading...</>;
-  }
-  if (!props.data) {
-    return <>No Data</>;
-  }
-  return <a href={props.data.waterRightsUrl} target="_blank">Water Rights {props.data.siteUuid}</a>
+  const currWaterRight = useMemo(() => {
+    return props.data.waterRights[props.currentIndex]
+  }, [])
+  return (
+    <Card className="m-0">
+      <CardHeader>Site ID: {props.data.siteUuid}</CardHeader>
+      <div className="card-body">
+        <div>
+          <strong>Water Right Native ID:</strong> <WaterRightsMapPopupToggle count={props.data.waterRights.length} currentIndex={props.currentIndex} setCurrentIndex={props.onSelectedIndexChanged} />
+        </div>
+        <div>
+          <a href={`/details/right/${currWaterRight.id}`} target="_blank">{currWaterRight.nativeId}</a>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+interface WaterRightsMapPopupToggleProps {
+  count: number, currentIndex: number, setCurrentIndex: (index: number) => void;
+}
+function WaterRightsMapPopupToggle(props: WaterRightsMapPopupToggleProps) {
+  const { count, currentIndex, setCurrentIndex } = props;
+  if (count <= 1) return null;
+  return (
+    <>
+      <span>{currentIndex + 1} of {count}</span>
+      <span style={{ width: "18px", display: "inline-block" }} onClick={() => setCurrentIndex((currentIndex + 1) % count)}>
+        <Icon path={mdiMenuLeft} />
+      </span>
+      <span style={{ width: "18px", display: "inline-block" }} onClick={() => setCurrentIndex((currentIndex - 1 + count) % count)}>
+        <Icon path={mdiMenuRight} />
+      </span>
+    </>
+  )
 }

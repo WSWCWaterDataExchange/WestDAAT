@@ -1,5 +1,4 @@
-import { ReactElement, useCallback, useContext, useEffect } from "react";
-import ReactDOMServer from "react-dom/server";
+import { ReactElement, useCallback, useContext } from "react";
 import { MapContext } from "../components/MapProvider";
 
 function useMapPopupOnClick() {
@@ -12,7 +11,7 @@ function useMapPopupOnClick() {
       setMapPopup({
         latitude: mapClickedFeatures.latitude,
         longitude: mapClickedFeatures.longitude,
-        markup: ReactDOMServer.renderToStaticMarkup(element)
+        element: element
       })
     } else{
       setMapPopup(null);

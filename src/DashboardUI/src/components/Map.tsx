@@ -24,6 +24,7 @@ function Map() {
   const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, mapPopup, setRenderedFeatures, mapBoundSettings, setMapClickedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
+  const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
@@ -104,8 +105,8 @@ function Map() {
       setMapRenderedFeatures(map);
     });
     mapConfig.layers.forEach((a) => {
-      map.on('click', a.id, e=>{
-        if(e.features && e.features.length > 0){
+      map.on('click', a.id, e => {
+        if (e.features && e.features.length > 0) {
           setMapClickedFeatures({
             latitude: e.lngLat.lat,
             longitude: e.lngLat.lng,
@@ -117,15 +118,23 @@ function Map() {
     })
   }, [map, setMapRenderedFeatures, setMapClickedFeatures])
 
-  useEffect(() =>{
-    if (!map || !mapPopup) return; //what to do if mapPopup comes in null?
-    new mapboxgl.Popup()
-      .setLngLat({
-        lat: mapPopup.latitude,
-        lng: mapPopup.longitude
-      })
-      .setHTML(mapPopup.markup)
-      .addTo(map);
+  useEffect(() => {
+    if (!map) return;
+    if (currentMapPopup.current) {
+      currentMapPopup.current.remove();
+    }
+    if (mapPopup) {
+      currentMapPopup.current = new mapboxgl.Popup()
+        .setLngLat({
+          lat: mapPopup.latitude,
+          lng: mapPopup.longitude
+        })
+        .setHTML("<div id='mapboxPopupId' style='margin: -10px -10px -15px'></div>")
+        .once('open', () => {
+          ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
+        })
+        .addTo(map);
+    }
   }, [map, mapPopup])
 
   useEffect(() => {
