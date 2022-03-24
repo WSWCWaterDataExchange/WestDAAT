@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, MapLayerMouseEvent, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -11,6 +11,9 @@ import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
+import { toast } from "react-toastify";
+import ReactDOM from "react-dom";
+import ReactDOMServer from "react-dom/server";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -18,7 +21,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 
 function Map() {
   const { user } = useContext(AppContext);
-    const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, setRenderedFeatures, mapBoundSettings } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, mapPopup, setRenderedFeatures, mapBoundSettings, setMapClickedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
 
@@ -90,8 +93,7 @@ function Map() {
 
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(s => {
-      var sourceFeatures = map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
-      return sourceFeatures;
+      return map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
     })
   }, 500)
 
@@ -101,7 +103,30 @@ function Map() {
     map.on('idle', () => {
       setMapRenderedFeatures(map);
     });
-  }, [map, setMapRenderedFeatures])
+    mapConfig.layers.forEach((a) => {
+      map.on('click', a.id, e=>{
+        if(e.features && e.features.length > 0){
+          setMapClickedFeatures({
+            latitude: e.lngLat.lat,
+            longitude: e.lngLat.lng,
+            layer: a.id,
+            features: e.features
+          })
+        }
+      })
+    })
+  }, [map, setMapRenderedFeatures, setMapClickedFeatures])
+
+  useEffect(() =>{
+    if (!map || !mapPopup) return; //what to do if mapPopup comes in null?
+    new mapboxgl.Popup()
+      .setLngLat({
+        lat: mapPopup.latitude,
+        lng: mapPopup.longitude
+      })
+      .setHTML(mapPopup.markup)
+      .addTo(map);
+  }, [map, mapPopup])
 
   useEffect(() => {
     if (!map) return;

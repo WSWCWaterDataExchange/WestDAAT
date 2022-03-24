@@ -15,6 +15,7 @@ import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
 import { PriorityDateRange } from "./PriorityDateRange";
+import useMapPopupOnClick from "../hooks/useMapPopupOnClick";
 
 
 enum waterRightsProperties {
@@ -44,7 +45,7 @@ interface WaterRightsFilters {
   waterSourceTypes?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
-  includeNulls: boolean,
+  includeExempt: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
   minVolume: number | undefined,
@@ -99,7 +100,7 @@ const defaultFilters: WaterRightsFilters = {
   allocationOwner: undefined,
   waterSourceTypes: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
-  includeNulls: false,
+  includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
   minVolume: undefined,
@@ -319,7 +320,7 @@ function WaterRightsTab() {
   const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
     setFilters(s => ({
       ...s,
-      includeNulls: e.target.checked
+      includeExempt: e.target.checked
     }));
   }, 400)
 
@@ -380,22 +381,25 @@ function WaterRightsTab() {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
     }
     if (filters.maxFlow !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxFlowRate, filters.maxFlow));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
     }
     if (filters.minFlow !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minFlowRate, filters.minFlow));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
     }
     if (filters.maxVolume !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxVolume, filters.maxVolume));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
     }
     if (filters.minVolume !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
     }
     if (filters.minPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
     }
     if (filters.maxPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+    }
+    if (!filters.includeExempt) {
+      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
     }
 
     setMapLayerFilters(allWaterRightsLayers.map(a => {
@@ -407,6 +411,31 @@ function WaterRightsTab() {
     setFilters({ ...defaultFilters });
     setAllocationOwnerValue("");
   }
+
+  const { updatePopup, clickedFeatures } = useMapPopupOnClick();
+  const clickedSiteUuid = useMemo(() => {
+    if (!clickedFeatures || clickedFeatures.length === 0) {
+      return undefined;
+    }
+    const feature = clickedFeatures.find(a => a.properties && a.properties[waterRightsProperties.siteUuid as string]);
+    if (!feature || !feature.properties) {
+      return undefined;
+    }
+    return feature.properties[waterRightsProperties.siteUuid as string];
+  }, [clickedFeatures])
+
+  const tempFakeQuery = async (siteUuid: string): Promise<{ waterRightsUrl: string, siteUuid: string }> => {
+    return { waterRightsUrl: 'https://google.com', siteUuid: siteUuid };
+  }
+  const { data: clickedSiteUuidData, isFetching: isFectchingClickedSiteUuid } = useQuery(['siteDigest', clickedSiteUuid], () => tempFakeQuery(clickedSiteUuid), { enabled: !!clickedSiteUuid });
+
+  useEffect(() => {
+    if(clickedSiteUuidData){
+      updatePopup(<WaterRightsMapPopup data={clickedSiteUuidData} isFetching={isFectchingClickedSiteUuid} />)
+    }
+  }, [clickedSiteUuid, isFectchingClickedSiteUuid])
+
+
 
   if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
 
@@ -490,7 +519,7 @@ function WaterRightsTab() {
           </div>
 
           <div className="mb-3 form-check form-switch">
-            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeNulls} onChange={handleIncludeNullChange} />
+            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeExempt} onChange={handleIncludeNullChange} />
             <label className="form-check-label">Include Empty Amount and Priority Date Value</label>
           </div>
 
@@ -528,4 +557,19 @@ function WaterRightsTab() {
 
 export default WaterRightsTab;
 
-
+interface WaterRightsMapPopupProps {
+  data: { 
+    waterRightsUrl: string,
+    siteUuid: string
+   } | undefined,
+  isFetching: boolean,
+}
+function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
+  if (props.isFetching) {
+    return <>Loading...</>;
+  }
+  if (!props.data) {
+    return <>No Data</>;
+  }
+  return <a href={props.data.waterRightsUrl} target="_blank">Water Rights {props.data.siteUuid}</a>
+}
