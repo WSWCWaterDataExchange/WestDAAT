@@ -36,7 +36,7 @@ export function useWaterRightsMapPopup() {
         }}
       </MapPopupCard>;
     }
-    if (!data) {
+    if (!data || data.length === 0) {
       return <MapPopupCard onClosePopup={handleClosePopup}>
         {{
           header: "Error",
