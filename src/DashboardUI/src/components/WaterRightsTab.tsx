@@ -383,9 +383,6 @@ function WaterRightsTab() {
     if (filters.maxPriorityDate !== undefined) {
       filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
     }
-    if (!filters.includeExempt) {
-      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
-    }
 
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
