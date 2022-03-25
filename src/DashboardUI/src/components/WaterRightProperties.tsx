@@ -38,7 +38,8 @@ function WaterRightProperties(props: waterRightPropertiesProps){
         <span className='property-value'>{waterRightDetails.allocationVolumeAF}</span>
 
         <span className='property-name'>Beneficial Use</span>
-        <span className='property-value'>{waterRightDetails.beneficialUse}</span>
+        {waterRightDetails.beneficialUses.map(a=><span key={a} className='property-value'>{a}</span>)}
+        
       </div>
       <div className='d-flex p-2 flex-column'>
         <h4>Variable</h4>

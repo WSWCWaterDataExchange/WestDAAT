@@ -6,10 +6,10 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
+    [TestCategory("Accessor Tests")]
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange
@@ -36,8 +36,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
-        public async Task WaterAllocationAccessor_GetWaterRightDetailsById()
+        public async Task GetWaterRightDetailsById_Matches()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -62,7 +61,43 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
+        public async Task GetWaterRightDetailsById_NoMatch()
+        {
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            Func<Task> call = async() =>await accessor.GetWaterRightDetailsById(1234);
+
+            // Assert
+            await call.Should().ThrowAsync<Exception>();
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public async Task GetWaterRightDetailsById_BeneficialUses(int beneficialUseCount)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(beneficialUseCount);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightDetailsById(allocationAmount.AllocationAmountId);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.BeneficialUses.Should().BeEquivalentTo(beneficialUses.Select(a => a.Name));
+        }
+
+        [TestMethod]
         public async Task WaterAllocationAccessor_GetWaterRightSiteInfoById()
         {
             // Arrange
@@ -95,7 +130,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetWaterRightSourceInfoById()
         {
             // Arrange
@@ -140,7 +174,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Any(x => x.WaterSourceUuid == waterSources[0].WaterSourceUuid).Should().BeTrue();
         }
 
-        [TestCategory("Accessor Tests")]
         [DataTestMethod]
         [DataRow(null)]
         [DataRow("2022-01-22")]
@@ -167,7 +200,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .Contain(a => a.AllocationPriorityDate == date);
         }
 
-        [TestCategory("Accessor Tests")]
         [TestMethod]
         public async Task GetWaterRightsDigestsBySite_Matches()
         {
@@ -203,7 +235,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 });
         }
 
-        [TestCategory("Accessor Tests")]
         [DataTestMethod]
         [DataRow(0)]
         [DataRow(1)]
@@ -234,7 +265,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .BeEquivalentTo(allocationAmount.Select(a => a.AllocationAmountId));
         }
 
-        [TestCategory("Accessor Tests")]
         [DataTestMethod]
         [DataRow(0)]
         [DataRow(1)]
@@ -268,7 +298,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .BeEquivalentTo(beneficialUses.Select(a => a.Name));
         }
 
-        [TestCategory("Accessor Tests")]
         [DataTestMethod]
         [DataRow(null)]
         [DataRow("2022-01-22")]
