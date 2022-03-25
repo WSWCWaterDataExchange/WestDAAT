@@ -2,25 +2,14 @@ import { useContext, useEffect } from "react";
 import Map from './Map';
 import { MapContext } from './MapProvider';
 import mapboxgl from 'mapbox-gl';
-import useProgressIndicator from '../hooks/useProgressIndicator';
-import { getWaterRightSiteLocations } from '../accessors/waterAllocationAccessor';
-import { useQuery } from 'react-query';
+import { useWaterRightSiteLocations } from "../hooks";
 
 interface waterRightMapProps {
   waterRightId: string;
 }
 
 function WaterRightMap(props: waterRightMapProps){
-  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useQuery(
-    ['waterRightSiteLocations', +props.waterRightId], 
-    () => getWaterRightSiteLocations(+props.waterRightId),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useWaterRightSiteLocations(+props.waterRightId);
 
   const {
     setVisibleLayers, 
@@ -54,8 +43,6 @@ function WaterRightMap(props: waterRightMapProps){
       padding: 50
     })
   }, [waterRightSiteLocations, setMapBounds])
-
-  useProgressIndicator([!isWaterRightSiteLocationsLoading], "Loading Map Data");
 
   if(isWaterRightSiteLocationsLoading) return null;
 
