@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import useMapPopupOnClick from "./useMapPopupOnClick";
 import { MapPopupCard } from "../components/MapPopupCard";
 import WaterRightsMapPopup from "../components/WaterRightsMapPopup";
 import { waterRightsProperties } from "../config/constants";
+import { useWaterRightsDigests } from "./useSiteQuery";
 
 export function useWaterRightsMapPopup() {
   const { updatePopup, clickedFeatures } = useMapPopupOnClick();
@@ -21,40 +21,7 @@ export function useWaterRightsMapPopup() {
     return feature.properties[waterRightsProperties.siteUuid as string];
   }, [clickedFeatures]);
 
-  const tempFakeQuery = async (siteUuid: string): Promise<{ waterRights: Array<{ id: string; nativeId: string; beneficialUses: string[]; priorityDate: string; }>; siteUuid: string; } | null> => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return {
-      waterRights: [
-        {
-          id: "518",
-          nativeId: "nativeId-518",
-          beneficialUses: ["Livestock"],
-          priorityDate: "1981-10-05"
-        },
-        {
-          id: "519",
-          nativeId: "nativeId-519",
-          beneficialUses: ["Livestock2"],
-          priorityDate: "2022-03-24"
-        },
-        {
-          id: "520",
-          nativeId: "nativeId-520",
-          beneficialUses: ["Livestock3", "Fire"],
-          priorityDate: "2022-03-25"
-        }
-      ], siteUuid: siteUuid
-    };
-  };
-
-  const { data, isFetching } = useQuery(['siteDigest', clickedSiteUuid], async () => await tempFakeQuery(clickedSiteUuid), {
-    enabled: !!clickedSiteUuid,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    cacheTime: 8600000,
-    staleTime: Infinity
-  });
+  const { data, isFetching } = useWaterRightsDigests(clickedSiteUuid);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -77,7 +44,7 @@ export function useWaterRightsMapPopup() {
         }}
       </MapPopupCard>;
     }
-    return <WaterRightsMapPopup data={data} onSelectedIndexChanged={setCurrentIndex} currentIndex={currentIndex} onClosePopup={handleClosePopup} />;
+    return <WaterRightsMapPopup siteUuid={clickedSiteUuid} waterRights={data} onSelectedIndexChanged={setCurrentIndex} currentIndex={currentIndex} onClosePopup={handleClosePopup} />;
   }, [isFetching, clickedSiteUuid, data, currentIndex, handleClosePopup, setCurrentIndex]);
 
   useEffect(() => {

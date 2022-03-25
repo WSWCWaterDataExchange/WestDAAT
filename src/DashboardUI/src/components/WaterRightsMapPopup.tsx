@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { MapPopupCard } from "./MapPopupCard";
-import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew  } from '@mdi/js';
+import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';
 import Icon from "@mdi/react";
+import WaterRightDigest from "../data-contracts/WaterRightsDigest";
 
 interface WaterRightsMapPopupToggleProps {
   count: number, currentIndex: number, setCurrentIndex: (index: number) => void;
@@ -23,27 +24,25 @@ function WaterRightsMapPopupToggle(props: WaterRightsMapPopupToggleProps) {
 }
 
 interface WaterRightsMapPopupProps {
-  data: {
-    waterRights: Array<{ id: string, nativeId: string, beneficialUses: string[], priorityDate: string }>,
-    siteUuid: string
-  },
+  waterRights: WaterRightDigest[],
+  siteUuid: string,
   currentIndex: number,
   onSelectedIndexChanged: (index: number) => void,
   onClosePopup: () => void;
 }
 function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
-  const {data, currentIndex, onSelectedIndexChanged, onClosePopup} = props;
+  const { waterRights, siteUuid, currentIndex, onSelectedIndexChanged, onClosePopup } = props;
   const currWaterRight = useMemo(() => {
-    return data.waterRights[currentIndex];
-  }, [data, currentIndex]);
+    return waterRights[currentIndex];
+  }, [waterRights, currentIndex]);
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
-        header: `Site ID: ${data.siteUuid}`,
+        header: `Site ID: ${siteUuid}`,
         body: <div className="map-popup-card-water-rights-body">
           <div className="mb-2">
             <div className="map-popup-card-water-rights-native-id-row">
-              <strong>Water Right Native ID:</strong> <WaterRightsMapPopupToggle count={data.waterRights.length} currentIndex={currentIndex} setCurrentIndex={onSelectedIndexChanged} />
+              <strong>Water Right Native ID:</strong> <WaterRightsMapPopupToggle count={waterRights.length} currentIndex={currentIndex} setCurrentIndex={onSelectedIndexChanged} />
             </div>
             <div>
               <a href={`/details/right/${currWaterRight.id}`} target="_blank" rel="noreferrer">{currWaterRight.nativeId} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a>
