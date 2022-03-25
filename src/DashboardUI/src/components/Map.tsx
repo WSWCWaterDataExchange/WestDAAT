@@ -1,4 +1,4 @@
-import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, MapLayerMouseEvent, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -11,9 +11,7 @@ import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
-import { toast } from "react-toastify";
 import ReactDOM from "react-dom";
-import ReactDOMServer from "react-dom/server";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -117,14 +115,13 @@ function Map() {
       })
     })
   }, [map, setMapRenderedFeatures, setMapClickedFeatures])
-
   useEffect(() => {
     if (!map) return;
     if (currentMapPopup.current) {
       currentMapPopup.current.remove();
     }
     if (mapPopup) {
-      currentMapPopup.current = new mapboxgl.Popup()
+      currentMapPopup.current = new mapboxgl.Popup({closeOnClick: false})
         .setLngLat({
           lat: mapPopup.latitude,
           lng: mapPopup.longitude
@@ -134,8 +131,10 @@ function Map() {
           ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
         })
         .addTo(map);
+    } else {
+      setMapClickedFeatures(null);
     }
-  }, [map, mapPopup])
+  }, [map, mapPopup, setMapClickedFeatures])
 
   useEffect(() => {
     if (!map) return;
@@ -167,7 +166,7 @@ function Map() {
           })
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
+        map.setStyle(`mapbox://styles/mapbox/${style}`);
       });
     }
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
