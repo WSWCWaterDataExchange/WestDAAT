@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using System.Diagnostics.CodeAnalysis;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
@@ -13,7 +14,6 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.SiteName, b => b.Address.StreetName())
                 .RuleFor(a => a.CoordinateMethodCvNavigation, new CoordinateMethodFaker().Generate())
                 .RuleFor(a => a.EpsgcodeCvNavigation, new EpsgcodeFaker().Generate())
-                .RuleFor(a => a.AllocationBridgeSitesFact, b => new AllocationBridgeSiteFactFaker().Generate(5))
                 .RuleFor(a => a.HUC8, b => b.Random.String(4, 'A', 'z'))
                 .RuleFor(a => a.HUC12, b => b.Random.String(4, 'A', 'z'))
                 .RuleFor(a => a.County, b => b.Address.County())
@@ -23,10 +23,21 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.SiteNativeId, b => b.Random.String(5, 'A', 'z'))
                 .RuleFor(a => a.Geometry, b => new NetTopologySuite.Geometries.Point(new Coordinate(b.Random.Double(-180, 180), b.Random.Double(-90, 90))));
         }
+    }
 
-        public void CreateSpecialSite(string country)
+    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1204:StaticElementsMustAppearBeforeInstanceElements", Justification = "Extension methods after class.")]
+    public static class SitesDimFakerExtensions
+    {
+        public static Faker<SitesDim> LinkAllocationAmounts(this Faker<SitesDim> faker, params AllocationAmountsFact[] allocationAmounts)
         {
-            this.RuleFor(a => a.County, country);
+            faker.RuleFor(a => a.AllocationBridgeSitesFact, () => allocationAmounts.Select(c => new AllocationBridgeSiteFactFaker().RuleFor(a => a.AllocationAmount, () => c).Generate()).ToList());
+            return faker;
+        }
+
+        public static Faker<SitesDim> CreateSpecialSite(this Faker<SitesDim> faker, string country)
+        {
+            faker.RuleFor(a => a.County, country);
+            return faker;
         }
     }
 }

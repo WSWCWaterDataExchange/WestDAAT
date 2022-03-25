@@ -1,6 +1,7 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -13,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             // Arrange
             var allocationAmount = new AllocationAmountFactFaker().Generate();
-            using(var db = CreateDatabaseContextFactory().Create())
+            using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.Add(allocationAmount);
                 db.SaveChanges();
@@ -74,7 +75,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
 
-            foreach(var site in sites)
+            foreach (var site in sites)
             {
                 var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
                     .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
@@ -119,7 +120,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     .Generate();
                 db.AllocationBridgeSitesFact.Add(allocationSiteBridge);
 
-                foreach(var waterSource in waterSources)
+                foreach (var waterSource in waterSources)
                 {
                     var waterSourceBridge = new WaterSourceBridgeSiteFactFaker()
                         .WaterSourceBridgeSiteFactFakerWithIds(waterSource.WaterSourceId, site.SiteId)
@@ -148,17 +149,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
 
-            EF.DateDim date = null;
-            if(dateValue != null)
-            {
-                date = new DateDimFaker()
-                    .RuleFor(a=>a.Date, () => DateTime.Parse(dateValue))
-                    .Generate();
-            }
+            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
 
             var allocationAmount = new AllocationAmountFactFaker()
-                .RuleFor(a=>a.AllocationPriorityDateID, () => null)
-                .RuleFor(a => a.AllocationPriorityDateNavigation, () => date)
+                .SetAllocationPriorityDate(date)
                 .Generate();
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
@@ -168,10 +162,142 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.GetAllWaterAllocations();
 
             // Assert
-            var expectedDate = date?.Date;
             result.Should().NotBeNull().And
                 .HaveCount(1).And
-                .Contain(a=>a.AllocationPriorityDate == expectedDate);
+                .Contain(a => a.AllocationPriorityDate == date);
+        }
+
+        [TestCategory("Accessor Tests")]
+        [TestMethod]
+        public async Task GetWaterRightsDigestsBySite_Matches()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var date = new Faker().Date.Past(150);
+            var site = new SitesDimFaker().Generate();
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .SetAllocationPriorityDate(date)
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .LinkSites(site)
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull().And
+                .BeEquivalentTo(new[]
+                {
+                    new CommonContracts.WaterRightsDigest
+                    {
+                        Id = allocationAmount.AllocationAmountId,
+                        NativeId = allocationAmount.AllocationNativeId,
+                        PriorityDate = date.Date,
+                        BeneficialUses = new List<string>()
+                    }
+                });
+        }
+
+        [TestCategory("Accessor Tests")]
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public async Task GetWaterRightsDigestsBySite_Multiples(int allocationCount)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var site = new SitesDimFaker().Generate();
+            db.SitesDim.Add(site);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .Generate(allocationCount);
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
+
+            // Assert
+            var dbSites = db.SitesDim.ToList();
+            dbSites.Should().HaveCount(1).And
+                .AllSatisfy(a => a.SiteUuid.Should().Be(site.SiteUuid));
+            result.Select(a => a.Id).Should()
+                .BeEquivalentTo(allocationAmount.Select(a => a.AllocationAmountId));
+        }
+
+        [TestCategory("Accessor Tests")]
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public async Task GetWaterRightsDigestsBySite_BeneficialUses(int beneficialUseCount)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var site = new SitesDimFaker().Generate();
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(beneficialUseCount);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
+
+            // Assert
+            result
+                .Should().NotBeNull().And
+                .HaveCount(1);
+
+            result[0].BeneficialUses
+                .Should().NotBeNull().And
+                .BeEquivalentTo(beneficialUses.Select(a => a.Name));
+        }
+
+        [TestCategory("Accessor Tests")]
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("2022-01-22")]
+        public async Task GetWaterRightsDigestsBySite_Dates(string dateValue)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var site = new SitesDimFaker().Generate();
+
+            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .SetAllocationPriorityDate(date)
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
+
+            // Assert
+            result
+                .Should().NotBeNull().And
+                .HaveCount(1);
+
+            result[0].PriorityDate.Should().Be(date);
         }
 
         [TestMethod]

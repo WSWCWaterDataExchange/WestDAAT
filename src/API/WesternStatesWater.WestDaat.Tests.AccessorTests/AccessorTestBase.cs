@@ -44,7 +44,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             };
             _transactionScopeFixture = new TransactionScope(
                 TransactionScopeOption.Required,
-                transactionOptions);
+                transactionOptions,
+                TransactionScopeAsyncFlowOption.Enabled);
 
             _loggerFactory = LoggerFactory.Create(a =>
             {

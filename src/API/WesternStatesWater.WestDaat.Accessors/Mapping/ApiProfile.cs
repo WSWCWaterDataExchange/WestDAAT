@@ -52,6 +52,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>()
                 .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))
                 .ForMember(dest => dest.GnisfeatureName, opt => opt.MapFrom(source => source.GnisfeatureNameCv));
+            CreateMap<EF.AllocationAmountsFact, WaterRightsDigest>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(source => source.AllocationAmountId))
+                .ForMember(dest => dest.NativeId, opt => opt.MapFrom(source => source.AllocationNativeId))
+                .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
+                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(a=>a.BeneficialUseCV)));
         }
     }
 }
