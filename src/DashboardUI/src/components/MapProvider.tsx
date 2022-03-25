@@ -79,7 +79,7 @@ const defaultState: MapContextState = {
   mapAlert: null,
   setMapAlert: () => {},
   mapBoundSettings: null,
-  setMapBoundSettings: () => {}
+  setMapBoundSettings: () => {},
   mapClickedFeatures: null,
   setMapClickedFeatures: () => { },
   mapPopup: null,
