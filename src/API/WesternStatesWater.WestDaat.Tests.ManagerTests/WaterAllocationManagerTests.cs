@@ -143,7 +143,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSiteLocations()
         {
-            var location = new DC.SiteLocation
+            var location = new CommonContracts.SiteLocation
             {
                 Latitude = 999,
                 Longitude = 888,
@@ -151,7 +151,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 SiteUuid = "TEST_PODorPOU"
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById(99)).ReturnsAsync(new List<DC.SiteLocation> { location }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById(99)).ReturnsAsync(new List<CommonContracts.SiteLocation> { location }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSiteLocations(99);
@@ -159,7 +159,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.Should().NotBeNull();
             _siteAccessorMock.Verify();
 
-            result.Features.Count().Should().Be(1);
+            result.Features.Count.Should().Be(1);
             result.Features[0].Properties.First(x => x.Key.ToLower() == "siteuuid").Value.Should().Be(location.SiteUuid);
         }
 
