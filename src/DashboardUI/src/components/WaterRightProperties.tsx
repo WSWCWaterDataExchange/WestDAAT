@@ -1,4 +1,4 @@
-import { useWaterRightDetails } from '../hooks/waterAllocation';
+import { useWaterRightDetails } from '../hooks/useWaterRightQuery';
 
 interface waterRightPropertiesProps {
     waterRightId: string;
