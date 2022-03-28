@@ -473,6 +473,17 @@ function WaterRightsTab() {
             <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
           </div>
 
+          <div className="mb-3">
+            <label>River Basin</label>
+            <DropdownMultiselect
+              className="form-control"
+              options={allWaterSourceTypes}
+              selected={filters.waterSourceTypes ?? []}
+              handleOnChange={handleWaterSourceTypeChange}
+              name="beneficialUses"
+            />
+          </div>
+
           {/* <div className="mb-3">
         <label>Allocation Priority Date</label>
         <span>{allocationDates[0]} to {allocationDates[1]}</span>

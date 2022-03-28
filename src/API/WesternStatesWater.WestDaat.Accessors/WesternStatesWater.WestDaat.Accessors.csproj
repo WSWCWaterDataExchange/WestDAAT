@@ -46,4 +46,10 @@
     <Folder Include="DataTransferObjects\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="RiverBasinShapes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
