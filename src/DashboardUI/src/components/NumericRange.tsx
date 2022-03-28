@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { Form, InputGroup } from "react-bootstrap";
 
 export interface NumericRangeProps {
   initialMin: number | undefined,
@@ -42,13 +43,13 @@ function NumericRange(props: NumericRangeProps) {
   const step = 1 / (10 ** props.precision);
 
   return (
-    <div className="input-group mb-3">
-      <input min={0 - step} type="number" className="form-control" value={minValue ?? ""} step={step} placeholder={`Min ${props.placeholderText}`} aria-label={`Minimum ${props.placeholderText}`} onChange={handleMinChange} />
-      {props.units && <span className="input-group-text">{props.units}</span>}
-      <span className="input-group-text px-2">to</span>
-      <input min={0 - step} type="number" className="form-control" value={maxValue ?? ""} step={step} placeholder={`Max ${props.placeholderText}`} aria-label={`Maximum ${props.placeholderText}`} onChange={handleMaxChange} />
-      {props.units && <span className="input-group-text">{props.units}</span>}
-    </div>
+    <InputGroup className="mb-3">
+      <Form.Control min={0 - step} type="number" value={minValue ?? ""} step={step} placeholder={`Min ${props.placeholderText}`} aria-label={`Minimum ${props.placeholderText}`} onChange={handleMinChange} />
+      {props.units && <InputGroup.Text>{props.units}</InputGroup.Text>}
+      <InputGroup.Text className="px-2">to</InputGroup.Text>
+      <Form.Control min={0 - step} type="number" value={maxValue ?? ""} step={step} placeholder={`Max ${props.placeholderText}`} aria-label={`Maximum ${props.placeholderText}`} onChange={handleMaxChange} />
+      {props.units && <InputGroup.Text>{props.units}</InputGroup.Text>}
+    </InputGroup>
   );
 }
 

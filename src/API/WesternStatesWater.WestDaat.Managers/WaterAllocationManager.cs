@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Text.Json;
 using GeoJSON.Text.Feature;
+using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -82,6 +83,25 @@ namespace WesternStatesWater.WestDaat.Managers
         public List<Feature> GetRiverBasinPolygonByName(string[] basinNames)
         {
             return _locationEngine.GetRiverBasinPolygonByName(basinNames);
+        }
+
+        public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)
+        {
+            var siteLocations = await _waterAllocationAccessor.GetWaterRightSiteLocationsById(waterRightsId);
+
+            List<Feature> features = new List<Feature>();
+
+            foreach(var siteLocation in siteLocations)
+            {
+                features.Add(
+                    new Feature(
+                        new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
+                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        )
+                    );
+            }
+
+            return new FeatureCollection(features);
         }
     }
 }

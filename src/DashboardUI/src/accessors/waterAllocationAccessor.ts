@@ -34,6 +34,15 @@ export const getRiverBasinOptions = async () => {
   return data;
 };
 
+export const getWaterRightSiteLocations = async (waterRightId: number) => {
+  const { data } = await axios.get<
+    GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
+  >(
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${waterRightId}/SiteLocations`
+  );
+  return data;
+};
+
 export const getRiverBasinPolygonsByName = async (basinNames: string[]) => {
   const url = new URL('RiverBasins', process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.post<feature[]>(url.toString(), basinNames);
