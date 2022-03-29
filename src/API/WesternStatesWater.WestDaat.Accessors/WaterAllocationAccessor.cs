@@ -1,9 +1,6 @@
 ﻿using AutoMapper.QueryableExtensions;
-
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Logging;
-
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
