@@ -126,7 +126,7 @@ function Map() {
           lat: mapPopup.latitude,
           lng: mapPopup.longitude
         })
-        .setHTML("<div id='mapboxPopupId' style='margin: -10px -10px -15px'></div>")
+        .setHTML("<div id='mapboxPopupId'></div>")
         .once('open', () => {
           ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
         })
