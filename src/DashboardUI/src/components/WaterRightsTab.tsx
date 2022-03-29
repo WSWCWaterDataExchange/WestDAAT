@@ -162,6 +162,13 @@ function WaterRightsTab() {
   }, [setVectorUrl])
 
   const renderedMapGroupings = useMemo(() => {
+    const tryParseJsonArray = (value: any) => {
+      try {
+        return JSON.parse(value ?? "[]");
+      } catch (e) {
+        return [];
+      }
+    }
     let colorMappings = [...mapGrouping.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
       colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
@@ -172,7 +179,7 @@ function WaterRightsTab() {
     if (mapGrouping.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
     }
-    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && tryParseJsonArray(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
     return {
       property: mapGrouping.property,
       colorMapping: colorMappings
@@ -229,7 +236,7 @@ function WaterRightsTab() {
   }, [setVisibleLayers])
 
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
-  
+
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
       setUrlParam("wr", undefined);
