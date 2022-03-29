@@ -96,38 +96,9 @@ const defaultFilters: WaterRightsFilters = {
 }
 
 function WaterRightsTab() {
-  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useQuery(
-    ['beneficialUses'],
-    getBeneficialUses,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
-
-  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useQuery(
-    ['waterSourceTypes'],
-    getWaterSourceTypes,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
-
-  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useQuery(
-    ['ownerClassifications'],
-    getOwnerClassifications,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useBeneficialUses();
+  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useWaterSourceTypes();
+  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useOwnerClassifications();
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading], "Loading Filter Data");
 

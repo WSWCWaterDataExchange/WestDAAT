@@ -23,3 +23,11 @@ export const getWaterSourceTypes = async (): Promise<string[]> => {
   );
   return data;
 };
+
+export const getStates = async (): Promise<string[]> => {
+  const url = new URL('system/states', process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<string[]>(
+    url.toString()
+  );
+  return data;
+};
