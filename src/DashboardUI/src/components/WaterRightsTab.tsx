@@ -9,14 +9,13 @@ import VolumeRange from "./VolumeRange";
 import { AppContext } from "../AppProvider";
 import { MapThemeSelector } from "./MapThemeSelector";
 import deepEqual from 'fast-deep-equal/es6';
-import { useQuery } from "react-query";
-import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from "../accessors/systemAccessor";
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties } from "../config/constants";
+import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -28,6 +27,7 @@ interface WaterRightsFilters {
   beneficialUses?: string[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
+  states?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
   includeExempt: boolean,
@@ -84,6 +84,7 @@ const defaultFilters: WaterRightsFilters = {
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
+  states: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
   includeExempt: false,
   minFlow: undefined,
@@ -247,6 +248,13 @@ function WaterRightsTab() {
     }));
   }
 
+  const handleStateChange = (selectedOptions: string[]) => {
+    setFilters(s => ({
+      ...s,
+      states: selectedOptions.length > 0 ? selectedOptions : undefined
+    }));
+  }
+
   const handleOwnerClassificationChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
@@ -320,7 +328,7 @@ function WaterRightsTab() {
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     }
-    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
+    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates) return;
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
       filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
@@ -333,6 +341,9 @@ function WaterRightsTab() {
     }
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+    }
+    if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
+      filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
@@ -359,7 +370,7 @@ function WaterRightsTab() {
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });
@@ -446,6 +457,17 @@ function WaterRightsTab() {
               selected={filters.waterSourceTypes ?? []}
               handleOnChange={handleWaterSourceTypeChange}
               name="beneficialUses"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label>State</label>
+            <DropdownMultiselect
+              className="form-control"
+              options={allStates}
+              selected={filters.states ?? []}
+              handleOnChange={handleStateChange}
+              name="states"
             />
           </div>
 
