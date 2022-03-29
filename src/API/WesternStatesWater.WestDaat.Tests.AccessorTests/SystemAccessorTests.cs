@@ -145,6 +145,52 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                   .BeEquivalentTo(new[] { expectedResult });
         }
 
+        [TestMethod]
+        public async Task GetAvailableStateNormalizedNames_RemovesDuplicates()
+        {
+            var duplicateOwnerClassifications = new StateFaker()
+                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
+                .Generate(2);
+            var uniqueOwnerClassification = new StateFaker()
+                .RuleFor(a => a.WaDEName, b => "Unique Name")
+                .Generate();
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.State.AddRange(duplicateOwnerClassifications);
+                db.State.Add(uniqueOwnerClassification);
+                db.SaveChanges();
+            }
+
+            var accessor = CreateSystemAccessor();
+            var result = await accessor.GetAvailableStateNormalizedNames();
+
+            result.Should().NotBeNull().And
+                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
+        }
+
+        [DataTestMethod]
+        [DataRow("NE", null, "NE")]
+        [DataRow("NE", "", "NE")]
+        [DataRow("NE", "CA", "CA")]
+        public async Task GetAvailableStateNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
+        {
+            var uniqueOwnerClassification = new StateFaker()
+                .RuleFor(a => a.Name, b => name)
+                .RuleFor(a => a.WaDEName, b => waDEName)
+                .Generate();
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.State.Add(uniqueOwnerClassification);
+                db.SaveChanges();
+            }
+
+            var accessor = CreateSystemAccessor();
+            var result = await accessor.GetAvailableStateNormalizedNames();
+
+            result.Should().NotBeNull().And
+                  .BeEquivalentTo(new[] { expectedResult });
+        }
+
         private ISystemAccessor CreateSystemAccessor()
         {
             return new SystemAccessor(CreateLogger<SystemAccessor>(), CreateDatabaseContextFactory());
