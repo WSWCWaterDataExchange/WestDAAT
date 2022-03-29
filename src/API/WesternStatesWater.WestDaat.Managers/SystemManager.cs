@@ -29,5 +29,10 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return await _systemAccessor.GetAvailableWaterSourceTypeNormalizedNames();
         }
+
+        async Task<List<string>> ISystemManager.GetAvailableStateNormalizedNames()
+        {
+            return await _systemAccessor.GetAvailableStateNormalizedNames();
+        }
     }
 }

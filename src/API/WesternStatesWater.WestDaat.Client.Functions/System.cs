@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [FunctionName(nameof(GetOwnerClassifications)), AllowAnonymous]
         public async Task<IActionResult> GetOwnerClassifications([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/ownerclassifications")] HttpRequest request)
         {
-            _logger.LogInformation("Getting Beneficial Uses");
+            _logger.LogInformation("Getting Owner Classifications");
 
             var results = await _systemManager.GetAvailableOwnerClassificationNormalizedNames();
 
@@ -42,9 +42,19 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [FunctionName(nameof(GetWaterSourceTypes)), AllowAnonymous]
         public async Task<IActionResult> GetWaterSourceTypes([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/watersourcetypes")] HttpRequest request)
         {
-            _logger.LogInformation("Getting Beneficial Uses");
+            _logger.LogInformation("Getting Water Source Types");
 
             var results = await _systemManager.GetAvailableWaterSourceTypeNormalizedNames();
+
+            return JsonResult(results);
+        }
+
+        [FunctionName(nameof(GetStates)), AllowAnonymous]
+        public async Task<IActionResult> GetStates([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/states")] HttpRequest request)
+        {
+            _logger.LogInformation("Getting States");
+
+            var results = await _systemManager.GetAvailableStateNormalizedNames();
 
             return JsonResult(results);
         }

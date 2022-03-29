@@ -12,12 +12,14 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
         [MaxLength(2)]
         public string Name { get; set; }
+        [MaxLength(150)]
+        public string WaDEName { get; set; }
         [MaxLength(2)]
         public string Term { get; set; }
         [MaxLength(20)]
         public string Definition { get; set; }
         [MaxLength(10)]
-        public string State1 { get; set; }
+        public string StateAbbr { get; set; }
         [MaxLength(100)]
         public string SourceVocabularyUri { get; set; }
 
