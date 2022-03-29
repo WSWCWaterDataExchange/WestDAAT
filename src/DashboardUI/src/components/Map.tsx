@@ -16,7 +16,9 @@ import ReactDOM from "react-dom";
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
+const mapIcons: Map<string, string> = new global.Map<string, string>([
+  ['mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`]
+])
 function Map() {
   const { user } = useContext(AppContext);
   const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, mapPopup, setRenderedFeatures, mapBoundSettings, setMapClickedFeatures } = useContext(MapContext);
@@ -65,9 +67,16 @@ function Map() {
       zoom: 4,
     });
 
+    mapInstance.on("styleimagemissing", e => {
+      const icon = mapIcons.get(e.id);
+      if (icon) {
+        addSvgImage(mapInstance, e.id, icon)
+      }
+    })
+
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
-      addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
+
       mapInstance.addControl(new mapboxgl.ScaleControl());
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
@@ -121,7 +130,7 @@ function Map() {
       currentMapPopup.current.remove();
     }
     if (mapPopup) {
-      currentMapPopup.current = new mapboxgl.Popup({closeOnClick: false})
+      currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
         .setLngLat({
           lat: mapPopup.latitude,
           lng: mapPopup.longitude
@@ -231,7 +240,7 @@ function Map() {
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
       maxZoom: mapBoundSettings.maxZoom
-      });
+    });
   }, [map, mapBoundSettings])
 
   const [, dropRef] = useDrop({

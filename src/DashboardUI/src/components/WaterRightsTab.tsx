@@ -9,14 +9,13 @@ import VolumeRange from "./VolumeRange";
 import { AppContext } from "../AppProvider";
 import { MapThemeSelector } from "./MapThemeSelector";
 import deepEqual from 'fast-deep-equal/es6';
-import { useQuery } from "react-query";
-import { getBeneficialUses, getOwnerClassifications, getWaterSourceTypes } from "../accessors/systemAccessor";
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
-import useNoMapResults from "../hooks/useNoMapResults";
+import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties } from "../config/constants";
+import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -28,9 +27,10 @@ interface WaterRightsFilters {
   beneficialUses?: string[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
+  states?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
-  includeExempt: boolean,
+  includeExempt?: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
   minVolume: number | undefined,
@@ -84,6 +84,7 @@ const defaultFilters: WaterRightsFilters = {
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
+  states: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
   includeExempt: false,
   minFlow: undefined,
@@ -95,41 +96,19 @@ const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined
 }
 
+const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
+  [undefined, ''],
+  [true, '1'],
+  [false, '0'],
+])
+
 function WaterRightsTab() {
-  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useQuery(
-    ['beneficialUses'],
-    getBeneficialUses,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading, isError: isAllBeneficialUsesError } = useBeneficialUses();
+  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading, isError: isAllWaterSourceTypesError } = useWaterSourceTypes();
+  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading, isError: isAllOwnerClassificationsError } = useOwnerClassifications();
+  const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
 
-  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useQuery(
-    ['waterSourceTypes'],
-    getWaterSourceTypes,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
-
-  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useQuery(
-    ['ownerClassifications'],
-    getOwnerClassifications,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
-
-  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading], "Loading Filter Data");
+  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading], "Loading Filter Data");
 
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
@@ -152,10 +131,16 @@ function WaterRightsTab() {
     return { property: filters.mapGrouping as string, colorMapping }
   }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
 
-  const radios = [
+  const podPouRadios = [
     { name: 'Both', value: '' },
     { name: 'POD', value: 'POD' },
     { name: 'POU', value: 'POU' },
+  ];
+
+  const exemptRadios = [
+    { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
+    { name: 'Exempt', value: exemptMapping.get(true) ?? '1' },
+    { name: 'Non-exempt', value: exemptMapping.get(false) ?? '0' },
   ];
 
   const {
@@ -177,6 +162,13 @@ function WaterRightsTab() {
   }, [setVectorUrl])
 
   const renderedMapGroupings = useMemo(() => {
+    const tryParseJsonArray = (value: any) => {
+      try {
+        return JSON.parse(value ?? "[]");
+      } catch (e) {
+        return [];
+      }
+    }
     let colorMappings = [...mapGrouping.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
       colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
@@ -187,7 +179,7 @@ function WaterRightsTab() {
     if (mapGrouping.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
     }
-    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && tryParseJsonArray(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
     return {
       property: mapGrouping.property,
       colorMapping: colorMappings
@@ -244,7 +236,6 @@ function WaterRightsTab() {
   }, [setVisibleLayers])
 
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
-  useNoMapResults(hasRenderedFeatures);
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
@@ -268,10 +259,30 @@ function WaterRightsTab() {
     }));
   }
 
+  const handleExemptChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let result: boolean | undefined = undefined;
+    if (e.target.value === "1") {
+      result = true;
+    } else if (e.target.value === "0") {
+      result = false;
+    }
+    setFilters(s => ({
+      ...s,
+      includeExempt: result
+    }));
+  }
+
   const handleBeneficialUseChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
       beneficialUses: selectedOptions.length > 0 ? selectedOptions : undefined
+    }));
+  }
+
+  const handleStateChange = (selectedOptions: string[]) => {
+    setFilters(s => ({
+      ...s,
+      states: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
   }
 
@@ -301,13 +312,6 @@ function WaterRightsTab() {
       waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
   }
-
-  const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setFilters(s => ({
-      ...s,
-      includeExempt: e.target.checked
-    }));
-  }, 400)
 
   const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
@@ -348,10 +352,13 @@ function WaterRightsTab() {
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     }
-    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
+    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates) return;
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
       filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+    }
+    if (filters.includeExempt !== undefined) {
+      filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
       filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
@@ -361,6 +368,9 @@ function WaterRightsTab() {
     }
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+    }
+    if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
+      filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
@@ -387,7 +397,7 @@ function WaterRightsTab() {
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });
@@ -396,7 +406,20 @@ function WaterRightsTab() {
 
   useWaterRightsMapPopup();
 
-  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
+  const isLoading = useMemo(() => {
+    return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading;
+  }, [isAllBeneficialUsesLoading, isAllWaterSourceTypesLoading, isAllOwnerClassificationsLoading, isAllStatesLoading])
+
+  const isError = useMemo(() => {
+    return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
+  }, [isAllBeneficialUsesError, isAllWaterSourceTypesError, isAllOwnerClassificationsError, isAllStatesError])
+
+  useMapErrorAlert(isError);
+  useNoMapResults(!hasRenderedFeatures);
+
+  if (isLoading) return null;
+
+  if (isError) return null;
 
   return (
     <>
@@ -413,13 +436,13 @@ function WaterRightsTab() {
           <div className="mb-3">
             <label>TOGGLE VIEW</label>
             <ButtonGroup className="w-100">
-              {radios.map((radio, idx) => (
+              {podPouRadios.map((radio, idx) => (
                 <ToggleButton
                   key={idx}
-                  id={`radio-${idx}`}
+                  id={`podPouRadio-${idx}`}
                   type="radio"
                   variant="outline-primary"
-                  name="radio"
+                  name="podPouRadio"
                   value={radio.value}
                   checked={(filters.podPou ?? '') === radio.value}
                   onChange={handlePodPouChange}
@@ -477,9 +500,34 @@ function WaterRightsTab() {
             />
           </div>
 
-          <div className="mb-3 form-check form-switch">
-            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeExempt} onChange={handleIncludeNullChange} />
-            <label className="form-check-label">Include Empty Amount and Priority Date Value</label>
+          <div className="mb-3">
+            <label>State</label>
+            <DropdownMultiselect
+              className="form-control"
+              options={allStates}
+              selected={filters.states ?? []}
+              handleOnChange={handleStateChange}
+              name="states"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label>Include Empty Amount and Priority Date Value</label>
+            <ButtonGroup className="w-100">
+              {exemptRadios.map((radio) => (<ToggleButton
+                key={radio.value}
+                id={`exemptRadio-${radio.value}`}
+                type="radio"
+                variant="outline-primary"
+                name="exemptRadio"
+                value={radio.value ?? ''}
+                checked={exemptMapping.get(filters.includeExempt) === radio.value}
+                onChange={handleExemptChange}
+              >
+                {radio.name}
+              </ToggleButton>
+              ))}
+            </ButtonGroup>
           </div>
 
           <div className="mb-3">

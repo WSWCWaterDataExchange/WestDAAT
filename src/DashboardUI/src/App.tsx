@@ -16,7 +16,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const queryClient = new QueryClient();
-  
+  queryClient.setDefaultOptions({
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      cacheTime: 8600000,
+      staleTime: Infinity
+    }
+  })
+
 
   return (
     <>
@@ -28,8 +37,8 @@ function App() {
                 <Route path="/" element={<Layout />}>
                   <Route index element={<HomePage />} />
                   <Route path="details" element={<DetailLayout />}>
-                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
-                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+                    <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
+                    <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
                   </Route>
                 </Route>
               </Routes>

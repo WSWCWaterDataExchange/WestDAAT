@@ -10,6 +10,8 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public double? AllocationFlowCfs { get; set; }
         public double? AllocationVolumeAf { get; set; }
         public string AllocationOwner { get; set; }
+        public string OrganizationState { get; set; }
+        public bool? ExemptOfVolumeFlowPriority { get; set; }
 
         public List<long> SiteIds { get; set; }
     }

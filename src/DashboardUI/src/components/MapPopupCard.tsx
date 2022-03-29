@@ -14,7 +14,8 @@ export function MapPopupCard(props: MapPopupCardProps) {
     <Card className="map-popup-card">
       <CardHeader>
         <div className="d-flex justify-content-between flex-nowrap">
-          {props.children.header}<button type="button" onClick={props.onClosePopup} className="btn-close map-popup-close-btn"></button>
+          {props.children.header}
+          <button type="button" onClick={props.onClosePopup} className="btn-close map-popup-close-btn"></button>
         </div>
       </CardHeader>
       <div className="card-body">
