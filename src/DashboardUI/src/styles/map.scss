@@ -41,6 +41,65 @@
   border: 1px solid $white;
 }
 
+.map {
+  .mapboxgl-popup-close-button{
+    display: none;
+  }
+  .map-popup-card{
+    .map-popup-close-btn{
+      margin-top: -7px;
+      margin-right: -15px;
+      svg{
+        width: 14px;
+        height: 14px;
+      }
+    }
+    .map-popup-card-water-rights-body{
+      .map-popup-card-water-rights-native-id-row{
+        display: flex;
+        align-items: center;
+        line-height: normal;
+        & > *{
+          white-space: nowrap;
+        }
+        button{
+          background: none;
+          color: #000;
+          opacity: .5;
+          border: none;
+          padding: 0;
+          
+          font: inherit;
+          cursor: pointer;
+          outline: inherit;
+          height: 18px;
+          width: 18px;
+          &:hover{
+            opacity: .75;
+          }
+          &.nav-prev-water-right{
+            margin-left: 3px;
+          }
+          &.nav-next-water-right{
+            margin-right: 3px;
+          }
+          svg{
+            height: 18px;
+            width: 18px;
+          }
+        }
+        
+      }
+      .map-popup-card-water-rights-link-icon{
+        fill: currentColor;
+        line-height: 1;
+        height: 1em;
+        width: 1em;
+      }
+    }
+  }
+}
+
 .legend-light {
   background-color: $white;
   border-color: $bs-gray-100;
@@ -79,6 +138,10 @@
         }
       }
     }
+}
+
+#mapboxPopupId {
+  margin: -10px -10px -15px
 }
 
 .grabbable:hover {

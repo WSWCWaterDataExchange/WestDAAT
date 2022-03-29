@@ -15,22 +15,8 @@ import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
 import { PriorityDateRange } from "./PriorityDateRange";
-
-
-enum waterRightsProperties {
-  owners = "o",
-  ownerClassifications = "oClass",
-  beneficialUses = "bu",
-  siteUuid = "uuid",
-  sitePodOrPou = "podPou",
-  waterSourceTypes = "wsType",
-  minFlowRate = "minFlow",
-  maxFlowRate = "maxFlow",
-  minVolume = "minVol",
-  maxVolume = "maxVol",
-  minPriorityDate = "minPri",
-  maxPriorityDate = "maxPri",
-}
+import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
+import { waterRightsProperties } from "../config/constants";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -44,7 +30,7 @@ interface WaterRightsFilters {
   waterSourceTypes?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
-  includeNulls: boolean,
+  includeExempt: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
   minVolume: number | undefined,
@@ -99,7 +85,7 @@ const defaultFilters: WaterRightsFilters = {
   allocationOwner: undefined,
   waterSourceTypes: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
-  includeNulls: false,
+  includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
   minVolume: undefined,
@@ -210,10 +196,10 @@ function WaterRightsTab() {
 
   useEffect(() => {
     let colorArray: any;
-    if (renderedMapGroupings.colorMapping.length > 0) {
+    if (mapGrouping.colorMapping.length > 0) {
       colorArray = ["case"];
-      renderedMapGroupings.colorMapping.forEach(a => {
-        colorArray.push(["in", a.key, ["get", renderedMapGroupings.property]]);
+      mapGrouping.colorMapping.forEach(a => {
+        colorArray.push(["in", a.key, ["get", mapGrouping.property]]);
         colorArray.push(a.color)
       })
       colorArray.push("#000000");
@@ -229,7 +215,7 @@ function WaterRightsTab() {
       layer: waterRightsPolygonsLayer,
       fillColor: colorArray
     })
-  }, [setLayerCircleColors, setLayerFillColors, renderedMapGroupings])
+  }, [setLayerCircleColors, setLayerFillColors, mapGrouping])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
@@ -319,7 +305,7 @@ function WaterRightsTab() {
   const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
     setFilters(s => ({
       ...s,
-      includeNulls: e.target.checked
+      includeExempt: e.target.checked
     }));
   }, 400)
 
@@ -380,22 +366,22 @@ function WaterRightsTab() {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
     }
     if (filters.maxFlow !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxFlowRate, filters.maxFlow));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
     }
     if (filters.minFlow !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minFlowRate, filters.minFlow));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
     }
     if (filters.maxVolume !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxVolume, filters.maxVolume));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
     }
     if (filters.minVolume !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minVolume, filters.minVolume));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
     }
     if (filters.minPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
     }
     if (filters.maxPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(filters.includeNulls, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
     }
 
     setMapLayerFilters(allWaterRightsLayers.map(a => {
@@ -407,6 +393,8 @@ function WaterRightsTab() {
     setFilters({ ...defaultFilters });
     setAllocationOwnerValue("");
   }
+
+  useWaterRightsMapPopup();
 
   if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
 
@@ -490,7 +478,7 @@ function WaterRightsTab() {
           </div>
 
           <div className="mb-3 form-check form-switch">
-            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeNulls} onChange={handleIncludeNullChange} />
+            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeExempt} onChange={handleIncludeNullChange} />
             <label className="form-check-label">Include Empty Amount and Priority Date Value</label>
           </div>
 
@@ -527,5 +515,3 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
-
-

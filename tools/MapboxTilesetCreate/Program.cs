@@ -94,7 +94,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         {"bu", siteAllocations.SelectMany(a => a.BeneficialUses).Distinct().ToList()},
                         {"uuid", site.SiteUuid},
                         {"podPou", site.PodPou},
-                        {"wsType", site.WaterSourceTypes},
+                        {"wsType", site.WaterSourceTypes}
                     };
 
                 var minFlow = siteAllocations.Select(a => a.AllocationFlowCfs).Min();

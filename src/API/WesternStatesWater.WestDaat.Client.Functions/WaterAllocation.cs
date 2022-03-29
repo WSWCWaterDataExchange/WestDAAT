@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -71,6 +71,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         public async Task<IActionResult> GetWaterRightSourceInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{waterRightId}/Sources")] HttpRequest request, long waterRightId)
         {
             var result = await _waterAllocationManager.GetWaterRightSourceInfoList(waterRightId);
+
+            return new OkObjectResult(result);
+        }
+
+        [FunctionName(nameof(GetWaterRightSiteDigest)), AllowAnonymous]
+        public async Task<IActionResult> GetWaterRightSiteDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/WaterRightsDigest")] HttpRequest request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetWaterRightsDigestsBySite(siteUuid);
 
             return new OkObjectResult(result);
         }

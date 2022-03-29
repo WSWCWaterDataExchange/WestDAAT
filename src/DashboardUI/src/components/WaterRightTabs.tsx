@@ -1,5 +1,5 @@
 import { Tab, Table, Tabs } from 'react-bootstrap';
-import { useWaterRightSiteInfoList, useWaterRightSourceInfoList } from '../hooks/waterAllocation';
+import { useWaterRightSiteInfoList, useWaterRightSourceInfoList } from '../hooks/useWaterRightQuery';
 
 interface waterRightTabsProps {
   waterRightId: string;

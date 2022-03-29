@@ -1,4 +1,4 @@
-import { createContext, FC,  useCallback, useContext, useEffect, useState } from "react";
+import { createContext, FC,  ReactElement,  useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
@@ -21,10 +21,11 @@ export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
 export type MapLayerFillColorsType = { [layer: string]: any };
+export type MapClickType = { latitude: number, longitude: number, layer: string, features: GeoJSON.Feature[]};
+export type MapPopupType = { latitude: number, longitude: number, element: ReactElement};
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
 type setFillColorsParamType = { layer: string, fillColor: any } | { layer: string, fillColor: any }[]
-
 type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
 
 interface MapContextState {
@@ -50,6 +51,10 @@ interface MapContextState {
   setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   mapBoundSettings: MapBoundSettings | null,
   setMapBoundSettings: (settings: MapBoundSettings) => void
+  mapClickedFeatures: MapClickType | null,
+  setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
+  mapPopup: MapPopupType | null,
+  setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>
 };
 
 const defaultState: MapContextState = {
@@ -74,7 +79,11 @@ const defaultState: MapContextState = {
   mapAlert: null,
   setMapAlert: () => {},
   mapBoundSettings: null,
-  setMapBoundSettings: () => {}
+  setMapBoundSettings: () => {},
+  mapClickedFeatures: null,
+  setMapClickedFeatures: () => { },
+  mapPopup: null,
+  setMapPopup: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -175,6 +184,10 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapBoundSettings, setMapBoundSettings] = useState<MapBoundSettings | null>(null);
 
+  const [mapClickedFeatures, setMapClickedFeatures] = useState<MapClickType | null>(null);
+
+  const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -197,7 +210,11 @@ const MapProvider: FC = ({ children }) => {
     mapBoundSettings,
     setMapBoundSettings,
     mapAlert,
-    setMapAlert
+    setMapAlert,
+    mapClickedFeatures,
+    setMapClickedFeatures,
+    mapPopup,
+    setMapPopup
   };
 
   return (

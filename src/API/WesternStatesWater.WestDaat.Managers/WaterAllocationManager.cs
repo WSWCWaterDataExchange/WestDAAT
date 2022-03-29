@@ -5,15 +5,15 @@ using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Exceptions;
-using WesternStatesWater.WestDaat.Contracts.Client;
+using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
-    public sealed class WaterAllocationManager : ManagerBase, IWaterAllocationManager
+    public sealed class WaterAllocationManager : ManagerBase, ClientContracts.IWaterAllocationManager
     {
         private readonly IGeoConnexEngine _geoConnexEngine;
         private readonly ISiteAccessor _siteAccessor;
@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _geoConnexEngine = geoConnexEngine;
         }
 
-        async Task<string> IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
+        async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
             var site = await _siteAccessor.GetSiteByUuid(siteUuid);
             if (site.AllocationIds == null || !site.AllocationIds.Any())
@@ -47,29 +47,34 @@ namespace WesternStatesWater.WestDaat.Managers
             return json;
         }
 
-        async Task<FeatureCollection> IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)
+        async Task<FeatureCollection> ClientContracts.IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)
         {
             return await _nldiAccessor.GetNldiFeatures(latitude, longitude, directions, dataPoints);
         }
 
-        public async Task<SiteDetails> GetSiteDetails(string siteUuid)
+        async Task<ClientContracts.SiteDetails> ClientContracts.IWaterAllocationManager.GetSiteDetails(string siteUuid)
         {
-            return await _siteAccessor.GetSiteDetailsByUuid(siteUuid);
+            return (await _siteAccessor.GetSiteDetailsByUuid(siteUuid)).Map<ClientContracts.SiteDetails>();
         }
 
-        public async Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId)
+        async Task<ClientContracts.WaterRightDetails> ClientContracts.IWaterAllocationManager.GetWaterRightDetails(long waterRightsId)
         {
-            return await _waterAllocationAccessor.GetWaterRightDetailsById(waterRightsId);
+            return (await _waterAllocationAccessor.GetWaterRightDetailsById(waterRightsId)).Map<ClientContracts.WaterRightDetails>();
         }
 
-        public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(long waterRightsId)
+        async Task<List<ClientContracts.SiteInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSiteInfoList(long waterRightsId)
         {
-            return await _waterAllocationAccessor.GetWaterRightSiteInfoById(waterRightsId);
+            return (await _waterAllocationAccessor.GetWaterRightSiteInfoById(waterRightsId)).Map<List<ClientContracts.SiteInfoListItem>>();
         }
 
-        public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(long waterRightsId)
+        async Task<List<ClientContracts.WaterSourceInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSourceInfoList(long waterRightsId)
         {
-            return await _waterAllocationAccessor.GetWaterRightSourceInfoById(waterRightsId);
+            return (await _waterAllocationAccessor.GetWaterRightSourceInfoById(waterRightsId)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
+        }
+
+        async Task<List<ClientContracts.WaterRightsDigest>> ClientContracts.IWaterAllocationManager.GetWaterRightsDigestsBySite(string siteUuid)
+        {
+            return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
         }
 
         public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)
