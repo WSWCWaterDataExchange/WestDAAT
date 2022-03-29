@@ -99,8 +99,9 @@ function WaterRightsTab() {
   const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useBeneficialUses();
   const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useWaterSourceTypes();
   const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useOwnerClassifications();
+  const { data: allStates, isFetching: isAllStatesLoading } = useStates();
 
-  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading], "Loading Filter Data");
+  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading], "Loading Filter Data");
 
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
