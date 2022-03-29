@@ -11,7 +11,7 @@ import { MapThemeSelector } from "./MapThemeSelector";
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
-import useNoMapResults from "../hooks/useNoMapResults";
+import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties } from "../config/constants";
@@ -103,10 +103,10 @@ const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
 ])
 
 function WaterRightsTab() {
-  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useBeneficialUses();
-  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useWaterSourceTypes();
-  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useOwnerClassifications();
-  const { data: allStates, isFetching: isAllStatesLoading } = useStates();
+  const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading, isError: isAllBeneficialUsesError } = useBeneficialUses();
+  const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading, isError: isAllWaterSourceTypesError } = useWaterSourceTypes();
+  const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading, isError: isAllOwnerClassificationsError } = useOwnerClassifications();
+  const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading], "Loading Filter Data");
 
@@ -229,8 +229,7 @@ function WaterRightsTab() {
   }, [setVisibleLayers])
 
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
-  useNoMapResults(hasRenderedFeatures);
-
+  
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
       setUrlParam("wr", undefined);
@@ -255,9 +254,9 @@ function WaterRightsTab() {
 
   const handleExemptChange = (e: ChangeEvent<HTMLInputElement>) => {
     let result: boolean | undefined = undefined;
-    if(e.target.value === "1"){
+    if (e.target.value === "1") {
       result = true;
-    } else if (e.target.value === "0"){
+    } else if (e.target.value === "0") {
       result = false;
     }
     setFilters(s => ({
@@ -400,7 +399,20 @@ function WaterRightsTab() {
 
   useWaterRightsMapPopup();
 
-  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading) return null;
+  const isLoading = useMemo(() => {
+    return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading;
+  }, [isAllBeneficialUsesLoading, isAllWaterSourceTypesLoading, isAllOwnerClassificationsLoading, isAllStatesLoading])
+
+  const isError = useMemo(() => {
+    return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
+  }, [isAllBeneficialUsesError, isAllWaterSourceTypesError, isAllOwnerClassificationsError, isAllStatesError])
+
+  useMapErrorAlert(isError);
+  useNoMapResults(!hasRenderedFeatures);
+
+  if (isLoading) return null;
+
+  if (isError) return null;
 
   return (
     <>

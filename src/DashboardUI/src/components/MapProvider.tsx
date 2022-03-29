@@ -1,4 +1,4 @@
-import { createContext, FC,  ReactElement,  useCallback, useContext, useEffect, useState } from "react";
+import { createContext, FC, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
@@ -21,12 +21,19 @@ export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
 export type MapLayerFillColorsType = { [layer: string]: any };
-export type MapClickType = { latitude: number, longitude: number, layer: string, features: GeoJSON.Feature[]};
-export type MapPopupType = { latitude: number, longitude: number, element: ReactElement};
+export type MapClickType = { latitude: number, longitude: number, layer: string, features: GeoJSON.Feature[] };
+export type MapPopupType = { latitude: number, longitude: number, element: ReactElement };
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
 type setFillColorsParamType = { layer: string, fillColor: any } | { layer: string, fillColor: any }[]
 type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
+
+export enum MapAlertPriority {
+  Critical = 0,
+  Error = 1,
+  Warning = 2,
+  Information = 3
+}
 
 interface MapContextState {
   mapStyle: MapStyle;
@@ -48,7 +55,8 @@ interface MapContextState {
   renderedFeatures: RenderedFeatureType[],
   setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>,
   mapAlert: JSX.Element | null,
-  setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+  changeAlertDisplay: (key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => void,
+  removeAlertDisplay: (key: string) => void,
   mapBoundSettings: MapBoundSettings | null,
   setMapBoundSettings: (settings: MapBoundSettings) => void
   mapClickedFeatures: MapClickType | null,
@@ -77,9 +85,10 @@ const defaultState: MapContextState = {
   renderedFeatures: [],
   setRenderedFeatures: () => { },
   mapAlert: null,
-  setMapAlert: () => {},
+  changeAlertDisplay: () => { },
+  removeAlertDisplay: () => { },
   mapBoundSettings: null,
-  setMapBoundSettings: () => {},
+  setMapBoundSettings: () => { },
   mapClickedFeatures: null,
   setMapClickedFeatures: () => { },
   mapPopup: null,
@@ -180,7 +189,27 @@ const MapProvider: FC = ({ children }) => {
 
   const [renderedFeatures, setRenderedFeatures] = useState<RenderedFeatureType[]>([]);
 
-  const [mapAlert, setMapAlert] = useState<JSX.Element | null>(null);
+  const [mapAlerts, setMapAlerts] = useState<{ key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority }[]>([]);
+  const mapAlert = useMemo(() => {
+    console.log(mapAlerts);
+    return [...mapAlerts].sort((a, b) => a.priority as number - b.priority as number).find(a => a.display)?.element ?? null;
+  }, [mapAlerts]);
+  const changeAlertDisplay = useCallback((key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => {
+    setMapAlerts(s => {
+      const unchangedData = s.filter(a => a.key !== key);
+      return [...unchangedData, {
+        key,
+        display,
+        element,
+        priority
+      }]
+    })
+  }, [setMapAlerts])
+  const removeAlertDisplay = useCallback((key: string) => {
+    setMapAlerts(s => {
+      return s.filter(a => a.key !== key);
+    })
+  }, [setMapAlerts])
 
   const [mapBoundSettings, setMapBoundSettings] = useState<MapBoundSettings | null>(null);
 
@@ -210,7 +239,8 @@ const MapProvider: FC = ({ children }) => {
     mapBoundSettings,
     setMapBoundSettings,
     mapAlert,
-    setMapAlert,
+    changeAlertDisplay,
+    removeAlertDisplay,
     mapClickedFeatures,
     setMapClickedFeatures,
     mapPopup,

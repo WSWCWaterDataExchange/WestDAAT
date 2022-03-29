@@ -1,8 +1,6 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import { getNldiFeatures } from "../accessors/nldiAccessor";
-import { useQuery } from "react-query";
 import { Button, Form } from "react-bootstrap";
 import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
@@ -11,6 +9,8 @@ import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
+import { useNldiFeatures } from "../hooks/useNldiQuery";
+import { useMapErrorAlert } from "../hooks/useMapAlert";
 
 function NldiTab() {
   interface NldiDataType {
@@ -114,20 +114,9 @@ function NldiTab() {
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataLoading } = useQuery(
-    ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
-    () => getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa),
-    {
-      enabled: !!nldiData.latitude && !!nldiData.longitude,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity,
-    }
-  );
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
-  useProgressIndicator([!isNldiDataLoading], "Loading NLDI Data");
+  useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
   useEffect(() => {
     if (nldiGeoJsonData) {
@@ -225,6 +214,8 @@ function NldiTab() {
       setUrlParam("nldi", nldiData);
     }
   }, [nldiData, setUrlParam, defaultNldiData])
+
+  useMapErrorAlert(isNldiDataError);
 
   return (
     <>
