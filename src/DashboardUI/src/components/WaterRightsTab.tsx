@@ -30,7 +30,7 @@ interface WaterRightsFilters {
   states?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
-  includeExempt: boolean,
+  includeExempt?: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
   minVolume: number | undefined,
@@ -96,6 +96,12 @@ const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined
 }
 
+const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
+  [undefined, ''],
+  [true, '1'],
+  [false, '0'],
+])
+
 function WaterRightsTab() {
   const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useBeneficialUses();
   const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useWaterSourceTypes();
@@ -125,10 +131,16 @@ function WaterRightsTab() {
     return { property: filters.mapGrouping as string, colorMapping }
   }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
 
-  const radios = [
+  const podPouRadios = [
     { name: 'Both', value: '' },
     { name: 'POD', value: 'POD' },
     { name: 'POU', value: 'POU' },
+  ];
+
+  const exemptRadios = [
+    { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
+    { name: 'Exempt', value: exemptMapping.get(true) ?? '1' },
+    { name: 'Non-exempt', value: exemptMapping.get(false) ?? '0' },
   ];
 
   const {
@@ -241,6 +253,19 @@ function WaterRightsTab() {
     }));
   }
 
+  const handleExemptChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let result: boolean | undefined = undefined;
+    if(e.target.value === "1"){
+      result = true;
+    } else if (e.target.value === "0"){
+      result = false;
+    }
+    setFilters(s => ({
+      ...s,
+      includeExempt: result
+    }));
+  }
+
   const handleBeneficialUseChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
@@ -281,13 +306,6 @@ function WaterRightsTab() {
       waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
     }));
   }
-
-  const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setFilters(s => ({
-      ...s,
-      includeExempt: e.target.checked
-    }));
-  }, 400)
 
   const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
@@ -332,6 +350,9 @@ function WaterRightsTab() {
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
       filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+    }
+    if (filters.includeExempt !== undefined) {
+      filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
       filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
@@ -379,7 +400,7 @@ function WaterRightsTab() {
 
   useWaterRightsMapPopup();
 
-  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
+  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading) return null;
 
   return (
     <>
@@ -396,13 +417,13 @@ function WaterRightsTab() {
           <div className="mb-3">
             <label>TOGGLE VIEW</label>
             <ButtonGroup className="w-100">
-              {radios.map((radio, idx) => (
+              {podPouRadios.map((radio, idx) => (
                 <ToggleButton
                   key={idx}
-                  id={`radio-${idx}`}
+                  id={`podPouRadio-${idx}`}
                   type="radio"
                   variant="outline-primary"
-                  name="radio"
+                  name="podPouRadio"
                   value={radio.value}
                   checked={(filters.podPou ?? '') === radio.value}
                   onChange={handlePodPouChange}
@@ -471,9 +492,23 @@ function WaterRightsTab() {
             />
           </div>
 
-          <div className="mb-3 form-check form-switch">
-            <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" defaultChecked={filters.includeExempt} onChange={handleIncludeNullChange} />
-            <label className="form-check-label">Include Empty Amount and Priority Date Value</label>
+          <div className="mb-3">
+            <label>Include Empty Amount and Priority Date Value</label>
+            <ButtonGroup className="w-100">
+              {exemptRadios.map((radio) => (<ToggleButton
+                key={radio.value}
+                id={`exemptRadio-${radio.value}`}
+                type="radio"
+                variant="outline-primary"
+                name="exemptRadio"
+                value={radio.value ?? ''}
+                checked={exemptMapping.get(filters.includeExempt) === radio.value}
+                onChange={handleExemptChange}
+              >
+                {radio.name}
+              </ToggleButton>
+              ))}
+            </ButtonGroup>
           </div>
 
           <div className="mb-3">

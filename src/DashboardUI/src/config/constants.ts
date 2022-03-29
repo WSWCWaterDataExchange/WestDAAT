@@ -21,6 +21,7 @@ export enum waterRightsProperties {
   sitePodOrPou = "podPou",
   waterSourceTypes = "wsType",
   states = "st",
+  exemptOfVolumeFlowPriority = "xmpt",
   minFlowRate = "minFlow",
   maxFlowRate = "maxFlow",
   minVolume = "minVol",
