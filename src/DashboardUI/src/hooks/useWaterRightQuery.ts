@@ -7,53 +7,38 @@ import {
 } from '../accessors/waterAllocationAccessor';
 
 export function useWaterRightDetails(waterRightId: number) {
-  return useQuery(['waterRightDetails', waterRightId],
+  return useQuery(['waterRight.Details', waterRightId],
     async () => await getWaterRightDetails(waterRightId),
     {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
+      enabled: !!waterRightId
     }
   );
 }
 
 export function useWaterRightSiteInfoList(waterRightId: number) {
-  return useQuery(['waterRightSiteInfoList', waterRightId],
+  return useQuery(['waterRight.SiteInfoList', waterRightId],
     async () => await getWaterRightSiteInfoList(waterRightId),
     {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
+      enabled: !!waterRightId
     }
   );
 }
 
 export function useWaterRightSourceInfoList(waterRightId: number) {
-  return useQuery(['waterRightSourceInfoList', waterRightId],
+  return useQuery(['waterRight.SourceInfoList', waterRightId],
     async () => await getWaterRightSourceInfoList(waterRightId),
     {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
+      enabled: !!waterRightId
     }
   );
 }
 
 export function useWaterRightSiteLocations(waterRightId: number) {
   return useQuery(
-    ['waterRightSiteLocations', waterRightId],
+    ['waterRight.SiteLocations', waterRightId],
     async () => await getWaterRightSiteLocations(waterRightId),
     {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+      enabled: !!waterRightId
+    }
+  );
 }

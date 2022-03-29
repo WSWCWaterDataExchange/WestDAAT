@@ -4,52 +4,24 @@ import { getBeneficialUses, getOwnerClassifications, getStates, getWaterSourceTy
 export function useBeneficialUses() {
   return useQuery(
     ['system.beneficialUses'],
-    getBeneficialUses,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    });
+    getBeneficialUses);
 }
 
 export function useWaterSourceTypes() {
   return useQuery(
     ['system.waterSourceTypes'],
-    getWaterSourceTypes,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    });
+    getWaterSourceTypes);
 }
 
 export function useOwnerClassifications() {
   return useQuery(
     ['system.ownerClassifications'],
-    getOwnerClassifications,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    });
+    getOwnerClassifications);
 }
 
 export function useStates() {
   return useQuery(
     ['system.states'],
-    getStates,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    });
+    getStates);
 }
 
