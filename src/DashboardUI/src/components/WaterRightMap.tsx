@@ -73,7 +73,10 @@ function WaterRightMap(props: waterRightMapProps) {
   if (isWaterRightSiteLocationsLoading) return null;
 
   return (
-    <Map />
+    <div className="water-rights-map-container h-100">
+      <Map />
+    </div>
+    
   )
 }
 
