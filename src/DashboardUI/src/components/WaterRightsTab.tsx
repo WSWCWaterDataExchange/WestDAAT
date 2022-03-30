@@ -496,7 +496,7 @@ function WaterRightsTab() {
               options={allWaterSourceTypes}
               selected={filters.waterSourceTypes ?? []}
               handleOnChange={handleWaterSourceTypeChange}
-              name="beneficialUses"
+              name="waterSourceTypes"
             />
           </div>
 
