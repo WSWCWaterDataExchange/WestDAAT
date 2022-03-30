@@ -57,22 +57,6 @@ const mapsJson = {
       },
     },
     {
-      "id": "site-locations-points",
-      "friendlyName": "SiteLocations",
-      "source": "site-locations",
-      "layout": {
-        "visibility": "visible"
-      },
-      "type": "circle",
-      "paint": {
-        "circle-radius": pointCircleRadius,
-        "circle-color": ["case",
-          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
-          nldi.colors.sitePOU],
-      },
-      "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
-    },
-    {
       "id": "site-locations-polygons",
       "friendlyName": "SiteLocations",
       "source": "site-locations",
@@ -87,6 +71,22 @@ const mapsJson = {
           nldi.colors.sitePOU],
       },
       "filter": ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]]
+    },
+    {
+      "id": "site-locations-points",
+      "friendlyName": "SiteLocations",
+      "source": "site-locations",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "circle",
+      "paint": {
+        "circle-radius": pointCircleRadius,
+        "circle-color": ["case",
+          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
+          nldi.colors.sitePOU],
+      },
+      "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
     },
     {
       "id": "site-locations-label",
