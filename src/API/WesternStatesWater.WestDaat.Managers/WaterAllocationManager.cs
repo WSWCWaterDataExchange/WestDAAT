@@ -1,15 +1,13 @@
-using System.Collections.Concurrent;
-using System.IO;
-using System.Text.Json;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Exceptions;
-using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
+using WesternStatesWater.WestDaat.Utilities;
+using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -83,11 +81,11 @@ namespace WesternStatesWater.WestDaat.Managers
 
             List<Feature> features = new List<Feature>();
 
-            foreach(var siteLocation in siteLocations)
+            foreach (var siteLocation in siteLocations)
             {
                 features.Add(
                     new Feature(
-                        new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
+                        siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
                         new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
                         )
                     );
