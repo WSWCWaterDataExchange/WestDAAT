@@ -97,6 +97,31 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.BeneficialUses.Should().BeEquivalentTo(beneficialUses.Select(a => a.Name));
         }
 
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("2022-03-30")]
+        public async Task GetWaterRightDetailsById_ExpirationDate(string dateValue)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .SetAllocationExpirationDate(date)
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightDetailsById(allocationAmount.AllocationAmountId);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.ExpirationDate.Should().Be(date);
+        }
+
         [TestMethod]
         public async Task WaterAllocationAccessor_GetWaterRightSiteInfoById()
         {

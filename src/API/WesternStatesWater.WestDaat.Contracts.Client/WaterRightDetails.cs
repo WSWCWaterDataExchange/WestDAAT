@@ -6,7 +6,7 @@
         public string AllocationNativeId { get; set; }
         public string AllocationOwner { get; set; }
         public DateTime? PriorityDate { get; set; }
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public string AllocationLegalStatus { get; set; }
         public double? AllocationFlowCfs { get; set; }
         public double? AllocationVolumeAF { get; set; }
