@@ -4,6 +4,7 @@ import { MapContext } from './MapProvider';
 import mapboxgl from 'mapbox-gl';
 import { useWaterRightSiteLocations } from "../hooks";
 import { Position } from "geojson";
+import { nldi } from "../config/constants";
 
 interface waterRightMapProps {
   waterRightId: string;
@@ -15,12 +16,26 @@ function WaterRightMap(props: waterRightMapProps) {
   const {
     setVisibleLayers,
     setGeoJsonData,
-    setMapBoundSettings: setMapBounds
+    setMapBoundSettings: setMapBounds,
+    setLegend
   } = useContext(MapContext);
 
   useEffect(() => {
     setVisibleLayers(["site-locations-points", "site-locations-polygons", "site-locations-label"]);
   }, [setVisibleLayers])
+
+  useEffect(() => {
+    setLegend(<>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOD }}></span>
+        Point of Diversion (POD)
+      </div>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOU }}></span>
+        Place of Use (POU)
+      </div>
+    </>);
+  }, [setLegend])
 
   useEffect(() => {
     if (waterRightSiteLocations) {
@@ -58,7 +73,10 @@ function WaterRightMap(props: waterRightMapProps) {
   if (isWaterRightSiteLocationsLoading) return null;
 
   return (
-    <Map />
+    <div className="water-rights-map-container h-100">
+      <Map />
+    </div>
+    
   )
 }
 

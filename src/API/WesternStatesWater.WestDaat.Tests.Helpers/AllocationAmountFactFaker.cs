@@ -31,6 +31,20 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
+        public static Faker<AllocationAmountsFact> SetAllocationExpirationDate(this Faker<AllocationAmountsFact> faker, DateTime? dateValue)
+        {
+            DateDim date = null;
+            if (dateValue != null)
+            {
+                date = new DateDimFaker()
+                    .RuleFor(a => a.Date, () => dateValue)
+                    .Generate();
+            }
+            faker.RuleFor(a => a.AllocationExpirationDateID, () => null)
+                .RuleFor(a => a.AllocationExpirationDateNavigation, () => date);
+            return faker;
+        }
+
         public static Faker<AllocationAmountsFact> LinkSites(this Faker<AllocationAmountsFact> faker, params SitesDim[] sites)
         {
             faker.RuleFor(a => a.AllocationBridgeSitesFact, () => sites.Select(c => new AllocationBridgeSiteFactFaker().RuleFor(a => a.Site, () => c).Generate()).ToList());

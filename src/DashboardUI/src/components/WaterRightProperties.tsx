@@ -1,4 +1,5 @@
 import { useWaterRightDetails } from '../hooks/useWaterRightQuery';
+import { FormattedDate } from './FormattedDate';
 
 interface waterRightPropertiesProps {
     waterRightId: string;
@@ -23,10 +24,10 @@ function WaterRightProperties(props: waterRightPropertiesProps){
         <span className='property-value'>{waterRightDetails.allocationOwner}</span>
         
         <span className='property-name'>Priority Date</span>
-        <span className='property-value'>{waterRightDetails.priorityDate}</span>
+        <span className='property-value'><FormattedDate>{waterRightDetails.priorityDate}</FormattedDate></span>
         
         <span className='property-name'>Expiration Date</span>
-        <span className='property-value'>{waterRightDetails.expirationDate}</span>
+        <span className='property-value'><FormattedDate>{waterRightDetails.expirationDate}</FormattedDate></span>
         
         <span className='property-name'>Legal Status</span>
         <span className='property-value'>{waterRightDetails.allocationLegalStatus}</span>

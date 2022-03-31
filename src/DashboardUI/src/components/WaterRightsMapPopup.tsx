@@ -3,6 +3,7 @@ import { MapPopupCard } from "./MapPopupCard";
 import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';
 import Icon from "@mdi/react";
 import WaterRightDigest from "../data-contracts/WaterRightsDigest";
+import { FormattedDate } from "./FormattedDate";
 
 interface WaterRightsMapPopupToggleProps {
   count: number, currentIndex: number, setCurrentIndex: (index: number) => void;
@@ -59,7 +60,7 @@ function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
               <strong>Priority Date:</strong>
             </div>
             <div>
-              {currWaterRight.priorityDate}
+              <FormattedDate>{currWaterRight.priorityDate}</FormattedDate>
             </div>
           </div>
         </div>
