@@ -4,7 +4,6 @@ import {
   getWaterRightSiteInfoList,
   getWaterRightSourceInfoList,
   getWaterRightSiteLocations,
-  getRiverBasinPolygonsByName,
   getRiverBasinOptions,
 } from '../accessors/waterAllocationAccessor';
 
