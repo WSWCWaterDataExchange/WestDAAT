@@ -21,7 +21,8 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
         public void GeoConnexEngineTests_BuildGeoConnexJson_ShouldFormatJson()
         {
             // ARRANGE 
-            var efSite = new SitesDimFaker().Generate();
+            var efAllocation = new AllocationAmountFactFaker().Generate();
+            var efSite = new SitesDimFaker().LinkAllocationAmounts(efAllocation).Generate();
 
             efSite.SiteTypeCv = efSite.SiteTypeCvNavigation.Name;
             efSite.GniscodeCv = efSite.GniscodeCvNavigation.Name;

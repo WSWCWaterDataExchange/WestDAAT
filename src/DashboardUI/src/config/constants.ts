@@ -12,3 +12,20 @@ export const nldi = {
   },
   latLongPrecision: 4
 }
+
+export enum waterRightsProperties {
+  owners = "o",
+  ownerClassifications = "oClass",
+  beneficialUses = "bu",
+  siteUuid = "uuid",
+  sitePodOrPou = "podPou",
+  waterSourceTypes = "wsType",
+  states = "st",
+  exemptOfVolumeFlowPriority = "xmpt",
+  minFlowRate = "minFlow",
+  maxFlowRate = "maxFlow",
+  minVolume = "minVol",
+  maxVolume = "maxVol",
+  minPriorityDate = "minPri",
+  maxPriorityDate = "maxPri",
+}

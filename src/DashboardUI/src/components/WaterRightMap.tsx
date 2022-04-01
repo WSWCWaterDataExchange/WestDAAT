@@ -2,65 +2,81 @@ import { useContext, useEffect } from "react";
 import Map from './Map';
 import { MapContext } from './MapProvider';
 import mapboxgl from 'mapbox-gl';
-import useProgressIndicator from '../hooks/useProgressIndicator';
-import { getWaterRightSiteLocations } from '../accessors/waterAllocationAccessor';
-import { useQuery } from 'react-query';
+import { useWaterRightSiteLocations } from "../hooks";
+import { Position } from "geojson";
+import { nldi } from "../config/constants";
 
 interface waterRightMapProps {
   waterRightId: string;
 }
 
-function WaterRightMap(props: waterRightMapProps){
-  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useQuery(
-    ['waterRightSiteLocations', +props.waterRightId], 
-    () => getWaterRightSiteLocations(+props.waterRightId),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+function WaterRightMap(props: waterRightMapProps) {
+  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useWaterRightSiteLocations(+props.waterRightId);
 
   const {
-    setVisibleLayers, 
+    setVisibleLayers,
     setGeoJsonData,
-    setMapBoundSettings: setMapBounds
+    setMapBoundSettings: setMapBounds,
+    setLegend
   } = useContext(MapContext);
 
   useEffect(() => {
-    setVisibleLayers(["site-locations", "site-locations-label"]);
+    setVisibleLayers(["site-locations-points", "site-locations-polygons", "site-locations-label"]);
   }, [setVisibleLayers])
 
   useEffect(() => {
-    if(waterRightSiteLocations){
+    setLegend(<>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOD }}></span>
+        Point of Diversion (POD)
+      </div>
+      <div className="legend-item">
+        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOU }}></span>
+        Place of Use (POU)
+      </div>
+    </>);
+  }, [setLegend])
+
+  useEffect(() => {
+    if (waterRightSiteLocations) {
       setGeoJsonData("site-locations", waterRightSiteLocations);
     }
   }, [waterRightSiteLocations, setGeoJsonData])
 
   useEffect(() => {
-    const mapBounds: mapboxgl.LngLatLike[] = [];
+    let positions: Position[] = [];
     waterRightSiteLocations?.features.forEach(x => {
-      // TODO: Update this method to account for polygons when they are added.
-      if(x.geometry.type === 'Point'){
-        const coordinates = x.geometry.coordinates;
-        mapBounds.push(new mapboxgl.LngLat(coordinates[0], coordinates[1]))
+      if (x.geometry.type === 'Point') {
+        positions.push(x.geometry.coordinates)
+      } else if (x.geometry.type === 'MultiPoint') {
+        positions = positions.concat(x.geometry.coordinates)
+      } else if (x.geometry.type === 'Polygon') {
+        x.geometry.coordinates.forEach(y => {
+          positions = positions.concat(y)
+        })
+      } else if (x.geometry.type === 'MultiPolygon') {
+        x.geometry.coordinates.forEach(y => {
+          y.forEach(z => {
+            positions = positions.concat(z)
+          })
+        })
       }
     })
 
     setMapBounds({
-      LngLatBounds: mapBounds,
-      maxZoom: 10, 
+      LngLatBounds: positions.map(a => new mapboxgl.LngLat(a[0], a[1])),
+      maxZoom: 10,
       padding: 50
     })
   }, [waterRightSiteLocations, setMapBounds])
 
-  useProgressIndicator([!isWaterRightSiteLocationsLoading], "Loading Map Data");
-
-  if(isWaterRightSiteLocationsLoading) return null;
+  if (isWaterRightSiteLocationsLoading) return null;
 
   return (
-    <Map />
+    <div className="water-rights-map-container h-100">
+      <Map />
+    </div>
+    
   )
 }
 

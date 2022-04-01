@@ -1,1 +1,1 @@
-export * from './waterAllocation';
+export * from './useWaterRightQuery';

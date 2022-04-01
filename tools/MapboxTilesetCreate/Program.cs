@@ -95,6 +95,8 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                         {"uuid", site.SiteUuid},
                         {"podPou", site.PodPou},
                         {"wsType", site.WaterSourceTypes},
+                        {"st", siteAllocations.Select(a => a.OrganizationState).Distinct() },
+                        {"xmpt", siteAllocations.Any(a=>a.ExemptOfVolumeFlowPriority ?? false) }
                     };
 
                 var minFlow = siteAllocations.Select(a => a.AllocationFlowCfs).Min();
@@ -109,7 +111,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 var maxVolume = siteAllocations.Select(a => a.AllocationVolumeAf).Max();
                 if (maxVolume != null) properties.Add("maxVol", maxVolume.Value);
 
-                var minPriorityDate = siteAllocations.Select(a=>GetUnixTime(a.AllocationPriorityDate)).Min();
+                var minPriorityDate = siteAllocations.Select(a => GetUnixTime(a.AllocationPriorityDate)).Min();
                 if (minPriorityDate != null) properties.Add("minPri", minPriorityDate.Value);
 
                 var maxPriorityDate = siteAllocations.Select(a => GetUnixTime(a.AllocationPriorityDate)).Max();
@@ -156,7 +158,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
         private static long? GetUnixTime(DateTime? value)
         {
-            if(value == null)
+            if (value == null)
             {
                 return null;
             }

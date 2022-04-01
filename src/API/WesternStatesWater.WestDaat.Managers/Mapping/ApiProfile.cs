@@ -1,5 +1,6 @@
 using AutoMapper;
-using WesternStatesWater.WestDaat.Common.DataContracts;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
@@ -7,7 +8,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
     {
         public ApiProfile()
         {
-            // Mappings go here
+            CreateMap<CommonContracts.WaterRightsDigest, ClientContracts.WaterRightsDigest>();
+            CreateMap<CommonContracts.WaterSourceInfoListItem, ClientContracts.WaterSourceInfoListItem>();
+            CreateMap<CommonContracts.SiteInfoListItem, ClientContracts.SiteInfoListItem>();
+            CreateMap<CommonContracts.WaterRightDetails, ClientContracts.WaterRightDetails>();
+            CreateMap<CommonContracts.SiteDetails, ClientContracts.SiteDetails>();
         }
     }
 }

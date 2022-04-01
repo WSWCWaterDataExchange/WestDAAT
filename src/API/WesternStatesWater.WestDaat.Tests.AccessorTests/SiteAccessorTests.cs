@@ -12,11 +12,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task SiteAccessor_GetSiteByUuid_ShouldReturnSite()
         {
             // Arrange
-            var siteDims = new SitesDimFaker().Generate(10);
+            var siteDims = new SitesDimFaker()
+                .LinkAllocationAmounts(new AllocationAmountFactFaker().Generate(5).ToArray())
+                .Generate(10);
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.SitesDim.AddRange(siteDims);
                 db.SaveChanges();
+                db.AllocationBridgeSitesFact.Should().HaveCount(50);
             }
 
 
@@ -31,7 +34,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.County.Should().Be(searchSite.County);
             result.Latitude.Should().Be(searchSite.Latitude);
             result.Longitude.Should().Be(searchSite.Longitude);
-            result.AllocationIds.Should().HaveCountGreaterThan(0);
+            result.AllocationIds.Should().HaveCount(5);
             result.AllocationIds.First().Should().Be(searchSite.AllocationBridgeSitesFact.First().AllocationBridgeId);
         }
 

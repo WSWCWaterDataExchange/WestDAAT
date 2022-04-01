@@ -32,7 +32,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
-            
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationAmountId == waterRightId)
                 .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
@@ -42,7 +41,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
-            
             return await db.AllocationBridgeSitesFact
                         .Where(x => x.AllocationAmountId == waterRightId)
                         .Select(x => x.Site)
@@ -53,7 +51,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
-
             return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
                     .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
                     .Select(a => a.WaterSource))
@@ -76,7 +73,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(long waterRightId)
         {
             using var db = _databaseContextFactory.Create();
-
             return await db.AllocationBridgeSitesFact
                         .Where(x => x.AllocationAmountId == waterRightId)
                         .Select(x => x.Site)
@@ -84,5 +80,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                         .ProjectTo<SiteLocation>(DtoMapper.Configuration)
                         .ToListAsync();
         }
+
+        async Task<List<WaterRightsDigest>> IWaterAllocationAccessor.GetWaterRightsDigestsBySite(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+            db.Database.SetCommandTimeout(int.MaxValue);
+            return await db.AllocationAmountsFact
+                .Where(x => x.AllocationBridgeSitesFact.Any(y=>y.Site.SiteUuid == siteUuid))
+                .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
+                .ToListAsync();
+        }
     }
+
 }

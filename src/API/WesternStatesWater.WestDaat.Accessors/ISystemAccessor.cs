@@ -7,5 +7,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<string>> GetAvailableBeneficialUseNormalizedNames();
         Task<List<string>> GetAvailableWaterSourceTypeNormalizedNames();
         Task<List<string>> GetAvailableOwnerClassificationNormalizedNames();
+        Task<List<string>> GetAvailableStateNormalizedNames();
     }
 }

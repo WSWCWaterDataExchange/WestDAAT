@@ -11,16 +11,20 @@ import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
+import ReactDOM from "react-dom";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
+const mapIcons: Map<string, string> = new global.Map<string, string>([
+  ['mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`]
+])
 function Map() {
   const { user } = useContext(AppContext);
-    const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, setRenderedFeatures, mapBoundSettings } = useContext(MapContext);
+  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, mapPopup, setRenderedFeatures, mapBoundSettings, setMapClickedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
+  const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
@@ -63,9 +67,16 @@ function Map() {
       zoom: 4,
     });
 
+    mapInstance.on("styleimagemissing", e => {
+      const icon = mapIcons.get(e.id);
+      if (icon) {
+        addSvgImage(mapInstance, e.id, icon)
+      }
+    })
+
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
-      addSvgImage(mapInstance, 'mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`);
+
       mapInstance.addControl(new mapboxgl.ScaleControl());
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
@@ -90,8 +101,7 @@ function Map() {
 
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(s => {
-      var sourceFeatures = map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
-      return sourceFeatures;
+      return map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
     })
   }, 500)
 
@@ -101,7 +111,39 @@ function Map() {
     map.on('idle', () => {
       setMapRenderedFeatures(map);
     });
-  }, [map, setMapRenderedFeatures])
+    mapConfig.layers.forEach((a) => {
+      map.on('click', a.id, e => {
+        if (e.features && e.features.length > 0) {
+          setMapClickedFeatures({
+            latitude: e.lngLat.lat,
+            longitude: e.lngLat.lng,
+            layer: a.id,
+            features: e.features
+          })
+        }
+      })
+    })
+  }, [map, setMapRenderedFeatures, setMapClickedFeatures])
+  useEffect(() => {
+    if (!map) return;
+    if (currentMapPopup.current) {
+      currentMapPopup.current.remove();
+    }
+    if (mapPopup) {
+      currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
+        .setLngLat({
+          lat: mapPopup.latitude,
+          lng: mapPopup.longitude
+        })
+        .setHTML("<div id='mapboxPopupId'></div>")
+        .once('open', () => {
+          ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
+        })
+        .addTo(map);
+    } else {
+      setMapClickedFeatures(null);
+    }
+  }, [map, mapPopup, setMapClickedFeatures])
 
   useEffect(() => {
     if (!map) return;
@@ -133,7 +175,7 @@ function Map() {
           })
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
+        map.setStyle(`mapbox://styles/mapbox/${style}`);
       });
     }
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
@@ -198,7 +240,7 @@ function Map() {
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
       maxZoom: mapBoundSettings.maxZoom
-      });
+    });
   }, [map, mapBoundSettings])
 
   const [, dropRef] = useDrop({

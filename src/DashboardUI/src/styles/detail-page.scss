@@ -16,11 +16,14 @@
 .property-name {
   font-size: 18px;
   font-weight: bold;
+  margin-top: 18px;
+  &:first-of-type{
+    margin-top: 0;
+  }
 }
 
 .property-value {
   font-size: 18px;
-  margin-bottom: 15px;
 }
 
 .nav-tabs .nav-link {
@@ -34,6 +37,6 @@
   border-bottom: none;
 }
 
-.properties-row {
+.water-rights-map-container {
   min-height: 700px;
 }

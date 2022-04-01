@@ -43,5 +43,15 @@ namespace WesternStatesWater.WestDaat.Accessors
               .OrderBy(a => a)
               .ToListAsync();
         }
+
+        async Task<List<string>> ISystemAccessor.GetAvailableStateNormalizedNames()
+        {
+            using var db = _databaseContextFactory.Create();
+            return await db.State
+              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
+              .Distinct()
+              .OrderBy(a => a)
+              .ToListAsync();
+        }
     }
 }

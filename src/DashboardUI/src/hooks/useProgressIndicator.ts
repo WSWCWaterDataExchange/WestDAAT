@@ -16,6 +16,7 @@ function useProgressIndicator(progress: number | boolean[], content: ToastConten
       toast.update(loadingFilterDataToast.current, { progress: calculatedProgress })
     } else if (loadingFilterDataToast.current != null) {
       toast.dismiss(loadingFilterDataToast.current);
+      loadingFilterDataToast.current = null;
     }
   }, [calculatedProgress, content])
 }

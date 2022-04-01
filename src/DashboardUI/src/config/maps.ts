@@ -65,7 +65,23 @@ const mapsJson = {
       },
     },
     {
-      "id": "site-locations",
+      "id": "site-locations-polygons",
+      "friendlyName": "SiteLocations",
+      "source": "site-locations",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "fill",
+      "paint": {
+        "fill-opacity": .5,
+        "fill-color": ["case",
+          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
+          nldi.colors.sitePOU],
+      },
+      "filter": ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]]
+    },
+    {
+      "id": "site-locations-points",
       "friendlyName": "SiteLocations",
       "source": "site-locations",
       "layout": {
@@ -77,7 +93,8 @@ const mapsJson = {
         "circle-color": ["case",
           ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
           nldi.colors.sitePOU],
-      }
+      },
+      "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
     },
     {
       "id": "river-basins",

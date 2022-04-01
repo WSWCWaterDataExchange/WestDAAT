@@ -66,6 +66,25 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _systemAccessorMock.VerifyAll();
         }
 
+        [TestMethod]
+        public async Task GetAvailableStateNormalizedNames_Success()
+        {
+            var faker = new Faker();
+            var state1 = faker.Address.StateAbbr();
+            var state2 = faker.Address.StateAbbr();
+
+            _systemAccessorMock.Setup(a => a.GetAvailableStateNormalizedNames())
+                             .ReturnsAsync(new List<string> { state1, state2 })
+                             .Verifiable();
+
+            var sut = CreateSystemManager();
+            var result = await sut.GetAvailableStateNormalizedNames();
+
+            result.Should().NotBeNull().And
+                .BeEquivalentTo(new[] { state2, state1 });
+            _systemAccessorMock.VerifyAll();
+        }
+
         private ISystemManager CreateSystemManager()
         {
             return new SystemManager(

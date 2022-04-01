@@ -1,8 +1,6 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
-import { getNldiFeatures } from "../accessors/nldiAccessor";
-import { useQuery } from "react-query";
 import { Button, Form } from "react-bootstrap";
 import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
@@ -11,6 +9,8 @@ import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
+import { useNldiFeatures } from "../hooks/useNldiQuery";
+import { useMapErrorAlert } from "../hooks/useMapAlert";
 
 function NldiTab() {
   interface NldiDataType {
@@ -114,20 +114,9 @@ function NldiTab() {
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataLoading } = useQuery(
-    ['nldiGeoJsonData', nldiData.latitude, nldiData.longitude],
-    () => getNldiFeatures(nldiData.latitude ?? 0, nldiData.longitude ?? 0, Directions.Upsteam | Directions.Downsteam, DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa),
-    {
-      enabled: !!nldiData.latitude && !!nldiData.longitude,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity,
-    }
-  );
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
-  useProgressIndicator([!isNldiDataLoading], "Loading NLDI Data");
+  useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
   useEffect(() => {
     if (nldiGeoJsonData) {
@@ -226,44 +215,48 @@ function NldiTab() {
     }
   }, [nldiData, setUrlParam, defaultNldiData])
 
+  useMapErrorAlert(isNldiDataError);
+
   return (
-    <>
-      <div className='row'>
-        <div className='col-12'>
-          <h1>NLDI Site Search Tool</h1>
+    <div className="position-relative flex-grow-1">
+      <div className="panel-content p-3">
+        <div className='row'>
+          <div className='col-12'>
+            <h3>NLDI Site Search Tool</h3>
+          </div>
+        </div>
+        <NldiDragAndDropButton setLatLong={setLatLongData} />
+        <Form.Group>
+          <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
+          <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
+          <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+        </Form.Group>
+        <div>
+          Direction
+          <Form.Group>
+            <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
+          </Form.Group>
+          <Form.Group>
+            <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
+          </Form.Group>
+        </div>
+        <div>
+          Data Type
+          <Form.Group>
+            <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE" />
+          </Form.Group>
+          <Form.Group>
+            <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS" />
+          </Form.Group>
+          <Form.Group>
+            <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA" />
+          </Form.Group>
         </div>
       </div>
-      <NldiDragAndDropButton setLatLong={setLatLongData} />
-      <Form.Group>
-        <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
-        <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
-        <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
-      </Form.Group>
-      <div>
-        Direction
-        <Form.Group>
-          <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
-        </Form.Group>
-      </div>
-      <div>
-        Data Type
-        <Form.Group>
-          <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE" />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS" />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA" />
-        </Form.Group>
-      </div>
-    </>
+    </div >
   );
 }
 

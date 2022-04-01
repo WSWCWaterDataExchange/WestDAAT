@@ -1,4 +1,4 @@
-export interface waterRightDetails {
+export interface WaterRightDetails {
   allocationAmountId: number;
   allocationNativeId: string;
   allocationOwner: string;
@@ -7,7 +7,7 @@ export interface waterRightDetails {
   allocationLegalStatus: string;
   allocationFlowCfs: number;
   allocationVolumeAF: number;
-  beneficialUse: string;
+  beneficialUses: string[];
 
   aggregationInterval: number;
   aggregationIntervalUnit: string;

@@ -1,4 +1,4 @@
-﻿namespace WesternStatesWater.WestDaat.Common.DataContracts
+﻿namespace WesternStatesWater.WestDaat.Common
 {
     [Flags]
     public enum NldiDataPoints
