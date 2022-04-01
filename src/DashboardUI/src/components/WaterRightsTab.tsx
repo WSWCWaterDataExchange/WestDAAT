@@ -155,8 +155,6 @@ function WaterRightsTab() {
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
   const [displayOptions, setDisplayOptions] = useState<WaterRightsDisplayOptions>(getUrlParam<WaterRightsDisplayOptions>("wrd") ?? defaultDisplayOptions);
 
-  
-
   const mapGrouping = useMemo(() => {
     let colorIndex = 0;
     let colorMapping: { key: string, color: string }[];
@@ -367,7 +365,6 @@ function WaterRightsTab() {
 
   const handleRiverBasinChange = async (riverBasinNames: string[]) => {
     let basins : string[] | undefined = undefined;
-    console.log('handling river basin change: ', riverBasinNames);
     if(riverBasinNames.length > 0){
       basins = riverBasinNames;
       setRiverBasinNames(riverBasinNames);
@@ -442,13 +439,10 @@ function WaterRightsTab() {
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
     }
-    console.log('filters: ', filters.riverBasinNames)
     if (filters.riverBasinNames && filters.riverBasinNames.length !== 0){
       if (filters.riverBasinNames !== riverBasinNames){
-        console.log('setting river basin names');
         setRiverBasinNames(filters.riverBasinNames);
       }
-      console.log('river basin polygons: ', riverBasinPolygons);
       if (riverBasinPolygons && riverBasinPolygons.features) {
         filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
       }

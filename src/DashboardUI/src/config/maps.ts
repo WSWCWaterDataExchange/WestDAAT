@@ -111,7 +111,7 @@ const mapsJson = {
       },
       "type": "fill",
       'paint': {
-        'fill-color': '#088',
+        'fill-color': nldi.colors.riverBasin,
         'fill-opacity': 0.3
       }
     },
