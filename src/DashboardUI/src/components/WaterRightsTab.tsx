@@ -18,7 +18,7 @@ import { waterRightsProperties, pointSizes } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 import { defaultPointCircleRadius } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
-import { useRiverBasinOptions, useRiverBasinPolygonsByName } from '../hooks';
+import { useRiverBasinOptions } from '../hooks';
 import { getRiverBasinPolygonsByName } from '../accessors/waterAllocationAccessor';
 import { useQuery } from 'react-query';
 
