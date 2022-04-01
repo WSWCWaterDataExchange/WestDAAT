@@ -190,6 +190,10 @@ function WaterRightsTab() {
     let colorArray: any;
     if (mapGrouping.colorMapping.length > 0) {
       colorArray = ["case"];
+      renderedMapGroupings.colorMapping.forEach(a => {
+        colorArray.push(["in", a.key, ["get", mapGrouping.property]]);
+        colorArray.push(a.color)
+      })
       mapGrouping.colorMapping.forEach(a => {
         colorArray.push(["in", a.key, ["get", mapGrouping.property]]);
         colorArray.push(a.color)
@@ -207,7 +211,7 @@ function WaterRightsTab() {
       layer: waterRightsPolygonsLayer,
       fillColor: colorArray
     })
-  }, [setLayerCircleColors, setLayerFillColors, mapGrouping])
+  }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
