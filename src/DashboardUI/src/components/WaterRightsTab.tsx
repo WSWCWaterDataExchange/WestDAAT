@@ -15,7 +15,7 @@ import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import useNoMapResults from "../hooks/useNoMapResults";
 import { PriorityDateRange } from "./PriorityDateRange";
-
+import { getRiverBasinOptions, getRiverBasinPolygonsByName } from '../accessors/waterAllocationAccessor';
 
 enum waterRightsProperties {
   owners = "o",
@@ -42,6 +42,7 @@ interface WaterRightsFilters {
   beneficialUses?: string[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
+  riverBasinNames?: string[],
   allocationOwner?: string,
   mapGrouping: MapGrouping,
   includeNulls: boolean,
@@ -98,6 +99,7 @@ const defaultFilters: WaterRightsFilters = {
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
+  riverBasinNames: undefined,
   mapGrouping: MapGrouping.BeneficialUse,
   includeNulls: false,
   minFlow: undefined,
@@ -109,45 +111,48 @@ const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined
 }
 
+const queryOptions = {
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+  cacheTime: 8600000,
+  staleTime: Infinity
+};
+
 function WaterRightsTab() {
   const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading } = useQuery(
     ['beneficialUses'],
     getBeneficialUses,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+    queryOptions)
 
   const { data: allWaterSourceTypes, isFetching: isAllWaterSourceTypesLoading } = useQuery(
     ['waterSourceTypes'],
     getWaterSourceTypes,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+    queryOptions)
 
   const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading } = useQuery(
     ['ownerClassifications'],
     getOwnerClassifications,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      cacheTime: 8600000,
-      staleTime: Infinity
-    })
+    queryOptions)
 
-  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading], "Loading Filter Data");
+    const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading} = useQuery(
+      ['riverBasinOptions'],
+    getRiverBasinOptions,
+    queryOptions)
+
+  const [riverBasinNames, setRiverBasinNames] = useState<string[]>([]);
+  const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', riverBasinNames], () =>
+    getRiverBasinPolygonsByName(riverBasinNames),
+    { keepPreviousData: true }
+  );
+
+  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
 
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+
+  
 
   const mapGrouping = useMemo(() => {
     let colorIndex = 0;
@@ -176,10 +181,12 @@ function WaterRightsTab() {
     setLegend,
     setLayerFilters: setMapLayerFilters,
     setVisibleLayers,
+    visibleLayers,
     renderedFeatures,
     setLayerCircleColors,
     setLayerFillColors,
-    setVectorUrl
+    setVectorUrl,
+    setGeoJsonData
   } = useContext(MapContext);
 
   useEffect(() => {
@@ -201,7 +208,9 @@ function WaterRightsTab() {
     if (mapGrouping.property === MapGrouping.OwnerClassification as string && filters.ownerClassifications && filters.ownerClassifications.length > 0) {
       colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
     }
-    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+    
+    colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && b.properties[mapGrouping.property] && JSON.parse(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+
     return {
       property: mapGrouping.property,
       colorMapping: colorMappings
@@ -316,6 +325,26 @@ function WaterRightsTab() {
     }));
   }
 
+  const handleRiverBasinChange = async (riverBasinNames: string[]) => {
+    let basins : string[] | undefined = undefined;
+    if(riverBasinNames.length > 0){
+      basins = riverBasinNames;
+      setRiverBasinNames(riverBasinNames);
+    }
+    setFilters(s => ({
+      ...s,
+      riverBasinNames: basins
+    }));
+  }
+
+  useEffect(() => {
+    if(riverBasinPolygons && riverBasinPolygons.features){
+      setGeoJsonData("river-basins", riverBasinPolygons);
+      setVisibleLayers([...visibleLayers, "river-basins"]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [riverBasinPolygons])
+
   const handleIncludeNullChange = useDebounceCallback((e: ChangeEvent<HTMLInputElement>) => {
     setFilters(s => ({
       ...s,
@@ -362,7 +391,7 @@ function WaterRightsTab() {
 
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     }
-    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes) return;
+    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allRiverBasinOptions) return;
     const filterSet = ["all"] as any[];
     if (filters.podPou === "POD" || filters.podPou === "POU") {
       filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
@@ -375,6 +404,14 @@ function WaterRightsTab() {
     }
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+    }
+    if (filters.riverBasinNames && filters.riverBasinNames.length !== 0){
+      if (filters.riverBasinNames !== riverBasinNames){
+        setRiverBasinNames(filters.riverBasinNames);
+      }
+      if (riverBasinPolygons && riverBasinPolygons.features) {
+        filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
+      }
     }
     if (filters.allocationOwner && filters.allocationOwner.length > 0) {
       filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
@@ -401,14 +438,16 @@ function WaterRightsTab() {
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allRiverBasinOptions, riverBasinPolygons])
 
   const clearMapFilters = () => {
+    setRiverBasinNames([]);
     setFilters({ ...defaultFilters });
     setAllocationOwnerValue("");
   }
 
-  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading) return null;
+  if (isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isRiverBasinOptionsLoading) return null;
 
   return (
     <>
@@ -512,10 +551,10 @@ function WaterRightsTab() {
             <label>River Basin</label>
             <DropdownMultiselect
               className="form-control"
-              options={allWaterSourceTypes}
-              selected={filters.waterSourceTypes ?? []}
-              handleOnChange={handleWaterSourceTypeChange}
-              name="beneficialUses"
+              options={allRiverBasinOptions}
+              selected={filters.riverBasinNames ?? []}
+              handleOnChange={handleRiverBasinChange}
+              name="riverBasins"
             />
           </div>
 

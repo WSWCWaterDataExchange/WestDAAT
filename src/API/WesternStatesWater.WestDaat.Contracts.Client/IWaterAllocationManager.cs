@@ -20,7 +20,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         List<string> GetRiverBasinNames();
 
-        List<Feature> GetRiverBasinPolygonByName(string[] basinNames);
+        FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames);
 
         Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId);
     }

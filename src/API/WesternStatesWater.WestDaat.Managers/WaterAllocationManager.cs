@@ -80,9 +80,9 @@ namespace WesternStatesWater.WestDaat.Managers
             return _locationEngine.GetRiverBasinNames();
         }
 
-        public List<Feature> GetRiverBasinPolygonByName(string[] basinNames)
+        public FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames)
         {
-            return _locationEngine.GetRiverBasinPolygonByName(basinNames);
+            return _locationEngine.GetRiverBasinPolygonsByName(basinNames);
         }
 
         public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)

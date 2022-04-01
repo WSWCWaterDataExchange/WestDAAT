@@ -1,5 +1,4 @@
 import {
-  feature,
   SiteInfoListItem,
   waterRightDetails,
   WaterSourceInfoListItem,
@@ -45,6 +44,8 @@ export const getWaterRightSiteLocations = async (waterRightId: number) => {
 
 export const getRiverBasinPolygonsByName = async (basinNames: string[]) => {
   const url = new URL('RiverBasins', process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.post<feature[]>(url.toString(), basinNames);
+  const { data } = await axios.post<
+    GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
+  >(url.toString(), basinNames);
   return data;
 };

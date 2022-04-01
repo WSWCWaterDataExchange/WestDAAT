@@ -7,6 +7,6 @@ namespace WesternStatesWater.WestDaat.Engines
     {
         public List<string> GetRiverBasinNames();
 
-        public List<Feature> GetRiverBasinPolygonByName(string[] basinNames);
+        public FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames);
     }
 }

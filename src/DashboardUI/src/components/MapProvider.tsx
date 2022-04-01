@@ -49,7 +49,7 @@ interface MapContextState {
   mapAlert: JSX.Element | null,
   setMapAlert: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   mapBoundSettings: MapBoundSettings | null,
-  setMapBoundSettings: (settings: MapBoundSettings) => void
+  setMapBoundSettings: (settings: MapBoundSettings) => void,
 };
 
 const defaultState: MapContextState = {
@@ -74,7 +74,7 @@ const defaultState: MapContextState = {
   mapAlert: null,
   setMapAlert: () => {},
   mapBoundSettings: null,
-  setMapBoundSettings: () => {}
+  setMapBoundSettings: () => {},
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -197,7 +197,7 @@ const MapProvider: FC = ({ children }) => {
     mapBoundSettings,
     setMapBoundSettings,
     mapAlert,
-    setMapAlert
+    setMapAlert,
   };
 
   return (

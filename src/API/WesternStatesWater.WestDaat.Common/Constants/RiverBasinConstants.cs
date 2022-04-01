@@ -11,8 +11,16 @@ namespace WesternStatesWater.WestDaat.Common.Constants
             {
                 return new List<string>
                 {
+                    ArkansasRiverBasin.BasinName,
                     BearRiverBasin.BasinName,
                     ColoradoRiverBasin.BasinName,
+                    ColumbiaRiverBasin.BasinName,
+                    KlamathRiverBasin.BasinName,
+                    MissouriRiverBasin.BasinName,
+                    PecosRiverBasin.BasinName,
+                    RioGrandeRiverBasin.BasinName,
+                    SacramentoSanJoaquinRiverBasin.BasinName,
+                    TruckeeCarsonRiverBasin.BasinName,
                 };
             }
         }
@@ -23,20 +31,16 @@ namespace WesternStatesWater.WestDaat.Common.Constants
             {
                 return new Dictionary<string, Feature>
                 {
+                    {ArkansasRiverBasin.BasinName, ArkansasRiverBasin.Feature },
                     {BearRiverBasin.BasinName, BearRiverBasin.Feature },
                     {ColoradoRiverBasin.BasinName, ColoradoRiverBasin.Feature },
-                };
-            }
-        }
-
-        public static Dictionary<string, Feature> RiverBasinDictionaryLite
-        {
-            get
-            {
-                return new Dictionary<string, Feature>
-                {
-                    {BearRiverBasinLite.BasinName, BearRiverBasinLite.Feature },
-                    {ColoradoRiverBasinLite.BasinName, ColoradoRiverBasinLite.Feature },
+                    {ColumbiaRiverBasin.BasinName, ColumbiaRiverBasin.Feature },
+                    {KlamathRiverBasin.BasinName, KlamathRiverBasin.Feature },
+                    {MissouriRiverBasin.BasinName, MissouriRiverBasin.Feature },
+                    {PecosRiverBasin.BasinName, PecosRiverBasin.Feature },
+                    {RioGrandeRiverBasin.BasinName, RioGrandeRiverBasin.Feature },
+                    {SacramentoSanJoaquinRiverBasin.BasinName, SacramentoSanJoaquinRiverBasin.Feature },
+                    {TruckeeCarsonRiverBasin.BasinName, TruckeeCarsonRiverBasin.Feature },
                 };
             }
         }

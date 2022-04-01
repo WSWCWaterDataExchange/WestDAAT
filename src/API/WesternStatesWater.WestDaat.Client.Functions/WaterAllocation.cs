@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using WesternStatesWater.WestDaat.Client.Functions.Models;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -93,11 +92,11 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
-            var basinPolygonsRequest = JsonConvert.DeserializeObject<BasinPolygonsRequest>(requestBody);
+            var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
 
-            var result = _waterAllocationManager.GetRiverBasinPolygonByName(basinPolygonsRequest.BasinNames);
+            var result = _waterAllocationManager.GetRiverBasinPolygonsByName(basinNames);
 
-            return new OkObjectResult(result);
+            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
         [FunctionName(nameof(GetWaterRightSiteLocations)), AllowAnonymous]

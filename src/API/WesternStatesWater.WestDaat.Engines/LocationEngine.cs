@@ -14,9 +14,10 @@ namespace WesternStatesWater.WestDaat.Engines
             return RiverBasinConstants.RiverBasinNames;
         }
 
-        public List<Feature> GetRiverBasinPolygonByName(string[] basinNames)
+        public FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames)
         {
-            return RiverBasinConstants.RiverBasinDictionary.Where(x => basinNames.Contains(x.Key)).Select(x => x.Value).ToList();
+            var features = RiverBasinConstants.RiverBasinDictionary.Where(x => basinNames.Contains(x.Key)).Select(x => x.Value).ToList();
+            return new FeatureCollection(features);
         }
     }
 }

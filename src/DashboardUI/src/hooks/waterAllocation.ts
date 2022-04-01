@@ -1,5 +1,6 @@
 import { useQuery } from 'react-query';
 import {
+  getRiverBasinPolygonsByName,
   getWaterRightDetails,
   getWaterRightSiteInfoList,
   getWaterRightSourceInfoList,
@@ -20,5 +21,11 @@ export function useWaterRightSiteInfoList(waterRightId: number) {
 export function useWaterRightSourceInfoList(waterRightId: number) {
   return useQuery(['waterRightSourceInfoList', waterRightId], () =>
     getWaterRightSourceInfoList(waterRightId)
+  );
+}
+
+export function useRiverBasinPolygonsByName(basinNames: string[]) {
+  return useQuery(['riverBasinPolygons', basinNames], () =>
+    getRiverBasinPolygonsByName(basinNames)
   );
 }
