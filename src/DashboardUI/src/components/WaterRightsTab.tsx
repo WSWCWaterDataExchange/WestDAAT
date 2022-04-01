@@ -142,7 +142,6 @@ function WaterRightsTab() {
 
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
   const [displayOptions, setDisplayOptions] = useState<WaterRightsDisplayOptions>(getUrlParam<WaterRightsDisplayOptions>("wrd") ?? defaultDisplayOptions);
-  console.log(displayOptions)
 
   const mapGrouping = useMemo(() => {
     let colorIndex = 0;
