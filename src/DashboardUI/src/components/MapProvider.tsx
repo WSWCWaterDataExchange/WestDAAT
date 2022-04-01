@@ -20,13 +20,15 @@ export enum MapStyle {
 export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
+export type MapLayerCircleRadiusType = { [layer: string]: any };
 export type MapLayerFillColorsType = { [layer: string]: any };
 export type MapClickType = { latitude: number, longitude: number, layer: string, features: GeoJSON.Feature[] };
 export type MapPopupType = { latitude: number, longitude: number, element: ReactElement };
 type setFiltersParamType = { layer: string, filter: MapLayerFilterType } | { layer: string, filter: MapLayerFilterType }[]
 type setCircleColorsParamType = { layer: string, circleColor: any } | { layer: string, circleColor: any }[]
+type setCircleRadiusParamType = { layer: string, circleRadius: any } | { layer: string, circleRadius: any }[]
 type setFillColorsParamType = { layer: string, fillColor: any } | { layer: string, fillColor: any }[]
-type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
+export type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & { layer: { id: string }, source: string }
 
 export enum MapAlertPriority {
   Critical = 0,
@@ -44,6 +46,8 @@ interface MapContextState {
   setLayerFilters: (filters: setFiltersParamType) => void;
   circleColors: MapLayerCircleColorsType;
   setLayerCircleColors: (circleColors: setCircleColorsParamType) => void;
+  circleRadii: MapLayerCircleRadiusType;
+  setLayerCircleRadii: (circleColors: setCircleRadiusParamType) => void;
   fillColors: MapLayerFillColorsType;
   setLayerFillColors: (fillColors: setFillColorsParamType) => void;
   geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
@@ -74,6 +78,8 @@ const defaultState: MapContextState = {
   setLayerFilters: () => { },
   circleColors: {},
   setLayerCircleColors: () => { },
+  circleRadii: {},
+  setLayerCircleRadii: () => { },
   fillColors: {},
   setLayerFillColors: () => { },
   geoJsonData: [],
@@ -141,6 +147,21 @@ const MapProvider: FC = ({ children }) => {
       return s;
     })
   }, [setCircleColors]);
+
+  const [circleRadii, setCircleRadii] = useState<MapLayerCircleRadiusType>({});
+  const setLayerCircleRadii = useCallback((updatedFilters: setCircleRadiusParamType): void => {
+    setCircleRadii(s => {
+      const circleRadiusArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
+      const updatedCircleRadiusSet = { ...s };
+      circleRadiusArray.forEach(value => {
+        updatedCircleRadiusSet[value.layer] = value.circleRadius
+      })
+      if (!deepEqual(s, updatedCircleRadiusSet)) {
+        return updatedCircleRadiusSet;
+      }
+      return s;
+    })
+  }, [setCircleRadii]);
 
   const [fillColors, setFillColors] = useState<MapLayerFillColorsType>({});
   const setLayerFillColors = useCallback((updatedFilters: setFillColorsParamType): void => {
@@ -225,6 +246,8 @@ const MapProvider: FC = ({ children }) => {
     setLayerFilters,
     circleColors,
     setLayerCircleColors,
+    circleRadii,
+    setLayerCircleRadii,
     fillColors,
     setLayerFillColors,
     geoJsonData,

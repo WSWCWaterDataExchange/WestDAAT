@@ -14,8 +14,10 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
-import { waterRightsProperties } from "../config/constants";
+import { waterRightsProperties, pointSizes } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
+import { defaultPointCircleRadius } from "../config/maps";
+import useLastKnownValue from "../hooks/useLastKnownValue";
 import { useRiverBasinOptions, useRiverBasinPolygonsByName } from '../hooks';
 import { getRiverBasinPolygonsByName } from '../accessors/waterAllocationAccessor';
 import { useQuery } from 'react-query';
@@ -42,6 +44,10 @@ interface WaterRightsFilters {
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined
+}
+
+interface WaterRightsDisplayOptions {
+  pointSize: 'd' | 'f' | 'v'
 }
 
 const mapDataTiers = [
@@ -101,11 +107,33 @@ const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined
 }
 
+const defaultDisplayOptions: WaterRightsDisplayOptions = {
+  pointSize: 'd'
+}
+
 const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
   [undefined, ''],
   [true, '1'],
   [false, '0'],
 ])
+
+const podPouRadios = [
+  { name: 'Both', value: '' },
+  { name: 'POD', value: 'POD' },
+  { name: 'POU', value: 'POU' },
+];
+
+const exemptRadios = [
+  { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
+  { name: 'Exempt', value: exemptMapping.get(true) ?? '1' },
+  { name: 'Non-exempt', value: exemptMapping.get(false) ?? '0' },
+];
+
+const pointSizeRadios: { name: 'Default' | 'Flow' | 'Volume', value: 'd' | 'f' | 'v' }[] = [
+  { name: 'Default', value: 'd' },
+  { name: 'Flow', value: 'f' },
+  { name: 'Volume', value: 'v' },
+];
 
 function WaterRightsTab() {
   const { data: allBeneficialUses, isFetching: isAllBeneficialUsesLoading, isError: isAllBeneficialUsesError } = useBeneficialUses();
@@ -125,6 +153,7 @@ function WaterRightsTab() {
   const { setUrlParam, getUrlParam } = useContext(AppContext);
 
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const [displayOptions, setDisplayOptions] = useState<WaterRightsDisplayOptions>(getUrlParam<WaterRightsDisplayOptions>("wrd") ?? defaultDisplayOptions);
 
   
 
@@ -144,18 +173,6 @@ function WaterRightsTab() {
     }
     return { property: filters.mapGrouping as string, colorMapping }
   }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
-
-  const podPouRadios = [
-    { name: 'Both', value: '' },
-    { name: 'POD', value: 'POD' },
-    { name: 'POU', value: 'POU' },
-  ];
-
-  const exemptRadios = [
-    { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
-    { name: 'Exempt', value: exemptMapping.get(true) ?? '1' },
-    { name: 'Non-exempt', value: exemptMapping.get(false) ?? '0' },
-  ];
 
   const {
     setLegend,
@@ -206,6 +223,10 @@ function WaterRightsTab() {
     let colorArray: any;
     if (mapGrouping.colorMapping.length > 0) {
       colorArray = ["case"];
+      renderedMapGroupings.colorMapping.forEach(a => {
+        colorArray.push(["in", a.key, ["get", mapGrouping.property]]);
+        colorArray.push(a.color)
+      })
       mapGrouping.colorMapping.forEach(a => {
         colorArray.push(["in", a.key, ["get", mapGrouping.property]]);
         colorArray.push(a.color)
@@ -223,7 +244,7 @@ function WaterRightsTab() {
       layer: waterRightsPolygonsLayer,
       fillColor: colorArray
     })
-  }, [setLayerCircleColors, setLayerFillColors, mapGrouping])
+  }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
     if (renderedMapGroupings.colorMapping.length === 0) {
@@ -261,6 +282,14 @@ function WaterRightsTab() {
     }
   }, [filters, setUrlParam])
 
+  useEffect(() => {
+    if (deepEqual(displayOptions, defaultDisplayOptions)) {
+      setUrlParam("wrd", undefined);
+    } else {
+      setUrlParam("wrd", displayOptions);
+    }
+  }, [displayOptions, setUrlParam])
+
   const handleMapGroupingChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilters(s => ({
       ...s,
@@ -285,6 +314,13 @@ function WaterRightsTab() {
     setFilters(s => ({
       ...s,
       includeExempt: result
+    }));
+  }
+
+  const handlePointSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDisplayOptions(s => ({
+      ...s,
+      pointSize: e.target.value === "f" ? "f" : e.target.value === "v" ? "v" : "d"
     }));
   }
 
@@ -451,10 +487,12 @@ function WaterRightsTab() {
   const clearMapFilters = () => {
     setRiverBasinNames([]);
     setFilters({ ...defaultFilters });
+    setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
   }
 
   useWaterRightsMapPopup();
+  useWaterRightMapPointScaling(displayOptions.pointSize, filters);
 
   const isLoading = useMemo(() => {
     return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading || isRiverBasinOptionsLoading;
@@ -606,6 +644,25 @@ function WaterRightsTab() {
           </div>
 
           <div className="mb-3">
+            <label>Toggle Point Size</label>
+            <ButtonGroup className="w-100">
+              {pointSizeRadios.map((radio) => (<ToggleButton
+                key={radio.value}
+                id={`pointSizeRadio-${radio.value}`}
+                type="radio"
+                variant="outline-primary"
+                name="pointSizeRadio"
+                value={radio.value}
+                checked={displayOptions.pointSize === radio.value}
+                onChange={handlePointSizeChange}
+              >
+                {radio.name}
+              </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </div>
+
+          <div className="mb-3">
             <label>MAP THEME</label>
             <MapThemeSelector />
           </div>
@@ -623,3 +680,103 @@ function WaterRightsTab() {
 }
 
 export default WaterRightsTab;
+
+const flowPointCircleRadiusFlow = ["coalesce", ["get", waterRightsProperties.maxFlowRate as string], 0];
+const volumePointCircleRadiusFlow = ["coalesce", ["get", waterRightsProperties.maxVolume as string], 0];
+function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: WaterRightsFilters) {
+  const [minVolume, lastKnownMinVolume, setMinVolume] = useLastKnownValue(0);
+  const [maxVolume, lastKnownMaxVolume, setMaxVolume] = useLastKnownValue(100);
+  const [minFlow, lastKnownMinFlow, setMinFlow] = useLastKnownValue(0);
+  const [maxFlow, lastKnownMaxFlow, setMaxFlow] = useLastKnownValue(100);
+  const {
+    renderedFeatures,
+    setLayerCircleRadii
+  } = useContext(MapContext);
+  
+  const pointScaleTimeDelay = 1000;
+  useEffect(() => {
+    //we delay these to give the map time to get new rendered features after the filters change
+    //check this if there are issues setting point sizes
+    setTimeout(()=>setMinFlow(undefined), pointScaleTimeDelay);
+    setTimeout(()=>setMaxFlow(undefined), pointScaleTimeDelay);
+    setTimeout(()=>setMinVolume(undefined), pointScaleTimeDelay);
+    setTimeout(()=>setMaxVolume(undefined), pointScaleTimeDelay);
+  }, [filters, setMinFlow, setMaxFlow, setMinVolume, setMaxVolume]);
+
+  const flowVolumeMinMax = useMemo(() => {
+    if (renderedFeatures.length === 0) {
+      return { minFlow: 0, maxFlow: 0, minVolume: 0, maxVolume: 0 }
+    }
+    const values = renderedFeatures
+      .map(a => ({
+        flow: (a.properties?.[waterRightsProperties.maxFlowRate as string]) ?? 0,
+        volume: (a.properties?.[waterRightsProperties.maxVolume as string]) ?? 0
+      }));
+    return values
+      .reduce((prev, curr) => (
+        {
+          minFlow: prev.minFlow === undefined || curr.flow < prev.minFlow ? curr.flow : prev.minFlow,
+          maxFlow: prev.maxFlow === undefined || curr.flow > prev.maxFlow ? curr.flow : prev.maxFlow,
+          minVolume: prev.minVolume === undefined || curr.volume < prev.minVolume ? curr.volume : prev.minVolume,
+          maxVolume: prev.maxVolume === undefined || curr.volume > prev.maxVolume ? curr.volume : prev.maxVolume
+        }
+      ), { minFlow: values[0].flow, maxFlow: values[0].flow, minVolume: values[0].volume, maxVolume: values[0].volume })
+  }, [renderedFeatures])
+
+  useEffect(() => {
+    if (minFlow === undefined || flowVolumeMinMax.minFlow < minFlow) {
+      setMinFlow(flowVolumeMinMax.minFlow)
+    }
+  }, [minFlow, flowVolumeMinMax.minFlow, setMinFlow])
+
+  useEffect(() => {
+    if (maxFlow === undefined || flowVolumeMinMax.maxFlow > maxFlow) {
+      setMaxFlow(flowVolumeMinMax.maxFlow)
+    }
+  }, [maxFlow, flowVolumeMinMax.maxFlow, setMaxFlow])
+
+  useEffect(() => {
+    if (minVolume === undefined || flowVolumeMinMax.minVolume < minVolume) {
+      setMinVolume(flowVolumeMinMax.minVolume)
+    }
+  }, [minVolume, flowVolumeMinMax.minVolume, setMinVolume])
+
+  useEffect(() => {
+    if (maxVolume === undefined || flowVolumeMinMax.maxVolume > maxVolume) {
+      setMaxVolume(flowVolumeMinMax.maxVolume)
+    }
+  }, [maxVolume, flowVolumeMinMax.maxVolume, setMaxVolume])
+
+  const min = useMemo(() => {
+    return pointSize === "f" ? filters.minFlow ?? lastKnownMinFlow : filters.minVolume ?? lastKnownMinVolume;
+  }, [pointSize, lastKnownMinFlow, lastKnownMinVolume, filters.minFlow, filters.minVolume])
+
+  const max = useMemo(() => {
+    return pointSize === "f" ? filters.maxFlow ?? lastKnownMaxFlow : filters.maxVolume ?? lastKnownMaxVolume;
+  }, [pointSize, filters.maxFlow, filters.maxVolume, lastKnownMaxFlow, lastKnownMaxVolume])
+
+  const scaleProperty = useMemo(() => {
+    return pointSize === "f" ? flowPointCircleRadiusFlow : volumePointCircleRadiusFlow;
+  }, [pointSize])
+
+  useEffect(() => {
+    if (pointSize === "d") {
+      setLayerCircleRadii({ layer: waterRightsPointsLayer, circleRadius: defaultPointCircleRadius })
+    } else {
+      if (min === max) {
+        setLayerCircleRadii({ layer: waterRightsPointsLayer, circleRadius: defaultPointCircleRadius })
+      }
+      const valueScaleFactorMinToMax = pointSizes.maxScaleFactorForSizedPoints;//the biggest point will be x times bigger than the smallest
+      const zoomScaleFactorMinToMax = pointSizes.maxPointSize / pointSizes.minPointSize;
+      const valueRange = max - min;
+      const minSizeAtMinimumZoom = pointSizes.minPointSize;
+      const maxSizeAtMinimumZoom = pointSizes.minPointSize * valueScaleFactorMinToMax;
+      const sizeRange = maxSizeAtMinimumZoom - minSizeAtMinimumZoom;
+      //(((vol-min)/(max-min))*(maxPointSize-minPointSize))+minPointSize === this point's size at minimum zoom
+      const minZoomValue = ["min", ["+", ["*", ["/", ["-", scaleProperty, min], valueRange], sizeRange], minSizeAtMinimumZoom], maxSizeAtMinimumZoom]
+      //size at minimum * zoomScaleFactorMinToMax === this point's size at maximum zoom
+      const maxZoomValue = ["*", minZoomValue, zoomScaleFactorMinToMax]
+      setLayerCircleRadii({ layer: waterRightsPointsLayer, circleRadius: ["interpolate", ["linear"], ["zoom"], pointSizes.minPointSizeZoomLevel, minZoomValue, pointSizes.maxPointSizeZoomLevel, maxZoomValue] })
+    }
+  }, [pointSize, scaleProperty, min, max, setLayerCircleRadii])
+}
