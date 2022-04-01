@@ -21,7 +21,21 @@ const mapIcons: Map<string, string> = new global.Map<string, string>([
 ])
 function Map() {
   const { user } = useContext(AppContext);
-  const { legend, mapStyle, visibleLayers, geoJsonData, filters, circleColors, vectorUrls, mapAlert, fillColors, mapPopup, setRenderedFeatures, mapBoundSettings, setMapClickedFeatures } = useContext(MapContext);
+  const {
+    legend,
+    mapStyle,
+    visibleLayers,
+    geoJsonData,
+    filters,
+    circleColors,
+    circleRadii,
+    vectorUrls,
+    mapAlert,
+    fillColors,
+    mapPopup,
+    mapBoundSettings,
+    setRenderedFeatures,
+    setMapClickedFeatures } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
@@ -223,6 +237,13 @@ function Map() {
       map.setPaintProperty(key, "circle-color", circleColors[key]);
     }
   }, [map, circleColors]);
+
+  useEffect(() => {
+    if (!map) return;
+    for (let key in circleRadii) {
+      map.setPaintProperty(key, "circle-radius", circleRadii[key]);
+    }
+  }, [map, circleRadii]);
 
   useEffect(() => {
     if (!map) return;

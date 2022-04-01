@@ -383,7 +383,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Count().Should().Be(5);
+            result.Count.Should().Be(5);
             result.Any(x => x.Latitude == sites[0].Latitude).Should().BeTrue();
         }
 
@@ -424,7 +424,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Count().Should().Be(5);
+            result.Count.Should().Be(5);
         }
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
