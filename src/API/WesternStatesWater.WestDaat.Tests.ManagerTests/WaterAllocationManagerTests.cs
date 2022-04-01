@@ -12,6 +12,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     [TestClass]
     public class WaterAllocationManagerTests : ManagerTestBase
     {
+        private readonly Mock<ILocationEngine> _locationEngineMock = new(MockBehavior.Strict);
+
         private readonly Mock<INldiAccessor> _nldiAccessorMock = new(MockBehavior.Strict);
         private readonly Mock<IGeoConnexEngine> _geoConnexEngineMock = new Mock<IGeoConnexEngine>(MockBehavior.Strict);
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
@@ -170,6 +172,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _siteAccessorMock.Object,
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
+                _locationEngineMock.Object,
                 CreateLogger<WaterAllocationManager>()
             );
         }

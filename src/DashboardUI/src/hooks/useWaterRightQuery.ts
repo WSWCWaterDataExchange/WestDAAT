@@ -54,13 +54,3 @@ export function useRiverBasinOptions() {
     async () => await getRiverBasinOptions()
   );
 }
-
-export function useRiverBasinPolygonsByName(basinNames: string[]) {
-  return useQuery(
-    ['riverBasinPolygons', basinNames],
-    async () => await getRiverBasinPolygonsByName(basinNames),
-    {
-      enabled: !!basinNames,
-    }
-  );
-}
