@@ -1,6 +1,12 @@
-import { nldi } from "./constants";
+import { nldi, pointSizes } from "./constants";
 
-const pointCircleRadius = ["interpolate", ["linear"], ["zoom"], 5, 2, 20, 20];
+export const defaultPointCircleRadius = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  pointSizes.minPointSizeZoomLevel, pointSizes.minPointSize,
+  pointSizes.maxPointSizeZoomLevel, pointSizes.maxPointSize,
+];
 
 const mapsJson = {
   "sources": [
@@ -52,7 +58,7 @@ const mapsJson = {
       },
       "type": "circle",
       "paint": {
-        "circle-radius": pointCircleRadius,
+        "circle-radius": defaultPointCircleRadius,
         "circle-color": "#ff0000"
       },
     },
@@ -81,7 +87,7 @@ const mapsJson = {
       },
       "type": "circle",
       "paint": {
-        "circle-radius": pointCircleRadius,
+        "circle-radius": defaultPointCircleRadius,
         "circle-color": ["case",
           ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
           nldi.colors.sitePOU],
@@ -138,7 +144,7 @@ const mapsJson = {
       },
       "type": "circle",
       "paint": {
-        "circle-radius": pointCircleRadius,
+        "circle-radius": defaultPointCircleRadius,
         "circle-color": ["case",
           ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs,
           ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa,

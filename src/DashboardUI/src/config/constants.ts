@@ -13,6 +13,14 @@ export const nldi = {
   latLongPrecision: 4
 }
 
+export const pointSizes = {
+  minPointSize: 2,
+  minPointSizeZoomLevel: 5,
+  maxPointSize: 20,
+  maxPointSizeZoomLevel: 20,
+  maxScaleFactorForSizedPoints: 10
+}
+
 export enum waterRightsProperties {
   owners = "o",
   ownerClassifications = "oClass",
