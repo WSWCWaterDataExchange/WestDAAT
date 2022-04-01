@@ -191,7 +191,6 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapAlerts, setMapAlerts] = useState<{ key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority }[]>([]);
   const mapAlert = useMemo(() => {
-    console.log(mapAlerts);
     return [...mapAlerts].sort((a, b) => a.priority as number - b.priority as number).find(a => a.display)?.element ?? null;
   }, [mapAlerts]);
   const changeAlertDisplay = useCallback((key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => {
@@ -239,7 +238,7 @@ const MapProvider: FC = ({ children }) => {
     mapBoundSettings,
     setMapBoundSettings,
     mapAlert,
-    setMapAlert,
+    setMapAlerts,
     changeAlertDisplay,
     removeAlertDisplay,
     mapClickedFeatures,
