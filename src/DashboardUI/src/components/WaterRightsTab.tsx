@@ -141,18 +141,14 @@ function WaterRightsTab() {
   const { data: allOwnerClassifications, isFetching: isAllOwnerClassificationsLoading, isError: isAllOwnerClassificationsError } = useOwnerClassifications();
   const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
   const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading } = useRiverBasinOptions();
-
-  const [riverBasinNames, setRiverBasinNames] = useState<string[]>([]);
-  const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', riverBasinNames], () =>
-    getRiverBasinPolygonsByName(riverBasinNames),
-    { keepPreviousData: true }
-  );
-
-  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
-
   const { setUrlParam, getUrlParam } = useContext(AppContext);
-
   const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', filters.riverBasinNames ?? []], async (): Promise<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | undefined> => {
+    if ((filters?.riverBasinNames?.length ?? 0) === 0) {
+      return undefined;
+    }
+    return await getRiverBasinPolygonsByName(filters?.riverBasinNames ?? []);
+  }, {keepPreviousData: true});
   const [displayOptions, setDisplayOptions] = useState<WaterRightsDisplayOptions>(getUrlParam<WaterRightsDisplayOptions>("wrd") ?? defaultDisplayOptions);
 
   const mapGrouping = useMemo(() => {
@@ -265,11 +261,6 @@ function WaterRightsTab() {
   }, [setLegend, renderedMapGroupings])
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
-
-  useEffect(() => {
-    setVisibleLayers(allWaterRightsLayers)
-  }, [setVisibleLayers])
-
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
 
   useEffect(() => {
@@ -364,24 +355,26 @@ function WaterRightsTab() {
   }
 
   const handleRiverBasinChange = async (riverBasinNames: string[]) => {
-    let basins : string[] | undefined = undefined;
-    if(riverBasinNames.length > 0){
-      basins = riverBasinNames;
-      setRiverBasinNames(riverBasinNames);
-    }
     setFilters(s => ({
       ...s,
-      riverBasinNames: basins
+      riverBasinNames: riverBasinNames
     }));
   }
 
   useEffect(() => {
-    if(riverBasinPolygons && riverBasinPolygons.features){
-      setGeoJsonData("river-basins", riverBasinPolygons);
-      setVisibleLayers([...visibleLayers, "river-basins"]);
+    if ((filters.riverBasinNames?.length ?? 0) > 0) {
+      setVisibleLayers([...allWaterRightsLayers, "river-basins"]);
+    } else {
+      setVisibleLayers([...allWaterRightsLayers]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [riverBasinPolygons])
+  }, [filters.riverBasinNames, setVisibleLayers])
+
+  useEffect(() => {
+    setGeoJsonData("river-basins", riverBasinPolygons ?? {
+      "type": "FeatureCollection",
+      "features": []
+    });
+  }, [riverBasinPolygons, setGeoJsonData])
 
   const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setFilters(s => ({
@@ -439,13 +432,8 @@ function WaterRightsTab() {
     if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
       filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
     }
-    if (filters.riverBasinNames && filters.riverBasinNames.length !== 0){
-      if (filters.riverBasinNames !== riverBasinNames){
-        setRiverBasinNames(filters.riverBasinNames);
-      }
-      if (riverBasinPolygons && riverBasinPolygons.features) {
-        filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
-      }
+    if (riverBasinPolygons && riverBasinPolygons.features) {
+      filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
     }
     if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
       filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
@@ -475,16 +463,15 @@ function WaterRightsTab() {
     setMapLayerFilters(allWaterRightsLayers.map(a => {
       return { layer: a, filter: filterSet }
     }))
-      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons])
 
   const clearMapFilters = () => {
-    setRiverBasinNames([]);
     setFilters({ ...defaultFilters });
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
   }
 
+  useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
   useWaterRightsMapPopup();
   useWaterRightMapPointScaling(displayOptions.pointSize, filters);
 
@@ -686,15 +673,15 @@ function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: Water
     renderedFeatures,
     setLayerCircleRadii
   } = useContext(MapContext);
-  
+
   const pointScaleTimeDelay = 1000;
   useEffect(() => {
     //we delay these to give the map time to get new rendered features after the filters change
     //check this if there are issues setting point sizes
-    setTimeout(()=>setMinFlow(undefined), pointScaleTimeDelay);
-    setTimeout(()=>setMaxFlow(undefined), pointScaleTimeDelay);
-    setTimeout(()=>setMinVolume(undefined), pointScaleTimeDelay);
-    setTimeout(()=>setMaxVolume(undefined), pointScaleTimeDelay);
+    setTimeout(() => setMinFlow(undefined), pointScaleTimeDelay);
+    setTimeout(() => setMaxFlow(undefined), pointScaleTimeDelay);
+    setTimeout(() => setMinVolume(undefined), pointScaleTimeDelay);
+    setTimeout(() => setMaxVolume(undefined), pointScaleTimeDelay);
   }, [filters, setMinFlow, setMaxFlow, setMinVolume, setMaxVolume]);
 
   const flowVolumeMinMax = useMemo(() => {
