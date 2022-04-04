@@ -62,7 +62,7 @@ interface MapContextState {
   changeAlertDisplay: (key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => void,
   removeAlertDisplay: (key: string) => void,
   mapBoundSettings: MapBoundSettings | null,
-  setMapBoundSettings: (settings: MapBoundSettings) => void
+  setMapBoundSettings: (settings: MapBoundSettings) => void,
   mapClickedFeatures: MapClickType | null,
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,

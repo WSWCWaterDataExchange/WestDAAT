@@ -45,6 +45,14 @@ const mapsJson = {
         "features": []
       }
     },
+    {
+      "id": "river-basins",
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": []
+      }
+    },
   ],
   "layers": [
     {
@@ -103,6 +111,19 @@ const mapsJson = {
           nldi.colors.sitePOU],
       },
       "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
+    },
+    {
+      "id": "river-basins",
+      "friendlyName": "RiverBasins",
+      "source": "river-basins",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "fill",
+      'paint': {
+        'fill-color': nldi.colors.riverBasin,
+        'fill-opacity': 0.3
+      }
     },
     {
       "id": "site-locations-label",

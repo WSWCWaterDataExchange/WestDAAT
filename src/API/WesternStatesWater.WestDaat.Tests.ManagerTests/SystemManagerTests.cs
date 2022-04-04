@@ -1,5 +1,6 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
@@ -7,6 +8,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     [TestClass]
     public class SystemManagerTests : ManagerTestBase
     {
+        private readonly Mock<ILocationEngine> _locationEngineMock = new(MockBehavior.Strict);
+
         private readonly Mock<ISystemAccessor> _systemAccessorMock = new(MockBehavior.Strict);
 
         [TestMethod]
@@ -88,6 +91,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private ISystemManager CreateSystemManager()
         {
             return new SystemManager(
+                _locationEngineMock.Object,
                 _systemAccessorMock.Object,
                 CreateLogger<SystemManager>()
             );

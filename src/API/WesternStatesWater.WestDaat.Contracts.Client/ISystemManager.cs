@@ -1,4 +1,5 @@
-﻿using WesternStatesWater.WestDaat.Common;
+﻿using GeoJSON.Text.Feature;
+using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
@@ -8,5 +9,9 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<string>> GetAvailableWaterSourceTypeNormalizedNames();
         Task<List<string>> GetAvailableOwnerClassificationNormalizedNames();
         Task<List<string>> GetAvailableStateNormalizedNames();
+
+        List<string> GetRiverBasinNames();
+
+        FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames);
     }
 }

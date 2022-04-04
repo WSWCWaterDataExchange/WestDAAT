@@ -42,6 +42,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
 
             builder.Services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
+            builder.Services.AddTransient<ILocationEngine, LocationEngine>();
             builder.Services.AddTransient<ITestEngine, TestEngine>();
 
             builder.Services.AddTransient<INldiAccessor, NldiAccessor>();
