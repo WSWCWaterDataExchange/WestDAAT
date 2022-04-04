@@ -8,6 +8,19 @@ export const defaultPointCircleRadius = [
   pointSizes.maxPointSizeZoomLevel, pointSizes.maxPointSize,
 ];
 
+const defaultPointPaintConfiguration = {
+  "circle-radius": defaultPointCircleRadius,
+  "circle-stroke-width": 1,
+  "circle-stroke-opacity": [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    pointSizes.minPointSizeZoomLevel, 0,
+    pointSizes.maxPointSizeZoomLevel, .3,
+  ],
+  "circle-color": "#ff0000"
+}
+
 const mapsJson = {
   "sources": [
     {
@@ -65,10 +78,7 @@ const mapsJson = {
         "visibility": "none"
       },
       "type": "circle",
-      "paint": {
-        "circle-radius": defaultPointCircleRadius,
-        "circle-color": "#ff0000"
-      },
+      "paint": defaultPointPaintConfiguration,
     },
     {
       "id": "site-locations-polygons",
@@ -95,7 +105,7 @@ const mapsJson = {
       },
       "type": "circle",
       "paint": {
-        "circle-radius": defaultPointCircleRadius,
+        ...defaultPointPaintConfiguration,
         "circle-color": ["case",
           ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
           nldi.colors.sitePOU],
@@ -165,7 +175,7 @@ const mapsJson = {
       },
       "type": "circle",
       "paint": {
-        "circle-radius": defaultPointCircleRadius,
+        ...defaultPointPaintConfiguration,
         "circle-color": ["case",
           ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs,
           ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa,
