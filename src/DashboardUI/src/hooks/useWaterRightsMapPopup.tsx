@@ -28,6 +28,9 @@ export function useWaterRightsMapPopup() {
   }, [data, setCurrentIndex]);
 
   const result = useMemo(() => {
+    if (!clickedSiteUuid) {
+      return undefined;
+    }
     if (isFetching) {
       return <MapPopupCard onClosePopup={handleClosePopup}>
         {{

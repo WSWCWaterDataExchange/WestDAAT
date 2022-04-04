@@ -56,6 +56,19 @@ const mapsJson = {
   ],
   "layers": [
     {
+      "id": "river-basins",
+      "friendlyName": "RiverBasins",
+      "source": "river-basins",
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "fill",
+      'paint': {
+        'fill-color': nldi.colors.riverBasin,
+        'fill-opacity': 0.3
+      }
+    },
+    {
       "id": "waterRightsPolygons",
       "friendlyName": "Water Rights Polygons",
       "source-layer": "polygons",
@@ -111,19 +124,6 @@ const mapsJson = {
           nldi.colors.sitePOU],
       },
       "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
-    },
-    {
-      "id": "river-basins",
-      "friendlyName": "RiverBasins",
-      "source": "river-basins",
-      "layout": {
-        "visibility": "visible"
-      },
-      "type": "fill",
-      'paint': {
-        'fill-color': nldi.colors.riverBasin,
-        'fill-opacity': 0.3
-      }
     },
     {
       "id": "site-locations-label",
