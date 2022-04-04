@@ -90,7 +90,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key
+            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --overwrite
     
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
