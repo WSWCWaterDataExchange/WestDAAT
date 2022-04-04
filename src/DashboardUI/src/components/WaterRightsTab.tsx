@@ -83,6 +83,7 @@ const colors = [
 
 const waterRightsPointsLayer = 'waterRightsPoints';
 const waterRightsPolygonsLayer = 'waterRightsPolygons';
+const waterRightsRiverBasinLayer = 'river-basins';
 
 const allWaterRightsLayers = [
   waterRightsPointsLayer,
@@ -172,7 +173,6 @@ function WaterRightsTab() {
     setLegend,
     setLayerFilters: setMapLayerFilters,
     setVisibleLayers,
-    visibleLayers,
     renderedFeatures,
     setLayerCircleColors,
     setLayerFillColors,
@@ -363,7 +363,7 @@ function WaterRightsTab() {
 
   useEffect(() => {
     if ((filters.riverBasinNames?.length ?? 0) > 0) {
-      setVisibleLayers([...allWaterRightsLayers, "river-basins"]);
+      setVisibleLayers([...allWaterRightsLayers, waterRightsRiverBasinLayer]);
     } else {
       setVisibleLayers([...allWaterRightsLayers]);
     }
