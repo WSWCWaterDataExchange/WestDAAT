@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.IO;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -57,6 +60,29 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var results = await _systemManager.GetAvailableStateNormalizedNames();
 
             return JsonResult(results);
+        }
+
+        [FunctionName(nameof(GetRiverBasinNames)), AllowAnonymous]
+        public IActionResult GetRiverBasinNames([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/RiverBasins")] HttpRequest request)
+        {
+            var result = _systemManager.GetRiverBasinNames();
+
+            return new OkObjectResult(result);
+        }
+
+        [FunctionName(nameof(GetRiverBasinPolygonsByName)), AllowAnonymous]
+        public async Task<IActionResult> GetRiverBasinPolygonsByName([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/RiverBasins")] HttpRequest request)
+        {
+            string requestBody = String.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
+
+            var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
+
+            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
     }
 }

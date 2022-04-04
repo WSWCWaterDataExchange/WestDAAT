@@ -1,4 +1,3 @@
-using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +5,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common;
-using Newtonsoft.Json;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -82,29 +80,6 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var result = await _waterAllocationManager.GetWaterRightsDigestsBySite(siteUuid);
 
             return new OkObjectResult(result);
-        }
-
-        [FunctionName(nameof(GetRiverBasinNames)), AllowAnonymous]
-        public IActionResult GetRiverBasinNames([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RiverBasins")] HttpRequest request)
-        {
-            var result = _waterAllocationManager.GetRiverBasinNames();
-
-            return new OkObjectResult(result);
-        }
-
-        [FunctionName(nameof(GetRiverBasinPolygonsByName)), AllowAnonymous]
-        public async Task<IActionResult> GetRiverBasinPolygonsByName([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "RiverBasins")] HttpRequest request)
-        {
-            string requestBody = String.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
-
-            var result = _waterAllocationManager.GetRiverBasinPolygonsByName(basinNames);
-
-            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
         [FunctionName(nameof(GetWaterRightSiteLocations)), AllowAnonymous]

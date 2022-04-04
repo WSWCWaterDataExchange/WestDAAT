@@ -261,7 +261,6 @@ const MapProvider: FC = ({ children }) => {
     mapBoundSettings,
     setMapBoundSettings,
     mapAlert,
-    setMapAlerts,
     changeAlertDisplay,
     removeAlertDisplay,
     mapClickedFeatures,

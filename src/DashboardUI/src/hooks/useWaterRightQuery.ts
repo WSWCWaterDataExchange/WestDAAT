@@ -4,7 +4,6 @@ import {
   getWaterRightSiteInfoList,
   getWaterRightSourceInfoList,
   getWaterRightSiteLocations,
-  getRiverBasinOptions,
 } from '../accessors/waterAllocationAccessor';
 
 export function useWaterRightDetails(waterRightId: number) {
@@ -44,12 +43,5 @@ export function useWaterRightSiteLocations(waterRightId: number) {
     {
       enabled: !!waterRightId,
     }
-  );
-}
-
-export function useRiverBasinOptions() {
-  return useQuery(
-    ['riverBasinOptions'],
-    async () => await getRiverBasinOptions()
   );
 }

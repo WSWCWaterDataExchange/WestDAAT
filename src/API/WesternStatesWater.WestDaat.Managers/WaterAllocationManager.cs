@@ -14,7 +14,6 @@ namespace WesternStatesWater.WestDaat.Managers
     public sealed class WaterAllocationManager : ManagerBase, ClientContracts.IWaterAllocationManager
     {
         private readonly IGeoConnexEngine _geoConnexEngine;
-        private readonly ILocationEngine _locationEngine;
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
@@ -24,14 +23,12 @@ namespace WesternStatesWater.WestDaat.Managers
             ISiteAccessor siteAccessor,
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
-            ILocationEngine locationEngine,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
-            _locationEngine = locationEngine;
         }
 
         async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
@@ -76,16 +73,6 @@ namespace WesternStatesWater.WestDaat.Managers
         async Task<List<ClientContracts.WaterRightsDigest>> ClientContracts.IWaterAllocationManager.GetWaterRightsDigestsBySite(string siteUuid)
         {
             return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
-        }
-
-        public List<string> GetRiverBasinNames()
-        {
-            return _locationEngine.GetRiverBasinNames();
-        }
-
-        public FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames)
-        {
-            return _locationEngine.GetRiverBasinPolygonsByName(basinNames);
         }
 
         public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)

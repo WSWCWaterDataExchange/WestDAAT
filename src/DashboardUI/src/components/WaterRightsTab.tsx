@@ -19,7 +19,7 @@ import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTy
 import { defaultPointCircleRadius } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
 import { useRiverBasinOptions } from '../hooks';
-import { getRiverBasinPolygonsByName } from '../accessors/waterAllocationAccessor';
+import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 
 enum MapGrouping {

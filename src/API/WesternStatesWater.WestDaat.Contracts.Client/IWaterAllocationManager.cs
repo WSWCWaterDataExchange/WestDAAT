@@ -17,10 +17,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(long waterRightsId);
 
-        List<string> GetRiverBasinNames();
-
-        FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames);
-
         Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId);
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
