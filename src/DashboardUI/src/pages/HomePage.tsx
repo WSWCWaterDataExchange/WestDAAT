@@ -45,7 +45,7 @@ function HomePage() {
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar 
+      <SiteNavbar
         onTabClick={setCurrentTab}
         currentTab={currentTab}
         showContactModal={shouldShowContactModal}
