@@ -7,6 +7,7 @@ import Map from '../components/Map';
 
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
+import TermsModal from '../components/TermsModal';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
@@ -20,9 +21,14 @@ function HomePage() {
   const { setUrlParam, getUrlParam } = useContext(AppContext);
   const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
+  }
+
+  const shouldShowTermsModal = (show: boolean) => {
+    setShowTermsModal(show);
   }
 
   useEffect(() => {
@@ -39,7 +45,12 @@ function HomePage() {
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar onTabClick={setCurrentTab} currentTab={currentTab} showContactModal={shouldShowContactModal} />
+      <SiteNavbar 
+        onTabClick={setCurrentTab}
+        currentTab={currentTab}
+        showContactModal={shouldShowContactModal}
+        showTermsModal={shouldShowTermsModal}
+      />
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">
@@ -50,6 +61,7 @@ function HomePage() {
       <SiteFooter />
 
       <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
+      <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
     </div>
   );
 }
