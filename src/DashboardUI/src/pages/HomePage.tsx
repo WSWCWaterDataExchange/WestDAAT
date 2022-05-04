@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import ContactModal from '../components/ContactModal';
+import Map from '../components/Map';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
-import Map from '../components/Map';
+import TermsModal from '../components/TermsModal';
 
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
-import TermsModal from '../components/TermsModal';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
