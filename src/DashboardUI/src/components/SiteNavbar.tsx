@@ -62,16 +62,16 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <Nav className="mx-2">
-          <AuthenticatedTemplate>
+          <UnauthenticatedTemplate>
             <Nav.Link onClick={() => handleLogin(msalClientApplication)}>              
               Log In
             </Nav.Link>
-          </AuthenticatedTemplate>
-          <UnauthenticatedTemplate>
+          </UnauthenticatedTemplate>
+          <AuthenticatedTemplate>
             <Nav.Link onClick={() => handleLogout(msalClientApplication)}>              
               Log Out
             </Nav.Link>
-          </UnauthenticatedTemplate>
+          </AuthenticatedTemplate>
           </Nav>
         </Container>
       </Navbar>
