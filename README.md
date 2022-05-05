@@ -17,19 +17,19 @@
    - Example: `Data Source=localhost;Initial Catalog=WaDE2;User Id=sa;Password=password`
    - May need to run this twice if using docker
 5. Setup Function App
-   1. Right-click on **Client.Functions** project and choose **Set as Startup Project**
-   1. create `local.settings.json` file in the **Client.Functions** project
-   1. Copy the `Example.local.settings.json` file from the same directory as this Readme file and make changes as appropriate
-   1. Set the listening port to 5001
-      1. Right-click on **Client.Functions** project
-      1. Choose Properties
-      1. Select Debug -> General -> Open debug launch profiles UI
-      1. In the command line arguments enter the following
-         1. `host start --port 5001`
-      1. Run the Function App
+   - Right-click on **Client.Functions** project and choose **Set as Startup Project**
+   - create `local.settings.json` file in the **Client.Functions** project
+   - Copy the `Example.local.settings.json` file from the same directory as this Readme file and make changes as appropriate
+   - Set the listening port to 5001
+      - Right-click on **Client.Functions** project
+      - Choose Properties
+      - Select Debug -> General -> Open debug launch profiles UI
+      - In the command line arguments enter the following
+         - `host start --port 5001`
+      - Run the Function App
 6. Setup React App
    - install NPM packages.
-      - From the DashboarUI directory `npm install`
+      - From the DashboardUI directory `npm install`
    - Requires Node version 16+
    - Requires NPM version 8+
       - For Windows download the Node installer here: https://nodejs.org/en/download/
