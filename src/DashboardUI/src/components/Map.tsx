@@ -1,18 +1,19 @@
 import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
-import { SetStateAction, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import { AppContext, User } from "../AppProvider";
 import { MapContext, MapStyle } from "./MapProvider";
 import mapConfig from "../config/maps";
-import { mdiMapMarker, mdiLink } from '@mdi/js';
+import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
+import { CustomShareControl } from "./CustomSharedControl";
+
 import ReactDOM from "react-dom";
-import Icon from "@mdi/react";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -92,6 +93,8 @@ function Map() {
 
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
+
+      mapInstance.addControl(new CustomShareControl(mapInstance));
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
@@ -297,13 +300,8 @@ function Map() {
         mapAlert
       }
       <div id="map" className="map h-100" ref={dropRef}></div>
-      <button id="shareLink" onClick={() => navigator.clipboard.writeText(window.location.href)}>
-        <Icon path={mdiLink} />
-      </button>
     </div>
   );
-
-
 }
 
 export default Map;
