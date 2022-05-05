@@ -1,3 +1,7 @@
+import { IPublicClientApplication } from "@azure/msal-browser";
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
+import { loginRequest } from "../authConfig";
+
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
@@ -15,8 +19,20 @@ interface SiteNavbarProps {
   showContactModal(show: boolean): void;
 }
 
-function SiteNavbar(props: SiteNavbarProps) {
+function handleLogin(msalClientApplication: IPublicClientApplication) {
+  msalClientApplication.loginPopup(loginRequest).catch(e => {
+    console.error(e);
+  });
+}
 
+function handleLogout(msalClientApplication: IPublicClientApplication) {
+  msalClientApplication.logoutPopup().catch(e => {
+    console.error(e);
+  });
+}
+
+function SiteNavbar(props: SiteNavbarProps) {
+  const msalClientApplication = useMsal().instance;
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   const handleClose = () => setShowHamburgerMenu(false);
@@ -46,9 +62,16 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <Nav className="mx-2">
-            <Nav.Link onClick={() => setUser({username: "WaDE User"})}>
-              {user ? `Hello, ${user.username}` : "Log In"}
+          <AuthenticatedTemplate>
+            <Nav.Link onClick={() => handleLogin(msalClientApplication)}>              
+              Log In
             </Nav.Link>
+          </AuthenticatedTemplate>
+          <UnauthenticatedTemplate>
+            <Nav.Link onClick={() => handleLogout(msalClientApplication)}>              
+              Log Out
+            </Nav.Link>
+          </UnauthenticatedTemplate>
           </Nav>
         </Container>
       </Navbar>
