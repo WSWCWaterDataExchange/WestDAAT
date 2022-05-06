@@ -38,8 +38,6 @@ function SiteNavbar(props: SiteNavbarProps) {
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
 
-  const { user, setUser } = useContext(AppContext);
-
   return (
     <div>
       <Navbar variant="dark" expand={false}>
