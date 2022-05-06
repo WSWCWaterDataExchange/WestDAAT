@@ -149,7 +149,7 @@ function WaterRightsTab() {
       return undefined;
     }
     return await getRiverBasinPolygonsByName(filters?.riverBasinNames ?? []);
-  }, {keepPreviousData: true});
+  }, { keepPreviousData: true });
   const [displayOptions, setDisplayOptions] = useState<WaterRightsDisplayOptions>(getUrlParam<WaterRightsDisplayOptions>("wrd") ?? defaultDisplayOptions);
 
   const mapGrouping = useMemo(() => {
