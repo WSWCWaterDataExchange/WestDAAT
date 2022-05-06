@@ -1,7 +1,10 @@
-export const msalConfig = {
+import { Configuration } from "@azure/msal-browser";
+
+export const msalConfig : Configuration = {
   auth: {
     clientId: "ab3cf308-8a7e-404e-977c-d0227f4a48c4",
-    authority: "https://login.microsoftonline.com//westdaatqa.onmicrosoft.com", // This is a URL (e.g. https://login.microsoftonline.com/{your tenant ID})
+    authority: "https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin", // This is a URL (e.g. https://login.microsoftonline.com/{your tenant ID})
+    knownAuthorities: ["https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com"],
     redirectUri: "http://localhost:3000",
   },
   cache: {
@@ -12,7 +15,7 @@ export const msalConfig = {
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest = {
- scopes: ["User.Read"]
+ scopes: ["openid"]
 };
 
 // Add the endpoints here for Microsoft Graph API services you'd like to use.
