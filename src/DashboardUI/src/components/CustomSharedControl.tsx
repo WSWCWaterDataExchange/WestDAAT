@@ -1,36 +1,25 @@
 import { mdiLink } from "@mdi/js";
-import Icon from "@mdi/react";
-import mapboxgl from "mapbox-gl";
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/map.scss";
 
 toast.configure()
 
-const iconElement = () => {
-  return <div><Icon path={mdiLink}></Icon></div>
-}
-
 export class CustomShareControl{
-  public mapInstance: mapboxgl.Map;
-
-  constructor(map: mapboxgl.Map){
-    this.mapInstance = map;
-  }
-  onAdd(map: mapboxgl.Map) {
-
+  onAdd() {
     const path = document.createElement("path");
     path.setAttribute("d", mdiLink)
     path.setAttribute("style", "fill: #000000")
 
-    const svg = document.createElement("svg");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class","shareElement");
     svg.setAttribute("viewbox", "0 0 24 24");
-    svg.setAttribute("role", "img");
-    svg.setAttribute("style", "width: 40px; height: 40px;")
+    svg.setAttribute("style", "width: 25px; height: 25px;")
     svg.appendChild(path);
 
     const btn = document.createElement("button");
     btn.className = "mapboxgl-ctrl-icon";
+    
     btn.onclick = () => {
       navigator.clipboard.writeText(window.location.href);
       toast.info("link copied successfully",
@@ -41,15 +30,16 @@ export class CustomShareControl{
     };
 
     btn.appendChild(svg);
-    
+
     const container = document.createElement("div");
-    container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+    container.className = "mapboxgl-ctrl mapboxgl-ctrl-group containerElement";
+    container.setAttribute("data-title", "Get a link for the current map view to bookmark or share");
     container.appendChild(btn);
 
     return container;
   }
 
-  onRemove(map: mapboxgl.Map) {
+  onRemove() {
     return;
   }
 }

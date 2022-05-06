@@ -94,7 +94,7 @@ function Map() {
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
 
-      mapInstance.addControl(new CustomShareControl(mapInstance));
+      mapInstance.addControl(new CustomShareControl());
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
