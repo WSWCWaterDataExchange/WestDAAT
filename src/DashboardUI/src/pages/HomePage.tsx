@@ -40,7 +40,6 @@ function HomePage() {
   return (
     <div className="home-page d-flex flex-column">
       <SiteNavbar onTabClick={setCurrentTab} currentTab={currentTab} showContactModal={shouldShowContactModal} />
-
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">
