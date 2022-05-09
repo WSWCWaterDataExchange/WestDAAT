@@ -16,6 +16,7 @@ interface SiteNavbarProps {
   currentTab: HomePageTab;
   onTabClick: (tab: HomePageTab) => void;
   showContactModal(show: boolean): void;
+  showTermsModal(show: boolean): void;
 }
 
 function handleLogin(msalClientApplication: IPublicClientApplication) {
@@ -99,7 +100,7 @@ function SiteNavbar(props: SiteNavbarProps) {
             <Nav.Link target="_blank" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
             <Nav.Link target="_blank" href="https://westernstateswater.org/wade/Aggregate-Water-Data">Aggregate Water Use Data</Nav.Link>
             <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
-            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/terms-of-service">Terms and Conditions</Nav.Link>
+            <Nav.Link onClick={() => props.showTermsModal(true)}>Terms and Conditions</Nav.Link>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>

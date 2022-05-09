@@ -5,8 +5,12 @@ import {
   GetTrackProps,
   SliderItem,
   SliderProps,
+  Slider,
+  Rail,
+  Handles,
+  Tracks,
+  Ticks
 } from 'react-compound-slider';
-import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 
 
 interface CustomSliderProps extends SliderProps {
