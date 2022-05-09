@@ -16,7 +16,7 @@ import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties, pointSizes } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
-import { defaultPointCircleRadius } from "../config/maps";
+import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
 import { useRiverBasinOptions } from '../hooks';
 import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
@@ -35,7 +35,6 @@ interface WaterRightsFilters {
   riverBasinNames?: string[],
   states?: string[],
   allocationOwner?: string,
-  mapGrouping: MapGrouping,
   includeExempt?: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
@@ -47,7 +46,8 @@ interface WaterRightsFilters {
 }
 
 interface WaterRightsDisplayOptions {
-  pointSize: 'd' | 'f' | 'v'
+  pointSize: 'd' | 'f' | 'v',
+  mapGrouping: MapGrouping
 }
 
 const mapDataTiers = [
@@ -97,7 +97,6 @@ const defaultFilters: WaterRightsFilters = {
   waterSourceTypes: undefined,
   states: undefined,
   riverBasinNames: undefined,
-  mapGrouping: MapGrouping.BeneficialUse,
   includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
@@ -109,7 +108,8 @@ const defaultFilters: WaterRightsFilters = {
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
-  pointSize: 'd'
+  pointSize: 'd',
+  mapGrouping: MapGrouping.BeneficialUse
 }
 
 const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
@@ -155,7 +155,7 @@ function WaterRightsTab() {
   const mapGrouping = useMemo(() => {
     let colorIndex = 0;
     let colorMapping: { key: string, color: string }[];
-    switch (filters.mapGrouping) {
+    switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
         colorMapping = allBeneficialUses?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
@@ -166,8 +166,8 @@ function WaterRightsTab() {
         colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
     }
-    return { property: filters.mapGrouping as string, colorMapping }
-  }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
+    return { property: displayOptions.mapGrouping as string, colorMapping }
+  }, [displayOptions.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
 
   const {
     setLegend,
@@ -524,7 +524,7 @@ function WaterRightsTab() {
 
           <div className="mb-3">
             <label>Change Map Legend</label>
-            <select className="form-select" onChange={handleMapGroupingChange} value={filters.mapGrouping}>
+            <select className="form-select" onChange={handleMapGroupingChange} value={displayOptions.mapGrouping}>
               <option value={MapGrouping.BeneficialUse}>Beneficial Use</option>
               <option value={MapGrouping.OwnerClassification}>Owner Classification</option>
               <option value={MapGrouping.WaterSourceType}>Water Source Type</option>
@@ -671,7 +671,8 @@ function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: Water
   const [maxFlow, lastKnownMaxFlow, setMaxFlow] = useLastKnownValue(100);
   const {
     renderedFeatures,
-    setLayerCircleRadii
+    setLayerCircleRadii,
+    setLayerCircleSortKeys
   } = useContext(MapContext);
 
   const pointScaleTimeDelay = 1000;
@@ -760,4 +761,14 @@ function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: Water
       setLayerCircleRadii({ layer: waterRightsPointsLayer, circleRadius: ["interpolate", ["linear"], ["zoom"], pointSizes.minPointSizeZoomLevel, minZoomValue, pointSizes.maxPointSizeZoomLevel, maxZoomValue] })
     }
   }, [pointSize, scaleProperty, min, max, setLayerCircleRadii])
+
+  useEffect(() => {
+    if (pointSize === "f") {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: flowPointCircleSortKey })
+    } else if (pointSize === "v") {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: volumePointCircleSortKey })
+    } else {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: defaultPointCircleSortKey })
+    }
+  }, [pointSize, setLayerCircleSortKeys])
 }
