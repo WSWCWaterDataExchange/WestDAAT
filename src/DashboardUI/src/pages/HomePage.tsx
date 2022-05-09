@@ -23,7 +23,7 @@ function HomePage() {
   const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showDisclaimerModal, setShowDisclaimerModal] = useState(localStorage.getItem("disclaimer") != "donotshow");
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(localStorage.getItem("disclaimer") !== "donotshow");
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
