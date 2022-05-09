@@ -1,3 +1,7 @@
+import { IPublicClientApplication } from "@azure/msal-browser";
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
+import { loginRequest } from "../authConfig";
+
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
@@ -6,8 +10,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
-import { useContext, useState } from 'react';
-import { AppContext } from '../AppProvider';
+import { useState } from 'react';
 
 interface SiteNavbarProps {
   currentTab: HomePageTab;
@@ -16,14 +19,24 @@ interface SiteNavbarProps {
   showTermsModal(show: boolean): void;
 }
 
-function SiteNavbar(props: SiteNavbarProps) {
+function handleLogin(msalClientApplication: IPublicClientApplication) {
+  msalClientApplication.loginPopup(loginRequest).catch(e => {
+    console.error(e);
+  });
+}
 
+function handleLogout(msalClientApplication: IPublicClientApplication) {
+  msalClientApplication.logoutPopup().catch(e => {
+    console.error(e);
+  });
+}
+
+function SiteNavbar(props: SiteNavbarProps) {
+  const msalClientApplication = useMsal().instance;
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
-
-  const { user, setUser } = useContext(AppContext);
 
   return (
     <div>
@@ -47,9 +60,16 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <Nav className="mx-2">
-            <Nav.Link onClick={() => setUser({username: "WaDE User"})}>
-              {user ? `Hello, ${user.username}` : "Log In"}
+          <UnauthenticatedTemplate>
+            <Nav.Link onClick={() => handleLogin(msalClientApplication)}>              
+              Log In
             </Nav.Link>
+          </UnauthenticatedTemplate>
+          <AuthenticatedTemplate>
+            <Nav.Link onClick={() => handleLogout(msalClientApplication)}>              
+              Log Out
+            </Nav.Link>
+          </AuthenticatedTemplate>
           </Nav>
         </Container>
       </Navbar>
