@@ -21,7 +21,8 @@ import useLastKnownValue from "../hooks/useLastKnownValue";
 import { useRiverBasinOptions } from '../hooks';
 import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
-import { Accordion } from "react-bootstrap";;
+import { Accordion } from "react-bootstrap";
+import '../App.scss';
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -121,7 +122,8 @@ const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
 
 const podPouRadios = [
   { name: 'Points of Diversion', value: 'POD' },
-  { name: 'Place of Use', value: 'POU' },
+  { name: 'Places of Use', value: 'POU' },
+  { name: 'Both', value: '' },
 ];
 
 const exemptRadios = [
@@ -503,7 +505,7 @@ function WaterRightsTab() {
       <div className="position-relative flex-grow-1 panel-content">
 
         <Accordion flush defaultActiveKey={['0', '1']} alwaysOpen>
-          <Accordion.Item style={{ backgroundColor: '#FAFAFA' }} eventKey="0">
+          <Accordion.Item eventKey="0">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -540,7 +542,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item style={{ backgroundColor: '#FAFAFA' }} eventKey="1">
+          <Accordion.Item eventKey="1">
             <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -660,7 +662,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item style={{ backgroundColor: '#FAFAFA' }} eventKey="3">
+          <Accordion.Item eventKey="3">
             <Accordion.Header>NLDI MAP</Accordion.Header>
             <Accordion.Body>TBD</Accordion.Body>
           </Accordion.Item>
