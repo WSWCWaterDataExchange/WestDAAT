@@ -108,6 +108,7 @@ function Map() {
       mapConfig.layers.forEach((a: any) => {
         mapInstance.addLayer(a)
       })
+      mapInstance.resize();
       setMap(mapInstance);
     });
   }, [setMap]);/* eslint-disable-line *//* We don't want to run this when mapStyle updates */
