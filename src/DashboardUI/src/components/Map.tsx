@@ -11,6 +11,8 @@ import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
+import { CustomShareControl } from "./CustomSharedControl";
+
 import ReactDOM from "react-dom";
 
 // Fix transpile errors. Mapbox is working on a fix for this
@@ -19,6 +21,7 @@ import ReactDOM from "react-dom";
 const mapIcons: Map<string, string> = new global.Map<string, string>([
   ['mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`]
 ])
+
 function Map() {
   const { user } = useContext(AppContext);
   const {
@@ -91,7 +94,10 @@ function Map() {
     mapInstance.once("load", () => {
       mapInstance.addControl(new NavigationControl());
 
+      mapInstance.addControl(new CustomShareControl());
+
       mapInstance.addControl(new mapboxgl.ScaleControl());
+
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
       });
@@ -296,8 +302,6 @@ function Map() {
       <div id="map" className="map h-100" ref={dropRef}></div>
     </div>
   );
-
-
 }
 
 export default Map;
