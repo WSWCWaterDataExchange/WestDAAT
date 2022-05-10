@@ -1,25 +1,18 @@
 import { createContext, FC, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import * as compress from "lz-string";
-
-export interface User {
-  username: string;
-}
+import { IAuthenticationContext, useAuthenticationContext } from "./hooks/useAuthenticationContext";
 
 interface AppContextState {
-  user: User | null,
-  setUser: (user: User | null) => void,
-
+  authorizationContext: IAuthenticationContext,
   setUrlParam: (key: string, value: any) => void,
-  getUrlParam: <T, >(key: string) => T | undefined,
+  getUrlParam: <T, >(key: string) => T | undefined
 }
 
 let defaultAppContextState = {
-  user: null,
-  setUser: (user: User | null) => { },
-
+  authorizationContext: { isAuthenticated: false, user: null },
   setUrlParam: (key: string, value: any) => { },
-  getUrlParam: <T,>(key: string): T | undefined => undefined,
+  getUrlParam: <T,>(key: string): T | undefined => undefined
 }
 
 export const AppContext = createContext<AppContextState>(defaultAppContextState);
@@ -28,7 +21,7 @@ const AppProvider: FC = ({ children }) => {
 
   let [urlParams, setUrlParams] = useSearchParams();
 
-  const [user, setUser] = useState(null as User | null);
+  const authorizationContext = useAuthenticationContext();
 
   const initUrlParams = () => {
     const stateStr = urlParams.get("state");
@@ -72,8 +65,7 @@ const AppProvider: FC = ({ children }) => {
   }, [stateUrlParams, setUrlParams])
 
   const appContextProviderValue = {
-    user,
-    setUser,
+    authorizationContext,
     setUrlParam,
     getUrlParam
   };

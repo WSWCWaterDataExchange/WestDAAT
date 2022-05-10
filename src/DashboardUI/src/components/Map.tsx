@@ -3,7 +3,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
-import { AppContext, User } from "../AppProvider";
+import { AppContext } from "../AppProvider";
 import { MapContext, MapStyle } from "./MapProvider";
 import mapConfig from "../config/maps";
 import { mdiMapMarker } from '@mdi/js';
@@ -23,7 +23,7 @@ const mapIcons: Map<string, string> = new global.Map<string, string>([
 ])
 
 function Map() {
-  const { user } = useContext(AppContext);
+  const { isAuthenticated } = useContext(AppContext).authorizationContext;
   const {
     legend,
     mapStyle,
@@ -63,10 +63,10 @@ function Map() {
     }
   }
 
-  const updateMapControls = (map: mapboxgl.Map, user: User | null) => {
-    if (map.hasControl(geocoderControl.current) && !user) {
+  const updateMapControls = (map: mapboxgl.Map, isAuthenticated: boolean) => {
+    if (map.hasControl(geocoderControl.current) && !isAuthenticated) {
       map.removeControl(geocoderControl.current);
-    } else if (user) {
+    } else if (isAuthenticated) {
       geocoderControl.current = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         mapboxgl: map
@@ -167,8 +167,8 @@ function Map() {
 
   useEffect(() => {
     if (!map) return;
-    updateMapControls(map, user);
-  }, [user, map]);
+    updateMapControls(map, isAuthenticated);
+  }, [isAuthenticated, map]);
 
   useEffect(() => {
     if (!map) return;
