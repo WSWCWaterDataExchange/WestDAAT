@@ -21,7 +21,7 @@ const AppProvider: FC = ({ children }) => {
 
   let [urlParams, setUrlParams] = useSearchParams();
 
-  //const authorizationContext = useAuthenticationContext();
+  const authenticationContext = useAuthenticationContext();
 
   const initUrlParams = () => {
     const stateStr = urlParams.get("state");
@@ -64,9 +64,8 @@ const AppProvider: FC = ({ children }) => {
 
   }, [stateUrlParams, setUrlParams])
 
-  const appContextProviderValue = {
-    //authorizationContext,
-    authenticationContext: defaultAppContextState.authenticationContext,
+  const appContextProviderValue = {    
+    authenticationContext,
     setUrlParam,
     getUrlParam
   };

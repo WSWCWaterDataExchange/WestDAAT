@@ -12,6 +12,7 @@ export interface IAuthenticationContext{
 
 export function useAuthenticationContext(): IAuthenticationContext {
   const { instance: msalContext, inProgress } = useMsal();
+  //msalContext.acquireTokenSilent()
   const activeAccount = msalContext.getActiveAccount() ?? undefined;
   const isAuthenticated = useIsAuthenticated(activeAccount);
   let user: User | null = null;
