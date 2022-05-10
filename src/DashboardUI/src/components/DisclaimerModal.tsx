@@ -2,18 +2,17 @@ import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 
 interface DisclaimerModalProps extends ModalProps {
-  setShow: (show: boolean) => void;
+  acceptDisclaimer: (today: Date) => void;
 }
 
 function DisclaimerModal(props: DisclaimerModalProps) {
 
   const close = () => {
-    localStorage.setItem("disclaimer", "donotshow");
-    props.setShow(false);
+    props.acceptDisclaimer(new Date());
   }
 
   return (
-    <Modal {...props} aria-labelledby="contained-modal-title-vcenter" centered>
+    <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
           Disclaimer

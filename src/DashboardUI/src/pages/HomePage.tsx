@@ -5,7 +5,6 @@ import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
 import TermsModal from '../components/TermsModal';
-import DisclaimerModal from '../components/DisclaimerModal';
 
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
@@ -23,7 +22,6 @@ function HomePage() {
   const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showDisclaimerModal, setShowDisclaimerModal] = useState(localStorage.getItem("disclaimer") !== "donotshow");
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
@@ -31,10 +29,6 @@ function HomePage() {
 
   const shouldShowTermsModal = (show: boolean) => {
     setShowTermsModal(show);
-  }
-
-  const shouldShowDisclaimerModal = (show: boolean) => {
-    setShowDisclaimerModal(show);
   }
 
   useEffect(() => {
@@ -68,7 +62,6 @@ function HomePage() {
 
       <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
       <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
-      <DisclaimerModal show={showDisclaimerModal} setShow={shouldShowDisclaimerModal} />
     </div>
   );
 }
