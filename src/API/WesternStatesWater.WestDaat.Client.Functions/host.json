@@ -1,13 +1,15 @@
 {
   "version": "2.0",
   "logging": {
-    "applicationInsights": {
-      "samplingSettings": {
-        "isEnabled": true,
-        "excludedTypes": "Request"
-      }
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft": "Warning",
+      "System": "Warning"
     },
-    "EnableDependencyTracking": true,
-    "DependencyTrackingOptions": { "enableSqlCommandTextInstrumentation": true }
+    "applicationInsights": {
+      "samplingSettings": { "isEnabled": false },
+      "EnableDependencyTracking": true,
+      "DependencyTrackingOptions": { "enableSqlCommandTextInstrumentation": true }
+    }
   }
 }

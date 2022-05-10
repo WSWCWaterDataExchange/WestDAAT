@@ -16,11 +16,13 @@ import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties, pointSizes } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
-import { defaultPointCircleRadius } from "../config/maps";
+import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
 import { useRiverBasinOptions } from '../hooks';
 import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
+import { Accordion } from "react-bootstrap";
+import '../App.scss';
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -35,7 +37,6 @@ interface WaterRightsFilters {
   riverBasinNames?: string[],
   states?: string[],
   allocationOwner?: string,
-  mapGrouping: MapGrouping,
   includeExempt?: boolean,
   minFlow: number | undefined,
   maxFlow: number | undefined,
@@ -47,7 +48,8 @@ interface WaterRightsFilters {
 }
 
 interface WaterRightsDisplayOptions {
-  pointSize: 'd' | 'f' | 'v'
+  pointSize: 'd' | 'f' | 'v',
+  mapGrouping: MapGrouping
 }
 
 const mapDataTiers = [
@@ -97,7 +99,6 @@ const defaultFilters: WaterRightsFilters = {
   waterSourceTypes: undefined,
   states: undefined,
   riverBasinNames: undefined,
-  mapGrouping: MapGrouping.BeneficialUse,
   includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
@@ -109,7 +110,8 @@ const defaultFilters: WaterRightsFilters = {
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
-  pointSize: 'd'
+  pointSize: 'd',
+  mapGrouping: MapGrouping.BeneficialUse
 }
 
 const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
@@ -119,15 +121,15 @@ const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
 ])
 
 const podPouRadios = [
+  { name: 'Points of Diversion', value: 'POD' },
+  { name: 'Places of Use', value: 'POU' },
   { name: 'Both', value: '' },
-  { name: 'POD', value: 'POD' },
-  { name: 'POU', value: 'POU' },
 ];
 
 const exemptRadios = [
-  { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
   { name: 'Exempt', value: exemptMapping.get(true) ?? '1' },
   { name: 'Non-exempt', value: exemptMapping.get(false) ?? '0' },
+  { name: 'Both', value: exemptMapping.get(undefined) ?? '' },
 ];
 
 const pointSizeRadios: { name: 'Default' | 'Flow' | 'Volume', value: 'd' | 'f' | 'v' }[] = [
@@ -155,7 +157,7 @@ function WaterRightsTab() {
   const mapGrouping = useMemo(() => {
     let colorIndex = 0;
     let colorMapping: { key: string, color: string }[];
-    switch (filters.mapGrouping) {
+    switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
         colorMapping = allBeneficialUses?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
@@ -166,8 +168,8 @@ function WaterRightsTab() {
         colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
     }
-    return { property: filters.mapGrouping as string, colorMapping }
-  }, [filters.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
+    return { property: displayOptions.mapGrouping as string, colorMapping }
+  }, [displayOptions.mapGrouping, allBeneficialUses, allWaterSourceTypes, allOwnerClassifications])
 
   const {
     setLegend,
@@ -495,165 +497,176 @@ function WaterRightsTab() {
       <div className="map-info text-center p-2">
         {renderedFeatures.length} Points of Diversions Displayed
       </div>
-      <div className="position-relative flex-grow-1">
-        <div className="panel-content p-3">
-          <div className="mb-3">
-            <label>FILTERS</label>
-            <a href="/filters" target="_blank">Learn about WaDE filters</a>
-          </div>
+      <div className="m-3">
+        <Button variant="outline-danger" className="w-100" onClick={clearMapFilters}>
+          Reset All Filters
+        </Button>
+      </div>
+      <div className="position-relative flex-grow-1 panel-content">
 
-          <div className="mb-3">
-            <label>TOGGLE VIEW</label>
-            <ButtonGroup className="w-100">
-              {podPouRadios.map((radio, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`podPouRadio-${idx}`}
-                  type="radio"
-                  variant="outline-primary"
-                  name="podPouRadio"
-                  value={radio.value}
-                  checked={(filters.podPou ?? '') === radio.value}
-                  onChange={handlePodPouChange}
-                >
-                  {radio.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          </div>
+        <Accordion flush defaultActiveKey={['0', '1']} alwaysOpen>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
+            <Accordion.Body>
+              <div className="mb-3">
+                <label>Change Map Color Legend</label>
+                <select className="form-select" onChange={handleMapGroupingChange} value={displayOptions.mapGrouping}>
+                  <option value={MapGrouping.BeneficialUse}>Beneficial Use</option>
+                  <option value={MapGrouping.OwnerClassification}>Owner Classification</option>
+                  <option value={MapGrouping.WaterSourceType}>Water Source Type</option>
+                </select>
+              </div>
 
-          <div className="mb-3">
-            <label>Change Map Legend</label>
-            <select className="form-select" onChange={handleMapGroupingChange} value={filters.mapGrouping}>
-              <option value={MapGrouping.BeneficialUse}>Beneficial Use</option>
-              <option value={MapGrouping.OwnerClassification}>Owner Classification</option>
-              <option value={MapGrouping.WaterSourceType}>Water Source Type</option>
-            </select>
-          </div>
+              <div className="mb-3">
+                <label>Toggle Point Size</label>
+                <ButtonGroup className="w-100">
+                  {pointSizeRadios.map((radio) => (<ToggleButton
+                    key={radio.value}
+                    id={`pointSizeRadio-${radio.value}`}
+                    type="radio"
+                    variant="outline-primary"
+                    name="pointSizeRadio"
+                    value={radio.value}
+                    checked={displayOptions.pointSize === radio.value}
+                    onChange={handlePointSizeChange}
+                  >
+                    {radio.name}
+                  </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
 
-          <div className="mb-3">
-            <label>Search Allocation Owner</label>
-            <input type="text" className="form-control" onChange={handleAllocationOwnerChange} value={allocationOwnerValue} />
-          </div>
+              <div className="mb-3">
+                <label>Map Layer</label>
+                <MapThemeSelector />
+              </div>
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1">
+            <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
+            <Accordion.Body>
+              <div className="mb-3">
+                <a href="/filters" target="_blank">Learn about WestDAAT filters</a>
+              </div>
+              <div className="mb-3">
+                <label>State</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  options={allStates}
+                  selected={filters.states ?? []}
+                  handleOnChange={handleStateChange}
+                  name="states"
+                  placeholder="Select State(s)"
+                />
+              </div>
+              <div className="mb-3">
+                <label>Beneficial Use</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  options={allBeneficialUses}
+                  selected={filters.beneficialUses ?? []}
+                  handleOnChange={handleBeneficialUseChange}
+                  name="beneficialUses"
+                  placeholder="Select Beneficial Use(s)"
+                />
+              </div>
+              <div className="mb-3">
+                <label>Water Source Type</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  options={allWaterSourceTypes}
+                  selected={filters.waterSourceTypes ?? []}
+                  handleOnChange={handleWaterSourceTypeChange}
+                  name="waterSourceTypes"
+                  placeholder="Select Water Source Type(s)"
+                />
+              </div>
 
-          <div className="mb-3">
-            <label>Owner Classification</label>
-            <DropdownMultiselect
-              className="form-control"
-              options={allOwnerClassifications}
-              selected={filters.ownerClassifications ?? []}
-              handleOnChange={handleOwnerClassificationChange}
-              name="ownerClassification"
-            />
-          </div>
+              <div className="mb-3">
+                <label>Search Allocation Owner</label>
+                <input type="text" className="form-control" onChange={handleAllocationOwnerChange} value={allocationOwnerValue} />
+              </div>
 
-          <div className="mb-3">
-            <label>Beneficial Use</label>
-            <DropdownMultiselect
-              className="form-control"
-              options={allBeneficialUses}
-              selected={filters.beneficialUses ?? []}
-              handleOnChange={handleBeneficialUseChange}
-              name="beneficialUses"
-            />
-          </div>
+              <div className="mb-3">
+                <label>Owner Classification Type</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  options={allOwnerClassifications}
+                  selected={filters.ownerClassifications ?? []}
+                  handleOnChange={handleOwnerClassificationChange}
+                  name="ownerClassification"
+                  placeholder="Select Owner Classification(s)"
+                />
+              </div>
+              <div className="mb-3">
+                <label>River Basin Area</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  options={allRiverBasinOptions}
+                  selected={filters.riverBasinNames ?? []}
+                  handleOnChange={handleRiverBasinChange}
+                  name="riverBasins"
+                  placeholder="Select Sites in River Basin(s)"
+                />
+              </div>
+              <div className="mb-3">
+                <label>Toggle View</label>
+                <ButtonGroup className="w-100">
+                  {podPouRadios.map((radio, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`podPouRadio-${idx}`}
+                      type="radio"
+                      variant="outline-primary"
+                      name="podPouRadio"
+                      value={radio.value}
+                      checked={(filters.podPou ?? '') === radio.value}
+                      onChange={handlePodPouChange}
+                    >
+                      {radio.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
+              <div className="mb-3">
+                <label>Site Content</label>
+                <ButtonGroup className="w-100">
+                  {exemptRadios.map((radio) => (<ToggleButton
+                    key={radio.value}
+                    id={`exemptRadio-${radio.value}`}
+                    type="radio"
+                    variant="outline-primary"
+                    name="exemptRadio"
+                    value={radio.value ?? ''}
+                    checked={exemptMapping.get(filters.includeExempt) === radio.value}
+                    onChange={handleExemptChange}
+                  >
+                    {radio.name}
+                  </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
 
-          <div className="mb-3">
-            <label>Water Source Type</label>
-            <DropdownMultiselect
-              className="form-control"
-              options={allWaterSourceTypes}
-              selected={filters.waterSourceTypes ?? []}
-              handleOnChange={handleWaterSourceTypeChange}
-              name="waterSourceTypes"
-            />
-          </div>
+              <div className="mb-3">
+                <label>Priority Date</label>
+                <PriorityDateRange onChange={handlePriorityDateChange} initialMin={filters.minPriorityDate} initialMax={filters.maxPriorityDate} />
+              </div>
+              <div className="mb-3">
+                <label>Flow Range (CFS)</label>
+                <FlowRangeSlider onChange={handleFlowChange} initialMin={filters.minFlow} initialMax={filters.maxFlow} />
+              </div>
 
-          <div className="mb-3">
-            <label>State</label>
-            <DropdownMultiselect
-              className="form-control"
-              options={allStates}
-              selected={filters.states ?? []}
-              handleOnChange={handleStateChange}
-              name="states"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Include Empty Amount and Priority Date Value</label>
-            <ButtonGroup className="w-100">
-              {exemptRadios.map((radio) => (<ToggleButton
-                key={radio.value}
-                id={`exemptRadio-${radio.value}`}
-                type="radio"
-                variant="outline-primary"
-                name="exemptRadio"
-                value={radio.value ?? ''}
-                checked={exemptMapping.get(filters.includeExempt) === radio.value}
-                onChange={handleExemptChange}
-              >
-                {radio.name}
-              </ToggleButton>
-              ))}
-            </ButtonGroup>
-          </div>
-
-          <div className="mb-3">
-            <label>Flow Range (CFS)</label>
-            <FlowRangeSlider onChange={handleFlowChange} initialMin={filters.minFlow} initialMax={filters.maxFlow} />
-          </div>
-
-          <div className="mb-3">
-            <label>Volume Range (AF)</label>
-            <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
-          </div>
-
-          <div className="mb-3">
-            <label>Priority Date</label>
-            <PriorityDateRange onChange={handlePriorityDateChange} initialMin={filters.minPriorityDate} initialMax={filters.maxPriorityDate} />
-          </div>
-          <div className="mb-3">
-            <label>River Basin</label>
-            <DropdownMultiselect
-              className="form-control"
-              options={allRiverBasinOptions}
-              selected={filters.riverBasinNames ?? []}
-              handleOnChange={handleRiverBasinChange}
-              name="riverBasins"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Toggle Point Size</label>
-            <ButtonGroup className="w-100">
-              {pointSizeRadios.map((radio) => (<ToggleButton
-                key={radio.value}
-                id={`pointSizeRadio-${radio.value}`}
-                type="radio"
-                variant="outline-primary"
-                name="pointSizeRadio"
-                value={radio.value}
-                checked={displayOptions.pointSize === radio.value}
-                onChange={handlePointSizeChange}
-              >
-                {radio.name}
-              </ToggleButton>
-              ))}
-            </ButtonGroup>
-          </div>
-
-          <div className="mb-3">
-            <label>MAP THEME</label>
-            <MapThemeSelector />
-          </div>
-
-          <div className="mt-4">
-            <Button className="w-100" onClick={clearMapFilters}>
-              Reset All Filters
-            </Button>
-          </div>
-        </div>
+              <div className="mb-3">
+                <label>Volume Range (AF)</label>
+                <VolumeRange onChange={handleVolumeChange} initialMin={filters.minVolume} initialMax={filters.maxVolume} />
+              </div>
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="3">
+            <Accordion.Header>NLDI MAP</Accordion.Header>
+            <Accordion.Body>TBD</Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </div>
 
     </>
@@ -671,7 +684,8 @@ function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: Water
   const [maxFlow, lastKnownMaxFlow, setMaxFlow] = useLastKnownValue(100);
   const {
     renderedFeatures,
-    setLayerCircleRadii
+    setLayerCircleRadii,
+    setLayerCircleSortKeys
   } = useContext(MapContext);
 
   const pointScaleTimeDelay = 1000;
@@ -760,4 +774,14 @@ function useWaterRightMapPointScaling(pointSize: "d" | "f" | "v", filters: Water
       setLayerCircleRadii({ layer: waterRightsPointsLayer, circleRadius: ["interpolate", ["linear"], ["zoom"], pointSizes.minPointSizeZoomLevel, minZoomValue, pointSizes.maxPointSizeZoomLevel, maxZoomValue] })
     }
   }, [pointSize, scaleProperty, min, max, setLayerCircleRadii])
+
+  useEffect(() => {
+    if (pointSize === "f") {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: flowPointCircleSortKey })
+    } else if (pointSize === "v") {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: volumePointCircleSortKey })
+    } else {
+      setLayerCircleSortKeys({ layer: waterRightsPointsLayer, circleSortKey: defaultPointCircleSortKey })
+    }
+  }, [pointSize, setLayerCircleSortKeys])
 }
