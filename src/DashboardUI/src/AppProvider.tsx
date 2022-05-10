@@ -4,13 +4,13 @@ import * as compress from "lz-string";
 import { IAuthenticationContext, useAuthenticationContext } from "./hooks/useAuthenticationContext";
 
 interface AppContextState {
-  authorizationContext: IAuthenticationContext,
+  authenticationContext: IAuthenticationContext,
   setUrlParam: (key: string, value: any) => void,
   getUrlParam: <T, >(key: string) => T | undefined
 }
 
 let defaultAppContextState = {
-  authorizationContext: { isAuthenticated: false, user: null },
+  authenticationContext: { isAuthenticated: false, user: null },
   setUrlParam: (key: string, value: any) => { },
   getUrlParam: <T,>(key: string): T | undefined => undefined
 }
@@ -21,7 +21,7 @@ const AppProvider: FC = ({ children }) => {
 
   let [urlParams, setUrlParams] = useSearchParams();
 
-  const authorizationContext = useAuthenticationContext();
+  const authenticationContext = useAuthenticationContext();
 
   const initUrlParams = () => {
     const stateStr = urlParams.get("state");
@@ -65,7 +65,7 @@ const AppProvider: FC = ({ children }) => {
   }, [stateUrlParams, setUrlParams])
 
   const appContextProviderValue = {
-    authorizationContext,
+    authenticationContext,
     setUrlParam,
     getUrlParam
   };
