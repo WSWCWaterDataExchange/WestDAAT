@@ -4,7 +4,12 @@ import Nav from 'react-bootstrap/Nav';
 
 import './../styles/footer.scss';
 
-function SiteFooter() {
+interface SiteFooterProps{
+  showFeedbackModal(show: boolean): void;
+}
+
+function SiteFooter(props: SiteFooterProps) {
+
   return (
     <Navbar className="footer" variant="dark">
       <Container fluid className="ms-2 me-2">
@@ -21,9 +26,10 @@ function SiteFooter() {
         <div>
           <Nav>
             <Nav.Link className="p-0" target="_blank"  href="#">FAQ</Nav.Link>
-            <Nav.Link className="p-0" target="_blank"  href="#">Feedback</Nav.Link>
+            <Nav.Link className="p-0" target="_blank"  href="#" onClick={() => props.showFeedbackModal(true)}> Feedback </Nav.Link>
           </Nav>
         </div>
+
       </Container>
     </Navbar>
   );
