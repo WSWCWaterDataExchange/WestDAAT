@@ -23,7 +23,7 @@ const mapIcons: Map<string, string> = new global.Map<string, string>([
 ])
 
 function Map() {
-  const { isAuthenticated } = useContext(AppContext).authorizationContext;
+  const { isAuthenticated } = useContext(AppContext).authenticationContext;
   const {
     legend,
     mapStyle,

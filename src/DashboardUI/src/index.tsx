@@ -27,12 +27,10 @@ msalInstance.addEventCallback((event: EventMessage) => {
 });
 
 ReactDOM.render(
-  <React.StrictMode>
-    <MsalProvider instance={msalInstance}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </MsalProvider>
+  <React.StrictMode>    
+    <BrowserRouter>
+      <App msalInstance={msalInstance} />
+    </BrowserRouter>
   </React.StrictMode>
   ,
   document.getElementById('root')
