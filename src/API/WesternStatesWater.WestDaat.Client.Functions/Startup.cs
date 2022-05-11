@@ -36,7 +36,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
+            builder.Services.AddScoped(a => configuration.GetSendGridAPIKey());
 
+            builder.Services.AddScoped<INotificationManager, NotificationManager>();
             builder.Services.AddTransient<ISystemManager, SystemManager>();
             builder.Services.AddTransient<ITestManager, TestManager>();
             builder.Services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
@@ -51,6 +53,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<ITestAccessor, TestAccessor>();
             builder.Services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
+            builder.Services.AddTransient<IEmailNotificationSDK, EmailNotificationSDK>();
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
 

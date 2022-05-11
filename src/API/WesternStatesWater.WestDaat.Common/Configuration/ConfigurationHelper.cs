@@ -13,12 +13,16 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "50" }
-
             };
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)
         {
             return config.GetSection(ConfigurationRootNames.Database).Get<DatabaseConfiguration>();
+        }
+
+        public static EmailServiceConfiguration GetSendGridAPIKey(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.SendGrid).Get<EmailServiceConfiguration>();
         }
 
         public static UsgsNldiServiceConfiguration GetUsgsNldiServiceConfiguration(this IConfiguration config)
@@ -35,6 +39,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
     public static class ConfigurationRootNames
     {
         public const string Database = "Database";
+        public const string SendGrid = "SendGrid";
         public const string UsgsNldiService = "UsgsNldiService";
         public const string Nldi = "Nldi";
     }

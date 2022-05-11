@@ -45,8 +45,8 @@ const dataUsageOptions: string[] = [
 
 function FeedbackModal(props: FeedBackModalProps) {
 
-  const [dataUseSelected, setDataUseChecked] = useState<string[]>([]);
-  const [dataInteresetSelected, setDataInterestChecked] = useState<string[]>([]);
+  const [dataUseSelected, setDataUseSelected] = useState<string[]>([]);
+  const [dataInteresetSelected, setDataInterestSelected] = useState<string[]>([]);
   const [satisfactionLevelSelected, setSatisfactionLevelValue] = useState<string>("");
   const [otherDataInterestValue, setOtherDataInterestValue] = useState<string>("");
   const [otherDataUseValue, setOtherDataUseValue] = useState<string>("");
@@ -55,6 +55,7 @@ function FeedbackModal(props: FeedBackModalProps) {
   const [organizationValue, setOrganizationValue] = useState<string>("");
   const [roleValue, setRoleValue] = useState<string>("");
   const [showThankYouModal, setShowThankYouModal] = useState<boolean>(false);
+  const [showErrorLabel, setShowErrorLabel] = useState<boolean>(false);
 
   const handleCheck = (event: ChangeEvent<HTMLInputElement>, dataArray: string[]) => {
     var updatedList: string[] = [...dataArray];
@@ -69,6 +70,7 @@ function FeedbackModal(props: FeedBackModalProps) {
 
   const close = () => {
     clearCollections();
+    setShowErrorLabel(false);
     props.setShow(false);
     setShowThankYouModal(false);
   }
@@ -92,15 +94,25 @@ function FeedbackModal(props: FeedBackModalProps) {
     }
     feedbackRequest.dataInterest = dataInteresetSelected;
 
-    postFeedback(feedbackRequest);
-    setShowThankYouModal(true);
-    props.setShow(false);
-    clearCollections();
-
-    // set up to display thank you modal
+    // check if feedback is empty before triggering a submit request
+    if ((feedbackRequest.comments !== null && feedbackRequest.comments !== "")
+    || (feedbackRequest.email !== null && feedbackRequest.email !== "")
+    || (feedbackRequest.organization !== null && feedbackRequest.organization !== "")
+    || (feedbackRequest.role !== null && feedbackRequest.role !== "")
+    || (feedbackRequest.satisfactionLevel !== null && feedbackRequest.satisfactionLevel !== "")
+    || (feedbackRequest.dataInterest?.length !== 0 && feedbackRequest.dataInterest?.every(interest => interest !== ""))
+    || (feedbackRequest.dataUsage?.length !== 0 && feedbackRequest.dataUsage?.every(use => use !== ""))){
+      postFeedback(feedbackRequest);
+      setShowThankYouModal(true);
+      props.setShow(false);
+      clearCollections();
+    }else{
+      setShowErrorLabel(true);
+    }
   }
 
   const clearCollections = () => {
+    setShowErrorLabel(false);
     setCommentsValue("");
     setEmailValue("");
     setOrganizationValue("");
@@ -108,8 +120,8 @@ function FeedbackModal(props: FeedBackModalProps) {
     setOtherDataUseValue("");
     setOtherDataInterestValue("");
     setSatisfactionLevelValue("");
-    setDataInterestChecked([]);
-    setDataUseChecked([]);
+    setDataInterestSelected([]);
+    setDataUseSelected([]);
   }
 
   return (
@@ -156,7 +168,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                   className="form-check-input"
                   type="checkbox"
                   value={element}
-                  onChange={(e) => setDataUseChecked(handleCheck(e, dataUseSelected))}
+                  onChange={(e) => setDataUseSelected(handleCheck(e, dataUseSelected))}
                 />
                 <label className="form-check-label" htmlFor={element}>
                   {element}
@@ -176,7 +188,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                   className="form-check-input"
                   type="checkbox"
                   value={element}
-                  onChange={(e) => setDataInterestChecked(handleCheck(e, dataInteresetSelected))}
+                  onChange={(e) => setDataInterestSelected(handleCheck(e, dataInteresetSelected))}
                 />
                 <label className="form-check-label" htmlFor={element}>
                   {element}
@@ -215,6 +227,7 @@ function FeedbackModal(props: FeedBackModalProps) {
           </div>
         </Modal.Body>
         <Modal.Footer>
+          {showErrorLabel && <label className="text-danger">Please fill at least one field before submitting</label>}
           <Button onClick={submit}>Submit</Button>
         </Modal.Footer>
       </Modal>
