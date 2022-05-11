@@ -10,8 +10,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import { HomePageTab } from '../pages/HomePage';
 import '../styles/navbar.scss';
-import { useContext, useState } from 'react';
-import { AppContext } from "../AppProvider";
+import { useState } from 'react';
 import { NavDropdown } from "react-bootstrap";
 import { useAuthenticationContext } from "../hooks/useAuthenticationContext";
 
@@ -22,25 +21,25 @@ interface SiteNavbarProps {
   showTermsModal(show: boolean): void;
 }
 
-async function handleLogin(msalContext: IPublicClientApplication | null) {
-  try{
+function handleLogin(msalContext: IPublicClientApplication | null) {    
+
     if(!msalContext) return;
-    var authResult = await msalContext.loginPopup(loginRequest);
-    msalContext.setActiveAccount(authResult.account);    
-  }
-  catch(e) {
-    console.error(e);
-  }
+
+    msalContext.loginPopup(loginRequest)
+      .then((authResult) => {
+        msalContext.setActiveAccount(authResult.account);    
+      })
+      .catch((e) => {
+        console.error(e);
+      });     
 }
 
-async function handleLogout(msalContext: IPublicClientApplication | null) {
-  try {
+function handleLogout(msalContext: IPublicClientApplication | null) {
     if(!msalContext) return;
-    await msalContext.logoutPopup();
-  }
-  catch(e) {
-    console.error(e);
-  }
+    msalContext.logoutPopup()
+      .catch(e =>  {
+        console.error(e);
+      });
 }
 
 function SiteNavbar(props: SiteNavbarProps) {
