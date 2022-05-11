@@ -12,7 +12,7 @@ interface AppContextState {
 
   setUrlParam: (key: string, value: any) => void,
   getUrlParam: <T, >(key: string) => T | undefined,
-};
+}
 
 let defaultAppContextState = {
   user: null,

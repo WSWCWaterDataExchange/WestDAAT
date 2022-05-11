@@ -14,12 +14,11 @@
    - **Need two databases WaDE2 and WaDE2Test**
       - WaDE2Test is for the unit tests
    - If not using the default SQL server, update the connection string in launchSettings.json in the DbUp project
-   - Example: `Data Source=localhost;Initial Catalog=WaDE2;User Id=sa;Password=password`
    - May need to run this twice if using docker
 5. Setup Function App
    - Right-click on **Client.Functions** project and choose **Set as Startup Project**
    - create `local.settings.json` file in the **Client.Functions** project
-   - Copy the `Example.local.settings.json` file from the same directory as this Readme file and make changes as appropriate
+   - If necessary, create `personal.settings.json` to override any developer specific settings
    - Set the listening port to 5001
       - Right-click on **Client.Functions** project
       - Choose Properties
@@ -44,13 +43,10 @@
 
 ## Update Mapbox Vector Tileset
 
-**Only do this if you need updated data in the DB. If you imported your database from a BACPAC you probably don't need to do these steps.**
+**Only do this if you need to update the vector tiles in maptiler**
 
 1. Run MapboxTilesetCreate console app located in /tools
 2. Optional - Add personal.settings.json for connection string settings
 3. Allocations.Points.geojson and Allocations.Polygons.geojson files will be generated in geojson dir
 4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson""` This will take about 5 minutes
 5. Upload to mapbox studio
-
-
-

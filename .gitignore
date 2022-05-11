@@ -457,5 +457,4 @@ personal.settings.json
 *.geojson
 *.geojson.zip
 *.mbtiles*
-local.settings.json
 launchSettings.json

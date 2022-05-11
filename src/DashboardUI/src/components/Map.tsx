@@ -32,6 +32,7 @@ function Map() {
     filters,
     circleColors,
     circleRadii,
+    circleSortKeys,
     vectorUrls,
     mapAlert,
     fillColors,
@@ -108,6 +109,7 @@ function Map() {
       mapConfig.layers.forEach((a: any) => {
         mapInstance.addLayer(a)
       })
+      mapInstance.resize();
       setMap(mapInstance);
     });
   }, [setMap]);/* eslint-disable-line *//* We don't want to run this when mapStyle updates */
@@ -250,6 +252,13 @@ function Map() {
       map.setPaintProperty(key, "circle-radius", circleRadii[key]);
     }
   }, [map, circleRadii]);
+
+  useEffect(() => {
+    if (!map) return;
+    for (let key in circleSortKeys) {
+      map.setLayoutProperty(key, "circle-sort-key", circleSortKeys[key]);
+    }
+  }, [map, circleSortKeys]);
 
   useEffect(() => {
     if (!map) return;

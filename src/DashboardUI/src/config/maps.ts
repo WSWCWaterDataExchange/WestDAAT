@@ -1,4 +1,4 @@
-import { nldi, pointSizes } from "./constants";
+import { nldi, pointSizes, waterRightsProperties } from "./constants";
 
 export const defaultPointCircleRadius = [
   "interpolate",
@@ -18,8 +18,13 @@ const defaultPointPaintConfiguration = {
     pointSizes.minPointSizeZoomLevel, 0,
     pointSizes.maxPointSizeZoomLevel, .3,
   ],
-  "circle-color": "#ff0000"
+  "circle-color": "#ff0000",
+  "circle-opacity": .75
 }
+
+export const defaultPointCircleSortKey = ["-", 0, ["get", waterRightsProperties.minPriorityDate]];
+export const flowPointCircleSortKey = ["-", 0, ["get", waterRightsProperties.maxFlowRate]];
+export const volumePointCircleSortKey = ["-", 0, ["get", waterRightsProperties.maxVolume]];
 
 const mapsJson = {
   "sources": [
@@ -88,7 +93,8 @@ const mapsJson = {
       "source-layer": "points",
       "source": "allocation-sites_1",
       "layout": {
-        "visibility": "none"
+        "visibility": "none",
+        "circle-sort-key": defaultPointCircleSortKey
       },
       "type": "circle",
       "paint": defaultPointPaintConfiguration,
