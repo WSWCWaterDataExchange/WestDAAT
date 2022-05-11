@@ -20,8 +20,8 @@ function SiteFooter() {
 
         <div>
           <Nav>
-            <Nav.Link className="p-0" target="_blank"  href="#">FAQ</Nav.Link>
-            <Nav.Link className="p-0" target="_blank"  href="#">Feedback</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="https://westernstateswater.org/wade">FAQ</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" href="#">Feedback</Nav.Link>
           </Nav>
         </div>
       </Container>
