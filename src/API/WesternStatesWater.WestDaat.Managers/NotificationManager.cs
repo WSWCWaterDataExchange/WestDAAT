@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net.Mail;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Utilities;
 using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
@@ -16,7 +17,11 @@ namespace WesternStatesWater.WestDaat.Managers
 
         async Task<bool> INotificationManager.PostFeedback(FeedbackRequest request)
         {
-            var emailAddress = "adelabdallah@wswc.utah.gov";
+            var emailAddresses = new List<string> { "adelabdallah@wswc.utah.gov", "rjames@wswc.utah.gov" };
+            if (IsValidEmail(request.Email))
+            {
+                emailAddresses.Add(request.Email);
+            }
             var messageBody = FeedbackMessageBody(request);
 
             var msg = new CommonDTO.EmailRequest()
@@ -24,8 +29,8 @@ namespace WesternStatesWater.WestDaat.Managers
                 Subject = "WestDAAT Feedback",
                 TextContent = "Please Enable HTML to display this message",
                 Body = messageBody,
-                From = emailAddress,
-                To = emailAddress
+                From = "adelabdallah@wswc.utah.gov",
+                To = emailAddresses.ToArray()
             };
 
             var response = await _emailSDK.SendEmail(msg);
@@ -36,6 +41,19 @@ namespace WesternStatesWater.WestDaat.Managers
             }
 
             return response.IsSuccessStatusCode;
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mail = new MailAddress(email);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private string FeedbackMessageBody(FeedbackRequest request)
@@ -96,7 +114,10 @@ namespace WesternStatesWater.WestDaat.Managers
 
         private string GetMessageSection(string propertyName, string value)
         {
-            return $"<div style=\"padding-top:20px;\"><label style=\"font-size: 20px; font-weight:bold; color: #003d4c; display:block; border-bottom: 1px solid #ccc;\">{propertyName}</label><label style=\"padding-left: 20px;\">{value}</label></div>";
+            return $"<div style=\"padding-top:20px;\">" +
+                $"<label style=\"font-size: 20px; font-weight:bold; color: #003d4c; display:block; border-bottom: 1px solid #ccc;\">{propertyName}</label>" +
+                $"<label style=\"padding-left: 20px;\">{value}</label>" +
+                $"</div>";
         }
     }
 }

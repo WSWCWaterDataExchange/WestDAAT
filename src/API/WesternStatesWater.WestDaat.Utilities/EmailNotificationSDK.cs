@@ -27,7 +27,10 @@ namespace WesternStatesWater.WestDaat.Utilities
                 HtmlContent = message.Body
             };
 
-            msg.AddTo(message.To);
+            foreach (var address in message.To)
+            {
+                msg.AddTo(address);
+            }
 
             return await _client.SendEmailAsync(msg);
         }
