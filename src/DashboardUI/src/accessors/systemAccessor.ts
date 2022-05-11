@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
 
 export const getBeneficialUses = async (): Promise<string[]> => {
   const url = new URL(
@@ -47,3 +48,8 @@ export const getRiverBasinPolygonsByName = async (basinNames: string[]) => {
   >(url.toString(), basinNames);
   return data;
 };
+
+export const postFeedback = async (feedbackRequest: FeedbackRequest) => {
+  const url = new URL('system/feedback', process.env.REACT_APP_WEBAPI_URL);
+    await axios.post<FeedbackRequest>(url.toString(), feedbackRequest);
+}
