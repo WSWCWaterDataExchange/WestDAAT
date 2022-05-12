@@ -88,18 +88,16 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(PostFeedback)), AllowAnonymous]
-        public async Task<IActionResult> PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequest request)
+        public async Task PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequest request)
         {
-            string requestBody = String.Empty;
+            string requestBody = string.Empty;
             using (StreamReader streamReader = new StreamReader(request.Body))
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
             var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
 
-            await _notificationManager.SendFeedback(feedbackRequest);
-
-            return new OkResult();
+            _notificationManager.SendFeedback(feedbackRequest);
         }
     }
 }

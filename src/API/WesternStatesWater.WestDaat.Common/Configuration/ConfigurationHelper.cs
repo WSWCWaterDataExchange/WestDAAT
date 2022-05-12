@@ -20,17 +20,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             return config.GetSection(ConfigurationRootNames.Database).Get<DatabaseConfiguration>();
         }
 
-        public static EmailServiceConfiguration GetSendGridAPIKey(this IConfiguration config)
-        {
-            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
-        }
-
-        public static EmailServiceConfiguration GetFeedbackToEmails(this IConfiguration config)
-        {
-            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
-        }
-
-        public static EmailServiceConfiguration GetFeedbackFromEmail(this IConfiguration config)
+        public static EmailServiceConfiguration GetSMTPConfiguration(this IConfiguration config)
         {
             return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
         }

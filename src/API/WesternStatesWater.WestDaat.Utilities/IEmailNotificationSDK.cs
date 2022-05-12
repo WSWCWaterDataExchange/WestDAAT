@@ -5,6 +5,6 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public interface IEmailNotificationSDK
     {
-        Task SendEmail(CommonDTO.EmailRequest message);
+        void SendFeedback(CommonDTO.EmailRequest message);
     }
 }

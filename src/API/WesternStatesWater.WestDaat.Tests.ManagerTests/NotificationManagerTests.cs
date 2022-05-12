@@ -18,7 +18,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task SendFeedback_Success()
+        public void SendFeedback_Success()
         {
             var faker = new Faker();
 
@@ -37,34 +37,29 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             CommonDTO.EmailRequest emailRequest = null;
 
-            _emailNotificationSDK.Setup(a => a.SendEmail(It.IsAny<CommonDTO.EmailRequest>()))
-                             .Callback<CommonDTO.EmailRequest>((request) => { emailRequest = request; })
-                             .ReturnsAsync(true)
-                             .Verifiable();
+            _emailNotificationSDK.Setup(a => a.SendFeedback(It.IsAny<CommonDTO.EmailRequest>()))
+                             .Callback<CommonDTO.EmailRequest>((request) => { emailRequest = request; });
 
-            await Manager.SendFeedback(feedbackRequest);
+            Manager.SendFeedback(feedbackRequest);
 
             emailRequest.Should().NotBeNull();
             emailRequest.Subject.Should().NotBeNull();
             emailRequest.Subject.Should().Be("WestDAAT Feedback");
-            emailRequest.TextContent.Should().NotBeNull();
-            emailRequest.TextContent.Should().Be("Please Enable HTML to display this message");
-            emailRequest.To.Should().NotBeNullOrEmpty();
-            emailRequest.To.Length.Should().Be(2);
-            emailRequest.Body.Should().NotBeNullOrEmpty();
-            emailRequest.Body.Should().StartWith("<div");
-            emailRequest.Body.Should().EndWith("</div>");
-            emailRequest.Body.Should().Contain(feedbackRequest.Name);
-            emailRequest.Body.Should().Contain(feedbackRequest.LastName);
-            emailRequest.Body.Should().Contain(feedbackRequest.SatisfactionLevel);
-            emailRequest.Body.Should().Contain(feedbackRequest.Organization);
-            emailRequest.Body.Should().Contain(feedbackRequest.Role);
-            emailRequest.Body.Should().Contain(feedbackRequest.Comments);
-            emailRequest.Body.Should().Contain(feedbackRequest.Email);
-            emailRequest.Body.Should().Contain(feedbackRequest.DataInterest[0]);
-            emailRequest.Body.Should().Contain(feedbackRequest.DataInterest[1]);
-            emailRequest.Body.Should().Contain(feedbackRequest.DataUsage[0]);
-            emailRequest.Body.Should().Contain(feedbackRequest.DataUsage[1]);
+            emailRequest.To.Should().BeNullOrEmpty();
+            emailRequest.From.Should().BeNull();
+            emailRequest.TextContent.Should().NotBeNullOrEmpty();
+            emailRequest.TextContent.Should().Contain(feedbackRequest.Name);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.LastName);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.SatisfactionLevel);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.Organization);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.Role);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.Comments);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.Email);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.DataInterest[0]);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.DataInterest[1]);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.DataUsage[0]);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.DataUsage[1]);
+            emailRequest.Body.Should().BeNullOrWhiteSpace();
         }
 
         private INotificationManager CreateNotificationManager()

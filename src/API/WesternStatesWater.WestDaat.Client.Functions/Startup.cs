@@ -36,7 +36,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
-            builder.Services.AddScoped(a => configuration.GetSendGridAPIKey());
+            builder.Services.AddScoped(a => configuration.GetSMTPConfiguration());
 
             builder.Services.AddScoped<INotificationManager, NotificationManager>();
             builder.Services.AddTransient<ISystemManager, SystemManager>();
