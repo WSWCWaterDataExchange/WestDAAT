@@ -13,8 +13,14 @@ import { TouchBackend } from "react-dnd-touch-backend"; //We need to use the tou
 
 import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
+import { IPublicClientApplication } from "@azure/msal-browser";
+import { MsalProvider } from "@azure/msal-react";
 
-function App() {
+export interface AppProps {
+  msalInstance: IPublicClientApplication
+}
+
+function App({ msalInstance } : AppProps) {
   const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
@@ -27,7 +33,7 @@ function App() {
   })
 
   return (
-    <>
+    <MsalProvider instance={msalInstance}>
       <AppProvider>
         <MapProvider>
           <QueryClientProvider client={queryClient}>
@@ -47,7 +53,7 @@ function App() {
           </QueryClientProvider>
         </MapProvider>
       </AppProvider>
-    </>
+    </MsalProvider>
   );
 }
 
