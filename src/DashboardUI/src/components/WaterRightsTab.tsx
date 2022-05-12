@@ -546,7 +546,7 @@ function WaterRightsTab() {
             <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
-                <a href="/filters" target="_blank">Learn about WestDAAT filters</a>
+                <a href="/filters" target="_blank" rel="noopener noreferrer">Learn about WestDAAT filters</a>
               </div>
               <div className="mb-3">
                 <label>State</label>
