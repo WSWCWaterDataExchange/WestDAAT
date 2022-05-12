@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _emailSDK = emailSDK;
         }
 
-        async Task<bool> INotificationManager.SendFeedback(FeedbackRequest request)
+        async Task INotificationManager.SendFeedback(FeedbackRequest request)
         {
             var emailAddresses = new List<string> { "adelabdallah@wswc.utah.gov", "rjames@wswc.utah.gov" };
             if (IsValidEmail(request.Email?.Trim()))
@@ -35,7 +35,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 To = emailAddresses.ToArray()
             };
 
-            return await _emailSDK.SendEmail(msg);
+            await _emailSDK.SendEmail(msg);
         }
 
         // code from https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format

@@ -41,8 +41,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                              .ReturnsAsync(true)
                              .Verifiable();
 
-            var result = await Manager.SendFeedback(feedbackRequest);
-            result.Should().BeTrue();
+            await Manager.SendFeedback(feedbackRequest);
 
             emailRequest.Should().NotBeNull();
             emailRequest.Subject.Should().NotBeNull();
@@ -55,6 +54,14 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             emailRequest.Body.Should().StartWith("<div");
             emailRequest.Body.Should().EndWith("</div>");
             emailRequest.Body.Should().Contain(feedbackRequest.SatisfactionLevel);
+            emailRequest.Body.Should().Contain(feedbackRequest.Organization);
+            emailRequest.Body.Should().Contain(feedbackRequest.Role);
+            emailRequest.Body.Should().Contain(feedbackRequest.Comments);
+            emailRequest.Body.Should().Contain(feedbackRequest.Email);
+            emailRequest.Body.Should().Contain(feedbackRequest.DataInterest[0]);
+            emailRequest.Body.Should().Contain(feedbackRequest.DataInterest[1]);
+            emailRequest.Body.Should().Contain(feedbackRequest.DataUsage[0]);
+            emailRequest.Body.Should().Contain(feedbackRequest.DataUsage[1]);
         }
 
         [TestMethod]
@@ -87,8 +94,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                              .ReturnsAsync(true)
                              .Verifiable();
 
-            var result = await Manager.SendFeedback(feedbackRequest);
-            result.Should().BeTrue();
+            await Manager.SendFeedback(feedbackRequest);
+            
             emailRequest.To.Length.Should().Be(3);
         }
 
@@ -124,8 +131,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                              .ReturnsAsync(true)
                              .Verifiable();
 
-            var result = await Manager.SendFeedback(feedbackRequest);
-            result.Should().BeTrue();
+            await Manager.SendFeedback(feedbackRequest);
+
             emailRequest.To.Length.Should().Be(2);
         }
 
