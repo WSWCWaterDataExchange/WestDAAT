@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Globalization;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Utilities;
@@ -45,28 +44,29 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 return false;
             }
-                try
+
+            try
+            {
+                // Normalize the domain
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                        RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                // Examines the domain part of the email and normalizes it.
+                string DomainMapper(Match match)
                 {
-                    // Normalize the domain
-                    email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
-                                          RegexOptions.None, TimeSpan.FromMilliseconds(200));
+                    // Use IdnMapping class to convert Unicode domain names.
+                    var idn = new IdnMapping();
 
-                    // Examines the domain part of the email and normalizes it.
-                    string DomainMapper(Match match)
-                    {
-                        // Use IdnMapping class to convert Unicode domain names.
-                        var idn = new IdnMapping();
+                    // Pull out and process domain name (throws ArgumentException on invalid)
+                    string domainName = idn.GetAscii(match.Groups[2].Value);
 
-                        // Pull out and process domain name (throws ArgumentException on invalid)
-                        string domainName = idn.GetAscii(match.Groups[2].Value);
-
-                        return match.Groups[1].Value + domainName;
-                    }
+                    return match.Groups[1].Value + domainName;
                 }
-                catch (Exception)
-                {
-                    return false;
-                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
             try
             {
@@ -74,7 +74,7 @@ namespace WesternStatesWater.WestDaat.Managers
                     @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                     RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
             }
-            catch
+            catch(Exception)
             {
                 return false;
             }

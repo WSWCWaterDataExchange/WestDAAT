@@ -2,7 +2,6 @@
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Managers;
-using SendGrid;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
