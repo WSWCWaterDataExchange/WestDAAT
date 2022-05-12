@@ -4,7 +4,6 @@ import { BrowserRouter } from "react-router-dom";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthenticationResult, EventMessage, EventType, PublicClientApplication } from "@azure/msal-browser";
-import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./authConfig";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
