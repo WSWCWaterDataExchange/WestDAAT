@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Utilities;
 using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
@@ -10,19 +11,17 @@ namespace WesternStatesWater.WestDaat.Managers
     public sealed class NotificationManager : ManagerBase, INotificationManager
     {
         private readonly IEmailNotificationSDK _emailSDK;
+        private readonly EmailServiceConfiguration _emailConfig;
 
-        public NotificationManager(IEmailNotificationSDK emailSDK, ILogger<NotificationManager> logger) : base(logger)
+        public NotificationManager(IEmailNotificationSDK emailSDK, EmailServiceConfiguration emailConfig, ILogger<NotificationManager> logger) : base(logger)
         {
             _emailSDK = emailSDK;
+            _emailConfig = emailConfig;
         }
 
         async Task INotificationManager.SendFeedback(FeedbackRequest request)
         {
-            var emailAddresses = new List<string> { "adelabdallah@wswc.utah.gov", "rjames@wswc.utah.gov" };
-            if (IsValidEmail(request.Email?.Trim()))
-            {
-                emailAddresses.Add(request.Email?.Trim());
-            }
+            var emailAddresses = _emailConfig.FeedbackTo;
             var messageBody = FeedbackMessageBody(request);
 
             var msg = new CommonDTO.EmailRequest()
@@ -30,63 +29,31 @@ namespace WesternStatesWater.WestDaat.Managers
                 Subject = "WestDAAT Feedback",
                 TextContent = "Please Enable HTML to display this message",
                 Body = messageBody,
-                From = "adelabdallah@wswc.utah.gov",
-                To = emailAddresses.ToArray()
+                From = _emailConfig.FeedbackFrom,
+                To = emailAddresses
             };
 
             await _emailSDK.SendEmail(msg);
         }
 
-        // code from https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
-        private static bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return false;
-            }
-
-            try
-            {
-                // Normalize the domain
-                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
-                                        RegexOptions.None, TimeSpan.FromMilliseconds(200));
-
-                // Examines the domain part of the email and normalizes it.
-                string DomainMapper(Match match)
-                {
-                    // Use IdnMapping class to convert Unicode domain names.
-                    var idn = new IdnMapping();
-
-                    // Pull out and process domain name (throws ArgumentException on invalid)
-                    string domainName = idn.GetAscii(match.Groups[2].Value);
-
-                    return match.Groups[1].Value + domainName;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            try
-            {
-                return Regex.IsMatch(email,
-                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-            }
-            catch(Exception)
-            {
-                return false;
-            }
-        }
-
         private string FeedbackMessageBody(FeedbackRequest request)
         {
+            // use some sort of whitelisting for the request or use an encoder to prevent injection
             var messageBody = "<div style=\"padding-left: 30px;\">";
+
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                messageBody += GetMessageSection(nameof(request.Name), request.Name);
+            }
+
+            if (!string.IsNullOrEmpty(request.LastName))
+            {
+                messageBody += GetMessageSection("Last Name", request.LastName);
+            }
 
             if (!string.IsNullOrWhiteSpace(request.SatisfactionLevel))
             {
-                messageBody += GetMessageSection(nameof(request.SatisfactionLevel), request.SatisfactionLevel);
+                messageBody += GetMessageSection("Satisfation", request.SatisfactionLevel);
             }
 
             if (!string.IsNullOrWhiteSpace(request.Comments))

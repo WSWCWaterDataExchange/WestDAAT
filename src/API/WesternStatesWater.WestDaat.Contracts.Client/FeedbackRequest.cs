@@ -2,6 +2,8 @@
 {
     public class FeedbackRequest
     {
+        public string Name { get; set; }
+        public string LastName { get; set; }
         public string Comments { get; set; }
         public string[] DataInterest { get; set; }
         public string[] DataUsage { get; set; }

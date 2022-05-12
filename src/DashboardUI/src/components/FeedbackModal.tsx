@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
 import { postFeedback } from '../accessors/systemAccessor';
+import validator from 'validator';
 
 interface FeedBackModalProps extends ModalProps {
   setShow: (show: boolean) => void;
@@ -52,10 +53,13 @@ function FeedbackModal(props: FeedBackModalProps) {
   const [otherDataUseValue, setOtherDataUseValue] = useState<string>("");
   const [commentsValue, setCommentsValue] = useState<string>("");
   const [emailValue, setEmailValue] = useState<string>("");
+  const [nameValue, setNameValue] = useState<string>("");
+  const [lastNameValue, setLastNameValue] = useState<string>("");
   const [organizationValue, setOrganizationValue] = useState<string>("");
   const [roleValue, setRoleValue] = useState<string>("");
   const [showThankYouModal, setShowThankYouModal] = useState<boolean>(false);
   const [showErrorLabel, setShowErrorLabel] = useState<boolean>(false);
+  const [isEmailInvalid, setEmailError] = useState<boolean>()
 
   const handleCheck = (event: ChangeEvent<HTMLInputElement>, dataArray: string[]) => {
     var updatedList: string[] = [...dataArray];
@@ -77,7 +81,8 @@ function FeedbackModal(props: FeedBackModalProps) {
 
   const submit = () => {
     const feedbackRequest = new FeedbackRequest();
-
+    feedbackRequest.name = nameValue;
+    feedbackRequest.lastName = lastNameValue;
     feedbackRequest.comments = commentsValue;
     feedbackRequest.email = emailValue;
     feedbackRequest.organization = organizationValue;
@@ -95,24 +100,42 @@ function FeedbackModal(props: FeedBackModalProps) {
     feedbackRequest.dataInterest = dataInteresetSelected;
 
     // check if feedback is empty before triggering a submit request
-    if ((feedbackRequest.comments !== null && feedbackRequest.comments !== "")
-    || (feedbackRequest.email !== null && feedbackRequest.email !== "")
-    || (feedbackRequest.organization !== null && feedbackRequest.organization !== "")
-    || (feedbackRequest.role !== null && feedbackRequest.role !== "")
-    || (feedbackRequest.satisfactionLevel !== null && feedbackRequest.satisfactionLevel !== "")
-    || (feedbackRequest.dataInterest?.length !== 0 && feedbackRequest.dataInterest?.every(interest => interest !== ""))
-    || (feedbackRequest.dataUsage?.length !== 0 && feedbackRequest.dataUsage?.every(use => use !== ""))){
+    if (validateRequestIsValid(feedbackRequest)) {
       postFeedback(feedbackRequest);
       setShowThankYouModal(true);
       props.setShow(false);
       clearCollections();
-    }else{
+    } else {
       setShowErrorLabel(true);
     }
   }
 
+  const validateRequestIsValid = (request: FeedbackRequest) => {
+    return ((request.comments !== null && request.comments !== "")
+    || ((!isEmailInvalid) && (request.email !== null && request.email !== ""))
+    || (request.name !== null && request.name !== "")
+    || (request.lastName !== null && request.lastName !== "")
+    || (request.organization !== null && request.organization !== "")
+    || (request.role !== null && request.role !== "")
+    || (request.satisfactionLevel !== null && request.satisfactionLevel !== "")
+    || (request.dataInterest?.length !== 0 && request.dataInterest?.every(interest => interest !== ""))
+    || (request.dataUsage?.length !== 0 && request.dataUsage?.every(use => use !== "")))
+  }
+
+  const validateEmail = (email: string) => {
+  setEmailValue(email);
+    if (!validator.isEmail(email)) {
+      setEmailError(true)
+    }else{
+      setEmailError(false);
+    }
+  }
+
   const clearCollections = () => {
+    setEmailError(false);
     setShowErrorLabel(false);
+    setNameValue("");
+    setLastNameValue("");
     setCommentsValue("");
     setEmailValue("");
     setOrganizationValue("");
@@ -137,28 +160,29 @@ function FeedbackModal(props: FeedBackModalProps) {
             Please let us know your feedback about the Water Data Exchange Data (WaDE) Dashboard.
           </p>
           <div className="mb-3">
-            <label className="form-label fw-bolder">Comments(Optional)</label>
-            <input type="text" className="form-control" placeholder="Anything will help us improve" onChange={(e) => setCommentsValue(e.target.value ?? "")} value={commentsValue} />
+            <label className="form-label fw-bolder">Name(Optional)</label>
+            <input className="form-control" placeholder="John" onChange={(e) => setNameValue(e.target.value ?? "")} value={nameValue} />
           </div>
           <div className="mb-3">
-            <label className="form-label fw-bolder">Email(Optional)</label>
-            <input type="text" className="form-control" placeholder="email@domain.com" onChange={(e) => setEmailValue(e.target.value ?? "")} value={emailValue} />
+            <label className="form-label fw-bolder">Last Name(Optional)</label>
+            <input className="form-control" placeholder="Doe" onChange={(e) => setLastNameValue(e.target.value ?? "")} value={lastNameValue} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bolder">Email(Required)</label>
+            <input type="email" className="form-control" placeholder="email@domain.com" onChange={(e) => validateEmail(e.target.value)} value={emailValue} />
+            {isEmailInvalid && <label className="text-danger">Please use a valid email address</label>}
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bolder">Comments(Optional)</label>
+            <textarea className="form-control" onChange={(e) => setCommentsValue(e.target.value ?? "")} value={commentsValue} />
           </div>
           <div className="mb-3">
             <label className="fw-bolder">Professional Organization(Optional)</label> <br />
-            <select name="formGroupOrganizationSelect" className="form-select" onChange={(e) => setOrganizationValue(e.target.value ?? "")} value={organizationValue}>
-              <option value="">Please Select</option>
-              <option value="Organization 1">Organization 1</option>
-              <option value="Organization 2">Organization 2</option>
-            </select>
+            <input className="form-control" onChange={(e) => setOrganizationValue(e.target.value ?? "")} value={organizationValue} />
           </div>
           <div className="mb-3">
             <label className="fw-bolder">Role(Optional)</label> <br />
-            <select name="formGroupRoleSelect" className="form-select" onChange={(e) => setRoleValue(e.target.value ?? "")} value={roleValue}>
-              <option value="">Please Select</option>
-              <option value="option 1">Role 1</option>
-              <option value="option 2">Role 2</option>
-            </select>
+            <input className="form-control" onChange={(e) => setRoleValue(e.target.value ?? "")} value={roleValue} />
           </div>
           <div className="mb-3">
             <label className="fw-bolder">How do you use the data?(Optional)</label>
@@ -218,10 +242,8 @@ function FeedbackModal(props: FeedBackModalProps) {
             )}
             <div className="mt-3">
               <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's
-                when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived
-                into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release
-                passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                Lorem Ipsum has been the industry's
               </p>
             </div>
           </div>

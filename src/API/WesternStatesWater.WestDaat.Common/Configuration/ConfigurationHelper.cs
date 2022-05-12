@@ -22,7 +22,17 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
 
         public static EmailServiceConfiguration GetSendGridAPIKey(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.SendGrid).Get<EmailServiceConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
+        }
+
+        public static EmailServiceConfiguration GetFeedbackToEmails(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
+        }
+
+        public static EmailServiceConfiguration GetFeedbackFromEmail(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
         }
 
         public static UsgsNldiServiceConfiguration GetUsgsNldiServiceConfiguration(this IConfiguration config)
@@ -39,7 +49,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
     public static class ConfigurationRootNames
     {
         public const string Database = "Database";
-        public const string SendGrid = "SendGrid";
+        public const string Smtp = "Smtp";
         public const string UsgsNldiService = "UsgsNldiService";
         public const string Nldi = "Nldi";
     }

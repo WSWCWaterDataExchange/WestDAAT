@@ -1,6 +1,8 @@
 export class FeedbackRequest {
-  comments?: string;
+  name?: string;
+  lastName?: string;
   email?: string;
+  comments?: string;
   dataUsage?: string[];
   dataInterest?: string[];
   organization?: string;
