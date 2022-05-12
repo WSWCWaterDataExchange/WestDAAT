@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
+import {toast} from 'react-toastify';
 import { postFeedback } from '../accessors/systemAccessor';
 import validator from 'validator';
 
@@ -79,9 +80,9 @@ function FeedbackModal(props: FeedBackModalProps) {
     setShowThankYouModal(false);
   }
 
-  const submit = () => {
+  const submit = async () => {
     const feedbackRequest = new FeedbackRequest();
-    feedbackRequest.name = nameValue;
+    feedbackRequest.firstName = nameValue;
     feedbackRequest.lastName = lastNameValue;
     feedbackRequest.comments = commentsValue;
     feedbackRequest.email = emailValue;
@@ -101,10 +102,18 @@ function FeedbackModal(props: FeedBackModalProps) {
 
     // check if feedback is empty before triggering a submit request
     if (validateRequestIsValid(feedbackRequest)) {
-      postFeedback(feedbackRequest);
       setShowThankYouModal(true);
       props.setShow(false);
       clearCollections();
+      const result = await postFeedback(feedbackRequest);
+      if (result === false){
+        toast.error("Something went wrong sending the feedback",
+          {
+            position: toast.POSITION.TOP_CENTER,
+            theme: 'colored'
+          })
+        // do toast error message that something went wrong
+      }
     } else {
       setShowErrorLabel(true);
     }
@@ -113,7 +122,7 @@ function FeedbackModal(props: FeedBackModalProps) {
   const validateRequestIsValid = (request: FeedbackRequest) => {
     return ((request.comments !== null && request.comments !== "")
     || ((!isEmailInvalid) && (request.email !== null && request.email !== ""))
-    || (request.name !== null && request.name !== "")
+    || (request.firstName !== null && request.firstName !== "")
     || (request.lastName !== null && request.lastName !== "")
     || (request.organization !== null && request.organization !== "")
     || (request.role !== null && request.role !== "")
@@ -160,7 +169,7 @@ function FeedbackModal(props: FeedBackModalProps) {
             Please let us know your feedback about the Water Data Exchange Data (WaDE) Dashboard.
           </p>
           <div className="mb-3">
-            <label className="form-label fw-bolder">Name(Optional)</label>
+            <label className="form-label fw-bolder">First Name(Optional)</label>
             <input className="form-control" placeholder="John" onChange={(e) => setNameValue(e.target.value ?? "")} value={nameValue} />
           </div>
           <div className="mb-3">

@@ -10,24 +10,28 @@ namespace WesternStatesWater.WestDaat.Managers
 {
     public sealed class NotificationManager : ManagerBase, INotificationManager
     {
-        private readonly IEmailNotificationSDK _emailSDK;
+        private readonly IEmailNotificationSdk _emailSDK;
+        private readonly EmailServiceConfiguration _emailConfig;
 
-        public NotificationManager(IEmailNotificationSDK emailSDK, ILogger<NotificationManager> logger) : base(logger)
+        public NotificationManager(EmailServiceConfiguration emailService, IEmailNotificationSdk emailSDK, ILogger<NotificationManager> logger) : base(logger)
         {
+            _emailConfig = emailService;
             _emailSDK = emailSDK;
         }
 
-        void INotificationManager.SendFeedback(FeedbackRequest request)
+        async Task INotificationManager.SendFeedback(FeedbackRequest request)
         {
             var messageBody = FeedbackTextContent(request);
 
             var msg = new CommonDTO.EmailRequest()
             {
                 Subject = "WestDAAT Feedback",
-                TextContent = messageBody
+                TextContent = messageBody,
+                From = _emailConfig.FeedbackFrom,
+                To = _emailConfig.FeedbackTo,
             };
 
-            _emailSDK.SendFeedback(msg);
+            await _emailSDK.SendEmail(msg);
         }
 
         private string FeedbackTextContent(FeedbackRequest request)
@@ -36,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
             if (!string.IsNullOrEmpty(request.Name))
             {
-                messageBody += GetBasicTextConfig(nameof(request.Name), request.Name);
+                messageBody += GetBasicTextConfig("First Name", request.Name);
             }
 
             if (!string.IsNullOrEmpty(request.LastName))
@@ -74,7 +78,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 messageBody += "Data Usage: \r\n";
                 foreach (var use in request.DataUsage)
                 {
-                    messageBody += $"      - {use} \r\n";
+                    messageBody += $"        - {use} \r\n";
                 }
             }
 
@@ -83,7 +87,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 messageBody += "Data Interest: \r\n";
                 foreach (var interest in request.DataInterest)
                 {
-                    messageBody += $"      - {interest} \r\n";
+                    messageBody += $"        - {interest} \r\n";
                 }
             }
 

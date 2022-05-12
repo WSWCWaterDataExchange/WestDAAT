@@ -1,5 +1,5 @@
 export class FeedbackRequest {
-  name?: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   comments?: string;

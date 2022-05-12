@@ -51,5 +51,6 @@ export const getRiverBasinPolygonsByName = async (basinNames: string[]) => {
 
 export const postFeedback = async (feedbackRequest: FeedbackRequest) => {
   const url = new URL('system/feedback', process.env.REACT_APP_WEBAPI_URL);
-    await axios.post<FeedbackRequest>(url.toString(), feedbackRequest);
+  return axios.post<FeedbackRequest>(url.toString(), feedbackRequest)
+    .catch(() => {return false});
 }

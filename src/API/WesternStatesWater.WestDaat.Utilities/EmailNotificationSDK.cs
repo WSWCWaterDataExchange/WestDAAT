@@ -7,57 +7,37 @@ using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities
 {
-    public class EmailNotificationSDK : IEmailNotificationSDK
+    public class EmailNotificationSdk : IEmailNotificationSdk
     {
-        private readonly EmailServiceConfiguration _emailConfig;
+        private readonly SendGridClient _client;
         private readonly ILogger _logger;
 
-        public EmailNotificationSDK(EmailServiceConfiguration emailService, ILogger<EmailNotificationSDK> logger)
+        public EmailNotificationSdk(EmailServiceConfiguration emailConfig, ILogger<EmailNotificationSdk> logger)
         {
-            _emailConfig = emailService;
+            _client = new SendGridClient(emailConfig.APIKey);
             _logger = logger;
         }
 
-        public async void SendFeedback(CommonDTO.EmailRequest message)
+        public async Task SendEmail(CommonDTO.EmailRequest message)
         {
-            try
+            var msg = new SendGridMessage
             {
-                var msg = new SendGridMessage
-                {
-                    Subject = message.Subject,
-                    PlainTextContent = message.TextContent,
-                    From = new EmailAddress(_emailConfig.FeedbackFrom),
-                };
+                Subject = message.Subject,
+                PlainTextContent = message.TextContent,
+                HtmlContent = message.Body,
+                From = new EmailAddress(message.From),
+            };
 
-                foreach (var address in _emailConfig.FeedbackTo)
-                {
-                    msg.AddTo(address);
-                }
-
-                await SendEmail(msg);
+            foreach (var address in message.To)
+            {
+                msg.AddTo(address);
             }
-            catch (WestDaatException ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-        }
 
-        private async Task SendEmail(SendGridMessage message)
-        {
-            try
-            {
-                var client = new SendGridClient(_emailConfig.APIKey);
+            var response = await _client.SendEmailAsync(msg);
 
-                var response = await client.SendEmailAsync(message);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new WestDaatException($"Something went wrong while sending email.\nStatusCode: {response.StatusCode}.\nSubject: {message.Subject}");
-                }
-            }
-            catch (Exception ex)
+            if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError(ex.Message);
+                throw new WestDaatException($"Something went wrong while sending email.\nStatusCode: {response.StatusCode}.\nSubject: {message.Subject}");
             }
         }
     }

@@ -4,6 +4,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface INotificationManager : IServiceContractBase
     {
-        void SendFeedback(FeedbackRequest request);
+        Task SendFeedback(FeedbackRequest request);
     }
 }

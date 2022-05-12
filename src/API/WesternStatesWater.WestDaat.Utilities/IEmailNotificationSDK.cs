@@ -3,8 +3,8 @@ using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities
 {
-    public interface IEmailNotificationSDK
+    public interface IEmailNotificationSdk
     {
-        void SendFeedback(CommonDTO.EmailRequest message);
+        Task SendEmail(CommonDTO.EmailRequest message);
     }
 }
