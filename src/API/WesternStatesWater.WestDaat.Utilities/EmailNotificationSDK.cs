@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Utilities
             _logger = logger;
         }
 
-        public async Task<Response> SendEmail(CommonDTO.EmailRequest message)
+        public async Task<bool> SendEmail(CommonDTO.EmailRequest message)
         {
             var msg = new SendGridMessage
             {
@@ -32,7 +32,14 @@ namespace WesternStatesWater.WestDaat.Utilities
                 msg.AddTo(address);
             }
 
-            return await _client.SendEmailAsync(msg);
+            var response = await _client.SendEmailAsync(msg);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Something went wrong while sending feedback email.\nStatusCode: {response.StatusCode}.\nMessageBody: {message.Body}.");
+            }
+
+            return response.IsSuccessStatusCode;
         }
     }
 }

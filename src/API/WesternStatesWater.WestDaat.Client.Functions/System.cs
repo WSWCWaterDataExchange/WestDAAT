@@ -97,7 +97,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             }
             var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
 
-            await _notificationManager.PostFeedback(feedbackRequest);
+            await _notificationManager.SendFeedback(feedbackRequest);
 
             return new OkResult();
         }

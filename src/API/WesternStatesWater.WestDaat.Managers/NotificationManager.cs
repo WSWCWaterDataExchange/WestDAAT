@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Utilities;
 using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
@@ -15,12 +17,12 @@ namespace WesternStatesWater.WestDaat.Managers
             _emailSDK = emailSDK;
         }
 
-        async Task<bool> INotificationManager.PostFeedback(FeedbackRequest request)
+        async Task<bool> INotificationManager.SendFeedback(FeedbackRequest request)
         {
             var emailAddresses = new List<string> { "adelabdallah@wswc.utah.gov", "rjames@wswc.utah.gov" };
-            if (IsValidEmail(request.Email))
+            if (IsValidEmail(request.Email?.Trim()))
             {
-                emailAddresses.Add(request.Email);
+                emailAddresses.Add(request.Email?.Trim());
             }
             var messageBody = FeedbackMessageBody(request);
 
@@ -33,22 +35,44 @@ namespace WesternStatesWater.WestDaat.Managers
                 To = emailAddresses.ToArray()
             };
 
-            var response = await _emailSDK.SendEmail(msg);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Logger.LogError($"Something went wrong while sending feedback email.\nStatusCode: {response.StatusCode}.\nMessageBody: {messageBody}.");
-            }
-
-            return response.IsSuccessStatusCode;
+            return await _emailSDK.SendEmail(msg);
         }
 
+        // code from https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
         private static bool IsValidEmail(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+                try
+                {
+                    // Normalize the domain
+                    email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                          RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                    // Examines the domain part of the email and normalizes it.
+                    string DomainMapper(Match match)
+                    {
+                        // Use IdnMapping class to convert Unicode domain names.
+                        var idn = new IdnMapping();
+
+                        // Pull out and process domain name (throws ArgumentException on invalid)
+                        string domainName = idn.GetAscii(match.Groups[2].Value);
+
+                        return match.Groups[1].Value + domainName;
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+
             try
             {
-                var mail = new MailAddress(email);
-                return true;
+                return Regex.IsMatch(email,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
             }
             catch
             {
