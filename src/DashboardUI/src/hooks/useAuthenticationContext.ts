@@ -13,7 +13,7 @@ export interface IAuthenticationContext{
 }
 
 export function useAuthenticationContext(): IAuthenticationContext {
-  const [authContext, setAuthContext] = useState({ isAuthenticated: false, user: null } as IAuthenticationContext);
+  const [authContext, setAuthContext] = useState<IAuthenticationContext>({ isAuthenticated: false, user: null });
   const { inProgress } = useMsal();
   const activeAccount = useAccount() ?? undefined;  
   const isAuthenticated = useIsAuthenticated(activeAccount);

@@ -73,16 +73,16 @@ function SiteNavbar(props: SiteNavbarProps) {
 
           <Nav className="mx-2">
             <UnauthenticatedTemplate>
-              <Nav.Link onClick={() => handleLogin(msalContext)}>              
+              <Nav.Link onClick={() => handleLogin(msalContext)}>
                 Log In
-              </Nav.Link>            
-            </UnauthenticatedTemplate>                    
+              </Nav.Link>
+            </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
                 <NavDropdown title={ user?.emailAddress ?? 'My Account'}>
                   <NavDropdown.Item onClick={() => handleLogout(msalContext)}>
                     Logout
                   </NavDropdown.Item>
-                </NavDropdown>          
+                </NavDropdown>
             </AuthenticatedTemplate>
           </Nav>
           
