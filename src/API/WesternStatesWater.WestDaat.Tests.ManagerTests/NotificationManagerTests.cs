@@ -27,7 +27,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var feedbackRequest = new FeedbackRequest
             {
-                Name = faker.Random.String(),
+                FirstName = faker.Random.String(),
                 LastName = faker.Random.String(),
                 Email = faker.Random.String(),
                 Organization = faker.Random.String(),
@@ -53,7 +53,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             emailRequest.From.Should().NotBeNullOrEmpty();
             emailRequest.From.Should().Be(EmailConfig.FeedbackFrom);
             emailRequest.TextContent.Should().NotBeNullOrEmpty();
-            emailRequest.TextContent.Should().Contain(feedbackRequest.Name);
+            emailRequest.TextContent.Should().Contain(feedbackRequest.FirstName);
             emailRequest.TextContent.Should().Contain(feedbackRequest.LastName);
             emailRequest.TextContent.Should().Contain(feedbackRequest.SatisfactionLevel);
             emailRequest.TextContent.Should().Contain(feedbackRequest.Organization);

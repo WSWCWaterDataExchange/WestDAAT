@@ -2,7 +2,7 @@
 {
     public class FeedbackRequest
     {
-        public string Name { get; set; }
+        public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Comments { get; set; }
         public string[] DataInterest { get; set; }

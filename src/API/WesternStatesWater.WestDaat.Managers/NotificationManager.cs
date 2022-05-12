@@ -38,9 +38,9 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             var messageBody = "";
 
-            if (!string.IsNullOrEmpty(request.Name))
+            if (!string.IsNullOrEmpty(request.FirstName))
             {
-                messageBody += GetBasicTextConfig("First Name", request.Name);
+                messageBody += GetBasicTextConfig("First Name", request.FirstName);
             }
 
             if (!string.IsNullOrEmpty(request.LastName))
