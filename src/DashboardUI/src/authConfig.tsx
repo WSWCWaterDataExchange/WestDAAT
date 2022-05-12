@@ -5,7 +5,7 @@ export const msalConfig : Configuration = {
     clientId: "ab3cf308-8a7e-404e-977c-d0227f4a48c4",
     authority: "https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin", // This is a URL (e.g. https://login.microsoftonline.com/{your tenant ID})
     knownAuthorities: ["https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com"],
-    redirectUri: "http://localhost:3000",
+    redirectUri: "/",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
