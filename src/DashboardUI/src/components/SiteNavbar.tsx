@@ -48,7 +48,7 @@ function SiteNavbar(props: SiteNavbarProps) {
             </Button>
 
             <Nav className="mx-2">
-              <Nav.Link target="_blank" href="https://westernstateswater.org/">
+              <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/">
                 <img alt="Wade Logo" src="/logo32x32.png" />
                 Western States Water Council
               </Nav.Link>
@@ -60,16 +60,16 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <Nav className="mx-2">
-          <UnauthenticatedTemplate>
-            <Nav.Link onClick={() => handleLogin(msalClientApplication)}>              
-              Log In
-            </Nav.Link>
-          </UnauthenticatedTemplate>
-          <AuthenticatedTemplate>
-            <Nav.Link onClick={() => handleLogout(msalClientApplication)}>              
-              Log Out
-            </Nav.Link>
-          </AuthenticatedTemplate>
+            <UnauthenticatedTemplate>
+              <Nav.Link onClick={() => handleLogin(msalClientApplication)}>
+                Log In
+              </Nav.Link>
+            </UnauthenticatedTemplate>
+            <AuthenticatedTemplate>
+              <Nav.Link onClick={() => handleLogout(msalClientApplication)}>
+                Log Out
+              </Nav.Link>
+            </AuthenticatedTemplate>
           </Nav>
         </Container>
       </Navbar>
@@ -96,9 +96,9 @@ function SiteNavbar(props: SiteNavbarProps) {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
-            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/about ">About</Nav.Link>
-            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
-            <Nav.Link target="_blank" href="https://westernstateswater.org/wade/Aggregate-Water-Data">Aggregate Water Use Data</Nav.Link>
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">About</Nav.Link>
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/Aggregate-Water-Data">Aggregate Water Use Data</Nav.Link>
             <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
             <Nav.Link onClick={() => props.showTermsModal(true)}>Terms and Conditions</Nav.Link>
           </Nav>

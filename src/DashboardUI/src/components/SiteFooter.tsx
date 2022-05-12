@@ -10,18 +10,18 @@ function SiteFooter() {
       <Container fluid className="ms-2 me-2">
         <div>
           <Nav>
-            <Nav.Link className="p-0" target="_blank" href="#">License Name</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" href="#">{new Date().getFullYear()}</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" href="#">Contact Us</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" href="https://westernstateswater.org/wade/">WaDE</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" href="https://westernstateswater.org/">WSWC</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">License Name</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">{new Date().getFullYear()}</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">Contact Us</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/">WaDE</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/">WSWC</Nav.Link>
           </Nav>
         </div>
 
         <div>
           <Nav>
-            <Nav.Link className="p-0" target="_blank"  href="#">FAQ</Nav.Link>
-            <Nav.Link className="p-0" target="_blank"  href="#">Feedback</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade">FAQ</Nav.Link>
+            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">Feedback</Nav.Link>
           </Nav>
         </div>
       </Container>
