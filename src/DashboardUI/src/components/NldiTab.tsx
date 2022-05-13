@@ -11,6 +11,7 @@ import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useNldiFeatures } from "../hooks/useNldiQuery";
 import { useMapErrorAlert } from "../hooks/useMapAlert";
+import "../styles/NldiFilters.scss";
 
 function NldiTab() {
   interface NldiDataType {
@@ -219,42 +220,38 @@ function NldiTab() {
 
   return (
     <div className="position-relative flex-grow-1">
-      <div className="panel-content p-3">
-        <div className='row'>
-          <div className='col-12'>
-            <h3>NLDI Site Search Tool</h3>
-          </div>
-        </div>
-        <NldiDragAndDropButton setLatLong={setLatLongData} />
+      <NldiDragAndDropButton setLatLong={setLatLongData} />
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
+        <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
+        <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+      </Form.Group>
+      <div className="mb-3">
+        <label className="form-label fw-bolder">Direction</label>
         <Form.Group>
-          <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
-          <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+          <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
-          <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
-        <div>
-          Direction
-          <Form.Group>
-            <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
-          </Form.Group>
-        </div>
-        <div>
-          Data Type
-          <Form.Group>
-            <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA" />
-          </Form.Group>
-        </div>
+      </div>
+      <div className="mb-3">
+        <label className="form-label fw-bolder">Scope of Query</label>
+        <Form.Group>
+          <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE Sites" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS sites" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA Sites" />
+        </Form.Group>
+      </div>
+      <div className="d-grid gap-2">
+        <Button className="btn btn-success btn-lg"> GENERATE NLDI MAP </Button>
       </div>
     </div >
   );
@@ -281,10 +278,10 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
   }, [dropResult, setLatLong])
 
   return (<div className="d-inline-flex flex-row align-items-center">
-    <Button type="button" ref={dragRef} variant="outline-primary" className="grabbable me-2" >
-      <Icon path={mdiMapMarker} size="14px" />
+    <Button type="button" ref={dragRef} variant="no-outline" className="grabbable me-2" >
+      <Icon path={mdiMapMarker} size="48px" />
     </Button>
-    <span>Drag and drop pin on map</span>
+    <span>Drag and drop pin on the map to select your search location</span>
   </div>
   );
 }

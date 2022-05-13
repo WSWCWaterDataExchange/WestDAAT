@@ -23,6 +23,7 @@ import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
+import NldiTab from "./NldiTab";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -663,8 +664,19 @@ function WaterRightsTab() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="3">
-            <Accordion.Header>NLDI MAP</Accordion.Header>
-            <Accordion.Body>TBD</Accordion.Body>
+            <Accordion.Header>
+              <label className="fw-bold">NLDI MAP</label>
+              <div className="onoffswitch">
+                <input type="checkbox" name="onoffswitch4" className="onoffswitch-checkbox" id="myonoffswitch" />
+                <label className="onoffswitch-label" htmlFor="myonoffswitch">
+                  <span className="onoffswitch-inner"></span>
+                  <span className="onoffswitch-switch"></span>
+                </label>
+              </div>
+            </Accordion.Header>
+            <Accordion.Body >
+              <NldiTab />
+            </Accordion.Body>
           </Accordion.Item>
         </Accordion>
       </div>
