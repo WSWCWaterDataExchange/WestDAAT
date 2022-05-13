@@ -8,6 +8,7 @@ import TermsModal from '../components/TermsModal';
 
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
+import FeedbackModal from '../components/FeedbackModal';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
@@ -22,6 +23,7 @@ function HomePage() {
   const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
@@ -29,6 +31,10 @@ function HomePage() {
 
   const shouldShowTermsModal = (show: boolean) => {
     setShowTermsModal(show);
+  }
+
+  const shouldShowFeedbackModal = (show: boolean) => {
+    setShowFeedbackModal(show);
   }
 
   useEffect(() => {
@@ -58,10 +64,13 @@ function HomePage() {
         </div>
       </div>
 
-      <SiteFooter />
+      <SiteFooter
+        showFeedbackModal={shouldShowFeedbackModal}
+      />
 
       <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
       <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
+      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
     </div>
   );
 }
