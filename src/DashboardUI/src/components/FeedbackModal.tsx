@@ -112,7 +112,6 @@ function FeedbackModal(props: FeedBackModalProps) {
             position: toast.POSITION.TOP_CENTER,
             theme: 'colored'
           })
-        // do toast error message that something went wrong
       }
     } else {
       setShowErrorLabel(true);
