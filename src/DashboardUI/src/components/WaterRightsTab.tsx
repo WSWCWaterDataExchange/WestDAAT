@@ -159,7 +159,7 @@ function WaterRightsTab() {
     let colorMapping: { key: string, color: string }[];
     switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
-        colorMapping = allBeneficialUses?.map(a => ({ key: a.BeneficialUseName, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
       case MapGrouping.OwnerClassification:
         colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
@@ -564,8 +564,8 @@ function WaterRightsTab() {
                 className="form-control"
                 placeholder="Select Beneficial Use(s)"
                 options={allBeneficialUses}
-                optionKey="BeneficialUseName"
-                optionLabel="BeneficialUseName"
+                optionKey="beneficialUseName"
+                optionLabel="beneficialUseName"
                 selected={filters.beneficialUses ?? []}
                 handleOnChange={handleBeneficialUseChange}
                 name="beneficialUses"

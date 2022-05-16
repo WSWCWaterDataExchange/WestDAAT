@@ -1,6 +1,6 @@
 export interface BeneficialUseListItem {
-  BeneficialUseName: string;
-  ConsumptionCategory: ConsumptionCategoryType;
+  beneficialUseName: string;
+  consumptionCategory: ConsumptionCategoryType;
 }
 
 export enum ConsumptionCategoryType {

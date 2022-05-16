@@ -26,8 +26,20 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
+            var item = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = "Unique Name",
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
+            var item2 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = "Duplicate Name",
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
             result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] {item, item2 });
         }
 
         [DataTestMethod]
@@ -49,8 +61,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
+
+            var item = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = expectedResult,
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
             result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { expectedResult });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { item });
         }
 
         [TestMethod]

@@ -29,7 +29,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableBeneficialUseNormalizedNames();
 
-            return JsonResult(results);
+            return new OkObjectResult(results);
         }
 
         [FunctionName(nameof(GetOwnerClassifications)), AllowAnonymous]
