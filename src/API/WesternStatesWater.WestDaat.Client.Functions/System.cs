@@ -13,12 +13,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class System : FunctionBase
     {
-        public System(ISystemManager systemManager, ILogger<WaterAllocation> logger)
+        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<WaterAllocation> logger)
         {
             _systemManager = systemManager;
+            _notificationManager = notificationManager;
             _logger = logger;
         }
 
+        private readonly INotificationManager _notificationManager;
         private readonly ISystemManager _systemManager;
         private readonly ILogger _logger;
 
@@ -83,6 +85,21 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
 
             return new OkObjectResult(JsonSerializer.Serialize(result));
+        }
+
+        [FunctionName(nameof(PostFeedback)), AllowAnonymous]
+        public async Task<IActionResult> PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequest request)
+        {
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
+
+            await _notificationManager.SendFeedback(feedbackRequest);
+
+            return new OkResult();
         }
     }
 }
