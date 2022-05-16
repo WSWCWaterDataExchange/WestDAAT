@@ -20,6 +20,7 @@
         public string SourceVocabularyURI { get; set; }
         public string UsgscategoryNameCv { get; set; }
         public string NaicscodeNameCv { get; set; }
+        public Common.ConsumptionCategory? ConsumptionCategoryType { get; set; }
 
         public virtual ICollection<AggBridgeBeneficialUsesFact> AggBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<AggregatedAmountsFact> AggregatedAmountsFact { get; set; }

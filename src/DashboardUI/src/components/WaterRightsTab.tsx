@@ -159,7 +159,7 @@ function WaterRightsTab() {
     let colorMapping: { key: string, color: string }[];
     switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
-        colorMapping = allBeneficialUses?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allBeneficialUses?.map(a => ({ key: a.BeneficialUseName, color: colors[colorIndex++ % colors.length] })) ?? []
         break;
       case MapGrouping.OwnerClassification:
         colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
@@ -199,7 +199,7 @@ function WaterRightsTab() {
       }
     }
     let colorMappings = [...mapGrouping.colorMapping];
-    if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses.length > 0) {
+    if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses?.length > 0) {
       colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
     }
     if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
@@ -559,17 +559,19 @@ function WaterRightsTab() {
                   placeholder="Select State(s)"
                 />
               </div>
-              <div className="mb-3">
-                <label>Beneficial Use</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  options={allBeneficialUses}
-                  selected={filters.beneficialUses ?? []}
-                  handleOnChange={handleBeneficialUseChange}
-                  name="beneficialUses"
-                  placeholder="Select Beneficial Use(s)"
-                />
-              </div>
+              <label>Beneficial Use</label>
+              <DropdownMultiselect
+                className="form-control"
+                placeholder="Select Beneficial Use(s)"
+                options={allBeneficialUses}
+                optionKey="BeneficialUseName"
+                optionLabel="BeneficialUseName"
+                selected={filters.beneficialUses ?? []}
+                handleOnChange={handleBeneficialUseChange}
+                name="beneficialUses"
+              >
+
+              </DropdownMultiselect>
               <div className="mb-3">
                 <label>Water Source Type</label>
                 <DropdownMultiselect

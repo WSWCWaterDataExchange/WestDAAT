@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { BeneficialUseListItem } from '@data-contracts';
 
-export const getBeneficialUses = async (): Promise<string[]> => {
+export const getBeneficialUses = async (): Promise<BeneficialUseListItem[]> => {
   const url = new URL(
     'system/beneficialuses',
     process.env.REACT_APP_WEBAPI_URL
   );
-  const { data } = await axios.get<string[]>(url.toString());
+  const { data } = await axios.get<BeneficialUseListItem[]>(url.toString());
   return data;
 };
 
