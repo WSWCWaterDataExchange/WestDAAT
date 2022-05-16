@@ -25,7 +25,8 @@ export class CustomShareControl{
       toast.info("link copied successfully",
         {
           position: toast.POSITION.BOTTOM_RIGHT,
-          autoClose: 500
+          autoClose: 500,
+          theme: 'colored'
         });
     };
 
