@@ -559,19 +559,21 @@ function WaterRightsTab() {
                   placeholder="Select State(s)"
                 />
               </div>
-              <label>Beneficial Use</label>
-              <DropdownMultiselect
-                className="form-control"
-                placeholder="Select Beneficial Use(s)"
-                options={allBeneficialUses}
-                optionKey="beneficialUseName"
-                optionLabel="beneficialUseName"
-                selected={filters.beneficialUses ?? []}
-                handleOnChange={handleBeneficialUseChange}
-                name="beneficialUses"
-              >
+              <div className="mb-3">
+                <label>Beneficial Use</label>
+                <DropdownMultiselect
+                  className="form-control"
+                  placeholder="Select Beneficial Use(s)"
+                  options={allBeneficialUses}
+                  optionKey="beneficialUseName"
+                  optionLabel="beneficialUseName"
+                  selected={filters.beneficialUses ?? []}
+                  handleOnChange={handleBeneficialUseChange}
+                  name="beneficialUses"
+                >
 
-              </DropdownMultiselect>
+                </DropdownMultiselect>
+              </div>
               <div className="mb-3">
                 <label>Water Source Type</label>
                 <DropdownMultiselect
