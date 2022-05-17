@@ -14,7 +14,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
-import { waterRightsProperties, pointSizes } from "../config/constants";
+import { waterRightsProperties, pointSizes, nldi } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
@@ -24,6 +24,8 @@ import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
 import NldiTab from "./NldiTab";
+import Icon from "@mdi/react";
+import { mdiMapMarker } from "@mdi/js";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -87,6 +89,7 @@ const colors = [
 const waterRightsPointsLayer = 'waterRightsPoints';
 const waterRightsPolygonsLayer = 'waterRightsPolygons';
 const waterRightsRiverBasinLayer = 'river-basins';
+const nldiLayer = ['nldi-flowlines', 'nldi-usgs-location', 'nldi-usgs-points'];
 
 const allWaterRightsLayers = [
   waterRightsPointsLayer,
@@ -183,7 +186,7 @@ function WaterRightsTab() {
     setGeoJsonData
   } = useContext(MapContext);
 
-  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false)
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
 
   useEffect(() => {
     let params = (new URL(document.location.href)).searchParams;
@@ -246,7 +249,41 @@ function WaterRightsTab() {
   }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
-    if (renderedMapGroupings.colorMapping.length === 0) {
+    if (isNldiMapActive === true){
+      setLegend(
+        <div className="legend-nldi">
+          <div className="legend-item">
+            <span>
+              <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
+            </span>
+            Starting Point of Interest
+          </div>
+          <div className="legend-item">
+            <span className="legend-flowline">
+              <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
+            </span>
+            Mainstem
+          </div>
+          <div className="legend-item">
+            <span>
+              <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
+            </span>
+            Tributaries
+          </div>
+          <div className="legend-item">
+            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
+            WaDE Sites
+          </div>
+          <div className="legend-item">
+            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
+            USGS NWIS Sites
+          </div>
+          <div className="legend-item">
+            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
+            EPA Water Quality Portal<br /> Sites OSM Standard
+          </div>
+        </div>);
+    }else if (renderedMapGroupings.colorMapping.length === 0) {
       setLegend(null);
     } else {
       setLegend(
@@ -263,7 +300,7 @@ function WaterRightsTab() {
           }
         </>);
     }
-  }, [setLegend, renderedMapGroupings])
+  }, [setLegend, renderedMapGroupings, isNldiMapActive])
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
@@ -367,12 +404,14 @@ function WaterRightsTab() {
   }
 
   useEffect(() => {
-    if ((filters.riverBasinNames?.length ?? 0) > 0) {
+    if (isNldiMapActive === true) {
+      setVisibleLayers(nldiLayer);
+    } else if ((filters.riverBasinNames?.length ?? 0) > 0) {
       setVisibleLayers([...allWaterRightsLayers, waterRightsRiverBasinLayer]);
     } else {
       setVisibleLayers([...allWaterRightsLayers]);
     }
-  }, [filters.riverBasinNames, setVisibleLayers])
+  }, [filters.riverBasinNames, setVisibleLayers, isNldiMapActive])
 
   useEffect(() => {
     setGeoJsonData("river-basins", riverBasinPolygons ?? {
@@ -670,16 +709,12 @@ function WaterRightsTab() {
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="onoffswitch">
                 <input
-                type="checkbox"
-                name="onoffswitch4"
-                className="onoffswitch-checkbox"
-                id="myonoffswitch"
-                checked={isNldiMapActive}
-                onChange={(e) => {
-                  setUrlParam("wr", undefined);
-                  setUrlParam("wrd", undefined);
-                  setNldiMapStatus(e.target.checked);
-                }}
+                  type="checkbox"
+                  name="onoffswitch4"
+                  className="onoffswitch-checkbox"
+                  id="myonoffswitch"
+                  checked={isNldiMapActive}
+                  onChange={(e) => setNldiMapStatus(e.target.checked)}
                 />
                 <label className="onoffswitch-label" htmlFor="myonoffswitch">
                   <span className="onoffswitch-inner"></span>
@@ -688,7 +723,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab isEnabled={isNldiMapActive}/>
+              <NldiTab isEnabled={isNldiMapActive} />
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

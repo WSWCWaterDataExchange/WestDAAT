@@ -12,6 +12,7 @@ import Icon from '@mdi/react';
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
+import { toast } from "react-toastify";
 
 interface NldiTabProps {
   isEnabled: boolean;
@@ -53,46 +54,55 @@ function NldiTab(props: NldiTabProps) {
   }, [setPointData])
 
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
-    let lat = parseFloat(latValue);
-    let long = parseFloat(longValue);
-    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
-    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
-    if (isNaN(lat) || isNaN(long)) {
-      setPointData(s => ({
-        ...s,
-        latitude: pointLat,
-        longitude: pointLong
-      }));
+    if (props.isEnabled === false) {
+      toast.error("NLDI Features are not turned On, please turn on to use this feature",
+        {
+          position: toast.POSITION.TOP_CENTER,
+          theme: 'colored',
+          autoClose: 1000
+        })
+    } else {
+      let lat = parseFloat(latValue);
+      let long = parseFloat(longValue);
+      let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+      let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+      if (isNaN(lat) || isNaN(long)) {
+        setPointData(s => ({
+          ...s,
+          latitude: pointLat,
+          longitude: pointLong
+        }));
+        setNldiData(s => ({
+          ...s,
+          latitude: null,
+          longitude: null
+        }));
+        return;
+      }
+      if (lat > 90) {
+        lat = 90;
+      } else if (lat < -90) {
+        lat = -90
+      }
+      if (long > 180) {
+        long = 180;
+      } else if (long < -180) {
+        long = -180
+      }
+      lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+      long = parseFloat(long.toFixed(nldi.latLongPrecision));
       setNldiData(s => ({
         ...s,
-        latitude: null,
-        longitude: null
+        latitude: lat,
+        longitude: long
       }));
-      return;
+      setPointData(s => ({
+        ...s,
+        latitude: lat.toFixed(nldi.latLongPrecision),
+        longitude: long.toFixed(nldi.latLongPrecision)
+      }));
     }
-    if (lat > 90) {
-      lat = 90;
-    } else if (lat < -90) {
-      lat = -90
-    }
-    if (long > 180) {
-      long = 180;
-    } else if (long < -180) {
-      long = -180
-    }
-    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
-    long = parseFloat(long.toFixed(nldi.latLongPrecision));
-    setNldiData(s => ({
-      ...s,
-      latitude: lat,
-      longitude: long
-    }));
-    setPointData(s => ({
-      ...s,
-      latitude: lat.toFixed(nldi.latLongPrecision),
-      longitude: long.toFixed(nldi.latLongPrecision)
-    }));
-  }, [])
+  }, [props.isEnabled])
 
   const handleLatitudeBlurred = () => {
     setLatLongData(pointData.latitude, pointData.longitude);
@@ -118,7 +128,7 @@ function NldiTab(props: NldiTabProps) {
     }));
   }
 
-  const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
   const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude, props.isEnabled);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
@@ -128,45 +138,6 @@ function NldiTab(props: NldiTabProps) {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
-
-  useEffect(() => {
-    setVisibleLayers(['nldi-flowlines', 'nldi-usgs-location', 'nldi-usgs-points'])
-  }, [setVisibleLayers]);
-
-  useEffect(() => {
-    setLegend(<div className="legend-nldi">
-      <div className="legend-item">
-        <span>
-          <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
-        </span>
-        Starting Point of Interest
-      </div>
-      <div className="legend-item">
-        <span className="legend-flowline">
-          <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
-        </span>
-        Mainstem
-      </div>
-      <div className="legend-item">
-        <span>
-          <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
-        </span>
-        Tributaries
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
-        WaDE Sites
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
-        USGS NWIS Sites
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
-        EPA Water Quality Portal<br /> Sites OSM Standard
-      </div>
-    </div>);
-  }, [setLegend])
 
   const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
   const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
