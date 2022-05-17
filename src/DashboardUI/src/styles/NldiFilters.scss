@@ -1,7 +1,13 @@
+// overriding form check label padding top, if not the switch will look like a staircase
+.form-check-label {
+  padding-top: 4px !important;
+}
+
 .onoffswitch {
   margin-left: 25px;
   position: relative;
   width: 75px;
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

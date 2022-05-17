@@ -2,18 +2,22 @@ import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } fr
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import { Button, Form } from "react-bootstrap";
-import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
-import deepEqual from 'fast-deep-equal/es6';
-import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useNldiFeatures } from "../hooks/useNldiQuery";
 import { useMapErrorAlert } from "../hooks/useMapAlert";
+import Icon from '@mdi/react';
+import deepEqual from 'fast-deep-equal/es6';
+import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
 
-function NldiTab() {
+interface NldiTabProps {
+  isEnabled: boolean;
+}
+
+function NldiTab(props: NldiTabProps) {
   interface NldiDataType {
     latitude: number | null,
     longitude: number | null,
@@ -26,7 +30,7 @@ function NldiTab() {
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
   }), [])
-  const { getUrlParam, setUrlParam } = useContext(AppContext);
+  const { setUrlParam, getUrlParam } = useContext(AppContext);
   const [nldiData, setNldiData] = useState(getUrlParam<NldiDataType>("nldi") ?? defaultNldiData);
 
   const [pointData, setPointData] = useState({
@@ -115,7 +119,7 @@ function NldiTab() {
   }
 
   const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude, props.isEnabled);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
@@ -232,26 +236,23 @@ function NldiTab() {
       <div className="mb-3">
         <label className="form-label fw-bolder">Direction</label>
         <Form.Group>
-          <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
+          <Form.Check className="toggle" type="switch" id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
+          <Form.Check className="toggle" type="switch" id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
       </div>
       <div className="mb-3">
         <label className="form-label fw-bolder">Scope of Query</label>
         <Form.Group>
-          <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE Sites" />
+          <Form.Check className="toggle" type="switch" id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE Sites" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS sites" />
+          <Form.Check className="toggle" type="switch" id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS sites" />
         </Form.Group>
         <Form.Group>
-          <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA Sites" />
+          <Form.Check className="toggle" type="switch" id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA Sites" />
         </Form.Group>
-      </div>
-      <div className="d-grid gap-2">
-        <Button className="btn btn-success btn-lg"> GENERATE NLDI MAP </Button>
       </div>
     </div >
   );

@@ -183,6 +183,8 @@ function WaterRightsTab() {
     setGeoJsonData
   } = useContext(MapContext);
 
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false)
+
   useEffect(() => {
     let params = (new URL(document.location.href)).searchParams;
     let tier = parseInt(params.get("tier") ?? "");
@@ -505,7 +507,7 @@ function WaterRightsTab() {
       </div>
       <div className="position-relative flex-grow-1 panel-content">
 
-        <Accordion flush defaultActiveKey={['0', '1']} alwaysOpen>
+        <Accordion flush defaultActiveKey={['0']} alwaysOpen>
           <Accordion.Item eventKey="0">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
@@ -663,11 +665,22 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="3">
+          <Accordion.Item eventKey="2">
             <Accordion.Header>
-              <label className="fw-bold">NLDI MAP</label>
+              <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="onoffswitch">
-                <input type="checkbox" name="onoffswitch4" className="onoffswitch-checkbox" id="myonoffswitch" />
+                <input
+                type="checkbox"
+                name="onoffswitch4"
+                className="onoffswitch-checkbox"
+                id="myonoffswitch"
+                checked={isNldiMapActive}
+                onChange={(e) => {
+                  setUrlParam("wr", undefined);
+                  setUrlParam("wrd", undefined);
+                  setNldiMapStatus(e.target.checked);
+                }}
+                />
                 <label className="onoffswitch-label" htmlFor="myonoffswitch">
                   <span className="onoffswitch-inner"></span>
                   <span className="onoffswitch-switch"></span>
@@ -675,7 +688,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab />
+              <NldiTab isEnabled={isNldiMapActive}/>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
