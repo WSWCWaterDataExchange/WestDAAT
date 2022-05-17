@@ -19,6 +19,7 @@ interface SiteNavbarProps {
   onTabClick: (tab: HomePageTab) => void;
   showContactModal(show: boolean): void;
   showTermsModal(show: boolean): void;
+  showDownloadModal(show: boolean): void;
 }
 
 function handleLogin(msalContext: IPublicClientApplication | null) {    
@@ -101,7 +102,7 @@ function SiteNavbar(props: SiteNavbarProps) {
 
           <div className="mx-2">
             <Button className="ms-1">View Table Results</Button>
-            <Button className="ms-1">Download Data</Button>
+            <Button className="ms-1" onClick={() => props.showDownloadModal(true)}>Download Data</Button>
           </div>
         </Container>
       </Navbar>
