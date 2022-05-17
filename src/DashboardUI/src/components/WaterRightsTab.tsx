@@ -26,6 +26,7 @@ import '../App.scss';
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
+import { toast } from "react-toastify";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -194,7 +195,7 @@ function WaterRightsTab() {
     if (!isNaN(tier) && tier >= 0 && tier < mapDataTiers.length) {
       setVectorUrl('allocation-sites_1', mapDataTiers[tier])
     }
-  }, [setVectorUrl])
+  }, [setVectorUrl, isNldiMapActive])
 
   const renderedMapGroupings = useMemo(() => {
     const tryParseJsonArray = (value: any) => {
@@ -249,7 +250,7 @@ function WaterRightsTab() {
   }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
-    if (isNldiMapActive === true){
+    if (isNldiMapActive === true) {
       setLegend(
         <div className="legend-nldi">
           <div className="legend-item">
@@ -283,7 +284,7 @@ function WaterRightsTab() {
             EPA Water Quality Portal<br /> Sites OSM Standard
           </div>
         </div>);
-    }else if (renderedMapGroupings.colorMapping.length === 0) {
+    } else if (renderedMapGroupings.colorMapping.length === 0) {
       setLegend(null);
     } else {
       setLegend(
@@ -445,69 +446,79 @@ function WaterRightsTab() {
   }, 400)
 
   useEffect(() => {
-    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
-      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
-      const fieldStr = field as string;
-      const operator = isMin ? "<=" : ">=";
+    if (isNldiMapActive === true) {
+      toast.error("NLDI has to be OFF in order to use Site Selection Filters",
+        {
+          position: toast.POSITION.TOP_CENTER,
+          theme: 'colored',
+          autoClose: 1000
+        })
+    } else {
 
-      let coalesceValue;
-      if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
-        coalesceValue = 999999999999
-      } else {
-        coalesceValue = -999999999999
+      const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
+        const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
+        const fieldStr = field as string;
+        const operator = isMin ? "<=" : ">=";
+
+        let coalesceValue;
+        if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
+          coalesceValue = 999999999999
+        } else {
+          coalesceValue = -999999999999
+        }
+
+        return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
+      }
+      if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
+      const filterSet = ["all"] as any[];
+      if (filters.podPou === "POD" || filters.podPou === "POU") {
+        filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+      }
+      if (filters.includeExempt !== undefined) {
+        filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
+      }
+      if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
+        filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
+      }
+      if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
+        filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
+      }
+      if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
+        filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+      }
+      if (riverBasinPolygons && riverBasinPolygons.features) {
+        filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
+      }
+      if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
+        filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
+      }
+      if (filters.allocationOwner && filters.allocationOwner.length > 0) {
+        filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
+      }
+      if (filters.maxFlow !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
+      }
+      if (filters.minFlow !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
+      }
+      if (filters.maxVolume !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
+      }
+      if (filters.minVolume !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
+      }
+      if (filters.minPriorityDate !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+      }
+      if (filters.maxPriorityDate !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
       }
 
-      return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
+      setMapLayerFilters(allWaterRightsLayers.map(a => {
+        return { layer: a, filter: filterSet }
+      }))
     }
-    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
-    const filterSet = ["all"] as any[];
-    if (filters.podPou === "POD" || filters.podPou === "POU") {
-      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
-    }
-    if (filters.includeExempt !== undefined) {
-      filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
-    }
-    if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
-    }
-    if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
-      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
-    }
-    if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
-      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
-    }
-    if (riverBasinPolygons && riverBasinPolygons.features) {
-      filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
-    }
-    if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
-      filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
-    }
-    if (filters.allocationOwner && filters.allocationOwner.length > 0) {
-      filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
-    }
-    if (filters.maxFlow !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
-    }
-    if (filters.minFlow !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
-    }
-    if (filters.maxVolume !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
-    }
-    if (filters.minVolume !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
-    }
-    if (filters.minPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
-    }
-    if (filters.maxPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
-    }
-
-    setMapLayerFilters(allWaterRightsLayers.map(a => {
-      return { layer: a, filter: filterSet }
-    }))
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });
