@@ -25,7 +25,9 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<BeneficialUseItem>(DtoMapper.Configuration)
                 .Distinct()
                 .OrderBy(a => a.BeneficialUseName)
-                .ToListAsync(); 
+                .GroupBy(a => a.BeneficialUseName)
+                .Select(g => g.OrderBy(c => c.ConsumptionCategory).LastOrDefault())
+                .ToListAsync();
         }
 
         async Task<List<string>> ISystemAccessor.GetAvailableWaterSourceTypeNormalizedNames()

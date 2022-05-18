@@ -24,11 +24,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
         async Task<List<BeneficialUseItem>> ISystemManager.GetAvailableBeneficialUseNormalizedNames()
         {
-            var data = (await _systemAccessor.GetAvailableBeneficialUseNormalizedNames()).Map<List<BeneficialUseItem>>();
-            var result = from x in data
-                         group x by x.BeneficialUseName into g
-                         select g.Last();
-            return result.ToList();
+            return (await _systemAccessor.GetAvailableBeneficialUseNormalizedNames()).Map<List<BeneficialUseItem>>();
         }
 
         async Task<List<string>> ISystemManager.GetAvailableOwnerClassificationNormalizedNames()

@@ -26,27 +26,27 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
-            var item = new Common.DataContracts.BeneficialUseItem
+            var expectedResult1 = new Common.DataContracts.BeneficialUseItem
             {
                 BeneficialUseName = "Unique Name",
                 ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
             };
 
-            var item2 = new Common.DataContracts.BeneficialUseItem
+            var expectedResult2 = new Common.DataContracts.BeneficialUseItem
             {
                 BeneficialUseName = "Duplicate Name",
                 ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
             };
 
             result.Should().NotBeNull().And
-                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] {item, item2 });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] {expectedResult1, expectedResult2 });
         }
 
         [DataTestMethod]
         [DataRow("Name1", null, "Name1")]
         [DataRow("Name1", "", "Name1")]
         [DataRow("Name1", "Name2", "Name2")]
-        public async Task GetAvailableBeneficialUseNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
+        public async Task GetAvailableBeneficialUseNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedBeneficialUseName)
         {
             var uniqueBeneficialUse = new BeneficialUsesCVFaker()
                 .RuleFor(a => a.Name, b => name)
@@ -62,14 +62,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
 
-            var item = new Common.DataContracts.BeneficialUseItem
+            var expectedResult = new Common.DataContracts.BeneficialUseItem
             {
-                BeneficialUseName = expectedResult,
+                BeneficialUseName = expectedBeneficialUseName,
                 ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
             };
 
             result.Should().NotBeNull().And
-                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { item });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { expectedResult });
         }
 
         [TestMethod]
