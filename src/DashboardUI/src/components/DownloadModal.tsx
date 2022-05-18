@@ -2,22 +2,17 @@ import { useContext } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { AppContext } from '../AppProvider';
+import { SignIn } from "./SignIn";
 
 interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
 }
 
 function DownloadModal(props: DownloadModalProps) {
-
   const { isAuthenticated } = useContext(AppContext).authenticationContext;
   const close = () => {
     props.setShow(false);
   }
-
-  const handleLogin = () => {
-    // bubble up something so the parent catches and does the log in request
-  }
-
   const download = () => {
     // do the download calls
     // probably display modals that the operation was success or failed for whatever reason ?
@@ -33,14 +28,16 @@ function DownloadModal(props: DownloadModalProps) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>
+      { !isAuthenticated && <p>
           Sign up <strong>completely free</strong> or login for down access of up to 100.000
           water rights points.
-        </p>
+        </p>}
+      { isAuthenticated && <p>Nulla lacinia pharetra velit, eget malesuada arcu finibus vel.
+        Pellentesque ac malesuada ipsum. Sed eleifend sapien diam, ut volutpat diam.</p>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
-      {!isAuthenticated && <Button onClick={handleLogin}>Log In</Button>}
+      {!isAuthenticated && <Button style={{padding: "0px", height: "36px"}} ><SignIn /></Button>}
       {isAuthenticated && <Button onClick={download}>Download</Button>}
       </Modal.Footer>
     </Modal>
