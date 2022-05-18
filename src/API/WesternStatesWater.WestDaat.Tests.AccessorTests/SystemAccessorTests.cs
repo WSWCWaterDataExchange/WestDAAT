@@ -26,15 +26,58 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
+            var expectedResult1 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = "Unique Name",
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
+            var expectedResult2 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = "Duplicate Name",
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
             result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] {expectedResult1, expectedResult2 });
+        }
+
+        [TestMethod]
+        public async Task GetAvailableBeneficialUseNormalizedNames_RemovesMultipleConsumptionTypes()
+        {
+            var beneficialUseConsumptive = new BeneficialUsesCVFaker()
+                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
+                .RuleFor(a => a.ConsumptionCategoryType, b => Common.ConsumptionCategory.Consumptive)
+                .Generate();
+            var beneficialUseNonconsumptive = new BeneficialUsesCVFaker()
+                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
+                .RuleFor(a => a.ConsumptionCategoryType, b => Common.ConsumptionCategory.NonConsumptive)
+                .Generate();
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.BeneficialUsesCV.Add(beneficialUseConsumptive);
+                db.BeneficialUsesCV.Add(beneficialUseNonconsumptive);
+                db.SaveChanges();
+            }
+
+            var accessor = CreateSystemAccessor();
+            var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
+
+            var expectedResult = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = "Duplicate Name",
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
+            result.Should().NotBeNull().And
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { expectedResult });
         }
 
         [DataTestMethod]
         [DataRow("Name1", null, "Name1")]
         [DataRow("Name1", "", "Name1")]
         [DataRow("Name1", "Name2", "Name2")]
-        public async Task GetAvailableBeneficialUseNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
+        public async Task GetAvailableBeneficialUseNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedBeneficialUseName)
         {
             var uniqueBeneficialUse = new BeneficialUsesCVFaker()
                 .RuleFor(a => a.Name, b => name)
@@ -49,8 +92,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
 
+
+            var expectedResult = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = expectedBeneficialUseName,
+                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+            };
+
             result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { expectedResult });
+                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { expectedResult });
         }
 
         [TestMethod]
