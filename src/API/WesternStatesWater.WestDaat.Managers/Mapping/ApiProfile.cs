@@ -13,6 +13,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.SiteInfoListItem, ClientContracts.SiteInfoListItem>();
             CreateMap<CommonContracts.WaterRightDetails, ClientContracts.WaterRightDetails>();
             CreateMap<CommonContracts.SiteDetails, ClientContracts.SiteDetails>();
+            CreateMap<CommonContracts.BeneficialUseItem, ClientContracts.BeneficialUseItem>();
         }
     }
 }

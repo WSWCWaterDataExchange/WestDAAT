@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -14,14 +17,17 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
-        async Task<List<string>> ISystemAccessor.GetAvailableBeneficialUseNormalizedNames()
+        async Task<List<BeneficialUseItem>> ISystemAccessor.GetAvailableBeneficialUseNormalizedNames()
         {
             using var db = _databaseContextFactory.Create();
+
             return await db.BeneficialUsesCV
-              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-              .Distinct()
-              .OrderBy(a => a)
-              .ToListAsync();
+                .ProjectTo<BeneficialUseItem>(DtoMapper.Configuration)
+                .Distinct()
+                .OrderBy(a => a.BeneficialUseName)
+                .GroupBy(a => a.BeneficialUseName)
+                .Select(g => g.OrderBy(c => c.ConsumptionCategory).LastOrDefault())
+                .ToListAsync();
         }
 
         async Task<List<string>> ISystemAccessor.GetAvailableWaterSourceTypeNormalizedNames()

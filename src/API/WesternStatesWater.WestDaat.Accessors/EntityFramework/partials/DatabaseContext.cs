@@ -640,6 +640,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                    .HasColumnName("SourceVocabularyURI")
                    .HasMaxLength(100);
 
+                entity.Property(e => e.ConsumptionCategoryType)
+                    .HasColumnName("ConsumptionCategoryType");
+
 
             });
 

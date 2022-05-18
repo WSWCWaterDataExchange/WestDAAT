@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -21,9 +22,9 @@ namespace WesternStatesWater.WestDaat.Managers
             _systemAccessor = systemAccessor;
         }
 
-        async Task<List<string>> ISystemManager.GetAvailableBeneficialUseNormalizedNames()
+        async Task<List<BeneficialUseItem>> ISystemManager.GetAvailableBeneficialUseNormalizedNames()
         {
-            return await _systemAccessor.GetAvailableBeneficialUseNormalizedNames();
+            return (await _systemAccessor.GetAvailableBeneficialUseNormalizedNames()).Map<List<BeneficialUseItem>>();
         }
 
         async Task<List<string>> ISystemManager.GetAvailableOwnerClassificationNormalizedNames()
