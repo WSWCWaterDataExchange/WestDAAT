@@ -16,12 +16,21 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         public async Task GetAvailableBeneficialUseNormalizedNames_Success()
         {
             var faker = new Faker();
-            var beneficialUse1 = faker.Random.AlphaNumeric(10);
-            var beneficialUse2 = faker.Random.AlphaNumeric(10);
+
+            var beneficialUse1 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = faker.Random.AlphaNumeric(10),
+                ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
+            };
+            var beneficialUse2 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = faker.Random.AlphaNumeric(10),
+                ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
+            };
 
             _systemAccessorMock.Setup(a => a.GetAvailableBeneficialUseNormalizedNames())
-                             .ReturnsAsync(new List<string> { beneficialUse1, beneficialUse2 })
-                             .Verifiable();
+                        .ReturnsAsync(new List<Common.DataContracts.BeneficialUseItem> { beneficialUse1, beneficialUse2 })
+                        .Verifiable();
 
             var sut = CreateSystemManager();
             var result = await sut.GetAvailableBeneficialUseNormalizedNames();

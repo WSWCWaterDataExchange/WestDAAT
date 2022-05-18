@@ -1,12 +1,13 @@
 import axios from 'axios';
+import { BeneficialUseListItem } from '@data-contracts';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
 
-export const getBeneficialUses = async (): Promise<string[]> => {
+export const getBeneficialUses = async (): Promise<BeneficialUseListItem[]> => {
   const url = new URL(
     'system/beneficialuses',
     process.env.REACT_APP_WEBAPI_URL
   );
-  const { data } = await axios.get<string[]>(url.toString());
+  const { data } = await axios.get<BeneficialUseListItem[]>(url.toString());
   return data;
 };
 
@@ -52,5 +53,5 @@ export const getRiverBasinPolygonsByName = async (basinNames: string[]) => {
 export const postFeedback = async (feedbackRequest: FeedbackRequest) => {
   const url = new URL('system/feedback', process.env.REACT_APP_WEBAPI_URL);
   return axios.post<FeedbackRequest>(url.toString(), feedbackRequest)
-    .catch(() => {return false});
+    .catch(() => { return false });
 }
