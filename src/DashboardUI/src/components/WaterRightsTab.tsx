@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -23,11 +23,29 @@ import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
+import BeneficialUseSelect, { BeneficialUseChangeOption } from "./BeneficialUseSelect";
+import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
+import AlertIcon from 'mdi-react/AlertIcon';
+
 
 enum MapGrouping {
   BeneficialUse = "bu",
   OwnerClassification = "oClass",
   WaterSourceType = "wsType"
+}
+
+const convertLayersToBeneficialUseOptions = (beneficialUses: BeneficialUseListItem[] | undefined) => {
+
+  const convertTest = (beneficialuse: BeneficialUseListItem) => {
+    return {
+      value: beneficialuse.beneficialUseName,
+      label: <> <span>{beneficialuse.beneficialUseName}</span><AlertIcon /></>
+    }
+  }
+
+  return beneficialUses?.map(a => {
+    return convertTest(a);
+  }).filter(a => a !== undefined) as unknown as BeneficialUseChangeOption[];
 }
 
 interface WaterRightsFilters {
@@ -315,11 +333,15 @@ function WaterRightsTab() {
     }));
   }
 
-  const handleBeneficialUseChange = (selectedOptions: string[]) => {
+  const handleBeneficialUseChange = (selectedOptions: BeneficialUseChangeOption[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions.length > 0 ? selectedOptions : undefined
-    }));
+      beneficialUses: selectedOptions.length > 0 ? selectedOptions.map(a => { return a.value }) : undefined
+    })
+
+    );
+
+    return selectedOptions;
   }
 
   const handleStateChange = (selectedOptions: string[]) => {
@@ -561,18 +583,10 @@ function WaterRightsTab() {
               </div>
               <div className="mb-3">
                 <label>Beneficial Use</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  placeholder="Select Beneficial Use(s)"
-                  options={allBeneficialUses}
-                  optionKey="beneficialUseName"
-                  optionLabel="beneficialUseName"
-                  selected={filters.beneficialUses ?? []}
-                  handleOnChange={handleBeneficialUseChange}
-                  name="beneficialUses"
-                >
-
-                </DropdownMultiselect>
+                <div className="mb-3">
+                  <label>Beneficial Use</label>
+                  <BeneficialUseSelect selectedOptions={[]} options={convertLayersToBeneficialUseOptions(allBeneficialUses)} onChange={handleBeneficialUseChange} />
+                </div>
               </div>
               <div className="mb-3">
                 <label>Water Source Type</label>
