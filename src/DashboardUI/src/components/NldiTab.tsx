@@ -2,17 +2,23 @@ import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } fr
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import { MapContext } from "./MapProvider";
 import { Button, Form } from "react-bootstrap";
-import Icon from '@mdi/react';
 import { mdiMapMarker } from '@mdi/js';
 import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
-import deepEqual from 'fast-deep-equal/es6';
-import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useNldiFeatures } from "../hooks/useNldiQuery";
 import { useMapErrorAlert } from "../hooks/useMapAlert";
+import Icon from '@mdi/react';
+import deepEqual from 'fast-deep-equal/es6';
+import useProgressIndicator from "../hooks/useProgressIndicator";
+import "../styles/NldiFilters.scss";
+import { toast } from "react-toastify";
 
-function NldiTab() {
+interface NldiTabProps {
+  isEnabled: boolean;
+}
+
+function NldiTab(props: NldiTabProps) {
   interface NldiDataType {
     latitude: number | null,
     longitude: number | null,
@@ -25,7 +31,7 @@ function NldiTab() {
     directions: Directions.Upsteam | Directions.Downsteam as Directions,
     dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
   }), [])
-  const { getUrlParam, setUrlParam } = useContext(AppContext);
+  const { setUrlParam, getUrlParam } = useContext(AppContext);
   const [nldiData, setNldiData] = useState(getUrlParam<NldiDataType>("nldi") ?? defaultNldiData);
 
   const [pointData, setPointData] = useState({
@@ -48,46 +54,55 @@ function NldiTab() {
   }, [setPointData])
 
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
-    let lat = parseFloat(latValue);
-    let long = parseFloat(longValue);
-    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
-    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
-    if (isNaN(lat) || isNaN(long)) {
-      setPointData(s => ({
-        ...s,
-        latitude: pointLat,
-        longitude: pointLong
-      }));
+    if (props.isEnabled === false) {
+      toast.error("NLDI Features are not turned On, please turn on to use this feature",
+        {
+          position: toast.POSITION.TOP_CENTER,
+          theme: 'colored',
+          autoClose: 1000
+        })
+    } else {
+      let lat = parseFloat(latValue);
+      let long = parseFloat(longValue);
+      let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+      let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+      if (isNaN(lat) || isNaN(long)) {
+        setPointData(s => ({
+          ...s,
+          latitude: pointLat,
+          longitude: pointLong
+        }));
+        setNldiData(s => ({
+          ...s,
+          latitude: null,
+          longitude: null
+        }));
+        return;
+      }
+      if (lat > 90) {
+        lat = 90;
+      } else if (lat < -90) {
+        lat = -90
+      }
+      if (long > 180) {
+        long = 180;
+      } else if (long < -180) {
+        long = -180
+      }
+      lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+      long = parseFloat(long.toFixed(nldi.latLongPrecision));
       setNldiData(s => ({
         ...s,
-        latitude: null,
-        longitude: null
+        latitude: lat,
+        longitude: long
       }));
-      return;
+      setPointData(s => ({
+        ...s,
+        latitude: lat.toFixed(nldi.latLongPrecision),
+        longitude: long.toFixed(nldi.latLongPrecision)
+      }));
     }
-    if (lat > 90) {
-      lat = 90;
-    } else if (lat < -90) {
-      lat = -90
-    }
-    if (long > 180) {
-      long = 180;
-    } else if (long < -180) {
-      long = -180
-    }
-    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
-    long = parseFloat(long.toFixed(nldi.latLongPrecision));
-    setNldiData(s => ({
-      ...s,
-      latitude: lat,
-      longitude: long
-    }));
-    setPointData(s => ({
-      ...s,
-      latitude: lat.toFixed(nldi.latLongPrecision),
-      longitude: long.toFixed(nldi.latLongPrecision)
-    }));
-  }, [])
+  }, [props.isEnabled])
 
   const handleLatitudeBlurred = () => {
     setLatLongData(pointData.latitude, pointData.longitude);
@@ -113,8 +128,8 @@ function NldiTab() {
     }));
   }
 
-  const { setLegend, setVisibleLayers, setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude, props.isEnabled);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
@@ -123,45 +138,6 @@ function NldiTab() {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
-
-  useEffect(() => {
-    setVisibleLayers(['nldi-flowlines', 'nldi-usgs-location', 'nldi-usgs-points'])
-  }, [setVisibleLayers]);
-
-  useEffect(() => {
-    setLegend(<div className="legend-nldi">
-      <div className="legend-item">
-        <span>
-          <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
-        </span>
-        Starting Point of Interest
-      </div>
-      <div className="legend-item">
-        <span className="legend-flowline">
-          <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
-        </span>
-        Mainstem
-      </div>
-      <div className="legend-item">
-        <span>
-          <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
-        </span>
-        Tributaries
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
-        WaDE Sites
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
-        USGS NWIS Sites
-      </div>
-      <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
-        EPA Water Quality Portal<br /> Sites OSM Standard
-      </div>
-    </div>);
-  }, [setLegend])
 
   const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
   const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
@@ -219,42 +195,35 @@ function NldiTab() {
 
   return (
     <div className="position-relative flex-grow-1">
-      <div className="panel-content p-3">
-        <div className='row'>
-          <div className='col-12'>
-            <h3>NLDI Site Search Tool</h3>
-          </div>
-        </div>
-        <NldiDragAndDropButton setLatLong={setLatLongData} />
+      <NldiDragAndDropButton setLatLong={setLatLongData} />
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
+        <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
+        <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+      </Form.Group>
+      <div className="mb-3">
+        <label className="form-label fw-bolder">Direction</label>
         <Form.Group>
-          <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
-          <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
+          <Form.Check className="toggle" type="switch" id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
         </Form.Group>
         <Form.Group>
-          <Form.Label htmlFor="nldiLongitude">Longitude</Form.Label>
-          <Form.Control id='nldiLongitude' type='number' placeholder="Enter Longitude" max={180} min={-180} step={.01} value={pointData.longitude ?? ''} onChange={handleLongitudeChanged} onBlur={handleLongitudeBlurred} />
+          <Form.Check className="toggle" type="switch" id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
         </Form.Group>
-        <div>
-          Direction
-          <Form.Group>
-            <Form.Check id="nldiUpstream" checked={(nldiData.directions & Directions.Upsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Upsteam)} label="Upstream" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiDownstream" checked={(nldiData.directions & Directions.Downsteam) > 0} onChange={e => handleDirectionsChanged(e, Directions.Downsteam)} label="Downstream" />
-          </Form.Group>
-        </div>
-        <div>
-          Data Type
-          <Form.Group>
-            <Form.Check id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS" />
-          </Form.Group>
-          <Form.Group>
-            <Form.Check id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA" />
-          </Form.Group>
-        </div>
+      </div>
+      <div className="mb-3">
+        <label className="form-label fw-bolder">Scope of Query</label>
+        <Form.Group>
+          <Form.Check className="toggle" type="switch" id="nldiWade" checked={(nldiData.dataPoints & DataPoints.Wade) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Wade)} label="WaDE Sites" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check className="toggle" type="switch" id="nldiUsgs" checked={(nldiData.dataPoints & DataPoints.Usgs) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Usgs)} label="USGS sites" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check className="toggle" type="switch" id="nldiEpa" checked={(nldiData.dataPoints & DataPoints.Epa) > 0} onChange={e => handleDataPointsChanged(e, DataPoints.Epa)} label="EPA Sites" />
+        </Form.Group>
       </div>
     </div >
   );
@@ -281,10 +250,10 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
   }, [dropResult, setLatLong])
 
   return (<div className="d-inline-flex flex-row align-items-center">
-    <Button type="button" ref={dragRef} variant="outline-primary" className="grabbable me-2" >
-      <Icon path={mdiMapMarker} size="14px" />
+    <Button type="button" ref={dragRef} variant="no-outline" className="grabbable me-2" >
+      <Icon path={mdiMapMarker} size="48px" />
     </Button>
-    <span>Drag and drop pin on map</span>
+    <span>Drag and drop pin on the map to select your search location</span>
   </div>
   );
 }
