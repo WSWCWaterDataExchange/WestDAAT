@@ -12,7 +12,6 @@ import FeedbackModal from '../components/FeedbackModal';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
-  TempNldi = "Temp NLDI",
   Aggregations = "Aggregate Area Time Series Water Data",
   SiteSpecific = "Water Use Site-Specific Time Series Data"
 }
