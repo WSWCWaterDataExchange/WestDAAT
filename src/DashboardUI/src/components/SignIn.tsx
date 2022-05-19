@@ -1,6 +1,7 @@
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
+import '../styles/home-page.scss';
 
 function handleLogin(msalContext: IPublicClientApplication | null) {    
 
@@ -19,6 +20,6 @@ export const SignIn = () => {
   const { instance } = useMsal();
 
   return (
-      <span style={{padding: "12px", height:"100%", alignItems: "center"}} onClick={() => handleLogin(instance)}>Sign In</span>
+      <span className="sign-in-span" onClick={() => handleLogin(instance)}>Sign In</span>
   );
 }

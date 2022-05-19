@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { AppContext } from '../AppProvider';
 import { SignIn } from "./SignIn";
+import '../styles/home-page.scss';
 
 interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
@@ -37,7 +38,7 @@ function DownloadModal(props: DownloadModalProps) {
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
-      {!isAuthenticated && <Button style={{padding: "0px", height: "36px"}} ><SignIn /></Button>}
+      {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
       {isAuthenticated && <Button onClick={download}>Download</Button>}
       </Modal.Footer>
     </Modal>
