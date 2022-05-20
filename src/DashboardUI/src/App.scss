@@ -13,8 +13,10 @@ a {
   .accordion-body {
     background-color: #FAFAFA;
   }
-  
-  .accordion-button, .accordion-button:not(.collapsed), .accordion-button:focus{
+
+  .accordion-button,
+  .accordion-button:not(.collapsed),
+  .accordion-button:focus {
     background-color: #FAFAFA;
     color: black;
     border: none;
@@ -22,7 +24,7 @@ a {
     font-size: 1.2rem;
     box-shadow: none;
   }
-  
+
   .accordion-item {
     border: none;
   }
