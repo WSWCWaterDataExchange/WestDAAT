@@ -2,7 +2,6 @@ import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "ma
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import * as turf from '@turf/turf';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import { AppContext } from "../AppProvider";
@@ -41,7 +40,8 @@ function Map() {
     mapPopup,
     mapBoundSettings,
     setRenderedFeatures,
-    setMapClickedFeatures } = useContext(MapContext);
+    setMapClickedFeatures,
+    setPolylineFilter } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
@@ -120,30 +120,16 @@ function Map() {
 
       // DRAW AND update BASICALLY DO THE SAME
       mapInstance.on('draw.create', function (e) {
-
+        setPolylineFilter('Polygon', e.features);
         console.log(e);
-
-        console.log(JSON.stringify(e.features[0]))
-
-        // var polygonBoundingBox = turf.bbox(e.features[0].geometry);
-        // console.log('e', e, '\nfeature', polygonBoundingBox);
-
-        // do something here to get the areas to apply on the filter, then apply it to the
-
-        // FILTER EXISTING DATA WITH THIS INTERSECTION AND UPDATE TO ONLY DISPLAY WHAT IT IS INSIDE
-        //fetchAllocationData(getPolygonMapIntersect(mapInstance, e.features[0]).slice(2));
       });
 
       mapInstance.on('draw.update', function (e) {
-        console.log("update");
-        // UPDATE WITH NEW FILTER, MAYBE THEY WANT 2 SECTIONS
-        //   fetchAllocationData(getPolygonMapIntersect(mapInstance, e.features[0]).slice(2));
+        setPolylineFilter('Polygon', e.features);
       });
 
       mapInstance.on('draw.delete', function (e) {
-        console.log("Delete")
-        // use the full data, or just refetch the data, whatever is easier
-        // RESET WATHEVER THE FILTER HAS DONE TO A PREVIOUS STATE
+        setPolylineFilter('Polygon', "");
       });
 
       mapConfig.sources.forEach(a => {
@@ -158,29 +144,6 @@ function Map() {
     });
   }, [setMap]);/* eslint-disable-line *//* We don't want to run this when mapStyle updates */
 
-  // function getPolygonMapIntersect(mapInstance: mapboxgl.Map, userPolygon: turf.AllGeoJSON) {
-  //   var polygonBoundingBox = turf.bbox(userPolygon);
-
-  //   var southWest = [polygonBoundingBox[0], polygonBoundingBox[1]];
-  //   var northEast = [polygonBoundingBox[2], polygonBoundingBox[3]];
-
-  //   var northEastPointPixel = mapInstance.project(northEast);
-  //   var southWestPointPixel = mapInstance.project(southWest);
-
-  //   var features = mapInstance.queryRenderedFeatures([southWestPointPixel, northEastPointPixel], {layers: visibleLayers});
-
-  //   return features.reduce(function (memo, feature) {
-  //     if (feature.geometry.coordinates[0].constructor === Array) {
-  //       feature.geometry.coordinates = feature.geometry.coordinates[0];
-  //     }
-
-  //     if (turf.inside(feature, userPolygon)) {
-  //       memo.push(feature.properties.allocationId);
-  //     }
-  //     return memo;
-  //   }, ['in', 'allocationId']);
-  // }
-
   const sourceIds = useMemo(() => {
     return mapConfig.sources.map(a => a.id)
   }, [])
@@ -192,7 +155,7 @@ function Map() {
     setRenderedFeatures(s => {
       return map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
     })
-  }, 500)
+  }, 5000)
 
   useEffect(() => {
     if (!map) return;
