@@ -48,7 +48,8 @@ interface WaterRightsFilters {
   maxVolume: number | undefined,
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
-  maxPriorityDate: number | undefined
+  maxPriorityDate: number | undefined,
+  polyline?: string[]
 }
 
 interface WaterRightsDisplayOptions {
@@ -111,7 +112,8 @@ const defaultFilters: WaterRightsFilters = {
   maxVolume: undefined,
   podPou: undefined,
   minPriorityDate: undefined,
-  maxPriorityDate: undefined
+  maxPriorityDate: undefined,
+  polyline: undefined,
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -454,7 +456,6 @@ function WaterRightsTab() {
           autoClose: 1000
         })
     } else {
-
       const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
         const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
         const fieldStr = field as string;
@@ -469,6 +470,7 @@ function WaterRightsTab() {
 
         return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
       }
+
       if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
       const filterSet = ["all"] as any[];
       if (filters.podPou === "POD" || filters.podPou === "POU") {
@@ -513,6 +515,9 @@ function WaterRightsTab() {
       if (filters.maxPriorityDate !== undefined) {
         filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
       }
+
+      var customObject = [{ "type": "Feature", "properties": {}, "geometry": { "coordinates": [[[-106.86780296644264, 43.78356799708203], [-107.04367068260066, 40.991536265492755], [-98.6899541650915, 41.28953811572137], [-100.0529289653167, 46.420741830271055], [-106.86780296644264, 43.78356799708203]]], "type": "Polygon" } }];
+      filterSet.push(["any", ...customObject.map(a => ["within", a])]);
 
       setMapLayerFilters(allWaterRightsLayers.map(a => {
         return { layer: a, filter: filterSet }
