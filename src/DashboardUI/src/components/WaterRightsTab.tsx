@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -23,10 +23,8 @@ import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
-import BeneficialUseSelect, { BeneficialUseChangeOption } from "./BeneficialUseSelect";
+import BeneficialUseSelect from "./BeneficialUseSelect";
 import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
-import AlertIcon from 'mdi-react/AlertIcon';
-
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -34,22 +32,8 @@ enum MapGrouping {
   WaterSourceType = "wsType"
 }
 
-const convertLayersToBeneficialUseOptions = (beneficialUses: BeneficialUseListItem[] | undefined) => {
-
-  const convertTest = (beneficialuse: BeneficialUseListItem) => {
-    return {
-      value: beneficialuse.beneficialUseName,
-      label: <> <span>{beneficialuse.beneficialUseName}</span><AlertIcon /></>
-    }
-  }
-
-  return beneficialUses?.map(a => {
-    return convertTest(a);
-  }).filter(a => a !== undefined) as unknown as BeneficialUseChangeOption[];
-}
-
 interface WaterRightsFilters {
-  beneficialUses?: string[],
+  beneficialUses?: BeneficialUseListItem[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
   riverBasinNames?: string[],
@@ -218,7 +202,7 @@ function WaterRightsTab() {
     }
     let colorMappings = [...mapGrouping.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses?.length > 0) {
-      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
+      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b.beneficialUseName === a.key));
     }
     if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
       colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
@@ -333,15 +317,11 @@ function WaterRightsTab() {
     }));
   }
 
-  const handleBeneficialUseChange = (selectedOptions: BeneficialUseChangeOption[]) => {
+  const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions.length > 0 ? selectedOptions.map(a => { return a.value }) : undefined
-    })
-
-    );
-
-    return selectedOptions;
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
+    }));
   }
 
   const handleStateChange = (selectedOptions: string[]) => {
@@ -448,7 +428,7 @@ function WaterRightsTab() {
       filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
     }
     if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
+      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a.beneficialUseName, ["get", waterRightsProperties.beneficialUses]])]);
     }
     if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
       filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
@@ -583,10 +563,12 @@ function WaterRightsTab() {
               </div>
               <div className="mb-3">
                 <label>Beneficial Use</label>
-                <div className="mb-3">
-                  <label>Beneficial Use</label>
-                  <BeneficialUseSelect selectedOptions={[]} options={convertLayersToBeneficialUseOptions(allBeneficialUses)} onChange={handleBeneficialUseChange} />
-                </div>
+
+                <BeneficialUseSelect
+                  selectedOptions={filters.beneficialUses}
+                  options={allBeneficialUses}
+                  onChange={handleBeneficialUseChange}
+                />
               </div>
               <div className="mb-3">
                 <label>Water Source Type</label>
