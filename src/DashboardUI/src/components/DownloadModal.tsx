@@ -30,7 +30,7 @@ function DownloadModal(props: DownloadModalProps) {
       </Modal.Header>
       <Modal.Body>
       { !isAuthenticated && <p>
-          Sign up <strong>completely free</strong> or login for down access of up to 100.000
+          Sign up <strong>completely free</strong> or login for down access of up to 100,000
           water rights points.
         </p>}
       { isAuthenticated && <p>Nulla lacinia pharetra velit, eget malesuada arcu finibus vel.
