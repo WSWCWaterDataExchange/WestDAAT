@@ -14,6 +14,8 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomSharedControl";
 
 import ReactDOM from "react-dom";
+import { Offcanvas, ProgressBar } from "react-bootstrap";
+import TableView from "./TableView";
 
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -305,6 +307,11 @@ function Map() {
           {legend}
         </div>
       }
+      {legend && map &&
+        <div className={`legend ${legendClass}`}>
+          {legend}
+        </div>
+      }      
       {map &&
         mapAlert
       }

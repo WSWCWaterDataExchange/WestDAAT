@@ -9,6 +9,8 @@ import TermsModal from '../components/TermsModal';
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
 import FeedbackModal from '../components/FeedbackModal';
+import { Offcanvas, ProgressBar } from 'react-bootstrap';
+import TableView from '../components/TableView';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
@@ -59,9 +61,12 @@ function HomePage() {
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1">
-          <Map />
+          <Map />               
+          <div className="position-relative h-100">
+          <TableView />
         </div>
-      </div>
+        </div>        
+      </div>      
 
       <SiteFooter
         showFeedbackModal={shouldShowFeedbackModal}
