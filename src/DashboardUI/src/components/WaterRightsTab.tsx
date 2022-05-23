@@ -49,7 +49,7 @@ interface WaterRightsFilters {
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
-  polyline?: string[]
+  polyline: { source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[]
 }
 
 interface WaterRightsDisplayOptions {
@@ -113,7 +113,7 @@ const defaultFilters: WaterRightsFilters = {
   podPou: undefined,
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
-  polyline: undefined,
+  polyline: []
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -183,6 +183,7 @@ function WaterRightsTab() {
     setLayerFilters: setMapLayerFilters,
     setVisibleLayers,
     renderedFeatures,
+    polylineFilter,
     setLayerCircleColors,
     setLayerFillColors,
     setVectorUrl,
@@ -307,6 +308,12 @@ function WaterRightsTab() {
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
+  const [polygonFilter, setPolylineFilter ] = useState<{ source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[]>(filters.polyline ?? []);
+
+  useEffect(() => {
+    setPolylineFilter(polylineFilter);
+    filters.polyline = polylineFilter;
+  }, [setPolylineFilter, polylineFilter, filters])
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
@@ -515,15 +522,14 @@ function WaterRightsTab() {
       if (filters.maxPriorityDate !== undefined) {
         filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
       }
-
-      var customObject = [{ "type": "Feature", "properties": {}, "geometry": { "coordinates": [[[-106.86780296644264, 43.78356799708203], [-107.04367068260066, 40.991536265492755], [-98.6899541650915, 41.28953811572137], [-100.0529289653167, 46.420741830271055], [-106.86780296644264, 43.78356799708203]]], "type": "Polygon" } }];
-      filterSet.push(["any", ...customObject.map(a => ["within", a])]);
-
+      if(polygonFilter && polygonFilter.length > 0){
+        filterSet.push(["any", ...polygonFilter.map(a => ["within", a.data])]);
+      }
       setMapLayerFilters(allWaterRightsLayers.map(a => {
         return { layer: a, filter: filterSet }
       }))
     }
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, polygonFilter])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });

@@ -70,7 +70,9 @@ interface MapContextState {
   mapClickedFeatures: MapClickType | null,
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
-  setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>
+  setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
+  polylineFilter: { source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[],
+  setPolylineFilter: (source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void
 };
 
 const defaultState: MapContextState = {
@@ -104,7 +106,9 @@ const defaultState: MapContextState = {
   mapClickedFeatures: null,
   setMapClickedFeatures: () => { },
   mapPopup: null,
-  setMapPopup: () => { }
+  setMapPopup: () => { },
+  polylineFilter: [],
+  setPolylineFilter: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -258,6 +262,20 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
+  const [polylineFilter, setAllPolylineFilter] = useState<{ source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[]>([]);
+  const setPolylineFilter = useCallback((source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+    setAllPolylineFilter(s => {
+      const unchangedData = s.filter(a => a.source !== source && source !== null && a.data !== null);
+      if (data !== null && source !== null) {
+        const updatedData = [...unchangedData, { source, data }];
+        if (!deepEqual(s, updatedData)) {
+          return updatedData;
+        }
+      }
+      return unchangedData;
+    });
+  }, [setAllPolylineFilter])
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -289,7 +307,9 @@ const MapProvider: FC = ({ children }) => {
     mapClickedFeatures,
     setMapClickedFeatures,
     mapPopup,
-    setMapPopup
+    setMapPopup,
+    polylineFilter,
+    setPolylineFilter
   };
 
   return (

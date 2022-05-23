@@ -10,7 +10,7 @@ import mapConfig from "../config/maps";
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { nldi } from "../config/constants";
-import { useDrop } from "react-dnd";
+import { DragPreviewImage, useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomSharedControl";
 
@@ -41,7 +41,8 @@ function Map() {
     mapBoundSettings,
     setRenderedFeatures,
     setMapClickedFeatures,
-    setPolylineFilter } = useContext(MapContext);
+    setPolylineFilter,
+    polylineFilter } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
@@ -49,8 +50,6 @@ function Map() {
   let geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
   }));
-
-  // useEffect (do data ) [filters]
 
   const addSvgImage = async (map: mapboxgl.Map, id: string, svg: string): Promise<void> => {
     const canvas = new OffscreenCanvas(24, 24);
@@ -105,7 +104,6 @@ function Map() {
 
       const drawControl = new MapboxDraw({
         displayControlsDefault: false,
-        boxSelect: true,
         controls: {
           polygon: true,
           trash: true
@@ -118,20 +116,16 @@ function Map() {
         setCoords(e.lngLat.wrap());
       });
 
-      // DRAW AND update BASICALLY DO THE SAME
       mapInstance.on('draw.create', function (e) {
-        setPolylineFilter('Polygon', e.features);
-        console.log(e);
+        setPolylineFilter(e.features[0].id, e.features[0]);
       });
-
       mapInstance.on('draw.update', function (e) {
-        setPolylineFilter('Polygon', e.features);
+        setPolylineFilter(e.features[0].id, e.features[0]);
       });
-
       mapInstance.on('draw.delete', function (e) {
-        setPolylineFilter('Polygon', "");
+        setPolylineFilter(e.features[0].id, null);
       });
-
+      
       mapConfig.sources.forEach(a => {
         var { id, ...src } = a;
         mapInstance.addSource(id, src as AnySourceImpl)
