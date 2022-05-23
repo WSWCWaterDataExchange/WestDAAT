@@ -1,4 +1,4 @@
-import Select, { StylesConfig } from 'react-select';
+import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
@@ -94,18 +94,21 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     </div>
   );
 
-  const selectedOptions: BeneficialUseChangeOption[] = mapToBeneficialUseOptions(props.selectedOptions);
-
   const handleChanges = (currentSelectedOptions: BeneficialUseChangeOption[]): void => {
-    if (currentSelectedOptions.some(typeFilter => typeFilter.consumptiveFilter === true)) {
+    if (currentSelectedOptions.some(option => option.consumptiveFilter === true)) {
+      // filter by category option selected
       var selected: BeneficialUseListItem[] = [];
       currentSelectedOptions.forEach(option => {
         if (option.consumptiveFilter) {
           var newSelected = props.options?.filter(f => f.consumptionCategory === option.category) ?? [];
-          newSelected.forEach(beneficialUse => { selected.push(beneficialUse) });
+          newSelected.forEach(beneficialUse => {
+            if (!currentSelectedOptions.some(f => f.value === beneficialUse.beneficialUseName)) {
+              selected.push(beneficialUse)
+            }
+          });
         }
       })
-      props.onChange([...mapToBeneficialUseListItem(currentSelectedOptions), ...selected]);
+      props.onChange([...mapToBeneficialUseListItem(currentSelectedOptions.filter(f => f.consumptiveFilter !== true)), ...selected]);
     } else {
       props.onChange(mapToBeneficialUseListItem(currentSelectedOptions));
     }
@@ -119,7 +122,7 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
         formatGroupLabel={formatGroupLabel}
         onChange={a => handleChanges([...a])}
         closeMenuOnSelect={false}
-        value={selectedOptions}
+        value={mapToBeneficialUseOptions(props.selectedOptions)}
       />
     </>
   );
