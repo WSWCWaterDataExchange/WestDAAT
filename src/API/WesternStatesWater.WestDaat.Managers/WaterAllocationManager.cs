@@ -3,6 +3,7 @@ using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
@@ -29,6 +30,19 @@ namespace WesternStatesWater.WestDaat.Managers
             _siteAccessor = siteAccessor;
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
+        }
+
+        async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            //TODO: call mapper
+            var accessorSearchRequest = new WaterRightsSearchCriteria();
+            //TODO: if boundaries is not null then call to convert GeoJson
+
+            var result = await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest);
+
+            //TODO: map result
+
+            return result;
         }
 
         async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
