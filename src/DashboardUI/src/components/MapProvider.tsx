@@ -71,8 +71,8 @@ interface MapContextState {
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
-  polylineFilter: { source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[],
-  setPolylineFilter: (source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void
+  polylines: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  setPolylines: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
 };
 
 const defaultState: MapContextState = {
@@ -107,8 +107,8 @@ const defaultState: MapContextState = {
   setMapClickedFeatures: () => { },
   mapPopup: null,
   setMapPopup: () => { },
-  polylineFilter: [],
-  setPolylineFilter: () => { }
+  polylines: [],
+  setPolylines: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -262,19 +262,22 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
-  const [polylineFilter, setAllPolylineFilter] = useState<{ source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null }[]>([]);
-  const setPolylineFilter = useCallback((source: string | null, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
-    setAllPolylineFilter(s => {
+  const [polylines, setAllPolylines] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
+  const setPolylines = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+    setAllPolylines(s => {
       const unchangedData = s.filter(a => a.source !== source && source !== null && a.data !== null);
       if (data !== null && source !== null) {
         const updatedData = [...unchangedData, { source, data }];
+        
         if (!deepEqual(s, updatedData)) {
           return updatedData;
+        }else{
+          return s;
         }
       }
       return unchangedData;
     });
-  }, [setAllPolylineFilter])
+  }, [setAllPolylines])
 
   const mapContextProviderValue = {
     mapStyle,
@@ -308,8 +311,8 @@ const MapProvider: FC = ({ children }) => {
     setMapClickedFeatures,
     mapPopup,
     setMapPopup,
-    polylineFilter,
-    setPolylineFilter
+    polylines,
+    setPolylines
   };
 
   return (
