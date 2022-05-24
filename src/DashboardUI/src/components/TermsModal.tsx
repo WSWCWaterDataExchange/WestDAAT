@@ -12,7 +12,7 @@ function TermsModal(props: TermsModalProps) {
   }
 
   return (
-    <Modal {...props} aria-labelledby="contained-modal-title-vcenter" centered>
+    <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
           Terms and Conditions

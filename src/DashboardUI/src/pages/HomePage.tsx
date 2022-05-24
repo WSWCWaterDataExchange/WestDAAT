@@ -5,12 +5,13 @@ import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
 import TermsModal from '../components/TermsModal';
+import FeedbackModal from '../components/FeedbackModal';
+import DownloadModal from '../components/DownloadModal';
+import { Offcanvas, ProgressBar } from 'react-bootstrap';
+import TableView from '../components/TableView';
 
 import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
-import FeedbackModal from '../components/FeedbackModal';
-import { Offcanvas, ProgressBar } from 'react-bootstrap';
-import TableView from '../components/TableView';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data",
@@ -25,6 +26,7 @@ function HomePage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const containerRef = useRef(null);
 
@@ -38,6 +40,10 @@ function HomePage() {
 
   const shouldShowFeedbackModal = (show: boolean) => {
     setShowFeedbackModal(show);
+  }
+
+  const shouldShowDownloadModal = (show: boolean) => {
+    setShowDownloadModal(show);
   }
 
   useEffect(() => {
@@ -59,6 +65,7 @@ function HomePage() {
         currentTab={currentTab}
         showContactModal={shouldShowContactModal}
         showTermsModal={shouldShowTermsModal}
+        showDownloadModal={shouldShowDownloadModal}
       />
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
@@ -77,6 +84,7 @@ function HomePage() {
       <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
       <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
+      <DownloadModal show={showDownloadModal} setShow={shouldShowDownloadModal} />
     </div>
   );
 }
