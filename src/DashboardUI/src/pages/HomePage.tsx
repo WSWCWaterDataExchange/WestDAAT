@@ -7,7 +7,6 @@ import SiteNavbar from '../components/SiteNavbar';
 import TermsModal from '../components/TermsModal';
 import FeedbackModal from '../components/FeedbackModal';
 import DownloadModal from '../components/DownloadModal';
-import { Offcanvas, ProgressBar } from 'react-bootstrap';
 import TableView from '../components/TableView';
 
 import '../styles/home-page.scss';
