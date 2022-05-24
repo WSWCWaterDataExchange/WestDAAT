@@ -166,7 +166,7 @@ function Map() {
     setRenderedFeatures(s => {
       return map.queryRenderedFeatures().filter(a => sourceIds.some(b => a.source === b));
     })
-  }, 5000)
+  }, 500)
 
   useEffect(() => {
     if (!map) return;
