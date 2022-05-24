@@ -71,9 +71,7 @@ function HomePage() {
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1" ref={containerRef}>
           <Map />               
-          {/* <div className="position-relative h-100"> */}
-            <TableView containerRef={containerRef} />
-          {/* </div> */}
+          <TableView containerRef={containerRef} />
         </div>        
       </div>      
 

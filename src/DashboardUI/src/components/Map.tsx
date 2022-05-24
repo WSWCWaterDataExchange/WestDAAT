@@ -306,11 +306,6 @@ function Map() {
         <div className={`legend ${legendClass}`}>
           {legend}
         </div>
-      }
-      {legend && map &&
-        <div className={`legend ${legendClass}`}>
-          {legend}
-        </div>
       }      
       {map &&
         mapAlert
