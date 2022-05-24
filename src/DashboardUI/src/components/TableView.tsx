@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button, Offcanvas, ProgressBar } from "react-bootstrap";
-import { mdiChevronUp } from '@mdi/js';
+import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
 import Icon from "@mdi/react";
 
@@ -17,7 +17,7 @@ function TableView(props: TableViewProps) {
   return <>
     <Button type="button" className={`table-view-toggle-btn ${show ? "toggle-on" : null}`} onClick={toggleShow}>
       ANALYTICS & TABLE
-      <Icon path={mdiChevronUp} size="1.5em" />
+      <Icon path={show ? mdiChevronDown : mdiChevronUp} size="1.5em" />
     </Button>    
     <Offcanvas 
     show={show} 
