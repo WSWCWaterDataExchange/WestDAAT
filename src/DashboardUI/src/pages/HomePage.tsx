@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ContactModal from '../components/ContactModal';
 import Map from '../components/Map';
 import SidePanel from '../components/SidePanel';
@@ -25,6 +25,8 @@ function HomePage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  const containerRef = useRef(null);
 
   const shouldShowContactModal = (show: boolean) => {
     setShowContactModal(show);
@@ -60,11 +62,11 @@ function HomePage() {
       />
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
-        <div className="flex-grow-1">
+        <div className="flex-grow-1" ref={containerRef}>
           <Map />               
-          <div className="position-relative h-100">
-          <TableView />
-        </div>
+          {/* <div className="position-relative h-100"> */}
+            <TableView containerRef={containerRef} />
+          {/* </div> */}
         </div>        
       </div>      
 

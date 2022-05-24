@@ -1,17 +1,39 @@
 @import './colors.scss';
 
-.buttonTest {
+.offcanvas {
+  position: relative !important;
+  //bottom: 30vh !important;
+  //transition: transform 5s !important;
+  transition: none;
+
+  &.offcanvas-bottom {
+    right: auto !important;
+    left: auto !important;  
+    bottom: 30vh;
+    transition: none;
+  }
+
+}
+
+.table-view-toggle-btn {
   position: absolute;
-  top: -34px;
-  right: 42%;
-  margin: 0px;
+  bottom: 42px;
+  //right: 50%;
+  margin: 0 auto;
   background-color: $bs-gray-900;
   color: $text-color-light;
   // Just behind the geocode search results
-  z-index: 2;
+  z-index: 1045;
   border-bottom-left-radius: 0px !important;
   border-bottom-right-radius: 0px !important;
   border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  border-top-right-radius: 5px;  
+  //transition: transform 5s ease-in-out;
+  transition: none;
 
+  &.toggle-on {
+    transform: translateY(-30vh);    
+    //transition: transform 5s ease-in-out;
+    transition: none;
+  }
 }
