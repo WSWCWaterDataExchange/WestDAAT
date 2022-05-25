@@ -5,7 +5,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
     {
-        Task<WaterRightsSearchResult> FindWaterRights(WaterRightsSearchCriteria searchRequest);
+        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchRequest);
 
         Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
         

@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _geoConnexEngine = geoConnexEngine;
         }
 
-        async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             //TODO: call mapper
             var accessorSearchRequest = new WaterRightsSearchCriteria();

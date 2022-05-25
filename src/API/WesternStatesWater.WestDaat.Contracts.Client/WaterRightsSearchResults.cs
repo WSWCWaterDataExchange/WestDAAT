@@ -8,5 +8,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public class WaterRightsSearchResults
     {
+        public long CurrentPageNumber { get; set; }
+
     }
 }
