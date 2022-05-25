@@ -27,6 +27,7 @@ import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 import { toast } from "react-toastify";
+import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -720,21 +721,10 @@ function WaterRightsTab() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">
-            <Accordion.Header>
+            <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
-              <div className="onoffswitch">
-                <input
-                  type="checkbox"
-                  name="onoffswitch4"
-                  className="onoffswitch-checkbox"
-                  id="myonoffswitch"
-                  checked={isNldiMapActive}
-                  onChange={(e) => setNldiMapStatus(e.target.checked)}
-                />
-                <label className="onoffswitch-label" htmlFor="myonoffswitch">
-                  <span className="onoffswitch-inner"></span>
-                  <span className="onoffswitch-switch"></span>
-                </label>
+              <div className="px-5">
+                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" onChange={(e) => setNldiMapStatus(e.valueOf())} />
               </div>
             </Accordion.Header>
             <Accordion.Body >
