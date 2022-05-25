@@ -70,7 +70,9 @@ interface MapContextState {
   mapClickedFeatures: MapClickType | null,
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
-  setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>
+  setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
+  polylines: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  setPolylines: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
 };
 
 const defaultState: MapContextState = {
@@ -104,7 +106,9 @@ const defaultState: MapContextState = {
   mapClickedFeatures: null,
   setMapClickedFeatures: () => { },
   mapPopup: null,
-  setMapPopup: () => { }
+  setMapPopup: () => { },
+  polylines: [],
+  setPolylines: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -258,6 +262,23 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
+  const [polylines, setAllPolylines] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
+  const setPolylines = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+    setAllPolylines(s => {
+      const unchangedData = s.filter(a => a.source !== source && source !== null && a.data !== null);
+      if (data !== null && source !== null) {
+        const updatedData = [...unchangedData, { source, data }];
+        
+        if (!deepEqual(s, updatedData)) {
+          return updatedData;
+        }else{
+          return s;
+        }
+      }
+      return unchangedData;
+    });
+  }, [setAllPolylines])
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -289,7 +310,9 @@ const MapProvider: FC = ({ children }) => {
     mapClickedFeatures,
     setMapClickedFeatures,
     mapPopup,
-    setMapPopup
+    setMapPopup,
+    polylines,
+    setPolylines
   };
 
   return (
