@@ -2,7 +2,6 @@ import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
-import { CSSProperties } from 'react';
 
 interface BeneficialUseSelectProps {
   options: BeneficialUseListItem[] | undefined;
@@ -21,15 +20,6 @@ interface BeneficialUseChangeOption {
   readonly consumptiveFilter: boolean;
   readonly category?: ConsumptionCategoryType;
 }
-
-const consumptiveOption: BeneficialUseChangeOption =
-  { value: 'ConsumptiveType', category: ConsumptionCategoryType.Consumptive, label: <><span>Consumptive </span><CloseCircleOutline color="red" /></>, consumptiveFilter: true };
-
-const nonconsumptiveOption: BeneficialUseChangeOption =
-  { value: 'NonConsumptiveType', category: ConsumptionCategoryType.NonConsumptive, label: <><span>Non-Consumptive </span><SyncIcon color="green" /></>, consumptiveFilter: true };
-
-const unspecifiedOption: BeneficialUseChangeOption =
-  { value: 'UnspecifiedType', category: ConsumptionCategoryType.Unspecified, label: <><span>Unspecified </span></>, consumptiveFilter: true };
 
 function BeneficialUseSelect(props: BeneficialUseSelectProps) {
 
@@ -57,44 +47,20 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     }).filter(a => a !== undefined) as BeneficialUseChangeOption[];
   }
 
-  const groupedOptions: GroupedOption[] = [
-    {
-      label: 'Filter by Beneficial Use Category',
-      options: [],
-    },
-    {
-      label: 'Filter by Specified Beneficial Use',
-      options: mapToBeneficialUseOptions(props.options),
-    },
-  ];
+  const consumptiveOption: BeneficialUseChangeOption =
+    { value: 'ConsumptiveType', category: ConsumptionCategoryType.Consumptive, label: <><span>Consumptive </span><CloseCircleOutline color="red" /></>, consumptiveFilter: true };
 
-  const groupStyles = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between"
-  };
-  const groupBadgeStyles: CSSProperties = {
-    backgroundColor: "#EBECF0",
-    borderRadius: "2em",
-    color: "#172B4D",
-    display: "inline-block",
-    fontSize: 12,
-    fontWeight: "normal",
-    lineHeight: "1",
-    minWidth: 1,
-    padding: "0.16666666666667em 0.5em",
-    textAlign: "center"
-  };
-  const filterHeaderStyle: CSSProperties = {
-    fontWeight: "bold",
-    color: "black",
-    fontSize: 12
-  }
+  const nonconsumptiveOption: BeneficialUseChangeOption =
+    { value: 'NonConsumptiveType', category: ConsumptionCategoryType.NonConsumptive, label: <><span>Non-Consumptive </span><SyncIcon color="green" /></>, consumptiveFilter: true };
+
+  const unspecifiedOption: BeneficialUseChangeOption =
+    { value: 'UnspecifiedType', category: ConsumptionCategoryType.Unspecified, label: <><span>Unspecified </span></>, consumptiveFilter: true };
+
+
   const formatGroupLabel = (data: GroupedOption) => (
-    <div style={groupStyles}>
-      <span style={filterHeaderStyle}>{data.label}</span>
-      <span style={groupBadgeStyles}>{data.options?.length}</span>
-    </div>
+    <div className='group-styles'>
+      <span className='filter-header-style'>{data.label}</span>
+    </div >
   );
 
   const handleChanges = (currentSelectedOptions: BeneficialUseChangeOption[]): void => {
@@ -139,7 +105,16 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
       consumptiveCategoryOptions.push(unspecifiedOption);
     }
 
-    groupedOptions[0].options = consumptiveCategoryOptions;
+    const groupedOptions: GroupedOption[] = [
+      {
+        label: 'Filter by Beneficial Use Category',
+        options: consumptiveCategoryOptions,
+      },
+      {
+        label: 'Filter by Specified Beneficial Use',
+        options: mapToBeneficialUseOptions(props.options),
+      },
+    ];
     return groupedOptions;
   }
 
