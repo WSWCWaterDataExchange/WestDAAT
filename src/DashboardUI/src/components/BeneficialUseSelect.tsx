@@ -2,6 +2,7 @@ import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
+import { useEffect, useState } from 'react';
 
 interface BeneficialUseSelectProps {
   options: BeneficialUseListItem[] | undefined;
@@ -11,7 +12,7 @@ interface BeneficialUseSelectProps {
 
 interface GroupedOption {
   readonly label: string;
-  options: readonly BeneficialUseChangeOption[];
+  options: BeneficialUseChangeOption[];
 }
 
 interface BeneficialUseChangeOption {
@@ -83,17 +84,18 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     }
   }
 
+  useEffect(() => {
+    setAvailableDropDownOptions(calculateAvailableDropDownOptions());
+  }, [props.selectedOptions])
+
   const allSelected = (categoryType: ConsumptionCategoryType) => {
     const selectedCountByCategory = props.selectedOptions?.filter(option => option.consumptionCategory === categoryType).length;
     const totalCountByCategory = props.options?.filter(option => option.consumptionCategory === categoryType).length;
 
-    if (selectedCountByCategory === totalCountByCategory) {
-      return true;
-    }
-    return false;
+    return (selectedCountByCategory === totalCountByCategory);
   }
 
-  const availableDropdownOptions = () => {
+  const calculateAvailableDropDownOptions = () => {
     var consumptiveCategoryOptions = [];
     if (!allSelected(ConsumptionCategoryType.Consumptive)) {
       consumptiveCategoryOptions.push(consumptiveOption);
@@ -118,11 +120,13 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     return groupedOptions;
   }
 
+  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<GroupedOption[]>(calculateAvailableDropDownOptions())
+
   return (
     <>
       <Select<BeneficialUseChangeOption, true, GroupedOption>
         isMulti
-        options={availableDropdownOptions()}
+        options={availableDropdownOptions}
         formatGroupLabel={formatGroupLabel}
         onChange={a => handleChanges([...a])}
         closeMenuOnSelect={false}
