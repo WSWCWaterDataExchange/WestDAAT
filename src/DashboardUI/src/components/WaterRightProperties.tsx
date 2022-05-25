@@ -2,6 +2,7 @@ import { Card, Col, Row } from 'react-bootstrap';
 import { useWaterRightDetails } from '../hooks/useWaterRightQuery';
 import Domain from 'mdi-react/DomainIcon';
 import FormatListBulleted from 'mdi-react/FormatListBulletedIcon';
+import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
 
 interface waterRightPropertiesProps {
   waterRightId: string;
@@ -63,40 +64,27 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
               </Card.Body>
             </Card>
           </Col>
+          <Col>
+            <Card>
+              <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Method Information</Card.Header>
+              <Card.Body>
+                <div className='d-flex p-2 flex-column'>
+                  <span className='property-name'>Applicable Resource Type</span>
+                  <span className='property-value'>{waterRightDetails.applicableResourceType}</span>
+
+                  <span className='property-name'>Method Type</span>
+                  <span className='property-value'>{waterRightDetails.methodType}</span>
+
+                  <span className='property-name'>Method Link</span>
+                  <span className='property-value'>{waterRightDetails.methodLink}</span>
+
+                  <span className='property-name'>Method Description</span>
+                  <span className='property-value'>{waterRightDetails.methodDescription}</span>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
         </Row>
-
-
-        {/* <div className='d-flex p-2 flex-column'>
-          <h4>Water Right Info</h4>
-          <span className='property-name'>WaDE ID</span>
-          <span className='property-value'>{waterRightDetails.allocationAmountId}</span>
-
-          <span className='property-name'>Native ID</span>
-          <span className='property-value'>{waterRightDetails.allocationNativeId}</span>
-
-          <span className='property-name'>Owner</span>
-          <span className='property-value'>{waterRightDetails.allocationOwner}</span>
-
-          <span className='property-name'>Priority Date</span>
-          <span className='property-value'><FormattedDate>{waterRightDetails.priorityDate}</FormattedDate></span>
-
-          <span className='property-name'>Expiration Date</span>
-          <span className='property-value'><FormattedDate>{waterRightDetails.expirationDate}</FormattedDate></span>
-
-          <span className='property-name'>Legal Status</span>
-          <span className='property-value'>{waterRightDetails.allocationLegalStatus}</span>
-
-          <span className='property-name'>Assigned Flow (CFS)</span>
-          <span className='property-value'>{waterRightDetails.allocationFlowCfs}</span>
-
-          <span className='property-name'>Assigned Volume (AF)</span>
-          <span className='property-value'>{waterRightDetails.allocationVolumeAF}</span>
-
-          <span className='property-name'>Beneficial Use</span>
-          {waterRightDetails.beneficialUses.map(a => <span key={a} className='property-value'>{a}</span>)}
-
-        </div> */}
-
       </>}
     </div>
   )
