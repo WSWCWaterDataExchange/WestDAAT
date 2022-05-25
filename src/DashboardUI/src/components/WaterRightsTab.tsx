@@ -340,7 +340,7 @@ function WaterRightsTab() {
   }, [displayOptions, setUrlParam])
 
   const handleMapGroupingChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setFilters(s => ({
+    setDisplayOptions(s => ({
       ...s,
       mapGrouping: e.target.value as MapGrouping
     }));
