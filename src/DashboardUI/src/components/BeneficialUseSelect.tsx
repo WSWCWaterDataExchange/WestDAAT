@@ -12,7 +12,7 @@ interface BeneficialUseSelectProps {
 
 interface GroupedOption {
   readonly label: string;
-  readonly options: readonly BeneficialUseChangeOption[];
+  options: readonly BeneficialUseChangeOption[];
 }
 
 interface BeneficialUseChangeOption {
@@ -22,11 +22,14 @@ interface BeneficialUseChangeOption {
   readonly category?: ConsumptionCategoryType;
 }
 
-const consumptiveCategoryOptions: BeneficialUseChangeOption[] = [
-  { value: 'ConsumptiveType', category: ConsumptionCategoryType.Consumptive, label: <><span>Consumptive </span><CloseCircleOutline color="red" /></>, consumptiveFilter: true },
-  { value: 'NonConsumptiveType', category: ConsumptionCategoryType.NonConsumptive, label: <><span>Non-Consumptive </span><SyncIcon color="green" /></>, consumptiveFilter: true },
-  { value: 'UnspecifiedType', category: ConsumptionCategoryType.Unspecified, label: <><span>Unspecified </span></>, consumptiveFilter: true },
-];
+const consumptiveOption: BeneficialUseChangeOption =
+  { value: 'ConsumptiveType', category: ConsumptionCategoryType.Consumptive, label: <><span>Consumptive </span><CloseCircleOutline color="red" /></>, consumptiveFilter: true };
+
+const nonconsumptiveOption: BeneficialUseChangeOption =
+  { value: 'NonConsumptiveType', category: ConsumptionCategoryType.NonConsumptive, label: <><span>Non-Consumptive </span><SyncIcon color="green" /></>, consumptiveFilter: true };
+
+const unspecifiedOption: BeneficialUseChangeOption =
+  { value: 'UnspecifiedType', category: ConsumptionCategoryType.Unspecified, label: <><span>Unspecified </span></>, consumptiveFilter: true };
 
 function BeneficialUseSelect(props: BeneficialUseSelectProps) {
 
@@ -57,7 +60,7 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
   const groupedOptions: GroupedOption[] = [
     {
       label: 'Filter by Beneficial Use Category',
-      options: consumptiveCategoryOptions,
+      options: [],
     },
     {
       label: 'Filter by Specified Beneficial Use',
@@ -114,11 +117,37 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
     }
   }
 
+  const allSelected = (categoryType: ConsumptionCategoryType) => {
+    const selectedCountByCategory = props.selectedOptions?.filter(option => option.consumptionCategory === categoryType).length;
+    const totalCountByCategory = props.options?.filter(option => option.consumptionCategory === categoryType).length;
+
+    if (selectedCountByCategory === totalCountByCategory) {
+      return true;
+    }
+    return false;
+  }
+
+  const availableDropdownOptions = () => {
+    var consumptiveCategoryOptions = [];
+    if (!allSelected(ConsumptionCategoryType.Consumptive)) {
+      consumptiveCategoryOptions.push(consumptiveOption);
+    }
+    if (!allSelected(ConsumptionCategoryType.NonConsumptive)) {
+      consumptiveCategoryOptions.push(nonconsumptiveOption);
+    }
+    if (!allSelected(ConsumptionCategoryType.Unspecified)) {
+      consumptiveCategoryOptions.push(unspecifiedOption);
+    }
+
+    groupedOptions[0].options = consumptiveCategoryOptions;
+    return groupedOptions;
+  }
+
   return (
     <>
       <Select<BeneficialUseChangeOption, true, GroupedOption>
         isMulti
-        options={groupedOptions}
+        options={availableDropdownOptions()}
         formatGroupLabel={formatGroupLabel}
         onChange={a => handleChanges([...a])}
         closeMenuOnSelect={false}
