@@ -12,13 +12,8 @@ import Icon from '@mdi/react';
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
-import { toast } from "react-toastify";
 
-interface NldiTabProps {
-  isEnabled: boolean;
-}
-
-function NldiTab(props: NldiTabProps) {
+function NldiTab() {
   interface NldiDataType {
     latitude: number | null,
     longitude: number | null,
@@ -54,14 +49,6 @@ function NldiTab(props: NldiTabProps) {
   }, [setPointData])
 
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
-    if (props.isEnabled === false) {
-      toast.error("NLDI Features are not turned On, please turn on to use this feature",
-        {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
-          autoClose: 1000
-        })
-    } else {
       let lat = parseFloat(latValue);
       let long = parseFloat(longValue);
       let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
@@ -101,8 +88,7 @@ function NldiTab(props: NldiTabProps) {
         latitude: lat.toFixed(nldi.latLongPrecision),
         longitude: long.toFixed(nldi.latLongPrecision)
       }));
-    }
-  }, [props.isEnabled])
+  }, [])
 
   const handleLatitudeBlurred = () => {
     setLatLongData(pointData.latitude, pointData.longitude);
@@ -129,7 +115,7 @@ function NldiTab(props: NldiTabProps) {
   }
 
   const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude, props.isEnabled);
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
