@@ -85,42 +85,43 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
   }
 
   useEffect(() => {
+
+    const allSelected = (categoryType: ConsumptionCategoryType) => {
+      const selectedCountByCategory = props.selectedOptions?.filter(option => option.consumptionCategory === categoryType).length;
+      const totalCountByCategory = props.options?.filter(option => option.consumptionCategory === categoryType).length;
+
+      return (selectedCountByCategory === totalCountByCategory);
+    }
+
+    const calculateAvailableDropDownOptions = () => {
+      var consumptiveCategoryOptions = [];
+      if (!allSelected(ConsumptionCategoryType.Consumptive)) {
+        consumptiveCategoryOptions.push(consumptiveOption);
+      }
+      if (!allSelected(ConsumptionCategoryType.NonConsumptive)) {
+        consumptiveCategoryOptions.push(nonconsumptiveOption);
+      }
+      if (!allSelected(ConsumptionCategoryType.Unspecified)) {
+        consumptiveCategoryOptions.push(unspecifiedOption);
+      }
+
+      const groupedOptions: GroupedOption[] = [
+        {
+          label: 'Filter by Beneficial Use Category',
+          options: consumptiveCategoryOptions,
+        },
+        {
+          label: 'Filter by Specified Beneficial Use',
+          options: mapToBeneficialUseOptions(props.options),
+        },
+      ];
+      return groupedOptions;
+    }
+
     setAvailableDropDownOptions(calculateAvailableDropDownOptions());
   }, [props.selectedOptions])
 
-  const allSelected = (categoryType: ConsumptionCategoryType) => {
-    const selectedCountByCategory = props.selectedOptions?.filter(option => option.consumptionCategory === categoryType).length;
-    const totalCountByCategory = props.options?.filter(option => option.consumptionCategory === categoryType).length;
-
-    return (selectedCountByCategory === totalCountByCategory);
-  }
-
-  const calculateAvailableDropDownOptions = () => {
-    var consumptiveCategoryOptions = [];
-    if (!allSelected(ConsumptionCategoryType.Consumptive)) {
-      consumptiveCategoryOptions.push(consumptiveOption);
-    }
-    if (!allSelected(ConsumptionCategoryType.NonConsumptive)) {
-      consumptiveCategoryOptions.push(nonconsumptiveOption);
-    }
-    if (!allSelected(ConsumptionCategoryType.Unspecified)) {
-      consumptiveCategoryOptions.push(unspecifiedOption);
-    }
-
-    const groupedOptions: GroupedOption[] = [
-      {
-        label: 'Filter by Beneficial Use Category',
-        options: consumptiveCategoryOptions,
-      },
-      {
-        label: 'Filter by Specified Beneficial Use',
-        options: mapToBeneficialUseOptions(props.options),
-      },
-    ];
-    return groupedOptions;
-  }
-
-  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<GroupedOption[]>(calculateAvailableDropDownOptions())
+  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<GroupedOption[]>([])
 
   return (
     <>
