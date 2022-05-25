@@ -1,72 +1,132 @@
-import Select, { StylesConfig } from 'react-select';
-import chroma from "chroma-js";
-
-export interface BeneficialUseChangeOption {
-  value: string; // layerId
-  label: string;
-  color: string | undefined;
-}
+import Select from 'react-select';
+import { BeneficialUseListItem, ConsumptionCategoryType } from '../data-contracts/BeneficialUseListItem';
+import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
+import SyncIcon from 'mdi-react/SyncIcon';
+import { useEffect, useState } from 'react';
 
 interface BeneficialUseSelectProps {
-  options: BeneficialUseChangeOption[];
-  selectedOptions: BeneficialUseChangeOption[];
-  onChange: (selectedOptions: BeneficialUseChangeOption[]) => void;
+  options: BeneficialUseListItem[] | undefined;
+  selectedOptions: BeneficialUseListItem[] | undefined;
+  onChange: (selectedOptions: BeneficialUseListItem[]) => void;
 }
+
+interface GroupedOption {
+  readonly label: string;
+  options: BeneficialUseChangeOption[];
+}
+
+interface BeneficialUseChangeOption {
+  readonly value: string;
+  readonly label: JSX.Element;
+  readonly consumptiveFilter: boolean;
+  readonly category?: ConsumptionCategoryType;
+}
+
+const consumptiveOption: BeneficialUseChangeOption =
+  { value: 'ConsumptiveType', category: ConsumptionCategoryType.Consumptive, label: <><span>Consumptive </span><CloseCircleOutline color="red" /></>, consumptiveFilter: true };
+
+const nonconsumptiveOption: BeneficialUseChangeOption =
+  { value: 'NonConsumptiveType', category: ConsumptionCategoryType.NonConsumptive, label: <><span>Non-Consumptive </span><SyncIcon color="green" /></>, consumptiveFilter: true };
+
+const unspecifiedOption: BeneficialUseChangeOption =
+  { value: 'UnspecifiedType', category: ConsumptionCategoryType.Unspecified, label: <><span>Unspecified </span></>, consumptiveFilter: true };
 
 function BeneficialUseSelect(props: BeneficialUseSelectProps) {
 
-  const displayNone = () => ({
-    display: 'none'
-  });
+  const mapToBeneficialUseListItem = (selectedOptions: BeneficialUseChangeOption[]) => {
+    return selectedOptions?.map(a => { return { beneficialUseName: a.value, consumptionCategory: a.category } })
+      .filter(a => a !== undefined) as BeneficialUseListItem[]
+  }
 
-  // Can't use CSS, must use JS for these styles
-  const layerOptionStyles: StylesConfig<BeneficialUseChangeOption, true> = {
-    dropdownIndicator: (styles) => ({
-      ...styles,
-      color: "#3a4046",
-      ":hover": {
-        color: "#3a4046",
-      },
-    }),
-    placeholder: displayNone,
-    indicatorSeparator: displayNone,
-    multiValue: (styles, { data }) => {
-      if(data.color){
-        const color = chroma(data.color);
-        return {
-          ...styles,
-          backgroundColor: color.darken().alpha(0.3).css(),
-        };
+  const mapToBeneficialUseOptions = (beneficialUses: BeneficialUseListItem[] | undefined) => {
+
+    return beneficialUses?.map(a => {
+      var label = <span>{a.beneficialUseName}</span>;
+
+      if (a.consumptionCategory === ConsumptionCategoryType.Consumptive) {
+        label = <><span>{a.beneficialUseName} </span><CloseCircleOutline color="red" /></>
       }
-      return styles;
-    },
-    multiValueLabel: (styles) => ({
-      ...styles,
-      color: 'black',
-    }),
-    multiValueRemove: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-      ':hover': {
-        backgroundColor: data.color,
-        color: 'white',
+      else if (a.consumptionCategory === ConsumptionCategoryType.NonConsumptive) {
+        label = <><span>{a.beneficialUseName} </span><SyncIcon color="green" /></>
+      }
+      return {
+        value: a.beneficialUseName,
+        label: label,
+        category: a.consumptionCategory
+      }
+    }).filter(a => a !== undefined) as BeneficialUseChangeOption[];
+  }
+
+  const formatGroupLabel = (data: GroupedOption) => (
+    <div className='group-styles'>
+      <span className='filter-header-style'>{data.label}</span>
+    </div >
+  );
+
+  const handleChanges = (currentSelectedOptions: BeneficialUseChangeOption[]): void => {
+    if (currentSelectedOptions.some(option => option.consumptiveFilter === true)) {
+      // filter by category option selected
+      var selected: BeneficialUseListItem[] = [];
+      currentSelectedOptions.forEach(option => {
+        if (option.consumptiveFilter) {
+          var newSelected = props.options?.filter(f => f.consumptionCategory === option.category) ?? [];
+          newSelected.forEach(beneficialUse => {
+            if (!currentSelectedOptions.some(f => f.value === beneficialUse.beneficialUseName)) {
+              selected.push(beneficialUse)
+            }
+          });
+        }
+      })
+      props.onChange([...mapToBeneficialUseListItem(currentSelectedOptions.filter(f => f.consumptiveFilter !== true)), ...selected]);
+    } else {
+      props.onChange(mapToBeneficialUseListItem(currentSelectedOptions));
+    }
+  }
+
+  useEffect(() => {
+
+    const allSelected = (categoryType: ConsumptionCategoryType) => {
+      const selectedCountByCategory = props.selectedOptions?.filter(option => option.consumptionCategory === categoryType).length;
+      const totalCountByCategory = props.options?.filter(option => option.consumptionCategory === categoryType).length;
+
+      return (selectedCountByCategory === totalCountByCategory);
+    }
+
+    var consumptiveCategoryOptions = [];
+    if (!allSelected(ConsumptionCategoryType.Consumptive)) {
+      consumptiveCategoryOptions.push(consumptiveOption);
+    }
+    if (!allSelected(ConsumptionCategoryType.NonConsumptive)) {
+      consumptiveCategoryOptions.push(nonconsumptiveOption);
+    }
+    if (!allSelected(ConsumptionCategoryType.Unspecified)) {
+      consumptiveCategoryOptions.push(unspecifiedOption);
+    }
+
+    const groupedOptions: GroupedOption[] = [
+      {
+        label: 'Filter by Beneficial Use Category',
+        options: consumptiveCategoryOptions,
       },
-    }),
-    menu: (styles) => ({
-      ...styles,
-      zIndex: 10
-    })
-  };
+      {
+        label: 'Filter by Specified Beneficial Use',
+        options: mapToBeneficialUseOptions(props.options),
+      },
+    ];
+    setAvailableDropDownOptions(groupedOptions);
+  }, [props.selectedOptions, props.options])
+
+  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<GroupedOption[]>([])
 
   return (
     <>
-      <Select
-        value={props.selectedOptions}
+      <Select<BeneficialUseChangeOption, true, GroupedOption>
         isMulti
-        onChange={a=>props.onChange([...a])}
+        options={availableDropdownOptions}
+        formatGroupLabel={formatGroupLabel}
+        onChange={a => handleChanges([...a])}
         closeMenuOnSelect={false}
-        options={props.options}
-        styles={layerOptionStyles}
+        value={mapToBeneficialUseOptions(props.selectedOptions)}
       />
     </>
   );
