@@ -48,7 +48,8 @@ interface WaterRightsFilters {
   maxVolume: number | undefined,
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
-  maxPriorityDate: number | undefined
+  maxPriorityDate: number | undefined,
+  polyline: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>}[]
 }
 
 interface WaterRightsDisplayOptions {
@@ -111,7 +112,8 @@ const defaultFilters: WaterRightsFilters = {
   maxVolume: undefined,
   podPou: undefined,
   minPriorityDate: undefined,
-  maxPriorityDate: undefined
+  maxPriorityDate: undefined,
+  polyline: []
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -181,6 +183,8 @@ function WaterRightsTab() {
     setLayerFilters: setMapLayerFilters,
     setVisibleLayers,
     renderedFeatures,
+    polylines,
+    setPolylines,
     setLayerCircleColors,
     setLayerFillColors,
     setVectorUrl,
@@ -188,6 +192,19 @@ function WaterRightsTab() {
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
+
+  useEffect(() =>{
+    for (var element of filters.polyline){
+      setPolylines(element.source, element.data);
+    }
+  }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
+
+  useEffect(() =>{
+    setFilters((s) =>({
+      ...s,
+      polyline: polylines
+    }))
+  }, [setFilters, polylines])
 
   useEffect(() => {
     let params = (new URL(document.location.href)).searchParams;
@@ -305,7 +322,7 @@ function WaterRightsTab() {
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
-
+  
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
       setUrlParam("wr", undefined);
@@ -454,7 +471,6 @@ function WaterRightsTab() {
           autoClose: 1000
         })
     } else {
-
       const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
         const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
         const fieldStr = field as string;
@@ -469,6 +485,7 @@ function WaterRightsTab() {
 
         return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
       }
+
       if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
       const filterSet = ["all"] as any[];
       if (filters.podPou === "POD" || filters.podPou === "POU") {
@@ -513,7 +530,9 @@ function WaterRightsTab() {
       if (filters.maxPriorityDate !== undefined) {
         filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
       }
-
+      if(filters.polyline && filters.polyline.length > 0){
+        filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
+      }
       setMapLayerFilters(allWaterRightsLayers.map(a => {
         return { layer: a, filter: filterSet }
       }))
@@ -524,6 +543,9 @@ function WaterRightsTab() {
     setFilters({ ...defaultFilters });
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
+    polylines.forEach(a => {
+      setPolylines(a.source, null);
+    })
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
