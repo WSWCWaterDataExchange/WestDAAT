@@ -1,6 +1,7 @@
 import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import { AppContext } from "../AppProvider";
@@ -12,6 +13,7 @@ import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomSharedControl";
+import { Feature } from 'geojson';
 
 import ReactDOM from "react-dom";
 
@@ -39,9 +41,12 @@ function Map() {
     mapPopup,
     mapBoundSettings,
     setRenderedFeatures,
-    setMapClickedFeatures } = useContext(MapContext);
+    setMapClickedFeatures,
+    setPolylines,
+    polylines } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
+  const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   let geocoderControl = useRef(new MapboxGeocoder({
@@ -76,6 +81,30 @@ function Map() {
     }
   }
 
+  const mapboxDrawControl = (mapInstance: mapboxgl.Map) => {
+    const dc = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: true
+      }
+    });
+
+    mapInstance.addControl(dc);
+
+    mapInstance.on('draw.create', function (e) {
+      setPolylines(e.features[0].id, e.features[0]);
+    });
+    mapInstance.on('draw.update', function (e) {
+      setPolylines(e.features[0].id, e.features[0]);
+    });
+    mapInstance.on('draw.delete', function (e) {
+      setPolylines(e.features[0].id, null);
+    });
+
+    setDrawControl(dc);
+  }
+
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
     const mapInstance = new mapboxgl.Map({
@@ -99,13 +128,17 @@ function Map() {
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
+      mapboxDrawControl(mapInstance);
+
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
       });
+
       mapConfig.sources.forEach(a => {
         var { id, ...src } = a;
         mapInstance.addSource(id, src as AnySourceImpl)
       })
+
       mapConfig.layers.forEach((a: any) => {
         mapInstance.addLayer(a)
       })
@@ -113,6 +146,14 @@ function Map() {
       setMap(mapInstance);
     });
   }, [setMap]);/* eslint-disable-line *//* We don't want to run this when mapStyle updates */
+
+  useEffect(() => {
+    if (!map) return;
+    drawControl?.deleteAll();
+    for (var element of polylines) {
+      drawControl?.add(element.data as unknown as Feature);
+    }
+  }, [polylines, setPolylines, map, drawControl])
 
   const sourceIds = useMemo(() => {
     return mapConfig.sources.map(a => a.id)
