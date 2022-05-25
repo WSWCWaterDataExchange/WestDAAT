@@ -50,7 +50,7 @@ interface WaterRightsFilters {
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
-  polyline: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>}[]
+  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>}[]
 }
 
 interface WaterRightsDisplayOptions {
@@ -196,7 +196,7 @@ function WaterRightsTab() {
 
   useEffect(() =>{
     for (var element of filters.polyline){
-      setPolylines(element.source, element.data);
+      setPolylines(element.identifier, element.data);
     }
   }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
 
@@ -529,7 +529,6 @@ function WaterRightsTab() {
       setMapLayerFilters(allWaterRightsLayers.map(a => {
         return { layer: a, filter: filterSet }
       }))
-    }
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive])
 
   const clearMapFilters = () => {
@@ -537,7 +536,7 @@ function WaterRightsTab() {
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
     polylines.forEach(a => {
-      setPolylines(a.source, null);
+      setPolylines(a.identifier, null);
     })
   }
 

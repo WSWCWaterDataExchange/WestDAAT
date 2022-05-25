@@ -71,8 +71,8 @@ interface MapContextState {
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
-  polylines: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-  setPolylines: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
+  polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
 };
 
 const defaultState: MapContextState = {
@@ -262,12 +262,12 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
-  const [polylines, setAllPolylines] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
-  const setPolylines = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+  const [polylines, setAllPolylines] = useState<{ identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
+  const setPolylines = useCallback((identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
     setAllPolylines(s => {
-      const unchangedData = s.filter(a => a.source !== source && source !== null && a.data !== null);
-      if (data !== null && source !== null) {
-        const updatedData = [...unchangedData, { source, data }];
+      const unchangedData = s.filter(a => identifier !== null && a.identifier !== identifier &&  a.data !== null);
+      if (data !== null && identifier !== null) {
+        const updatedData = [...unchangedData, { identifier, data }];
         
         if (!deepEqual(s, updatedData)) {
           return updatedData;

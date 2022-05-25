@@ -13,7 +13,6 @@ import { nldi } from "../config/constants";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomSharedControl";
-import { Feature } from 'geojson';
 
 import ReactDOM from "react-dom";
 
@@ -151,7 +150,7 @@ function Map() {
     if (!map) return;
     drawControl?.deleteAll();
     for (var element of polylines) {
-      drawControl?.add(element.data as unknown as Feature);
+      drawControl?.add(element.data);
     }
   }, [polylines, setPolylines, map, drawControl])
 
