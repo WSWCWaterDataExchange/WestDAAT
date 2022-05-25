@@ -217,7 +217,6 @@ function NldiTab() {
 
 export default NldiTab;
 
-
 function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
   const [{ dropResult }, dragRef] = useDrag({
     type: 'nldiMapPoint',
