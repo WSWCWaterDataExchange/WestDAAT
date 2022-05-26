@@ -20,8 +20,24 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
+            var beneficalUsesList = searchCriteria.BeneficialUses.ToList();
+
             using var db = _databaseContextFactory.Create();
-            var result = db.
+            var waterRightDetails = await db.AllocationAmountsFact
+                .Include(x => x.AllocationBridgeBeneficialUsesFact)
+                .Where(x => x.AllocationBridgeBeneficialUsesFact.Any(b => 
+                    beneficalUsesList.Contains(b.BeneficialUse.WaDEName)))
+                .Select(x => new WaterRightsSearchDetail
+                {
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName).ToArray()
+                })
+                .ToArrayAsync();
+
+            return new WaterRightsSearchResults
+            {
+                CurrentPageNumber = 1,
+                WaterRightsDetails = waterRightDetails
+            };
         }
 
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)

@@ -6,6 +6,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     public interface IWaterAllocationAccessor : IServiceContractBase
     {
+        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
+
         Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId);
 
         Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId);
@@ -19,6 +21,5 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<SiteLocation>> GetWaterRightSiteLocationsById(long waterRightId);
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
-        Task<object> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
     }
 }

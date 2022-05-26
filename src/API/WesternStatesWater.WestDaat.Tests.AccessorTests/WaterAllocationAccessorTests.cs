@@ -10,6 +10,36 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
+        public async Task FindWaterRights_SearchByBeneficalUse()
+        {
+            // Arrange
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(1);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocationAmount);
+                db.SaveChanges();
+            }
+
+            var expectedBeneficialUse = beneficialUses.First().WaDEName;
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                BeneficialUses = new[] { expectedBeneficialUse }
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.FirstOrDefault().BeneficialUses.Should().AllBeEquivalentTo(expectedBeneficialUse);
+        }
+
+        [TestMethod]
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange

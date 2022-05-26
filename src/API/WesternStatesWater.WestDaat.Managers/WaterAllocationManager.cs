@@ -38,9 +38,13 @@ namespace WesternStatesWater.WestDaat.Managers
             var accessorSearchRequest = new WaterRightsSearchCriteria();
             //TODO: if boundaries is not null then call to convert GeoJson
 
-            var result = await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest);
+            var accessorResult = await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest);
 
             //TODO: map result
+            var result = new ClientContracts.WaterRightsSearchResults
+            {
+                CurrentPageNumber = accessorResult.CurrentPageNumber
+            };
 
             return result;
         }
