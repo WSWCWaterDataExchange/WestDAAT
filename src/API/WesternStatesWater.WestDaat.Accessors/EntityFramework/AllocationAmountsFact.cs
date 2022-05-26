@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LinqKit;
+using System.ComponentModel.DataAnnotations;
 
 namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
@@ -69,5 +70,29 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual OwnerClassificationCv OwnerClassification { get; set; }
         public virtual ICollection<AllocationBridgeBeneficialUsesFact> AllocationBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
+
+        #region Filters
+        public static ExpressionStarter<AllocationAmountsFact> HasBeneficialUses(List<string> beneficalUses)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
+                    beneficalUses.Contains(
+                        !string.IsNullOrWhiteSpace(b.BeneficialUse.WaDEName) ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name)));
+
+            return predicate;
+        }
+
+        public static ExpressionStarter<AllocationAmountsFact> HasOwnerClassifications(List<string> ownerClassifications)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => ownerClassifications.Contains(
+                !string.IsNullOrWhiteSpace(x.OwnerClassification.WaDEName) ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name));
+
+            return predicate;
+        }
+
+        #endregion
     }
 }

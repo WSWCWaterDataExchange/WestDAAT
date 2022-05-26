@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -19,19 +20,29 @@ namespace WesternStatesWater.WestDaat.Accessors
         
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
-        {
-            var beneficalUsesList = searchCriteria.BeneficialUses.ToList();
+        {            
+            var predicate = AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList());
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
                 .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                .Where(x => x.AllocationBridgeBeneficialUsesFact.Any(b => 
-                    beneficalUsesList.Contains(b.BeneficialUse.WaDEName)))
+                .Where(predicate)
                 .Select(x => new WaterRightsSearchDetail
                 {
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName).ToArray()
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()
                 })
                 .ToArrayAsync();
+
+            //using var db = _databaseContextFactory.Create();
+            //var waterRightDetails = await db.AllocationAmountsFact
+            //    .Include(x => x.AllocationBridgeBeneficialUsesFact)
+            //    .Where(x => x.AllocationBridgeBeneficialUsesFact.Any(b => 
+            //        beneficalUsesList.Contains(b.BeneficialUse.WaDEName)))
+            //    .Select(x => new WaterRightsSearchDetail
+            //    {
+            //        BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName).ToArray()
+            //    })
+            //    .ToArrayAsync();
 
             return new WaterRightsSearchResults
             {
@@ -39,6 +50,15 @@ namespace WesternStatesWater.WestDaat.Accessors
                 WaterRightsDetails = waterRightDetails
             };
         }
+
+        //private static ExpressionStarter<AllocationAmountsFact> HasBeneficialUses(List<string> beneficalUsesList)
+        //{
+        //    var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+        //    predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
+        //            beneficalUsesList.Contains(b.BeneficialUse.WaDEName)));
+        //    return predicate;
+        //}
 
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {

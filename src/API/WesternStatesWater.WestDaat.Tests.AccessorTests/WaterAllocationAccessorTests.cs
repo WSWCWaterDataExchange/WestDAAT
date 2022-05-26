@@ -10,25 +10,32 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        public async Task FindWaterRights_SearchByBeneficalUse()
+        [DataRow("expectedName", "name2", "expectedName")]
+        [DataRow("", "expectedName", "expectedName")]
+        [DataRow("expectedName", "", "expectedName")]
+        public async Task FindWaterRights_SearchByBeneficalUse_ReturnsOneMatch(string beneficialUseWadeName, string beneficialUseName, string expectedName)
         {
             // Arrange
             var beneficialUses = new BeneficialUsesCVFaker().Generate(1);
+            beneficialUses[0].WaDEName = beneficialUseWadeName;
+            beneficialUses[0].Name = beneficialUseName;
 
-            var allocationAmount = new AllocationAmountFactFaker()
+            var allocationAmountTarget = new AllocationAmountFactFaker()
                 .LinkBeneficialUses(beneficialUses.ToArray())
                 .Generate();
+            var allocationAmountOthers = new AllocationAmountFactFaker()
+                .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate(1).ToArray())
+                .Generate(3);
             using (var db = CreateDatabaseContextFactory().Create())
             {
-                db.AllocationAmountsFact.Add(allocationAmount);
+                db.AllocationAmountsFact.Add(allocationAmountTarget);
+                db.AllocationAmountsFact.AddRange(allocationAmountOthers);
                 db.SaveChanges();
             }
 
-            var expectedBeneficialUse = beneficialUses.First().WaDEName;
-
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
-                BeneficialUses = new[] { expectedBeneficialUse }
+                BeneficialUses = new[] { expectedName }
             };
 
             //Act
@@ -36,7 +43,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(searchCriteria);
 
             //Assert
-            result.WaterRightsDetails.FirstOrDefault().BeneficialUses.Should().AllBeEquivalentTo(expectedBeneficialUse);
+            result.WaterRightsDetails.FirstOrDefault().BeneficialUses.Should().Contain(expectedName);
         }
 
         [TestMethod]
