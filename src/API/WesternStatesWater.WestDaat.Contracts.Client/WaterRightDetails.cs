@@ -9,6 +9,7 @@
         public string ReportYearStartMonth { get; set; }
         public string ReportYearTypeCv { get; set; }
         public string VariableCv { get; set; }
+        public string VariableSpecific { get; set; }
 
         public string OrganizationName { get; set; }
         public string State { get; set; }

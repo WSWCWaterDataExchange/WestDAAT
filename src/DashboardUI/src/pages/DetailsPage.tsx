@@ -10,6 +10,7 @@ import SiteTabs from '../components/SiteTabs';
 import useProgressIndicator from '../hooks/useProgressIndicator';
 import { useMemo } from 'react';
 import { useWaterRightDetails, useWaterRightSiteInfoList, useWaterRightSiteLocations, useWaterRightSourceInfoList } from '../hooks/useWaterRightQuery';
+import ChevronLeft from 'mdi-react/ChevronLeftIcon';
 
 interface detailPageProps {
   detailType: "site" | "right";
@@ -35,11 +36,12 @@ function DetailsPage(props: detailPageProps) {
   return (
     <>
       <div className="detail-page d-flex flex-column">
-        <div className='d-flex flex-row align-items-center title-header'>
-          <h3 className='d-flex me-auto'>WaDE {isSiteDetail ? "Site" : "Right"} ID: {id} </h3>
+        <div className='d-flex flex-row align-items-center justify-content-md-between title-header'>
           <div className='p-2'>
-            <Button variant="secondary" size="lg">Return to Map</Button>
+            <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button>
           </div>
+          <h3 className='d-flex fw-bold'>WaDE {isSiteDetail ? "Site" : "Right"} ID: {id} </h3>
+
           <div className='p-2'>
             <Button size="lg">Download Data</Button>
           </div>
