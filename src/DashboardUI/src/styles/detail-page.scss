@@ -36,6 +36,9 @@
   font-size: 18px;
   font-weight: bold;
   color: $text-color-black;
+  &.empty {
+    color: $text-color-grey;
+  }
 }
 
 .nav-tabs .nav-link {

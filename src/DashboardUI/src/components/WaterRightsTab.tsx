@@ -23,6 +23,8 @@ import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
+import BeneficialUseSelect from "./BeneficialUseSelect";
+import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
@@ -36,7 +38,7 @@ enum MapGrouping {
 }
 
 interface WaterRightsFilters {
-  beneficialUses?: string[],
+  beneficialUses?: BeneficialUseListItem[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
   riverBasinNames?: string[],
@@ -238,7 +240,7 @@ function WaterRightsTab() {
     }
     let colorMappings = [...mapGrouping.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses?.length > 0) {
-      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
+      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b.beneficialUseName === a.key));
     }
     if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
       colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
@@ -379,10 +381,10 @@ function WaterRightsTab() {
     }));
   }
 
-  const handleBeneficialUseChange = (selectedOptions: string[]) => {
+  const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions.length > 0 ? selectedOptions : undefined
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
     }));
   }
 
@@ -482,58 +484,58 @@ function WaterRightsTab() {
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     }
 
-    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
-    const filterSet = ["all"] as any[];
-    if (filters.podPou === "POD" || filters.podPou === "POU") {
-      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+      if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
+      const filterSet = ["all"] as any[];
+      if (filters.podPou === "POD" || filters.podPou === "POU") {
+        filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+      }
+      if (filters.includeExempt !== undefined) {
+        filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
+      }
+      if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
+        filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a.beneficialUseName, ["get", waterRightsProperties.beneficialUses]])]);
+      }
+      if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
+        filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
+      }
+      if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
+        filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+      }
+      if (riverBasinPolygons && riverBasinPolygons.features) {
+        filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
+      }
+      if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
+        filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
+      }
+      if (filters.allocationOwner && filters.allocationOwner.length > 0) {
+        filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
+      }
+      if (filters.maxFlow !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
+      }
+      if (filters.minFlow !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
+      }
+      if (filters.maxVolume !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
+      }
+      if (filters.minVolume !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
+      }
+      if (filters.minPriorityDate !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+      }
+      if (filters.maxPriorityDate !== undefined) {
+        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+      }
+      if(filters.polyline && filters.polyline.length > 0){
+        filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
+      }
+      setMapLayerFilters(allWaterRightsLayers.map(a => {
+        return { layer: a, filter: filterSet }
+      }))
     }
-    if (filters.includeExempt !== undefined) {
-      filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
-    }
-    if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
-    }
-    if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
-      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
-    }
-    if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
-      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
-    }
-    if (riverBasinPolygons && riverBasinPolygons.features) {
-      filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
-    }
-    if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
-      filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
-    }
-    if (filters.allocationOwner && filters.allocationOwner.length > 0) {
-      filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
-    }
-    if (filters.maxFlow !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
-    }
-    if (filters.minFlow !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
-    }
-    if (filters.maxVolume !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
-    }
-    if (filters.minVolume !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
-    }
-    if (filters.minPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
-    }
-    if (filters.maxPriorityDate !== undefined) {
-      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
-    }
-    if (filters.polyline && filters.polyline.length > 0) {
-      filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
-    }
-
-    setMapLayerFilters(allWaterRightsLayers.map(a => {
-      return { layer: a, filter: filterSet }
-    }))
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, geoJsonData])
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });
@@ -632,18 +634,12 @@ function WaterRightsTab() {
               </div>
               <div className="mb-3">
                 <label>Beneficial Use</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  placeholder="Select Beneficial Use(s)"
-                  options={allBeneficialUses}
-                  optionKey="beneficialUseName"
-                  optionLabel="beneficialUseName"
-                  selected={filters.beneficialUses ?? []}
-                  handleOnChange={handleBeneficialUseChange}
-                  name="beneficialUses"
-                >
 
-                </DropdownMultiselect>
+                <BeneficialUseSelect
+                  selectedOptions={filters.beneficialUses}
+                  options={allBeneficialUses}
+                  onChange={handleBeneficialUseChange}
+                />
               </div>
               <div className="mb-3">
                 <label>Water Source Type</label>
