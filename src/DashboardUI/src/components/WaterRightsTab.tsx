@@ -347,10 +347,10 @@ function WaterRightsTab() {
     }
   }, [displayOptions, setUrlParam])
 
-  const handleMapGroupingChange = (e: MapGrouping | undefined) => {
+  const handleMapGroupingChange = (mapGroupingOption: MapGrouping | undefined) => {
     setDisplayOptions(s => ({
       ...s,
-      mapGrouping: e ? e : MapGrouping.BeneficialUse
+      mapGrouping: mapGroupingOption ? mapGroupingOption : MapGrouping.BeneficialUse
     }));
   }
 
