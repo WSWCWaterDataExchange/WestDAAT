@@ -20,8 +20,18 @@ namespace WesternStatesWater.WestDaat.Accessors
         
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
-        {            
-            var predicate = AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList());
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if(searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
+            {
+                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
+            }
+
+            if(searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
+            }                        
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
@@ -29,7 +39,9 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Where(predicate)
                 .Select(x => new WaterRightsSearchDetail
                 {
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()
+                    AllocationNativeID = x.AllocationNativeId,
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
+                    OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name
                 })
                 .ToArrayAsync();
 

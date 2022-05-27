@@ -78,17 +78,17 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
                     beneficalUses.Contains(
-                        !string.IsNullOrWhiteSpace(b.BeneficialUse.WaDEName) ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name)));
+                        b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name)));
 
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> HasOwnerClassifications(List<string> ownerClassifications)
+        public static ExpressionStarter<AllocationAmountsFact> HasOwnerClassification(List<string> ownerClassifications)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
             predicate = predicate.Or(x => ownerClassifications.Contains(
-                !string.IsNullOrWhiteSpace(x.OwnerClassification.WaDEName) ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name));
+                x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name));
 
             return predicate;
         }

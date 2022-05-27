@@ -43,7 +43,109 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(searchCriteria);
 
             //Assert
+            result.WaterRightsDetails.Count().Should().Be(1);
             result.WaterRightsDetails.FirstOrDefault().BeneficialUses.Should().Contain(expectedName);
+        }
+
+        [TestMethod]
+        [DataRow("expectedName", "name2", "expectedName")]
+        [DataRow("", "expectedName", "expectedName")]
+        public async Task FindWaterRights_SearchByOwnerClassification_ReturnsOneMatch(string ownerClassificationWadeName, string ownerClassificationName, string searchInput)
+        {
+            // Arrange
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(4);
+
+            allocationAmounts[2].OwnerClassificationCV = ownerClassificationName;
+            allocationAmounts[2].OwnerClassification.WaDEName = ownerClassificationWadeName;
+            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;
+
+            var expectedAllocationNativeID = allocationAmounts[2].AllocationNativeId;
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmounts);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                OwnerClassifications = new[] { searchInput }
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(1);
+            result.WaterRightsDetails.FirstOrDefault().AllocationNativeID.Should().Be(expectedAllocationNativeID);
+            result.WaterRightsDetails.FirstOrDefault().OwnerClassification.Should().Be(searchInput);
+        }
+
+        [TestMethod]
+        [DataRow(10, 2, new string[] {"expectedName0", "expectedName1" })]
+        [DataRow(4, 1, new string[] { "expectedName0", "expectedName1" })]
+        [DataRow(10, 0, new string[] { "expectedName0", "expectedName1" })]
+        public async Task FindWaterRights_SearchByOwnerClassification_ReturnsMultipleMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
+        {
+            //TODO: Test with more than 1 ownerClassification is failing because of foriegn key conflict.
+            // Multiple ownerClassifications are being generated with the same name
+
+            // Arrange
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(totalRecordCount);
+
+            var rand = new Random();
+
+            var expectedResults = new List<(string allocationNativeId, string ownerClassification)>();
+
+            var indexRecords = new List<int>();
+
+            for(int i = 0; i < expectedResultCount; i++)
+            {
+                var input = searchInputs[rand.Next(0, searchInputs.Length)];
+
+                var index = rand.Next(0, totalRecordCount);
+                while (indexRecords.Contains(index)) //ensure the same record is not updated twice
+                {
+                    index = rand.Next(0, totalRecordCount);
+                }
+                indexRecords.Add(index);
+
+                allocationAmounts[index].OwnerClassificationCV = input;
+                allocationAmounts[index].OwnerClassification.WaDEName = input;
+                allocationAmounts[index].OwnerClassification.Name = input;
+
+                expectedResults.Add((allocationNativeId: allocationAmounts[index].AllocationNativeId, ownerClassification: input));
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmounts);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                OwnerClassifications = searchInputs
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            expectedResults.Count.Should().Be(expectedResultCount);
+
+            result.WaterRightsDetails.Count().Should().Be(expectedResultCount);
+
+            expectedResults.TrueForAll(x => result.WaterRightsDetails.SingleOrDefault(w => w.AllocationNativeID == x.allocationNativeId) != null);
+
+            foreach(var expectedResult in expectedResults)
+            {
+                var waterRight = result.WaterRightsDetails.FirstOrDefault(x => x.AllocationNativeID == expectedResult.allocationNativeId);
+                waterRight.Should().NotBeNull();
+                searchInputs.Should().Contain(waterRight.OwnerClassification);
+            }            
         }
 
         [TestMethod]
@@ -272,8 +374,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var site = new SitesDimFaker().Generate();
 
             var allocationAmount = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(date)
-                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .SetAllocationPriorityDate(date)                
                 .LinkSites(site)
                 .Generate();
             db.AllocationAmountsFact.Add(allocationAmount);
