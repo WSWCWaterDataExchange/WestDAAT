@@ -49,45 +49,45 @@ function NldiTab() {
   }, [setPointData])
 
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
-      let lat = parseFloat(latValue);
-      let long = parseFloat(longValue);
-      let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
-      let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
-      if (isNaN(lat) || isNaN(long)) {
-        setPointData(s => ({
-          ...s,
-          latitude: pointLat,
-          longitude: pointLong
-        }));
-        setNldiData(s => ({
-          ...s,
-          latitude: null,
-          longitude: null
-        }));
-        return;
-      }
-      if (lat > 90) {
-        lat = 90;
-      } else if (lat < -90) {
-        lat = -90
-      }
-      if (long > 180) {
-        long = 180;
-      } else if (long < -180) {
-        long = -180
-      }
-      lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
-      long = parseFloat(long.toFixed(nldi.latLongPrecision));
-      setNldiData(s => ({
-        ...s,
-        latitude: lat,
-        longitude: long
-      }));
+    let lat = parseFloat(latValue);
+    let long = parseFloat(longValue);
+    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+    if (isNaN(lat) || isNaN(long)) {
       setPointData(s => ({
         ...s,
-        latitude: lat.toFixed(nldi.latLongPrecision),
-        longitude: long.toFixed(nldi.latLongPrecision)
+        latitude: pointLat,
+        longitude: pointLong
       }));
+      setNldiData(s => ({
+        ...s,
+        latitude: null,
+        longitude: null
+      }));
+      return;
+    }
+    if (lat > 90) {
+      lat = 90;
+    } else if (lat < -90) {
+      lat = -90
+    }
+    if (long > 180) {
+      long = 180;
+    } else if (long < -180) {
+      long = -180
+    }
+    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+    long = parseFloat(long.toFixed(nldi.latLongPrecision));
+    setNldiData(s => ({
+      ...s,
+      latitude: lat,
+      longitude: long
+    }));
+    setPointData(s => ({
+      ...s,
+      latitude: lat.toFixed(nldi.latLongPrecision),
+      longitude: long.toFixed(nldi.latLongPrecision)
+    }));
   }, [])
 
   const handleLatitudeBlurred = () => {
@@ -114,7 +114,7 @@ function NldiTab() {
     }));
   }
 
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiCords } = useContext(MapContext);
   const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
@@ -124,6 +124,10 @@ function NldiTab() {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
+
+  useEffect(() => {
+    setNldiCords(nldiData);
+  }, [nldiData, setNldiCords])
 
   const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
   const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({

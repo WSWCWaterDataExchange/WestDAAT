@@ -1,4 +1,4 @@
-import { createContext, FC, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, FC, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
@@ -73,6 +73,8 @@ interface MapContextState {
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
   polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
   setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
+  nldiCords: { latitude: number | null, longitude: number | null } | null,
+  setNldiCords: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null } | null>>,
 };
 
 const defaultState: MapContextState = {
@@ -108,7 +110,9 @@ const defaultState: MapContextState = {
   mapPopup: null,
   setMapPopup: () => { },
   polylines: [],
-  setPolylines: () => { }
+  setPolylines: () => { },
+  nldiCords: null,
+  setNldiCords: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -279,6 +283,8 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllPolylines])
 
+  const [nldiCords, setNldiCords] = useState<{latitude: number | null, longitude: number | null} | null>(null);
+
   const mapContextProviderValue = {
     mapStyle,
     setMapStyle: setMapStyleInternal,
@@ -312,7 +318,9 @@ const MapProvider: FC = ({ children }) => {
     mapPopup,
     setMapPopup,
     polylines,
-    setPolylines
+    setPolylines,
+    nldiCords,
+    setNldiCords
   };
 
   return (
