@@ -42,6 +42,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             using var db = CreateDatabaseContextFactory().Create();
 
             var allocationAmount = new AllocationAmountFactFaker().Generate();
+            allocationAmount.VariableSpecific.AggregationInterval = 5.0M;
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
 
@@ -49,15 +50,32 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var expectedVariable = allocationAmount.VariableSpecific;
             var allocationAmountId = allocationAmount.AllocationAmountId;
 
+            var expectedResult = new CommonContracts.WaterRightDetails
+            {
+                MethodDescription = allocationAmount.Method.MethodDescription,
+                MethodType = allocationAmount.Method.MethodTypeCv,
+                AggregationInterval = expectedVariable.AggregationInterval,
+                AggregationIntervalUnit = expectedVariable.AggregationIntervalUnitCv,
+                AggregationStatistic = expectedVariable.AggregationStatisticCv,
+                AmountUnitCv = expectedVariable.AmountUnitCv,
+                ApplicableResourceType = allocationAmount.Method.ApplicableResourceTypeCv,
+                MethodLink = allocationAmount.Method.MethodNemilink,
+                OrganizationName = expectedOrg.OrganizationName,
+                OrganizationWebsite = expectedOrg.OrganizationWebsite,
+                ReportYearStartMonth = expectedVariable.ReportYearStartMonth,
+                ReportYearTypeCv = expectedVariable.ReportYearTypeCv,
+                State = expectedOrg.State,
+                VariableCv = expectedVariable.VariableCv,
+                VariableSpecific = expectedVariable.VariableSpecificCv,
+            };
+
             // Act
             var accessor = CreateWaterAllocationAccessor();
             var result = await accessor.GetWaterRightDetailsById(allocationAmountId);
 
             // Assert
             result.Should().NotBeNull();
-            result.AllocationOwner.Should().Be(allocationAmount.AllocationOwner);
-            result.OrganizationName.Should().Be(expectedOrg.OrganizationName);
-            result.AggregationInterval.Should().Be(expectedVariable.AggregationInterval);
+            result.Should().BeEquivalentTo(expectedResult);
         }
 
         [TestMethod]
@@ -69,57 +87,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             await call.Should().ThrowAsync<Exception>();
-        }
-
-        [DataTestMethod]
-        [DataRow(0)]
-        [DataRow(1)]
-        [DataRow(2)]
-        public async Task GetWaterRightDetailsById_BeneficialUses(int beneficialUseCount)
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            var beneficialUses = new BeneficialUsesCVFaker().Generate(beneficialUseCount);
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .LinkBeneficialUses(beneficialUses.ToArray())
-                .Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightDetailsById(allocationAmount.AllocationAmountId);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.BeneficialUses.Should().BeEquivalentTo(beneficialUses.Select(a => a.Name));
-        }
-
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("2022-03-30")]
-        public async Task GetWaterRightDetailsById_ExpirationDate(string dateValue)
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .SetAllocationExpirationDate(date)
-                .Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightDetailsById(allocationAmount.AllocationAmountId);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.ExpirationDate.Should().Be(date);
         }
 
         [TestMethod]
