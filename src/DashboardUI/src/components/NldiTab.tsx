@@ -114,7 +114,7 @@ function NldiTab() {
     }));
   }
 
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiCords } = useContext(MapContext);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiFilterData } = useContext(MapContext);
   const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
@@ -126,8 +126,8 @@ function NldiTab() {
   }, [nldiGeoJsonData, setGeoJsonData]);
 
   useEffect(() => {
-    setNldiCords(nldiData);
-  }, [nldiData, setNldiCords])
+    setNldiFilterData(nldiData);
+  }, [nldiData, setNldiFilterData])
 
   const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
   const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
@@ -161,6 +161,7 @@ function NldiTab() {
       layer: 'nldi-usgs-points',
       filter: ["all",
         ["==", ["get", "westdaat_featuredatatype"], "Point"],
+        ["!=", ["get", "westdaat_pointdatasource"], "Wade"],
         pointsTypeFilters,
         directionFilters
       ]

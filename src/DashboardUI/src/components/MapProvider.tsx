@@ -2,6 +2,7 @@ import React, { createContext, FC, ReactElement, useCallback, useContext, useEff
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
+import { Directions, DataPoints } from "../data-contracts/nldi";
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -73,8 +74,8 @@ interface MapContextState {
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
   polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
   setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
-  nldiCords: { latitude: number | null, longitude: number | null } | null,
-  setNldiCords: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null } | null>>,
+  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
+  setNldiFilterData: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>>,
 };
 
 const defaultState: MapContextState = {
@@ -111,8 +112,8 @@ const defaultState: MapContextState = {
   setMapPopup: () => { },
   polylines: [],
   setPolylines: () => { },
-  nldiCords: null,
-  setNldiCords: () => { },
+  nldiFilterData: null,
+  setNldiFilterData: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -283,7 +284,7 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllPolylines])
 
-  const [nldiCords, setNldiCords] = useState<{latitude: number | null, longitude: number | null} | null>(null);
+  const [nldiFilterData, setNldiFilterData] = useState<{latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints} | null>(null);
 
   const mapContextProviderValue = {
     mapStyle,
@@ -319,8 +320,8 @@ const MapProvider: FC = ({ children }) => {
     setMapPopup,
     polylines,
     setPolylines,
-    nldiCords,
-    setNldiCords
+    nldiFilterData,
+    setNldiFilterData
   };
 
   return (
