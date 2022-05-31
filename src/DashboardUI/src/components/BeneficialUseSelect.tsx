@@ -126,6 +126,8 @@ function BeneficialUseSelect(props: BeneficialUseSelectProps) {
         formatGroupLabel={formatGroupLabel}
         onChange={a => handleChanges([...a])}
         closeMenuOnSelect={false}
+        placeholder="Select Beneficial Use(s)"
+        name="beneficialUse"
         value={mapToBeneficialUseOptions(props.selectedOptions)}
       />
     </>
