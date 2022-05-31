@@ -23,7 +23,7 @@ function DetailsPage(props: detailPageProps) {
   const id = useMemo(() => idParam ? idParam : "", [idParam]);
   const isSiteDetail = useMemo(() => props.detailType === "site", [props.detailType]);
 
-  const detailsComponent = isSiteDetail ? <SiteProperties /> : <WaterRightProperties waterRightId={id} />;
+  const detailsComponent = isSiteDetail ? <SiteProperties siteId={id} /> : <WaterRightProperties waterRightId={id} />;
   const mapComponent = isSiteDetail ? <SiteMap /> : <WaterRightMap waterRightId={id} />;
   const tabComponent = isSiteDetail ? <SiteTabs /> : <WaterRightTabs waterRightId={id} />;
 

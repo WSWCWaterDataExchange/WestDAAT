@@ -46,6 +46,12 @@
     display: none;
   }
   .map-popup-card{
+    .map-popup-card-water-rights-link-icon{
+      fill: currentColor;
+      line-height: 1;
+      height: 1em;
+      width: 1em;
+    }
     .map-popup-close-btn{
       margin-top: -7px;
       margin-right: -15px;
@@ -89,12 +95,6 @@
           }
         }
         
-      }
-      .map-popup-card-water-rights-link-icon{
-        fill: currentColor;
-        line-height: 1;
-        height: 1em;
-        width: 1em;
       }
     }
   }
