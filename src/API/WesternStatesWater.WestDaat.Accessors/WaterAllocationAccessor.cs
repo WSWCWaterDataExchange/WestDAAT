@@ -31,14 +31,21 @@ namespace WesternStatesWater.WestDaat.Accessors
             if(searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
             {
                 predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
-            }                        
+            }
+            
+            if(searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
+            }
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
                 .Include(x => x.AllocationBridgeBeneficialUsesFact)
+                .Include(x => x.AllocationBridgeSitesFact)
                 .Where(predicate)
                 .Select(x => new WaterRightsSearchDetail
                 {
+                    SiteUUIDs = x.AllocationBridgeSitesFact.Select(abs => abs.Site.SiteUuid).ToArray(),
                     AllocationNativeID = x.AllocationNativeId,
                     BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
                     OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name

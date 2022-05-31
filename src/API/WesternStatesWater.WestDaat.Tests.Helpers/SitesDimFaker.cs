@@ -39,5 +39,11 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             faker.RuleFor(a => a.County, country);
             return faker;
         }
+
+        public static Faker<SitesDim> LinkWaterSources(this Faker<SitesDim> faker, params WaterSourcesDim[] waterSources)
+        {
+            faker.RuleFor(a => a.WaterSourceBridgeSitesFact, () => waterSources.Select(c => new WaterSourceBridgeSiteFactFaker().RuleFor(wsb => wsb.WaterSource, () => c).Generate()).ToList());
+            return faker;
+        }
     }
 }

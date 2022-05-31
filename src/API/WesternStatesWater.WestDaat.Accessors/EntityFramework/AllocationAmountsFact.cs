@@ -93,6 +93,18 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> HasWaterSourceTypes(List<string> waterSourceTypes)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(
+                sb => sb.Site.WaterSourceBridgeSitesFact.Any(
+                    wsb => waterSourceTypes.Contains(
+                        wsb.WaterSource.WaterSourceTypeCvNavigation.WaDEName.Length > 0 ? wsb.WaterSource.WaterSourceTypeCvNavigation.WaDEName : wsb.WaterSource.WaterSourceTypeCvNavigation.Name))));
+
+            return predicate;
+        }
+
         #endregion
     }
 }

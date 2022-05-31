@@ -57,5 +57,15 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             faker.RuleFor(a => a.AllocationBridgeBeneficialUsesFact, () => beneficialUses.Select(c => new AllocationBridgeBeneficialUsesFactFaker().RuleFor(a => a.BeneficialUse, () => c).Generate()).ToList());
             return faker;
         }
+
+        public static Faker<AllocationAmountsFact> IncludeOwnerClassification(this Faker<AllocationAmountsFact> faker)
+        {
+            faker.RuleFor(a => a.OwnerClassificationCV, b => b.Random.String(10, 'A', 'z'))
+                .RuleFor(a => a.OwnerClassification,
+                    (faker, allocationAmountFact) => new OwnerClassificationCvFaker()
+                        .RuleFor(ownerClassificationCv => ownerClassificationCv.Name, f => allocationAmountFact.OwnerClassificationCV));
+
+            return faker;
+        }
     }
 }
