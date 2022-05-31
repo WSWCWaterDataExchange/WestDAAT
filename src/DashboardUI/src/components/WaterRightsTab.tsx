@@ -1,5 +1,4 @@
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
-import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
@@ -23,10 +22,13 @@ import { getRiverBasinPolygonsByName } from '../accessors/systemAccessor';
 import { useQuery } from 'react-query';
 import { Accordion } from "react-bootstrap";
 import '../App.scss';
+import BeneficialUseSelect from "./BeneficialUseSelect";
+import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 import { toast } from "react-toastify";
+import Select from "react-select";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -35,7 +37,7 @@ enum MapGrouping {
 }
 
 interface WaterRightsFilters {
-  beneficialUses?: string[],
+  beneficialUses?: BeneficialUseListItem[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],
   riverBasinNames?: string[],
@@ -49,7 +51,7 @@ interface WaterRightsFilters {
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
-  polyline: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>}[]
+  polyline: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]
 }
 
 interface WaterRightsDisplayOptions {
@@ -63,6 +65,12 @@ const mapDataTiers = [
   'https://api.maptiler.com/tiles/c03b0c46-b9c3-4574-8498-cbebca00b871/tiles.json?key=IauIQDaqjd29nJc5kJse',
   'https://api.maptiler.com/tiles/6d61092a-7c8a-4cd1-8272-d92cf019730c/tiles.json?key=IauIQDaqjd29nJc5kJse'
 ]
+
+const mapColorLegendOptions = [
+  { value: MapGrouping.BeneficialUse, label: 'Beneficial Use' },
+  { value: MapGrouping.OwnerClassification, label: 'Owner Classification' },
+  { value: MapGrouping.WaterSourceType, label: 'Water Source Type' }
+];
 
 const colors = [
   '#006400',
@@ -193,14 +201,14 @@ function WaterRightsTab() {
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
 
-  useEffect(() =>{
-    for (var element of filters.polyline){
+  useEffect(() => {
+    for (var element of filters.polyline) {
       setPolylines(element.source, element.data);
     }
   }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
 
-  useEffect(() =>{
-    setFilters((s) =>({
+  useEffect(() => {
+    setFilters((s) => ({
       ...s,
       polyline: polylines
     }))
@@ -224,7 +232,7 @@ function WaterRightsTab() {
     }
     let colorMappings = [...mapGrouping.colorMapping];
     if (mapGrouping.property === MapGrouping.BeneficialUse as string && filters.beneficialUses && filters.beneficialUses?.length > 0) {
-      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b === a.key));
+      colorMappings = colorMappings.filter(a => filters.beneficialUses?.some(b => b.beneficialUseName === a.key));
     }
     if (mapGrouping.property === MapGrouping.WaterSourceType as string && filters.waterSourceTypes && filters.waterSourceTypes.length > 0) {
       colorMappings = colorMappings.filter(a => filters.waterSourceTypes?.some(b => b === a.key));
@@ -322,7 +330,7 @@ function WaterRightsTab() {
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
-  
+
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
       setUrlParam("wr", undefined);
@@ -339,10 +347,10 @@ function WaterRightsTab() {
     }
   }, [displayOptions, setUrlParam])
 
-  const handleMapGroupingChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleMapGroupingChange = (mapGroupingOption: MapGrouping | undefined) => {
     setDisplayOptions(s => ({
       ...s,
-      mapGrouping: e.target.value as MapGrouping
+      mapGrouping: mapGroupingOption ? mapGroupingOption : MapGrouping.BeneficialUse
     }));
   }
 
@@ -373,10 +381,10 @@ function WaterRightsTab() {
     }));
   }
 
-  const handleBeneficialUseChange = (selectedOptions: string[]) => {
+  const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions.length > 0 ? selectedOptions : undefined
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
     }));
   }
 
@@ -495,7 +503,7 @@ function WaterRightsTab() {
         filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
       }
       if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-        filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a, ["get", waterRightsProperties.beneficialUses]])]);
+        filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a.beneficialUseName, ["get", waterRightsProperties.beneficialUses]])]);
       }
       if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
         filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
@@ -530,7 +538,7 @@ function WaterRightsTab() {
       if (filters.maxPriorityDate !== undefined) {
         filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
       }
-      if(filters.polyline && filters.polyline.length > 0){
+      if (filters.polyline && filters.polyline.length > 0) {
         filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
       }
       setMapLayerFilters(allWaterRightsLayers.map(a => {
@@ -585,17 +593,19 @@ function WaterRightsTab() {
             <Accordion.Body>
               <div className="mb-3">
                 <label>Change Map Color Legend</label>
-                <select className="form-select" onChange={handleMapGroupingChange} value={displayOptions.mapGrouping}>
-                  <option value={MapGrouping.BeneficialUse}>Beneficial Use</option>
-                  <option value={MapGrouping.OwnerClassification}>Owner Classification</option>
-                  <option value={MapGrouping.WaterSourceType}>Water Source Type</option>
-                </select>
+                <Select
+                  options={mapColorLegendOptions}
+                  onChange={a => handleMapGroupingChange(a?.value)}
+                  name="mapColorLegend"
+                  value={mapColorLegendOptions.find(x => x.value === displayOptions.mapGrouping)}
+                />
               </div>
 
               <div className="mb-3">
                 <label>Toggle Point Size</label>
                 <ButtonGroup className="w-100">
                   {pointSizeRadios.map((radio) => (<ToggleButton
+                    className="zindexzero"
                     key={radio.value}
                     id={`pointSizeRadio-${radio.value}`}
                     type="radio"
@@ -625,40 +635,36 @@ function WaterRightsTab() {
               </div>
               <div className="mb-3">
                 <label>State</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  options={allStates}
-                  selected={filters.states ?? []}
-                  handleOnChange={handleStateChange}
-                  name="states"
+                <Select
+                  isMulti
+                  options={allStates?.map(state => ({ value: state }))}
+                  onChange={a => handleStateChange(a.map(option => option.value))}
+                  closeMenuOnSelect={false}
                   placeholder="Select State(s)"
-                />
+                  name="states"
+                  getOptionLabel={(option) => option.value}
+                  value={filters.states?.map(state => ({ value: state }))} />
               </div>
               <div className="mb-3">
                 <label>Beneficial Use</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  placeholder="Select Beneficial Use(s)"
-                  options={allBeneficialUses}
-                  optionKey="beneficialUseName"
-                  optionLabel="beneficialUseName"
-                  selected={filters.beneficialUses ?? []}
-                  handleOnChange={handleBeneficialUseChange}
-                  name="beneficialUses"
-                >
 
-                </DropdownMultiselect>
+                <BeneficialUseSelect
+                  selectedOptions={filters.beneficialUses}
+                  options={allBeneficialUses}
+                  onChange={handleBeneficialUseChange}
+                />
               </div>
               <div className="mb-3">
                 <label>Water Source Type</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  options={allWaterSourceTypes}
-                  selected={filters.waterSourceTypes ?? []}
-                  handleOnChange={handleWaterSourceTypeChange}
-                  name="waterSourceTypes"
+                <Select
+                  isMulti
+                  options={allWaterSourceTypes?.map(waterSourceType => ({ value: waterSourceType }))}
+                  onChange={a => handleWaterSourceTypeChange(a.map(option => option.value))}
+                  closeMenuOnSelect={false}
                   placeholder="Select Water Source Type(s)"
-                />
+                  name="waterSourceTypes"
+                  getOptionLabel={(option) => option.value}
+                  value={filters.waterSourceTypes?.map(waterSourceType => ({ value: waterSourceType }))} />
               </div>
 
               <div className="mb-3">
@@ -668,31 +674,34 @@ function WaterRightsTab() {
 
               <div className="mb-3">
                 <label>Owner Classification Type</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  options={allOwnerClassifications}
-                  selected={filters.ownerClassifications ?? []}
-                  handleOnChange={handleOwnerClassificationChange}
-                  name="ownerClassification"
+                <Select
+                  isMulti
+                  options={allOwnerClassifications?.map(ownerClassification => ({ value: ownerClassification }))}
+                  onChange={a => handleOwnerClassificationChange(a.map(option => option.value))}
+                  closeMenuOnSelect={false}
                   placeholder="Select Owner Classification(s)"
-                />
+                  name="ownerClassification"
+                  getOptionLabel={(option) => option.value}
+                  value={filters.ownerClassifications?.map(ownerClassification => ({ value: ownerClassification }))} />
               </div>
               <div className="mb-3">
                 <label>River Basin Area</label>
-                <DropdownMultiselect
-                  className="form-control"
-                  options={allRiverBasinOptions}
-                  selected={filters.riverBasinNames ?? []}
-                  handleOnChange={handleRiverBasinChange}
-                  name="riverBasins"
+                <Select
+                  isMulti
+                  options={allRiverBasinOptions?.map(riverBasin => ({ value: riverBasin }))}
+                  onChange={a => handleRiverBasinChange(a.map(option => option.value))}
+                  closeMenuOnSelect={false}
                   placeholder="Select Sites in River Basin(s)"
-                />
+                  name="riverBasins"
+                  getOptionLabel={(option) => option.value}
+                  value={filters.riverBasinNames?.map(riverBasin => ({ value: riverBasin }))} />
               </div>
               <div className="mb-3">
                 <label>Toggle View</label>
                 <ButtonGroup className="w-100">
                   {podPouRadios.map((radio, idx) => (
                     <ToggleButton
+                      className="zindexzero"
                       key={idx}
                       id={`podPouRadio-${idx}`}
                       type="radio"
@@ -711,6 +720,8 @@ function WaterRightsTab() {
                 <label>Site Content</label>
                 <ButtonGroup className="w-100">
                   {exemptRadios.map((radio) => (<ToggleButton
+                    className="zindexzero"
+
                     key={radio.value}
                     id={`exemptRadio-${radio.value}`}
                     type="radio"
