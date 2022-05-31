@@ -47,78 +47,51 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.WaterRightsDetails.FirstOrDefault().BeneficialUses.Should().Contain(expectedName);
         }
 
-        [TestMethod]
-        [DataRow("expectedName", "name2", "expectedName")]
-        [DataRow("", "expectedName", "expectedName")]
-        public async Task FindWaterRights_SearchByOwnerClassification_ReturnsOneMatch(string ownerClassificationWadeName, string ownerClassificationName, string searchInput)
-        {
-            // Arrange
-            var allocationAmounts = new AllocationAmountFactFaker().Generate(4);
-
-            allocationAmounts[2].OwnerClassificationCV = ownerClassificationName;
-            allocationAmounts[2].OwnerClassification.WaDEName = ownerClassificationWadeName;
-            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;
-
-            var expectedAllocationNativeID = allocationAmounts[2].AllocationNativeId;
-
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.AllocationAmountsFact.AddRange(allocationAmounts);
-                db.SaveChanges();
-            }
-
-            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
-            {
-                OwnerClassifications = new[] { searchInput }
-            };
-
-            //Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
-
-            //Assert
-            result.WaterRightsDetails.Count().Should().Be(1);
-            result.WaterRightsDetails.FirstOrDefault().AllocationNativeID.Should().Be(expectedAllocationNativeID);
-            result.WaterRightsDetails.FirstOrDefault().OwnerClassification.Should().Be(searchInput);
-        }
-
-        [TestMethod]
-        [DataRow(10, 2, new string[] {"expectedName0", "expectedName1" })]
-        [DataRow(4, 1, new string[] { "expectedName0", "expectedName1" })]
+        [TestMethod]        
         [DataRow(10, 0, new string[] { "expectedName0", "expectedName1" })]
-        public async Task FindWaterRights_SearchByOwnerClassification_ReturnsMultipleMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
+        [DataRow(4, 1, new string[] { "expectedName0", "expectedName1" })]
+        [DataRow(10, 2, new string[] { "expectedName0", "expectedName1", "expectedName2" })]
+        [DataRow(10, 4, new string[] { "expectedName0" })]
+        public async Task FindWaterRights_SearchByOwnerClassification_ReturnsMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
         {
-            //TODO: Test with more than 1 ownerClassification is failing because of foriegn key conflict.
-            // Multiple ownerClassifications are being generated with the same name
-
             // Arrange
-            var allocationAmounts = new AllocationAmountFactFaker().Generate(totalRecordCount);
-
             var rand = new Random();
 
             var expectedResults = new List<(string allocationNativeId, string ownerClassification)>();
 
-            var indexRecords = new List<int>();
+            var ownerClassificationCVs = new List<EF.OwnerClassificationCv>();
 
-            for(int i = 0; i < expectedResultCount; i++)
+            // generate ownerClassificationsCV objects that match search inputs
+            foreach(var input in searchInputs)
+            {
+                var ownerClassificationFake = new OwnerClassificationCvFaker().Generate();
+                ownerClassificationFake.WaDEName = input;
+                ownerClassificationFake.Name = input;
+
+                ownerClassificationCVs.Add(ownerClassificationFake);
+            }
+
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(totalRecordCount);
+
+            // assign the the ownerClassifications
+            for (int i = 0; i < expectedResultCount; i++)
             {
                 var input = searchInputs[rand.Next(0, searchInputs.Length)];
 
-                var index = rand.Next(0, totalRecordCount);
-                while (indexRecords.Contains(index)) //ensure the same record is not updated twice
-                {
-                    index = rand.Next(0, totalRecordCount);
-                }
-                indexRecords.Add(index);
+                allocationAmounts[i].OwnerClassificationCV = input;
+                allocationAmounts[i].OwnerClassification = ownerClassificationCVs.First(x => x.WaDEName == input);
 
-                allocationAmounts[index].OwnerClassificationCV = input;
-                allocationAmounts[index].OwnerClassification.WaDEName = input;
-                allocationAmounts[index].OwnerClassification.Name = input;
-
-                expectedResults.Add((allocationNativeId: allocationAmounts[index].AllocationNativeId, ownerClassification: input));
+                expectedResults.Add((allocationNativeId: allocationAmounts[i].AllocationNativeId, ownerClassification: input));
             }
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            for (int i = expectedResultCount; i < totalRecordCount; i++)
+            {
+                var ownerClassificationFake = new OwnerClassificationCvFaker().Generate();
+                allocationAmounts[i].OwnerClassificationCV = ownerClassificationFake.Name;
+                allocationAmounts[i].OwnerClassification = ownerClassificationFake;
+            }
+
+                using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmounts);
                 db.SaveChanges();

@@ -11,10 +11,6 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.DataPublicationDate, b => new DateDimFaker().Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
-                .RuleFor(a => a.OwnerClassificationCV, b => b.Random.String(10, 'A', 'z'))
-                .RuleFor(a => a.OwnerClassification, 
-                    (faker, allocationAmountFact) => new OwnerClassificationCvFaker()
-                        .RuleFor(o => o.Name, f => allocationAmountFact.OwnerClassificationCV))
                 .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'));
         }
     }
