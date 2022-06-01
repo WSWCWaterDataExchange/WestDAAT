@@ -288,9 +288,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(10, 0, new string[] { "WY" })]
-        [DataRow(5, 5, new string[] { "UT", "NE" })]
-        [DataRow(10, 2, new string[] { "UT", "NE", "CO"})]
+        [DataRow(10, 0, new string[] { "ZZ" })]
+        [DataRow(5, 5, new string[] { "XX", "ZZ" })]
+        [DataRow(10, 2, new string[] { "YY", "NN", "ZZ"})]
         public async Task FindWaterRights_SearchByStates_ReturnsMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
         {
             //Arrange
