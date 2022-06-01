@@ -58,6 +58,13 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
+        public static Faker<AllocationAmountsFact> LinkOrganizaion(this Faker<AllocationAmountsFact> faker, OrganizationsDim organization)
+        {
+            faker.RuleFor(a => a.OrganizationId, () => organization.OrganizationId)
+                .RuleFor(a => a.Organization, () => organization);
+            return faker;
+        }
+
         public static Faker<AllocationAmountsFact> IncludeOwnerClassification(this Faker<AllocationAmountsFact> faker)
         {
             faker.RuleFor(a => a.OwnerClassificationCV, b => b.Random.String(10, 'A', 'z'))

@@ -105,6 +105,15 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> HasOrginizationStates(List<string> states)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => states.Contains(x.Organization.State));
+
+            return predicate;
+        }
+
         #endregion
     }
 }

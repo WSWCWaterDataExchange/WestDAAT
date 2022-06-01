@@ -288,6 +288,75 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        [DataRow(10, 0, new string[] { "WY" })]
+        [DataRow(5, 5, new string[] { "UT", "NE" })]
+        [DataRow(10, 2, new string[] { "UT", "NE", "CO"})]
+        public async Task FindWaterRights_SearchByStates_ReturnsMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
+        {
+            //Arrange
+            var rand = new Random();
+
+            var matchedOrganizations = new List<EF.OrganizationsDim>();
+
+            // generate an orgainization for each search param
+            foreach(var input in searchInputs)
+            {
+                var organizationFake = new OrganizationsDimFaker().Generate();
+                organizationFake.State = input;
+
+                matchedOrganizations.Add(organizationFake);
+            }
+            
+            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+
+            var expectedNativeIds = new List<string>();
+
+            // generate matching allocationAmouts
+            for (int i = 0; i < expectedResultCount; i++)
+            {
+                var organization = matchedOrganizations[rand.Next(0, matchedOrganizations.Count)];
+                var allocationAmount = new AllocationAmountFactFaker()
+                    .LinkOrganizaion(organization).Generate();
+
+                expectedNativeIds.Add(allocationAmount.AllocationNativeId);
+                matchedAllocationAmounts.Add(allocationAmount);
+            }
+            
+            //generate non-matching organizations
+            var nonMatchedOrgizations = new List<EF.OrganizationsDim>(new OrganizationsDimFaker().Generate(5));
+
+            //generate non-matching allocationAmounts
+            var nonMatchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+            for (int i = 0; i < totalRecordCount - expectedResultCount; i++)
+            {
+                var organization = nonMatchedOrgizations[rand.Next(0, nonMatchedOrgizations.Count)];
+                nonMatchedAllocationAmounts.Add(new AllocationAmountFactFaker()
+                    .LinkOrganizaion(organization).Generate());
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                States = searchInputs
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedNativeIds.TrueForAll(x => result.WaterRightsDetails.SingleOrDefault(w => w.AllocationNativeID == x) != null);
+        }
+
+        [TestMethod]
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange
