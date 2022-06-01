@@ -27,7 +27,9 @@ import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
-import { toast } from "react-toastify";
+import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import { FeatureCollection } from "geojson";
+import { Directions, DataPoints } from "../data-contracts/nldi";
 import Select from "react-select";
 
 enum MapGrouping {
@@ -51,7 +53,8 @@ interface WaterRightsFilters {
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
-  polyline: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]
+  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
 }
 
 interface WaterRightsDisplayOptions {
@@ -121,7 +124,8 @@ const defaultFilters: WaterRightsFilters = {
   podPou: undefined,
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
-  polyline: []
+  polyline: [],
+  nldiFilterData: null
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -196,14 +200,16 @@ function WaterRightsTab() {
     setLayerCircleColors,
     setLayerFillColors,
     setVectorUrl,
-    setGeoJsonData
+    geoJsonData,
+    setGeoJsonData,
+    nldiFilterData
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
 
   useEffect(() => {
     for (var element of filters.polyline) {
-      setPolylines(element.source, element.data);
+      setPolylines(element.identifier, element.data);
     }
   }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
 
@@ -213,6 +219,13 @@ function WaterRightsTab() {
       polyline: polylines
     }))
   }, [setFilters, polylines])
+
+  useEffect(() => {
+    setFilters((s) => ({
+      ...s,
+      nldiFilterData: nldiFilterData
+    }))
+  }, [setFilters, nldiFilterData])
 
   useEffect(() => {
     let params = (new URL(document.location.href)).searchParams;
@@ -241,6 +254,7 @@ function WaterRightsTab() {
       colorMappings = colorMappings.filter(a => filters.ownerClassifications?.some(b => b === a.key));
     }
     colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && tryParseJsonArray(b.properties[mapGrouping.property]).some((c: string) => c === a.key)));
+
     return {
       property: mapGrouping.property,
       colorMapping: colorMappings
@@ -275,41 +289,7 @@ function WaterRightsTab() {
   }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
-    if (isNldiMapActive === true) {
-      setLegend(
-        <div className="legend-nldi">
-          <div className="legend-item">
-            <span>
-              <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
-            </span>
-            Starting Point of Interest
-          </div>
-          <div className="legend-item">
-            <span className="legend-flowline">
-              <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
-            </span>
-            Mainstem
-          </div>
-          <div className="legend-item">
-            <span>
-              <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
-            </span>
-            Tributaries
-          </div>
-          <div className="legend-item">
-            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.wade }}></span>
-            WaDE Sites
-          </div>
-          <div className="legend-item">
-            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
-            USGS NWIS Sites
-          </div>
-          <div className="legend-item">
-            <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
-            EPA Water Quality Portal<br /> Sites OSM Standard
-          </div>
-        </div>);
-    } else if (renderedMapGroupings.colorMapping.length === 0) {
+    if (renderedMapGroupings.colorMapping.length === 0) {
       setLegend(null);
     } else {
       setLegend(
@@ -324,12 +304,59 @@ function WaterRightsTab() {
               )
             })
           }
+          {isNldiMapActive &&
+            <div className="legend-nldi">
+              <div className="legend-item">
+                <span>
+                  <Icon path={mdiMapMarker} size="14px" style={{ color: nldi.colors.mapMarker }} />
+                </span>
+                Starting Point of Interest
+              </div>
+              <div className="legend-item">
+                <span className="legend-flowline">
+                  <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
+                </span>
+                Mainstem
+              </div>
+              <div className="legend-item">
+                <span>
+                  <span className="legend-flowline legend-flowline-tributary" style={{ backgroundColor: nldi.colors.tributaries }} />
+                </span>
+                Tributaries
+              </div>
+              <div className="legend-item">
+                <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
+                USGS NWIS Sites
+              </div>
+              <div className="legend-item">
+                <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
+                EPA Water Quality Portal<br /> Sites OSM Standard
+              </div>
+            </div>
+          }
         </>);
     }
   }, [setLegend, renderedMapGroupings, isNldiMapActive])
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
+  const nldiWadeSiteIds = useMemo(() => {
+    var nldiData = geoJsonData.filter(s => s.source === 'nldi');
+    if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
+      var arr = (nldiData[0].data as FeatureCollection).features
+        .filter(x => x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' || x.properties?.source?.toLowerCase() === 'wade');
+
+      if ((nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
+        arr = arr.filter(x => x.properties?.westdaat_direction === 'Upstream');
+      } else if (!(nldiFilterData?.directions & Directions.Upsteam) && (nldiFilterData?.directions & Directions.Downsteam)) {
+        arr = arr.filter(x => x.properties?.westdaat_direction === 'Downstream');
+      } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
+        return
+      }
+      return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
+        .map(a => a.properties?.identifier)
+    }
+  }, [geoJsonData, nldiFilterData])
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
@@ -430,13 +457,11 @@ function WaterRightsTab() {
   }
 
   useEffect(() => {
-    if (isNldiMapActive === true) {
-      setVisibleLayers(nldiLayer);
-    } else if ((filters.riverBasinNames?.length ?? 0) > 0) {
-      setVisibleLayers([...allWaterRightsLayers, waterRightsRiverBasinLayer]);
-    } else {
-      setVisibleLayers([...allWaterRightsLayers]);
-    }
+    let visible = [...allWaterRightsLayers];
+    if ((filters.riverBasinNames?.length ?? 0) > 0) visible.push(waterRightsRiverBasinLayer);
+    if (isNldiMapActive === true) visible.push(...nldiLayer);
+
+    setVisibleLayers(visible);
   }, [filters.riverBasinNames, setVisibleLayers, isNldiMapActive])
 
   useEffect(() => {
@@ -471,88 +496,82 @@ function WaterRightsTab() {
   }, 400)
 
   useEffect(() => {
-    if (isNldiMapActive === true) {
-      toast.error("NLDI has to be OFF in order to use Site Selection Filters",
-        {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
-          autoClose: 1000
-        })
-    } else {
-      const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
-        const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
-        const fieldStr = field as string;
-        const operator = isMin ? "<=" : ">=";
+    const buildRangeFilter = (includeNulls: boolean, field: waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate, value: number): any[] => {
+      const isMin = field === waterRightsProperties.minFlowRate || field === waterRightsProperties.minVolume || field === waterRightsProperties.minPriorityDate;
+      const fieldStr = field as string;
+      const operator = isMin ? "<=" : ">=";
 
-        let coalesceValue;
-        if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
-          coalesceValue = 999999999999
-        } else {
-          coalesceValue = -999999999999
-        }
-
-        return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
+      let coalesceValue;
+      if ((includeNulls && isMin) || (!includeNulls && !isMin)) {
+        coalesceValue = 999999999999
+      } else {
+        coalesceValue = -999999999999
       }
-
-      if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
-      const filterSet = ["all"] as any[];
-      if (filters.podPou === "POD" || filters.podPou === "POU") {
-        filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
-      }
-      if (filters.includeExempt !== undefined) {
-        filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
-      }
-      if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
-        filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a.beneficialUseName, ["get", waterRightsProperties.beneficialUses]])]);
-      }
-      if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
-        filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
-      }
-      if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
-        filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
-      }
-      if (riverBasinPolygons && riverBasinPolygons.features) {
-        filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
-      }
-      if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
-        filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
-      }
-      if (filters.allocationOwner && filters.allocationOwner.length > 0) {
-        filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
-      }
-      if (filters.maxFlow !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
-      }
-      if (filters.minFlow !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
-      }
-      if (filters.maxVolume !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
-      }
-      if (filters.minVolume !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
-      }
-      if (filters.minPriorityDate !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
-      }
-      if (filters.maxPriorityDate !== undefined) {
-        filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
-      }
-      if (filters.polyline && filters.polyline.length > 0) {
-        filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
-      }
-      setMapLayerFilters(allWaterRightsLayers.map(a => {
-        return { layer: a, filter: filterSet }
-      }))
+      return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     }
-  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive])
+
+    if (!allBeneficialUses || !allOwnerClassifications || !allWaterSourceTypes || !allStates || !allRiverBasinOptions) return;
+    const filterSet = ["all"] as any[];
+    if (filters.podPou === "POD" || filters.podPou === "POU") {
+      filterSet.push(["==", ["get", waterRightsProperties.sitePodOrPou], filters.podPou]);
+    }
+    if (filters.includeExempt !== undefined) {
+      filterSet.push(["==", ["get", waterRightsProperties.exemptOfVolumeFlowPriority], filters.includeExempt]);
+    }
+    if (filters.beneficialUses && filters.beneficialUses.length > 0 && filters.beneficialUses.length !== allBeneficialUses.length) {
+      filterSet.push(["any", ...filters.beneficialUses.map(a => ["in", a.beneficialUseName, ["get", waterRightsProperties.beneficialUses]])]);
+    }
+    if (filters.ownerClassifications && filters.ownerClassifications.length > 0 && filters.ownerClassifications.length !== allOwnerClassifications.length) {
+      filterSet.push(["any", ...filters.ownerClassifications.map(a => ["in", a, ["get", waterRightsProperties.ownerClassifications]])]);
+    }
+    if (filters.waterSourceTypes && filters.waterSourceTypes.length > 0 && filters.waterSourceTypes.length !== allWaterSourceTypes.length) {
+      filterSet.push(["any", ...filters.waterSourceTypes.map(a => ["in", a, ["get", waterRightsProperties.waterSourceTypes]])]);
+    }
+    if (riverBasinPolygons && riverBasinPolygons.features) {
+      filterSet.push(["any", ...riverBasinPolygons.features.map(a => ["within", a])]);
+    }
+    if (filters.states && filters.states.length > 0 && filters.states.length !== allStates.length) {
+      filterSet.push(["any", ...filters.states.map(a => ["in", a, ["get", waterRightsProperties.states]])]);
+    }
+    if (filters.allocationOwner && filters.allocationOwner.length > 0) {
+      filterSet.push(["in", filters.allocationOwner.toUpperCase(), ["upcase", ["get", waterRightsProperties.owners]]])
+    }
+    if (filters.maxFlow !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxFlowRate, filters.maxFlow));
+    }
+    if (filters.minFlow !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minFlowRate, filters.minFlow));
+    }
+    if (filters.maxVolume !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxVolume, filters.maxVolume));
+    }
+    if (filters.minVolume !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minVolume, filters.minVolume));
+    }
+    if (filters.minPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.minPriorityDate, filters.minPriorityDate));
+    }
+    if (filters.maxPriorityDate !== undefined) {
+      filterSet.push(buildRangeFilter(false, waterRightsProperties.maxPriorityDate, filters.maxPriorityDate));
+    }
+    if (filters.polyline && filters.polyline.length > 0) {
+      filterSet.push(["any", ...filters.polyline.map(a => ["within", a.data])]);
+    }
+    if (isNldiMapActive && nldiWadeSiteIds !== undefined) {
+      filterSet.push(["in", ["get", waterRightsProperties.siteUuid], ["literal", nldiWadeSiteIds]]);
+    }
+
+    setMapLayerFilters(allWaterRightsLayers.map(a => {
+      return { layer: a, filter: filterSet }
+    }))
+  }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, nldiWadeSiteIds])
 
   const clearMapFilters = () => {
     setFilters({ ...defaultFilters });
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
     polylines.forEach(a => {
-      setPolylines(a.source, null);
+      setPolylines(a.identifier, null);
     })
   }
 
@@ -753,25 +772,14 @@ function WaterRightsTab() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">
-            <Accordion.Header>
+            <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
-              <div className="onoffswitch">
-                <input
-                  type="checkbox"
-                  name="onoffswitch4"
-                  className="onoffswitch-checkbox"
-                  id="myonoffswitch"
-                  checked={isNldiMapActive}
-                  onChange={(e) => setNldiMapStatus(e.target.checked)}
-                />
-                <label className="onoffswitch-label" htmlFor="myonoffswitch">
-                  <span className="onoffswitch-inner"></span>
-                  <span className="onoffswitch-switch"></span>
-                </label>
+              <div className="px-5">
+                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary"/>
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab isEnabled={isNldiMapActive} />
+              <NldiTab />
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
