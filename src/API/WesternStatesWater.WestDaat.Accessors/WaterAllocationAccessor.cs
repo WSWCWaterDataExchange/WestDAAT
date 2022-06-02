@@ -43,6 +43,11 @@ namespace WesternStatesWater.WestDaat.Accessors
                 predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
             }
 
+            if(searchCriteria?.AllocationOwner != null && searchCriteria.AllocationOwner.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+            }
+
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
                 .Include(x => x.AllocationBridgeBeneficialUsesFact)
