@@ -50,8 +50,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Where(predicate)
                 .Select(x => new WaterRightsSearchDetail
                 {
-                    SiteUUIDs = x.AllocationBridgeSitesFact.Select(abs => abs.Site.SiteUuid).ToArray(),
-                    AllocationNativeID = x.AllocationNativeId,
+                    WadeUuid = x.AllocationAmountId.ToString(), // Per Ryan, until a real WadeUUID exists use AllocationAmountId
                     BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
                     OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name
                 })

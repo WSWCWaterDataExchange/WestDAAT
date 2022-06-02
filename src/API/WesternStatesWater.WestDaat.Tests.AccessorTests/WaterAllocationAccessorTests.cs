@@ -59,15 +59,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             allocationAmounts[2].OwnerClassificationCV = ownerClassificationName;
             allocationAmounts[2].OwnerClassification.WaDEName = ownerClassificationWadeName;
-            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;
-
-            var expectedAllocationNativeID = allocationAmounts[2].AllocationNativeId;
+            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;            
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmounts);
                 db.SaveChanges();
             }
+
+            var expectedWadeUuid = allocationAmounts[2].AllocationAmountId.ToString();
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
@@ -80,7 +80,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
-            result.WaterRightsDetails.FirstOrDefault().AllocationNativeID.Should().Be(expectedAllocationNativeID);
+            result.WaterRightsDetails.FirstOrDefault().WadeUuid.Should().Be(expectedWadeUuid);
             result.WaterRightsDetails.FirstOrDefault().OwnerClassification.Should().Be(searchInput);
         }
 
@@ -94,7 +94,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Arrange
             var rand = new Random();
 
-            var expectedResults = new List<(string allocationNativeId, string ownerClassification)>();
+            var expectedResults = new List<(string wadeUuid, string ownerClassification)>();
 
             var ownerClassificationCVs = new List<EF.OwnerClassificationCv>();
 
@@ -116,9 +116,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 var input = searchInputs[rand.Next(0, searchInputs.Length)];
 
                 allocationAmounts[i].OwnerClassificationCV = input;
-                allocationAmounts[i].OwnerClassification = ownerClassificationCVs.First(x => x.WaDEName == input);
-
-                expectedResults.Add((allocationNativeId: allocationAmounts[i].AllocationNativeId, ownerClassification: input));
+                allocationAmounts[i].OwnerClassification = ownerClassificationCVs.First(x => x.WaDEName == input);                
             }
 
             // create additional random ownerClassifications
@@ -135,6 +133,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 db.SaveChanges();
             }
 
+            expectedResults.AddRange(allocationAmounts
+                .Take(expectedResultCount)
+                .Select(x => (wadeUuid: x.AllocationAmountId.ToString(), ownerClassification: x.OwnerClassification.WaDEName)));
+
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
                 OwnerClassifications = searchInputs
@@ -149,11 +151,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             result.WaterRightsDetails.Count().Should().Be(expectedResultCount);
 
-            expectedResults.TrueForAll(x => result.WaterRightsDetails.SingleOrDefault(w => w.AllocationNativeID == x.allocationNativeId) != null);
+            expectedResults.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected.wadeUuid) != null);
 
             foreach (var expectedResult in expectedResults)
             {
-                var waterRight = result.WaterRightsDetails.FirstOrDefault(x => x.AllocationNativeID == expectedResult.allocationNativeId);
+                var waterRight = result.WaterRightsDetails.FirstOrDefault(actual => actual.WadeUuid == expectedResult.wadeUuid);
                 waterRight.Should().NotBeNull();
                 searchInputs.Should().Contain(waterRight.OwnerClassification);
             }
@@ -180,15 +182,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var allocationAmounts = new AllocationAmountFactFaker().Generate(3);
             allocationAmounts.Add(new AllocationAmountFactFaker()
                     .LinkSites(siteFake)
-                    .Generate());
-
-            var expectedAllocationNativeID = allocationAmounts[3].AllocationNativeId;
+                    .Generate());            
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmounts);
                 db.SaveChanges();
             }
+
+            var expectedWadeUuid = allocationAmounts[3].AllocationAmountId.ToString();
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
@@ -201,7 +203,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
-            result.WaterRightsDetails.FirstOrDefault().AllocationNativeID.Should().Be(expectedAllocationNativeID);
+            result.WaterRightsDetails.FirstOrDefault().WadeUuid.Should().Be(expectedWadeUuid);
         }
 
         [TestMethod]
@@ -245,9 +247,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 matchingAllocationAmounts.Add(new AllocationAmountFactFaker()
                     .LinkSites(siteFake)
                     .Generate());
-            }
-
-            expectedResults.AddRange(matchingAllocationAmounts.Select(x => x.AllocationNativeId));
+            }            
 
             // generate waterSource objects that don't match
             var notMatchingAllocationAmounts = new AllocationAmountFactFaker()
@@ -264,6 +264,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 db.SaveChanges();
             }
 
+            expectedResults.AddRange(matchingAllocationAmounts.Select(x => x.AllocationAmountId.ToString()));
+
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
                 WaterSourceTypes = searchInputs
@@ -278,11 +280,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             result.WaterRightsDetails.Count().Should().Be(expectedResultCount);
 
-            expectedResults.TrueForAll(x => result.WaterRightsDetails.SingleOrDefault(w => w.AllocationNativeID == x) != null);
+            expectedResults.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null);
 
             foreach (var expectedResult in expectedResults)
             {
-                var waterRight = result.WaterRightsDetails.FirstOrDefault(x => x.AllocationNativeID == expectedResult);
+                var waterRight = result.WaterRightsDetails.FirstOrDefault(actual => actual.WadeUuid == expectedResult);
                 waterRight.Should().NotBeNull();
             }
         }
@@ -309,7 +311,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             
             var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
 
-            var expectedNativeIds = new List<string>();
+            var expectedWadeUuids = new List<string>();
 
             // generate matching allocationAmouts
             for (int i = 0; i < expectedResultCount; i++)
@@ -318,7 +320,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 var allocationAmount = new AllocationAmountFactFaker()
                     .LinkOrganizaion(organization).Generate();
 
-                expectedNativeIds.Add(allocationAmount.AllocationNativeId);
+                expectedWadeUuids.Add(allocationAmount.AllocationAmountId.ToString());
                 matchedAllocationAmounts.Add(allocationAmount);
             }
             
@@ -353,7 +355,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
 
-            expectedNativeIds.TrueForAll(x => result.WaterRightsDetails.SingleOrDefault(w => w.AllocationNativeID == x) != null);
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null);
         }
 
         [TestMethod]
