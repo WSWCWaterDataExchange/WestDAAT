@@ -1,7 +1,8 @@
-import { createContext, FC, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, FC, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
+import { Directions, DataPoints } from "../data-contracts/nldi";
 
 export enum MapTypes {
   WaterRights = "waterRights",
@@ -71,8 +72,10 @@ interface MapContextState {
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
-  polylines: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-  setPolylines: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
+  polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
+  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
+  setNldiFilterData: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>>,
 };
 
 const defaultState: MapContextState = {
@@ -108,7 +111,9 @@ const defaultState: MapContextState = {
   mapPopup: null,
   setMapPopup: () => { },
   polylines: [],
-  setPolylines: () => { }
+  setPolylines: () => { },
+  nldiFilterData: null,
+  setNldiFilterData: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -262,12 +267,12 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
-  const [polylines, setAllPolylines] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
-  const setPolylines = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+  const [polylines, setAllPolylines] = useState<{ identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
+  const setPolylines = useCallback((identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
     setAllPolylines(s => {
-      const unchangedData = s.filter(a => a.source !== source && source !== null && a.data !== null);
-      if (data !== null && source !== null) {
-        const updatedData = [...unchangedData, { source, data }];
+      const unchangedData = s.filter(a => identifier !== null && a.identifier !== identifier &&  a.data !== null);
+      if (data !== null && identifier !== null) {
+        const updatedData = [...unchangedData, { identifier, data }];
         
         if (!deepEqual(s, updatedData)) {
           return updatedData;
@@ -278,6 +283,8 @@ const MapProvider: FC = ({ children }) => {
       return unchangedData;
     });
   }, [setAllPolylines])
+
+  const [nldiFilterData, setNldiFilterData] = useState<{latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints} | null>(null);
 
   const mapContextProviderValue = {
     mapStyle,
@@ -312,7 +319,9 @@ const MapProvider: FC = ({ children }) => {
     mapPopup,
     setMapPopup,
     polylines,
-    setPolylines
+    setPolylines,
+    nldiFilterData,
+    setNldiFilterData
   };
 
   return (

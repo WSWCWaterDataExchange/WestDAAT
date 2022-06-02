@@ -12,13 +12,8 @@ import Icon from '@mdi/react';
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
-import { toast } from "react-toastify";
 
-interface NldiTabProps {
-  isEnabled: boolean;
-}
-
-function NldiTab(props: NldiTabProps) {
+function NldiTab() {
   interface NldiDataType {
     latitude: number | null,
     longitude: number | null,
@@ -54,55 +49,46 @@ function NldiTab(props: NldiTabProps) {
   }, [setPointData])
 
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
-    if (props.isEnabled === false) {
-      toast.error("NLDI Features are not turned On, please turn on to use this feature",
-        {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
-          autoClose: 1000
-        })
-    } else {
-      let lat = parseFloat(latValue);
-      let long = parseFloat(longValue);
-      let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
-      let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
-      if (isNaN(lat) || isNaN(long)) {
-        setPointData(s => ({
-          ...s,
-          latitude: pointLat,
-          longitude: pointLong
-        }));
-        setNldiData(s => ({
-          ...s,
-          latitude: null,
-          longitude: null
-        }));
-        return;
-      }
-      if (lat > 90) {
-        lat = 90;
-      } else if (lat < -90) {
-        lat = -90
-      }
-      if (long > 180) {
-        long = 180;
-      } else if (long < -180) {
-        long = -180
-      }
-      lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
-      long = parseFloat(long.toFixed(nldi.latLongPrecision));
-      setNldiData(s => ({
-        ...s,
-        latitude: lat,
-        longitude: long
-      }));
+    let lat = parseFloat(latValue);
+    let long = parseFloat(longValue);
+    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+    if (isNaN(lat) || isNaN(long)) {
       setPointData(s => ({
         ...s,
-        latitude: lat.toFixed(nldi.latLongPrecision),
-        longitude: long.toFixed(nldi.latLongPrecision)
+        latitude: pointLat,
+        longitude: pointLong
       }));
+      setNldiData(s => ({
+        ...s,
+        latitude: null,
+        longitude: null
+      }));
+      return;
     }
-  }, [props.isEnabled])
+    if (lat > 90) {
+      lat = 90;
+    } else if (lat < -90) {
+      lat = -90
+    }
+    if (long > 180) {
+      long = 180;
+    } else if (long < -180) {
+      long = -180
+    }
+    lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
+    long = parseFloat(long.toFixed(nldi.latLongPrecision));
+    setNldiData(s => ({
+      ...s,
+      latitude: lat,
+      longitude: long
+    }));
+    setPointData(s => ({
+      ...s,
+      latitude: lat.toFixed(nldi.latLongPrecision),
+      longitude: long.toFixed(nldi.latLongPrecision)
+    }));
+  }, [])
 
   const handleLatitudeBlurred = () => {
     setLatLongData(pointData.latitude, pointData.longitude);
@@ -128,8 +114,8 @@ function NldiTab(props: NldiTabProps) {
     }));
   }
 
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude, props.isEnabled);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiFilterData } = useContext(MapContext);
+  const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
 
@@ -138,6 +124,10 @@ function NldiTab(props: NldiTabProps) {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
+
+  useEffect(() => {
+    setNldiFilterData(nldiData);
+  }, [nldiData, setNldiFilterData])
 
   const pointFeatureDataSourceNameKeys = useMemo(() => [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa] as const, []);
   const pointFeatureDataSourceNames: Record<DataPoints, string> = useMemo(() => ({
@@ -171,6 +161,7 @@ function NldiTab(props: NldiTabProps) {
       layer: 'nldi-usgs-points',
       filter: ["all",
         ["==", ["get", "westdaat_featuredatatype"], "Point"],
+        ["!=", ["get", "westdaat_pointdatasource"], "Wade"],
         pointsTypeFilters,
         directionFilters
       ]
