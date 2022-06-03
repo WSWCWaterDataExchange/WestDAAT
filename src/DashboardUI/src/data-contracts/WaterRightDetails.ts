@@ -16,4 +16,14 @@ export interface WaterRightDetails {
   methodType: string;
   methodLink: string;
   methodDescription: string;
+
+  allocationAmountId: number;
+  allocationNativeId: string;
+  allocationOwner: string;
+  priorityDate: Date;
+  expirationDate: Date;
+  allocationLegalStatus: string;
+  allocationFlowCfs: number;
+  allocationVolumeAF: number;
+  beneficialUses: string[];
 }
