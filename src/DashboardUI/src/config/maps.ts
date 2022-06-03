@@ -120,15 +120,16 @@ const mapsJson = {
       "friendlyName": "SiteLocations",
       "source": "site-locations",
       "layout": {
-        "visibility": "visible"
+        "visibility": "visible",
+        "icon-image": ["case",
+          ["==", ["get", "podOrPou"], "POD"], "mapMarkerPOD",
+          "mapMarkerPOU"],
+        "icon-anchor": "bottom",
+        "icon-size": ["interpolate", ["linear"], ["zoom"], 5, .5, 15, 1],
+        "icon-allow-overlap": true,
+
       },
-      "type": "circle",
-      "paint": {
-        ...defaultPointPaintConfiguration,
-        "circle-color": ["case",
-          ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
-          nldi.colors.sitePOU],
-      },
+      "type": "symbol",
       "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
     },
     {
@@ -140,7 +141,8 @@ const mapsJson = {
         "visibility": "visible",
         "text-field": ["get", "siteUuid"],
         "text-size": 16,
-        "text-offset": [0, -1.5],
+        "text-anchor": "top",
+        "text-allow-overlap": true,
       },
       "paint": {
         "text-color": "#000000",
