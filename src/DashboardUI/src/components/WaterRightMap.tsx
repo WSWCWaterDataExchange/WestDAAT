@@ -5,6 +5,8 @@ import mapboxgl from 'mapbox-gl';
 import { useWaterRightSiteLocations } from "../hooks";
 import { Position } from "geojson";
 import { nldi } from "../config/constants";
+import Icon from "@mdi/react";
+import { mdiMapMarker } from "@mdi/js";
 
 interface waterRightMapProps {
   waterRightId: string;
@@ -17,21 +19,21 @@ function WaterRightMap(props: waterRightMapProps) {
     setVisibleLayers,
     setGeoJsonData,
     setMapBoundSettings: setMapBounds,
-    setLegend
+    setLegend,
   } = useContext(MapContext);
 
   useEffect(() => {
-    setVisibleLayers(["site-locations-points", "site-locations-polygons", "site-locations-label"]);
+    setVisibleLayers(["site-locations-label", "site-locations-points", "site-locations-polygons"]);
   }, [setVisibleLayers])
 
   useEffect(() => {
     setLegend(<>
       <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOD }}></span>
+        <Icon path={mdiMapMarker} size="48px" color={nldi.colors.sitePOD} />
         Point of Diversion (POD)
       </div>
       <div className="legend-item">
-        <span className="legend-circle" style={{ "backgroundColor": nldi.colors.sitePOU }}></span>
+        <Icon path={mdiMapMarker} size="48px" color={nldi.colors.sitePOU} />
         Place of Use (POU)
       </div>
     </>);
@@ -74,9 +76,8 @@ function WaterRightMap(props: waterRightMapProps) {
 
   return (
     <div className="water-rights-map-container h-100">
-      <Map />
+      <Map hideDrawControl={true} />
     </div>
-    
   )
 }
 
