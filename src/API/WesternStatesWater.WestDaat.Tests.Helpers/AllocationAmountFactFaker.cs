@@ -46,6 +46,20 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
+        public static Faker<AllocationAmountsFact> SetExemptOfVolumeFlowPriority(this Faker<AllocationAmountsFact> faker, bool? isExempt)
+        {
+            if (isExempt != null)
+            {
+                faker
+                    .RuleFor(a => a.ExemptOfVolumeFlowPriority, () => isExempt);
+            }
+            else
+            {
+                faker.RuleFor(a => a.ExemptOfVolumeFlowPriority, () => null);
+            }
+            return faker;
+        }
+
         public static Faker<AllocationAmountsFact> LinkSites(this Faker<AllocationAmountsFact> faker, params SitesDim[] sites)
         {
             faker.RuleFor(a => a.AllocationBridgeSitesFact, () => sites.Select(c => new AllocationBridgeSiteFactFaker().RuleFor(a => a.Site, () => c).Generate()).ToList());

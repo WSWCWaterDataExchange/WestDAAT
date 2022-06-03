@@ -11,7 +11,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public Geometry Boundaries { get; set; }
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
-        public string IncludeExempt { get; set; }
+        public bool? ExemptOfVolumeFlowPriority { get; set; }
         public long? MinimumFlow { get; set; }
         public long? MaximumFlow { get; set; }
         public long? MinimumVolume { get; set; }

@@ -368,14 +368,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task FindWaterRights_SearchByAllocationOwner_ReturnsMatches(int totalRecordCount, int expectedResultCount, string searchInput)
         {
             //Arrange
-            var rand = new Random();            
-
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
                 .RuleFor(x => x.AllocationOwner, () => searchInput)
                 .Generate(expectedResultCount);
 
             //generate non-matching allocationAmounts
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
+                .RuleFor(x => x.AllocationOwner, f=> f.Random.String(20, 'A', 'z'))
                 .Generate(totalRecordCount - expectedResultCount);
 
             using (var db = CreateDatabaseContextFactory().Create())
@@ -390,6 +389,104 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
                 AllocationOwner = searchInput
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(5, 5, null)]
+        [DataRow(10, 0, true)]
+        [DataRow(5, 5, false)]
+        [DataRow(10, 2, true)]
+        [DataRow(10, 3, false)]
+        public async Task FindWaterRights_SearchByExemptOfVolumeFlowPriority_ReturnsMatches(int totalRecordCount, int expectedResultCount, bool searchInput)
+        {
+            //Arrange
+            var matchedAllocationAmounts = new AllocationAmountFactFaker()
+                .SetExemptOfVolumeFlowPriority(searchInput)
+                .Generate(expectedResultCount);
+
+            //generate non-matching allocationAmounts
+            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
+                .SetExemptOfVolumeFlowPriority(null)
+                .Generate(totalRecordCount - expectedResultCount);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                ExemptOfVolumeFlowPriority = searchInput
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(5, 5, null, null)]
+        [DataRow(10, 0, null, 20L)]
+        [DataRow(5, 5, 10L, 10000L)]
+        [DataRow(10, 2, 500L, 50000L)]
+        [DataRow(10, 3, null, 50000L)]
+        [DataRow(10, 3, 200L, null)]
+        public async Task FindWaterRights_SearchByFlowRate_ReturnsMatches(int totalRecordCount, int expectedResultCount, long? minimumFlow, long? maximumFlow)
+        {
+            //Arrange
+            var rand = new Random();
+
+            var matchedAllocationAmounts = new AllocationAmountFactFaker()
+                .RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(minimumFlow.HasValue ? minimumFlow.Value : 1, maximumFlow.HasValue ? maximumFlow.Value : long.MaxValue))
+                .Generate(expectedResultCount);
+
+            //generate non-matching allocationAmounts
+            var nonMatchFaker = new AllocationAmountFactFaker();
+            if (minimumFlow.HasValue)
+            {
+                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(1, minimumFlow.Value - 1));
+            }
+            else if(maximumFlow.HasValue)
+            {
+                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(maximumFlow.Value));
+            }
+
+            var nonMatchedAllocationAmounts = nonMatchFaker.Generate(totalRecordCount - expectedResultCount);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                MinimumFlow = minimumFlow,
+                MaximumFlow = maximumFlow
             };
 
             //Act

@@ -123,6 +123,35 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool? isExempt)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.ExemptOfVolumeFlowPriority == isExempt);
+
+            return predicate;
+        }
+
+        public static ExpressionStarter<AllocationAmountsFact> FlowRateRange(long? minimumFlow, long? maximumFlow)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            if (minimumFlow.HasValue && maximumFlow.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationFlow_CFS >= minimumFlow  && x.AllocationFlow_CFS <= maximumFlow);
+            }
+            else if(minimumFlow.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationFlow_CFS >= minimumFlow);
+            }
+            else if (maximumFlow.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationFlow_CFS <= maximumFlow);
+            }
+
+            return predicate;
+        }
+
         #endregion
     }
 }

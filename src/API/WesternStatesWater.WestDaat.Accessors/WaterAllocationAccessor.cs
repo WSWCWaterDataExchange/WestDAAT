@@ -43,9 +43,19 @@ namespace WesternStatesWater.WestDaat.Accessors
                 predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
             }
 
-            if(searchCriteria?.AllocationOwner != null && searchCriteria.AllocationOwner.Any())
+            if(!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
             {
                 predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+            }
+
+            if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
+            {
+                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority));
+            }
+
+            if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
+            {
+                predicate.And(AllocationAmountsFact.FlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
             }
 
             using var db = _databaseContextFactory.Create();
