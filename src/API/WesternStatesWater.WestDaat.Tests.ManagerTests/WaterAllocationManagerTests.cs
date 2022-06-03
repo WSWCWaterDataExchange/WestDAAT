@@ -92,6 +92,28 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        public async Task WaterAllocationManager_GetWaterSiteLocation()
+        {
+            var location = new CommonContracts.SiteLocation
+            {
+                Latitude = 999,
+                Longitude = 888,
+                PODorPOUSite = "TEST_PODorPOU",
+                SiteUuid = "TEST_PODorPOU"
+            };
+
+            _siteAccessorMock.Setup(x => x.GetWaterSiteLocationByUuid("TEST_PODorPOU")).ReturnsAsync(location);
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterSiteLocation("TEST_PODorPOU");
+
+            result.Should().NotBeNull();
+            _siteAccessorMock.Verify();
+
+            result.Properties.First(x => x.Key.ToLower() == "siteuuid").Value.Should().Be(location.SiteUuid);
+        }
+
+        [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightDetails()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById(99)).ReturnsAsync(new CommonContracts.WaterRightDetails()).Verifiable();

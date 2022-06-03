@@ -49,8 +49,8 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             return await db.SitesDim.Where(x => x.SiteUuid == siteUuid)
-                        .ProjectTo<SiteLocation>(DtoMapper.Configuration)
-                        .SingleAsync();
+                .ProjectTo<SiteLocation>(DtoMapper.Configuration)
+                .SingleAsync();
         }
     }
 }
