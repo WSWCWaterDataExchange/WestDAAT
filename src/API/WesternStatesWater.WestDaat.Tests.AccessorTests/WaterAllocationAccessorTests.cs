@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .SetAllocationExpirationDate(expirationDate)
                 .Generate();
             allocationAmount.VariableSpecific.AggregationInterval = 5.0M;
-            
+
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
 
@@ -90,10 +90,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(expectedResult, options =>
-            options.Using<DateTime>(x => x.Subject.Should().NotBe(DateTime.Now)).WhenTypeIs<DateTime>());
-
-            result.PriorityDate.Should().BeSameDateAs(priorityDate);
-            result.ExpirationDate.Should().BeSameDateAs(expirationDate);
+                options.Using<DateTime>(x => x.Subject.Should().BeSameDateAs(expirationDate)).When(info => info.Path.Equals("ExpirationDate"))
+                       .Using<DateTime>(x => x.Subject.Should().BeSameDateAs(priorityDate)).When(info => info.Path.Equals("PriorityDate")));
         }
 
         [TestMethod]
