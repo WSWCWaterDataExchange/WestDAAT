@@ -24,7 +24,7 @@ function DetailsPage(props: detailPageProps) {
   const isSiteDetail = useMemo(() => props.detailType === "site", [props.detailType]);
 
   const detailsComponent = isSiteDetail ? <SiteProperties /> : <WaterRightProperties waterRightId={id} />;
-  const mapComponent = isSiteDetail ? <SiteMap /> : <WaterRightMap waterRightId={id} />;
+  const mapComponent = isSiteDetail ? <SiteMap siteId={id} /> : <WaterRightMap waterRightId={id} />;
   const tabComponent = isSiteDetail ? <SiteTabs /> : <WaterRightTabs waterRightId={id} />;
 
   const { isFetching: isFetchingDetails } = useWaterRightDetails(+id);

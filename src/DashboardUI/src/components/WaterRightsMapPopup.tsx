@@ -39,7 +39,7 @@ function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
-        header: `Site ID: ${siteUuid}`,
+        header: <div>Site ID: <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">{siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a></div>,
         body: <div className="map-popup-card-water-rights-body">
           <div className="mb-2">
             <div className="map-popup-card-water-rights-native-id-row">

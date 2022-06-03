@@ -55,6 +55,18 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetSiteDetailsByUuid(siteUuid)).Map<ClientContracts.SiteDetails>();
         }
 
+        public async Task<Feature> GetWaterSiteLocation(string siteUuid)
+        {
+            var siteLocation = await _siteAccessor.GetWaterSiteLocationByUuid(siteUuid);
+
+            Feature feature = new Feature(
+                        siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
+                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        );
+
+            return feature;
+        }
+
         async Task<ClientContracts.WaterRightDetails> ClientContracts.IWaterAllocationManager.GetWaterRightDetails(long waterRightsId)
         {
             return (await _waterAllocationAccessor.GetWaterRightDetailsById(waterRightsId)).Map<ClientContracts.WaterRightDetails>();
