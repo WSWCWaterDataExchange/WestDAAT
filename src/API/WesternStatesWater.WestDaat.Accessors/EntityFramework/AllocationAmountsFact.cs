@@ -116,7 +116,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
         public static ExpressionStarter<AllocationAmountsFact> HasAllocationOwner(string allowcationOwner)
         {
-            //TODO add tests
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
             predicate = predicate.Or(x => x.AllocationOwner == allowcationOwner);
