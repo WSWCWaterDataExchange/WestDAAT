@@ -90,6 +90,29 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
         }
-    }
 
+        public async Task<List<dynamic>> GetAllWaterSiteLocations()
+        {
+            using var db = _databaseContextFactory.Create();
+            return await db.AllocationBridgeSitesFact
+                .Select(x => (dynamic)new 
+                {
+                    x.Site.Latitude,
+                    x.Site.Longitude,
+                    x.Site.HUC8,
+                    x.Site.HUC12,
+                    x.Site.County,
+                    x.Site.SiteTypeCv,
+                    x.Site.SiteUuid,
+                    x.Site.GniscodeCv,
+                    x.Site.SiteName,
+                    OrganizationDataMappingUrl = db.AllocationAmountsFact
+                        .Where(s => s.AllocationAmountId == x.AllocationAmountId)
+                        .Select(a => a.Organization.OrganizationDataMappingUrl)
+                        .FirstOrDefault(),
+                    x.Site.Geometry,
+                })
+                .ToListAsync();
+        }
+    }
 }

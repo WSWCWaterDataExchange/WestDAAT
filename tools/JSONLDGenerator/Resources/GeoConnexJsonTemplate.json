@@ -1,0 +1,112 @@
+{
+  {
+    "@context": [
+      {
+        {
+          "schema": "http://schema.org/",
+          "skos": "https://www.w3.org/TR/skos-reference/",
+          "sosa": "http://www.w3.org/ns/sosa/",
+          "hyf": "https://www.opengis.net/def/schema/hy_features/hyf/",
+          "gsp": "http://www.opengeospatial.org/standards/geosparql/",
+          "name": "schema:name",
+          "sameAs": "schema:sameAs",
+          "related": "skos:related",
+          "description": "schema:description",
+          "geo": "schema:geo",
+          "image": {
+            {
+              "@id": "schema:image",
+              "@type": "@id"
+            }
+          }
+        }
+      }
+    ],
+    "@id": "https://geoconnex.us/wade/sites/{6}",
+    "@type": [
+      "https://www.opengis.net/def/schema/hy_features/hyf/HY_HydrometricFeature",
+      "https://www.opengis.net/def/schema/hy_features/hyf/HY_HydroLocation"
+    ],
+    "name": "{8}",
+    "description": "",
+    "sameAs": "",
+    "schema:about": [
+      {
+        {
+          "schema:url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/{7}"
+        }
+      },
+      {
+        {
+          "schema:url": "",
+          "schema:provider": "{9}"
+        }
+      }
+    ],
+    "hyf:referencedPosition": [
+      {
+        {
+          "hyf:HY_IndirectPosition": {
+            {
+              "hyf:distanceExpression": {
+                {
+                  "hyf:HY_DistanceFromReferent": {
+                    {
+                      "hyf:interpolative": ""
+                    }
+                  }
+                }
+              },
+              "hyf:distanceDescription": {
+                {
+                  "hyf:HY_DistanceDescription": ""
+                }
+              },
+              "hyf:linearElement": ""
+            }
+          }
+        }
+      },
+      {
+        {
+          "hyf:HY_IndirectPosition": {
+            {
+              "hyf:linearElement": ""
+            }
+          }
+        }
+      }
+    ],
+    "sosa:isFeatureOfInterestOf": {
+      {
+        "@id": "https://wade-api-qa.azure-api.net/v1/SiteAllocationAmounts/{6}",
+        "@type": "sosa:ObservationCollection",
+        "schema:format": [
+          "application/json"
+        ],
+        "schema:provider": "https://westernstateswater.org/wade"
+      }
+    },
+    "schema:geoWithin": [
+      "https://geoconnex.us/counties/{4}",
+      "https://geoconnex.us/nhdplusv2/huc12/{3}",
+      "https://geoconnex.us/ref/hu08/{2}"
+    ],
+    "hyf:HY_HydroLocationType": [
+      "{5}"
+    ],
+    "geo": {
+      {
+        "@type": "schema:GeoCoordinates",
+        "schema:latitude": "{1}",
+        "schema:longitude": "{0}"
+      }
+    },
+    "gsp:hasGeometry": {
+      {
+        "@type": "gsp:Geometry",
+        "gsp:asWKT": "{10}"
+      }
+    }
+  }
+}
