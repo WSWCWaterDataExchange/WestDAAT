@@ -29,10 +29,19 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>JSONLDSchemas.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\JSONLDSchemas.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>JSONLDSchemas.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="JSONLDSchemas.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>JSONLDSchemas.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\JSONLDSchemas.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>JSONLDSchemas.Designer.cs</LastGenOutput>
     </EmbeddedResource>

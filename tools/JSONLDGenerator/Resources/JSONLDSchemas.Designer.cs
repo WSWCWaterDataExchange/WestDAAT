@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator {
+namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Tools.JSONLDGenerator.JSONLDSchemas", typeof(JSONLDSchemas).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Tools.JSONLDGenerator.Resources.JSONLDSchemas", typeof(JSONLDSchemas).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,21 +61,21 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {
-        ///  {
-        ///    &quot;@context&quot;: [
-        ///      {
-        ///        {
-        ///          &quot;schema&quot;: &quot;http://schema.org/&quot;,
-        ///          &quot;skos&quot;: &quot;https://www.w3.org/TR/skos-reference/&quot;,
-        ///          &quot;sosa&quot;: &quot;http://www.w3.org/ns/sosa/&quot;,
-        ///          &quot;hyf&quot;: &quot;https://www.opengis.net/def/schema/hy_features/hyf/&quot;,
-        ///          &quot;gsp&quot;: &quot;http://www.opengeospatial.org/standards/geosparql/&quot;,
-        ///          &quot;name&quot;: &quot;schema:name&quot;,
-        ///          &quot;sameAs&quot;: &quot;schema:sameAs&quot;,
-        ///          &quot;related&quot;: &quot;skos:related&quot;,
-        ///          &quot;description&quot;: &quot;schema:description&quot;,
-        ///           [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to {{
+        ///  &quot;@context&quot;: [
+        ///    {{
+        ///      &quot;schema&quot;: &quot;http://schema.org/&quot;,
+        ///      &quot;skos&quot;: &quot;https://www.w3.org/TR/skos-reference/&quot;,
+        ///      &quot;sosa&quot;: &quot;http://www.w3.org/ns/sosa/&quot;,
+        ///      &quot;hyf&quot;: &quot;https://www.opengis.net/def/schema/hy_features/hyf/&quot;,
+        ///      &quot;gsp&quot;: &quot;http://www.opengeospatial.org/standards/geosparql/&quot;,
+        ///      &quot;name&quot;: &quot;schema:name&quot;,
+        ///      &quot;sameAs&quot;: &quot;schema:sameAs&quot;,
+        ///      &quot;related&quot;: &quot;skos:related&quot;,
+        ///      &quot;description&quot;: &quot;schema:description&quot;,
+        ///      &quot;geo&quot;: &quot;schema:geo&quot;,
+        ///      &quot;image&quot;: {{
+        ///        &quot;@id&quot;: &quot;s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GeoConnexJsonTemplate {
             get {
