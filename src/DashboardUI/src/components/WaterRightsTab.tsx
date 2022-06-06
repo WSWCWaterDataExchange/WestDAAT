@@ -289,7 +289,7 @@ function WaterRightsTab() {
   }, [setLayerCircleColors, setLayerFillColors, mapGrouping, renderedMapGroupings])
 
   useEffect(() => {
-    if (renderedMapGroupings.colorMapping.length === 0) {
+    if (renderedMapGroupings.colorMapping.length === 0 && !isNldiMapActive) {
       setLegend(null);
     } else {
       setLegend(
@@ -573,6 +573,7 @@ function WaterRightsTab() {
     polylines.forEach(a => {
       setPolylines(a.identifier, null);
     })
+    setNldiMapStatus(false);
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
