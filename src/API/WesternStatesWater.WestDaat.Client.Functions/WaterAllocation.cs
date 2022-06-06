@@ -50,6 +50,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(result);
         }
 
+        [FunctionName(nameof(GetSiteLocation)), AllowAnonymous]
+        public async Task<IActionResult> GetSiteLocation([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteLocation")] HttpRequest request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetWaterSiteLocation(siteUuid);
+
+            return new OkObjectResult(JsonSerializer.Serialize(result));
+        }
+
         [FunctionName(nameof(GetWaterRightDetails)), AllowAnonymous]
         public async Task<IActionResult> GetWaterRightDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{waterRightId}")] HttpRequest request, long waterRightId)
         {

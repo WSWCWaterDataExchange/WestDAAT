@@ -62,6 +62,33 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Geometry?.AsText().Should().Be(expectedGeography);
         }
 
+        [TestMethod]
+        public async Task SiteAccessor_GetWaterSiteLocationByUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            var expectedResult = new Common.DataContracts.SiteLocation
+            {
+                Geometry = site.Geometry,
+                Latitude = site.Latitude,
+                Longitude = site.Longitude,
+                PODorPOUSite = site.PODorPOUSite,
+                SiteUuid = site.SiteUuid,
+            };
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterSiteLocationByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
         private ISiteAccessor CreateSiteAccessor()
         {
             return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());

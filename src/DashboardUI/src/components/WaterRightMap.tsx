@@ -75,7 +75,7 @@ function WaterRightMap(props: waterRightMapProps) {
   if (isWaterRightSiteLocationsLoading) return null;
 
   return (
-    <div className="water-rights-map-container h-100">
+    <div className="map-container h-100">
       <Map hideDrawControl={true} />
     </div>
   )
