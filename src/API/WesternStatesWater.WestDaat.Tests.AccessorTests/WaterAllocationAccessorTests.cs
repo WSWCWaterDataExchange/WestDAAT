@@ -447,29 +447,29 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         [TestMethod]
         [DataRow(5, 5, null, null)]
-        [DataRow(10, 0, null, 20L)]
-        [DataRow(5, 5, 10L, 10000L)]
-        [DataRow(10, 2, 500L, 50000L)]
-        [DataRow(10, 3, null, 50000L)]
-        [DataRow(10, 3, 200L, null)]
-        public async Task FindWaterRights_SearchByFlowRate_ReturnsMatches(int totalRecordCount, int expectedResultCount, long? minimumFlow, long? maximumFlow)
+        [DataRow(10, 0, null, 20d)]
+        [DataRow(5, 5, 10d, 10000d)]
+        [DataRow(10, 2, 500d, 50000d)]
+        [DataRow(10, 3, null, 50000d)]
+        [DataRow(10, 3, 200d, null)]
+        public async Task FindWaterRights_SearchByFlowRate_ReturnsMatches(int totalRecordCount, int expectedResultCount, double? minimumFlow, double? maximumFlow)
         {
             //Arrange
             var rand = new Random();
 
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(minimumFlow.HasValue ? minimumFlow.Value : 1, maximumFlow.HasValue ? maximumFlow.Value : long.MaxValue))
+                .RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Double(minimumFlow.HasValue ? minimumFlow.Value : 1, maximumFlow.HasValue ? maximumFlow.Value : double.MaxValue))
                 .Generate(expectedResultCount);
 
             //generate non-matching allocationAmounts
             var nonMatchFaker = new AllocationAmountFactFaker();
             if (minimumFlow.HasValue)
             {
-                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(1, minimumFlow.Value - 1));
+                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Double(1, minimumFlow.Value - 1));
             }
             else if(maximumFlow.HasValue)
             {
-                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Long(maximumFlow.Value));
+                nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Double(maximumFlow.Value, double.MaxValue));
             }
 
             var nonMatchedAllocationAmounts = nonMatchFaker.Generate(totalRecordCount - expectedResultCount);
@@ -481,7 +481,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 db.SaveChanges();
             }
 
-            var expectedWadeUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => new
+            { 
+                WadeUuid = x.AllocationAmountId.ToString(),
+                AllocationFlowCfs = x.AllocationFlow_CFS
+            }).ToList();
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
@@ -496,7 +500,68 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
 
-            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null)
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => actual.WadeUuid == expected.WadeUuid && actual.AllocationFlowCfs == expected.AllocationFlowCfs) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(5, 5, null, null)]
+        [DataRow(10, 0, null, 20d)]
+        [DataRow(5, 5, 10d, 10000d)]
+        [DataRow(10, 2, 500d, 50000d)]
+        [DataRow(10, 3, null, 50000d)]
+        [DataRow(10, 3, 200d, null)]
+        public async Task FindWaterRights_SearchByVolume_ReturnsMatches(int totalRecordCount, int expectedResultCount, double? minimumVolume, double? maximumVolume)
+        {
+            //Arrange
+            var rand = new Random();
+
+            var matchedAllocationAmounts = new AllocationAmountFactFaker()
+                .RuleFor(x => x.AllocationVolume_AF, f => f.Random.Double(minimumVolume.HasValue ? minimumVolume.Value : 1, maximumVolume.HasValue ? maximumVolume.Value : double.MaxValue))
+                .Generate(expectedResultCount);
+
+            //generate non-matching allocationAmounts
+            var nonMatchFaker = new AllocationAmountFactFaker();
+            if (minimumVolume.HasValue)
+            {
+                nonMatchFaker.RuleFor(x => x.AllocationVolume_AF, f => f.Random.Double(1, minimumVolume.Value - 1));
+            }
+            else if (maximumVolume.HasValue)
+            {
+                nonMatchFaker.RuleFor(x => x.AllocationVolume_AF, f => f.Random.Double(maximumVolume.Value, double.MaxValue));
+            }
+
+            var nonMatchedAllocationAmounts = nonMatchFaker.Generate(totalRecordCount - expectedResultCount);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => new
+            {
+                WadeUuid = x.AllocationAmountId.ToString(),
+                AllocationVolumeAf = x.AllocationVolume_AF
+            }).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                MinimumVolume = minimumVolume,
+                MaximumVolume = maximumVolume
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => actual.WadeUuid == expected.WadeUuid && actual.AllocationVolumeAf == expected.AllocationVolumeAf) != null)
                 .Should().BeTrue();
         }
 

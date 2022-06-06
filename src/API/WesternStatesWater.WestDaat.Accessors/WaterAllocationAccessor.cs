@@ -21,29 +21,55 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var waterRightDetails = await db.AllocationAmountsFact
+                .Include(x => x.AllocationBridgeBeneficialUsesFact)
+                .Include(x => x.AllocationBridgeSitesFact)
+                .Where(predicate)
+                .Select(x => new WaterRightsSearchDetail
+                {
+                    WadeUuid = x.AllocationAmountId.ToString(), // Per Ryan, until a real WadeUUID exists use AllocationAmountId
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
+                    OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name,
+                    AllocationFlowCfs = x.AllocationFlow_CFS,
+                    AllocationVolumeAf = x.AllocationVolume_AF
+                })
+                .ToArrayAsync();
+
+            return new WaterRightsSearchResults
+            {
+                CurrentPageNumber = 1,
+                WaterRightsDetails = waterRightDetails
+            };
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
-            if(searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
+            if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
             {
                 predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
             }
 
-            if(searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
+            if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
             {
                 predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
             }
-            
-            if(searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
+
+            if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
             {
                 predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
             }
 
-            if(searchCriteria?.States != null && searchCriteria.States.Any())
+            if (searchCriteria?.States != null && searchCriteria.States.Any())
             {
                 predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
             }
 
-            if(!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
+            if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
             {
                 predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
             }
@@ -55,48 +81,16 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
             {
-                predicate.And(AllocationAmountsFact.FlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
+                predicate.And(AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
             }
 
-            using var db = _databaseContextFactory.Create();
-            var waterRightDetails = await db.AllocationAmountsFact
-                .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                .Include(x => x.AllocationBridgeSitesFact)
-                .Where(predicate)
-                .Select(x => new WaterRightsSearchDetail
-                {
-                    WadeUuid = x.AllocationAmountId.ToString(), // Per Ryan, until a real WadeUUID exists use AllocationAmountId
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
-                    OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name
-                })
-                .ToArrayAsync();
-
-            //using var db = _databaseContextFactory.Create();
-            //var waterRightDetails = await db.AllocationAmountsFact
-            //    .Include(x => x.AllocationBridgeBeneficialUsesFact)
-            //    .Where(x => x.AllocationBridgeBeneficialUsesFact.Any(b => 
-            //        beneficalUsesList.Contains(b.BeneficialUse.WaDEName)))
-            //    .Select(x => new WaterRightsSearchDetail
-            //    {
-            //        BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName).ToArray()
-            //    })
-            //    .ToArrayAsync();
-
-            return new WaterRightsSearchResults
+            if (searchCriteria?.MinimumVolume != null || searchCriteria?.MaximumVolume != null)
             {
-                CurrentPageNumber = 1,
-                WaterRightsDetails = waterRightDetails
-            };
+                predicate.And(AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
+            }
+
+            return predicate;
         }
-
-        //private static ExpressionStarter<AllocationAmountsFact> HasBeneficialUses(List<string> beneficalUsesList)
-        //{
-        //    var predicate = PredicateBuilder.New<AllocationAmountsFact>();
-
-        //    predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
-        //            beneficalUsesList.Contains(b.BeneficialUse.WaDEName)));
-        //    return predicate;
-        //}
 
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {

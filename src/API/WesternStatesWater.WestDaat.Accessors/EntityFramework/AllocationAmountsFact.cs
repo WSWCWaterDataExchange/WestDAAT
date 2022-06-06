@@ -132,7 +132,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> FlowRateRange(long? minimumFlow, long? maximumFlow)
+        public static ExpressionStarter<AllocationAmountsFact> HasFlowRateRange(double? minimumFlow, double? maximumFlow)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
@@ -147,6 +147,26 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             else if (maximumFlow.HasValue)
             {
                 predicate = predicate.Or(x => x.AllocationFlow_CFS <= maximumFlow);
+            }
+
+            return predicate;
+        }
+
+        public static ExpressionStarter<AllocationAmountsFact> HasVolumeRange(double? minimumVolume, double? maximumVolume)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            if (minimumVolume.HasValue && maximumVolume.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationVolume_AF >= minimumVolume && x.AllocationVolume_AF <= maximumVolume);
+            }
+            else if (minimumVolume.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationVolume_AF >= minimumVolume);
+            }
+            else if (maximumVolume.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationVolume_AF <= maximumVolume);
             }
 
             return predicate;

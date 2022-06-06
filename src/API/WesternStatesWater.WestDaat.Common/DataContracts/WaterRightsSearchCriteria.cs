@@ -12,10 +12,10 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
         public bool? ExemptOfVolumeFlowPriority { get; set; }
-        public long? MinimumFlow { get; set; }
-        public long? MaximumFlow { get; set; }
-        public long? MinimumVolume { get; set; }
-        public long? MaximumVolume { get; set; }
+        public double? MinimumFlow { get; set; }
+        public double? MaximumFlow { get; set; }
+        public double? MinimumVolume { get; set; }
+        public double? MaximumVolume { get; set; }
         public string PodOrPou { get; set; }
         public DateTime? MinimumPriorityDate { get; set; }
         public DateTime? MaximumPriorityDate { get; set; }
