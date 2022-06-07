@@ -566,6 +566,54 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        [DataRow(10, 0, "POD")]
+        [DataRow(5, 5, "POU")]
+        [DataRow(5, 5, null)]
+        [DataRow(5, 5, "")]
+        [DataRow(10, 2, "POD")]
+        public async Task FindWaterRights_SearchByPodOrPou_ReturnsMatches(int totalRecordCount, int expectedResultCount, string searchInput)
+        {
+            //Arrange
+            var matchedSite = new SitesDimFaker().Generate();
+            matchedSite.PODorPOUSite = searchInput;
+
+            var matchedAllocationAmounts = new AllocationAmountFactFaker()
+                .LinkSites(matchedSite)
+                .Generate(expectedResultCount);
+
+            var nonMatchedSite = new SitesDimFaker().Generate();
+
+            //generate non-matching allocationAmounts
+            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
+                .LinkSites(nonMatchedSite)
+                .Generate(totalRecordCount - expectedResultCount);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                PodOrPou = searchInput
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.WadeUuid == expected) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange

@@ -47,32 +47,25 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
             if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
             {
                 predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
             }
 
-            if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
-            {
-                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
-            }
+            predicate.And(BuildOwnerSearchPredicate(searchCriteria));
 
-            if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
-            {
-                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
-            }
+            predicate.And(BuildSearchSiteDetailsPredicate(searchCriteria));
 
-            if (searchCriteria?.States != null && searchCriteria.States.Any())
-            {
-                predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
-            }
+            predicate.And(BuildVolumeAndFlowPredicate(searchCriteria));
 
-            if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
-            {
-                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
-            }
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
             if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
             {
@@ -87,6 +80,45 @@ namespace WesternStatesWater.WestDaat.Accessors
             if (searchCriteria?.MinimumVolume != null || searchCriteria?.MaximumVolume != null)
             {
                 predicate.And(AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
+            {
+                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildSearchSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
+            }
+
+            if (searchCriteria?.States != null && searchCriteria.States.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))
+            {
+                predicate.And(AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
             }
 
             return predicate;

@@ -172,6 +172,15 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> IsPodOrPou(string podOrPou)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(abs => abs.Site.PODorPOUSite == podOrPou));
+
+            return predicate;
+        }
+
         #endregion
     }
 }
