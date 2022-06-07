@@ -34,7 +34,9 @@ namespace WesternStatesWater.WestDaat.Accessors
                     BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
                     OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name,
                     AllocationFlowCfs = x.AllocationFlow_CFS,
-                    AllocationVolumeAf = x.AllocationVolume_AF
+                    AllocationVolumeAf = x.AllocationVolume_AF,
+                    AllocationPriorityDate = x.AllocationPriorityDateID != null ? x.AllocationPriorityDateNavigation.Date : default(DateTime),
+                    AllocationLegalStatus = x.AllocationLegalStatusCvNavigation.WaDEName.Length >0 ? x.AllocationLegalStatusCvNavigation.WaDEName : x.AllocationLegalStatusCvNavigation.Name
                 })
                 .ToArrayAsync();
 

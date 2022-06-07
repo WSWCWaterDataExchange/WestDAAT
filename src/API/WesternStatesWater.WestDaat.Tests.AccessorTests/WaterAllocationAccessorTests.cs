@@ -362,6 +362,48 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task FindWaterRights_SearchByStateAndBeneficailUse_ReturnsMatches()
+        {
+            var organizationFake = new OrganizationsDimFaker().Generate();
+            organizationFake.State = "ZZ";
+
+            var beneficialUse = new BeneficialUsesCVFaker().Generate();
+            beneficialUse.WaDEName = "searchName";
+            beneficialUse.Name = "searchName";
+
+            var matchedAllocationAmount = new AllocationAmountFactFaker()
+                    .LinkBeneficialUses(beneficialUse)
+                    .LinkOrganizaion(organizationFake).Generate();
+
+            var nonMatchedAllocationAmount = new AllocationAmountFactFaker()
+                .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate())
+                .LinkOrganizaion(new OrganizationsDimFaker().Generate())
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmount);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmount);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                States = new[] { "ZZ" },
+                BeneficialUses = new[] { "searchName" }
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().HaveCount(1);
+            result.WaterRightsDetails[0].WadeUuid.Should().Be(matchedAllocationAmount.AllocationAmountId.ToString());
+            result.WaterRightsDetails[0].BeneficialUses.Should().Contain("searchName");
+        }
+
+
+        [TestMethod]
         [DataRow(10, 0, "ownerName")]
         [DataRow(5, 5, "ownerName")]
         [DataRow(10, 2, "ownerName")]
@@ -635,7 +677,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .SetAllocationPriorityDate(matchingDate)                
                 .Generate(expectedResultCount);
 
-            //generate non-matching allocationAmounts
             DateTime nonMatchingDate;
             if (minimumPriorityDate.HasValue)
             {
@@ -679,6 +720,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
                 actual => expected == actual.WadeUuid) != null)
                 .Should().BeTrue();
+
+            result.WaterRightsDetails.All(x => x.AllocationPriorityDate.Date == matchingDate.Date).Should().BeTrue();
         }
 
         [TestMethod]
