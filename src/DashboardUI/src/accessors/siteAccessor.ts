@@ -1,3 +1,4 @@
+import { WaterSourceInfoListItem } from "@data-contracts";
 import axios from "axios";
 import WaterRightDigest from "../data-contracts/WaterRightsDigest";
 
@@ -14,6 +15,15 @@ export const getWaterSiteLocation = async (siteUuid: string) => {
   const { data } = await axios.get<
     GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
   >(
+    url.toString()
+  );
+  return data;
+
+};
+
+export const getWaterSiteSourceInfoList = async (siteUuid: string) => {
+  const url = new URL(`Sites/${siteUuid}/Sources`, process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<WaterSourceInfoListItem[]>(
     url.toString()
   );
   return data;

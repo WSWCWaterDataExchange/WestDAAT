@@ -89,6 +89,38 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().BeEquivalentTo(expectedResult);
         }
 
+        [TestMethod]
+        public async Task SiteAccessor_GetWaterSiteSourceInfoById()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            var waterSources = new WaterSourceDimFaker().Generate(5);
+            db.WaterSourcesDim.AddRange(waterSources);
+            db.SaveChanges();
+
+            foreach (var waterSource in waterSources)
+            {
+                var waterSourceBridge = new WaterSourceBridgeSiteFactFaker()
+                    .WaterSourceBridgeSiteFactFakerWithIds(waterSource.WaterSourceId, site.SiteId)
+                    .Generate();
+                db.WaterSourceBridgeSitesFact.Add(waterSourceBridge);
+            }
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterSiteSourceInfoListByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(5);
+            result.Any(x => x.WaterSourceUuid == waterSources[0].WaterSourceUuid).Should().BeTrue();
+        }
+
         private ISiteAccessor CreateSiteAccessor()
         {
             return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
