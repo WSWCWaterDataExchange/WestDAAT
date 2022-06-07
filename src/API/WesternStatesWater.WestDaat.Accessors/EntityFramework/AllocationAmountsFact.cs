@@ -172,6 +172,26 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> HasPriorityDateRange(DateTime? minimumPriorityDate, DateTime? maximumPriorityDate)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            if (minimumPriorityDate.HasValue && maximumPriorityDate.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationPriorityDateID != null && x.AllocationPriorityDateNavigation.Date >= minimumPriorityDate && x.AllocationPriorityDateNavigation.Date <= maximumPriorityDate);
+            }
+            else if (minimumPriorityDate.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationPriorityDateID != null && x.AllocationPriorityDateNavigation.Date >= minimumPriorityDate);
+            }
+            else if (maximumPriorityDate.HasValue)
+            {
+                predicate = predicate.Or(x => x.AllocationPriorityDateID != null && x.AllocationPriorityDateNavigation.Date <= maximumPriorityDate);
+            }
+
+            return predicate;
+        }
+
         public static ExpressionStarter<AllocationAmountsFact> IsPodOrPou(string podOrPou)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();

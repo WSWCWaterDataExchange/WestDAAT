@@ -614,6 +614,74 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        [DataRow(5, 5, null, null)]
+        [DataRow(10, 0, null, "2022-06-07")]
+        [DataRow(5, 5, "2017-06-07", "2022-06-07")]
+        [DataRow(10, 2, "2010-06-07", "2022-06-07")]
+        [DataRow(10, 3, null, "2022-06-07")]
+        [DataRow(10, 3, "2019-06-07", null)]
+        public async Task FindWaterRights_SearchByPriorityDate_ReturnsMatches(int totalRecordCount, int expectedResultCount, string minimumPriorityDateString, string maximumPriorityDateString)
+        {
+            DateTime? minimumPriorityDate = minimumPriorityDateString == null ? null : DateTime.Parse(minimumPriorityDateString);
+            DateTime? maximumPriorityDate = maximumPriorityDateString == null ? null : DateTime.Parse(maximumPriorityDateString);
+
+            //Arrange
+            var rand = new Random();
+
+            var dateFaker = new Faker().Date;
+            var matchingDate = dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue);
+
+            var matchedAllocationAmounts = new AllocationAmountFactFaker()
+                .SetAllocationPriorityDate(matchingDate)                
+                .Generate(expectedResultCount);
+
+            //generate non-matching allocationAmounts
+            DateTime nonMatchingDate;
+            if (minimumPriorityDate.HasValue)
+            {
+                nonMatchingDate = dateFaker.Past(1, minimumPriorityDate);
+            }
+            else if (maximumPriorityDate.HasValue)
+            {
+                nonMatchingDate = dateFaker.Future(1, maximumPriorityDate);
+            }
+            else
+            {
+                nonMatchingDate = default(DateTime);
+            }
+
+            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
+                .SetAllocationPriorityDate(nonMatchingDate)
+                .Generate(totalRecordCount - expectedResultCount);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedWadeUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                MinimumPriorityDate = minimumPriorityDate,
+                MaximumPriorityDate = maximumPriorityDate
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
+
+            expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => expected == actual.WadeUuid) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
         public void WaterAllocationAccessor_GetWaterAllocationAmountOrganizationById_ShouldReturnOrg()
         {
             // Arrange

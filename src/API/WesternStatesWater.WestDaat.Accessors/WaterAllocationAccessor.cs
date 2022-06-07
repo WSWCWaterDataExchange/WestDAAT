@@ -56,9 +56,23 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             predicate.And(BuildOwnerSearchPredicate(searchCriteria));
 
-            predicate.And(BuildSearchSiteDetailsPredicate(searchCriteria));
+            predicate.And(BuildSiteDetailsPredicate(searchCriteria));
 
             predicate.And(BuildVolumeAndFlowPredicate(searchCriteria));
+
+            predicate.And(BuildDatePredicate(searchCriteria));
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if(searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
+            {
+                predicate.And(AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
+            }
 
             return predicate;
         }
@@ -102,7 +116,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildSearchSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
