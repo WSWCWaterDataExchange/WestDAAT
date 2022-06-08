@@ -49,7 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "8. Tools", "8. Tools", "{93
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate", "..\..\tools\MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj", "{E3B6F100-9065-4A8F-83F8-8B3805D94BE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tools.JSONLDGenerator", "..\..\tools\JSONLDGenerator\WesternStatesWater.WestDaat.Tools.JSONLDGenerator.csproj", "{7C72C705-CCC4-4B90-9177-800532CDB0D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.JSONLDGenerator", "..\..\tools\JSONLDGenerator\WesternStatesWater.WestDaat.Tools.JSONLDGenerator.csproj", "{7C72C705-CCC4-4B90-9177-800532CDB0D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

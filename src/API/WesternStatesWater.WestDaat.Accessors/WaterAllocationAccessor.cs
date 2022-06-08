@@ -91,11 +91,11 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        public async Task<List<dynamic>> GetAllWaterSiteLocations()
+        public async Task<List<dynamic>> GetJSONLDData()
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                .Select(x => (dynamic)new 
+                .Select(x => (dynamic)new
                 {
                     x.Site.Latitude,
                     x.Site.Longitude,

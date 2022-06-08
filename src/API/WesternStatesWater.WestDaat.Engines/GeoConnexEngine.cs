@@ -1,19 +1,23 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Engines.Resources;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Engines
 {
     public sealed class GeoConnexEngine : EngineBase, IGeoConnexEngine
     {
-        public GeoConnexEngine(ILogger<GeoConnexEngine> logger) : base(logger)
+        private readonly ITemplateResourceSdk _templateResourceSdk;
+
+        public GeoConnexEngine(ITemplateResourceSdk rss, ILogger<GeoConnexEngine> logger) : base(logger)
         {
+            _templateResourceSdk = rss;
         }
 
         string IGeoConnexEngine.BuildGeoConnexJson(Site site, Organization org)
         {
-            var geoConnexJson = string.Format(GeoConnexResources.GeoConnexJsonTemplate,
+            var file = _templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
+            var geoConnexJson = string.Format(file,
                 JsonEncode(
                     site.Longitude,                 // {0}
                     site.Latitude,                  // {1}

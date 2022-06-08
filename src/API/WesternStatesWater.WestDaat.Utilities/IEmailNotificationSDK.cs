@@ -1,5 +1,4 @@
-﻿using SendGrid;
-using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
+﻿using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities
 {

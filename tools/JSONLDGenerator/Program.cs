@@ -1,14 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Engines;
-using WesternStatesWater.WestDaat.Tools.JSONLDGenerator.Resources;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
 {
@@ -18,7 +16,6 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Environment.CurrentDirectory)
-                .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
                 .Build();
@@ -27,24 +24,36 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             var services = hostBuilder.ConfigureServices((_, services) =>
             {
                 services.AddScoped(_ => config.GetDatabaseConfiguration());
+                services.AddScoped(a => config.GetBlobStorageConfiguration());
                 services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
+                services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
+                services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
                 services.BuildServiceProvider();
             }).Build();
 
             var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
+            var rawData = await waterAllocationAccessor!.GetJSONLDData();
 
-            var allocations = await waterAllocationAccessor!.GetAllWaterSiteLocations();
+            var templateResourceSdk = services.Services.GetService<ITemplateResourceSdk>();
+            var stringFile = templateResourceSdk!.GetTemplate(Common.ResourceType.JsonLD);
 
             var list = new List<string>();
-            string stringFile = JSONLDSchemas.GeoConnexJsonTemplate;
-
-            allocations.AsParallel().ForAll(allocation => 
+            rawData.AsParallel().ForAll(allocation => 
             {
                 list.Add(BuildGeoConnexJson(stringFile, allocation));
             });
 
-            // trigger the push to docker
+            var stream = new MemoryStream(
+                Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(list)
+                    ));
+
+            var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
+            
+            await blobStorageSdk!.UploadAsync("jsonlds", "JsonLDSchemaData", stream, true);
+
+            Console.WriteLine("finish");
         }
 
         private static string BuildGeoConnexJson(string stringFile, dynamic customObject)

@@ -2167,6 +2167,5 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             });
         }
-   
     }
 }

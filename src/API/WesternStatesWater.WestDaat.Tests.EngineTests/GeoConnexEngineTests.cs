@@ -6,6 +6,7 @@ using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Tests.Helpers;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.EngineTests
 {
@@ -63,7 +64,8 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
 
         private static IGeoConnexEngine CreateGeoConnexEngine()
         {
-            return new GeoConnexEngine(NullLogger<GeoConnexEngine>.Instance);
+            Mock<ITemplateResourceSdk> templateResourceSdk = new(MockBehavior.Strict);
+            return new GeoConnexEngine(templateResourceSdk.Object, NullLogger<GeoConnexEngine>.Instance);
         }
 
         [TestMethod]

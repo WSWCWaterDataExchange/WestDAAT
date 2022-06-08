@@ -1,18 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\src\API</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
   </ItemGroup>
 
@@ -24,34 +28,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="JSONLDSchemas.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>JSONLDSchemas.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\JSONLDSchemas.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>JSONLDSchemas.resx</DependentUpon>
-    </Compile>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+    <None Update="personal.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="JSONLDSchemas.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>JSONLDSchemas.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\JSONLDSchemas.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>JSONLDSchemas.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-	<ItemGroup>
-		<None Update="personal.settings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
-		</None>
-	</ItemGroup>
 
 </Project>
