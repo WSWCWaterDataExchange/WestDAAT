@@ -111,7 +111,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [FunctionName(nameof(GetWaterSiteRightsListByUuid)), AllowAnonymous]
         public async Task<IActionResult> GetWaterSiteRightsListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights")] HttpRequest request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterSiteSourceInfoListByUuid(siteUuid);
+            var result = await _waterAllocationManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
 
             return new OkObjectResult(result);
         }

@@ -111,7 +111,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterSiteSourceInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
         }
 
-        async Task<List<ClientContracts.WaterRightInfoListItem>> GetWaterRightInfoListItems(string siteUuid)
+        async Task<List<ClientContracts.WaterRightInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterSiteRightsInfoListByUuid(string siteUuid)
         {
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }

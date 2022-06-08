@@ -67,11 +67,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<List<WaterRightInfoListItem>> GetWaterRightInfoListByUuid(string siteUuid)
         {
             using var db = _databaseContextFactory.Create();
-
-            //var test = await db.SitesDim.Where(x => x.SiteUuid == siteUuid)
-            //    .SelectMany(x => x.AllocationBridgeSitesFact.Select(a => a.AllocationAmount))
-            //    .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)
-            //    .ToListAsync();
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)

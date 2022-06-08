@@ -1,5 +1,6 @@
 import { Tab, Table, Tabs } from 'react-bootstrap';
 import { useWaterSiteSourceInfoList, useWaterRightInfoList } from '../hooks/useSiteQuery';
+import { FormattedDate } from './FormattedDate';
 
 interface siteTabsProps {
     siteUuid: string;
@@ -50,12 +51,17 @@ function SiteTabs(props: siteTabsProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {waterSourceInfoList?.map((source) =>
-                                <tr key={source.waterSourceUuid}>
-                                    <td>{source.waterSourceUuid}</td>
-                                    <td>{source.waterSourceNativeId}</td>
-                                    <td>{source.waterSourceName}</td>
-                                    <td>{source.waterSourceType}</td>
+                            {waterRightInfoList?.map((right) =>
+                                <tr key={right.waterRightId}>
+                                    <td>{right.waterRightId}</td>
+                                    <td>{right.waterRightNativeId}</td>
+                                    <td>{right.owner}</td>
+                                    <td><FormattedDate>{right.priorityDate}</FormattedDate></td>
+                                    <td><FormattedDate>{right.expirationDate}</FormattedDate></td>
+                                    <td>{right.legalStatus}</td>
+                                    <td>{right.flow}</td>
+                                    <td>{right.volume}</td>
+                                    <td>{right.beneficialUses}</td>
                                 </tr>
                             )}
                         </tbody>
