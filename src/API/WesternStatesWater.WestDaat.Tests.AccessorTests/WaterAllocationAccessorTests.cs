@@ -402,6 +402,79 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.WaterRightsDetails[0].BeneficialUses.Should().Contain("searchName");
         }
 
+        [TestMethod]
+        public async Task FindWaterRights_SearchByPodOrPouAndMaximumVolume_ReturnsMatches()
+        {
+            var matchedSite = new SitesDimFaker().Generate();
+            matchedSite.PODorPOUSite = "pou";
+
+            var matchedAllocationAmount = new AllocationAmountFactFaker()
+                .RuleFor(x => x.AllocationVolume_AF, 2000)
+                .LinkSites(matchedSite)
+                .Generate();
+
+            var nonMatchedAllocationAmount = new AllocationAmountFactFaker()
+                .RuleFor(x => x.AllocationVolume_AF, 10000)
+                .LinkSites(new SitesDimFaker().Generate())
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmount);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmount);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                PodOrPou = "pou",
+                MaximumVolume = 3000
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().HaveCount(1);
+            result.WaterRightsDetails[0].WadeUuid.Should().NotBeNull();
+            result.WaterRightsDetails[0].WadeUuid.Should().Be(matchedAllocationAmount.AllocationAmountId.ToString());
+            result.WaterRightsDetails[0].AllocationVolumeAf.Should().Be(2000);
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_LegalStatusMapped_NameOrWadeName()
+        {
+            var matchedAllocationAmountWithWadeName = new AllocationAmountFactFaker()
+                .IncludeLegalStatus()
+                .Generate();
+
+            var legalStatusNoWadeName = new LegalStatusCVFaker().Generate();
+            legalStatusNoWadeName.WaDEName = null;
+
+            var matchedAllocationAmountNoWadeName = new AllocationAmountFactFaker().Generate();
+            matchedAllocationAmountNoWadeName.AllocationLegalStatusCv = legalStatusNoWadeName.Name;
+            matchedAllocationAmountNoWadeName.AllocationLegalStatusCvNavigation = legalStatusNoWadeName;
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(matchedAllocationAmountWithWadeName);
+                db.AllocationAmountsFact.Add(matchedAllocationAmountNoWadeName);
+                db.SaveChanges();
+            }
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria();
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            result.WaterRightsDetails.Should().HaveCount(2);            
+            result.WaterRightsDetails.First(x => x.WadeUuid == matchedAllocationAmountWithWadeName.AllocationAmountId.ToString())
+                .AllocationLegalStatus.Should().Be(matchedAllocationAmountWithWadeName.AllocationLegalStatusCvNavigation.WaDEName);
+            result.WaterRightsDetails.First(x => x.WadeUuid == matchedAllocationAmountNoWadeName.AllocationAmountId.ToString())
+                .AllocationLegalStatus.Should().Be(matchedAllocationAmountNoWadeName.AllocationLegalStatusCvNavigation.Name);
+
+        }
 
         [TestMethod]
         [DataRow(10, 0, "ownerName")]

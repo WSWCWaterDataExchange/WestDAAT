@@ -88,5 +88,15 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
 
             return faker;
         }
+
+        public static Faker<AllocationAmountsFact> IncludeLegalStatus(this Faker<AllocationAmountsFact> faker)
+        {
+            faker.RuleFor(a => a.AllocationLegalStatusCv, b => b.Random.String(10, 'A', 'z'))
+                .RuleFor(a => a.AllocationLegalStatusCvNavigation,
+                    (faker, allocationAmountFact) => new LegalStatusCVFaker()
+                        .RuleFor(legalStatusCV => legalStatusCV.Name, f => allocationAmountFact.AllocationLegalStatusCv));
+
+            return faker;
+        }
     }
 }
