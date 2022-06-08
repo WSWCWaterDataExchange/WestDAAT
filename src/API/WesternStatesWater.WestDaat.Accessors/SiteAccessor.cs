@@ -52,5 +52,17 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteLocation>(DtoMapper.Configuration)
                 .SingleAsync();
         }
+
+        public async Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+
+            return await db.SitesDim.Where(x => x.SiteUuid == siteUuid)
+                    .SelectMany(x => x.WaterSourceBridgeSitesFact
+                    .Select(a => a.WaterSource))
+                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                    .Distinct()
+                    .ToListAsync();
+        }
     }
 }

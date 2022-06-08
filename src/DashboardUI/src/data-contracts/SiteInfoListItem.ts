@@ -2,7 +2,7 @@ export interface SiteInfoListItem {
   siteUuid: string;
   siteNativeId: string;
   siteName: string;
-  siteTypeCv: string;
+  siteType: string;
   longitude?: number;
   latitude?: number;
   county: string;

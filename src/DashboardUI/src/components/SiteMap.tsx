@@ -9,11 +9,11 @@ import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 
 interface siteMapProps {
-  siteId: string;
+  siteUuid: string;
 }
 
 function SiteMap(props: siteMapProps) {
-  const { data: waterSiteLocation, isFetching: isWaterSiteLocationLoading } = useWaterSiteLocation(props.siteId);
+  const { data: waterSiteLocation, isFetching: isWaterSiteLocationLoading } = useWaterSiteLocation(props.siteUuid);
 
   const {
     setVisibleLayers,

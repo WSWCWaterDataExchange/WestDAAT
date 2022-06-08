@@ -31,40 +31,9 @@ namespace WesternStatesWater.WestDaat.Managers
             _geoConnexEngine = geoConnexEngine;
         }
 
-        async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
-        {
-            var site = await _siteAccessor.GetSiteByUuid(siteUuid);
-            if (site.AllocationIds == null || !site.AllocationIds.Any())
-            {
-                throw new WestDaatException($"No AllocationAmounts found for site uuid [{siteUuid}]");
-            }
-
-            var organization = _waterAllocationAccessor.GetWaterAllocationAmountOrganizationById(site.AllocationIds.First());
-            var json = _geoConnexEngine.BuildGeoConnexJson(site, organization);
-
-            return json;
-        }
-
         async Task<FeatureCollection> ClientContracts.IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)
         {
             return await _nldiAccessor.GetNldiFeatures(latitude, longitude, directions, dataPoints);
-        }
-
-        async Task<ClientContracts.SiteDetails> ClientContracts.IWaterAllocationManager.GetSiteDetails(string siteUuid)
-        {
-            return (await _siteAccessor.GetSiteDetailsByUuid(siteUuid)).Map<ClientContracts.SiteDetails>();
-        }
-
-        public async Task<Feature> GetWaterSiteLocation(string siteUuid)
-        {
-            var siteLocation = await _siteAccessor.GetWaterSiteLocationByUuid(siteUuid);
-
-            Feature feature = new Feature(
-                        siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
-                        );
-
-            return feature;
         }
 
         async Task<ClientContracts.WaterRightDetails> ClientContracts.IWaterAllocationManager.GetWaterRightDetails(long waterRightsId)
@@ -80,11 +49,6 @@ namespace WesternStatesWater.WestDaat.Managers
         async Task<List<ClientContracts.WaterSourceInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSourceInfoList(long waterRightsId)
         {
             return (await _waterAllocationAccessor.GetWaterRightSourceInfoById(waterRightsId)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
-        }
-
-        async Task<List<ClientContracts.WaterRightsDigest>> ClientContracts.IWaterAllocationManager.GetWaterRightsDigestsBySite(string siteUuid)
-        {
-            return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
         }
 
         public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)
@@ -104,6 +68,47 @@ namespace WesternStatesWater.WestDaat.Managers
             }
 
             return new FeatureCollection(features);
+        }
+
+        async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
+        {
+            var site = await _siteAccessor.GetSiteByUuid(siteUuid);
+            if (site.AllocationIds == null || !site.AllocationIds.Any())
+            {
+                throw new WestDaatException($"No AllocationAmounts found for site uuid [{siteUuid}]");
+            }
+
+            var organization = _waterAllocationAccessor.GetWaterAllocationAmountOrganizationById(site.AllocationIds.First());
+            var json = _geoConnexEngine.BuildGeoConnexJson(site, organization);
+
+            return json;
+        }
+
+        async Task<ClientContracts.SiteDetails> ClientContracts.IWaterAllocationManager.GetSiteDetails(string siteUuid)
+        {
+            return (await _siteAccessor.GetSiteDetailsByUuid(siteUuid)).Map<ClientContracts.SiteDetails>();
+        }
+
+        async Task<List<ClientContracts.WaterRightsDigest>> ClientContracts.IWaterAllocationManager.GetWaterRightsDigestsBySite(string siteUuid)
+        {
+            return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
+        }
+
+        public async Task<Feature> GetWaterSiteLocation(string siteUuid)
+        {
+            var siteLocation = await _siteAccessor.GetWaterSiteLocationByUuid(siteUuid);
+
+            Feature feature = new Feature(
+                        siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
+                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        );
+
+            return feature;
+        }
+
+        async Task<List<ClientContracts.WaterSourceInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterSiteSourceInfoListByUuid(string siteUuid)
+        {
+            return (await _siteAccessor.GetWaterSiteSourceInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
         }
     }
 }
