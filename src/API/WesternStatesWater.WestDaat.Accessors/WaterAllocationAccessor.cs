@@ -5,15 +5,19 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class WaterAllocationAccessor : AccessorBase, IWaterAllocationAccessor
     {
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        private readonly PerformanceConfiguration _performanceConfiguration;
+
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
+            _performanceConfiguration = performanceConfiguration;
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
@@ -28,6 +32,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Include(x => x.AllocationBridgeBeneficialUsesFact)
                 .Include(x => x.AllocationBridgeSitesFact)
                 .Where(predicate)
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId) // eventually this will be WadeUuid
+                .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
+                .Take(_performanceConfiguration.WaterRightsSearchPageSize)
                 .Select(x => new WaterRightsSearchDetail
                 {
                     WadeUuid = x.AllocationAmountId.ToString(), // Per Ryan, until a real WadeUUID exists use AllocationAmountId
@@ -36,13 +44,13 @@ namespace WesternStatesWater.WestDaat.Accessors
                     AllocationFlowCfs = x.AllocationFlow_CFS,
                     AllocationVolumeAf = x.AllocationVolume_AF,
                     AllocationPriorityDate = x.AllocationPriorityDateID != null ? x.AllocationPriorityDateNavigation.Date : default(DateTime),
-                    AllocationLegalStatus = x.AllocationLegalStatusCvNavigation.WaDEName.Length >0 ? x.AllocationLegalStatusCvNavigation.WaDEName : x.AllocationLegalStatusCvNavigation.Name
+                    AllocationLegalStatus = x.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? x.AllocationLegalStatusCvNavigation.WaDEName : x.AllocationLegalStatusCvNavigation.Name
                 })
                 .ToArrayAsync();
 
             return new WaterRightsSearchResults
             {
-                CurrentPageNumber = 1,
+                CurrentPageNumber = searchCriteria.PageNumber,
                 WaterRightsDetails = waterRightDetails
             };
         }

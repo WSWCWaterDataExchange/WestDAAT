@@ -2,6 +2,7 @@
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -9,6 +10,45 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     [TestCategory("Accessor Tests")]
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
+        [TestMethod]
+        public async Task FindWaterRights_Pagination_PageThroughResults()
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker().Generate(1000);
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            var orderedAllocationAmountsFacts = allocationAmountFacts
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId);
+
+            //Act
+            var results = new List<WaterRightsSearchResults>();
+
+            var accessor = CreateWaterAllocationAccessor();
+
+            for(var i = 0; i < 10; i++)
+            {
+                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+                {
+                    PageNumber = i
+                };
+
+                results.Add(await accessor.FindWaterRights(searchCriteria));
+            }
+
+            //Assert
+            for (var i = 0; i < 10; i++)
+            {
+                var expected = orderedAllocationAmountsFacts.Skip(i).Take(100);
+                results[0].Should().BeEquivalentTo(expected);
+
+            }
+        }
+        
         [TestMethod]
         [DataRow("expectedName", "name2", "expectedName")]
         [DataRow("", "expectedName", "expectedName")]
@@ -744,10 +784,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var rand = new Random();
 
             var dateFaker = new Faker().Date;
-            var matchingDate = dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue);
+            //var matchingDate = dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue);
 
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(matchingDate)                
+                .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))                
                 .Generate(expectedResultCount);
 
             DateTime nonMatchingDate;
@@ -790,11 +830,18 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
 
+            var expectedOrder = result.WaterRightsDetails.OrderBy(x => x.AllocationPriorityDate.Date).ThenBy(x => x.WadeUuid);
+
+            result.WaterRightsDetails.Should().ContainInOrder(expectedOrder);
+
             expectedWadeUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
                 actual => expected == actual.WadeUuid) != null)
                 .Should().BeTrue();
 
-            result.WaterRightsDetails.All(x => x.AllocationPriorityDate.Date == matchingDate.Date).Should().BeTrue();
+            result.WaterRightsDetails.All(x => 
+                x.AllocationPriorityDate.Date.Date == matchedAllocationAmounts.First(a => a.AllocationAmountId.ToString() == x.WadeUuid).AllocationPriorityDateNavigation.Date.Date)
+                .Should().BeTrue();
+            result.WaterRightsDetails.Should().BeInAscendingOrder(x => x.AllocationPriorityDate);
         }
 
         [TestMethod]
@@ -1183,7 +1230,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
         {
-            return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory());
+            return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory(), CreatePerformanceConfiguration());
         }
     }
 }

@@ -32,6 +32,17 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
+        public static Faker<AllocationAmountsFact> SetAllocationPriorityDate(this Faker<AllocationAmountsFact> faker, Func<DateTime?> dateGenerator)
+        {
+            var dateFaker = new DateDimFaker()
+                    .RuleFor(a => a.Date, dateGenerator);
+
+            faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
+                .RuleFor(a => a.AllocationPriorityDateNavigation, () => dateFaker.Generate());
+
+            return faker;
+        }
+
         public static Faker<AllocationAmountsFact> SetAllocationExpirationDate(this Faker<AllocationAmountsFact> faker, DateTime? dateValue)
         {
             DateDim date = null;

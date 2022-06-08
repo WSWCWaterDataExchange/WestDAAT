@@ -4,7 +4,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
 {
     public class WaterRightsSearchCriteria
     {
-        public long PageNumber { get; set; }
+        public int PageNumber { get; set; }
         public string[] BeneficialUses { get; set; }
         public string[] OwnerClassifications { get; set; }
         public string[] WaterSourceTypes { get; set; }
