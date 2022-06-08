@@ -89,6 +89,47 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().BeEquivalentTo(expectedResult);
         }
 
+        [TestMethod]
+        public async Task GetSiteDetailsByUuid_Matches()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            var expectedResult = new Common.DataContracts.SiteDetails
+            {
+                SiteUuid = site.SiteUuid,
+                County = site.County,
+                Latitude = site.Latitude,
+                Longitude = site.Longitude,
+                PodOrPou = site.PODorPOUSite,
+                SiteName = site.SiteName,
+                SiteNativeId = site.SiteNativeId,
+                SiteType = site.SiteTypeCv,
+            };
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDetailsByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
+        public async Task GetSiteDetailsByUuid_NoMatch()
+        {
+            // Act
+            var accessor = CreateSiteAccessor();
+            Func<Task> call = async () => await accessor.GetSiteDetailsByUuid("test");
+
+            // Assert
+            await call.Should().ThrowAsync<Exception>();
+        }
+
         private ISiteAccessor CreateSiteAccessor()
         {
             return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
