@@ -29,6 +29,14 @@ export const getWaterSiteSourceInfoList = async (siteUuid: string) => {
   return data;
 };
 
+export const getWaterRightInfoList = async (siteUuid: string) => {
+  const url = new URL(`Sites/${siteUuid}/Sources`, process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<WaterSourceInfoListItem[]>(
+    url.toString()
+  );
+  return data;
+};
+
 export const getSiteDetails = async (siteUuid: string) => {
   const url = new URL(`Sites/${siteUuid}`, process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<SiteDetails>(
