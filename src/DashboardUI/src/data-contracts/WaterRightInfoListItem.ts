@@ -1,5 +1,5 @@
 export interface WaterRightInfoListItem {
-  waterRightId: string;
+  waterRightId: number;
   waterRightNativeId: string;
   owner: string;
   priorityDate: Date;
@@ -7,5 +7,5 @@ export interface WaterRightInfoListItem {
   legalStatus: string;
   flow: number;
   volume: number;
-  beneficialUses: string;
+  beneficialUses: string[];
 }

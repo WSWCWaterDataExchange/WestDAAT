@@ -1,7 +1,5 @@
-import { WaterSourceInfoListItem } from "@data-contracts";
+import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem } from "@data-contracts";
 import axios from "axios";
-import { SiteDetails } from "../data-contracts/SiteDetails";
-import { WaterRightInfoListItem } from "../data-contracts/WaterRightInfoListItem";
 import WaterRightDigest from "../data-contracts/WaterRightsDigest";
 
 export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {

@@ -10,6 +10,10 @@ function SiteTabs(props: siteTabsProps) {
     const waterSourceInfoList = useWaterSiteSourceInfoList(props.siteUuid).data;
     const waterRightInfoList = useWaterRightInfoList(props.siteUuid).data;
 
+    const getFormattedBeneficialUses = (beneficialUses: string[]) => {
+        return beneficialUses.map(use => use !== beneficialUses[beneficialUses.length - 1] ? `${use}, ` : use);
+    }
+
     return (
         <>
             <Tabs defaultActiveKey="source" id="uncontrolled-tab-example" className="mb-3">
@@ -61,7 +65,7 @@ function SiteTabs(props: siteTabsProps) {
                                     <td>{right.legalStatus}</td>
                                     <td>{right.flow}</td>
                                     <td>{right.volume}</td>
-                                    <td>{right.beneficialUses}</td>
+                                    <td>{getFormattedBeneficialUses(right.beneficialUses)}</td>
                                 </tr>
                             )}
                         </tbody>
