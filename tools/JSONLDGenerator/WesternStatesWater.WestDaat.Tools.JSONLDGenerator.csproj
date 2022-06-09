@@ -10,21 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\API\WesternStatesWater.WestDaat.Accessors\WesternStatesWater.WestDaat.Accessors.csproj" />
     <ProjectReference Include="..\..\src\API\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
-    <ProjectReference Include="..\..\src\API\WesternStatesWater.WestDaat.Contracts.Client\WesternStatesWater.WestDaat.Contracts.Client.csproj" />
-    <ProjectReference Include="..\..\src\API\WesternStatesWater.WestDaat.Engines\WesternStatesWater.WestDaat.Engines.csproj" />
   </ItemGroup>
 
   <ItemGroup>
