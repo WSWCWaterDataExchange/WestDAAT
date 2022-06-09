@@ -99,9 +99,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 {
                     x.Site.Latitude,
                     x.Site.Longitude,
-                    x.Site.HUC8,
-                    x.Site.HUC12,
-                    x.Site.County,
                     x.Site.SiteTypeCv,
                     x.Site.SiteUuid,
                     x.Site.GniscodeCv,

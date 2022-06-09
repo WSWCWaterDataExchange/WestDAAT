@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Tests.EngineTests.Resources;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -13,6 +14,9 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
     [TestClass]
     public class GeoConnexEngineTests : EngineTestBase
     {
+        private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new(MockBehavior.Strict);
+        private readonly string _geoConnexJsonTemplate = GeoConnexJson.GeoConnexJsonTemplate;
+
         [TestInitialize]
         public override void TestInitialize()
         {
@@ -33,6 +37,9 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             var site = efSite.Map<Site>();
             var org = efOrg.Map<Organization>();
 
+            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.JsonLD))
+                .Returns(_geoConnexJsonTemplate);
+
             // ACT
             var engine = CreateGeoConnexEngine();
             var result = engine.BuildGeoConnexJson(site, org);
@@ -43,9 +50,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             {
                 site.Longitude.ToString(),
                 site.Latitude.ToString(),
-                site.HUC8,
-                site.HUC12,
-                site.County,
                 site.SiteTypeCv,
                 site.SiteUuid,
                 site.GniscodeCv,
@@ -62,10 +66,9 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             CheckValidJson(result);
         }
 
-        private static IGeoConnexEngine CreateGeoConnexEngine()
+        private IGeoConnexEngine CreateGeoConnexEngine()
         {
-            Mock<ITemplateResourceSdk> templateResourceSdk = new(MockBehavior.Strict);
-            return new GeoConnexEngine(templateResourceSdk.Object, NullLogger<GeoConnexEngine>.Instance);
+            return new GeoConnexEngine(_templateResourceSdk.Object, NullLogger<GeoConnexEngine>.Instance);
         }
 
         [TestMethod]
@@ -76,6 +79,8 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             site.Geometry = new Point(0, 0);
 
             var org = new Organization();
+            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.JsonLD))
+                .Returns(_geoConnexJsonTemplate);
 
             // ACT
             var engine = CreateGeoConnexEngine();
@@ -98,6 +103,9 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             site.Geometry = new Point(0, 0);
 
             var org = new Organization();
+
+            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.JsonLD))
+                .Returns(_geoConnexJsonTemplate);
 
             // ACT
             var engine = CreateGeoConnexEngine();

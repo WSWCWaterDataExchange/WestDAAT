@@ -52,8 +52,6 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
             
             await blobStorageSdk!.UploadAsync("jsonlds", "JsonLDSchemaData", stream, true);
-
-            Console.WriteLine("finish");
         }
 
         private static string BuildGeoConnexJson(string stringFile, dynamic customObject)
@@ -62,15 +60,12 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                 JsonEncode(
                     customObject.Longitude,                  // {0}
                     customObject.Latitude,                   // {1}
-                    customObject.HUC8,                       // {2}
-                    customObject.HUC12,                      // {3}
-                    customObject.County,                     // {4}
-                    customObject.SiteTypeCv,                 // {5}
-                    customObject.SiteUuid,                   // {6}
-                    customObject.GniscodeCv,                 // {7}
-                    customObject.SiteName,                   // {8}
-                    customObject.OrganizationDataMappingUrl, // {9}
-                    customObject.Geometry?.ToString()        // {10}
+                    customObject.SiteTypeCv,                 // {2}
+                    customObject.SiteUuid,                   // {3}
+                    customObject.GniscodeCv,                 // {4}
+                    customObject.SiteName,                   // {5}
+                    customObject.OrganizationDataMappingUrl, // {6}
+                    customObject.Geometry?.ToString()        // {7}
                 ));
 
             return geoConnexJson;
