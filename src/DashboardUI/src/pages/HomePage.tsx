@@ -69,10 +69,10 @@ function HomePage() {
       <div className="d-flex flex-grow-1 overflow-hidden">
         <SidePanel currentTab={currentTab} />
         <div className="flex-grow-1" ref={containerRef}>
-          <Map />               
+          <Map />
           <TableView containerRef={containerRef} />
-        </div>        
-      </div>      
+        </div>
+      </div>
 
       <SiteFooter
         showFeedbackModal={shouldShowFeedbackModal}

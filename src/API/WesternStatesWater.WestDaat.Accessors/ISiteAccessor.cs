@@ -9,5 +9,11 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<Site>> GetSites();
 
         Task<SiteDetails> GetSiteDetailsByUuid(string siteUuid);
+
+        Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid);
+
+        Task<SiteLocation> GetWaterSiteLocationByUuid(string siteUuid);
+
+        Task<List<WaterRightInfoListItem>> GetWaterRightInfoListByUuid(string siteUuid);
     }
 }

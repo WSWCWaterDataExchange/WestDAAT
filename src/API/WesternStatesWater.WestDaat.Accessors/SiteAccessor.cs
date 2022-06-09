@@ -44,5 +44,34 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteDetails>(DtoMapper.Configuration)
                 .SingleAsync();
         }
+
+        async Task<SiteLocation> ISiteAccessor.GetWaterSiteLocationByUuid(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+            return await db.SitesDim.Where(x => x.SiteUuid == siteUuid)
+                .ProjectTo<SiteLocation>(DtoMapper.Configuration)
+                .SingleAsync();
+        }
+
+        public async Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+
+            return await db.SitesDim.Where(x => x.SiteUuid == siteUuid)
+                    .SelectMany(x => x.WaterSourceBridgeSitesFact
+                    .Select(a => a.WaterSource))
+                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                    .ToListAsync();
+        }
+
+        public async Task<List<WaterRightInfoListItem>> GetWaterRightInfoListByUuid(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
+                .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)
+                .ToListAsync();
+        }
+
     }
 }
