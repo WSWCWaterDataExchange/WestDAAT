@@ -134,7 +134,6 @@ function Map(_props: mapProps) {
 
       if (!_props.hideDrawControl) {
         mapboxDrawControl(mapInstance);
-
       }
 
       mapInstance.on('mousemove', (e) => {
@@ -232,17 +231,18 @@ function Map(_props: mapProps) {
       await new Promise(resolve => {
         var currLayers = map.getStyle().layers;
         var currSources = map.getStyle().sources;
-        map.once("styledata", () => {
-          sourceIds.forEach(sourceId => {
+        map.on("styledata", () => {
+          sourceIds?.forEach(sourceId => {
             if (!map.getSource(sourceId)) {
               map.addSource(sourceId, currSources?.[sourceId] as AnySourceImpl);
             }
-          })
+          });
           layerIds?.forEach(layerId => {
             if (!map.getLayer(layerId)) {
               map.addLayer(currLayers?.find(a => a.id === layerId) as AnyLayer);
             }
-          })
+          });
+
           resolve(true);
         });
         map.setStyle(`mapbox://styles/mapbox/${style}`);
