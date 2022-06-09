@@ -40,24 +40,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\GeoConnexJson.Designer.cs">
+    <Compile Update="Resources\GeoConnexJsonLDResource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>GeoConnexJson.resx</DependentUpon>
+      <DependentUpon>GeoConnexJsonLDResource.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\GeoConnexJson.resx">
+    <EmbeddedResource Update="Resources\GeoConnexJsonLDResource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>GeoConnexJson.Designer.cs</LastGenOutput>
+      <LastGenOutput>GeoConnexJsonLDResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Resources\GeoConnexJsonTemplate.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
 
