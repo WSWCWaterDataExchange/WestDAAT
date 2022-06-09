@@ -77,9 +77,9 @@ namespace WesternStatesWater.WestDaat.Utilities.Resources {
         ///      &quot;image&quot;: {{
         ///        &quot;@id&quot;: &quot;s [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string GeoConnexJsonTemplate {
+        internal static string geoconnexjsontemplate {
             get {
-                return ResourceManager.GetString("GeoConnexJsonTemplate", resourceCulture);
+                return ResourceManager.GetString("geoconnexjsontemplate", resourceCulture);
             }
         }
     }
