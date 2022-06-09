@@ -4,12 +4,8 @@ using WesternStatesWater.WestDaat.Common;
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
-    {
-        Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
-        
+    {        
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
-
-        Task<SiteDetails> GetSiteDetails(string siteUuid);
 
         Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId);
 
@@ -19,6 +15,17 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId);
 
+        Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
+
+        Task<SiteDetails> GetSiteDetails(string siteUuid);
+
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
+
+        Task<Feature> GetWaterSiteLocation(string siteUuid);
+
+        Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid);
+
+        Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
+
     }
 }

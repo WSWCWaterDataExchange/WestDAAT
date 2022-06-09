@@ -16,14 +16,19 @@ import { CustomShareControl } from "./CustomSharedControl";
 
 import ReactDOM from "react-dom";
 
+interface mapProps {
+  hideDrawControl?: boolean;
+}
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 const mapIcons: Map<string, string> = new global.Map<string, string>([
-  ['mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`]
+  ['mapMarker', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.mapMarker};"></path></svg>`],
+  ['mapMarkerPOU', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.sitePOU};"></path></svg>`],
+  ['mapMarkerPOD', `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${nldi.colors.sitePOD};"></path></svg>`]
 ])
 
-function Map() {
+function Map(_props: mapProps) {
   const { isAuthenticated } = useContext(AppContext).authenticationContext;
   const {
     legend,
@@ -127,7 +132,10 @@ function Map() {
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
-      mapboxDrawControl(mapInstance);
+      if (!_props.hideDrawControl) {
+        mapboxDrawControl(mapInstance);
+
+      }
 
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());

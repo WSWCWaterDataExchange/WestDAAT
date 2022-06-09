@@ -21,6 +21,13 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(a => a.AllocationVolumeAf, b => b.MapFrom(c => c.AllocationVolume_AF))
                 .ForMember(a => a.OrganizationState, b => b.MapFrom(c => c.Organization.State));
             CreateMap<EF.AllocationAmountsFact, WaterRightDetails>()
+                .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
+                .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateNavigation.Date))
+                .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCv))
+                .ForMember(dest => dest.AllocationFlowCfs, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
+                .ForMember(dest => dest.AllocationVolumeAF, opt => opt.MapFrom(source => source.AllocationVolume_AF))
+                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV)))
+                .ForMember(dest => dest.AllocationOwner, opt => opt.MapFrom(source => source.AllocationOwner))
                 .ForMember(dest => dest.AggregationInterval, opt => opt.MapFrom(source => source.VariableSpecific.AggregationInterval))
                 .ForMember(dest => dest.AggregationIntervalUnit, opt => opt.MapFrom(source => source.VariableSpecific.AggregationIntervalUnitCv))
                 .ForMember(dest => dest.AggregationStatistic, opt => opt.MapFrom(source => source.VariableSpecific.AggregationStatisticCv))
@@ -36,6 +43,16 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodLink, opt => opt.MapFrom(source => source.Method.MethodNemilink))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.Method.MethodDescription))
                 .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv));
+            CreateMap<EF.AllocationAmountsFact, WaterRightInfoListItem>()
+                .ForMember(dest => dest.WaterRightId, opt => opt.MapFrom(source => source.AllocationAmountId))
+                .ForMember(dest => dest.Volume, opt => opt.MapFrom(source => source.AllocationVolume_AF))
+                .ForMember(dest => dest.Flow, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
+                .ForMember(dest => dest.WaterRightNativeId, opt => opt.MapFrom(source => source.AllocationNativeId))
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(source => source.AllocationOwner))
+                .ForMember(dest => dest.LegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCv))
+                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV)))
+                .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
+                .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateNavigation.Date));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
                 .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCvNavigation.WaDEName.Length > 0 ? c.SiteTypeCvNavigation.WaDEName : c.SiteTypeCv))
@@ -45,6 +62,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.SitesDim, SiteInfoListItem>()
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
             CreateMap<EF.SitesDim, SiteLocation>();
+            CreateMap<EF.SitesDim, SiteDetails>()
+                .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCv))
+                .ForMember(a => a.PodOrPou, b => b.MapFrom(c => c.PODorPOUSite));
             CreateMap<EF.OrganizationsDim, Organization>();
             CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>()
                 .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))
