@@ -24,7 +24,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+  <ItemGroup>
+	<EmbeddedResource Update="Resources\GeoConnexJson.resx">
+	  <Generator>ResXFileCodeGenerator</Generator>
+	  <LastGenOutput>GeoConnexJson.Designer.cs</LastGenOutput>
+	</EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\GeoConnexJson.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -33,16 +38,5 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\GeoConnexJson.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>GeoConnexJson.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\GeoConnexJsonTemplate.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
