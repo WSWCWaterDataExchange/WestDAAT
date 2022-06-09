@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Utilities
         {
             return type switch
             {
-                ResourceType.JsonLD => GeoConnexJson.geoconnexjsontemplate,
+                ResourceType.JsonLD => GeoConnexJson.GeoConnexJsonTemplate,
                 _ => null
             };
         }
