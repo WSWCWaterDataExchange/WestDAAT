@@ -84,7 +84,17 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             //Arrange
             _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults())
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    CurrentPageNumber = 0,
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            WadeUuid = "abc123"
+                        }
+                    }
+                })
                 .Verifiable();
 
             var searchCriteria = new WaterRightsSearchCriteria();
