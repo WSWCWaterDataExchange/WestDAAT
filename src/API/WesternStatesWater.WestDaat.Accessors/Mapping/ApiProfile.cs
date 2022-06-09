@@ -36,6 +36,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodLink, opt => opt.MapFrom(source => source.Method.MethodNemilink))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.Method.MethodDescription))
                 .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv));
+            CreateMap<EF.AllocationAmountsFact, WaterRightsSearchDetail>()
+                .ForMember(dest => dest.WadeUuid, opt => opt.MapFrom(source => source.AllocationAmountId.ToString()))
+                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()))
+                .ForMember(dest => dest.OwnerClassification, opt => opt.MapFrom(source => source.OwnerClassification.WaDEName.Length > 0 ? source.OwnerClassification.WaDEName : source.OwnerClassification.Name))
+                .ForMember(dest => dest.AllocationFlowCfs, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
+                .ForMember(dest => dest.AllocationVolumeAf, opt => opt.MapFrom(source => source.AllocationVolume_AF))
+                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateID != null ? source.AllocationPriorityDateNavigation.Date : default(DateTime)))
+                .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? source.AllocationLegalStatusCvNavigation.WaDEName : source.AllocationLegalStatusCvNavigation.Name));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
                 .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCvNavigation.WaDEName.Length > 0 ? c.SiteTypeCvNavigation.WaDEName : c.SiteTypeCv))

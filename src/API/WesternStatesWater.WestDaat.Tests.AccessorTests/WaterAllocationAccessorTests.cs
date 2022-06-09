@@ -3,6 +3,7 @@ using WesternStatesWater.WestDaat.Tests.Helpers;
 using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -14,7 +15,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task FindWaterRights_Pagination_PageThroughResults()
         {
             //Arrange
-            var allocationAmountFacts = new AllocationAmountFactFaker().Generate(1000);
+            var allocationAmountFacts = new AllocationAmountFactFaker()
+                .IncludeAllocationPriorityDate()
+                .Generate(500);
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmountFacts);
@@ -23,14 +26,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var orderedAllocationAmountsFacts = allocationAmountFacts
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
-                .ThenBy(x => x.AllocationAmountId);
+                .ThenBy(x => x.AllocationAmountId)
+                .ToList();
 
             //Act
             var results = new List<WaterRightsSearchResults>();
 
             var accessor = CreateWaterAllocationAccessor();
 
-            for(var i = 0; i < 10; i++)
+            for(var i = 0; i < 5; i++)
             {
                 var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
                 {
@@ -40,15 +44,72 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 results.Add(await accessor.FindWaterRights(searchCriteria));
             }
 
+            var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
+
             //Assert
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 5; i++)
             {
-                var expected = orderedAllocationAmountsFacts.Skip(i).Take(100);
-                results[0].Should().BeEquivalentTo(expected);
+                var expected = expectedResults.Skip(i * 100).Take(100);
+                results[i].WaterRightsDetails.Should().BeEquivalentTo(expected);
 
             }
         }
-        
+
+        [TestMethod]
+        public async Task FindWaterRights_PagedSearchResults_GetNextPage()
+        {
+            //Arrange
+            var beneficialUse = new BeneficialUsesCVFaker().Generate();
+            beneficialUse.WaDEName = "beneficialUseWadeName";
+            beneficialUse.Name = "beneficialUseName";
+
+            var allocationAmountFactFaker = new AllocationAmountFactFaker();
+
+            var matchingAllocationAmountFacts = allocationAmountFactFaker
+                .IncludeAllocationPriorityDate()
+                .LinkBeneficialUses(beneficialUse)
+                .Generate(250);
+
+            var nonMatchBeneficalUse = new BeneficialUsesCVFaker().Generate();
+
+            var nonMatchingAllocationAmountFacts = allocationAmountFactFaker
+                .IncludeAllocationPriorityDate()
+                .LinkBeneficialUses(nonMatchBeneficalUse)
+                .Generate(200);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchingAllocationAmountFacts);
+                db.AllocationAmountsFact.AddRange(nonMatchingAllocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            var orderedAllocationAmountsFacts = matchingAllocationAmountFacts
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId)
+                .ToList();
+
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                PageNumber = 2,
+                BeneficialUses = new[] { "beneficialUseWadeName" }
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
+
+            //Assert
+            result.CurrentPageNumber.Should().Be(2);
+            result.WaterRightsDetails.Should().HaveCount(50);
+
+            var expected = expectedResults.Skip(2 * 100).Take(100);
+            result.WaterRightsDetails.Should().BeEquivalentTo(expected);
+        }
+
         [TestMethod]
         [DataRow("expectedName", "name2", "expectedName")]
         [DataRow("", "expectedName", "expectedName")]
@@ -56,20 +117,22 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task FindWaterRights_SearchByBeneficalUse_ReturnsOneMatch(string beneficialUseWadeName, string beneficialUseName, string expectedName)
         {
             // Arrange
-            var beneficialUses = new BeneficialUsesCVFaker().Generate(1);
-            beneficialUses[0].WaDEName = beneficialUseWadeName;
-            beneficialUses[0].Name = beneficialUseName;
+            var beneficialUse = new BeneficialUsesCVFaker().Generate();
+            beneficialUse.WaDEName = beneficialUseWadeName;
+            beneficialUse.Name = beneficialUseName;
 
-            var allocationAmountTarget = new AllocationAmountFactFaker()
-                .LinkBeneficialUses(beneficialUses.ToArray())
+            var matchingAllocationAmountFacts = new AllocationAmountFactFaker()
+                .LinkBeneficialUses(beneficialUse)
                 .Generate();
-            var allocationAmountOthers = new AllocationAmountFactFaker()
+            var nonMatchingAllocationAmountFacts = new AllocationAmountFactFaker()
                 .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate(1).ToArray())
                 .Generate(3);
+            nonMatchingAllocationAmountFacts.AddRange(new AllocationAmountFactFaker()                
+                .Generate(3));
             using (var db = CreateDatabaseContextFactory().Create())
             {
-                db.AllocationAmountsFact.Add(allocationAmountTarget);
-                db.AllocationAmountsFact.AddRange(allocationAmountOthers);
+                db.AllocationAmountsFact.Add(matchingAllocationAmountFacts);
+                db.AllocationAmountsFact.AddRange(nonMatchingAllocationAmountFacts);
                 db.SaveChanges();
             }
 

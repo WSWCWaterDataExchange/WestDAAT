@@ -18,6 +18,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
+
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
@@ -36,16 +37,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ThenBy(x => x.AllocationAmountId) // eventually this will be WadeUuid
                 .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
                 .Take(_performanceConfiguration.WaterRightsSearchPageSize)
-                .Select(x => new WaterRightsSearchDetail
-                {
-                    WadeUuid = x.AllocationAmountId.ToString(), // Per Ryan, until a real WadeUUID exists use AllocationAmountId
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray(),
-                    OwnerClassification = x.OwnerClassification.WaDEName.Length > 0 ? x.OwnerClassification.WaDEName : x.OwnerClassification.Name,
-                    AllocationFlowCfs = x.AllocationFlow_CFS,
-                    AllocationVolumeAf = x.AllocationVolume_AF,
-                    AllocationPriorityDate = x.AllocationPriorityDateID != null ? x.AllocationPriorityDateNavigation.Date : default(DateTime),
-                    AllocationLegalStatus = x.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? x.AllocationLegalStatusCvNavigation.WaDEName : x.AllocationLegalStatusCvNavigation.Name
-                })
+                .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
                 .ToArrayAsync();
 
             return new WaterRightsSearchResults

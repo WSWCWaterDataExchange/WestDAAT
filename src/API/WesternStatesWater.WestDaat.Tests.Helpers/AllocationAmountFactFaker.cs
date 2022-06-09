@@ -5,10 +5,12 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
 {
     public class AllocationAmountFactFaker : Faker<AllocationAmountsFact>
     {
+        public DateDimFaker DateDimFaker { get; } = new DateDimFaker(); //use this to prevent collisions in Date_Dim table
+
         public AllocationAmountFactFaker()
         {
             this.RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate())
-                .RuleFor(a => a.DataPublicationDate, b => new DateDimFaker().Generate())
+                .RuleFor(a => a.DataPublicationDate, b => DateDimFaker.Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
                 .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'));
@@ -39,6 +41,14 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
 
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
                 .RuleFor(a => a.AllocationPriorityDateNavigation, () => dateFaker.Generate());
+
+            return faker;
+        }
+
+        public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDate(this AllocationAmountFactFaker faker)
+        {        
+            faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
+                .RuleFor(a => a.AllocationPriorityDateNavigation, () => faker.DateDimFaker.Generate());
 
             return faker;
         }
