@@ -80,6 +80,25 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        public async Task WaterAllocationManager_FindWaterRights()
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults())
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
         public async Task WaterAllocationManager_GetSiteDetails()
         {
             _siteAccessorMock.Setup(x => x.GetSiteDetailsByUuid("TESTME")).ReturnsAsync(new CommonContracts.SiteDetails()).Verifiable();

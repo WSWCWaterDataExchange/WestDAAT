@@ -11,10 +11,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.WaterRightsDigest, ClientContracts.WaterRightsDigest>();
             CreateMap<CommonContracts.WaterSourceInfoListItem, ClientContracts.WaterSourceInfoListItem>();
             CreateMap<CommonContracts.WaterRightInfoListItem, ClientContracts.WaterRightInfoListItem>();
+            CreateMap<CommonContracts.WaterRightsSearchResults, ClientContracts.WaterRightsSearchResults>();
+            CreateMap<ClientContracts.WaterRightsSearchCriteria, CommonContracts.WaterRightsSearchCriteria>()
+                .ForMember(x => x.Boundaries, opt => opt.Ignore());
             CreateMap<CommonContracts.SiteInfoListItem, ClientContracts.SiteInfoListItem>();
             CreateMap<CommonContracts.WaterRightDetails, ClientContracts.WaterRightDetails>();
             CreateMap<CommonContracts.SiteDetails, ClientContracts.SiteDetails>();
-            CreateMap<CommonContracts.BeneficialUseItem, ClientContracts.BeneficialUseItem>();
+            CreateMap<CommonContracts.BeneficialUseItem, ClientContracts.BeneficialUseItem>();            
         }
     }
 }

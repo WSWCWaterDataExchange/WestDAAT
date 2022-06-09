@@ -34,19 +34,10 @@ namespace WesternStatesWater.WestDaat.Managers
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
-            //TODO: call mapper
-            var accessorSearchRequest = new WaterRightsSearchCriteria();
+            var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
             //TODO: if boundaries is not null then call to convert GeoJson
 
-            var accessorResult = await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest);
-
-            //TODO: map result
-            var result = new ClientContracts.WaterRightsSearchResults
-            {
-                CurrentPageNumber = accessorResult.CurrentPageNumber
-            };
-
-            return result;
+            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
         }
 
         async Task<FeatureCollection> ClientContracts.IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)
