@@ -1,5 +1,11 @@
 import { useQuery } from 'react-query';
-import { getSiteDetails, getWaterRightsDigests, getWaterSiteLocation, getWaterSiteSourceInfoList } from '../accessors/siteAccessor';
+import {
+  getSiteDetails,
+  getWaterRightsDigests,
+  getWaterSiteLocation,
+  getWaterSiteSourceInfoList,
+  getWaterRightInfoList
+} from '../accessors/siteAccessor';
 
 export function useWaterRightsDigests(siteUuid: string) {
   return useQuery(
@@ -25,6 +31,16 @@ export function useWaterSiteSourceInfoList(siteUuid: string) {
   return useQuery(
     ['site.SourceInfoList', siteUuid],
     async () => await getWaterSiteSourceInfoList(siteUuid),
+    {
+      enabled: !!siteUuid,
+    }
+  );
+}
+
+export function useWaterRightInfoList(siteUuid: string) {
+  return useQuery(
+    ['site.WaterRightInfoList', siteUuid],
+    async () => await getWaterRightInfoList(siteUuid),
     {
       enabled: !!siteUuid,
     }

@@ -162,6 +162,121 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             await call.Should().ThrowAsync<Exception>();
         }
 
+        [TestMethod]
+        public async Task SiteAccessor_GetWaterRightInfoListByUuid_Matches()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            var allocationAmount = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .LinkSites(site)
+                .Generate();
+
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterRightInfoListByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(1);
+            result.First().WaterRightNativeId.Should().Be(allocationAmount.AllocationNativeId);
+            result.First().WaterRightId.Should().Be(allocationAmount.AllocationAmountId);
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public async Task SiteAccessor_GetWaterRightInfoListByUuid_Multiple(int waterRightCount)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            var allocationAmount = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .LinkSites(site)
+                .Generate(waterRightCount);
+
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterRightInfoListByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(waterRightCount);
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public async Task GetWaterRightInfoList_BeneficialUses(int beneficialUseCount)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var site = new SitesDimFaker().Generate();
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(beneficialUseCount);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterRightInfoListByUuid(site.SiteUuid);
+
+            // Assert
+            result
+                .Should().NotBeNull().And
+                .HaveCount(1);
+
+            result[0].BeneficialUses
+                .Should().NotBeNull().And
+                .BeEquivalentTo(beneficialUses.Select(a => a.Name));
+        }
+
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("2022-01-22")]
+        public async Task GetWaterRightInfoList_Dates(string dateValue)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var site = new SitesDimFaker().Generate();
+
+            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .SetAllocationPriorityDate(date)
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetWaterRightInfoListByUuid(site.SiteUuid);
+
+            // Assert
+            result
+                .Should().NotBeNull().And
+                .HaveCount(1);
+
+            result[0].PriorityDate.Should().Be(date);
+        }
+
         private ISiteAccessor CreateSiteAccessor()
         {
             return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());
