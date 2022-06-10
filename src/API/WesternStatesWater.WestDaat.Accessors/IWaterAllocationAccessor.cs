@@ -20,6 +20,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
 
-        Task<List<dynamic>> GetJSONLDData();
+        Task<List<GeoConnex>> GetJSONLDData();
     }
 }

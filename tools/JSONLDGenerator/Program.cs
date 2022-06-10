@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
@@ -39,9 +40,9 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             var stringFile = templateResourceSdk!.GetTemplate(Common.ResourceType.JsonLD);
 
             var list = new List<string>();
-            rawData.AsParallel().ForAll(allocation => 
+            rawData.AsParallel().ForAll(geoConnex => 
             {
-                list.Add(BuildGeoConnexJson(stringFile, allocation));
+                list.Add(BuildGeoConnexJson(stringFile, geoConnex));
             });
 
             var stream = new MemoryStream(
@@ -54,18 +55,18 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             await blobStorageSdk!.UploadAsync("jsonlds", "JsonLDSchemaData", stream, true);
         }
 
-        private static string BuildGeoConnexJson(string stringFile, dynamic customObject)
+        private static string BuildGeoConnexJson(string stringFile, GeoConnex geoConnex)
         {
             var geoConnexJson = string.Format(stringFile, 
                 JsonEncode(
-                    customObject.Longitude,                  // {0}
-                    customObject.Latitude,                   // {1}
-                    customObject.SiteTypeCv,                 // {2}
-                    customObject.SiteUuid,                   // {3}
-                    customObject.GniscodeCv,                 // {4}
-                    customObject.SiteName,                   // {5}
-                    customObject.OrganizationDataMappingUrl, // {6}
-                    customObject.Geometry?.ToString()        // {7}
+                    geoConnex.Longitude,                  // {0}
+                    geoConnex.Latitude,                   // {1}
+                    geoConnex.SiteTypeCv,                 // {2}
+                    geoConnex.SiteUuid,                   // {3}
+                    geoConnex.GniscodeCv,                 // {4}
+                    geoConnex.SiteName,                   // {5}
+                    geoConnex.OrganizationDataMappingUrl, // {6}
+                    geoConnex.Geometry?.ToString()        // {7}
                 ));
 
             return geoConnexJson;

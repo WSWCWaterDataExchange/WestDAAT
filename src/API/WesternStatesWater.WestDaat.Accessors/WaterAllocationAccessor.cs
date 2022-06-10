@@ -91,23 +91,24 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        public async Task<List<dynamic>> GetJSONLDData()
+        public async Task<List<GeoConnex>> GetJSONLDData()
         {
             using var db = _databaseContextFactory.Create();
+
             return await db.AllocationBridgeSitesFact
-                .Select(x => (dynamic)new
+                .Select(x => new GeoConnex
                 {
-                    x.Site.Latitude,
-                    x.Site.Longitude,
-                    x.Site.SiteTypeCv,
-                    x.Site.SiteUuid,
-                    x.Site.GniscodeCv,
-                    x.Site.SiteName,
+                    Latitude = x.Site.Latitude,
+                    Longitude = x.Site.Longitude,
+                    SiteTypeCv = x.Site.SiteTypeCv,
+                    SiteUuid = x.Site.SiteUuid,
+                    GniscodeCv =x.Site.GniscodeCv,
+                    SiteName = x.Site.SiteName,
                     OrganizationDataMappingUrl = db.AllocationAmountsFact
                         .Where(s => s.AllocationAmountId == x.AllocationAmountId)
                         .Select(a => a.Organization.OrganizationDataMappingUrl)
                         .FirstOrDefault(),
-                    x.Site.Geometry,
+                    Geometry = x.Site.Geometry,
                 })
                 .ToListAsync();
         }
