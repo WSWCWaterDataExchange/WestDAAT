@@ -39,7 +39,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
 
             if (waterAllocationAccessor != null)
             {
-                rawData = await waterAllocationAccessor!.GetJSONLDData();
+                rawData = await waterAllocationAccessor.GetJSONLDData();
             }
             else
             {
@@ -52,7 +52,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             string stringFile;
             if (templateResourceSdk != null)
             {
-                stringFile = templateResourceSdk!.GetTemplate(Common.ResourceType.JsonLD);
+                stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
             }
             else
             {
@@ -63,7 +63,11 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             var list = new List<string>();
             rawData.AsParallel().ForAll(geoConnex => 
             {
-                list.Add(BuildGeoConnexJson(stringFile, geoConnex));
+                var file = BuildGeoConnexJson(stringFile, geoConnex); 
+                if (!string.IsNullOrEmpty(file))
+                {
+                    list.Add(file);
+                }
             });
 
             var stream = new MemoryStream(
@@ -87,19 +91,24 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
 
         private static string BuildGeoConnexJson(string stringFile, GeoConnex geoConnex)
         {
-            var geoConnexJson = string.Format(stringFile, 
-                JsonEncode(
-                    geoConnex.Longitude,                  // {0}
-                    geoConnex.Latitude,                   // {1}
-                    geoConnex.SiteTypeCv,                 // {2}
-                    geoConnex.SiteUuid,                   // {3}
-                    geoConnex.GniscodeCv,                 // {4}
-                    geoConnex.SiteName,                   // {5}
-                    geoConnex.OrganizationDataMappingUrl, // {6}
-                    geoConnex.Geometry?.ToString()        // {7}
-                ));
+            if (geoConnex != null)
+            {
+                var geoConnexJson = string.Format(stringFile, 
+                    JsonEncode(
+                        geoConnex.Longitude ?? default,                  // {0}
+                        geoConnex.Latitude ?? default,                   // {1}
+                        geoConnex.SiteTypeCv,                            // {2}
+                        geoConnex.SiteUuid,                              // {3}
+                        geoConnex.GniscodeCv,                            // {4}
+                        geoConnex.SiteName,                              // {5}
+                        geoConnex.OrganizationDataMappingUrl,            // {6}
+                        geoConnex.Geometry?.ToString() ?? string.Empty   // {7}
+                    ));
 
-            return geoConnexJson;
+                return geoConnexJson;
+            }
+
+            return string.Empty;
         }
 
         private static string[] JsonEncode(params object[] args)
