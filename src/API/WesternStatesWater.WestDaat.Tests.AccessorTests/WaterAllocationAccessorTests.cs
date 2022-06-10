@@ -51,7 +51,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 var expected = expectedResults.Skip(i * 100).Take(100);
                 results[i].WaterRightsDetails.Should().BeEquivalentTo(expected);
-
             }
         }
 
@@ -213,7 +212,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var allocationAmounts = new AllocationAmountFactFaker().Generate(totalRecordCount);
 
-            // assign the the ownerClassifications
+            // assign the ownerClassifications
             for (int i = 0; i < expectedResultCount; i++)
             {
                 var input = searchInputs[rand.Next(0, searchInputs.Length)];
@@ -416,7 +415,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             
             var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();            
 
-            // generate matching allocationAmouts
             for (int i = 0; i < expectedResultCount; i++)
             {
                 var organization = matchedOrganizations[rand.Next(0, matchedOrganizations.Count)];
@@ -426,10 +424,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 matchedAllocationAmounts.Add(allocationAmount);
             }
             
-            //generate non-matching organizations
             var nonMatchedOrgizations = new List<EF.OrganizationsDim>(new OrganizationsDimFaker().Generate(5));
 
-            //generate non-matching allocationAmounts
             var nonMatchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
             for (int i = 0; i < totalRecordCount - expectedResultCount; i++)
             {

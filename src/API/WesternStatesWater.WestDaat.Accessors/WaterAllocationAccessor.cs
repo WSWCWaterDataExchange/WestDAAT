@@ -50,10 +50,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
-            {
-                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
-            }
+            predicate.And(BuildBeneficialUsesPredicate(searchCriteria));
 
             predicate.And(BuildOwnerSearchPredicate(searchCriteria));
 
@@ -62,6 +59,18 @@ namespace WesternStatesWater.WestDaat.Accessors
             predicate.And(BuildVolumeAndFlowPredicate(searchCriteria));
 
             predicate.And(BuildDatePredicate(searchCriteria));
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
+            {
+                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
+            }
 
             return predicate;
         }

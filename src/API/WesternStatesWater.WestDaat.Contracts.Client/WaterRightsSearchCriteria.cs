@@ -15,6 +15,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         // Geojson string
         public string Boundaries { get; set; }
+
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
         public string ExemptOfVolumeFlowPriority { get; set; }

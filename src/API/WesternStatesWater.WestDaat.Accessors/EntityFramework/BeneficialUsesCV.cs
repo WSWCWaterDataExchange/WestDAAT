@@ -29,9 +29,5 @@
         public virtual ICollection<SitesBridgeBeneficialUsesFact> SitesBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFact { get; set; }
 
-        public string ResolveName()
-        {
-            return this.WaDEName.Length > 0 ? this.WaDEName : this.Name;
-        }
     }
 }
