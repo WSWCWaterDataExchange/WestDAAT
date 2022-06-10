@@ -484,13 +484,26 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SaveChanges();
 
             // Act
-
             var accessor = CreateWaterAllocationAccessor();
             var result = await accessor.GetJSONLDData();
 
             // Assert
-
             result.Should().NotBeNullOrEmpty();
+            result.Count().Should().Be(5);
+
+            sites.ForEach(site =>
+            {
+                var justOne = result.Where(res =>
+                    res.Latitude == site.Latitude
+                    && res.Longitude == site.Longitude
+                    && res.SiteTypeCv == site.SiteTypeCv
+                    && res.GniscodeCv == site.GniscodeCv
+                    && res.SiteName == site.SiteName
+                    && res.Geometry == site.Geometry);
+
+                justOne.Count().Should().Be(1);
+            });
+
         }
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
