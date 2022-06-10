@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             }
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
-            var result = _waterAllocationManager.FindWaterRights(searchRequest);
+            var result = await _waterAllocationManager.FindWaterRights(searchRequest);
 
             return new OkObjectResult(result);
         }
