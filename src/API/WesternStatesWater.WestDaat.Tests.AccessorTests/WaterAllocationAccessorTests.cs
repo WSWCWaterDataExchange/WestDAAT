@@ -395,6 +395,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         [TestMethod]
         [DataRow(10, 0, new string[] { "ZZ" })]
+        [DataRow(5, 5, null)]
         [DataRow(5, 5, new string[] { "XX", "ZZ" })]
         [DataRow(10, 2, new string[] { "YY", "NN", "ZZ"})]
         public async Task FindWaterRights_SearchByStates_ReturnsMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
@@ -404,13 +405,20 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var matchedOrganizations = new List<EF.OrganizationsDim>();
 
-            // generate an orgainization for each search param
-            foreach(var input in searchInputs)
+            if (searchInputs != null && searchInputs.Length > 0)
             {
-                var organizationFake = new OrganizationsDimFaker().Generate();
-                organizationFake.State = input;
+                // generate an orgainization for each search param
+                foreach (var input in searchInputs ?? Array.Empty<string>())
+                {
+                    var organizationFake = new OrganizationsDimFaker().Generate();
+                    organizationFake.State = input;
 
-                matchedOrganizations.Add(organizationFake);
+                    matchedOrganizations.Add(organizationFake);
+                } 
+            }
+            else
+            {
+                matchedOrganizations.AddRange(new OrganizationsDimFaker().Generate(5));
             }
             
             var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();            
