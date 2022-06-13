@@ -231,7 +231,7 @@ function Map(_props: mapProps) {
       await new Promise(resolve => {
         var currLayers = map.getStyle().layers;
         var currSources = map.getStyle().sources;
-        map.on("styledata", () => {
+        map.once("styledata", () => {
           sourceIds?.forEach(sourceId => {
             if (!map.getSource(sourceId)) {
               map.addSource(sourceId, currSources?.[sourceId] as AnySourceImpl);
@@ -255,7 +255,9 @@ function Map(_props: mapProps) {
       }
     }
     if (!map) return;
-    buildMap(map);
+    if (map.isStyleLoaded()) {
+      buildMap(map);
+    }
   }, [map, mapStyle, layerIds, sourceIds]);
 
   useEffect(() => {
