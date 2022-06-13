@@ -1,0 +1,12 @@
+{
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+  },
+  "Database": {
+    "ConnectionString": "Server=host.docker.internal, 1433;Initial Catalog=WaDe2;User Id=yourUser;Password=yourPassword;"
+  },
+  "BlobStorage": {
+    "ConnectionString": "UseDevelopmentStorage=true"
+  }
+}

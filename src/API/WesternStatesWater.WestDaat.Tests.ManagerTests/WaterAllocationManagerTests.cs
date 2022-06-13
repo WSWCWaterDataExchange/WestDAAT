@@ -102,7 +102,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 SiteUuid = "TEST_PODorPOU"
             };
 
-            _siteAccessorMock.Setup(x => x.GetWaterSiteLocationByUuid("TEST_PODorPOU")).ReturnsAsync(location);
+            _siteAccessorMock.Setup(x => x.GetWaterSiteLocationByUuid("TEST_PODorPOU")).ReturnsAsync(location).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterSiteLocation("TEST_PODorPOU");
@@ -122,7 +122,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var result = await manager.GetWaterRightDetails(99);
 
             result.Should().NotBeNull();
-            _siteAccessorMock.Verify();
+            _waterAllocationAccessorMock.Verify();
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var result = await manager.GetWaterRightSiteInfoList(99);
 
             result.Should().NotBeNull();
-            _siteAccessorMock.Verify();
+            _waterAllocationAccessorMock.Verify();
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var result = await manager.GetWaterRightSourceInfoList(99);
 
             result.Should().NotBeNull();
-            _siteAccessorMock.Verify();
+            _waterAllocationAccessorMock.Verify();
         }
 
         [TestMethod]

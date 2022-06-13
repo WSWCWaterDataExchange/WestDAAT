@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WesternStatesWater.WestDaat.Engines.Resources {
+namespace WesternStatesWater.WestDaat.Utilities.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace WesternStatesWater.WestDaat.Engines.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class GeoConnexResources {
+    internal class GeoConnexJsonLDResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal GeoConnexResources() {
+        internal GeoConnexJsonLDResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace WesternStatesWater.WestDaat.Engines.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Engines.Resources.GeoConnexResources", typeof(GeoConnexResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Utilities.Resources.GeoConnexJsonLDResource", typeof(GeoConnexJsonLDResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -77,9 +77,9 @@ namespace WesternStatesWater.WestDaat.Engines.Resources {
         ///      &quot;image&quot;: {{
         ///        &quot;@id&quot;: &quot;s [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string GeoConnexJsonTemplate {
+        internal static string GeoConnexJsonLDTemplate {
             get {
-                return ResourceManager.GetString("GeoConnexJsonTemplate", resourceCulture);
+                return ResourceManager.GetString("GeoConnexJsonLDTemplate", resourceCulture);
             }
         }
     }
