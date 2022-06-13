@@ -34,6 +34,11 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         {
             return config.GetSection(ConfigurationRootNames.Nldi).Get<NldiConfiguration>();
         }
+
+        public static BlobStorageConfiguration GetBlobStorageConfiguration(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Blob).Get<BlobStorageConfiguration>();
+        }
     }
 
     public static class ConfigurationRootNames
@@ -42,5 +47,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public const string Smtp = "Smtp";
         public const string UsgsNldiService = "UsgsNldiService";
         public const string Nldi = "Nldi";
+        public const string Blob = "BlobStorage";
     }
 }

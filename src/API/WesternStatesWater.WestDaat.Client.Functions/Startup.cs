@@ -37,6 +37,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped(a => configuration.GetDatabaseConfiguration());
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
             builder.Services.AddScoped(a => configuration.GetSmtpConfiguration());
+            builder.Services.AddScoped(a => configuration.GetBlobStorageConfiguration());
 
             builder.Services.AddScoped<INotificationManager, NotificationManager>();
             builder.Services.AddTransient<ISystemManager, SystemManager>();
@@ -56,6 +57,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
             builder.Services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
+            builder.Services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
+            builder.Services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
 
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {
