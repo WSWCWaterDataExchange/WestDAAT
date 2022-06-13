@@ -40,8 +40,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         {
             return config.GetSection(ConfigurationRootNames.Blob).Get<BlobStorageConfiguration>();
         }
-    }
-
         public static PerformanceConfiguration GetPerformanceConfiguration(this IConfiguration config)
         {
             return config.GetSection(ConfigurationRootNames.Performance).Get<PerformanceConfiguration>();
