@@ -12,11 +12,17 @@ namespace WesternStatesWater.WestDaat.Utilities
         {
             _client = new BlobServiceClient(configuration.ConnectionString);
         }
+        async Task IBlobStorageSdk.CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite)
+        {
+            var blobContainerClient = _client.GetBlobContainerClient(container);
+            await blobContainerClient.CreateIfNotExistsAsync();
+            var blobClient = blobContainerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(content, overwrite);
+        }
 
         async Task IBlobStorageSdk.UploadAsync(string container, string blobName, Stream content, bool overwrite)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);
-            await blobContainerClient.CreateIfNotExistsAsync();
             var blobClient = blobContainerClient.GetBlobClient(blobName);
             await blobClient.UploadAsync(content, overwrite);
         }
