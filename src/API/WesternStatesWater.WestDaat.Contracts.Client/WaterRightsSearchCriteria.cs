@@ -12,6 +12,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string[] BeneficialUses { get; set; }
         public string[] OwnerClassifications { get; set; }
         public string[] WaterSourceTypes { get; set; }
+        public string[] RiverBasinNames { get; set; }
 
         // Geojson string
         public string Boundaries { get; set; }

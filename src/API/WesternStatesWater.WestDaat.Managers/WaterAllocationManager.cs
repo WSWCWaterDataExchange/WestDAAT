@@ -15,6 +15,7 @@ namespace WesternStatesWater.WestDaat.Managers
     public sealed class WaterAllocationManager : ManagerBase, ClientContracts.IWaterAllocationManager
     {
         private readonly IGeoConnexEngine _geoConnexEngine;
+        private readonly ILocationEngine _locationEngine;
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
@@ -24,18 +25,27 @@ namespace WesternStatesWater.WestDaat.Managers
             ISiteAccessor siteAccessor,
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
+            ILocationEngine locationEngine,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
+            _locationEngine = locationEngine;
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
             //TODO: if boundaries is not null then call to convert GeoJson
+            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            {
+                var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
+                var geometry = featureCollection.Features[0].Geometry.;
+                accessorSearchRequest.Boundaries = geometry;
+
+            }
 
             return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
         }
