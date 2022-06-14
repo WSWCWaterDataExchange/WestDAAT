@@ -29,11 +29,9 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
-                .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                .Include(x => x.AllocationBridgeSitesFact)
                 .Where(predicate)
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
-                .ThenBy(x => x.AllocationAmountId) // eventually this will be WadeUuid
+                .ThenBy(x => x.AllocationAmountId) // eventually this will be AllocationUuid
                 .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
                 .Take(_performanceConfiguration.WaterRightsSearchPageSize)
                 .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
@@ -93,7 +91,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
             {
-                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority));
+                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
             }
 
             if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
@@ -137,7 +135,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             if (searchCriteria?.States != null && searchCriteria.States.Any())
             {
-                predicate.And(AllocationAmountsFact.HasOrginizationStates(searchCriteria.States.ToList()));
+                predicate.And(AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
             }
 
             if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))

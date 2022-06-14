@@ -71,8 +71,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
         {
             if (isExempt != null)
             {
-                faker
-                    .RuleFor(a => a.ExemptOfVolumeFlowPriority, () => isExempt);
+                faker.RuleFor(a => a.ExemptOfVolumeFlowPriority, () => isExempt);
             }
             else
             {
