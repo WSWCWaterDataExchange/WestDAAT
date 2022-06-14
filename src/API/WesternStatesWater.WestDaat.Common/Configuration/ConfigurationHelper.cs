@@ -12,7 +12,8 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
-                { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "50" }
+                { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "50" },
+                { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.WaterRightsSearchPageSize)}", "100" }
             };
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)
@@ -39,6 +40,10 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         {
             return config.GetSection(ConfigurationRootNames.Blob).Get<BlobStorageConfiguration>();
         }
+        public static PerformanceConfiguration GetPerformanceConfiguration(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Performance).Get<PerformanceConfiguration>();
+        }
     }
 
     public static class ConfigurationRootNames
@@ -48,5 +53,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public const string UsgsNldiService = "UsgsNldiService";
         public const string Nldi = "Nldi";
         public const string Blob = "BlobStorage";
+        public const string Performance = "Performance";
     }
 }

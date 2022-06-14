@@ -71,6 +71,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             return new DatabaseContextFactory(Configuration.GetDatabaseConfiguration());
         }
 
+        internal PerformanceConfiguration CreatePerformanceConfiguration()
+        {
+            return new PerformanceConfiguration
+            {
+                WaterRightsSearchPageSize = 100
+            };
+        }
+
         protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)

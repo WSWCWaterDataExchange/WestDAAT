@@ -38,6 +38,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddScoped(a => configuration.GetNldiConfiguration());
             builder.Services.AddScoped(a => configuration.GetSmtpConfiguration());
             builder.Services.AddScoped(a => configuration.GetBlobStorageConfiguration());
+            builder.Services.AddScoped(a => configuration.GetPerformanceConfiguration());
 
             builder.Services.AddScoped<INotificationManager, NotificationManager>();
             builder.Services.AddTransient<ISystemManager, SystemManager>();
