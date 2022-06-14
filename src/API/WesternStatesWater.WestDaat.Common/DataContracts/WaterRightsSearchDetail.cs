@@ -2,8 +2,8 @@
 {
     public class WaterRightsSearchDetail
     {
-        public string WadeUuid { get; set; }
-        public DateTime AllocationPriorityDate { get; set; }
+        public string AllocationUuid { get; set; }
+        public DateTime? AllocationPriorityDate { get; set; }
         public string[] BeneficialUses { get; set; }
         public double? AllocationFlowCfs { get; set; }
         public double? AllocationVolumeAf { get; set; }

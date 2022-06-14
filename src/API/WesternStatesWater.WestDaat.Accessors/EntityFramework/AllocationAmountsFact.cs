@@ -105,7 +105,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> HasOrginizationStates(List<string> states)
+        public static ExpressionStarter<AllocationAmountsFact> HasOrganizationStates(List<string> states)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
@@ -118,12 +118,12 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(x => x.AllocationOwner == allowcationOwner);
+            predicate = predicate.Or(x => x.AllocationOwner.Contains(allowcationOwner));
 
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool? isExempt)
+        public static ExpressionStarter<AllocationAmountsFact> IsExemptOfVolumeFlowPriority(bool isExempt)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 

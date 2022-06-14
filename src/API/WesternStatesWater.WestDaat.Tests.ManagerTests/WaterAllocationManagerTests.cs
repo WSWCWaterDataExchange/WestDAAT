@@ -91,7 +91,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                     {
                         new CommonContracts.WaterRightsSearchDetail
                         {
-                            WadeUuid = "abc123"
+                            AllocationUuid = "abc123"
                         }
                     }
                 })
