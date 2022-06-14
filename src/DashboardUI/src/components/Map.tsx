@@ -134,7 +134,6 @@ function Map(_props: mapProps) {
 
       if (!_props.hideDrawControl) {
         mapboxDrawControl(mapInstance);
-
       }
 
       mapInstance.on('mousemove', (e) => {
@@ -233,16 +232,17 @@ function Map(_props: mapProps) {
         var currLayers = map.getStyle().layers;
         var currSources = map.getStyle().sources;
         map.once("styledata", () => {
-          sourceIds.forEach(sourceId => {
+          sourceIds?.forEach(sourceId => {
             if (!map.getSource(sourceId)) {
               map.addSource(sourceId, currSources?.[sourceId] as AnySourceImpl);
             }
-          })
+          });
           layerIds?.forEach(layerId => {
             if (!map.getLayer(layerId)) {
               map.addLayer(currLayers?.find(a => a.id === layerId) as AnyLayer);
             }
-          })
+          });
+
           resolve(true);
         });
         map.setStyle(`mapbox://styles/mapbox/${style}`);
@@ -255,7 +255,9 @@ function Map(_props: mapProps) {
       }
     }
     if (!map) return;
-    buildMap(map);
+    if (map.isStyleLoaded()) {
+      buildMap(map);
+    }
   }, [map, mapStyle, layerIds, sourceIds]);
 
   useEffect(() => {
