@@ -4,7 +4,9 @@ using WesternStatesWater.WestDaat.Common;
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
-    {        
+    {
+        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchRequest);
+        
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
         Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId);
