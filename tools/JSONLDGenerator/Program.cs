@@ -61,25 +61,31 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
             }
 
             var list = new List<string>();
-            rawData.AsParallel().ForAll(geoConnex => 
+            rawData.AsParallel().ForAll(geoConnex =>
             {
-                var file = BuildGeoConnexJson(stringFile, geoConnex); 
+                var file = BuildGeoConnexJson(stringFile, geoConnex);
                 if (!string.IsNullOrEmpty(file))
                 {
                     list.Add(file);
                 }
             });
 
+            var json = JsonConvert.SerializeObject(list.ToArray(), new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeNonAscii });
+            json = System.Text.RegularExpressions.Regex.Unescape(json)
+                .Replace("\",\"", ",") // from object to object
+                .Replace("[\"{", "[{") // begining of the object
+                .Replace("\"]", "]") // end of array
+                .Replace("]\"}", "]}"); // end of object
+            ;
+
             var stream = new MemoryStream(
-                Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(list)
-                    ));
+                Encoding.UTF8.GetBytes(json));
 
             var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
 
             if (blobStorageSdk != null)
             {
-                await blobStorageSdk.UploadAsync("jsonlds", "JsonLDSchemaData", stream, true);
+                await blobStorageSdk.UploadAsync("$web", "jsonld.json", stream, true);
             }
             else
             {
