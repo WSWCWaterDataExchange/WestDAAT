@@ -85,7 +85,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
 
             if (blobStorageSdk != null)
             {
-                await blobStorageSdk.CreateAndUploadAsync("jsonlds", "Jsonld.json", stream, true);
+                await blobStorageSdk.UploadAsync("$web", "Jsonld.json", stream, true);
             }
             else
             {
