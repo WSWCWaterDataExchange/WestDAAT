@@ -38,15 +38,20 @@ namespace WesternStatesWater.WestDaat.Managers
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
-            //TODO: if boundaries is not null then call to convert GeoJson
-            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            //TODO: get geometry from RiverBasinNames
+            //if (searchRequest.RiverBasinNames?.Any() ?? false)
+            //{
+            //    var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
+            //    var geometry = featureCollection.Features[0].Geometry;
+            //    accessorSearchRequest.Boundaries = geometry;
+
+            //}
+
+            if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
             {
-                var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
-                var geometry = featureCollection.Features[0].Geometry.;
-                accessorSearchRequest.Boundaries = geometry;
-
+                accessorSearchRequest.FilterGeometry = GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry);
             }
-
+            
             return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
         }
 

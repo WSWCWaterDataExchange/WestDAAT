@@ -1,4 +1,5 @@
 ﻿using LinqKit;
+using NetTopologySuite.Geometries;
 using System.ComponentModel.DataAnnotations;
 
 namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
@@ -138,9 +139,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             if (minimumFlow.HasValue && maximumFlow.HasValue)
             {
-                predicate = predicate.Or(x => x.AllocationFlow_CFS >= minimumFlow  && x.AllocationFlow_CFS <= maximumFlow);
+                predicate = predicate.Or(x => x.AllocationFlow_CFS >= minimumFlow && x.AllocationFlow_CFS <= maximumFlow);
             }
-            else if(minimumFlow.HasValue)
+            else if (minimumFlow.HasValue)
             {
                 predicate = predicate.Or(x => x.AllocationFlow_CFS >= minimumFlow);
             }
@@ -197,6 +198,16 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
             predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(abs => abs.Site.PODorPOUSite == podOrPou));
+
+            return predicate;
+        }
+
+        public static ExpressionStarter<AllocationAmountsFact> IsWithinPolygon(Geometry geometry)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+                (site.Site.Geometry != null && site.Site.Geometry.Intersects(geometry)) || (site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry))));
 
             return predicate;
         }

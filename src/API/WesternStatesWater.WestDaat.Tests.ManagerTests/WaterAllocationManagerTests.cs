@@ -6,6 +6,8 @@ using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using Common = WesternStatesWater.WestDaat.Common;
+using NetTopologySuite.Geometries;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -14,6 +16,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     {
         private readonly Mock<INldiAccessor> _nldiAccessorMock = new(MockBehavior.Strict);
         private readonly Mock<IGeoConnexEngine> _geoConnexEngineMock = new Mock<IGeoConnexEngine>(MockBehavior.Strict);
+        private readonly Mock<ILocationEngine> _locationEngineMock = new Mock<ILocationEngine>(MockBehavior.Strict);
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
 
@@ -80,7 +83,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_FindWaterRights()
+        public async Task FindWaterRights_ResultsReturned()
         {
             //Arrange
             _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -106,6 +109,45 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             //Assert
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByGeometry_GeoJsonConvertedToParam()
+        {
+            //Arrange
+            Geometry actualFilterGeometryParam = null;
+
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    CurrentPageNumber = 0,
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            AllocationUuid = "abc123"
+                        }
+                    }
+                })
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                FilterGeometry = "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}"
+            };
+
+            var expectedFilterGeometryParam = GeometryHelpers.GetGeometryByGeoJson(searchCriteria.FilterGeometry);
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+            actualFilterGeometryParam.Should().NotBeNull();
+            actualFilterGeometryParam.Should().Be(expectedFilterGeometryParam);
         }
 
         [TestMethod]
@@ -233,6 +275,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _siteAccessorMock.Object,
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
+                _locationEngineMock.Object,
                 CreateLogger<WaterAllocationManager>()
             );
         }

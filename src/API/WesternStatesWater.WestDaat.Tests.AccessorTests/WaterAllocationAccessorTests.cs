@@ -4,6 +4,7 @@ using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -950,6 +951,63 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 x.AllocationPriorityDate?.Date == matchedAllocationAmounts.First(a => a.AllocationAmountId.ToString() == x.AllocationUuid).AllocationPriorityDateNavigation.Date.Date)
                 .Should().BeTrue();
             result.WaterRightsDetails.Should().BeInAscendingOrder(x => x.AllocationPriorityDate);
+        }
+
+        [TestMethod]
+        [DataRow(2, null, "POINT(-96.7014 40.8146)", "POINT(-96.7014 40.8146)", "POINT(-96.7010 40.8146)")] //same point
+        [DataRow(0, null, "POINT(-96.7008 40.8147)", "POINT(-96.7014 40.8146)", "POINT(-96.7010 40.8146)")] //different points
+        [DataRow(2, null, "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)")] //inside
+        [DataRow(0, null, "POINT(-96.7014 40.8146)", "POLYGON((-96.7013 40.8147,-96.7012 40.8147,-96.7012 40.8146,-96.7013 40.8146,-96.7013 40.8147))", "POINT(-96.7010 40.8146)")] //outside
+        [DataRow(2, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7008 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)")] //match geo not point
+        [DataRow(2, "POLYGON((-96.7113 40.8147,-96.7112 40.8147,-96.7112 40.8146,-96.7113 40.8146,-96.7113 40.8147))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)")] //match point not geo
+        [DataRow(2, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)")] //match both
+        [DataRow(0, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7113 40.8147,-96.7112 40.8147,-96.7112 40.8146,-96.7113 40.8146,-96.7113 40.8147))", "POINT(-96.7010 40.8146)")] //match neither
+        public async Task FindWaterRights_SearchByGeometry_MatchOnSitePoint(int expectedResultsCount, string siteGeometry, string sitePoint, string filterGeometry, string outsidePoint)
+        {
+            //Arrange
+            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+
+            if(expectedResultsCount > 0)
+            {
+                var matchedSite = new SitesDimFaker()
+                .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(sitePoint))
+                .RuleFor(s => s.Geometry, () => GeometryHelpers.GetGeometryByWkt(siteGeometry))
+                .Generate();
+
+                matchedAllocationAmounts = new AllocationAmountFactFaker().LinkSites(matchedSite).Generate(expectedResultsCount);
+            }            
+
+            var nonMatchedSite = new SitesDimFaker()
+                .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(outsidePoint))
+                .Generate();
+
+            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker().LinkSites(nonMatchedSite).Generate(3);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                FilterGeometry = GeometryHelpers.GetGeometryByWkt(filterGeometry)
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultsCount);
+
+            expectedAllocationUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => expected == actual.AllocationUuid) != null)
+                .Should().BeTrue();
         }
 
         [TestMethod]

@@ -15,7 +15,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string[] RiverBasinNames { get; set; }
 
         // Geojson string
-        public string Boundaries { get; set; }
+        public string FilterGeometry { get; set; }
 
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
