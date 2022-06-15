@@ -1,6 +1,7 @@
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -38,18 +39,26 @@ namespace WesternStatesWater.WestDaat.Managers
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
-            //TODO: get geometry from RiverBasinNames
-            //if (searchRequest.RiverBasinNames?.Any() ?? false)
-            //{
-            //    var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
-            //    var geometry = featureCollection.Features[0].Geometry;
-            //    accessorSearchRequest.Boundaries = geometry;
 
-            //}
+            //TODO: get geometry from RiverBasinNames
+            var geometryFilters = new List<Geometry>();
+            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            {
+                var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
+                var riverBasinPolygons = GeometryHelpers.GetGeometryByFeatures(featureCollection.Features);
+                //accessorSearchRequest.FilterGeometry = riverBasinPolygons;
+                geometryFilters.AddRange(riverBasinPolygons);
+            }
 
             if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
             {
-                accessorSearchRequest.FilterGeometry = GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry);
+                //accessorSearchRequest.FilterGeometry = GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry);
+                geometryFilters.Add(GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry));
+            }
+
+            if (geometryFilters.Any())
+            {
+                accessorSearchRequest.FilterGeometry = geometryFilters.ToArray();
             }
             
             return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();

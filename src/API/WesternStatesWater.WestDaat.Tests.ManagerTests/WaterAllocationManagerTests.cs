@@ -8,6 +8,8 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using Common = WesternStatesWater.WestDaat.Common;
 using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -266,6 +268,23 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             result.Should().NotBeNull();
             _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public void ConvertFeaturesToGeometries_Success()
+        {
+            var basinNames = new List<string>
+            {
+                ArkansasRiverBasin.BasinName,
+                ColoradoRiverBasin.BasinName
+            };
+
+            var features = RiverBasinConstants.RiverBasinDictionary.Where(x => basinNames.Contains(x.Key)).Select(x => x.Value).ToList();
+
+            var polygons = GeometryHelpers.GetGeometryByFeatures(features);
+
+            polygons.Should().NotBeNull();
+            polygons.Should().HaveCount(2);
         }
 
         private IWaterAllocationManager CreateWaterAllocationManager()

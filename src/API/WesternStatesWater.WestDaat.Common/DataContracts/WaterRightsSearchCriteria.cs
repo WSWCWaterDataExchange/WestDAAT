@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string[] BeneficialUses { get; set; }
         public string[] OwnerClassifications { get; set; }
         public string[] WaterSourceTypes { get; set; }
-        public Geometry FilterGeometry { get; set; }
+        public Geometry[] FilterGeometry { get; set; }
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
         public bool? ExemptOfVolumeFlowPriority { get; set; }
