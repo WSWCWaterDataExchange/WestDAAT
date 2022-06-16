@@ -47,7 +47,6 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                 var rawData = waterAllocationAccessor.GetJSONLDData();
 
                 var templateResourceSdk = services.Services.GetService<ITemplateResourceSdk>();
-
                 if (templateResourceSdk == null)
                 {
                     Console.WriteLine("TemplateSdk was null");
@@ -55,7 +54,17 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                 }
                 var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
 
+                var list = new List<string>();
+
                 Console.WriteLine("Populating Templates");
+                Parallel.ForEach(rawData, (site) =>
+                {
+                    var file = BuildGeoConnexJson(stringFile, site);
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        list.Add(file);
+                    }
+                });
 
                 var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
                 if (blobStorageSdk == null)
@@ -63,19 +72,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     Console.WriteLine("Blob storage service was null");
                     return;
                 }
-
-                var list = new List<string>();
-                rawData.AsParallel().ForAll(geoConnex =>
-                {
-                    var file = BuildGeoConnexJson(stringFile, geoConnex);
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        list.Add(file);
-                    }
-                });
-
                 Console.WriteLine("normalizing the templates");
-
                 Console.WriteLine("Creating Stream");
                 var stream = new MemoryStream(
                     );
@@ -107,15 +104,6 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                         geoConnex.OrganizationDataMappingUrl,            // {6}
                         geoConnex.Geometry?.ToString() ?? string.Empty   // {7}
                     ));
-
-                var json = JsonConvert.SerializeObject(geoConnexJson, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeNonAscii });
-                json = System.Text.RegularExpressions.Regex.Unescape(json);
-
-                var builder = new StringBuilder(json);
-                builder.Replace("\",\"", ",") // from object to object
-                    .Replace("[\"{", "[{") // begining of the object
-                    .Replace("\"]", "]") // end of array
-                    .Replace("]\"}", "]}"); // end of object
 
                 return geoConnexJson;
             }
