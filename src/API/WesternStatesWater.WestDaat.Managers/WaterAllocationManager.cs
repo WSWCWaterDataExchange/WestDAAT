@@ -37,21 +37,25 @@ namespace WesternStatesWater.WestDaat.Managers
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
+        }
+
+        private WaterRightsSearchCriteria MapSearchRequest(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
 
-            //TODO: get geometry from RiverBasinNames
             var geometryFilters = new List<NetTopologySuite.Geometries.Geometry>();
             if (searchRequest.RiverBasinNames?.Any() ?? false)
             {
                 var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
                 var riverBasinPolygons = GeometryHelpers.GetGeometryByFeatures(featureCollection.Features);
-                //accessorSearchRequest.FilterGeometry = riverBasinPolygons;
                 geometryFilters.AddRange(riverBasinPolygons);
             }
 
             if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
             {
-                //accessorSearchRequest.FilterGeometry = GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry);
                 geometryFilters.Add(GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry));
             }
 
@@ -59,8 +63,8 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 accessorSearchRequest.FilterGeometry = geometryFilters.ToArray();
             }
-            
-            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
+
+            return accessorSearchRequest;
         }
 
         async Task<FeatureCollection> ClientContracts.IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)

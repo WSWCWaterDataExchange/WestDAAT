@@ -202,7 +202,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> IsWithinPolygon(params Geometry[] geometries)
+        public static ExpressionStarter<AllocationAmountsFact> IsWithinGeometry(params Geometry[] geometries)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 

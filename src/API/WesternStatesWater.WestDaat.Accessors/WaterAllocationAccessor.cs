@@ -154,7 +154,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             if (searchCriteria?.FilterGeometry != null)
             {
-                predicate.And(AllocationAmountsFact.IsWithinPolygon(searchCriteria.FilterGeometry));
+                predicate.And(AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
             }
 
             return predicate;

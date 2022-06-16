@@ -893,7 +893,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var rand = new Random();
 
             var dateFaker = new Faker().Date;
-            //var matchingDate = dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue);
 
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
                 .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))
@@ -1011,21 +1010,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(new string[] { "POINT(-96.7014 40.8146)", "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "2 matches, 1 for each polygon")]
-        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "1st site match, 2 polygons")]
-        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "2nd site match, 2nd polygon")]
-        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.7146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", null, DisplayName = "1 match, 1st polygon")]
-        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.8146)" }, "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", null, DisplayName = "1 match, 2nd polygon")]
-        [DataRow(new string[] { }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "0 match, 2 polygons")]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)", "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "2 matches 1 for each polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 1 match 1st polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 2 match 2nd polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.7146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", null, DisplayName = "site 1 match 1 polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.8146)" }, null, "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 2 match 1 polygon")]
+        [DataRow(new string[] { }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "0 match 2 polygons")]
         public async Task FindWaterRights_SearchByMultipleGeometries_MultipleMatches(string[] matchedSitePoints, string[] unmatchedSitePoints, string filterPolygon1, string filterPolygon2)
         {
             //Arrange
-            //var sitePoint1 = "POINT(-96.7014 40.8146)";
-            //var sitePoint2 = "POINT(-96.7014 40.7146)";
-            //var outsidePoint = "POINT(-96.7010 40.8146)";
-            //var filterPolygon1 = "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))";
-            //var filterPolygon2 = "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))";
-
             var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
             var nonMatchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
 
