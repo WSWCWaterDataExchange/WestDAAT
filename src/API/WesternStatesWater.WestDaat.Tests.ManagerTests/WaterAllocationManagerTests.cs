@@ -117,7 +117,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         public async Task FindWaterRights_SearchByGeometry_GeoJsonConvertedToParam()
         {
             //Arrange
-            Geometry actualFilterGeometryParam = null;
+            Geometry[] actualFilterGeometryParam = null;
 
             _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
                 .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
@@ -139,7 +139,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 FilterGeometry = "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}"
             };
 
-            var expectedFilterGeometryParam = GeometryHelpers.GetGeometryByGeoJson(searchCriteria.FilterGeometry);
+            var expectedFilterGeometryParam = new Geometry[] { GeometryHelpers.GetGeometryByGeoJson(searchCriteria.FilterGeometry) };
 
             //Act
             var manager = CreateWaterAllocationManager();
@@ -149,7 +149,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
             actualFilterGeometryParam.Should().NotBeNull();
-            actualFilterGeometryParam.Should().Be(expectedFilterGeometryParam);
+            actualFilterGeometryParam.Should().BeEquivalentTo(expectedFilterGeometryParam);
         }
 
         [TestMethod]

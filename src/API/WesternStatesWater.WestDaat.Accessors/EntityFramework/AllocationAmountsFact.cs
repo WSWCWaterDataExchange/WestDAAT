@@ -202,13 +202,16 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             return predicate;
         }
 
-        public static ExpressionStarter<AllocationAmountsFact> IsWithinPolygon(Geometry geometry)
+        public static ExpressionStarter<AllocationAmountsFact> IsWithinPolygon(params Geometry[] geometries)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+            foreach(var geometry in geometries)
+            {
+                predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
                 (site.Site.Geometry != null && site.Site.Geometry.Intersects(geometry)) || (site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry))));
-
+            }
+            
             return predicate;
         }
 

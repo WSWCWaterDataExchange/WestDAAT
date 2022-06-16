@@ -1,7 +1,6 @@
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -41,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Managers
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
 
             //TODO: get geometry from RiverBasinNames
-            var geometryFilters = new List<Geometry>();
+            var geometryFilters = new List<NetTopologySuite.Geometries.Geometry>();
             if (searchRequest.RiverBasinNames?.Any() ?? false)
             {
                 var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
