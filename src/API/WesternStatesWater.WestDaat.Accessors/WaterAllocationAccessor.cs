@@ -220,26 +220,26 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        public async Task<List<GeoConnex>> GetJSONLDData()
+        public IEnumerable<GeoConnex> GetJSONLDData()
         {
             using var db = _databaseContextFactory.Create();
-
-            return await db.AllocationBridgeSitesFact
-                .Select(x => new GeoConnex
+            foreach (var fact in db.AllocationBridgeSitesFact)
+            {
+                yield return new GeoConnex
                 {
-                    Latitude = x.Site.Latitude,
-                    Longitude = x.Site.Longitude,
-                    SiteTypeCv = x.Site.SiteTypeCv,
-                    SiteUuid = x.Site.SiteUuid,
-                    GniscodeCv =x.Site.GniscodeCv,
-                    SiteName = x.Site.SiteName,
+                    Latitude = fact.Site.Latitude,
+                    Longitude = fact.Site.Longitude,
+                    SiteTypeCv = fact.Site.SiteTypeCv,
+                    SiteUuid = fact.Site.SiteUuid,
+                    GniscodeCv = fact.Site.GniscodeCv,
+                    SiteName = fact.Site.SiteName,
                     OrganizationDataMappingUrl = db.AllocationAmountsFact
-                        .Where(s => s.AllocationAmountId == x.AllocationAmountId)
+                        .Where(s => s.AllocationAmountId == fact.AllocationAmountId)
                         .Select(a => a.Organization.OrganizationDataMappingUrl)
                         .FirstOrDefault(),
-                    Geometry = x.Site.Geometry,
-                })
-                .ToListAsync();
+                    Geometry = fact.Site.Geometry,
+                };
+            }
         }
     }
 }

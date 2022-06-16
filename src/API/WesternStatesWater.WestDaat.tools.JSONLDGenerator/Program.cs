@@ -15,85 +15,81 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
     {
         static async Task Main(string[] args)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-                .Build();
-
-            var hostBuilder = Host.CreateDefaultBuilder();
-            var services = hostBuilder.ConfigureServices((_, services) =>
+            try
             {
-                services.AddScoped(_ => config.GetDatabaseConfiguration());
-                services.AddScoped(_ => config.GetBlobStorageConfiguration());
-                services.AddScoped(_ => config.GetPerformanceConfiguration());
-                services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
-                services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
-                services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
-                services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
-                services.BuildServiceProvider();
-            }).Build();
+                var config = new ConfigurationBuilder()
+                        .SetBasePath(Environment.CurrentDirectory)
+                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                        .Build();
 
-            var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
-
-            var rawData = new List<GeoConnex>();
-
-            if (waterAllocationAccessor != null)
-            {
-                rawData = await waterAllocationAccessor.GetJSONLDData();
-            }
-            else
-            {
-                Console.WriteLine("WaterAllocationAccessor service was null");
-                return;
-            }
-
-            var templateResourceSdk = services.Services.GetService<ITemplateResourceSdk>();
-
-            string stringFile;
-            if (templateResourceSdk != null)
-            {
-                stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
-            }
-            else
-            {
-                Console.WriteLine("TemplateSdk was null");
-                return;
-            }
-
-            var list = new List<string>();
-            rawData.AsParallel().ForAll(geoConnex =>
-            {
-                var file = BuildGeoConnexJson(stringFile, geoConnex);
-                if (!string.IsNullOrEmpty(file))
+                var hostBuilder = Host.CreateDefaultBuilder();
+                var services = hostBuilder.ConfigureServices((_, services) =>
                 {
-                    list.Add(file);
+                    services.AddScoped(_ => config.GetDatabaseConfiguration());
+                    services.AddScoped(_ => config.GetBlobStorageConfiguration());
+                    services.AddScoped(_ => config.GetPerformanceConfiguration());
+                    services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
+                    services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
+                    services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
+                    services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
+                    services.BuildServiceProvider();
+                }).Build();
+                var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
+
+                if (waterAllocationAccessor == null)
+                {
+                    Console.WriteLine("WaterAllocationAccessor service was null");
+                    return;
                 }
-            });
 
-            var json = JsonConvert.SerializeObject(list.ToArray(), new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeNonAscii });
-            json = System.Text.RegularExpressions.Regex.Unescape(json)
-                .Replace("\",\"", ",") // from object to object
-                .Replace("[\"{", "[{") // begining of the object
-                .Replace("\"]", "]") // end of array
-                .Replace("]\"}", "]}"); // end of object
-            ;
+                Console.WriteLine("Fetching Data");
+                var rawData = waterAllocationAccessor.GetJSONLDData();
 
-            var stream = new MemoryStream(
-                Encoding.UTF8.GetBytes(json));
+                var templateResourceSdk = services.Services.GetService<ITemplateResourceSdk>();
 
-            var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
+                if (templateResourceSdk == null)
+                {
+                    Console.WriteLine("TemplateSdk was null");
+                    return;
+                }
+                var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
 
-            if (blobStorageSdk != null)
-            {
+                Console.WriteLine("Populating Templates");
+
+                var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
+                if (blobStorageSdk == null)
+                {
+                    Console.WriteLine("Blob storage service was null");
+                    return;
+                }
+
+                var list = new List<string>();
+                rawData.AsParallel().ForAll(geoConnex =>
+                {
+                    var file = BuildGeoConnexJson(stringFile, geoConnex);
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        list.Add(file);
+                    }
+                });
+
+                Console.WriteLine("normalizing the templates");
+
+                Console.WriteLine("Creating Stream");
+                var stream = new MemoryStream(
+                    );
+                // Encoding.UTF8.GetBytes(list)
+
+                Console.WriteLine("Pushing to Blob");
                 await blobStorageSdk.UploadAsync("$web", "jsonld.json", stream, true);
-            }
-            else
-            {
-                Console.WriteLine("Blob storage service was null");
-                return;
-            }
 
+                Console.WriteLine("Finish");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Message: { ex.Message}\nStackTrace: {ex.StackTrace}");
+            }
         }
 
         private static string BuildGeoConnexJson(string stringFile, GeoConnex geoConnex)
@@ -111,6 +107,15 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                         geoConnex.OrganizationDataMappingUrl,            // {6}
                         geoConnex.Geometry?.ToString() ?? string.Empty   // {7}
                     ));
+
+                var json = JsonConvert.SerializeObject(geoConnexJson, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeNonAscii });
+                json = System.Text.RegularExpressions.Regex.Unescape(json);
+
+                var builder = new StringBuilder(json);
+                builder.Replace("\",\"", ",") // from object to object
+                    .Replace("[\"{", "[{") // begining of the object
+                    .Replace("\"]", "]") // end of array
+                    .Replace("]\"}", "]}"); // end of object
 
                 return geoConnexJson;
             }
