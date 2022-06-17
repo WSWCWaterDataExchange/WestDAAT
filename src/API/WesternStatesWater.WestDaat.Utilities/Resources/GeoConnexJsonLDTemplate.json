@@ -23,19 +23,26 @@
 		"hyf:HY_HydroLocation",
 		"sosa:FeatureOfInterest"
 	],
-  "name": "{5}",
+  "name": "{4}",
   "description": "",
-  "schema:about": {{
-    "@id": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/{4}",
-    "schema:provider": "{6}"
+  "schema:subjectOf": {{
+    "@type": "schema:CreativeWork",
+    "schema:identifier": "WestDAAT",
+    "schema:name": "Western States Water Data Access and Analysis Tool (WestDAAT)",
+    "schema:url": "https://westdaat.westernstateswater.org/",
+    "schema:provider": {{
+      "@type": "schema:Organization",
+      "schema:identifier": "Wade",
+      "schema:name": "Water Data Exchange",
+      "schema:url": "https://westernstateswater.org/wade/" 
+    }} 
   }},
   "sosa:isFeatureOfInterestOf": {{
     "schema:url": "https://wade-api-qa.azure-api.net/v1/SiteAllocationAmounts/{3}",
     "@type": "sosa:ObservationCollection",
     "schema:format": [
       "application/json"
-    ],
-    "schema:provider": "https://westernstateswater.org/wade"
+    ]
   }},
   "hyf:HY_HydroLocationType": [
     "{2}"
@@ -47,6 +54,6 @@
   }},
   "gsp:hasGeometry": {{
     "@type": "gsp:Geometry",
-    "gsp:asWKT": "{7}"
+    "gsp:asWKT": "POINT ({0} {1})"
   }}
 }}

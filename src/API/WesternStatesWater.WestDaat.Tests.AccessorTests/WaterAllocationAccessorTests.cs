@@ -1430,15 +1430,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var enumerable = accessor.GetJSONLDData();
             // Assert
             var result = enumerable.ToList();
+
             sites.ForEach(site =>
             {
                 var justOne = result.Where(res =>
                     res.Latitude == site.Latitude
                     && res.Longitude == site.Longitude
                     && res.SiteTypeCv == site.SiteTypeCv
-                    && res.GniscodeCv == site.GniscodeCv
-                    && res.SiteName == site.SiteName
-                    && res.Geometry == site.Geometry);
+                    && res.GniscodeCv == site.SiteName
+                    && res.SiteName == site.SiteName);
 
                 justOne.Count().Should().Be(1);
             });
