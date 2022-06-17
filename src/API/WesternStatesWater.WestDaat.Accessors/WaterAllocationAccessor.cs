@@ -231,11 +231,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                     Longitude = fact.Site.Longitude,
                     SiteTypeCv = fact.Site.SiteTypeCv,
                     SiteUuid = fact.Site.SiteUuid,
-                    SiteName = fact.Site.SiteName,
-                    OrganizationDataMappingUrl = db.AllocationAmountsFact
-                        .Where(s => s.AllocationAmountId == fact.AllocationAmountId)
-                        .Select(a => a.Organization.OrganizationDataMappingUrl)
-                        .FirstOrDefault()
+                    SiteName = fact.Site.SiteName
                 };
             }
         }

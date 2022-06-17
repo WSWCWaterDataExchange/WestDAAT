@@ -99,8 +99,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                         geoConnex.Latitude ?? default,                   // {1}
                         geoConnex.SiteTypeCv,                            // {2}
                         geoConnex.SiteUuid,                              // {3}
-                        geoConnex.SiteName,                              // {4}
-                        geoConnex.OrganizationDataMappingUrl             // {5}
+                        geoConnex.SiteName                               // {4}
                     ));
 
                 return geoConnexJson;
