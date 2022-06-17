@@ -1,5 +1,6 @@
-﻿using System.IO;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using System.IO;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Utilities
@@ -25,6 +26,14 @@ namespace WesternStatesWater.WestDaat.Utilities
             var blobContainerClient = _client.GetBlobContainerClient(container);
             var blobClient = blobContainerClient.GetBlobClient(blobName);
             await blobClient.UploadAsync(content, overwrite);
+        }
+
+        async Task<Stream> IBlobStorageSdk.GetBlobStream(string container, string blobName, bool overwrite)
+        {
+            var blobContainerClient = _client.GetBlobContainerClient(container);
+            var blobClient = blobContainerClient.GetBlobClient(blobName);
+
+            return await blobClient.OpenWriteAsync(overwrite, options: new BlobOpenWriteOptions());
         }
     }
 }

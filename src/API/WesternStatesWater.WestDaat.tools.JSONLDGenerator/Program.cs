@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using System.Text;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
@@ -35,16 +34,13 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
                     services.BuildServiceProvider();
                 }).Build();
-                var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
 
+                var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
                 if (waterAllocationAccessor == null)
                 {
                     Console.WriteLine("WaterAllocationAccessor service was null");
                     return;
                 }
-
-                Console.WriteLine("Fetching Data");
-                var rawData = waterAllocationAccessor.GetJSONLDData();
 
                 var templateResourceSdk = services.Services.GetService<ITemplateResourceSdk>();
                 if (templateResourceSdk == null)
@@ -52,19 +48,6 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     Console.WriteLine("TemplateSdk was null");
                     return;
                 }
-                var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
-
-                var list = new List<string>();
-
-                Console.WriteLine("Populating Templates");
-                Parallel.ForEach(rawData, (site) =>
-                {
-                    var file = BuildGeoConnexJson(stringFile, site);
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        list.Add(file);
-                    }
-                });
 
                 var blobStorageSdk = services.Services.GetService<IBlobStorageSdk>();
                 if (blobStorageSdk == null)
@@ -72,20 +55,37 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     Console.WriteLine("Blob storage service was null");
                     return;
                 }
-                Console.WriteLine("normalizing the templates");
-                Console.WriteLine("Creating Stream");
-                var stream = new MemoryStream(
-                    );
-                // Encoding.UTF8.GetBytes(list)
+                var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
 
-                Console.WriteLine("Pushing to Blob");
-                await blobStorageSdk.UploadAsync("$web", "jsonld.json", stream, true);
+                var rawDataEnumerable = waterAllocationAccessor.GetJSONLDData();
 
+                var blobStream = await blobStorageSdk.GetBlobStream("$web", "jsonld.json", true);
+                using (var sw = new StreamWriter(blobStream))
+                {
+                    var hasJsonBeenStreamed = false;
+                    await sw.WriteLineAsync("[");
+                    foreach (var site in rawDataEnumerable)
+                    {
+                        var file = BuildGeoConnexJson(stringFile, site);
+                        if (!string.IsNullOrEmpty(file))
+                        {
+                            if (hasJsonBeenStreamed)
+                            {
+                                sw.WriteLine(",");
+                            }
+                            await sw.WriteLineAsync(file);
+                            hasJsonBeenStreamed = true;
+                        }
+                    };
+                    await sw.WriteLineAsync("]");
+                    await sw.FlushAsync();
+                    sw.Close();
+                }
                 Console.WriteLine("Finish");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Message: { ex.Message}\nStackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Message: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
         }
 
