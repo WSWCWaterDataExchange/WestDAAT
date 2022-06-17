@@ -1437,7 +1437,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     res.Latitude == site.Latitude
                     && res.Longitude == site.Longitude
                     && res.SiteTypeCv == site.SiteTypeCv
-                    && res.GniscodeCv == site.SiteName
+                    && res.SiteUuid == site.SiteUuid
                     && res.SiteName == site.SiteName);
 
                 justOne.Count().Should().Be(1);
