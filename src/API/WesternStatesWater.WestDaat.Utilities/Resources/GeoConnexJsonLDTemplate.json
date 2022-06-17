@@ -54,6 +54,6 @@
   }},
   "gsp:hasGeometry": {{
     "@type": "gsp:Geometry",
-    "gsp:asWKT": "POINT ({0} {1})"
+    "gsp:asWKT": "POINT ({0}, {1})"
   }}
 }}
