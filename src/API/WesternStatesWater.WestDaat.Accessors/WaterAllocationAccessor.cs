@@ -223,17 +223,14 @@ namespace WesternStatesWater.WestDaat.Accessors
         public IEnumerable<GeoConnex> GetJSONLDData()
         {
             using var db = _databaseContextFactory.Create();
-            foreach (var fact in db.AllocationBridgeSitesFact.Include(s => s.Site))
+            yield return db.AllocationBridgeSitesFact.Select(a => new GeoConnex 
             {
-                yield return new GeoConnex
-                {
-                    Latitude = fact.Site.Latitude,
-                    Longitude = fact.Site.Longitude,
-                    SiteTypeCv = fact.Site.SiteTypeCv,
-                    SiteUuid = fact.Site.SiteUuid,
-                    SiteName = fact.Site.SiteName
-                };
-            }
+                Latitude = a.Site.Latitude,
+                Longitude = a.Site.Longitude,
+                SiteTypeCv = a.Site.SiteTypeCv,
+                SiteUuid = a.Site.SiteUuid,
+                SiteName = a.Site.SiteName,
+            });
         }
     }
 }
