@@ -4,6 +4,7 @@ using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -34,7 +35,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var accessor = CreateWaterAllocationAccessor();
 
-            for(var i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
                 {
@@ -126,7 +127,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var nonMatchingAllocationAmountFacts = new AllocationAmountFactFaker()
                 .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate(1).ToArray())
                 .Generate(3);
-            nonMatchingAllocationAmountFacts.AddRange(new AllocationAmountFactFaker()                
+            nonMatchingAllocationAmountFacts.AddRange(new AllocationAmountFactFaker()
                 .Generate(3));
             using (var db = CreateDatabaseContextFactory().Create())
             {
@@ -161,7 +162,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             allocationAmounts[2].OwnerClassificationCV = ownerClassificationName;
             allocationAmounts[2].OwnerClassification.WaDEName = ownerClassificationWadeName;
-            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;            
+            allocationAmounts[2].OwnerClassification.Name = ownerClassificationName;
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
@@ -218,7 +219,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 var input = searchInputs[rand.Next(0, searchInputs.Length)];
 
                 allocationAmounts[i].OwnerClassificationCV = input;
-                allocationAmounts[i].OwnerClassification = ownerClassificationCVs.First(x => x.WaDEName == input);                
+                allocationAmounts[i].OwnerClassification = ownerClassificationCVs.First(x => x.WaDEName == input);
             }
 
             // create additional random ownerClassifications
@@ -285,7 +286,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var allocationAmounts = new AllocationAmountFactFaker().Generate(3);
             allocationAmounts.Add(new AllocationAmountFactFaker()
                     .LinkSites(siteFake)
-                    .Generate());            
+                    .Generate());
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
@@ -350,7 +351,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 matchingAllocationAmounts.Add(new AllocationAmountFactFaker()
                     .LinkSites(siteFake)
                     .Generate());
-            }            
+            }
 
             // generate waterSource objects that don't match
             var notMatchingAllocationAmounts = new AllocationAmountFactFaker()
@@ -397,7 +398,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [DataRow(10, 0, new string[] { "ZZ" })]
         [DataRow(5, 5, null)]
         [DataRow(5, 5, new string[] { "XX", "ZZ" })]
-        [DataRow(10, 2, new string[] { "YY", "NN", "ZZ"})]
+        [DataRow(10, 2, new string[] { "YY", "NN", "ZZ" })]
         public async Task FindWaterRights_SearchByStates_ReturnsMatches(int totalRecordCount, int expectedResultCount, string[] searchInputs)
         {
             //Arrange
@@ -414,14 +415,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     organizationFake.State = input;
 
                     matchedOrganizations.Add(organizationFake);
-                } 
+                }
             }
             else
             {
                 matchedOrganizations.AddRange(new OrganizationsDimFaker().Generate(5));
             }
-            
-            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();            
+
+            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
 
             for (int i = 0; i < expectedResultCount; i++)
             {
@@ -431,7 +432,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
                 matchedAllocationAmounts.Add(allocationAmount);
             }
-            
+
             var nonMatchedOrgizations = new List<EF.OrganizationsDim>(new OrganizationsDimFaker().Generate(5));
 
             var nonMatchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
@@ -575,7 +576,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateWaterAllocationAccessor();
             var result = await accessor.FindWaterRights(searchCriteria);
 
-            result.WaterRightsDetails.Should().HaveCount(2);            
+            result.WaterRightsDetails.Should().HaveCount(2);
             result.WaterRightsDetails.First(x => x.AllocationUuid == matchedAllocationAmountWithWadeName.AllocationAmountId.ToString())
                 .AllocationLegalStatus.Should().Be(matchedAllocationAmountWithWadeName.AllocationLegalStatusCvNavigation.WaDEName);
             result.WaterRightsDetails.First(x => x.AllocationUuid == matchedAllocationAmountNoWadeName.AllocationAmountId.ToString())
@@ -596,7 +597,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //generate non-matching allocationAmounts
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f=> f.Random.String(20, 'A', 'z'))
+                .RuleFor(x => x.AllocationOwner, f => f.Random.String(20, 'A', 'z'))
                 .Generate(totalRecordCount - expectedResultCount);
 
             using (var db = CreateDatabaseContextFactory().Create())
@@ -730,7 +731,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Double(1, minimumFlow.Value - 1));
             }
-            else if(maximumFlow.HasValue)
+            else if (maximumFlow.HasValue)
             {
                 nonMatchFaker.RuleFor(x => x.AllocationFlow_CFS, f => f.Random.Double(maximumFlow.Value, double.MaxValue));
             }
@@ -745,7 +746,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => new
-            { 
+            {
                 AllocationUuid = x.AllocationAmountId.ToString(),
                 AllocationFlowCfs = x.AllocationFlow_CFS
             }).ToList();
@@ -892,10 +893,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var rand = new Random();
 
             var dateFaker = new Faker().Date;
-            //var matchingDate = dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue);
 
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))                
+                .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))
                 .Generate(expectedResultCount);
 
             DateTime nonMatchingDate;
@@ -946,10 +946,135 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 actual => expected == actual.AllocationUuid) != null)
                 .Should().BeTrue();
 
-            result.WaterRightsDetails.All(x => 
+            result.WaterRightsDetails.All(x =>
                 x.AllocationPriorityDate?.Date == matchedAllocationAmounts.First(a => a.AllocationAmountId.ToString() == x.AllocationUuid).AllocationPriorityDateNavigation.Date.Date)
                 .Should().BeTrue();
             result.WaterRightsDetails.Should().BeInAscendingOrder(x => x.AllocationPriorityDate);
+        }
+
+        [TestMethod]
+        [DataRow(2, null, "POINT(-96.7014 40.8146)", "POINT(-96.7014 40.8146)", "POINT(-96.7010 40.8146)", DisplayName = "same point")]
+        [DataRow(0, null, "POINT(-96.7008 40.8147)", "POINT(-96.7014 40.8146)", "POINT(-96.7010 40.8146)", DisplayName = "different points")]
+        [DataRow(2, null, "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)", DisplayName = "inside")]
+        [DataRow(0, null, "POINT(-96.7014 40.8146)", "POLYGON((-96.7013 40.8147,-96.7012 40.8147,-96.7012 40.8146,-96.7013 40.8146,-96.7013 40.8147))", "POINT(-96.7010 40.8146)", DisplayName = "outside")]
+        [DataRow(2, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7008 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)", DisplayName = "match geo not point")]
+        [DataRow(2, "POLYGON((-96.7113 40.8147,-96.7112 40.8147,-96.7112 40.8146,-96.7113 40.8146,-96.7113 40.8147))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)", DisplayName = "match point not geo")]
+        [DataRow(2, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7010 40.8146)", DisplayName = "match both")]
+        [DataRow(0, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POINT(-96.7014 40.8146)", "POLYGON((-96.7113 40.8147,-96.7112 40.8147,-96.7112 40.8146,-96.7113 40.8146,-96.7113 40.8147))", "POINT(-96.7010 40.8146)", DisplayName = "match neither")]
+        public async Task FindWaterRights_SearchByGeometry_MatchOnSitePointOrGeometry(int expectedResultsCount, string siteGeometry, string sitePoint, string filterGeometry, string outsidePoint)
+        {
+            //Arrange
+            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+
+            if (expectedResultsCount > 0)
+            {
+                var matchedSite = new SitesDimFaker()
+                .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(sitePoint))
+                .RuleFor(s => s.Geometry, () => GeometryHelpers.GetGeometryByWkt(siteGeometry))
+                .Generate();
+
+                matchedAllocationAmounts = new AllocationAmountFactFaker().LinkSites(matchedSite).Generate(expectedResultsCount);
+            }
+
+            var nonMatchedSite = new SitesDimFaker()
+                .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(outsidePoint))
+                .Generate();
+
+            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker().LinkSites(nonMatchedSite).Generate(3);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                FilterGeometry = new NetTopologySuite.Geometries.Geometry[] { GeometryHelpers.GetGeometryByWkt(filterGeometry) }
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(expectedResultsCount);
+
+            expectedAllocationUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => expected == actual.AllocationUuid) != null)
+                .Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)", "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "2 matches 1 for each polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 1 match 1st polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 2 match 2nd polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.8146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.7146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", null, DisplayName = "site 1 match 1 polygon")]
+        [DataRow(new string[] { "POINT(-96.7014 40.7146)" }, new string[] { "POINT(-96.7010 40.8146)", "POINT(-96.7014 40.8146)" }, null, "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "site 2 match 1 polygon")]
+        [DataRow(new string[] { }, new string[] { "POINT(-96.7010 40.8146)" }, "POLYGON((-96.7015 40.8149,-96.7012 40.8149,-96.7012 40.8146,-96.7015 40.8146,-96.7015 40.8149))", "POLYGON((-96.7015 40.7149,-96.7012 40.7149,-96.7012 40.7146,-96.7015 40.7146,-96.7015 40.7149))", DisplayName = "0 match 2 polygons")]
+        public async Task FindWaterRights_SearchByMultipleGeometries_MultipleMatches(string[] matchedSitePoints, string[] unmatchedSitePoints, string filterPolygon1, string filterPolygon2)
+        {
+            //Arrange
+            var matchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+            var nonMatchedAllocationAmounts = new List<EF.AllocationAmountsFact>();
+
+            foreach (var point in matchedSitePoints)
+            {
+                var matchedSite = new SitesDimFaker()
+                .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(point))
+                .Generate();
+
+                matchedAllocationAmounts.Add(new AllocationAmountFactFaker().LinkSites(matchedSite).Generate());
+            }
+
+            foreach (var point in unmatchedSitePoints)
+            {
+                var nonMatchedSite = new SitesDimFaker()
+                        .RuleFor(s => s.SitePoint, () => GeometryHelpers.GetGeometryByWkt(point))
+                        .Generate();
+
+                nonMatchedAllocationAmounts.AddRange(new AllocationAmountFactFaker().LinkSites(nonMatchedSite).Generate(3));
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
+                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.SaveChanges();
+            }
+
+            var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationAmountId.ToString()).ToList();
+
+            var filters = new List<NetTopologySuite.Geometries.Geometry>();
+            if (!string.IsNullOrWhiteSpace(filterPolygon1))
+            {
+                filters.Add(GeometryHelpers.GetGeometryByWkt(filterPolygon1));
+            }
+            if (!string.IsNullOrWhiteSpace(filterPolygon2))
+            {
+                filters.Add(GeometryHelpers.GetGeometryByWkt(filterPolygon2));
+            }
+
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                FilterGeometry = filters.ToArray()
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(matchedSitePoints.Length);
+
+            expectedAllocationUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(
+                actual => expected == actual.AllocationUuid) != null)
+                .Should().BeTrue();
         }
 
         [TestMethod]

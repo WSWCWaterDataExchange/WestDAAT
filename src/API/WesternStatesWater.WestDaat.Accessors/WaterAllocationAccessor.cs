@@ -22,7 +22,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
-        
+
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
@@ -58,6 +58,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             predicate.And(BuildDatePredicate(searchCriteria));
 
+            predicate.And(BuildGeometrySearchPredicate(searchCriteria));
+
             return predicate;
         }
 
@@ -77,7 +79,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
-            if(searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
+            if (searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
             {
                 predicate.And(AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
             }
@@ -141,6 +143,18 @@ namespace WesternStatesWater.WestDaat.Accessors
             if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))
             {
                 predicate.And(AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.FilterGeometry != null)
+            {
+                predicate.And(AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
             }
 
             return predicate;
@@ -215,7 +229,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
             return await db.AllocationAmountsFact
-                .Where(x => x.AllocationBridgeSitesFact.Any(y=>y.Site.SiteUuid == siteUuid))
+                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
         }
