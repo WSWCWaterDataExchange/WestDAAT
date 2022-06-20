@@ -27,5 +27,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
 
+        Task<dynamic> WaterRightsAsZip();
     }
 }

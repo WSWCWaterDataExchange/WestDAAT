@@ -112,5 +112,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                 })
                 .ToListAsync();
         }
+
+        public Task<int> GetWaterRightsCount()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

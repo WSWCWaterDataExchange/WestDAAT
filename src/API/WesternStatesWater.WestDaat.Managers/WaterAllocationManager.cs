@@ -115,5 +115,11 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
+
+        public async Task<dynamic> WaterRightsAsZip()
+        {
+            var count = await _waterAllocationAccessor.GetWaterRightsCount();
+            throw new NotImplementedException();
+        }
     }
 }
