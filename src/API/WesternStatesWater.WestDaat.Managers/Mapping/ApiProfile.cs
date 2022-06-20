@@ -14,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.WaterRightsSearchResults, ClientContracts.WaterRightsSearchResults>();
             CreateMap<CommonContracts.WaterRightsSearchDetail, ClientContracts.WaterRightsSearchDetail>();
             CreateMap<ClientContracts.WaterRightsSearchCriteria, CommonContracts.WaterRightsSearchCriteria>()
-                .ForMember(x => x.Boundaries, opt => opt.Ignore());
+                .ForMember(x => x.FilterGeometry, opt => opt.Ignore());
             CreateMap<CommonContracts.SiteInfoListItem, ClientContracts.SiteInfoListItem>();
             CreateMap<CommonContracts.WaterRightDetails, ClientContracts.WaterRightDetails>();
             CreateMap<CommonContracts.SiteDetails, ClientContracts.SiteDetails>();

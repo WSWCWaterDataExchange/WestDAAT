@@ -1,6 +1,8 @@
-﻿using GeoJSON.Text.Geometry;
+﻿using GeoJSON.Text.Feature;
+using GeoJSON.Text.Geometry;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.IO;
@@ -62,6 +64,19 @@ namespace WesternStatesWater.WestDaat.Utilities
             using var stringReader = new StringReader(geoJson);
             using var jsonReader = new JsonTextReader(stringReader);
             return serializer.Deserialize<Geometry>(jsonReader);
+        }
+
+        public static Geometry[] GetGeometryByFeatures(List<Feature> features)
+        {
+            var extract = new List<Geometry>();
+
+            foreach (var feature in features)
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(feature.Geometry);
+                extract.Add(GetGeometryByGeoJson(json));
+            }
+
+            return extract.ToArray();
         }
 
         private static bool IsGeoJsonString(string geometry)
