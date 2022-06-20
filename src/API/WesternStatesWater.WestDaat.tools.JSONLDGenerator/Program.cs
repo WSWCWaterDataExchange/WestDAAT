@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text;
+using System.Diagnostics;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
@@ -40,13 +40,15 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                 var blobStorageSdk = services.Services.GetRequiredService<IBlobStorageSdk>();
                 var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
 
-                var rawDataEnumerable = waterAllocationAccessor.GetJSONLDData().Take(20);
+                var rawDataEnumerable = waterAllocationAccessor.GetJSONLDData();
 
                 var blobStream = await blobStorageSdk.GetBlobStream("$web", "jsonld.json", true);
                 using (var sw = new StreamWriter(blobStream))
                 {
+                    var count = 0;
                     var hasJsonBeenStreamed = false;
                     await sw.WriteLineAsync("[");
+
                     foreach (var site in rawDataEnumerable)
                     {
                         var file = BuildGeoConnexJson(stringFile, site);
@@ -58,6 +60,14 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                             }
                             await sw.WriteLineAsync(file);
                             hasJsonBeenStreamed = true;
+                            count++;
+
+                            // flushing is expensive, so only flushing on chunks and not per json
+                            if (count == 10000)
+                            {
+                                await sw.FlushAsync();
+                                count = 0;
+                            }
                         }
                     };
                     await sw.WriteLineAsync("]");
