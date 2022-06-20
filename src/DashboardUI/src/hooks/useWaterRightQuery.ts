@@ -4,7 +4,9 @@ import {
   getWaterRightSiteInfoList,
   getWaterRightSourceInfoList,
   getWaterRightSiteLocations,
+  findWaterRight,
 } from '../accessors/waterAllocationAccessor';
+import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 
 export function useWaterRightDetails(waterRightId: number) {
   return useQuery(
@@ -12,6 +14,16 @@ export function useWaterRightDetails(waterRightId: number) {
     async () => await getWaterRightDetails(waterRightId),
     {
       enabled: !!waterRightId,
+    }
+  );
+}
+
+export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria){
+  return useQuery(
+    ['waterRight.Find', searchCriteria],
+    async () => await findWaterRight(searchCriteria), 
+    {
+      enabled: searchCriteria !== null
     }
   );
 }
