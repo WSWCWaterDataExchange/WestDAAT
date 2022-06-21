@@ -24,6 +24,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<GeoConnex>> GetJSONLDData();
 
-        Task<int> GetWaterRightsCount();
+        Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
     }
 }

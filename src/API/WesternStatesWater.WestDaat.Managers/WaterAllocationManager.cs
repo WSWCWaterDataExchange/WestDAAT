@@ -19,6 +19,7 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
+        private readonly IDocumentProcessingSdk _documentProcessingSdk;
 
         public WaterAllocationManager(
             INldiAccessor nldiAccessor,
@@ -26,6 +27,7 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            IDocumentProcessingSdk documentProcessingSdk,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
@@ -33,6 +35,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
             _locationEngine = locationEngine;
+            _documentProcessingSdk = documentProcessingSdk;
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
@@ -152,9 +155,31 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public async Task<dynamic> WaterRightsAsZip()
+        public async Task<dynamic> WaterRightsAsZip(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
-            var count = await _waterAllocationAccessor.GetWaterRightsCount();
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+            var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+
+            if (count > 100000) // return code if they are requesting more than 100k
+            {
+                // return the function and trigger and error message for the front end saying that the requested files are more than 100.000
+            }
+
+            // this records is just for testing purposes
+            var records = new List<ClientContracts.WaterRightInfoListItem>
+            {
+                new ClientContracts.WaterRightInfoListItem { WaterRightId = 1, Owner = "one", LegalStatus = "legal" },
+                new ClientContracts.WaterRightInfoListItem { WaterRightId = 2, Owner = "two", LegalStatus = "Ilegal" },
+            };
+
+            var doc = _documentProcessingSdk.ToCsv<ClientContracts.WaterRightInfoListItem>(records, "testing");
+
+            // I think we will get a combination of filters, and based on these filters we would be getting a list of objects from the querys.
+            // then from that list of query call the DocumentProcessing file, and have a list of the processed documents
+            // then call the .zip in the document processing sdk
+            
+            // then return document, also then go to the controller and change the headers based if all of this was successfull or not
+
             throw new NotImplementedException();
         }
     }

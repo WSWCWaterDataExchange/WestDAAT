@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,19 +12,17 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public class DocumentProcessingSdk : IDocumentProcessingSdk
     {
-        public Task ToCsv<T>(IEnumerable<T> fileToGenerate, string fileName)
+        public async Task ToCsv<T>(IEnumerable<T> fileToGenerate, string fileName)
         {
-            var itemType = typeof(T);
-            var props = itemType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                .OrderBy(p => p.Name);
-
-            using var writer = new StreamWriter(fileName);
-            using var csvWriter = new CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture);
-            writer.WriteLine(string.Join(", ", props.Select(p => p.Name)));
-            foreach (var item in fileToGenerate)
+            using (var writer = new StreamWriter($"{fileName}.csv"))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csvWriter.WriteField(string.Join(", ", props.Select(p => p.GetValue(item, null))));
+                await csv.WriteRecordsAsync(fileToGenerate);
+
+                Console.WriteLine(csv.ToString());
+                Console.WriteLine(writer.ToString());
             }
+
             throw new NotImplementedException();
         }
 
