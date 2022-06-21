@@ -31,7 +31,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             var waterRightDetails = await db.AllocationAmountsFact
                 .Where(predicate)
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
-                .ThenBy(x => x.AllocationAmountId) // eventually this will be AllocationUuid
+                .ThenBy(x => x.AllocationUuid)
                 .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
                 .Take(_performanceConfiguration.WaterRightsSearchPageSize)
                 .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
@@ -172,29 +172,29 @@ namespace WesternStatesWater.WestDaat.Accessors
             return org;
         }
 
-        public async Task<WaterRightDetails> GetWaterRightDetailsById(long waterRightId)
+        public async Task<WaterRightDetails> GetWaterRightDetailsById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationAmountsFact
-                .Where(x => x.AllocationAmountId == waterRightId)
+                .Where(x => x.AllocationUuid == allocationUuid)
                 .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
                 .SingleAsync();
         }
 
-        public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(long waterRightId)
+        public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmountId == waterRightId)
+                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
                         .Select(x => x.Site)
                         .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
                         .ToListAsync();
         }
 
-        public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(long waterRightId)
+        public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
-            return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmountId == waterRightId)
+            return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
                     .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
                     .Select(a => a.WaterSource))
                     .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
@@ -213,11 +213,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             return waterAllocations;
         }
 
-        async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(long waterRightId)
+        async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmountId == waterRightId)
+                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
                         .Select(x => x.Site)
                         .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
                         .ProjectTo<SiteLocation>(DtoMapper.Configuration)

@@ -184,7 +184,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().NotBeNull();
             result.Count.Should().Be(1);
             result.First().WaterRightNativeId.Should().Be(allocationAmount.AllocationNativeId);
-            result.First().WaterRightId.Should().Be(allocationAmount.AllocationAmountId);
+            result.First().AllocationUuid.Should().Be(allocationAmount.AllocationUuid);
         }
 
         [DataTestMethod]

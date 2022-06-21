@@ -6,7 +6,6 @@
         {
             AggBridgeBeneficialUsesFact = new HashSet<AggBridgeBeneficialUsesFact>();
             AggregatedAmountsFact = new HashSet<AggregatedAmountsFact>();
-            AllocationAmountsFact = new HashSet<AllocationAmountsFact>();
             AllocationBridgeBeneficialUsesFact = new HashSet<AllocationBridgeBeneficialUsesFact>();
             SitesBridgeBeneficialUsesFact = new HashSet<SitesBridgeBeneficialUsesFact>();
             SiteVariableAmountsFact = new HashSet<SiteVariableAmountsFact>();
@@ -24,7 +23,6 @@
 
         public virtual ICollection<AggBridgeBeneficialUsesFact> AggBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<AggregatedAmountsFact> AggregatedAmountsFact { get; set; }
-        public virtual ICollection<AllocationAmountsFact> AllocationAmountsFact { get; set; }
         public virtual ICollection<AllocationBridgeBeneficialUsesFact> AllocationBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<SitesBridgeBeneficialUsesFact> SitesBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFact { get; set; }

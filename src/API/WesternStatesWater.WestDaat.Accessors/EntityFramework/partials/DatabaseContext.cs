@@ -144,7 +144,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.Property(e => e.AggregatedAmountId).HasColumnName("AggregatedAmountID");
 
-                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryUseCategoryCV");
+                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryBeneficialUseCategory");
 
                 entity.Property(e => e.DataPublicationDoi)
                     .HasColumnName("DataPublicationDOI")
@@ -433,7 +433,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.Property(e => e.GeneratedPowerCapacityMW).HasColumnName("GeneratedPowerCapacityMW");
 
-                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryUseCategoryCV");
+                entity.Property(e => e.PrimaryBeneficialUseCategory).HasColumnName("PrimaryBeneficialUseCategory");
 
                 entity.Property(e => e.VariableSpecificId).HasColumnName("VariableSpecificID");
 
@@ -489,11 +489,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_AllocationAmounts_fact_Organizations_dim");
-
-                entity.HasOne(d => d.PrimaryBeneficialUse)
-                    .WithMany(p => p.AllocationAmountsFact)
-                    .HasForeignKey(d => d.PrimaryUseCategoryCV)
-                    .HasConstraintName("fk_AllocationAmounts_fact_BeneficialUses");
 
                 entity.HasOne(d => d.VariableSpecific)
                     .WithMany(p => p.AllocationAmountsFact)
