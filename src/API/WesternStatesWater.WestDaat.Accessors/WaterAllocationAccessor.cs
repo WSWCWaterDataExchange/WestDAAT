@@ -245,6 +245,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 SiteUuid = a.Site.SiteUuid,
                 SiteName = a.Site.SiteName,
             });
+
             foreach (var geoConnexItem in query)
             {
                 yield return geoConnexItem;

@@ -62,7 +62,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                             hasJsonBeenStreamed = true;
                             count++;
 
-                            // flushing is expensive, so only flushing on chunks and not per json
+                            // flushing is expensive, so only flushing on chunks of ~10mb and not per json
                             if (count == 10000)
                             {
                                 await sw.FlushAsync();
