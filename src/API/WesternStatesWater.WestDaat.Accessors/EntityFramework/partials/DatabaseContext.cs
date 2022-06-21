@@ -337,6 +337,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.ToTable("AllocationAmounts_fact", "Core");
 
+                entity.Property(e => e.AllocationUuid).HasColumnName("AllocationUUID");
+
                 entity.Property(e => e.AllocationAmountId).HasColumnName("AllocationAmountID");
 
                 entity.Property(e => e.AllocationAssociatedConsumptiveUseSiteIds)
