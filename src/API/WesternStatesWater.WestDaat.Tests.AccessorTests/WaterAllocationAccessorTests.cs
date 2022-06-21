@@ -1529,7 +1529,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationAccessor_GetAllJsonLDData()
+        public void WaterAllocationAccessor_GetAllJsonLDData()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -1552,11 +1552,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetJSONLDData();
-
+            var enumerable = accessor.GetJSONLDData();
             // Assert
-            result.Should().NotBeNullOrEmpty();
-            result.Count().Should().Be(5);
+            var result = enumerable.ToList();
 
             sites.ForEach(site =>
             {
@@ -1564,13 +1562,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     res.Latitude == site.Latitude
                     && res.Longitude == site.Longitude
                     && res.SiteTypeCv == site.SiteTypeCv
-                    && res.GniscodeCv == site.GniscodeCv
-                    && res.SiteName == site.SiteName
-                    && res.Geometry == site.Geometry);
+                    && res.SiteUuid == site.SiteUuid
+                    && res.SiteName == site.SiteName);
 
                 justOne.Count().Should().Be(1);
             });
-
         }
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
