@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public interface IDocumentProcessingSdk
     {
-        Task ToCsv<T>(T processing);
+        Task ToCsv<T>(IEnumerable<T> processing, string fileName);
 
         Task ToZip(dynamic collectionOfFiles);
     }

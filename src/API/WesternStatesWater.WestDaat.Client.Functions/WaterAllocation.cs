@@ -133,11 +133,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(result);
         }
 
-        
-
         // this is just a copy paste, needsto be updated
-        [FunctionName(nameof(GetWaterSiteRightsListByUuid)), AllowAnonymous]
-        public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights")] HttpRequest request, string siteUuid)
+        [FunctionName(nameof(DownloadWaterRights)), AllowAnonymous]
+        public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights/download")] HttpRequest request, string siteUuid)
         {
             var result = await _waterAllocationManager.WaterRightsAsZip();
 
