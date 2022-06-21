@@ -6,6 +6,10 @@ using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using Common = WesternStatesWater.WestDaat.Common;
+using NetTopologySuite.Geometries;
+using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -14,6 +18,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     {
         private readonly Mock<INldiAccessor> _nldiAccessorMock = new(MockBehavior.Strict);
         private readonly Mock<IGeoConnexEngine> _geoConnexEngineMock = new Mock<IGeoConnexEngine>(MockBehavior.Strict);
+        private readonly Mock<ILocationEngine> _locationEngineMock = new Mock<ILocationEngine>(MockBehavior.Strict);
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
 
@@ -77,6 +82,120 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             result.Should().Be(resultFeatureCollection);
             _nldiAccessorMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_ResultsReturned()
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    CurrentPageNumber = 0,
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            AllocationUuid = "abc123"
+                        }
+                    }
+                })
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByGeometry_GeoJsonConvertedToGeometry()
+        {
+            //Arrange
+            Geometry[] actualFilterGeometryParam = null;
+
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    CurrentPageNumber = 0,
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            AllocationUuid = "abc123"
+                        }
+                    }
+                })
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                FilterGeometry = "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}"
+            };
+
+            var expectedFilterGeometryParam = new Geometry[] { GeometryHelpers.GetGeometryByGeoJson(searchCriteria.FilterGeometry) };
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(1);
+            result.WaterRightsDetails[0].AllocationUuid.Should().Be("abc123");
+            actualFilterGeometryParam.Should().NotBeNull();
+            actualFilterGeometryParam.Should().BeEquivalentTo(expectedFilterGeometryParam);
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByRiverBasinNames_FeatureConvertedToGeometry()
+        {
+            //Arrange
+            Geometry[] actualFilterGeometryParam = null;
+
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    CurrentPageNumber = 0,
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            AllocationUuid = "abc123"
+                        }
+                    }
+                })
+                .Verifiable();
+
+            _locationEngineMock.Setup(x => x.GetRiverBasinPolygonsByName(It.Is<string[]>(s => s.Length == 1 && s[0] == ColoradoRiverBasin.BasinName)))
+                .Returns(new FeatureCollection(new List<Feature> { ColoradoRiverBasin.Feature }))
+                .Verifiable();
+
+            var expectedFilterGeometryParam = GeometryHelpers.GetGeometryByFeatures(new List<Feature> { ColoradoRiverBasin.Feature });            
+
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                RiverBasinNames = new[] { ColoradoRiverBasin.BasinName } 
+            };
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDetails.Should().HaveCount(1);
+            _locationEngineMock.Verify();
+            result.WaterRightsDetails[0].AllocationUuid.Should().Be("abc123");
+            actualFilterGeometryParam.Should().NotBeNull();
+            actualFilterGeometryParam.Should().BeEquivalentTo(expectedFilterGeometryParam);
         }
 
         [TestMethod]
@@ -197,6 +316,23 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _siteAccessorMock.Verify();
         }
 
+        [TestMethod]
+        public void ConvertFeaturesToGeometries_Success()
+        {
+            var basinNames = new List<string>
+            {
+                ArkansasRiverBasin.BasinName,
+                ColoradoRiverBasin.BasinName
+            };
+
+            var features = RiverBasinConstants.RiverBasinDictionary.Where(x => basinNames.Contains(x.Key)).Select(x => x.Value).ToList();
+
+            var polygons = GeometryHelpers.GetGeometryByFeatures(features);
+
+            polygons.Should().NotBeNull();
+            polygons.Should().HaveCount(2);
+        }
+
         private IWaterAllocationManager CreateWaterAllocationManager()
         {
             return new WaterAllocationManager(
@@ -204,6 +340,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _siteAccessorMock.Object,
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
+                _locationEngineMock.Object,
                 CreateLogger<WaterAllocationManager>()
             );
         }

@@ -28,7 +28,7 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
     <None Update="personal.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>

@@ -3,6 +3,7 @@ using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
@@ -14,6 +15,7 @@ namespace WesternStatesWater.WestDaat.Managers
     public sealed class WaterAllocationManager : ManagerBase, ClientContracts.IWaterAllocationManager
     {
         private readonly IGeoConnexEngine _geoConnexEngine;
+        private readonly ILocationEngine _locationEngine;
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
@@ -23,12 +25,46 @@ namespace WesternStatesWater.WestDaat.Managers
             ISiteAccessor siteAccessor,
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
+            ILocationEngine locationEngine,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
+            _locationEngine = locationEngine;
+        }
+
+        public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
+        }
+
+        private WaterRightsSearchCriteria MapSearchRequest(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
+
+            var geometryFilters = new List<NetTopologySuite.Geometries.Geometry>();
+            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            {
+                var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
+                var riverBasinPolygons = GeometryHelpers.GetGeometryByFeatures(featureCollection.Features);
+                geometryFilters.AddRange(riverBasinPolygons);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
+            {
+                geometryFilters.Add(GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry));
+            }
+
+            if (geometryFilters.Any())
+            {
+                accessorSearchRequest.FilterGeometry = geometryFilters.ToArray();
+            }
+
+            return accessorSearchRequest;
         }
 
         async Task<FeatureCollection> ClientContracts.IWaterAllocationManager.GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints)

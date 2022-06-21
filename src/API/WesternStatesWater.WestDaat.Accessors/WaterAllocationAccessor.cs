@@ -1,21 +1,164 @@
 ﻿using AutoMapper.QueryableExtensions;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class WaterAllocationAccessor : AccessorBase, IWaterAllocationAccessor
     {
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        private readonly PerformanceConfiguration _performanceConfiguration;
+
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
+            _performanceConfiguration = performanceConfiguration;
+
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
+
+        public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var waterRightDetails = await db.AllocationAmountsFact
+                .Where(predicate)
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId) // eventually this will be AllocationUuid
+                .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
+                .Take(_performanceConfiguration.WaterRightsSearchPageSize)
+                .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
+                .ToArrayAsync();
+
+            return new WaterRightsSearchResults
+            {
+                CurrentPageNumber = searchCriteria.PageNumber,
+                WaterRightsDetails = waterRightDetails
+            };
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate.And(BuildBeneficialUsesPredicate(searchCriteria));
+
+            predicate.And(BuildOwnerSearchPredicate(searchCriteria));
+
+            predicate.And(BuildSiteDetailsPredicate(searchCriteria));
+
+            predicate.And(BuildVolumeAndFlowPredicate(searchCriteria));
+
+            predicate.And(BuildDatePredicate(searchCriteria));
+
+            predicate.And(BuildGeometrySearchPredicate(searchCriteria));
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
+            {
+                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
+            {
+                predicate.And(AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
+            {
+                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
+            }
+
+            if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
+            {
+                predicate.And(AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
+            }
+
+            if (searchCriteria?.MinimumVolume != null || searchCriteria?.MaximumVolume != null)
+            {
+                predicate.And(AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
+            {
+                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
+            }
+
+            if (searchCriteria?.States != null && searchCriteria.States.Any())
+            {
+                predicate.And(AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))
+            {
+                predicate.And(AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
+            }
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.FilterGeometry != null)
+            {
+                predicate.And(AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
+            }
+
+            return predicate;
+        }
 
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {
@@ -86,7 +229,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
             return await db.AllocationAmountsFact
-                .Where(x => x.AllocationBridgeSitesFact.Any(y=>y.Site.SiteUuid == siteUuid))
+                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
         }
@@ -102,7 +245,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                     Longitude = x.Site.Longitude,
                     SiteTypeCv = x.Site.SiteTypeCv,
                     SiteUuid = x.Site.SiteUuid,
-                    GniscodeCv =x.Site.GniscodeCv,
+                    GniscodeCv = x.Site.GniscodeCv,
                     SiteName = x.Site.SiteName,
                     OrganizationDataMappingUrl = db.AllocationAmountsFact
                         .Where(s => s.AllocationAmountId == x.AllocationAmountId)
