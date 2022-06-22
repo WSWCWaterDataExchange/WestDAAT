@@ -147,7 +147,7 @@ const mapsJson = {
       "paint": {
         "text-color": "#000000",
         "text-halo-color": "#ffffff",
-        "text-halo-width": 0.5,
+        "text-halo-width": 2,
       },
     },
     {
