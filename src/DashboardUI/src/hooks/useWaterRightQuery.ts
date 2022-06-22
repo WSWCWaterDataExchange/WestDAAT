@@ -18,10 +18,10 @@ export function useWaterRightDetails(waterRightId: number) {
   );
 }
 
-export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria){
+export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria | null){
   return useQuery(
     ['waterRight.Find', searchCriteria],
-    async () => await findWaterRight(searchCriteria), 
+    async () => await findWaterRight(searchCriteria!),
     {
       enabled: searchCriteria !== null
     }
