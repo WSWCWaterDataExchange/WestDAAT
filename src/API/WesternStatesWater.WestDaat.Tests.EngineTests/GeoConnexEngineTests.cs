@@ -52,10 +52,7 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
                 site.Latitude.ToString(),
                 site.SiteTypeCv,
                 site.SiteUuid,
-                site.GniscodeCv,
-                site.SiteName,
-                org.OrganizationDataMappingUrl,
-                site.Geometry.ToString()
+                site.SiteName
             }.Select(x => JsonEncodedText.Encode(x).ToString());
 
             foreach (var value in shouldContainList)
