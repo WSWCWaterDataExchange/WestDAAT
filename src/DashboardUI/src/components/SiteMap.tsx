@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import Map from './Map';
-import { MapContext } from './MapProvider';
+import { MapContext, MapStyle } from './MapProvider';
 import mapboxgl from 'mapbox-gl';
 import { useWaterSiteLocation } from "../hooks";
 import { Position } from "geojson";
@@ -20,7 +20,12 @@ function SiteMap(props: siteMapProps) {
     setGeoJsonData,
     setMapBoundSettings: setMapBounds,
     setLegend,
+    setMapStyle
   } = useContext(MapContext);
+
+  useEffect(() => {
+    setMapStyle(MapStyle.Satellite);
+  }, [setMapStyle])
 
   useEffect(() => {
     setVisibleLayers(["site-locations-label", "site-locations-points", "site-locations-polygons"]);
