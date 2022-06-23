@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button, Nav, Offcanvas, ProgressBar, Tab, Table, Tabs } from "react-bootstrap";
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
@@ -8,6 +8,7 @@ import { WaterRightsSearchCriteria } from "../data-contracts/WaterRightsSearchCr
 import { WaterRightsSearchResults } from "../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "./FormattedDate";
 import { NavLink } from "react-router-dom";
+import { MapContext } from "./MapProvider";
 
 interface TableViewProps {
   containerRef: React.MutableRefObject<any>;
@@ -20,6 +21,8 @@ function TableView(props: TableViewProps) {
   const [hasMoreResults, setHasMoreResults] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
+
+  const {filters} = useContext(MapContext);
 
   const handleClose = () => handleVisibilityChange(false);
   const toggleShow = () => handleVisibilityChange(!show);
@@ -41,6 +44,10 @@ function TableView(props: TableViewProps) {
   }
 
   const { data: latestSearchResults, isFetching } = useFindWaterRights(searchCriteria)
+
+  useEffect(() => {
+    console.log(filters);
+  }, [filters]);
 
   useEffect(() => {
     if (!latestSearchResults) return;
