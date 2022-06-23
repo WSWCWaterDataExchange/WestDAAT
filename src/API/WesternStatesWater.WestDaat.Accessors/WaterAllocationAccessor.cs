@@ -233,23 +233,5 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
         }
-
-        public IEnumerable<GeoConnex> GetJSONLDData()
-        {
-            var db = _databaseContextFactory.Create();
-            var query = db.AllocationBridgeSitesFact.Select(a => new GeoConnex
-            {
-                Latitude = a.Site.Latitude,
-                Longitude = a.Site.Longitude,
-                SiteTypeCv = a.Site.SiteTypeCv,
-                SiteUuid = a.Site.SiteUuid,
-                SiteName = a.Site.SiteName,
-            });
-
-            foreach (var geoConnexItem in query)
-            {
-                yield return geoConnexItem;
-            }
-        }
     }
 }
