@@ -29,18 +29,18 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     services.AddScoped(_ => config.GetBlobStorageConfiguration());
                     services.AddScoped(_ => config.GetPerformanceConfiguration());
                     services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
-                    services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
+                    services.AddScoped<ISiteAccessor, SiteAccessor>();
                     services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
                     services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
                     services.BuildServiceProvider();
                 }).Build();
 
-                var waterAllocationAccessor = services.Services.GetRequiredService<IWaterAllocationAccessor>();
+                var siteAccessor = services.Services.GetRequiredService<ISiteAccessor>();
                 var templateResourceSdk = services.Services.GetRequiredService<ITemplateResourceSdk>();
                 var blobStorageSdk = services.Services.GetRequiredService<IBlobStorageSdk>();
                 var stringFile = templateResourceSdk.GetTemplate(Common.ResourceType.JsonLD);
 
-                var rawDataEnumerable = waterAllocationAccessor.GetJSONLDData();
+                var rawDataEnumerable = siteAccessor.GetJSONLDData();
 
                 var blobStream = await blobStorageSdk.GetBlobStream("$web", "jsonld.json", true);
                 using (var sw = new StreamWriter(blobStream))
