@@ -1528,47 +1528,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Count.Should().Be(5);
         }
 
-        [TestMethod]
-        public void WaterAllocationAccessor_GetAllJsonLDData()
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-            var sites = new SitesDimFaker().Generate(5);
-            db.SitesDim.AddRange(sites);
-            db.SaveChanges();
-
-            var allocationAmount = new AllocationAmountFactFaker().Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            foreach (var site in sites)
-            {
-                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
-                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
-                    .Generate();
-                db.Add(allocationSiteBridge);
-            }
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var enumerable = accessor.GetJSONLDData();
-            // Assert
-            var result = enumerable.ToList();
-
-            sites.ForEach(site =>
-            {
-                var justOne = result.Where(res =>
-                    res.Latitude == site.Latitude
-                    && res.Longitude == site.Longitude
-                    && res.SiteTypeCv == site.SiteTypeCv
-                    && res.SiteUuid == site.SiteUuid
-                    && res.SiteName == site.SiteName);
-
-                justOne.Count().Should().Be(1);
-            });
-        }
-
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
         {
             return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory(), CreatePerformanceConfiguration());
