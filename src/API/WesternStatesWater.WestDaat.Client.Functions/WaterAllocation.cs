@@ -134,7 +134,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [FunctionName(nameof(DownloadWaterRights)), AllowAnonymous]
-        public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Sites/Rights/download")] HttpRequest request)
+        public async Task<FileStreamResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Sites/Rights/download")] HttpRequest request)
         {
             string requestBody = string.Empty;
             using (StreamReader streamReader = new StreamReader(request.Body))
@@ -145,7 +145,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var result = await _waterAllocationManager.WaterRightsAsZip(searchRequest);
 
             // mod headers if successful or return an error message to display on the front end
-            return new OkObjectResult(result);
+            // something like return File(zipFile.Bytes, "application/octet-stream", zipFile.FileName);
+            return new FileStreamResult(result, "application/octet-stream", "WaterRightsZip");
         }
     }
 }

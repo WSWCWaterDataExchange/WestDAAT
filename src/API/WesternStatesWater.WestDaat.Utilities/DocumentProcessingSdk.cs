@@ -1,8 +1,8 @@
 ﻿using CsvHelper;
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,23 +12,51 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public class DocumentProcessingSdk : IDocumentProcessingSdk
     {
-        public async Task ToCsv<T>(IEnumerable<T> fileToGenerate, string fileName)
+        public async Task<File> ToCsv(IEnumerable fileToGenerate, string fileName)
         {
-            using (var writer = new StreamWriter($"{fileName}.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            byte[] bytes;
+            using (var ms = new MemoryStream())
             {
-                await csv.WriteRecordsAsync(fileToGenerate);
+                using (var writer = new StreamWriter(ms))
+                {
+                    using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                    {
+                        await csv.WriteRecordsAsync(fileToGenerate);
+                    }
+                }
 
-                Console.WriteLine(csv.ToString());
-                Console.WriteLine(writer.ToString());
+                bytes = ms.ToArray();
             }
 
-            throw new NotImplementedException();
+            return new File
+            {
+                Bytes = bytes,
+                FileName = fileName
+            };
         }
 
-        public Task ToZip(dynamic collectionOfFiles)
+        public async Task<File> ToZip(List<File> files)
         {
-            throw new NotImplementedException();
+            var compressedFileStream = new MemoryStream();
+            using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var file in files)
+                {
+                    var zipEntry = zipArchive.CreateEntry(file.FileName);
+
+                    using (var originalFileStream = new MemoryStream(file.Bytes))
+                    using (var zipEntryStream = zipEntry.Open())
+                    {
+                        await originalFileStream.CopyToAsync(zipEntryStream);
+                    }
+                }
+            }
+
+            return new File()
+            {
+                Bytes = compressedFileStream.ToArray(),
+                FileName = "waterrights.zip"
+            };
         }
     }
 }

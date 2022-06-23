@@ -22,7 +22,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
 
-        Task<List<GeoConnex>> GetJSONLDData();
+        IEnumerable<GeoConnex> GetJSONLDData();
 
         Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
     }

@@ -1,6 +1,7 @@
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using Microsoft.Extensions.Logging;
+using System.IO;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -155,7 +156,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public async Task<dynamic> WaterRightsAsZip(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<Stream> WaterRightsAsZip(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
             var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
@@ -172,7 +173,12 @@ namespace WesternStatesWater.WestDaat.Managers
                 new ClientContracts.WaterRightInfoListItem { WaterRightId = 2, Owner = "two", LegalStatus = "Ilegal" },
             };
 
-            var doc = _documentProcessingSdk.ToCsv<ClientContracts.WaterRightInfoListItem>(records, "testing");
+            var doc = _documentProcessingSdk.ToCsv(records, "testing");
+
+
+            // this is more probably like
+            // call database, for each search request create an enumerable of the object/file we need and push to a a list/Ienumerable then a foreach that calls the sdk to csv and get it as a list, and then we call the .toZip with that list
+
 
             // I think we will get a combination of filters, and based on these filters we would be getting a list of objects from the querys.
             // then from that list of query call the DocumentProcessing file, and have a list of the processed documents
