@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import Map from './Map';
-import { MapContext } from './MapProvider';
+import { MapContext, MapStyle } from './MapProvider';
 import mapboxgl from 'mapbox-gl';
 import { useWaterRightSiteLocations } from "../hooks";
 import { Position } from "geojson";
@@ -20,11 +20,16 @@ function WaterRightMap(props: waterRightMapProps) {
     setGeoJsonData,
     setMapBoundSettings: setMapBounds,
     setLegend,
+    setMapStyle
   } = useContext(MapContext);
 
   useEffect(() => {
     setVisibleLayers(["site-locations-label", "site-locations-points", "site-locations-polygons"]);
   }, [setVisibleLayers])
+
+  useEffect(() => {
+    setMapStyle(MapStyle.Satellite);
+  }, [setMapStyle])
 
   useEffect(() => {
     setLegend(<>

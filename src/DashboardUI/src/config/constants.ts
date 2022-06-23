@@ -8,8 +8,8 @@ export const nldi = {
     epa: '#D55E00',
     unknown: '#CC79A7',
     riverBasin: '#088',
-    sitePOD: '#01579b',
-    sitePOU: '#7cb342',
+    sitePOD: '#00CEFF',
+    sitePOU: '#32CD32',
   },
   latLongPrecision: 4,
 };
