@@ -73,5 +73,22 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
+        public IEnumerable<GeoConnex> GetJSONLDData()
+        {
+            var db = _databaseContextFactory.Create();
+            var query = db.SitesDim.Select(a => new GeoConnex
+            {
+                Latitude = a.Latitude,
+                Longitude = a.Longitude,
+                SiteTypeCv = a.SiteTypeCv,
+                SiteUuid = a.SiteUuid,
+                SiteName = a.SiteName,
+            });
+
+            foreach (var geoConnexItem in query)
+            {
+                yield return geoConnexItem;
+            }
+        }
     }
 }
