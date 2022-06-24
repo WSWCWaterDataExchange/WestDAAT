@@ -110,12 +110,12 @@ const allWaterRightsLayers = [
 ]
 
 const defaultFilters: WaterRightsFilters = {
-  beneficialUses: undefined,
-  ownerClassifications: undefined,
+  beneficialUses: [],
+  ownerClassifications: [],
   allocationOwner: undefined,
-  waterSourceTypes: undefined,
-  states: undefined,
-  riverBasinNames: undefined,
+  waterSourceTypes: [],
+  states: [],
+  riverBasinNames: [],
   includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
@@ -411,21 +411,21 @@ function WaterRightsTab() {
   const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleStateChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      states: selectedOptions.length > 0 ? selectedOptions : undefined
+      states: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleOwnerClassificationChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
+      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -445,7 +445,7 @@ function WaterRightsTab() {
   const handleWaterSourceTypeChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
+      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -567,7 +567,7 @@ function WaterRightsTab() {
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, nldiWadeSiteIds])
 
   const clearMapFilters = () => {
-    setFilters({ ...defaultFilters });
+    setFilters(defaultFilters);
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
     polylines.forEach(a => {
@@ -776,7 +776,7 @@ function WaterRightsTab() {
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="px-5">
-                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary"/>
+                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" />
               </div>
             </Accordion.Header>
             <Accordion.Body >
