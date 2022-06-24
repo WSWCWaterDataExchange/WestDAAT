@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useEffect, useState } from "react";
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
@@ -47,7 +47,7 @@ function App({ msalInstance }: AppProps) {
 
   useEffect(() => {
     if(googleAnalyticsInitialized){
-      ReactGA.pageview(`${location.pathname}${location.search}`)
+      ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
     }
   }, [googleAnalyticsInitialized, location])
 
