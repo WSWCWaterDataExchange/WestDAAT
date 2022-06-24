@@ -159,21 +159,14 @@ namespace WesternStatesWater.WestDaat.Managers
         public async Task<Stream> WaterRightsAsZip(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
-            var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+            //var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
-            if (count > 100000) // return code if they are requesting more than 100k
-            {
-                // return the function and trigger and error message for the front end saying that the requested files are more than 100.000
-            }
+            //if (count > 100000) // return code if they are requesting more than 100k
+            //{
+            //    // return the function and trigger and error message for the front end saying that the requested files are more than 100.000
+            //}
 
-            // this records is just for testing purposes
-            var records = new List<ClientContracts.WaterRightInfoListItem>
-            {
-                new ClientContracts.WaterRightInfoListItem { WaterRightId = 1, Owner = "one", LegalStatus = "legal" },
-                new ClientContracts.WaterRightInfoListItem { WaterRightId = 2, Owner = "two", LegalStatus = "Ilegal" },
-            };
-
-            var doc = _documentProcessingSdk.ToCsv(records, "testing");
+            return await _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
 
 
             // this is more probably like
@@ -183,7 +176,7 @@ namespace WesternStatesWater.WestDaat.Managers
             // I think we will get a combination of filters, and based on these filters we would be getting a list of objects from the querys.
             // then from that list of query call the DocumentProcessing file, and have a list of the processed documents
             // then call the .zip in the document processing sdk
-            
+
             // then return document, also then go to the controller and change the headers based if all of this was successfull or not
 
             throw new NotImplementedException();

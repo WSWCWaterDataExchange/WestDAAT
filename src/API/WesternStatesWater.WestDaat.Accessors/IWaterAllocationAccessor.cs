@@ -1,3 +1,4 @@
+using System.IO;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -25,5 +26,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         IEnumerable<GeoConnex> GetJSONLDData();
 
         Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
+
+        Task<Stream> GetWaterRightsZip(WaterRightsSearchCriteria accessorSearchRequest);
     }
 }

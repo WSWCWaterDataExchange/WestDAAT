@@ -61,6 +61,26 @@ namespace WesternStatesWater.WestDaat.Utilities.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Water rights data downloaded from Western States Water Data Access and Analysis Tool (WestDAAT) on [insert download date here]
+        ///
+        ///By WaDE2 Staff
+        ///Adel Abdallah, WaDE Program Manager
+        ///Email: adelabdallah@wswc.utah.gov
+        ///Ryan James, Data Analyst / Hydroinformatics Specialist
+        ///Email: rjames@wswc.utah.gov
+        ///
+        ///How to cite this data?
+        ///Adel Abdallah and Ryan James. Western States Water Data Access and Analysis Tool (WestDAAT), Western States Water Council, [insert download date here]
+        ///
+        ///DISCLAIMER and Terms of Servi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Citation {
+            get {
+                return ResourceManager.GetString("Citation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{
         ///  &quot;@context&quot;: [
         ///    {{

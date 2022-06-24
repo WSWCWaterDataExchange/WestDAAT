@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using CsvHelper;
+using System.Collections;
 using System.IO;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities
 {
     public interface IDocumentProcessingSdk
     {
-        Task<File> ToCsv(IEnumerable processing, string fileName);
-        Task<File> ToZip(List<File> files);
+        Task<Stream> GetZipStreamFromCsv(List<IQueryable> filesToGenerate);
     }
 }

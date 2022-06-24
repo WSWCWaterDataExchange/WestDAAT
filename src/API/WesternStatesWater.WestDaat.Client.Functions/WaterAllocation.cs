@@ -142,11 +142,11 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 requestBody = await streamReader.ReadToEndAsync();
             }
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
-            var result = await _waterAllocationManager.WaterRightsAsZip(searchRequest);
 
-            // mod headers if successful or return an error message to display on the front end
-            // something like return File(zipFile.Bytes, "application/octet-stream", zipFile.FileName);
-            return new FileStreamResult(result, "application/octet-stream", "WaterRightsZip");
+            return new FileStreamResult(await _waterAllocationManager.WaterRightsAsZip(searchRequest), "application/octet-stream")
+            {
+                FileDownloadName = "WaterRightsZip"
+            };
         }
     }
 }

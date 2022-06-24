@@ -3,22 +3,27 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using System.IO;
+using CsvModel = WesternStatesWater.WestDaat.Accessors.CsvModels;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class WaterAllocationAccessor : AccessorBase, IWaterAllocationAccessor
     {
         private readonly PerformanceConfiguration _performanceConfiguration;
+        private readonly DocumentProcessingSdk _documentProcessingSdk;
 
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration, DocumentProcessingSdk documentProcessingSdk) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
-
+            _documentProcessingSdk = documentProcessingSdk;
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
@@ -260,6 +265,53 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.AllocationAmountsFact
                 .Where(predicate)
                 .CountAsync();
+        }
+
+        public async Task<Stream> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var waterRightDetails = db.AllocationAmountsFact.Where(predicate);
+
+            var listofquery = new List<CsvListModel>
+            {
+                new CsvListModel
+                {
+                    Data = waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
+                    // probably update to get the column names with some class reflection
+                    // as I did on assurity to get the enums
+                    ColumnNames = new string[]
+                    { 
+                        "SiteUUID",
+                        "Regulatory",
+                        "WaterSourceUUIDs",
+                        "CoordinateAccuracy",
+                        "CoordinateMEthodCV",
+                        "County",
+                        "EPSGCodeCV",
+                        "Geometry",
+                        "GNISCodeCV",
+                        "HUC12",
+                        "HUC8",
+                        "Latitude",
+                        "Longitude",
+                        "NHDNetworkStatusCV",
+                        "NHDProductCV",
+                        "PODorPOUSite",
+                        "SiteName",
+                        "SiteNativeID",
+                        "ID",
+                        "SitePoint",
+                        "SiteTypeCV",
+                        "StateCV",
+                        "USGSSiteID"
+                    },
+                    FileName = "Sites.csv"
+                }
+            };
+
+            return await _documentProcessingSdk.GetZipStreamFromCsv(listofquery);
         }
     }
 }

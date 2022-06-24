@@ -1571,7 +1571,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()
         {
-            return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory(), CreatePerformanceConfiguration());
+            return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory(), CreatePerformanceConfiguration(), CreateDocumentProcessingSdk());
         }
     }
 }

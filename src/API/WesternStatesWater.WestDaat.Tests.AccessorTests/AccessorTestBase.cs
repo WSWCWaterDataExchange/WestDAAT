@@ -4,6 +4,7 @@ using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -77,6 +78,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 WaterRightsSearchPageSize = 100
             };
+        }
+
+        internal DocumentProcessingSdk CreateDocumentProcessingSdk()
+        {
+            return new DocumentProcessingSdk();
         }
 
         protected AmbientContext Context { get; } = new AmbientContext();

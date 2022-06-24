@@ -17,7 +17,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 {
                     var config = new AutoMapper.MapperConfiguration(cfg =>
                     {
-                        cfg.AddProfile<ApiProfile>();                        
+                        cfg.AddProfile<ApiProfile>();
+                        cfg.AddProfile<CsvProfile>();
                     });
                     _config = config;
                 }
