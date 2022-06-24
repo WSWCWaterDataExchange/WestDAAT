@@ -20,7 +20,7 @@
         public string MethodLink { get; set; }
         public string MethodDescription { get; set; }
 
-        public long AllocationAmountId { get; set; }
+        public string AllocationUuid { get; set; }
         public string AllocationNativeId { get; set; }
         public string AllocationOwner { get; set; }
         public DateTime? PriorityDate { get; set; }
