@@ -31,6 +31,8 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             {
                 services.AddScoped(_ => config.GetDatabaseConfiguration());
                 services.AddScoped(_ => config.GetNldiConfiguration());
+                services.AddScoped(_ => config.GetBlobStorageConfiguration());
+                services.AddScoped(_ => config.GetPerformanceConfiguration());
                 services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
                 services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
@@ -38,6 +40,8 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services.AddScoped<INldiAccessor, NldiAccessor>();
                 services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
                 services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
+                services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
+                services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
                 services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
                 services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
                 {
