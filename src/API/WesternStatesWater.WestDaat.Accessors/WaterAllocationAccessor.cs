@@ -23,6 +23,27 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
+        public async Task<WaterRightsSearchResults> GetPieChartSlices(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var waterRightDetails = await db.AllocationAmountsFact
+                .Where(predicate)
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId) // eventually this will be AllocationUuid
+                .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
+                .Take(_performanceConfiguration.WaterRightsSearchPageSize)
+                .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
+                .ToArrayAsync();
+
+            return new WaterRightsSearchResults
+            {
+                CurrentPageNumber = searchCriteria.PageNumber,
+                WaterRightsDetails = waterRightDetails
+            };
+        }
+
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);

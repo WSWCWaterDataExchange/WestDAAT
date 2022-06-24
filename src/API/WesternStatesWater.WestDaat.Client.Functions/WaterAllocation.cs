@@ -84,6 +84,12 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
+        [FunctionName(nameof(GetPieChartInformation)), AllowAnonymous]
+        public async Task<IActionResult> GetPieChartInformation([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/PieChartInformation")] HttpRequest request)
+        {
+            return new OkObjectResult(JsonSerializer.Serialize(true));
+        }
+
         // Site Routes
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
         public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequest request, string siteUuid)

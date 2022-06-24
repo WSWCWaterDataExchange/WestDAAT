@@ -6,6 +6,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     public interface IWaterAllocationAccessor : IServiceContractBase
     {
+        Task<WaterRightsSearchResults> GetPieChartInformation(WaterRightsSearchCriteria accessorRequest);
         Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
 
         Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId);

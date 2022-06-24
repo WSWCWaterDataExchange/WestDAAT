@@ -35,6 +35,13 @@ namespace WesternStatesWater.WestDaat.Managers
             _locationEngine = locationEngine;
         }
 
+        public async Task<ClientContracts.PieChartSlice> GetPieChartInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            return (await _waterAllocationAccessor.GetPieChartInformation(accessorSearchRequest)).Map<ClientContracts.PieChartSlice>();
+        }
+
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
