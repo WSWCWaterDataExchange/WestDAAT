@@ -3,7 +3,7 @@ import { AppContext } from "./AppProvider";
 import { BeneficialUseListItem } from "./data-contracts/BeneficialUseListItem";
 import { DataPoints, Directions } from "./data-contracts/nldi";
 
-interface WaterRightsFilters{
+export interface WaterRightsFilters{
   beneficialUses?: BeneficialUseListItem[],
   ownerClassifications?: string[],
   waterSourceTypes?: string[],

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Button, Nav, Offcanvas, ProgressBar, Tab, Table, Tabs } from "react-bootstrap";
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
 import Icon from "@mdi/react";
-import { useFindWaterRights, useWaterRightDetails } from "../hooks/useWaterRightQuery";
+import { useFindWaterRights } from "../hooks/useWaterRightQuery";
 import { WaterRightsSearchCriteria } from "../data-contracts/WaterRightsSearchCriteria";
 import { WaterRightsSearchResults } from "../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "./FormattedDate";
-import { NavLink } from "react-router-dom";
-import { MapContext } from "./MapProvider";
+import { FilterContext } from "../FilterProvider";
 
 interface TableViewProps {
   containerRef: React.MutableRefObject<any>;
@@ -22,14 +21,14 @@ function TableView(props: TableViewProps) {
   const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
 
-  const {filters} = useContext(MapContext);
+  const {filters} = useContext(FilterContext);
 
   const handleClose = () => handleVisibilityChange(false);
   const toggleShow = () => handleVisibilityChange(!show);
 
   const handleVisibilityChange = (shouldShow: boolean) => {
     if (shouldShow) {
-      setSearchCriteria({ pageNumber: 0 });
+      handleSearchCriteriaChange();
     }
     else {
       setSearchCriteria(null);
@@ -37,6 +36,14 @@ function TableView(props: TableViewProps) {
     }
     setshow(shouldShow);
   }
+
+  const handleSearchCriteriaChange = useCallback( () => {
+    setSearchCriteria({
+      pageNumber: 0,
+      states: filters.states,
+      beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName)
+    });
+  }, [setSearchCriteria, filters]);
 
   const handleLoadMoreResults = () => {
     if (!waterRightsSearchResults) return;
@@ -47,7 +54,8 @@ function TableView(props: TableViewProps) {
 
   useEffect(() => {
     console.log(filters);
-  }, [filters]);
+    handleSearchCriteriaChange();
+  }, [filters, handleSearchCriteriaChange]);
 
   useEffect(() => {
     if (!latestSearchResults) return;
