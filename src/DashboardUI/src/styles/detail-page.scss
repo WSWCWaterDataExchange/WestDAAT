@@ -1,0 +1,63 @@
+@import '_colors.scss';
+
+.detail-page {
+  position: relative;
+  height: 100%;
+  background-color: $white;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.title-header {
+  padding: 10px;
+  border-bottom: 1px solid $bs-gray-600;
+}
+
+.card {
+  .water-rights-header{
+    background-color: $card-header-color-red;
+    font-size: 20px;
+    color: $white;
+    padding: 15px;
+  }
+
+  .site-header{
+    background-color: $card-header-color-blue;
+    font-size: 20px;
+    color: $white;
+    padding: 15px;
+  }
+}
+
+.property-name {
+  font-size: 16px;
+  margin-top: 18px;
+  color: $text-color-grey;
+  &:first-of-type{
+    margin-top: 0;
+  }
+}
+
+.property-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: $text-color-black;
+  &.empty {
+    color: $text-color-grey;
+  }
+}
+
+.nav-tabs .nav-link {
+  .active {
+    background-color: $white;
+  }
+}
+
+.nav-link.active {
+  background-color: $white !important;
+  border-bottom: none;
+}
+
+.map-container {
+  min-height: 700px;
+}

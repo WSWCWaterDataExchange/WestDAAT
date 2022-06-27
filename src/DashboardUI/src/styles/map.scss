@@ -1,0 +1,176 @@
+@import './colors.scss';
+
+.legend {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 26px 8px;
+  background-color: $bs-gray-900;
+  border: 1px solid $bs-gray-800;
+  color: $text-color-light;
+  // Just behind the geocode search results
+  z-index: 2; 
+  padding: 6px;
+  border-radius: 5px;
+  .legend-item{
+    display: flex;
+    align-items: center;
+    .legend-circle {
+      border-radius: 50%;
+      display: inline-block;
+      height: 14px;
+      margin: 0 6px 0 3px;
+      width: 14px;
+      padding: -1px;
+      border: 1px solid rgba($bs-gray-200, .4);
+    }
+  }
+}
+
+.map-coordinates {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 72px 10px;
+  //these next 2 colors are to match the scale control
+  background-color: hsla(0,0%,100%,.75);
+  color: #333;
+  z-index: 2;
+  font-size: 10px;
+  padding: 5px;
+  border: 1px solid $white;
+}
+
+.map {
+  .mapboxgl-popup-close-button{
+    display: none;
+  }
+  .map-popup-card{
+    .map-popup-card-water-rights-link-icon{
+      fill: currentColor;
+      line-height: 1;
+      height: 1em;
+      width: 1em;
+    }
+    .map-popup-close-btn{
+      margin-top: -7px;
+      margin-right: -15px;
+      svg{
+        width: 14px;
+        height: 14px;
+      }
+    }
+    .map-popup-card-water-rights-body{
+      .map-popup-card-water-rights-native-id-row{
+        display: flex;
+        align-items: center;
+        line-height: normal;
+        & > *{
+          white-space: nowrap;
+        }
+        button{
+          background: none;
+          color: #000;
+          opacity: .5;
+          border: none;
+          padding: 0;
+          
+          font: inherit;
+          cursor: pointer;
+          outline: inherit;
+          height: 18px;
+          width: 18px;
+          &:hover{
+            opacity: .75;
+          }
+          &.nav-prev-water-right{
+            margin-left: 3px;
+          }
+          &.nav-next-water-right{
+            margin-right: 3px;
+          }
+          svg{
+            height: 18px;
+            width: 18px;
+          }
+        }  
+      }
+    }
+  }
+}
+
+.legend-light {
+  background-color: $white;
+  border-color: $bs-gray-100;
+  color: $text-color-dark;
+  .legend-circle {
+    border-color: rgba($bs-gray-800, .4);
+  }
+}
+
+.legend-nldi{
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    
+    .legend-item {
+      & > span{
+        display: inline-block;
+        width: 25px;
+        margin-right: 6px;
+        text-align: center;
+        
+        &.legend-circle{
+          width: 14px;
+          margin-right: 17px;
+        }
+        .legend-flowline{
+          display: inline-block;
+          width: 100%;
+          vertical-align: middle;
+          &.legend-flowline-main{
+            height: 4px
+          }
+          &.legend-flowline-tributary{
+            height: 2px
+          }
+        }
+      }
+    }
+}
+
+#mapboxPopupId {
+  margin: -10px -10px -15px
+}
+
+.grabbable:hover {
+  //cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 512 512'%3e%3cg transform='rotate(45 256 256)'%3e%3crect id='r' x='16' y='216' width='480' height='80' rx='14'/%3e%3cuse href='%23r' transform='rotate(90 256 256)'/%3e%3c/g%3e%3c/svg%3e") 16 16, crosshair !important;
+    cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' style='width: 32px; height: 32px;'%3e%3cpath d='M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z' style='fill: %23007BFF'%3e%3c/path%3e%3c/svg%3e") 16 16, crosshair !important;
+}
+
+.shareElement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 24 24' style='width: 100%25; height: 100%25;'%3E%3Cpath d='M3.9,12C3.9,10.29 5.29,8.9 7,8.9H11V7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H11V15.1H7C5.29,15.1 3.9,13.71 3.9,12M8,13H16V11H8V13M17,7H13V8.9H17C18.71,8.9 20.1,10.29 20.1,12C20.1,13.71 18.71,15.1 17,15.1H13V17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7Z' style='fill: %23000000'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.containerElement {
+  position: relative;
+}
+
+.containerElement:after {
+  content:attr(data-title);
+    position:absolute;
+    right:100%;
+    color:#fff;
+    background-color:black;
+    margin: -35px -10px 0px 0px;
+    display:none;
+    width: 250px;
+    border-radius: 5px;
+    opacity: 0.85;
+    padding:2px 10px 2px 5px;
+    clip-path: polygon(0% 0%, 0% 100%, 90% 100%, 90% 35%, 95% 50%, 90% 65%, 90% 0%);
+}
+
+.containerElement:hover:after{
+  display:block;
+}

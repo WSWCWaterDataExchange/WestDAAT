@@ -1,0 +1,48 @@
+@import "styles/colors";
+
+a {
+  color: $text-color-light;
+}
+
+.group-styles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-header-style {
+  font-weight: bold;
+  color: black;
+  font-size: 12;
+}
+
+.scroll-vertical {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.accordion {
+  .accordion-body {
+    background-color: #FAFAFA;
+  }
+
+  .accordion-button,
+  .accordion-button:not(.collapsed),
+  .accordion-button:focus {
+    background-color: #FAFAFA;
+    color: black;
+    border: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: none;
+  }
+
+  .accordion-item {
+    border: none;
+  }
+}
+
+.zindexzero{
+  // stops radio buttons from showing in front of dropdowns
+  z-index: 0 !important;
+}

@@ -1,5 +1,0 @@
-{
-  "extensions":[
-    { "name": "Startup", "typeName":"MapboxPrototypeAPI.Startup, MapboxPrototypeAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"}
-  ]
-}

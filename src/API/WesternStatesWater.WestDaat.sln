@@ -1,0 +1,144 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Clients", "1. Clients", "{49ED5613-E256-4FDF-BA66-9924B7BDA830}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Managers", "2. Managers", "{DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Contracts.Client", "WesternStatesWater.WestDaat.Contracts.Client\WesternStatesWater.WestDaat.Contracts.Client.csproj", "{12CCCE43-3DE7-43DE-AC09-2DA824312527}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Managers", "WesternStatesWater.WestDaat.Managers\WesternStatesWater.WestDaat.Managers.csproj", "{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Engines", "3. Engines", "{D5C8B58F-19F9-4FC8-B5F6-84679D879291}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Engines", "WesternStatesWater.WestDaat.Engines\WesternStatesWater.WestDaat.Engines.csproj", "{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Accessors", "4. Accessors", "{BC0ACDFA-99E7-4E4E-93B9-FF5A9BE01736}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Accessors", "WesternStatesWater.WestDaat.Accessors\WesternStatesWater.WestDaat.Accessors.csproj", "{83C2F94F-7C49-40CE-A4F7-967986C37557}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Service Utilities", "5. Service Utilities", "{80849DCA-1C66-42E4-BBCB-0D4257D4EFA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Utilities", "WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj", "{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6. Common", "6. Common", "{5D804A37-ABAD-4B1E-855C-F84E36E36950}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Common", "WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj", "{B4DB2035-1815-406B-9C93-74CA2AD618C1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. Database", "7. Database", "{BC8B9A41-7FCD-4248-B608-AE11A5B5A372}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "9. Tests", "9. Tests", "{6312C581-2A47-430B-AEB9-B0FA1D83F751}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.AccessorTests", "WesternStatesWater.WestDaat.Tests.AccessorTests\WesternStatesWater.WestDaat.Tests.AccessorTests.csproj", "{B66BA00D-08F7-4FAA-9625-B1B351C9945F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.EngineTests", "WesternStatesWater.WestDaat.Tests.EngineTests\WesternStatesWater.WestDaat.Tests.EngineTests.csproj", "{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.ManagerTests", "WesternStatesWater.WestDaat.Tests.ManagerTests\WesternStatesWater.WestDaat.Tests.ManagerTests.csproj", "{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.IntegrationTests", "WesternStatesWater.WestDaat.Tests.IntegrationTests\WesternStatesWater.WestDaat.Tests.IntegrationTests.csproj", "{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Client.Functions", "WesternStatesWater.WestDaat.Client.Functions\WesternStatesWater.WestDaat.Client.Functions.csproj", "{9AAA8E06-CB84-4B28-B475-29A4E666045E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.UtilitiesTests", "WesternStatesWater.WestDaat.Tests.Utilities.Tests\WesternStatesWater.WestDaat.Tests.UtilitiesTests.csproj", "{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.Helpers", "WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj", "{AD76D1F4-188C-4923-A887-410B52FB1FA6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "8. Tools", "8. Tools", "{93C6F30C-6287-40F1-907C-8C0CFDA23482}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.JSONLDGenerator", "WesternStatesWater.WestDaat.tools.JSONLDGenerator\WesternStatesWater.WestDaat.Tools.JSONLDGenerator.csproj", "{5E195A8E-3E0A-4D51-ADBF-F864668265BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate", "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj", "{25C64908-689E-4D52-B814-A41021918B88}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12CCCE43-3DE7-43DE-AC09-2DA824312527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83C2F94F-7C49-40CE-A4F7-967986C37557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83C2F94F-7C49-40CE-A4F7-967986C37557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83C2F94F-7C49-40CE-A4F7-967986C37557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83C2F94F-7C49-40CE-A4F7-967986C37557}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4DB2035-1815-406B-9C93-74CA2AD618C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4DB2035-1815-406B-9C93-74CA2AD618C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4DB2035-1815-406B-9C93-74CA2AD618C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4DB2035-1815-406B-9C93-74CA2AD618C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B66BA00D-08F7-4FAA-9625-B1B351C9945F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66BA00D-08F7-4FAA-9625-B1B351C9945F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66BA00D-08F7-4FAA-9625-B1B351C9945F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B66BA00D-08F7-4FAA-9625-B1B351C9945F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AAA8E06-CB84-4B28-B475-29A4E666045E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD76D1F4-188C-4923-A887-410B52FB1FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD76D1F4-188C-4923-A887-410B52FB1FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD76D1F4-188C-4923-A887-410B52FB1FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD76D1F4-188C-4923-A887-410B52FB1FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E195A8E-3E0A-4D51-ADBF-F864668265BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E195A8E-3E0A-4D51-ADBF-F864668265BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E195A8E-3E0A-4D51-ADBF-F864668265BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E195A8E-3E0A-4D51-ADBF-F864668265BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25C64908-689E-4D52-B814-A41021918B88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25C64908-689E-4D52-B814-A41021918B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12CCCE43-3DE7-43DE-AC09-2DA824312527} = {DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}
+		{DB11BF5C-7A79-42D1-BC9E-AEF56E4455D4} = {DC4864EA-39BB-42E5-89C6-3FEB2118B1AD}
+		{BCBA3B6D-0EB9-4B02-B194-7BF73309B4E4} = {D5C8B58F-19F9-4FC8-B5F6-84679D879291}
+		{83C2F94F-7C49-40CE-A4F7-967986C37557} = {BC0ACDFA-99E7-4E4E-93B9-FF5A9BE01736}
+		{FFD734C2-130B-439F-8ACC-3B8B1CBFD7AD} = {80849DCA-1C66-42E4-BBCB-0D4257D4EFA5}
+		{B4DB2035-1815-406B-9C93-74CA2AD618C1} = {5D804A37-ABAD-4B1E-855C-F84E36E36950}
+		{B66BA00D-08F7-4FAA-9625-B1B351C9945F} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{C1CE56F1-34E4-4235-9558-67E2EBA5F1FE} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{DFB59E33-0E3A-4B15-8653-FA6F38AB3A76} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{07E42C48-B3FD-430A-ADC4-B67A70BC8D70} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{9AAA8E06-CB84-4B28-B475-29A4E666045E} = {49ED5613-E256-4FDF-BA66-9924B7BDA830}
+		{9948A8C3-1BC8-4B9D-8695-5D40B1599E48} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{AD76D1F4-188C-4923-A887-410B52FB1FA6} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{5E195A8E-3E0A-4D51-ADBF-F864668265BC} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
+		{25C64908-689E-4D52-B814-A41021918B88} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {76EF2099-5BC9-4F48-8EBA-524560067EC3}
+	EndGlobalSection
+EndGlobal

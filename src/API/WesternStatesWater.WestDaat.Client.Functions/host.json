@@ -1,0 +1,15 @@
+{
+  "version": "2.0",
+  "logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft": "Warning",
+      "System": "Warning"
+    },
+    "applicationInsights": {
+      "samplingSettings": { "isEnabled": false },
+      "EnableDependencyTracking": true,
+      "DependencyTrackingOptions": { "enableSqlCommandTextInstrumentation": true }
+    }
+  }
+}
