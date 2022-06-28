@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Button, Nav, Offcanvas, ProgressBar, Tab, Table, Tabs } from "react-bootstrap";
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
@@ -14,21 +14,21 @@ interface TableViewProps {
 }
 
 function TableView(props: TableViewProps) {
-  const _defaultResults = { currentPageNumber: 0, waterRightsDetails: [] };
+  const _defaultResults = useMemo(() => ({ currentPageNumber: 0, waterRightsDetails: [] }), []);
 
   const [show, setshow] = useState(false);
   const [hasMoreResults, setHasMoreResults] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
 
-  const {filters} = useContext(FilterContext);
+  const { filters } = useContext(FilterContext);
 
   const handleClose = () => handleVisibilityChange(false);
   const toggleShow = () => handleVisibilityChange(!show);
 
   const handleVisibilityChange = (shouldShow: boolean) => {
     if (shouldShow) {
-      handleSearchCriteriaChange();
+      handleFiltersChange();
     }
     else {
       setSearchCriteria(null);
@@ -37,25 +37,28 @@ function TableView(props: TableViewProps) {
     setshow(shouldShow);
   }
 
-  const handleSearchCriteriaChange = useCallback( () => {
+  const handleFiltersChange = useCallback(() => {
+    setWaterRightsSearchResults(_defaultResults);
     setSearchCriteria({
       pageNumber: 0,
       states: filters.states,
       beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName)
     });
-  }, [setSearchCriteria, filters]);
+  }, [_defaultResults, filters, setSearchCriteria, setWaterRightsSearchResults]);
 
   const handleLoadMoreResults = () => {
-    if (!waterRightsSearchResults) return;
-    setSearchCriteria({ pageNumber: waterRightsSearchResults.currentPageNumber + 1, ...waterRightsSearchResults })
+    if (waterRightsSearchResults.waterRightsDetails.length === 0) return;
+    console.log(waterRightsSearchResults.currentPageNumber + 1);
+    setSearchCriteria({ ...searchCriteria, pageNumber: waterRightsSearchResults.currentPageNumber + 1 })
   }
 
   const { data: latestSearchResults, isFetching } = useFindWaterRights(searchCriteria)
 
   useEffect(() => {
-    console.log(filters);
-    handleSearchCriteriaChange();
-  }, [filters, handleSearchCriteriaChange]);
+    if (show) {
+      handleFiltersChange();
+    }
+  }, [filters, handleFiltersChange, show]);
 
   useEffect(() => {
     if (!latestSearchResults) return;
@@ -102,7 +105,7 @@ function TableView(props: TableViewProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {
+                  {waterRightsSearchResults.waterRightsDetails?.length > 0 &&
                     waterRightsSearchResults?.waterRightsDetails.map((waterRightDetail) => {
                       return <tr key={waterRightDetail.allocationUuid}>
                         <td>{waterRightDetail.allocationUuid}</td>
@@ -114,6 +117,11 @@ function TableView(props: TableViewProps) {
                         <td>{waterRightDetail.beneficialUses.join(', ')}</td>
                       </tr>
                     })
+                  }
+                  {waterRightsSearchResults.waterRightsDetails?.length === 0 &&
+                    <tr key="noResults">
+                      <td colSpan={7} align="center">No results found</td>
+                    </tr>
                   }
                   {hasMoreResults && !isFetching &&
                     <tr>
