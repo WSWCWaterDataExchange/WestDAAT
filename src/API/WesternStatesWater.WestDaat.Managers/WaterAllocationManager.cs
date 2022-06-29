@@ -54,9 +54,10 @@ namespace WesternStatesWater.WestDaat.Managers
                 geometryFilters.AddRange(riverBasinPolygons);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
+            if (searchRequest.FilterGeometry?.Length > 0)
             {
-                geometryFilters.Add(GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry));
+                geometryFilters.AddRange(searchRequest.FilterGeometry
+                    .Select(x => GeometryHelpers.GetGeometryByGeoJson(x)));
             }
 
             if (geometryFilters.Any())

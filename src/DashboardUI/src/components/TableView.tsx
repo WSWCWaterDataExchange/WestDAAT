@@ -40,15 +40,27 @@ function TableView(props: TableViewProps) {
   const handleFiltersChange = useCallback(() => {
     setWaterRightsSearchResults(_defaultResults);
     setSearchCriteria({
-      pageNumber: 0,
+      pageNumber: 0,      
+      beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName),
+      filterGeometry: filters.polyline.map(p => JSON.stringify(p.data.geometry)),
+      expemptofVolumeFlowPriority: filters.includeExempt,
+      minimumFlow: filters.minFlow,
+      maximumFlow: filters.maxFlow,
+      minimumVolume: filters.minVolume,
+      maximumVolume: filters.maxVolume,
+      podOrPou: filters.podPou,
+      minimumPriorityDate: filters.minPriorityDate,
+      maximumPriorityDate: filters.maxPriorityDate,
+      ownerClassifications: filters.ownerClassifications,
+      waterSourceTypes: filters.waterSourceTypes,
+      riverBasinNames: filters.riverBasinNames,
+      allocationOwner: filters.allocationOwner,      
       states: filters.states,
-      beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName)
     });
   }, [_defaultResults, filters, setSearchCriteria, setWaterRightsSearchResults]);
 
   const handleLoadMoreResults = () => {
     if (waterRightsSearchResults.waterRightsDetails.length === 0) return;
-    console.log(waterRightsSearchResults.currentPageNumber + 1);
     setSearchCriteria({ ...searchCriteria, pageNumber: waterRightsSearchResults.currentPageNumber + 1 })
   }
 
@@ -118,7 +130,7 @@ function TableView(props: TableViewProps) {
                       </tr>
                     })
                   }
-                  {waterRightsSearchResults.waterRightsDetails?.length === 0 &&
+                  {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetching &&
                     <tr key="noResults">
                       <td colSpan={7} align="center">No results found</td>
                     </tr>

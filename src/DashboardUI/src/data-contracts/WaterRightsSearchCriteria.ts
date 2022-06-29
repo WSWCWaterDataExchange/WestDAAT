@@ -4,15 +4,15 @@ export interface WaterRightsSearchCriteria {
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
   riverBasinNames?: string[];
-  filterGeometry?: string; //geojson string
+  filterGeometry?: string[]; //geojson string
   states?: string[];
   allocationOwner?: string;
-  expemptofVolumeFlowPriority?: string;
+  expemptofVolumeFlowPriority?: boolean;
   minimumFlow?: number;
   maximumFlow?: number;
   minimumVolume?: number;
   maximumVolume?: number;
   podOrPou?: string;
-  minimumPriorityDate?: Date;
-  maximumPriorityDate?: Date;
+  minimumPriorityDate?: number;
+  maximumPriorityDate?: number;
 }

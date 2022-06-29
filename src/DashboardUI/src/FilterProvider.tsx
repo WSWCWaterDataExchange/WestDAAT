@@ -18,7 +18,7 @@ export interface WaterRightsFilters{
   podPou: "POD" | "POU" | undefined,
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
-  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
+  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
   nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
 
 }
