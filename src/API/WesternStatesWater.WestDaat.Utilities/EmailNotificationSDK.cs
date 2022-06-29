@@ -9,12 +9,12 @@ namespace WesternStatesWater.WestDaat.Utilities
 {
     public class EmailNotificationSdk : IEmailNotificationSdk
     {
-        private readonly SendGridClient _client;
+        private readonly EmailServiceConfiguration _emailConfiguration;
         private readonly ILogger _logger;
 
         public EmailNotificationSdk(EmailServiceConfiguration emailConfig, ILogger<EmailNotificationSdk> logger)
         {
-            _client = new SendGridClient(emailConfig.APIKey);
+            _emailConfiguration = emailConfig;
             _logger = logger;
         }
 
@@ -33,7 +33,8 @@ namespace WesternStatesWater.WestDaat.Utilities
                 msg.AddTo(address);
             }
 
-            var response = await _client.SendEmailAsync(msg);
+            var client = new SendGridClient(_emailConfiguration.APIKey);
+            var response = await client.SendEmailAsync(msg);
 
             if (!response.IsSuccessStatusCode)
             {

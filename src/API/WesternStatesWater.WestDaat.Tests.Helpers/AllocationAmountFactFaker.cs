@@ -13,7 +13,8 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.DataPublicationDate, b => DateDimFaker.Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
-                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'));
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .RuleFor(a => a.AllocationUuid, f => f.Random.String(11, 'A', 'z'));
         }
     }
 

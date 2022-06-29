@@ -242,10 +242,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightDetails()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById(99)).ReturnsAsync(new CommonContracts.WaterRightDetails()).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById("99")).ReturnsAsync(new CommonContracts.WaterRightDetails()).Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetWaterRightDetails(99);
+            var result = await manager.GetWaterRightDetails("99");
 
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
@@ -254,10 +254,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById(99)).ReturnsAsync(new List<CommonContracts.SiteInfoListItem> { }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem>{ }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetWaterRightSiteInfoList(99);
+            var result = await manager.GetWaterRightSiteInfoList("99");
 
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
@@ -266,10 +266,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById(99)).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem> { }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem>{ }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetWaterRightSourceInfoList(99);
+            var result = await manager.GetWaterRightSourceInfoList("99");
 
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
@@ -299,10 +299,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 SiteUuid = "TEST_PODorPOU"
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById(99)).ReturnsAsync(new List<CommonContracts.SiteLocation> { location }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById("99")).ReturnsAsync(new List<CommonContracts.SiteLocation> { location }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetWaterRightSiteLocations(99);
+            var result = await manager.GetWaterRightSiteLocations("99");
 
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();

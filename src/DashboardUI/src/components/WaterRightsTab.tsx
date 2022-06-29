@@ -27,7 +27,7 @@ import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
-import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
 import { Directions, DataPoints } from "../data-contracts/nldi";
 import Select from "react-select";
