@@ -13,6 +13,6 @@ export interface WaterRightsSearchCriteria {
   minimumVolume?: number;
   maximumVolume?: number;
   podOrPou?: string;
-  minimumPriorityDate?: number;
-  maximumPriorityDate?: number;
+  minimumPriorityDate?: Date;
+  maximumPriorityDate?: Date;
 }

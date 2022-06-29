@@ -8,6 +8,7 @@ import { WaterRightsSearchCriteria } from "../data-contracts/WaterRightsSearchCr
 import { WaterRightsSearchResults } from "../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "./FormattedDate";
 import { FilterContext } from "../FilterProvider";
+import moment from "moment";
 
 interface TableViewProps {
   containerRef: React.MutableRefObject<any>;
@@ -49,8 +50,8 @@ function TableView(props: TableViewProps) {
       minimumVolume: filters.minVolume,
       maximumVolume: filters.maxVolume,
       podOrPou: filters.podPou,
-      minimumPriorityDate: filters.minPriorityDate,
-      maximumPriorityDate: filters.maxPriorityDate,
+      minimumPriorityDate: filters.minPriorityDate ? moment.unix(filters.minPriorityDate).toDate() : undefined,
+      maximumPriorityDate: filters.maxPriorityDate ? moment.unix(filters.maxPriorityDate).toDate() : undefined,
       ownerClassifications: filters.ownerClassifications,
       waterSourceTypes: filters.waterSourceTypes,
       riverBasinNames: filters.riverBasinNames,
