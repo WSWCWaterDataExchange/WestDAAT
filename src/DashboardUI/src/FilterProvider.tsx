@@ -23,8 +23,6 @@ export interface WaterRightsFilters{
 
 }
 
-//[WaterRightsFilters, Dispatch<SetStateAction<WaterRightsFilters>>]'
-
 interface FilterContextState {
   filters: WaterRightsFilters;
   setFilters: React.Dispatch<React.SetStateAction<WaterRightsFilters>>;

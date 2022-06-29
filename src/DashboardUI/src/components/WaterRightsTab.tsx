@@ -39,25 +39,6 @@ enum MapGrouping {
   WaterSourceType = "wsType"
 }
 
-// interface WaterRightsFilters {
-//   beneficialUses?: BeneficialUseListItem[],
-//   ownerClassifications?: string[],
-//   waterSourceTypes?: string[],
-//   riverBasinNames?: string[],
-//   states?: string[],
-//   allocationOwner?: string,
-//   includeExempt?: boolean,
-//   minFlow: number | undefined,
-//   maxFlow: number | undefined,
-//   minVolume: number | undefined,
-//   maxVolume: number | undefined,
-//   podPou: "POD" | "POU" | undefined,
-//   minPriorityDate: number | undefined,
-//   maxPriorityDate: number | undefined,
-//   polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-//   nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
-// }
-
 interface WaterRightsDisplayOptions {
   pointSize: 'd' | 'f' | 'v',
   mapGrouping: MapGrouping
@@ -165,7 +146,6 @@ function WaterRightsTab() {
   const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
   const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading } = useRiverBasinOptions();
   const { setUrlParam, getUrlParam } = useContext(AppContext);
-  //const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
   const { filters, setFilters } = useContext(FilterContext);
   const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', filters.riverBasinNames ?? []], async (): Promise<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | undefined> => {
     if ((filters?.riverBasinNames?.length ?? 0) === 0) {
