@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Button, Nav, Offcanvas, ProgressBar, Tab, Table, Tabs } from "react-bootstrap";
+import { Button, Nav, Offcanvas, ProgressBar, Tab, Table } from "react-bootstrap";
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
 import Icon from "@mdi/react";
