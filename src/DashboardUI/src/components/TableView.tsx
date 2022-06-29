@@ -14,7 +14,7 @@ interface TableViewProps {
 }
 
 function TableView(props: TableViewProps) {
-  const _defaultResults = useMemo(() => ({ currentPageNumber: 0, waterRightsDetails: [] }), []);
+  const _defaultResults = useMemo(() => ({ currentPageNumber: 0, hasMoreResults: false, waterRightsDetails: [] }), []);
 
   const [show, setshow] = useState(false);
   const [hasMoreResults, setHasMoreResults] = useState(false);
@@ -75,10 +75,11 @@ function TableView(props: TableViewProps) {
   useEffect(() => {
     if (!latestSearchResults) return;
 
-    setHasMoreResults(latestSearchResults.waterRightsDetails.length > 0);
+    setHasMoreResults(latestSearchResults.waterRightsDetails.length > 0 && latestSearchResults.hasMoreResults);
 
     setWaterRightsSearchResults(previousState => ({
       currentPageNumber: latestSearchResults.currentPageNumber,
+      hasMoreResults: latestSearchResults.hasMoreResults,
       waterRightsDetails: [...previousState.waterRightsDetails, ...latestSearchResults.waterRightsDetails]
     }));
   }, [latestSearchResults]);
