@@ -15,11 +15,11 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string[] RiverBasinNames { get; set; }
 
         // Geojson string
-        public string FilterGeometry { get; set; }
+        public string[] FilterGeometry { get; set; }
 
         public string[] States { get; set; }
         public string AllocationOwner { get; set; }
-        public string ExemptOfVolumeFlowPriority { get; set; }
+        public bool? ExemptOfVolumeFlowPriority { get; set; }
         public long? MinimumFlow { get; set; } 
         public long? MaximumFlow { get; set; }
         public long? MinimumVolume { get; set; }

@@ -2,7 +2,7 @@
 {
     public class WaterRightInfoListItem
     {
-        public long WaterRightId { get; set; }
+        public string AllocationUuid { get; set; }
         public string WaterRightNativeId { get; set; }
         public string Owner { get; set; }
         public DateTime? PriorityDate { get; set; }

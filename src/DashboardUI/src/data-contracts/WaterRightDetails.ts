@@ -17,7 +17,7 @@ export interface WaterRightDetails {
   methodLink: string;
   methodDescription: string;
 
-  allocationAmountId: number;
+  allocationUuid: string;
   allocationNativeId: string;
   allocationOwner: string;
   priorityDate: Date;

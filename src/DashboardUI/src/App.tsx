@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -15,12 +15,15 @@ import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
+import { useEffect, useState } from "react";
+import ReactGA from 'react-ga4';
+import { FilterProvider } from "./FilterProvider";
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
 }
 
-function App({ msalInstance } : AppProps) {
+function App({ msalInstance }: AppProps) {
   const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
@@ -32,25 +35,44 @@ function App({ msalInstance } : AppProps) {
     }
   })
 
+  const [googleAnalyticsInitialized, setgoogleAnalyticsInitialized] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    //initialize Google Analytics
+    if (process.env.REACT_APP_GA_ID) {
+      ReactGA.initialize(process.env.REACT_APP_GA_ID);
+      setgoogleAnalyticsInitialized(true);
+    }
+  }, []); //only run once
+
+  useEffect(() => {
+    if (googleAnalyticsInitialized) {
+      ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
+    }
+  }, [googleAnalyticsInitialized, location])
+
   return (
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <MapProvider>
-          <QueryClientProvider client={queryClient}>
-            <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<HomePage />} />
-                  <Route path="details" element={<DetailLayout />}>
-                    <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
-                    <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+          <FilterProvider>
+            <QueryClientProvider client={queryClient}>
+              <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="details" element={<DetailLayout />}>
+                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
+                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+                    </Route>
                   </Route>
-                </Route>
-              </Routes>
-              <ReactQueryDevtools initialIsOpen={false} />
-              <ToastContainer />
-            </DndProvider>
-          </QueryClientProvider>
+                </Routes>
+                <ReactQueryDevtools initialIsOpen={false} />
+                <ToastContainer />
+              </DndProvider>
+            </QueryClientProvider>
+          </FilterProvider>
         </MapProvider>
       </AppProvider>
     </MsalProvider>

@@ -27,34 +27,16 @@ import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
 import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
-import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
-import { Directions, DataPoints } from "../data-contracts/nldi";
+import { Directions } from "../data-contracts/nldi";
 import Select from "react-select";
+import { FilterContext, WaterRightsFilters } from "../FilterProvider";
 
 enum MapGrouping {
   BeneficialUse = "bu",
   OwnerClassification = "oClass",
   WaterSourceType = "wsType"
-}
-
-interface WaterRightsFilters {
-  beneficialUses?: BeneficialUseListItem[],
-  ownerClassifications?: string[],
-  waterSourceTypes?: string[],
-  riverBasinNames?: string[],
-  states?: string[],
-  allocationOwner?: string,
-  includeExempt?: boolean,
-  minFlow: number | undefined,
-  maxFlow: number | undefined,
-  minVolume: number | undefined,
-  maxVolume: number | undefined,
-  podPou: "POD" | "POU" | undefined,
-  minPriorityDate: number | undefined,
-  maxPriorityDate: number | undefined,
-  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
 }
 
 interface WaterRightsDisplayOptions {
@@ -110,12 +92,12 @@ const allWaterRightsLayers = [
 ]
 
 const defaultFilters: WaterRightsFilters = {
-  beneficialUses: undefined,
-  ownerClassifications: undefined,
+  beneficialUses: [],
+  ownerClassifications: [],
   allocationOwner: undefined,
-  waterSourceTypes: undefined,
-  states: undefined,
-  riverBasinNames: undefined,
+  waterSourceTypes: [],
+  states: [],
+  riverBasinNames: [],
   includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
@@ -164,7 +146,7 @@ function WaterRightsTab() {
   const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
   const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading } = useRiverBasinOptions();
   const { setUrlParam, getUrlParam } = useContext(AppContext);
-  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const { filters, setFilters } = useContext(FilterContext);
   const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', filters.riverBasinNames ?? []], async (): Promise<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | undefined> => {
     if ((filters?.riverBasinNames?.length ?? 0) === 0) {
       return undefined;
@@ -411,21 +393,21 @@ function WaterRightsTab() {
   const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleStateChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      states: selectedOptions.length > 0 ? selectedOptions : undefined
+      states: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleOwnerClassificationChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
+      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -445,7 +427,7 @@ function WaterRightsTab() {
   const handleWaterSourceTypeChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
+      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -567,7 +549,7 @@ function WaterRightsTab() {
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, nldiWadeSiteIds])
 
   const clearMapFilters = () => {
-    setFilters({ ...defaultFilters });
+    setFilters(defaultFilters);
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
     polylines.forEach(a => {
@@ -776,7 +758,7 @@ function WaterRightsTab() {
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="px-5">
-                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary"/>
+                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" />
               </div>
             </Accordion.Header>
             <Accordion.Body >

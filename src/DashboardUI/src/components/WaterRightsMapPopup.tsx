@@ -46,7 +46,7 @@ function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
               <strong>Water Right Native ID:</strong> <WaterRightsMapPopupToggle count={waterRights.length} currentIndex={currentIndex} setCurrentIndex={onSelectedIndexChanged} />
             </div>
             <div>
-              <a href={`/details/right/${currWaterRight.id}`} target="_blank" rel="noopener noreferrer">{currWaterRight.nativeId} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a>
+              <a href={`/details/right/${currWaterRight.allocationUuid}`} target="_blank" rel="noopener noreferrer">{currWaterRight.nativeId} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a>
             </div>
           </div>
           <div className="mb-2">
