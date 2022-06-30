@@ -4,6 +4,7 @@ import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { AppContext } from '../AppProvider';
 import { SignIn } from "./SignIn";
 import '../styles/home-page.scss';
+import { downloadWaterRights } from '../accessors/waterAllocationAccessor';
 
 interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
@@ -15,6 +16,7 @@ function DownloadModal(props: DownloadModalProps) {
     props.setShow(false);
   }
   const download = () => {
+    downloadWaterRights()
     // do the download calls
     // probably display modals that the operation was success or failed for whatever reason ?
     props.setShow(false);

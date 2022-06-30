@@ -25,6 +25,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
 
-        Task<Stream> GetWaterRightsZip(WaterRightsSearchCriteria accessorSearchRequest);
+        List<List<object>> GetWaterRightsZip(WaterRightsSearchCriteria accessorSearchRequest);
     }
 }

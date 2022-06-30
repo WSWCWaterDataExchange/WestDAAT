@@ -11,7 +11,7 @@ namespace WesternStatesWater.WestDaat.Accessors.CsvModels
         public string CoordinateMEthodCV { get; set; }
         public string County { get; set; }
         public string EPSGCodeCV { get; set; }
-        public Geometry Geometry { get; set; }
+        public string Geometry { get; set; }
         public string GNISCodeCV { get; set; }
         public string HUC12 { get; set; }
         public string HUC8 { get; set; }
@@ -23,7 +23,7 @@ namespace WesternStatesWater.WestDaat.Accessors.CsvModels
         public string SiteName { get; set; }
         public string SiteNativeID { get; set; }
         public string ID { get; set; }
-        public Geometry SitePoint { get; set; }
+        public string SitePoint { get; set; }
         public string SiteTypeCV { get; set; }
         public string StateCV { get; set; }
         public string USGSSiteID { get; set; }

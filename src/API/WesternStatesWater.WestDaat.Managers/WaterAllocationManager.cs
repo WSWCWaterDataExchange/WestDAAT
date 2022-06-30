@@ -1,6 +1,9 @@
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.IO;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
@@ -156,30 +159,47 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public async Task<Stream> WaterRightsAsZip(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public Stream WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
             //var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
-            //if (count > 100000) // return code if they are requesting more than 100k
+            //if (count > 100000) // return code if they are requesting more than 100k, the the total count from a config
             //{
             //    // return the function and trigger and error message for the front end saying that the requested files are more than 100.000
             //}
 
-            return await _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
+            var listOfCsvs =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
 
+            using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
+            {
+                zipStream.SetLevel(9);
+                zipStream.IsStreamOwner = false;
 
-            // this is more probably like
-            // call database, for each search request create an enumerable of the object/file we need and push to a a list/Ienumerable then a foreach that calls the sdk to csv and get it as a list, and then we call the .toZip with that list
+                foreach (var file in listOfCsvs)
+                {
+                    var ms = new MemoryStream();
+                    var writer = new StreamWriter(ms);
+                    var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+                    csv.WriteRecords(file);
+                    csv.Flush();
 
+                    var entry = new ZipEntry(ZipEntry.CleanName(nameof(file)));
+                    zipStream.UseZip64 = UseZip64.Off;
+                    zipStream.PutNextEntry(entry);
 
-            // I think we will get a combination of filters, and based on these filters we would be getting a list of objects from the querys.
-            // then from that list of query call the DocumentProcessing file, and have a list of the processed documents
-            // then call the .zip in the document processing sdk
+                    ms.Seek(0, SeekOrigin.Begin);
+                    StreamUtils.Copy(ms, zipStream, new byte[4096]);
 
-            // then return document, also then go to the controller and change the headers based if all of this was successfull or not
+                }
 
-            throw new NotImplementedException();
+                // call the TemplateSDK and Create an entry for the text file
+                // modify the required fields on the template file
+                // add the template file to the zip stream
+
+                zipStream.Close();
+                return responseStream;
+            }
         }
     }
 }

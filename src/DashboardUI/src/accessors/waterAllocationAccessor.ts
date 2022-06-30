@@ -4,6 +4,7 @@ import {
   WaterSourceInfoListItem,
 } from '@data-contracts';
 import axios from 'axios';
+import saveAs from 'file-saver';
 
 export const getWaterRightDetails = async (waterRightId: number) => {
   const { data } = await axios.get<WaterRightDetails>(
@@ -34,3 +35,14 @@ export const getWaterRightSiteLocations = async (waterRightId: number) => {
   );
   return data;
 };
+
+export const downloadWaterRights = async () => {
+  await axios.post<any>(
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
+    {responseType: 'arraybuffer'}
+  ).then((response)=>{
+    console.log(response.data);
+    saveAs(new Blob([response.data], {type: 'application/zip'}), "WaterRights.zip")
+  });
+};
+

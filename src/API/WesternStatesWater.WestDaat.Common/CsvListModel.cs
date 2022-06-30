@@ -2,8 +2,7 @@
 {
     public class CsvListModel
     {
-        public IQueryable Data { get; set; }
-        public string[] ColumnNames { get; set; }
+        public List<object> Data { get; set; }
         public string FileName { get; set; }
     }
 }

@@ -11,6 +11,9 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Common;
+using System.IO.Compression;
+using CsvHelper;
+using System.Globalization;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -249,51 +252,18 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .CountAsync();
         }
 
-        public async Task<Stream> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
+        public List<object> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = db.AllocationAmountsFact.Where(predicate);
 
-            var listofquery = new List<CsvListModel>
-            {
-                new CsvListModel
-                {
-                    Data = waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
-                    // probably update to get the column names with some class reflection
-                    // as I did on assurity to get the enums
-                    ColumnNames = new string[]
-                    { 
-                        "SiteUUID",
-                        "Regulatory",
-                        "WaterSourceUUIDs",
-                        "CoordinateAccuracy",
-                        "CoordinateMEthodCV",
-                        "County",
-                        "EPSGCodeCV",
-                        "Geometry",
-                        "GNISCodeCV",
-                        "HUC12",
-                        "HUC8",
-                        "Latitude",
-                        "Longitude",
-                        "NHDNetworkStatusCV",
-                        "NHDProductCV",
-                        "PODorPOUSite",
-                        "SiteName",
-                        "SiteNativeID",
-                        "ID",
-                        "SitePoint",
-                        "SiteTypeCV",
-                        "StateCV",
-                        "USGSSiteID"
-                    },
-                    FileName = "Sites.csv"
-                }
-            };
+            var listResponse = new List<object>();
 
-            return await _documentProcessingSdk.GetZipStreamFromCsv(listofquery);
+            // listResponse.Add(each one of the needed csv files.)
+
+            return listResponse;
         }
     }
 }
