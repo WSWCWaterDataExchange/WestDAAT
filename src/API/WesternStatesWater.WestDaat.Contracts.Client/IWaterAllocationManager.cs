@@ -10,13 +10,13 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
-        Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId);
+        Task<WaterRightDetails> GetWaterRightDetails(string allocationUuid);
 
-        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(long waterRightsId);
+        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(string allocationUuid);
 
-        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(long waterRightsId);
+        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(string allocationUuid);
 
-        Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId);
+        Task<FeatureCollection> GetWaterRightSiteLocations(string allocationUuid);
 
         Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
 

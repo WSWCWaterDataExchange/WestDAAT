@@ -11,12 +11,12 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             AllocationBridgeBeneficialUsesFact = new HashSet<AllocationBridgeBeneficialUsesFact>();
             AllocationBridgeSitesFact = new HashSet<AllocationBridgeSitesFact>();
         }
-
+        public string AllocationUuid { get; set; }
         public long AllocationAmountId { get; set; }
         public long OrganizationId { get; set; }
         public long VariableSpecificId { get; set; }
         public long MethodId { get; set; }
-        public string PrimaryUseCategoryCV { get; set; }
+        public string PrimaryBeneficialUseCategory { get; set; }
         public long DataPublicationDateId { get; set; }
         public string DataPublicationDoi { get; set; }
         public string AllocationNativeId { get; set; }
@@ -61,7 +61,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DateDim DataPublicationDate { get; set; }
         public virtual MethodsDim Method { get; set; }
         public virtual OrganizationsDim Organization { get; set; }
-        public virtual BeneficialUsesCV PrimaryBeneficialUse { get; set; }
         public virtual VariablesDim VariableSpecific { get; set; }
         public virtual CropType CropType { get; set; }
         public virtual CustomerType CustomerType { get; set; }

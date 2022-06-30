@@ -184,7 +184,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().NotBeNull();
             result.Count.Should().Be(1);
             result.First().WaterRightNativeId.Should().Be(allocationAmount.AllocationNativeId);
-            result.First().WaterRightId.Should().Be(allocationAmount.AllocationAmountId);
+            result.First().AllocationUuid.Should().Be(allocationAmount.AllocationUuid);
         }
 
         [DataTestMethod]
@@ -275,6 +275,34 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .HaveCount(1);
 
             result[0].PriorityDate.Should().Be(date);
+        }
+
+        [TestMethod]
+        public void SiteAccessor_GetAllJsonLDData()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(5);
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var enumerable = accessor.GetJSONLDData();
+            // Assert
+            var result = enumerable.ToList();
+
+            sites.ForEach(site =>
+            {
+                var justOne = result.Where(res =>
+                    res.Latitude == site.Latitude
+                    && res.Longitude == site.Longitude
+                    && res.SiteTypeCv == site.SiteTypeCv
+                    && res.SiteUuid == site.SiteUuid
+                    && res.SiteName == site.SiteName);
+
+                justOne.Count().Should().Be(1);
+            });
         }
 
         private ISiteAccessor CreateSiteAccessor()

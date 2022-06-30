@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -15,12 +15,14 @@ import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
+import { useEffect, useState } from "react";
+import ReactGA from 'react-ga4';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
 }
 
-function App({ msalInstance } : AppProps) {
+function App({ msalInstance }: AppProps) {
   const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
@@ -31,6 +33,23 @@ function App({ msalInstance } : AppProps) {
       staleTime: Infinity
     }
   })
+
+  const [googleAnalyticsInitialized, setgoogleAnalyticsInitialized] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    //initialize Google Analytics
+    if (process.env.REACT_APP_GA_ID) {
+      ReactGA.initialize(process.env.REACT_APP_GA_ID);
+      setgoogleAnalyticsInitialized(true);
+    }
+  }, []); //only run once
+
+  useEffect(() => {
+    if(googleAnalyticsInitialized){
+      ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
+    }
+  }, [googleAnalyticsInitialized, location])
 
   return (
     <MsalProvider instance={msalInstance}>
