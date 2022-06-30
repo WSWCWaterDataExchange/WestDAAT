@@ -72,8 +72,8 @@ interface MapContextState {
   setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>,
   mapPopup: MapPopupType | null,
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
-  polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-  setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => void,
+  polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
+  setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | null) => void,
   nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
   setNldiFilterData: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>>,
 };
@@ -267,8 +267,8 @@ const MapProvider: FC = ({ children }) => {
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
-  const [polylines, setAllPolylines] = useState<{ identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[]>([]);
-  const setPolylines = useCallback((identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | null) => {
+  const [polylines, setAllPolylines] = useState<{ identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[]>([]);
+  const setPolylines = useCallback((identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | null) => {
     setAllPolylines(s => {
       const unchangedData = s.filter(a => identifier !== null && a.identifier !== identifier &&  a.data !== null);
       if (data !== null && identifier !== null) {

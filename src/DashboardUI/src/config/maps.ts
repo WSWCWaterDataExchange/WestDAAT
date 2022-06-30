@@ -31,7 +31,7 @@ const mapsJson = {
     {
       "id": "allocation-sites_1",
       "type": "vector",
-      "url": "https://api.maptiler.com/tiles/acf2ef77-3afa-4100-9a97-13bdce51772b/tiles.json?key=IauIQDaqjd29nJc5kJse",
+      "url": process.env.REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL,
       "volatile": true
     },
     {

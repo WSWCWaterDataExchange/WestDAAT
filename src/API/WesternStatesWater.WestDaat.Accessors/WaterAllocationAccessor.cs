@@ -41,14 +41,15 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
                 .ThenBy(x => x.AllocationUuid)
                 .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
-                .Take(_performanceConfiguration.WaterRightsSearchPageSize)
+                .Take(_performanceConfiguration.WaterRightsSearchPageSize + 1)
                 .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
                 .ToArrayAsync();
 
             return new WaterRightsSearchResults
             {
                 CurrentPageNumber = searchCriteria.PageNumber,
-                WaterRightsDetails = waterRightDetails
+                HasMoreResults = waterRightDetails.Length > _performanceConfiguration.WaterRightsSearchPageSize,
+                WaterRightsDetails = waterRightDetails.Take(_performanceConfiguration.WaterRightsSearchPageSize).ToArray()
             };
         }
 

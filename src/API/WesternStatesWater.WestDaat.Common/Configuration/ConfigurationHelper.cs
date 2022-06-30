@@ -18,31 +18,31 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Database).Get<DatabaseConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Database).Get<DatabaseConfiguration>() ?? new DatabaseConfiguration();
         }
 
         public static EmailServiceConfiguration GetSmtpConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Smtp).Get<EmailServiceConfiguration>() ?? new EmailServiceConfiguration();
         }
 
         public static UsgsNldiServiceConfiguration GetUsgsNldiServiceConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.UsgsNldiService).Get<UsgsNldiServiceConfiguration>();
+            return config.GetSection(ConfigurationRootNames.UsgsNldiService).Get<UsgsNldiServiceConfiguration>() ?? new UsgsNldiServiceConfiguration();
         }
 
         public static NldiConfiguration GetNldiConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Nldi).Get<NldiConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Nldi).Get<NldiConfiguration>() ?? new NldiConfiguration();
         }
 
         public static BlobStorageConfiguration GetBlobStorageConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Blob).Get<BlobStorageConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Blob).Get<BlobStorageConfiguration>() ?? new BlobStorageConfiguration();
         }
         public static PerformanceConfiguration GetPerformanceConfiguration(this IConfiguration config)
         {
-            return config.GetSection(ConfigurationRootNames.Performance).Get<PerformanceConfiguration>();
+            return config.GetSection(ConfigurationRootNames.Performance).Get<PerformanceConfiguration>() ?? new PerformanceConfiguration();
         }
     }
 

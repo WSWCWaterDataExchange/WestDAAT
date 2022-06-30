@@ -17,6 +17,7 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
+import { FilterProvider } from "./FilterProvider";
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
@@ -46,7 +47,7 @@ function App({ msalInstance }: AppProps) {
   }, []); //only run once
 
   useEffect(() => {
-    if(googleAnalyticsInitialized){
+    if (googleAnalyticsInitialized) {
       ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
     }
   }, [googleAnalyticsInitialized, location])
@@ -55,21 +56,23 @@ function App({ msalInstance }: AppProps) {
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <MapProvider>
-          <QueryClientProvider client={queryClient}>
-            <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<HomePage />} />
-                  <Route path="details" element={<DetailLayout />}>
-                    <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
-                    <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+          <FilterProvider>
+            <QueryClientProvider client={queryClient}>
+              <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="details" element={<DetailLayout />}>
+                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
+                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
+                    </Route>
                   </Route>
-                </Route>
-              </Routes>
-              <ReactQueryDevtools initialIsOpen={false} />
-              <ToastContainer />
-            </DndProvider>
-          </QueryClientProvider>
+                </Routes>
+                <ReactQueryDevtools initialIsOpen={false} />
+                <ToastContainer />
+              </DndProvider>
+            </QueryClientProvider>
+          </FilterProvider>
         </MapProvider>
       </AppProvider>
     </MsalProvider>

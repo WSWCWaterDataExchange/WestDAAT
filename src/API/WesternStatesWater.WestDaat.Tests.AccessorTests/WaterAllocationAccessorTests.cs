@@ -13,7 +13,57 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        public async Task FindWaterRights_Pagination_PageThroughResults()
+        [DataRow(500, 5, DisplayName = "5 pages even")]
+        [DataRow(225, 3, DisplayName = "3 pages, uneven")]
+        [DataRow(301, 4, DisplayName = "1 result on last page")]
+        [DataRow(100, 1, DisplayName = "1 page even")]
+        [DataRow(44, 1, DisplayName = "1 page not full")]
+        [DataRow(99, 1, DisplayName = "1 less than full page")]
+        public async Task FindWaterRights_Pagination_PageThroughResults(int numberOfResults, int numberOfPages)
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker()
+                .IncludeAllocationPriorityDate()
+                .Generate(numberOfResults);
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            var orderedAllocationAmountsFacts = allocationAmountFacts
+                .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
+                .ThenBy(x => x.AllocationAmountId)
+                .ToList();
+
+            //Act
+            var results = new List<WaterRightsSearchResults>();
+
+            var accessor = CreateWaterAllocationAccessor();
+
+            for (var i = 0; i < numberOfPages; i++)
+            {
+                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+                {
+                    PageNumber = i
+                };
+
+                results.Add(await accessor.FindWaterRights(searchCriteria));
+            }
+
+            var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
+
+            //Assert
+            for (var i = 0; i < numberOfPages; i++)
+            {
+                var expected = expectedResults.Skip(i * 100).Take(100);
+                results[i].WaterRightsDetails.Should().BeEquivalentTo(expected);
+                results[i].HasMoreResults.Should().Be(i < numberOfPages - 1);//should be true expect the last one
+            }
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_Pagination_HasMoreResults()
         {
             //Arrange
             var allocationAmountFacts = new AllocationAmountFactFaker()
