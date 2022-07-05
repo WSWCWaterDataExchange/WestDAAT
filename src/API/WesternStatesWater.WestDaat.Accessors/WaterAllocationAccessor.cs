@@ -23,7 +23,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
-        // GetAnalyticsSummaryInformation
         public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
