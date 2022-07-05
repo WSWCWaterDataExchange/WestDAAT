@@ -9,14 +9,7 @@ using System.IO;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using CsvModel = WesternStatesWater.WestDaat.Accessors.CsvModels;
-using System.Globalization;
-using System.Net.Http.Headers;
-using System.IO.Compression;
-using WesternStatesWater.WestDaat.Client.Functions.Attributes;
-using Microsoft.AspNetCore.Http.Features;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
+using Microsoft.AspNetCore.Http.Features; // remove this when the type filter works
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -141,8 +134,10 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(result);
         }
 
+
+        // the IO operations have to be synchronous 
         [FunctionName(nameof(DownloadWaterRights)), AllowAnonymous]
-        public async Task<Stream> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
+        public async Task<EmptyResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {
             // MOVE THIS TO A FILTER (Already done but is not picking up, figure out why is not picking it up) -- probably a header on the request needs to be set or something of the sort
             var feature = request.HttpContext.Features.Get<IHttpBodyControlFeature>();
@@ -152,17 +147,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var requestBody = await streamReader.ReadToEndAsync();
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
-            // remove this, only for query not to fail
-            searchRequest = new WaterRightsSearchCriteria
-            {
-                States = new string[] { "ne" }
-            };
-
             var response = request.HttpContext.Response;
             response.Headers.Add("Content-Type", "application/octet-stream");
+
+            // is this one actually needed? -- the front end might be able to take care of this, evaluate with and without it
             response.Headers.Append("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
 
-            return _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+            _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+
+            return new EmptyResult();
         }
     }
 }

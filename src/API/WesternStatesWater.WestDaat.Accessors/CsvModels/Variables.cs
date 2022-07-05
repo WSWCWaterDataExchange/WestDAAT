@@ -2,15 +2,15 @@
 {
     public class Variables
     {
-        public string VariableSpecificUUID { get; set; }
-        public int AggregationInterval { get; set; }
-        public string AggregationIntervalUnitCV { get; set; }
-        public string AggregationStatisticCV { get; set; }
-        public double AmountUnitCV { get; set; }
-        public double MaximumAmountUnitCV { get; set; }
-        public int ReportYearStartMonth { get; set; }
-        public int ReportYearTypeCV { get; set; }
-        public string VariableCV { get; set; }
-        public string VariableSpecificCV { get; set; }
+        public string VariableSpecificUuid { get; set; }
+        public decimal AggregationInterval { get; set; }
+        public string AggregationIntervalUnitCv { get; set; }
+        public string AggregationStatisticCv { get; set; }
+        public string AmountUnitCv { get; set; }
+        public string MaximumAmountUnitCv { get; set; }
+        public string ReportYearStartMonth { get; set; }
+        public string ReportYearTypeCv { get; set; }
+        public string VariableCv { get; set; }
+        public string VariableSpecificCv { get; set; }
     }
 }

@@ -30,6 +30,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
 
-        Stream WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteria searchRequest);
+        void WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteria searchRequest);
     }
 }

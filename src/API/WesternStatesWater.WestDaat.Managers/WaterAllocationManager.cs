@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
@@ -23,7 +24,8 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
-        private readonly IDocumentProcessingSdk _documentProcessingSdk;
+        private readonly ITemplateResourceSdk _templateResourceSdk;
+        private readonly PerformanceConfiguration _performanceConfiguration;
 
         public WaterAllocationManager(
             INldiAccessor nldiAccessor,
@@ -31,7 +33,8 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
-            IDocumentProcessingSdk documentProcessingSdk,
+            ITemplateResourceSdk templateResourceSdk,
+            PerformanceConfiguration performanceConfiguration,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
@@ -39,7 +42,8 @@ namespace WesternStatesWater.WestDaat.Managers
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
             _locationEngine = locationEngine;
-            _documentProcessingSdk = documentProcessingSdk;
+            _templateResourceSdk = templateResourceSdk;
+            _performanceConfiguration = performanceConfiguration;
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
@@ -160,46 +164,69 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public Stream WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public void WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
-            //var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+            var count = _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
-            //if (count > 100000) // return code if they are requesting more than 100k, the the total count from a config
-            //{
-            //    // return the function and trigger and error message for the front end saying that the requested files are more than 100.000
-            //}
+            if (count > _performanceConfiguration.MaxRecordsDownload)
+            {
+                throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
+            }
 
-            var listOfCsvs =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
+            var sites =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
+
+            var list2 = new List<dynamic>();
+            list2.Add(sites);
 
             using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
             {
-                zipStream.SetLevel(9);
+                // setting the compression level, owner and zipping compatibility
+                zipStream.SetLevel(3);
                 zipStream.IsStreamOwner = false;
+                zipStream.UseZip64 = UseZip64.Off;
 
-                foreach (var file in listOfCsvs)
+                foreach (var file in list2)
                 {
                     var ms = new MemoryStream();
                     var writer = new StreamWriter(ms);
                     var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+                    // dateTime is a complex type for csv, adding to auto map -- SideNode: Wonder if I can accomplish the same with GeometryObject?
+                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                     csv.WriteRecords(file);
                     csv.Flush();
 
-                    var entry = new ZipEntry(ZipEntry.CleanName(nameof(file)));
-                    zipStream.UseZip64 = UseZip64.Off;
+                    var entry = new ZipEntry(ZipEntry.CleanName($"{nameof(file)}.csv"));
                     zipStream.PutNextEntry(entry);
 
                     ms.Seek(0, SeekOrigin.Begin);
+
+                    // futher test with real data if 4096 is enough or it will give issues? documentation showed that number, but it's arbitrarily set.
+                    // probably has to be bigger if the request is close to the 100k request
                     StreamUtils.Copy(ms, zipStream, new byte[4096]);
 
+                    // do I need to flush the zip stream, so it starts flushing as soon as is starts writing?
                 }
 
-                // call the TemplateSDK and Create an entry for the text file
-                // modify the required fields on the template file
+
+                // getting citation file
+                var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);
+                // String replacement for the citation file
+
+
                 // add the template file to the zip stream
+                var memoryStream = new MemoryStream();
+                var stringWriter = new StreamWriter(memoryStream);
+                stringWriter.Write(citationFile.ToString());
+                stringWriter.Flush();
+
+                var citationEntry = new ZipEntry(ZipEntry.CleanName($"{nameof(citationFile)}.txt"));
+                zipStream.PutNextEntry(citationEntry);
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                StreamUtils.Copy(memoryStream, zipStream, new byte[4096]);
 
                 zipStream.Close();
-                return responseStream;
             }
         }
     }

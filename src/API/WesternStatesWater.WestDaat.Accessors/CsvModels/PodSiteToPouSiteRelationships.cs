@@ -2,9 +2,9 @@
 {
     public class PodSiteToPouSiteRelationships
     {
-        public string PODSiteUUID { get; set; }
-        public string POUSiteUUID { get; set; }
+        public long PODSiteUuid { get; set; }
+        public long POUSiteUuid { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

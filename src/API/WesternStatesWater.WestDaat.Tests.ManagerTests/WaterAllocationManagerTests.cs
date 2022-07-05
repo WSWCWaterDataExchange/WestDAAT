@@ -10,6 +10,7 @@ using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
+using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -21,7 +22,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ILocationEngine> _locationEngineMock = new Mock<ILocationEngine>(MockBehavior.Strict);
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
-        private readonly Mock<IDocumentProcessingSdk> _documentProcessingMock = new Mock<IDocumentProcessingSdk>(MockBehavior.Strict);
+        private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new Mock<ITemplateResourceSdk>(MockBehavior.Strict);
+        private readonly Mock<PerformanceConfiguration> _performanceConfiguration = new Mock<PerformanceConfiguration>(MockBehavior.Strict);
 
         [TestMethod]
         public async Task GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
@@ -349,7 +351,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
                 _locationEngineMock.Object,
-                _documentProcessingMock.Object,
+                _templateResourceSdk.Object,
+                _performanceConfiguration.Object,
                 CreateLogger<WaterAllocationManager>()
             );
         }

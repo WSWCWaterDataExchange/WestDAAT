@@ -60,7 +60,6 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             builder.Services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
             builder.Services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
             builder.Services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
-            builder.Services.AddTransient<IDocumentProcessingSdk, DocumentProcessingSdk>();
 
             builder.Services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
             {

@@ -13,7 +13,8 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "50" },
-                { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.WaterRightsSearchPageSize)}", "100" }
+                { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.WaterRightsSearchPageSize)}", "100" },
+                { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.MaxRecordsDownload)}", "100000" }
             };
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)

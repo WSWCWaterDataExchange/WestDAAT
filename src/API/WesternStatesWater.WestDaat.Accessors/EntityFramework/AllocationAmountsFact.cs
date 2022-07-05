@@ -70,6 +70,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual OwnerClassificationCv OwnerClassification { get; set; }
         public virtual ICollection<AllocationBridgeBeneficialUsesFact> AllocationBridgeBeneficialUsesFact { get; set; }
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
+        public virtual ICollection<AggregatedAmountsFact> AggregatedAmountsFact { get; set; }
 
         #region Filters
         public static ExpressionStarter<AllocationAmountsFact> HasBeneficialUses(List<string> beneficalUses)

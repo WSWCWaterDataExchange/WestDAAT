@@ -3,30 +3,21 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
-using System.IO;
-using CsvModel = WesternStatesWater.WestDaat.Accessors.CsvModels;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Utilities;
-using WesternStatesWater.WestDaat.Common;
-using System.IO.Compression;
-using CsvHelper;
-using System.Globalization;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class WaterAllocationAccessor : AccessorBase, IWaterAllocationAccessor
     {
         private readonly PerformanceConfiguration _performanceConfiguration;
-        private readonly DocumentProcessingSdk _documentProcessingSdk;
 
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration, DocumentProcessingSdk documentProcessingSdk) : base(logger)
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
-            _documentProcessingSdk = documentProcessingSdk;
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
@@ -243,28 +234,55 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        public async Task<int> GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
+        public int GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
-            return await db.AllocationAmountsFact
+            return db.AllocationAmountsFact
                 .Where(predicate)
-                .CountAsync();
+                .Count();
         }
 
-        public List<object> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
+        public IEnumerable<dynamic> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
-            var waterRightDetails = db.AllocationAmountsFact.Where(predicate);
+            var waterRightDetails = db.AllocationAmountsFact
+                .AsNoTracking()
+                .Include(x => x.AllocationBridgeSitesFact)
+                .ThenInclude(x => x.Site)
+                .ThenInclude(x => x.PODSiteToPOUSitePODFact)
+                .Include(x => x.AggregatedAmountsFact)
+                .ThenInclude(x => x.WaterSource)
+                .Where(predicate);
 
-            var listResponse = new List<object>();
+            foreach (var entry in waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration))
+            {
+                Console.WriteLine(entry);
+                yield return entry;
+            }
 
-            // listResponse.Add(each one of the needed csv files.)
+            //var waterRightDetails = db.AllocationAmountsFact;
 
-            return listResponse;
+            //var listResponse = new List<object>
+            //{
+            //    // waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
+            //    //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration)
+            //};
+
+            //var rep = new[] { listResponse };
+
+            //foreach (var entry in rep)
+            //{
+            //    yield return entry;
+            //}
         }
     }
 }

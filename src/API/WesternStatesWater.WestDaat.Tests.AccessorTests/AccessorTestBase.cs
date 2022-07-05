@@ -80,11 +80,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             };
         }
 
-        internal DocumentProcessingSdk CreateDocumentProcessingSdk()
-        {
-            return new DocumentProcessingSdk();
-        }
-
         protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)
