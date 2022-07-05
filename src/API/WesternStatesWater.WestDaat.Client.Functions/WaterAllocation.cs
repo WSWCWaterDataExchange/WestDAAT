@@ -84,10 +84,19 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
-        [FunctionName(nameof(GetPieChartInformation)), AllowAnonymous]
-        public async Task<IActionResult> GetPieChartInformation([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/PieChartInformation")] HttpRequest request)
+        [FunctionName(nameof(GetAnalyticsSummaryInformation)), AllowAnonymous]
+        public async Task<IActionResult> GetAnalyticsSummaryInformation([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/AnalyticsSummaryInformation")] HttpRequest request)
         {
-            return new OkObjectResult(JsonSerializer.Serialize(true));
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+
+            var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
+
+            return new OkObjectResult(result);
         }
 
         // Site Routes

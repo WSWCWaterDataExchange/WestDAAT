@@ -24,24 +24,24 @@ namespace WesternStatesWater.WestDaat.Accessors
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
         // GetAnalyticsSummaryInformation
-        public async Task<PieChartSlice[]> GetPieChartInformation(WaterRightsSearchCriteria searchCriteria)
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
-            var waterRightDetails = await db.AllocationAmountsFact
+            var analyticsSummary = await db.AllocationAmountsFact
                 .Where(predicate)
-                .GroupBy(a => a.PrimaryUseCategoryCV)
-                .Select(a => new PieChartSlice
+                .GroupBy(a => a.PrimaryBeneficialUseCategory)
+                .Select(a => new AnalyticsSummaryInformation
                 {
                     Flow = a.Sum(c => c.AllocationFlow_CFS),
-                    Name = a.Key,
+                    PrimaryUseCategoryName = a.Key,
                     Points = a.Count(),
                     Volume = a.Sum(c => c.AllocationVolume_AF),
                 })
                 .ToArrayAsync();
 
-            return waterRightDetails.ToArray();
+            return analyticsSummary.ToArray();
         }
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)

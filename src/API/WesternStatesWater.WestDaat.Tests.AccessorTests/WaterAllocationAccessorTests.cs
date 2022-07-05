@@ -13,6 +13,135 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
+        [DataRow(4)]
+        [DataRow(1)]
+        public async Task GetAnalyticsSummary_ResultCount(int uniquePrimaryUseCount)
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            for (var i = 0; i < uniquePrimaryUseCount; i++)
+            {
+                var newValues = new AllocationAmountFactFaker()
+                    .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use {i}")
+                    .Generate(5);
+                allocationAmountFacts.AddRange(newValues);
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.Length.Should().Be(uniquePrimaryUseCount);
+        }
+
+        [TestMethod]
+        [DataRow(new double[] { 5, 1, 9 }, new double[] { 10, 2, 0 }, 15, 12, 3)]
+        [DataRow(new double[] { -1, 1, 9 }, new double[] { 10, 2, -1 }, 10, 12, 3)]
+        [DataRow(new double[] {3.5553, 2.5533, 23.0}, new double[] {1, 1, 1}, 29.1086, 3, 3)]
+        public async Task GetAnalyticsSummary_CorrectSums(double[] flow, double[] volume, double flowSum, double volumeSum, int dataCount)
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var expected = new AnalyticsSummaryInformation()
+            {
+                Flow = flowSum,
+                Volume = volumeSum,
+                Points = dataCount,
+                PrimaryUseCategoryName = "test",
+            };
+
+            for (var i = 0; i < dataCount; i++)
+            {
+                allocationAmountFacts.AddRange(
+                    new AllocationAmountFactFaker()
+                    .RuleFor(a => a.PrimaryBeneficialUseCategory, () => "test")
+                    .RuleFor(a => a.AllocationFlow_CFS, () => flow[i] > 0 ? flow[i] : null)
+                    .RuleFor(a => a.AllocationVolume_AF, () => volume[i] > 0 ? volume[i] : null)
+                    .Generate(1));
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.First().Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        [DataRow(4)]
+        [DataRow(1)]
+        public async Task GetAnalyticsSummary_CorrectSliceAndValues(int uniquePrimaryUseCount)
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var primaryUse1Values = new AllocationAmountFactFaker()
+               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 1")
+               .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+               .RuleFor(a => a.AllocationVolume_AF, () => 2)
+               .Generate(5);
+            allocationAmountFacts.AddRange(primaryUse1Values);
+
+            var primaryUse2Values = new AllocationAmountFactFaker()
+               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 2")
+               .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+               .RuleFor(a => a.AllocationVolume_AF, () => 4)
+               .Generate(2);
+
+            allocationAmountFacts.AddRange(primaryUse2Values);
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Primary Use 1",
+                    Flow = 5,
+                    Points = 5,
+                    Volume = 10,
+                }, 
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Primary Use 2",
+                    Flow = 6,
+                    Volume = 8,
+                    Points = 2,
+                }
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
         [DataRow(500, 5, DisplayName = "5 pages even")]
         [DataRow(225, 3, DisplayName = "3 pages, uneven")]
         [DataRow(301, 4, DisplayName = "1 result on last page")]

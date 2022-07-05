@@ -35,15 +35,19 @@ namespace WesternStatesWater.WestDaat.Managers
             _locationEngine = locationEngine;
         }
 
-        public async Task<ClientContracts.PieChartSlice> GetPieChartInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            return (await _waterAllocationAccessor.GetPieChartInformation(accessorSearchRequest)).Map<ClientContracts.PieChartSlice>();
+            return (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
+            if ( searchRequest.PageNumber == null)
+            {
+                throw new WestDaatException($"Required value PageNumber was not found");
+            }
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
             return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
