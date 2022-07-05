@@ -46,7 +46,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [TestMethod]
         [DataRow(new double[] { 5, 1, 9 }, new double[] { 10, 2, 0 }, 15, 12, 3)]
         [DataRow(new double[] { -1, 1, 9 }, new double[] { 10, 2, -1 }, 10, 12, 3)]
-        [DataRow(new double[] {3.5553, 2.5533, 23.0}, new double[] {1, 1, 1}, 29.1086, 3, 3)]
+        [DataRow(new double[] {3.5553, 2.5533, 23.1}, new double[] {1, 1, 1}, 29.2086, 3, 3)]
         public async Task GetAnalyticsSummary_CorrectSums(double[] flow, double[] volume, double flowSum, double volumeSum, int dataCount)
         {
             //Arrange

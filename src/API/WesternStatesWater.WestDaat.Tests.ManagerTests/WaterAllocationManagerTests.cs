@@ -131,7 +131,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                PageNumber = 0,
+            };
 
             //Act
             var manager = CreateWaterAllocationManager();
@@ -193,6 +196,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var searchCriteria = new WaterRightsSearchCriteria
             {
+                PageNumber = 0,
                 FilterGeometry = new string[] 
                 {
                     "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}",
@@ -246,6 +250,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var searchCriteria = new WaterRightsSearchCriteria
             {
+                PageNumber = 0,
                 RiverBasinNames = new[] { ColoradoRiverBasin.BasinName }
             };
 
