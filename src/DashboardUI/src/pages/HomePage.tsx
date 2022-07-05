@@ -1,10 +1,8 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import ContactModal from '../components/ContactModal';
 import Map from '../components/Map';
 import SidePanel from '../components/SidePanel';
 import SiteFooter from '../components/SiteFooter';
 import SiteNavbar from '../components/SiteNavbar';
-import TermsModal from '../components/TermsModal';
 import FeedbackModal from '../components/FeedbackModal';
 import DownloadModal from '../components/DownloadModal';
 import TableView from '../components/TableView';
@@ -22,20 +20,10 @@ function HomePage() {
 
   const { setUrlParam, getUrlParam } = useContext(AppContext);
   const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
-  const [showContactModal, setShowContactModal] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const containerRef = useRef(null);
-
-  const shouldShowContactModal = (show: boolean) => {
-    setShowContactModal(show);
-  }
-
-  const shouldShowTermsModal = (show: boolean) => {
-    setShowTermsModal(show);
-  }
 
   const shouldShowFeedbackModal = (show: boolean) => {
     setShowFeedbackModal(show);
@@ -62,8 +50,6 @@ function HomePage() {
       <SiteNavbar
         onTabClick={setCurrentTab}
         currentTab={currentTab}
-        showContactModal={shouldShowContactModal}
-        showTermsModal={shouldShowTermsModal}
         showDownloadModal={shouldShowDownloadModal}
       />
       <div className="d-flex flex-grow-1 overflow-hidden">
@@ -78,8 +64,6 @@ function HomePage() {
         showFeedbackModal={shouldShowFeedbackModal}
       />
 
-      <ContactModal show={showContactModal} setShow={shouldShowContactModal} />
-      <TermsModal show={showTermsModal} setShow={shouldShowTermsModal} />
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
       <DownloadModal show={showDownloadModal} setShow={shouldShowDownloadModal} />
     </div>
