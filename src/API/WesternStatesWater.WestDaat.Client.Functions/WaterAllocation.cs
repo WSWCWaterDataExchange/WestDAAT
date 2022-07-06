@@ -153,7 +153,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             // is this one actually needed? -- the front end might be able to take care of this, evaluate with and without it
             response.Headers.Append("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
 
-            _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+            await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
 
             return new EmptyResult();
         }

@@ -29,7 +29,7 @@
         public string CropTypeCv { get; set; }
         public string CustomerTypeCv { get; set; }
         public DateTime DataPublicationDate { get; set; }
-        public DateTime DataPublicationDoi { get; set; }
+        public string DataPublicationDoi { get; set; }
         public string ExemptOfVolumeFlowPriority { get; set; }
         public string GeneratedPowerCapacityMW { get; set; }
         public string IrrigatedAcreage { get; set; }

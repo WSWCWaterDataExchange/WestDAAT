@@ -164,45 +164,37 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public void WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
-            var count = _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+            var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
             if (count > _performanceConfiguration.MaxRecordsDownload)
             {
                 throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
             }
 
-            var sites =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
-
-            var list2 = new List<dynamic>();
-            list2.Add(sites);
+            var filesToGenerate =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
 
             using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
             {
-                // setting the compression level, owner and zipping compatibility
                 zipStream.SetLevel(3);
                 zipStream.IsStreamOwner = false;
                 zipStream.UseZip64 = UseZip64.Off;
 
-                foreach (var file in list2)
+                foreach (var file in filesToGenerate)
                 {
                     var ms = new MemoryStream();
                     var writer = new StreamWriter(ms);
                     var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
-                    // dateTime is a complex type for csv, adding to auto map -- SideNode: Wonder if I can accomplish the same with GeometryObject?
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                     csv.WriteRecords(file);
                     csv.Flush();
-
-                    var entry = new ZipEntry(ZipEntry.CleanName($"{nameof(file)}.csv"));
+                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
                     zipStream.PutNextEntry(entry);
 
                     ms.Seek(0, SeekOrigin.Begin);
 
-                    // futher test with real data if 4096 is enough or it will give issues? documentation showed that number, but it's arbitrarily set.
-                    // probably has to be bigger if the request is close to the 100k request
                     StreamUtils.Copy(ms, zipStream, new byte[4096]);
 
                     // do I need to flush the zip stream, so it starts flushing as soon as is starts writing?

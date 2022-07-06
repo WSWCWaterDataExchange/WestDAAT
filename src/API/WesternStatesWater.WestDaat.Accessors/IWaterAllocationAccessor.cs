@@ -21,7 +21,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
 
-        int GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
+        Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
 
         IEnumerable<dynamic> GetWaterRightsZip(WaterRightsSearchCriteria accessorSearchRequest);
     }

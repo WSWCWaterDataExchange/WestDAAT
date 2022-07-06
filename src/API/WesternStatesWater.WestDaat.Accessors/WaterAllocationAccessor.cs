@@ -234,55 +234,59 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        public int GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
+        async Task<int> IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
-            return db.AllocationAmountsFact
+            return await db.AllocationAmountsFact
                 .Where(predicate)
-                .Count();
+                .CountAsync();
         }
 
-        public IEnumerable<dynamic> GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
+        IEnumerable<dynamic> IWaterAllocationAccessor.GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-
+                
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = db.AllocationAmountsFact
                 .AsNoTracking()
                 .Include(x => x.AllocationBridgeSitesFact)
                 .ThenInclude(x => x.Site)
                 .ThenInclude(x => x.PODSiteToPOUSitePODFact)
-                .Include(x => x.AggregatedAmountsFact)
+                .Include(x => x.AllocationBridgeSitesFact)
+                .ThenInclude(x => x.Site)
+                .ThenInclude(x => x.WaterSourceBridgeSitesFact)
                 .ThenInclude(x => x.WaterSource)
+                .Include(x => x.AllocationBridgeSitesFact)
+                .ThenInclude(x => x.Site)
+                .ThenInclude(x => x.RegulatoryOverlayBridgeSitesFact)
+                .ThenInclude(x => x.RegulatoryOverlay)
+                .Include(x => x.AllocationBridgeSitesFact)
+                .ThenInclude(x => x.Site)
+                .ThenInclude(x => x.WaterSourceBridgeSitesFact)
+                .ThenInclude(x => x.WaterSource)
+                .Include(x => x.AllocationBridgeBeneficialUsesFact)
+                .ThenInclude(x => x.BeneficialUse)
                 .Where(predicate);
 
-            foreach (var entry in waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration))
+            Console.WriteLine($"total count is =  {waterRightDetails.Count()}");
+
+            var response = new List<IEnumerable<dynamic>>()
             {
-                Console.WriteLine(entry);
+                //waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration), // works
+                //waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration), // works
+                //waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration), // works
+                //waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration), // Mapper is not right
+                //waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration), // Mapper is not right
+                waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration), // Mapper is not right
+                //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration) // Mapper is not right
+            };
+
+            foreach(var entry in response)
+            {
                 yield return entry;
             }
-
-            //var waterRightDetails = db.AllocationAmountsFact;
-
-            //var listResponse = new List<object>
-            //{
-            //    // waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
-            //    //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration)
-            //};
-
-            //var rep = new[] { listResponse };
-
-            //foreach (var entry in rep)
-            //{
-            //    yield return entry;
-            //}
         }
     }
 }
