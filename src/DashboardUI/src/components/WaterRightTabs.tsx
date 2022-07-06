@@ -16,7 +16,7 @@ function WaterRightTabs(props: waterRightTabsProps) {
 
   return (
     <>
-      <Tabs defaultActiveKey="site" id="uncontrolled-tab-example" className="mb-3">
+      <Tabs defaultActiveKey="site" className="mb-3 custom-tabs">
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>
