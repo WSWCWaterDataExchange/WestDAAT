@@ -267,25 +267,26 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ThenInclude(x => x.WaterSourceBridgeSitesFact)
                 .ThenInclude(x => x.WaterSource)
                 .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                .ThenInclude(x => x.BeneficialUse)
-                .Where(predicate);
+                .ThenInclude(x => x.BeneficialUse);
+                //.Where(predicate); removing the predicate just to get the full database on it basically
 
             Console.WriteLine($"total count is =  {waterRightDetails.Count()}");
 
             var response = new List<IEnumerable<dynamic>>()
             {
-                //waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration), // works
-                //waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration), // works
-                //waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration), // works
-                //waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration), // Mapper is not right
-                //waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration), // Mapper is not right
-                waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration), // Mapper is not right
-                //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration) // Mapper is not right
+                waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
+                waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
+                waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
+                waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration), // not entirely sure the mapper should be using forst or default, I feel there should be way more entries there
+                waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
+                waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
+                //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration) // Mapper is not right <- doesn't resolve the select
             };
+
 
             foreach(var entry in response)
             {
-                yield return entry;
+                 yield return entry;
             }
         }
     }

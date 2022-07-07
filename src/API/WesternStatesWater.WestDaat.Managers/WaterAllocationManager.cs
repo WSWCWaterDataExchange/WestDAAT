@@ -204,7 +204,9 @@ namespace WesternStatesWater.WestDaat.Managers
                 // getting citation file
                 var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);
                 // String replacement for the citation file
-
+                citationFile = citationFile
+                    .Replace("[insert download date here]", DateTime.Now.ToString("d"))
+                    .Replace("[Insert WestDAAT URL here]", "SET URL HERE? ARE WE WORRIED ABOUT ANYTHING HERE?");
 
                 // add the template file to the zip stream
                 var memoryStream = new MemoryStream();

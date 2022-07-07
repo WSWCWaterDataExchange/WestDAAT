@@ -15,8 +15,8 @@ namespace WesternStatesWater.WestDaat.Accessors.CsvModels
         public string GnisCodeCv { get; set; }
         public string HUC12 { get; set; }
         public string HUC8 { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public string NhdNetworkStatusCv { get; set; }
         public string NhdProductCv { get; set; }
         public string PODorPOUSite { get; set; }

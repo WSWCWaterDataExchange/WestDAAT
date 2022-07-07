@@ -35,37 +35,37 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.State, opt => opt.MapFrom(source => source.Organization.State));
 
             // needs update
-            CreateMap<EF.AllocationAmountsFact, PodSiteToPouSiteRelationships>() // these are failing, not sure why
-                .ForMember(dest => dest.PODSiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.PODSiteToPOUSitePOUFact.Select(y => y.PODSiteId.ToString()))))
-                .ForMember(dest => dest.POUSiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.PODSiteToPOUSitePOUFact.Select(y => y.POUSiteId.ToString()))))
-                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.PODSiteToPOUSitePODFact.Select(y => y.StartDate.ToString("d")))))
-                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.PODSiteToPOUSitePOUFact.Select(y => y.EndDate.ToString()))));
+            CreateMap<EF.AllocationAmountsFact, PodSiteToPouSiteRelationships>()
+                .ForMember(dest => dest.PODSiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.PODSiteToPOUSitePOUFact.FirstOrDefault().PODSiteId.ToString()))
+                .ForMember(dest => dest.POUSiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.PODSiteToPOUSitePOUFact.FirstOrDefault().POUSiteId.ToString()))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.PODSiteToPOUSitePOUFact.FirstOrDefault().StartDate))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.PODSiteToPOUSitePOUFact.FirstOrDefault().EndDate));
 
             // needs update
             CreateMap<EF.AllocationAmountsFact, Sites>()
-                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteUuid)))
-                .ForMember(dest => dest.Regulatory, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.RegulatoryOverlayBridgeSitesFact.Select(y => y.RegulatoryOverlay.RegulatoryName)))) // confirm with WaDE
-                .ForMember(dest => dest.WaterSourceUuids, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceUuid))))
-                .ForMember(dest => dest.CoordinateAccuracy, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.CoordinateAccuracy)))
-                .ForMember(dest => dest.CoordinateMethodCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.CoordinateMethodCv)))
-                .ForMember(dest => dest.County, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.County)))
-                .ForMember(dest => dest.EpsgCodeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.EpsgcodeCv)))
-                .ForMember(dest => dest.GnisCodeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.GniscodeCv)))
-                .ForMember(dest => dest.HUC12, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.HUC12)))
-                .ForMember(dest => dest.HUC8, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.HUC8)))
-                .ForMember(dest => dest.NhdNetworkStatusCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.NhdnetworkStatusCv)))
-                .ForMember(dest => dest.NhdProductCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.NhdproductCv)))
-                .ForMember(dest => dest.PODorPOUSite, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.PODorPOUSite)))
-                .ForMember(dest => dest.SiteName, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteName)))
-                .ForMember(dest => dest.SiteNativeId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteNativeId)))
-                .ForMember(dest => dest.ID, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteId.ToString())))
-                .ForMember(dest => dest.SiteTypeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteTypeCv)))
-                .ForMember(dest => dest.StateCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.StateCv)))
-                .ForMember(dest => dest.UsgsSiteId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.UsgssiteId)))
-                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.Geometry.ToString())))
-                .ForMember(dest => dest.SitePoint, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SitePoint.ToString())))
-                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.Latitude.ToString())))
-                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.Longitude.ToString())));
+                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteUuid))
+                .ForMember(dest => dest.Regulatory, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.RegulatoryOverlayBridgeSitesFact.FirstOrDefault().RegulatoryOverlay.RegulatoryName)) // confirm with WaDE
+                .ForMember(dest => dest.WaterSourceUuids, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.WaterSourceBridgeSitesFact.FirstOrDefault().WaterSource.WaterSourceUuid))
+                .ForMember(dest => dest.CoordinateAccuracy, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.CoordinateAccuracy))
+                .ForMember(dest => dest.CoordinateMethodCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.CoordinateMethodCv))
+                .ForMember(dest => dest.County, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.County))
+                .ForMember(dest => dest.EpsgCodeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.EpsgcodeCv))
+                .ForMember(dest => dest.GnisCodeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.GniscodeCv))
+                .ForMember(dest => dest.HUC12, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.HUC12))
+                .ForMember(dest => dest.HUC8, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.HUC8))
+                .ForMember(dest => dest.NhdNetworkStatusCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.NhdnetworkStatusCv))
+                .ForMember(dest => dest.NhdProductCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.NhdproductCv))
+                .ForMember(dest => dest.PODorPOUSite, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.PODorPOUSite))
+                .ForMember(dest => dest.SiteName, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteName))
+                .ForMember(dest => dest.SiteNativeId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteNativeId))
+                .ForMember(dest => dest.ID, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteId.ToString()))
+                .ForMember(dest => dest.SiteTypeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteTypeCv))
+                .ForMember(dest => dest.StateCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.StateCv))
+                .ForMember(dest => dest.UsgsSiteId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.UsgssiteId))
+                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.Geometry.IsValid ? source.AllocationBridgeSitesFact.FirstOrDefault().Site.Geometry.ToString() : string.Empty))
+                .ForMember(dest => dest.SitePoint, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SitePoint.IsValid ? source.AllocationBridgeSitesFact.FirstOrDefault().Site.SitePoint.ToString() : String.Empty))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.Latitude))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.Longitude));
 
             CreateMap<EF.AllocationAmountsFact, Variables>()
                 .ForMember(dest => dest.VariableSpecificUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
@@ -86,7 +86,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.DataPublicationDoi, opt => opt.MapFrom(source => source.DataPublicationDoi))
                 .ForMember(dest => dest.MethodUuid, opt => opt.MapFrom(source => source.Method.MethodUuid))
                 .ForMember(dest => dest.OrganizationUuid, opt => opt.MapFrom(source => source.Organization.OrganizationUuid))
-                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(site => site.Site.SiteUuid)))
+                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.FirstOrDefault().Site.SiteUuid))
                 .ForMember(dest => dest.VariableSpecificUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.CropTypeCv, opt => opt.MapFrom(source => source.CropTypeCV))
                 .ForMember(dest => dest.CustomerTypeCv, opt => opt.MapFrom(source => source.CustomerTypeCV))
@@ -102,12 +102,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             // needs update
             CreateMap<EF.AllocationAmountsFact, WaterSources>()
-                //.ForMember(dest => dest.WaterSourceUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceUuid))))
-                //.ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.Geometry.ToString()))))
-                //.ForMember(dest => dest.GnisFeatureNameCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.GnisfeatureNameCv))))
-                //.ForMember(dest => dest.WaterQualityIndicatorCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterQualityIndicatorCv))))
-                //.ForMember(dest => dest.WaterSourceName, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceName))))
-                //.ForMember(dest => dest.WaterSourceNativeId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceNativeId))))
+                .ForMember(dest => dest.WaterSourceUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceUuid))))
+                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.Geometry.ToString()))))
+                .ForMember(dest => dest.GnisFeatureNameCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.GnisfeatureNameCv))))
+                .ForMember(dest => dest.WaterQualityIndicatorCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterQualityIndicatorCv))))
+                .ForMember(dest => dest.WaterSourceName, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceName))))
+                .ForMember(dest => dest.WaterSourceNativeId, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceNativeId))))
                 .ForMember(dest => dest.WaterSourceTypeCv, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.SelectMany(x => x.Site.WaterSourceBridgeSitesFact.Select(y => y.WaterSource.WaterSourceTypeCv))));
         }
     }
