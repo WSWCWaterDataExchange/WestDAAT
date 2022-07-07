@@ -6,12 +6,12 @@ import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
 import { FormattedDate } from './FormattedDate';
 
 interface waterRightPropertiesProps {
-  waterRightId: string;
+  allocationUuid: string;
 }
 
 function WaterRightProperties(props: waterRightPropertiesProps) {
   // TODO: Update with loading screen after Dub update
-  const waterRightDetails = useWaterRightDetails(+props.waterRightId).data;
+  const waterRightDetails = useWaterRightDetails(props.allocationUuid).data;
 
   const getPropertyValueClass = (value: any) => {
     return value !== null ? 'property-value' : 'property-value empty';

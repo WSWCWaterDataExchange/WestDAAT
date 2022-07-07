@@ -8,17 +8,17 @@ import {
 } from '../accessors/waterAllocationAccessor';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 
-export function useWaterRightDetails(waterRightId: number) {
+export function useWaterRightDetails(allocationUuid: string) {
   return useQuery(
-    ['waterRight.Details', waterRightId],
-    async () => await getWaterRightDetails(waterRightId),
+    ['waterRight.Details', allocationUuid],
+    async () => await getWaterRightDetails(allocationUuid),
     {
-      enabled: !!waterRightId,
+      enabled: !!allocationUuid,
     }
   );
 }
 
-export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria | null){
+export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria | null) {
   return useQuery(
     ['waterRight.Find', searchCriteria],
     async () => await findWaterRight(searchCriteria!),
@@ -28,7 +28,7 @@ export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria | n
   );
 }
 
-export function useWaterRightSiteInfoList(waterRightId: number) {
+export function useWaterRightSiteInfoList(waterRightId: string) {
   return useQuery(
     ['waterRight.SiteInfoList', waterRightId],
     async () => await getWaterRightSiteInfoList(waterRightId),
@@ -38,22 +38,22 @@ export function useWaterRightSiteInfoList(waterRightId: number) {
   );
 }
 
-export function useWaterRightSourceInfoList(waterRightId: number) {
+export function useWaterRightSourceInfoList(allocationUuid: string) {
   return useQuery(
-    ['waterRight.SourceInfoList', waterRightId],
-    async () => await getWaterRightSourceInfoList(waterRightId),
+    ['waterRight.SourceInfoList', allocationUuid],
+    async () => await getWaterRightSourceInfoList(allocationUuid),
     {
-      enabled: !!waterRightId,
+      enabled: !!allocationUuid,
     }
   );
 }
 
-export function useWaterRightSiteLocations(waterRightId: number) {
+export function useWaterRightSiteLocations(allocationUuid: string) {
   return useQuery(
-    ['waterRight.SiteLocations', waterRightId],
-    async () => await getWaterRightSiteLocations(waterRightId),
+    ['waterRight.SiteLocations', allocationUuid],
+    async () => await getWaterRightSiteLocations(allocationUuid),
     {
-      enabled: !!waterRightId,
+      enabled: !!allocationUuid,
     }
   );
 }
