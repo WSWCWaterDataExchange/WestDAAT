@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 })
                 .ToArrayAsync();
 
-            return analyticsSummary.ToArray();
+            return analyticsSummary;
         }
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
