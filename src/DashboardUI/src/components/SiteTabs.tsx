@@ -16,7 +16,7 @@ function SiteTabs(props: siteTabsProps) {
 
     return (
         <>
-            <Tabs defaultActiveKey="source" id="uncontrolled-tab-example" className="mb-3">
+            <Tabs defaultActiveKey="source" className="mb-3 custom-tabs">
                 <Tab eventKey="source" title="Water Source Information">
                     <Table hover>
                         <thead>
