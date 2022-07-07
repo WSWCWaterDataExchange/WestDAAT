@@ -1,5 +1,5 @@
 export interface WaterRightsSearchCriteria {
-  pageNumber: number;
+  pageNumber?: number;
   beneficialUses?: string[];
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
