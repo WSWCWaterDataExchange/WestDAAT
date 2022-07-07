@@ -84,6 +84,21 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
+        [FunctionName(nameof(GetAnalyticsSummaryInformation)), AllowAnonymous]
+        public async Task<IActionResult> GetAnalyticsSummaryInformation([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/AnalyticsSummaryInformation")] HttpRequest request)
+        {
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+
+            var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
+
+            return new OkObjectResult(result);
+        }
+
         // Site Routes
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
         public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequest request, string siteUuid)

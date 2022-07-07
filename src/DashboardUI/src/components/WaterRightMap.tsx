@@ -9,11 +9,11 @@ import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 
 interface waterRightMapProps {
-  waterRightId: string;
+  allocationUuid: string;
 }
 
 function WaterRightMap(props: waterRightMapProps) {
-  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useWaterRightSiteLocations(+props.waterRightId);
+  const { data: waterRightSiteLocations, isFetching: isWaterRightSiteLocationsLoading } = useWaterRightSiteLocations(props.allocationUuid);
 
   const {
     setVisibleLayers,
