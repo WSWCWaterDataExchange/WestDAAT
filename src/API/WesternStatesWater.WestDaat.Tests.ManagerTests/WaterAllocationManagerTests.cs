@@ -85,6 +85,35 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        public async Task GetAnalyticsSummaryInformation_ResultsReturned()
+        {
+            var slice = new CommonContracts.AnalyticsSummaryInformation()
+            {
+                Flow = 0,
+                PrimaryUseCategoryName = "",
+                Points = 0,
+                Volume = 0
+            };
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(new CommonContracts.AnalyticsSummaryInformation[]
+                {
+                    slice, slice, slice
+                })
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetAnalyticsSummaryInformation(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
         public async Task FindWaterRights_ResultsReturned()
         {
             //Arrange
@@ -102,7 +131,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteria
+            {
+                PageNumber = 0,
+            };
 
             //Act
             var manager = CreateWaterAllocationManager();
@@ -110,6 +142,34 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             //Assert
             result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(WestDaatException))]
+        public async Task FindWaterRights_PageNumberRequired()
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
+                {
+                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
+                    {
+                        new CommonContracts.WaterRightsSearchDetail
+                        {
+                            AllocationUuid = "abc123"
+                        }
+                    }
+                })
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.FindWaterRights(searchCriteria);
+
+            //Assert
             _waterAllocationAccessorMock.Verify();
         }
 
@@ -136,6 +196,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var searchCriteria = new WaterRightsSearchCriteria
             {
+                PageNumber = 0,
                 FilterGeometry = new string[] 
                 {
                     "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}",
@@ -189,6 +250,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var searchCriteria = new WaterRightsSearchCriteria
             {
+                PageNumber = 0,
                 RiverBasinNames = new[] { ColoradoRiverBasin.BasinName }
             };
 
