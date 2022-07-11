@@ -174,7 +174,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
             }
 
-            var filesToGenerate =  _waterAllocationAccessor.GetWaterRightsZip(accessorSearchRequest);
+            var filesToGenerate = _waterAllocationAccessor.GetWaterRights(accessorSearchRequest);
 
             using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
             {
@@ -188,6 +188,7 @@ namespace WesternStatesWater.WestDaat.Managers
                     var writer = new StreamWriter(ms);
                     var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
                     csv.WriteRecords(file);
                     csv.Flush();
                     var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
@@ -196,10 +197,7 @@ namespace WesternStatesWater.WestDaat.Managers
                     ms.Seek(0, SeekOrigin.Begin);
 
                     StreamUtils.Copy(ms, zipStream, new byte[4096]);
-
-                    // do I need to flush the zip stream, so it starts flushing as soon as is starts writing?
                 }
-
 
                 // getting citation file
                 var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);

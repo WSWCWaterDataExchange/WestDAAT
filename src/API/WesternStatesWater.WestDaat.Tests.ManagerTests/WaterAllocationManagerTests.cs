@@ -5,12 +5,13 @@ using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
-using Common = WesternStatesWater.WestDaat.Common;
+using CsvModels = WesternStatesWater.WestDaat.Accessors.CsvModels;
 using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using System.IO;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -24,6 +25,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
         private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new Mock<ITemplateResourceSdk>(MockBehavior.Strict);
         private readonly Mock<PerformanceConfiguration> _performanceConfiguration = new Mock<PerformanceConfiguration>(MockBehavior.Strict);
+
+        private readonly string _citationFile = Resources.resources.citation;
 
         [TestMethod]
         public async Task GeoConnexEngine_GetWaterAllocationSiteGeoconnexIntegrationData_ShouldCallEngine()
@@ -341,6 +344,108 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             polygons.Should().NotBeNull();
             polygons.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        [DataRow(100001)]
+        [DataRow(450000)]
+        public async Task WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
+        {
+            var managerSearchRequest = new WaterRightsSearchCriteria
+            {
+                States = new string[] { "NE" }
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(returnAmount)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            await Assert.ThrowsExceptionAsync<WestDaatException>(() => manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
+
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task WaterRightsAsZip_ThrowsException_WhenAllSearchCriteriaPropertiesAreNull()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            await Assert.ThrowsExceptionAsync<NullReferenceException>(() => manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
+
+            // throws exception when building the predicate, before this call to happen
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task WaterRightsAsZip_BuildsStream()
+        {
+            // need to get the CSVhelper files
+            var variables = new List<CsvModels.Variables>
+            {
+                new CsvModels.Variables
+                {
+                    VariableSpecificUuid = Guid.NewGuid().ToString()
+                },
+                new CsvModels.Variables
+                {
+                    VariableSpecificUuid = Guid.NewGuid().ToString()
+                },
+                new CsvModels.Variables
+                {
+                    VariableSpecificUuid = Guid.NewGuid().ToString()
+                }
+            };
+
+            var organizations = new List<CsvModels.Organizations>
+            {
+                new CsvModels.Organizations
+                {
+                    OrganizationUuid = Guid.NewGuid().ToString()
+                },
+                new CsvModels.Organizations
+                {
+                    OrganizationUuid = Guid.NewGuid().ToString()
+                },
+                new CsvModels.Organizations
+                {
+                    OrganizationUuid = Guid.NewGuid().ToString()
+                }
+            };
+
+            var iEnumerableList = new List<IEnumerable<dynamic>>
+            {
+                variables,
+                organizations
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(5)
+                .Verifiable();
+
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Returns(iEnumerableList)
+                .Verifiable();
+
+            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
+                .Returns(_citationFile);
+
+            var managerSearchRequest = new WaterRightsSearchCriteria
+            {
+                States = new string[] { "NE" }
+            };
+
+            var memoryStream = new MemoryStream();
+
+            var manager = CreateWaterAllocationManager();
+            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+
+            var reader = new StreamReader(memoryStream);
+
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
         }
 
         private IWaterAllocationManager CreateWaterAllocationManager()

@@ -1,12 +1,10 @@
-﻿using NetTopologySuite.Geometries;
-
-namespace WesternStatesWater.WestDaat.Accessors.CsvModels
+﻿namespace WesternStatesWater.WestDaat.Accessors.CsvModels
 {
     public class Sites
     {
         public string SiteUuid { get; set; }
-        public string Regulatory { get; set; }
-        public string WaterSourceUuids { get; set; }
+        public string[] RegulatoryOverlayUUIDs { get; set; }
+        public string[] WaterSourceUuids { get; set; }
         public string CoordinateAccuracy { get; set; }
         public string CoordinateMethodCv { get; set; }
         public string County { get; set; }
@@ -15,8 +13,8 @@ namespace WesternStatesWater.WestDaat.Accessors.CsvModels
         public string GnisCodeCv { get; set; }
         public string HUC12 { get; set; }
         public string HUC8 { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
         public string NhdNetworkStatusCv { get; set; }
         public string NhdProductCv { get; set; }
         public string PODorPOUSite { get; set; }

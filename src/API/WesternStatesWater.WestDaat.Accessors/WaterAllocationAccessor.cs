@@ -244,49 +244,36 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .CountAsync();
         }
 
-        IEnumerable<dynamic> IWaterAllocationAccessor.GetWaterRightsZip(WaterRightsSearchCriteria searchCriteria)
+        IEnumerable<dynamic> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-                
+
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = db.AllocationAmountsFact
                 .AsNoTracking()
-                .Include(x => x.AllocationBridgeSitesFact)
-                .ThenInclude(x => x.Site)
-                .ThenInclude(x => x.PODSiteToPOUSitePODFact)
-                .Include(x => x.AllocationBridgeSitesFact)
-                .ThenInclude(x => x.Site)
-                .ThenInclude(x => x.WaterSourceBridgeSitesFact)
-                .ThenInclude(x => x.WaterSource)
-                .Include(x => x.AllocationBridgeSitesFact)
-                .ThenInclude(x => x.Site)
-                .ThenInclude(x => x.RegulatoryOverlayBridgeSitesFact)
-                .ThenInclude(x => x.RegulatoryOverlay)
-                .Include(x => x.AllocationBridgeSitesFact)
-                .ThenInclude(x => x.Site)
-                .ThenInclude(x => x.WaterSourceBridgeSitesFact)
-                .ThenInclude(x => x.WaterSource)
-                .Include(x => x.AllocationBridgeBeneficialUsesFact)
-                .ThenInclude(x => x.BeneficialUse);
-                //.Where(predicate); removing the predicate just to get the full database on it basically
+                .Where(predicate);
 
-            Console.WriteLine($"total count is =  {waterRightDetails.Count()}");
+            var filteredSites = db.SitesDim
+                .AsNoTracking()
+                .Where(a => a.AllocationBridgeSitesFact
+                    .Select(b => b.AllocationAmount)
+                    .Intersect(waterRightDetails)
+                    .Any());
 
             var response = new List<IEnumerable<dynamic>>()
             {
-                waterRightDetails.ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
-                waterRightDetails.ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
-                waterRightDetails.ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
-                waterRightDetails.ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration), // not entirely sure the mapper should be using forst or default, I feel there should be way more entries there
-                waterRightDetails.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
-                waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
-                //waterRightDetails.ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration) // Mapper is not right <- doesn't resolve the select
+                waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
+                waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
+                waterRightDetails.Select(x=>x.Method).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
+                filteredSites.SelectMany(x=>x.AllocationBridgeSitesFact).ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
+                filteredSites.SelectMany(c=>c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
+                filteredSites.SelectMany(b=>b.WaterSourceBridgeSitesFact).Select(c=>c.WaterSource).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration),
+                filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
             };
 
-
-            foreach(var entry in response)
+            foreach (var entry in response)
             {
-                 yield return entry;
+                yield return entry;
             }
         }
     }

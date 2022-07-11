@@ -24,7 +24,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackFrom)}", "test@test.com" },
             { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackTo)}:01", "test01@test.com" },
-            { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackTo)}:02", "test02@test.com" }
+            { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackTo)}:02", "test02@test.com" },
+            { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.MaxRecordsDownload)}", "100000"}
         };
 
         [TestInitialize]
