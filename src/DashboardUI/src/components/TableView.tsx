@@ -159,7 +159,7 @@ function TableView(props: TableViewProps) {
               </Table>
             </Tab.Pane>
             <Tab.Pane eventKey="pieChart">
-              <PieChart data={pieChartSearchResults}></PieChart>
+              <PieChart dataByBeneficialUse={pieChartSearchResults}></PieChart>
             </Tab.Pane>
           </Tab.Content>
         </Offcanvas.Body>
