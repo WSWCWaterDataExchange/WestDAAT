@@ -3,12 +3,13 @@ import { Button, Nav, Offcanvas, ProgressBar, Tab, Table } from "react-bootstrap
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
 import Icon from "@mdi/react";
-import { useFindWaterRights } from "../hooks/useWaterRightQuery";
+import { useFindWaterRights, useGetAnalyticsSummaryInfo } from "../hooks/useWaterRightQuery";
 import { WaterRightsSearchCriteria } from "../data-contracts/WaterRightsSearchCriteria";
 import { WaterRightsSearchResults } from "../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "./FormattedDate";
 import { FilterContext } from "../FilterProvider";
 import moment from "moment";
+import PieChart from "./PieChart";
 
 interface TableViewProps {
   containerRef: React.MutableRefObject<any>;
@@ -41,7 +42,7 @@ function TableView(props: TableViewProps) {
   const handleFiltersChange = useCallback(() => {
     setWaterRightsSearchResults(_defaultResults);
     setSearchCriteria({
-      pageNumber: 0,      
+      pageNumber: 0,
       beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName),
       filterGeometry: filters.polyline.map(p => JSON.stringify(p.data.geometry)),
       expemptofVolumeFlowPriority: filters.includeExempt,
@@ -55,7 +56,7 @@ function TableView(props: TableViewProps) {
       ownerClassifications: filters.ownerClassifications,
       waterSourceTypes: filters.waterSourceTypes,
       riverBasinNames: filters.riverBasinNames,
-      allocationOwner: filters.allocationOwner,      
+      allocationOwner: filters.allocationOwner,
       states: filters.states,
     });
   }, [_defaultResults, filters, setSearchCriteria, setWaterRightsSearchResults]);
@@ -66,6 +67,7 @@ function TableView(props: TableViewProps) {
   }
 
   const { data: latestSearchResults, isFetching } = useFindWaterRights(searchCriteria)
+  const { data: pieChartSearchResults } = useGetAnalyticsSummaryInfo(searchCriteria)
 
   useEffect(() => {
     if (show) {
@@ -83,7 +85,7 @@ function TableView(props: TableViewProps) {
       hasMoreResults: latestSearchResults.hasMoreResults,
       waterRightsDetails: [...previousState.waterRightsDetails, ...latestSearchResults.waterRightsDetails]
     }));
-  }, [latestSearchResults]);
+  }, [latestSearchResults, pieChartSearchResults]);
 
   return <>
     <Button type="button" className={`table-view-toggle-btn ${show ? "toggle-on" : null}`} onClick={toggleShow}>
@@ -102,6 +104,9 @@ function TableView(props: TableViewProps) {
           <Nav variant="tabs" defaultActiveKey="dataTable">
             <Nav.Item>
               <Nav.Link eventKey="dataTable">Data Table</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
@@ -152,6 +157,9 @@ function TableView(props: TableViewProps) {
                   }
                 </tbody>
               </Table>
+            </Tab.Pane>
+            <Tab.Pane eventKey="pieChart">
+              <PieChart data={pieChartSearchResults}></PieChart>
             </Tab.Pane>
           </Tab.Content>
         </Offcanvas.Body>
