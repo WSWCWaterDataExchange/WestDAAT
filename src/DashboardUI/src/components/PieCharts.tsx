@@ -9,7 +9,7 @@ interface PieChartProps {
     dataByBeneficialUse: AnalyticsSummaryInformation[] | undefined;
 }
 
-function PieChart(props: PieChartProps) {
+function PieCharts(props: PieChartProps) {
     const { data: allBeneficialUses } = useBeneficialUses();
 
     let colorIndex = 0;
@@ -19,12 +19,12 @@ function PieChart(props: PieChartProps) {
     let flowSum = 0;
     let volumeSum = 0;
     let pointSum = 0;
-    props.dataByBeneficialUse?.forEach(x => {
-        const currentColor = (colorMapping.find(color => color.key == x.primaryUseCategoryName));
-        x.color = currentColor?.color || colorMapping.find(color => color.key == 'Unspecified')?.color;
-        flowSum += x.flow || 0;
-        volumeSum += x.volume || 0;
-        pointSum += x.points || 0;
+    props.dataByBeneficialUse?.forEach(beneficialUse => {
+        const currentColor = (colorMapping.find(color => color.key === beneficialUse.primaryUseCategoryName));
+        beneficialUse.color = currentColor?.color || colorMapping.find(color => color.key === 'Unspecified')?.color;
+        flowSum += beneficialUse.flow || 0;
+        volumeSum += beneficialUse.volume || 0;
+        pointSum += beneficialUse.points || 0;
     })
 
     const flowOptions = {
@@ -105,4 +105,4 @@ function PieChart(props: PieChartProps) {
     </div>
 };
 
-export default PieChart;
+export default PieCharts;

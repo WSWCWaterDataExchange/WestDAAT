@@ -9,7 +9,7 @@ import { WaterRightsSearchResults } from "../data-contracts/WaterRightsSearchRes
 import { FormattedDate } from "./FormattedDate";
 import { FilterContext } from "../FilterProvider";
 import moment from "moment";
-import PieChart from "./PieChart";
+import PieCharts from "./PieCharts";
 
 interface TableViewProps {
   containerRef: React.MutableRefObject<any>;
@@ -159,7 +159,7 @@ function TableView(props: TableViewProps) {
               </Table>
             </Tab.Pane>
             <Tab.Pane eventKey="pieChart">
-              <PieChart dataByBeneficialUse={pieChartSearchResults}></PieChart>
+              <PieCharts dataByBeneficialUse={pieChartSearchResults}></PieCharts>
             </Tab.Pane>
           </Tab.Content>
         </Offcanvas.Body>
