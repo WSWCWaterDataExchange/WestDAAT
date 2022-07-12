@@ -5,7 +5,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import { AppContext } from "../AppProvider";
-import { MapContext, MapStyle } from "./MapProvider";
+import { MapContext, MapSettings, MapStyle } from "./MapProvider";
 import mapConfig from "../config/maps";
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
@@ -29,6 +29,8 @@ const mapIcons: Map<string, string> = new global.Map<string, string>([
 ])
 
 function Map(_props: mapProps) {
+  const { getUrlParam } = useContext(AppContext)
+
   const { isAuthenticated } = useContext(AppContext).authenticationContext;
   const {
     legend,
@@ -44,6 +46,7 @@ function Map(_props: mapProps) {
     fillColors,
     mapPopup,
     mapBoundSettings,
+    setMapLocationSettings,
     setRenderedFeatures,
     setMapClickedFeatures,
     setPolylines,
@@ -132,9 +135,22 @@ function Map(_props: mapProps) {
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
+      let mapSettings: MapSettings;
+      mapSettings = getUrlParam<MapSettings>('map') ?? { zoomLevel: 4, longitude: -100, latitude: 40 };
+      mapInstance.setZoom(mapSettings.zoomLevel);
+      mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
       if (!_props.hideDrawControl) {
         mapboxDrawControl(mapInstance);
       }
+
+      mapInstance.on('move', (e) => {
+        const mapSettings: MapSettings = {
+          zoomLevel: mapInstance.getZoom(),
+          latitude: mapInstance.getCenter().lat,
+          longitude: mapInstance.getCenter().lng,
+        }
+        setMapLocationSettings(mapSettings);
+      });
 
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());

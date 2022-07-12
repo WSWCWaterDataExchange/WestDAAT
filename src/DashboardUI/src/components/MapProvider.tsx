@@ -18,6 +18,12 @@ export enum MapStyle {
   Satellite = "satellite-v9"
 }
 
+export interface MapSettings {
+  zoomLevel: number,
+  latitude: number,
+  longitude: number,
+}
+
 export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
@@ -76,6 +82,8 @@ interface MapContextState {
   setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | null) => void,
   nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
   setNldiFilterData: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>>,
+  mapLocationSettings: { latitude: number, longitude: number, zoomLevel: number } | null,
+  setMapLocationSettings: React.Dispatch<React.SetStateAction<{ latitude: number, longitude: number, zoomLevel: number }>>
 };
 
 const defaultState: MapContextState = {
@@ -114,6 +122,8 @@ const defaultState: MapContextState = {
   setPolylines: () => { },
   nldiFilterData: null,
   setNldiFilterData: () => { },
+  mapLocationSettings: null,
+  setMapLocationSettings: () => { },
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -125,6 +135,13 @@ const MapProvider: FC = ({ children }) => {
   const setMapStyleInternal = (mapStyle: MapStyle): void => {
     setMapStyle(mapStyle);
   }
+
+  const [mapLocationSettings, setMapLocationSettings] = useState(getUrlParam<MapSettings>("map") ?? { zoomLevel: 4, longitude: -100, latitude: 40 });
+
+  useEffect(() => {
+    setUrlParam("map", mapLocationSettings);
+  }, [mapLocationSettings])
+
   useEffect(() => {
     if (mapStyle === MapStyle.Light) {
       setUrlParam("ms", undefined);
@@ -219,6 +236,7 @@ const MapProvider: FC = ({ children }) => {
       }
       return s;
     });
+    console.log("testing")
   }, [setAllGeoJsonData])
 
   const [vectorUrls, setAllVectorUrls] = useState<{ source: string, url: string }[]>([]);
@@ -270,13 +288,12 @@ const MapProvider: FC = ({ children }) => {
   const [polylines, setAllPolylines] = useState<{ identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[]>([]);
   const setPolylines = useCallback((identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | null) => {
     setAllPolylines(s => {
-      const unchangedData = s.filter(a => identifier !== null && a.identifier !== identifier &&  a.data !== null);
+      const unchangedData = s.filter(a => identifier !== null && a.identifier !== identifier && a.data !== null);
       if (data !== null && identifier !== null) {
         const updatedData = [...unchangedData, { identifier, data }];
-        
         if (!deepEqual(s, updatedData)) {
           return updatedData;
-        }else{
+        } else {
           return s;
         }
       }
@@ -284,7 +301,7 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllPolylines])
 
-  const [nldiFilterData, setNldiFilterData] = useState<{latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints} | null>(null);
+  const [nldiFilterData, setNldiFilterData] = useState<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>(null);
 
   const mapContextProviderValue = {
     mapStyle,
@@ -321,7 +338,9 @@ const MapProvider: FC = ({ children }) => {
     polylines,
     setPolylines,
     nldiFilterData,
-    setNldiFilterData
+    setNldiFilterData,
+    mapLocationSettings,
+    setMapLocationSettings,
   };
 
   return (
