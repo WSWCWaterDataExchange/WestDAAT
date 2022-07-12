@@ -2,7 +2,7 @@ import { Tab, Table, Tabs } from 'react-bootstrap';
 import { useWaterRightSiteInfoList, useWaterRightSourceInfoList } from '../hooks/useWaterRightQuery';
 
 interface waterRightTabsProps {
-  waterRightId: string;
+  allocationUuid: string;
 }
 
 export enum WaterRightTab {
@@ -11,12 +11,12 @@ export enum WaterRightTab {
 }
 
 function WaterRightTabs(props: waterRightTabsProps) {
-  const siteInfoList = useWaterRightSiteInfoList(+props.waterRightId).data;
-  const sourceInfoList = useWaterRightSourceInfoList(+props.waterRightId).data;
+  const siteInfoList = useWaterRightSiteInfoList(props.allocationUuid).data;
+  const sourceInfoList = useWaterRightSourceInfoList(props.allocationUuid).data;
 
   return (
     <>
-      <Tabs defaultActiveKey="site" id="uncontrolled-tab-example" className="mb-3">
+      <Tabs defaultActiveKey="site" className="mb-3 custom-tabs">
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>

@@ -22,6 +22,26 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
 
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var analyticsSummary = await db.AllocationAmountsFact
+                .Where(predicate)
+                .GroupBy(a => a.PrimaryBeneficialUseCategory)
+                .Select(a => new AnalyticsSummaryInformation
+                {
+                    Flow = a.Sum(c => c.AllocationFlow_CFS),
+                    PrimaryUseCategoryName = a.Key,
+                    Points = a.Count(),
+                    Volume = a.Sum(c => c.AllocationVolume_AF),
+                })
+                .ToArrayAsync();
+
+            return analyticsSummary;
+        }
+
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
