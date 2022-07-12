@@ -1586,11 +1586,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             using var db = CreateDatabaseContextFactory().Create();
             
             var allocationAmount = new AllocationAmountFactFaker()
-                .IncludeAllocationPriorityDate()
-                .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate())
-                .LinkOrganization(new OrganizationsDimFaker().Generate())
-                .LinkSites(new SitesDimFaker()
-                    .LinkWaterSources(new WaterSourceDimFaker().Generate(3).ToArray()))
+                //.IncludeAllocationPriorityDate()
+                //.LinkBeneficialUses(new BeneficialUsesCVFaker().Generate())
+                //.LinkOrganization(new OrganizationsDimFaker().Generate())
+                //.LinkSites(new SitesDimFaker()
+                //    .LinkWaterSources(new WaterSourceDimFaker().Generate(3).ToArray()))
                 .Generate();
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
@@ -1604,7 +1604,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateWaterAllocationAccessor();
 
             var result = accessor.GetWaterRights(searCriteria);
-
 
             result.Should().NotBeNull();
         }

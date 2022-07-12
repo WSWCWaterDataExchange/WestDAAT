@@ -10,8 +10,11 @@ using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
-using WesternStatesWater.WestDaat.Common.Configuration;
 using System.IO;
+using Ionic.Zip;
+using System.Globalization;
+using CsvHelper.Configuration;
+using Newtonsoft.Json;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -24,7 +27,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
         private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new Mock<ITemplateResourceSdk>(MockBehavior.Strict);
-        private readonly Mock<PerformanceConfiguration> _performanceConfiguration = new Mock<PerformanceConfiguration>(MockBehavior.Strict);
 
         private readonly string _citationFile = Resources.resources.citation;
 
@@ -375,14 +377,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
             await Assert.ThrowsExceptionAsync<NullReferenceException>(() => manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
 
-            // throws exception when building the predicate, before this call to happen
+            // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
         }
 
         [TestMethod]
-        public async Task WaterRightsAsZip_BuildsStream()
+        public async Task WaterRightsAsZip_BuildsStream_Variables()
         {
-            // need to get the CSVhelper files
             var variables = new List<CsvModels.Variables>
             {
                 new CsvModels.Variables
@@ -399,6 +400,49 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }
             };
 
+            var iEnumerableList = new List<IEnumerable<dynamic>>
+            {
+                variables
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(5)
+                .Verifiable();
+
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .Returns(iEnumerableList)
+                .Verifiable();
+
+            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
+                .Returns(_citationFile);
+
+            var managerSearchRequest = new WaterRightsSearchCriteria
+            {
+                States = new string[] { "NE" }
+            };
+
+            var memoryStream = new MemoryStream();
+
+            var manager = CreateWaterAllocationManager();
+            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using (var zip = ZipFile.Read(memoryStream))
+            {
+                foreach (ZipEntry e in zip)
+                {
+                    await CheckRecords(e, e.FileName, variables);
+                }
+            }
+
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
+            _waterAllocationAccessorMock.Verify(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task WaterRightsAsZip_BuildsStream_Organizations()
+        {
             var organizations = new List<CsvModels.Organizations>
             {
                 new CsvModels.Organizations
@@ -417,7 +461,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var iEnumerableList = new List<IEnumerable<dynamic>>
             {
-                variables,
                 organizations
             };
 
@@ -442,10 +485,43 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterAllocationManager();
             await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
-            var reader = new StreamReader(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using (var zip = ZipFile.Read(memoryStream))
+            {
+                foreach (ZipEntry e in zip)
+                {
+                    await CheckRecords(e, e.FileName, organizations);
+                }
+            }
 
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
+        }
+
+        private async Task CheckRecords<T>(ZipEntry entry, string fileEnd, List<T> list)
+        {
+            using var data = new MemoryStream();
+            entry.Extract(data);
+            data.Position = 0;
+
+            using var reader = new StreamReader(data);
+            data.Seek(0, SeekOrigin.Begin);
+
+            if (fileEnd.EndsWith(".csv"))
+            {
+                using var csvReader = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture);
+                csvReader.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(""); // this is for the csv reader to interpret the empty strings as nulls
+                var records = csvReader.GetRecords<T>().ToList();
+
+                records.Count.Should().Be(list.Count());
+                records.Should().BeEquivalentTo(list);
+            }
+            else if (fileEnd.EndsWith(".txt"))
+            {
+                var content = await reader.ReadToEndAsync();
+                content.Should().Contain(DateTime.Now.ToString("d"));
+            }
         }
 
         private IWaterAllocationManager CreateWaterAllocationManager()
@@ -457,7 +533,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _geoConnexEngineMock.Object,
                 _locationEngineMock.Object,
                 _templateResourceSdk.Object,
-                _performanceConfiguration.Object,
+                CreatePerformanceConfiguration(),
                 CreateLogger<WaterAllocationManager>()
             );
         }

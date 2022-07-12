@@ -44,6 +44,15 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _loggerFactory.Dispose();
         }
 
+        internal PerformanceConfiguration CreatePerformanceConfiguration()
+        {
+            return new PerformanceConfiguration
+            {
+                WaterRightsSearchPageSize = 100,
+                MaxRecordsDownload = 100000,
+            };
+        }
+
         public ILogger<T> CreateLogger<T>()
         {
             return _loggerFactory.CreateLogger<T>();

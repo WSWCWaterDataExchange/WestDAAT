@@ -1,3 +1,4 @@
+using CsvHelper;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
@@ -186,12 +187,17 @@ namespace WesternStatesWater.WestDaat.Managers
                 {
                     var ms = new MemoryStream();
                     var writer = new StreamWriter(ms);
-                    var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+                    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+                    csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
+                    // write an converter options for string arrays
+
+
                     csv.WriteRecords(file);
                     csv.Flush();
-                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
+                    //var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
+                    var entry = new ZipEntry(ZipEntry.CleanName($"{nameof(file)}.csv"));
                     zipStream.PutNextEntry(entry);
 
                     ms.Seek(0, SeekOrigin.Begin);
