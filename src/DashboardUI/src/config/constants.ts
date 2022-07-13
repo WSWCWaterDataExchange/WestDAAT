@@ -38,3 +38,27 @@ export enum waterRightsProperties {
   minPriorityDate = 'minPri',
   maxPriorityDate = 'maxPri',
 }
+
+export const colorList = [
+  '#006400',
+  '#9ACD32',
+  '#FF00E6',
+  '#0000FF',
+  '#32CD32',
+  '#FF4500',
+  '#9370DB',
+  '#00FFFF',
+  '#FF69B4',
+  '#800080',
+  '#00BFFF',
+  '#FFD700',
+  '#A52A2A',
+  '#4B0082',
+  '#808080',
+  '#FFA500',
+  '#D2691E',
+  '#FFC0CB',
+  '#F0FFF0',
+  '#F5DEB3',
+  '#FF0000'
+];
