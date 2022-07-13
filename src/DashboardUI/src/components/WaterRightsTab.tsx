@@ -164,8 +164,8 @@ function WaterRightsTab() {
     nldiFilterData
   } = useContext(MapContext);
 
-  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiOn") ?? false);
-  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["0", "2"] : ["0"]);
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
 
   useEffect(() => {
     for (var element of filters.polyline) {
@@ -547,9 +547,9 @@ function WaterRightsTab() {
 
   useEffect(() => {
     if (isNldiMapActive) {
-      setUrlParam("nldiOn", isNldiMapActive);
+      setUrlParam("nldiActive", isNldiMapActive);
     } else {
-      setUrlParam("nldiOn", undefined);
+      setUrlParam("nldiActive", undefined);
     }
   }, [setNldiMapStatus, isNldiMapActive, setUrlParam])
 
@@ -577,7 +577,7 @@ function WaterRightsTab() {
       <div className="position-relative flex-grow-1 panel-content">
 
         <Accordion flush activeKey={activeKeys} alwaysOpen onSelect={(e) => setActiveKeys(e)}>
-          <Accordion.Item eventKey="0">
+          <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -616,7 +616,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="1">
+          <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -741,7 +741,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="2">
+          <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="px-5">
