@@ -70,7 +70,7 @@ namespace WesternStatesWater.WestDaat.Managers
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
 
             var geometryFilters = new List<NetTopologySuite.Geometries.Geometry>();
-            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            if (searchRequest?.RiverBasinNames?.Any() ?? false)
             {
                 var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
                 var riverBasinPolygons = GeometryHelpers.GetGeometryByFeatures(featureCollection.Features);

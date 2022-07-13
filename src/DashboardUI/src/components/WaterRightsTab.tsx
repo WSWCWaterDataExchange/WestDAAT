@@ -13,7 +13,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
-import { waterRightsProperties, pointSizes, nldi } from "../config/constants";
+import { waterRightsProperties, pointSizes, nldi, colorList } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
@@ -56,30 +56,6 @@ const mapColorLegendOptions = [
   { value: MapGrouping.OwnerClassification, label: 'Owner Classification' },
   { value: MapGrouping.WaterSourceType, label: 'Water Source Type' }
 ];
-
-const colors = [
-  '#006400',
-  '#9ACD32',
-  '#FF00E6',
-  '#0000FF',
-  '#32CD32',
-  '#FF4500',
-  '#9370DB',
-  '#00FFFF',
-  '#FF69B4',
-  '#800080',
-  '#00BFFF',
-  '#FFD700',
-  '#A52A2A',
-  '#4B0082',
-  '#808080',
-  '#FFA500',
-  '#D2691E',
-  '#FFC0CB',
-  '#F0FFF0',
-  '#F5DEB3',
-  '#FF0000'
-]
 
 const waterRightsPointsLayer = 'waterRightsPoints';
 const waterRightsPolygonsLayer = 'waterRightsPolygons';
@@ -160,13 +136,13 @@ function WaterRightsTab() {
     let colorMapping: { key: string, color: string }[];
     switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
-        colorMapping = allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
       case MapGrouping.OwnerClassification:
-        colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
       case MapGrouping.WaterSourceType:
-        colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
     }
     return { property: displayOptions.mapGrouping as string, colorMapping }
