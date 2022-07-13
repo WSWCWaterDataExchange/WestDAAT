@@ -25,8 +25,8 @@ export interface MapSettings {
 }
 
 export const defaultMapLocationData: MapSettings = ({
-  latitude: -100,
-  longitude: 40,
+  latitude: 40,
+  longitude: -100,
   zoomLevel: 4,
 })
 
