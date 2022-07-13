@@ -163,7 +163,7 @@ function WaterRightsTab() {
     nldiFilterData
   } = useContext(MapContext);
 
-  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiOn") ?? false);
 
   useEffect(() => {
     for (var element of filters.polyline) {
@@ -542,6 +542,14 @@ function WaterRightsTab() {
     return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading || isRiverBasinOptionsLoading;
   }, [isAllBeneficialUsesLoading, isAllWaterSourceTypesLoading, isAllOwnerClassificationsLoading, isAllStatesLoading, isRiverBasinOptionsLoading])
 
+  useEffect(() => {
+    if (isNldiMapActive) {
+      setUrlParam("nldiOn", isNldiMapActive);
+    } else {
+      setUrlParam("nldiOn", false);
+    }
+  }, [setNldiMapStatus, isNldiMapActive])
+
   const isError = useMemo(() => {
     return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
   }, [isAllBeneficialUsesError, isAllWaterSourceTypesError, isAllOwnerClassificationsError, isAllStatesError])
@@ -565,7 +573,7 @@ function WaterRightsTab() {
       </div>
       <div className="position-relative flex-grow-1 panel-content">
 
-        <Accordion flush defaultActiveKey={['0']} alwaysOpen>
+        <Accordion flush defaultActiveKey={isNldiMapActive ? ['2'] : ['0']} alwaysOpen>
           <Accordion.Item eventKey="0">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
