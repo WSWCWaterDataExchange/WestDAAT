@@ -4,6 +4,7 @@ import {
   WaterSourceInfoListItem,
 } from '@data-contracts';
 import axios from 'axios';
+import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
 
@@ -11,6 +12,11 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}`
   );
+  return data;
+};
+
+export const getWaterRightAnalyticsSummaryInfo = async (searchCriteria: WaterRightsSearchCriteria) => {
+  const { data } = await axios.post<AnalyticsSummaryInformation[]>(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/AnalyticsSummaryInformation`, searchCriteria);
   return data;
 };
 
