@@ -94,6 +94,7 @@ function TableView(props: TableViewProps) {
     </Button>
     <Tab.Container id="analytics-and-table" defaultActiveKey="dataTable">
       <Offcanvas
+        className="offcanvas-analytics"
         show={show}
         onHide={handleClose}
         placement={'bottom'}
