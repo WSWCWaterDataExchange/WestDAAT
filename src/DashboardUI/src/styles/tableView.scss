@@ -1,10 +1,9 @@
 @import './colors.scss';
 @import './custom.scss';
 
-.analytics-and-table.offcanvas {
+.offcanvas-analytics {
   position: relative !important;
   transition: none;
-  display: block;
 
   &.offcanvas-bottom {
     bottom: $offcanvas-vertical-height + 3vh;
