@@ -32,6 +32,7 @@ import { FeatureCollection } from "geojson";
 import { Directions } from "../data-contracts/nldi";
 import Select from "react-select";
 import { FilterContext, WaterRightsFilters } from "../FilterProvider";
+import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -164,6 +165,7 @@ function WaterRightsTab() {
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiOn") ?? false);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["0", "2"] : ["0"]);
 
   useEffect(() => {
     for (var element of filters.polyline) {
@@ -532,6 +534,7 @@ function WaterRightsTab() {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
+    setActiveKeys(["0"]);
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
@@ -573,7 +576,7 @@ function WaterRightsTab() {
       </div>
       <div className="position-relative flex-grow-1 panel-content">
 
-        <Accordion flush defaultActiveKey={isNldiMapActive ? ['2'] : ['0']} alwaysOpen>
+        <Accordion flush activeKey={activeKeys} alwaysOpen onSelect={(e) => setActiveKeys(e)}>
           <Accordion.Item eventKey="0">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
