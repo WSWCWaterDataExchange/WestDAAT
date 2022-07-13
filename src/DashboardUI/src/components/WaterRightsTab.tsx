@@ -534,7 +534,7 @@ function WaterRightsTab() {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
-    setActiveKeys(["0"]);
+    setActiveKeys(["colorSizeTools"]);
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
