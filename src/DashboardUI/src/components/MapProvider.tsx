@@ -151,7 +151,7 @@ const MapProvider: FC = ({ children }) => {
     } else {
       setUrlParam("map", mapLocationSettings);
     }
-  }, [mapLocationSettings])
+  }, [mapLocationSettings, setUrlParam])
 
   useEffect(() => {
     if (mapStyle === MapStyle.Light) {
