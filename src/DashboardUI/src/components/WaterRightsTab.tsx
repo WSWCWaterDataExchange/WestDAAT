@@ -548,7 +548,7 @@ function WaterRightsTab() {
     } else {
       setUrlParam("nldiOn", undefined);
     }
-  }, [setNldiMapStatus, isNldiMapActive])
+  }, [setNldiMapStatus, isNldiMapActive, setUrlParam])
 
   const isError = useMemo(() => {
     return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
