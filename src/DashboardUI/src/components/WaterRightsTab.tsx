@@ -546,7 +546,7 @@ function WaterRightsTab() {
     if (isNldiMapActive) {
       setUrlParam("nldiOn", isNldiMapActive);
     } else {
-      setUrlParam("nldiOn", false);
+      setUrlParam("nldiOn", undefined);
     }
   }, [setNldiMapStatus, isNldiMapActive])
 
