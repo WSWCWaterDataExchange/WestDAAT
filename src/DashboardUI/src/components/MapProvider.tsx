@@ -24,6 +24,12 @@ export interface MapSettings {
   longitude: number,
 }
 
+export const defaultMapLocationData: MapSettings = ({
+  latitude: -100,
+  longitude: 40,
+  zoomLevel: 4,
+})
+
 export type MapLayerFilterType = any[] | boolean | null | undefined;
 export type MapLayerFiltersType = { [layer: string]: MapLayerFilterType };
 export type MapLayerCircleColorsType = { [layer: string]: any };
@@ -129,6 +135,7 @@ const defaultState: MapContextState = {
 export const MapContext = createContext<MapContextState>(defaultState);
 
 const MapProvider: FC = ({ children }) => {
+
   const { getUrlParam, setUrlParam } = useContext(AppContext)
 
   const [mapStyle, setMapStyle] = useState(getUrlParam<MapStyle>("ms") ?? MapStyle.Light);
@@ -136,10 +143,14 @@ const MapProvider: FC = ({ children }) => {
     setMapStyle(mapStyle);
   }
 
-  const [mapLocationSettings, setMapLocationSettings] = useState(getUrlParam<MapSettings>("map") ?? { zoomLevel: 4, longitude: -100, latitude: 40 });
+  const [mapLocationSettings, setMapLocationSettings] = useState(getUrlParam<MapSettings>("map") ?? defaultMapLocationData);
 
   useEffect(() => {
-    setUrlParam("map", mapLocationSettings);
+    if (mapLocationSettings === defaultMapLocationData) {
+      setUrlParam("map", undefined);
+    } else {
+      setUrlParam("map", mapLocationSettings);
+    }
   }, [mapLocationSettings])
 
   useEffect(() => {
@@ -236,7 +247,6 @@ const MapProvider: FC = ({ children }) => {
       }
       return s;
     });
-    console.log("testing")
   }, [setAllGeoJsonData])
 
   const [vectorUrls, setAllVectorUrls] = useState<{ source: string, url: string }[]>([]);

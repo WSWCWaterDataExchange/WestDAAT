@@ -5,7 +5,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import "../styles/map.scss";
 import { AppContext } from "../AppProvider";
-import { MapContext, MapSettings, MapStyle } from "./MapProvider";
+import { defaultMapLocationData, MapContext, MapSettings, MapStyle } from "./MapProvider";
 import mapConfig from "../config/maps";
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
@@ -129,16 +129,17 @@ function Map(_props: mapProps) {
     })
 
     mapInstance.once("load", () => {
+      let mapSettings: MapSettings;
+      mapSettings = getUrlParam<MapSettings>('map') ?? defaultMapLocationData;
+      mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
+      mapInstance.zoomTo(mapSettings.zoomLevel);
+
       mapInstance.addControl(new NavigationControl());
 
       mapInstance.addControl(new CustomShareControl());
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
-      let mapSettings: MapSettings;
-      mapSettings = getUrlParam<MapSettings>('map') ?? { zoomLevel: 4, longitude: -100, latitude: 40 };
-      mapInstance.setZoom(mapSettings.zoomLevel);
-      mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
       if (!_props.hideDrawControl) {
         mapboxDrawControl(mapInstance);
       }
