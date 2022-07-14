@@ -35,7 +35,7 @@ function PieCharts(props: PieChartProps) {
             text: 'Cumulative Flow (CFS) of Rendered Sites'
         },
         subtitle: {
-            text: `${flowSum.toFixed(2)} (CFS)`
+            text: `${flowSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`
         },
         tooltip: {
             pointFormat: '<b>{point.percentage:.1f}%</b>'
@@ -55,7 +55,7 @@ function PieCharts(props: PieChartProps) {
             text: 'Count of Rendered Points'
         },
         subtitle: {
-            text: `${pointSum} Sites`
+            text: `${pointSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Sites`
         },
         tooltip: {
             pointFormat: '<b>{point.percentage:.1f}%</b>'
@@ -74,7 +74,7 @@ function PieCharts(props: PieChartProps) {
             text: 'Cumulative Volume (AF) of Rendered Sites'
         },
         subtitle: {
-            text: `${volumeSum.toFixed(2)} (AF)`
+            text: `${volumeSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`
         },
         tooltip: {
             pointFormat: '<b>{point.percentage:.1f}%</b>'
