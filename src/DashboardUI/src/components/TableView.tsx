@@ -66,8 +66,8 @@ function TableView(props: TableViewProps) {
     setSearchCriteria({ ...searchCriteria, pageNumber: waterRightsSearchResults.currentPageNumber + 1 })
   }
 
-  const { data: latestSearchResults, isFetching } = useFindWaterRights(searchCriteria)
-  const { data: pieChartSearchResults } = useGetAnalyticsSummaryInfo(searchCriteria)
+  const { data: latestSearchResults, isFetching: isFetchingTableData } = useFindWaterRights(searchCriteria)
+  const { data: pieChartSearchResults, isFetching: isFetchingPieChartData } = useGetAnalyticsSummaryInfo(searchCriteria)
 
   useEffect(() => {
     if (show) {
@@ -94,6 +94,7 @@ function TableView(props: TableViewProps) {
     </Button>
     <Tab.Container id="analytics-and-table" defaultActiveKey="dataTable">
       <Offcanvas
+        className="offcanvas-analytics"
         show={show}
         onHide={handleClose}
         placement={'bottom'}
@@ -137,17 +138,17 @@ function TableView(props: TableViewProps) {
                       </tr>
                     })
                   }
-                  {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetching &&
+                  {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetchingTableData &&
                     <tr key="noResults">
                       <td colSpan={7} align="center">No results found</td>
                     </tr>
                   }
-                  {hasMoreResults && !isFetching &&
+                  {hasMoreResults && !isFetchingTableData &&
                     <tr>
                       <td colSpan={7} align="center"><Button onClick={handleLoadMoreResults}>Load more results</Button></td>
                     </tr>
                   }
-                  {isFetching &&
+                  {isFetchingTableData &&
                     <tr>
                       <td colSpan={7} align="center">
                         Loading... <ProgressBar animated now={100} />
@@ -159,7 +160,18 @@ function TableView(props: TableViewProps) {
               </Table>
             </Tab.Pane>
             <Tab.Pane eventKey="pieChart">
-              <PieCharts dataByBeneficialUse={pieChartSearchResults}></PieCharts>
+
+              {pieChartSearchResults && pieChartSearchResults?.length > 0 &&
+                <PieCharts dataByBeneficialUse={pieChartSearchResults}></PieCharts>
+              }
+              {pieChartSearchResults?.length === 0 && !isFetchingPieChartData &&
+                <div className="d-flex justify-content-center">No results found</div>
+              }
+              {isFetchingPieChartData &&
+                <div>
+                  <div className="d-flex justify-content-center">Loading... </div><ProgressBar animated now={100} />
+                </div>
+              }
             </Tab.Pane>
           </Tab.Content>
         </Offcanvas.Body>

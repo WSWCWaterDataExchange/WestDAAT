@@ -32,6 +32,7 @@ import { FeatureCollection } from "geojson";
 import { Directions } from "../data-contracts/nldi";
 import Select from "react-select";
 import { FilterContext, WaterRightsFilters } from "../FilterProvider";
+import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -163,7 +164,8 @@ function WaterRightsTab() {
     nldiFilterData
   } = useContext(MapContext);
 
-  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
 
   useEffect(() => {
     for (var element of filters.polyline) {
@@ -532,6 +534,7 @@ function WaterRightsTab() {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
+    setActiveKeys(["colorSizeTools"]);
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
@@ -541,6 +544,14 @@ function WaterRightsTab() {
   const isLoading = useMemo(() => {
     return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading || isRiverBasinOptionsLoading;
   }, [isAllBeneficialUsesLoading, isAllWaterSourceTypesLoading, isAllOwnerClassificationsLoading, isAllStatesLoading, isRiverBasinOptionsLoading])
+
+  useEffect(() => {
+    if (isNldiMapActive) {
+      setUrlParam("nldiActive", isNldiMapActive);
+    } else {
+      setUrlParam("nldiActive", undefined);
+    }
+  }, [setNldiMapStatus, isNldiMapActive, setUrlParam])
 
   const isError = useMemo(() => {
     return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
@@ -565,8 +576,8 @@ function WaterRightsTab() {
       </div>
       <div className="position-relative flex-grow-1 panel-content">
 
-        <Accordion flush defaultActiveKey={['0']} alwaysOpen>
-          <Accordion.Item eventKey="0">
+        <Accordion flush activeKey={activeKeys} alwaysOpen onSelect={(e) => setActiveKeys(e)}>
+          <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -605,7 +616,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="1">
+          <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -730,7 +741,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="2">
+          <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="px-5">
