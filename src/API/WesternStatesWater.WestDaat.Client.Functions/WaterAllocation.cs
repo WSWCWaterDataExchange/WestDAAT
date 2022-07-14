@@ -150,23 +150,22 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
 
-        // the IO operations have to be synchronous 
         [FunctionName(nameof(DownloadWaterRights)), AllowAnonymous]
-        public async Task<EmptyResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/download")] HttpRequest request)
+        public async Task<EmptyResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {
-            // MOVE THIS TO A FILTER (Already done but is not picking up, figure out why is not picking it up) -- probably a header on the request needs to be set or something of the sort
+            // the IO operations have to be synchronous 
             var feature = request.HttpContext.Features.Get<IHttpBodyControlFeature>();
             feature.AllowSynchronousIO = true;
 
-            //using var streamReader = new StreamReader(request.Body);
-            //var requestBody = await streamReader.ReadToEndAsync();
-            //var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            using var streamReader = new StreamReader(request.Body);
+            var requestBody = await streamReader.ReadToEndAsync();
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
             var response = request.HttpContext.Response;
             response.Headers.Add("Content-Type", "application/octet-stream");
             response.Headers.Append("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
 
-            await _waterAllocationManager.WaterRightsAsZip(response.Body, new WaterRightsSearchCriteria { States = new string[] { } });
+            await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
 
             return new EmptyResult();
         }

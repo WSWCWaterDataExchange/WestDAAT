@@ -5,7 +5,7 @@ import {
   getWaterRightSourceInfoList,
   getWaterRightSiteLocations,
   findWaterRight,
-  getWaterRightAnalyticsSummaryInfo,
+  getWaterRightAnalyticsSummaryInfo
 } from '../accessors/waterAllocationAccessor';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 

@@ -195,25 +195,27 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 foreach (var file in filesToGenerate)
                 {
-                    var ms = new MemoryStream();
-                    var writer = new StreamWriter(ms);
-                    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
-                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
-                    // write an converter options for string arrays
-                    csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
+                    if (file.Any())
+                    {
+                        var ms = new MemoryStream();
+                        var writer = new StreamWriter(ms);
+                        var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
+                        // write an converter options for string arrays
+                        csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
 
-                    csv.WriteRecords(file);
-                    csv.Flush();
+                        csv.WriteRecords(file);
+                        csv.Flush();
 
-                    //var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
-                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
-                    zipStream.PutNextEntry(entry);
+                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
+                        zipStream.PutNextEntry(entry);
 
-                    ms.Seek(0, SeekOrigin.Begin);
+                        ms.Seek(0, SeekOrigin.Begin);
 
-                    StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                    }
                 }
 
                 // getting citation file
@@ -221,7 +223,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 // String replacement for the citation file
                 citationFile = citationFile
                     .Replace("[insert download date here]", DateTime.Now.ToString("d"))
-                    .Replace("[Insert WestDAAT URL here]", "SET URL HERE? ARE WE WORRIED ABOUT ANYTHING HERE?");
+                    .Replace("[Insert WestDAAT URL here]", $"{searchRequest.FilterUrl}");
 
                 // add the template file to the zip stream
                 var memoryStream = new MemoryStream();

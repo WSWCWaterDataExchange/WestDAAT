@@ -4,6 +4,7 @@ import {
   WaterSourceInfoListItem,
 } from '@data-contracts';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
@@ -48,33 +49,16 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
   return data;
 };
 
-export const downloadWaterRights = () => {
-  axios.get(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
-    {
-      responseType: 'blob'
-    }
-  ).then((response)=> {
+export const downloadWaterRights = (searchCriteria: WaterRightsSearchCriteria) => {
 
-    let blob = new Blob([response.data], {type: "application/zip"});
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'WaterRights.zip');
-    document.body.appendChild(link);
-    link.click();
 
-    //remove elements
-    link.remove();
-    window.URL.revokeObjectURL(url);
-  });
-
-  function str2bytes (str: any) {
-    let bytes = new Uint8Array(str.length);
-    for (let i=0; i<str.length; i++) {
-        bytes[i] = str.charCodeAt(i);
-    }
-    return bytes;
-}
+  // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests
+  //https://stackoverflow.com/questions/70969837/how-to-download-zip-file-that-i-recieve-from-a-http-response-axios-put-request#:~:text=0,fetch%20over%20axios
+  fetch(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
+        {
+          method: "POST",
+          body: JSON.stringify(searchCriteria)
+      },)
+    .then(response=> response.blob())
+    .then(blob => saveAs(blob, 'WaterRigths.zip'))
 };
-
