@@ -40,8 +40,8 @@ function DownloadModal(props: DownloadModalProps) {
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
-      {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
-      {isAuthenticated && <Button onClick={download}>Download</Button>}
+      {isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
+      {!isAuthenticated && <Button onClick={download}>Download</Button>}
       </Modal.Footer>
     </Modal>
   );

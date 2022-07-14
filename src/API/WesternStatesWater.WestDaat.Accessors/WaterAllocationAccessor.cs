@@ -264,7 +264,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .CountAsync();
         }
 
-        IEnumerable<dynamic> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
+        IEnumerable<IEnumerable<object>> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
@@ -280,7 +280,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .Intersect(waterRightDetails)
                     .Any());
 
-            var response = new List<IEnumerable<dynamic>>()
+            var response = new List<IEnumerable<object>>()
             {
                 waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
                 waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),

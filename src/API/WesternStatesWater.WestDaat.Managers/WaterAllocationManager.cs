@@ -190,9 +190,8 @@ namespace WesternStatesWater.WestDaat.Managers
 
             using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
             {
-                zipStream.SetLevel(3);
+                zipStream.SetLevel(9);
                 zipStream.IsStreamOwner = false;
-                zipStream.UseZip64 = UseZip64.Off;
 
                 foreach (var file in filesToGenerate)
                 {
@@ -201,14 +200,15 @@ namespace WesternStatesWater.WestDaat.Managers
                     var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
-                    csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
                     // write an converter options for string arrays
+                    csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
 
 
                     csv.WriteRecords(file);
                     csv.Flush();
+
                     //var entry = new ZipEntry(ZipEntry.CleanName($"{file.ElementType.Name}.csv"));
-                    var entry = new ZipEntry(ZipEntry.CleanName($"{nameof(file)}.csv"));
+                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
                     zipStream.PutNextEntry(entry);
 
                     ms.Seek(0, SeekOrigin.Begin);

@@ -7,7 +7,6 @@ import axios from 'axios';
 import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
-import saveAs from 'file-saver';
 
 export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
@@ -49,13 +48,33 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
   return data;
 };
 
-export const downloadWaterRights = async () => {
-  await axios.post<any>(
+export const downloadWaterRights = () => {
+  axios.get(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
-    {responseType: 'arraybuffer'}
-  ).then((response)=>{
-    console.log(response.data);
-    saveAs(new Blob([response.data], {type: 'application/zip'}), "WaterRights.zip")
+    {
+      responseType: 'blob'
+    }
+  ).then((response)=> {
+
+    let blob = new Blob([response.data], {type: "application/zip"});
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'WaterRights.zip');
+    document.body.appendChild(link);
+    link.click();
+
+    //remove elements
+    link.remove();
+    window.URL.revokeObjectURL(url);
   });
+
+  function str2bytes (str: any) {
+    let bytes = new Uint8Array(str.length);
+    for (let i=0; i<str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes;
+}
 };
 
