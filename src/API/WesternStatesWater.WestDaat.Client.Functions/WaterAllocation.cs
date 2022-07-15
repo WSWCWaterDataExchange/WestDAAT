@@ -9,7 +9,7 @@ using System.IO;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using Microsoft.AspNetCore.Http.Features; // remove this when the type filter works
+using Microsoft.AspNetCore.Http.Features;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {

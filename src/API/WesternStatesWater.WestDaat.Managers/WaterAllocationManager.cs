@@ -222,13 +222,14 @@ namespace WesternStatesWater.WestDaat.Managers
                     .Replace("[insert download date here]", DateTime.Now.ToString("d"))
                     .Replace("[Insert WestDAAT URL here]", $"{searchRequest.FilterUrl}");
 
-                // add the template file to the zip stream
+
+                // add the citation file to the zip stream
                 var memoryStream = new MemoryStream();
                 var stringWriter = new StreamWriter(memoryStream);
                 stringWriter.Write(citationFile.ToString());
                 stringWriter.Flush();
 
-                var citationEntry = new ZipEntry(ZipEntry.CleanName($"{nameof(citationFile)}.txt"));
+                var citationEntry = new ZipEntry(ZipEntry.CleanName("citation.txt"));
                 zipStream.PutNextEntry(citationEntry);
 
                 memoryStream.Seek(0, SeekOrigin.Begin);
