@@ -203,9 +203,6 @@ namespace WesternStatesWater.WestDaat.Managers
                         csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                         csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                        // write an converter options for string arrays
-                        csv.Context.TypeConverterOptionsCache.GetOptions<string[]>().Formats = new string[] { };
-
                         csv.WriteRecords(file);
                         csv.Flush();
 

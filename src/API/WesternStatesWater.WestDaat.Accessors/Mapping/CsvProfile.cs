@@ -77,7 +77,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.SitesDim, Sites>()
                 .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.SiteUuid))
                 .ForMember(dest => dest.WaterSourceUuids, opt => opt.MapFrom(source => source.WaterSourceBridgeSitesFact.Select(a => a.WaterSource.WaterSourceUuid)))
-                .ForMember(dest => dest.RegulatoryOverlayUUIDs, opt => opt.MapFrom(source => source.RegulatoryOverlayBridgeSitesFact.Select(x=>x.RegulatoryOverlay.RegulatoryOverlayUuid)))
+                .ForMember(dest => dest.RegulatoryOverlayUuids, opt => opt.MapFrom(source => source.RegulatoryOverlayBridgeSitesFact.Select(x=>x.RegulatoryOverlay.RegulatoryOverlayUuid)))
                 .ForMember(dest => dest.EpsgCodeCv, opt => opt.MapFrom(source => source.EpsgcodeCv))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry.IsValid ? source.Geometry.ToString() : string.Empty))
                 .ForMember(dest => dest.NhdNetworkStatusCv, opt => opt.MapFrom(source => source.NhdnetworkStatusCv))
