@@ -291,8 +291,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
             };
 
-            var test = filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration).ToList();
-
             foreach (var entry in response)
             {
                 yield return entry;
