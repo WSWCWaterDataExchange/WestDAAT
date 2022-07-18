@@ -1,18 +1,23 @@
 import { useEffect, useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import moment from 'moment';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { AppContext } from '../AppProvider';
 import { SignIn } from "./SignIn";
 import '../styles/home-page.scss';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
-import moment from 'moment';
 import { FilterContext } from '../FilterProvider';
-import { downloadWaterRights } from '../accessors/waterAllocationAccessor';
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../hooks';
 
 interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
+}
+
+function DownloadFiles(searchCriteria: WaterRightsSearchCriteria){
+  const { isFetching, isError } = useWaterRightsDownload(searchCriteria);
+
+  return {isFetching, isError};
 }
 
 function DownloadModal(props: DownloadModalProps) {
@@ -21,7 +26,8 @@ function DownloadModal(props: DownloadModalProps) {
 
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
 
-  const { isFetching, isError } = useWaterRightsDownload(searchCriteria);
+  const [ isFetching, setIsFetching ] = useState(false);
+  const [ isError, setIsError ] = useState(false);
 
   const close = () => {
     props.setShow(false);
@@ -30,7 +36,10 @@ function DownloadModal(props: DownloadModalProps) {
   {
     if (searchCriteria !== null){
       searchCriteria.filterUrl = window.location.href;
-      downloadWaterRights(searchCriteria);
+      const { isFetching, isError } = DownloadFiles(searchCriteria);
+
+      setIsError(isError);
+      setIsFetching(isFetching);
 
       if (isError === false){
         props.setShow(false);
