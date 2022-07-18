@@ -27,6 +27,12 @@ function PieCharts(props: PieChartProps) {
         pointSum += beneficialUse.points || 0;
     })
 
+    Highcharts.setOptions({
+        lang: {
+          thousandsSep: ','
+        }
+      });
+
     const flowOptions = {
         chart: {
             type: 'pie',
@@ -38,7 +44,7 @@ function PieCharts(props: PieChartProps) {
             text: `${flowSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b>'
+            pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>'
         },
         series: [
             {
@@ -58,7 +64,7 @@ function PieCharts(props: PieChartProps) {
             text: `${pointSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Sites`
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b>'
+            pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>'
         },
         series: [
             {
@@ -66,6 +72,7 @@ function PieCharts(props: PieChartProps) {
             }
         ]
     };
+
     const volumeOptions = {
         chart: {
             type: 'pie',
@@ -77,7 +84,7 @@ function PieCharts(props: PieChartProps) {
             text: `${volumeSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b>'
+            pointFormat: `<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>`
         },
         series: [
             {
@@ -85,6 +92,8 @@ function PieCharts(props: PieChartProps) {
             }
         ]
     };
+
+    
 
     return <div>
         <div className="my-3 d-flex justify-content-center">
