@@ -14,10 +14,27 @@ interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
 }
 
-function DownloadFiles(searchCriteria: WaterRightsSearchCriteria){
-  const { isFetching, isError } = useWaterRightsDownload(searchCriteria);
+function DownloadWaterRights(props: {searchCriteria: WaterRightsSearchCriteria | null, setIsError:(isError: boolean) => void, setIsFetching: (isFetching: boolean) => void}){
 
-  return {isFetching, isError};
+  const {isFetching, isError} =  useWaterRightsDownload(props.searchCriteria);
+  const { setIsError } = props;
+  const { setIsFetching } = props;
+
+  useEffect(() => {
+    if (isError){
+      setIsError(isError);
+    }
+  }, [isError, setIsError])
+
+  useEffect(() => {
+    if (!isFetching){
+      setIsFetching(isFetching);
+    }
+  }, [isFetching, setIsFetching])
+
+  return <p>We are preparing your download, this might take some time
+                <ProgressBar animated now={100} />
+            </p>
 }
 
 function DownloadModal(props: DownloadModalProps) {
@@ -25,26 +42,20 @@ function DownloadModal(props: DownloadModalProps) {
   const { filters } = useContext(FilterContext);
 
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
-
-  const [ isFetching, setIsFetching ] = useState(false);
-  const [ isError, setIsError ] = useState(false);
+  const [ isFetching, setIsFetching ] = useState<boolean>(false);
+  const [ isError, setIsError ] = useState<boolean>(false);
 
   const close = () => {
     props.setShow(false);
   }
+
   const download = async () => 
   {
     if (searchCriteria !== null){
       searchCriteria.filterUrl = window.location.href;
-      const { isFetching, isError } = DownloadFiles(searchCriteria);
-
-      setIsError(isError);
-      setIsFetching(isFetching);
-
-      if (isError === false){
-        props.setShow(false);
-      }
+      setIsFetching(true);
     }
+    props.setShow(isFetching);
   }
 
   useEffect(() => {
@@ -81,14 +92,14 @@ function DownloadModal(props: DownloadModalProps) {
           water rights points.
         </p>}
         {/* display error if more than 100k records */}
-        { isError && <p> Something went wrong, please try again with a different query paramenter</p>} 
+        { isAuthenticated && isError &&
+          <p>Something went wrong, please try again.</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
-        { isAuthenticated && !isFetching && <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
+        { isAuthenticated && !isFetching && 
+          <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
         {/* display modal with is fetching info and progress bar with it */}
-        { isAuthenticated && isFetching && <p>We are preparing your download, this might take some time
-                <ProgressBar animated now={100} />
-            </p>
-            }
+        { isAuthenticated && isFetching &&
+          <DownloadWaterRights searchCriteria={searchCriteria} setIsError={setIsError} setIsFetching={setIsFetching}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>

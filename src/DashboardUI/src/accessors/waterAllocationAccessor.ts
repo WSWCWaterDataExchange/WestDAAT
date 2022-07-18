@@ -57,7 +57,7 @@ export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCrite
         {
           method: "POST",
           body: JSON.stringify(searchCriteria)
-      },)
+      })
     .then(response =>{
       if (response.ok){
           response.blob()
