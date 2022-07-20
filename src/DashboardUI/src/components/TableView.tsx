@@ -128,7 +128,7 @@ function TableView(props: TableViewProps) {
                   {waterRightsSearchResults.waterRightsDetails?.length > 0 &&
                     waterRightsSearchResults?.waterRightsDetails.map((waterRightDetail) => {
                       return <tr key={waterRightDetail.allocationUuid}>
-                        <td>{waterRightDetail.allocationUuid}</td>
+                        <td><a href={`/details/right/${waterRightDetail.allocationUuid}`} target="_blank" rel="noopener noreferrer">{waterRightDetail.allocationUuid}</a></td>
                         <td><FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate></td>
                         <td>{waterRightDetail.ownerClassication}</td>
                         <td>{waterRightDetail.allocationLegalStatus}</td>
