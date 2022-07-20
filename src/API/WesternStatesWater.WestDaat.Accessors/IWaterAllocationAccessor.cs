@@ -1,4 +1,3 @@
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -23,5 +22,9 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<SiteLocation>> GetWaterRightSiteLocationsById(string allocationUuid);
 
         Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
+
+        Task<int> GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
+
+        IEnumerable<IEnumerable<object>> GetWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
     }
 }

@@ -27,5 +27,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string PodOrPou { get; set; }
         public DateTime? MinimumPriorityDate { get; set; }
         public DateTime? MaximumPriorityDate { get; set; }
+
+        public string FilterUrl { get; set; }
     }
 }

@@ -75,7 +75,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             return new PerformanceConfiguration
             {
-                WaterRightsSearchPageSize = 100
+                WaterRightsSearchPageSize = 100,
+                MaxRecordsDownload = 100000,
             };
         }
 

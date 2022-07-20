@@ -9,6 +9,7 @@ using System.IO;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -146,6 +147,27 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var result = await _waterAllocationManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
 
             return new OkObjectResult(result);
+        }
+
+
+        [FunctionName(nameof(DownloadWaterRights)), AllowAnonymous]
+        public async Task<EmptyResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
+        {
+            // the IO operations have to be synchronous 
+            var feature = request.HttpContext.Features.Get<IHttpBodyControlFeature>();
+            feature.AllowSynchronousIO = true;
+
+            using var streamReader = new StreamReader(request.Body);
+            var requestBody = await streamReader.ReadToEndAsync();
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+
+            var response = request.HttpContext.Response;
+            response.Headers.Add("Content-Type", "application/octet-stream");
+            response.Headers.Append("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
+
+            await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+
+            return new EmptyResult();
         }
     }
 }

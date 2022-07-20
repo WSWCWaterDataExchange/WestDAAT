@@ -15,4 +15,5 @@ export interface WaterRightsSearchCriteria {
   podOrPou?: string;
   minimumPriorityDate?: Date;
   maximumPriorityDate?: Date;
+  filterUrl?: string;
 }

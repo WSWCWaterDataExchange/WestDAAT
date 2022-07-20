@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WesternStatesWater.WestDaat.Utilities.Resources {
+namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace WesternStatesWater.WestDaat.Utilities.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class GeoConnexJsonLDResource {
+    internal class resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal GeoConnexJsonLDResource() {
+        internal resources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace WesternStatesWater.WestDaat.Utilities.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Utilities.Resources.GeoConnexJsonLDResource", typeof(GeoConnexJsonLDResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WesternStatesWater.WestDaat.Tests.ManagerTests.Resources.resources", typeof(resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -74,32 +74,9 @@ namespace WesternStatesWater.WestDaat.Utilities.Resources {
         ///
         ///DISCLAIMER and Terms of Servi [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Citation {
+        internal static string citation {
             get {
-                return ResourceManager.GetString("Citation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {{
-        ///  &quot;@context&quot;: [
-        ///    {{
-        ///      &quot;schema&quot;: &quot;http://schema.org/&quot;,
-        ///      &quot;skos&quot;: &quot;https://www.w3.org/TR/skos-reference/&quot;,
-        ///      &quot;sosa&quot;: &quot;http://www.w3.org/ns/sosa/&quot;,
-        ///      &quot;hyf&quot;: &quot;https://www.opengis.net/def/schema/hy_features/hyf/&quot;,
-        ///      &quot;gsp&quot;: &quot;http://www.opengeospatial.org/standards/geosparql/&quot;,
-        ///      &quot;name&quot;: &quot;schema:name&quot;,
-        ///      &quot;sameAs&quot;: &quot;schema:sameAs&quot;,
-        ///      &quot;related&quot;: &quot;skos:related&quot;,
-        ///      &quot;description&quot;: &quot;schema:description&quot;,
-        ///      &quot;geo&quot;: &quot;schema:geo&quot;,
-        ///      &quot;image&quot;: {{
-        ///        &quot;@id&quot;: &quot;s [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GeoConnexJsonLDTemplate {
-            get {
-                return ResourceManager.GetString("GeoConnexJsonLDTemplate", resourceCulture);
+                return ResourceManager.GetString("citation", resourceCulture);
             }
         }
     }

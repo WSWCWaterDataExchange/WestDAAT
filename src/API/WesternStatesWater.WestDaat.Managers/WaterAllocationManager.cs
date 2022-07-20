@@ -1,8 +1,14 @@
+using CsvHelper;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
+using System.IO;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
@@ -19,6 +25,8 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
+        private readonly ITemplateResourceSdk _templateResourceSdk;
+        private readonly PerformanceConfiguration _performanceConfiguration;
 
         public WaterAllocationManager(
             INldiAccessor nldiAccessor,
@@ -26,6 +34,8 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            ITemplateResourceSdk templateResourceSdk,
+            PerformanceConfiguration performanceConfiguration,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
@@ -33,6 +43,8 @@ namespace WesternStatesWater.WestDaat.Managers
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
             _locationEngine = locationEngine;
+            _templateResourceSdk = templateResourceSdk;
+            _performanceConfiguration = performanceConfiguration;
         }
 
         public async Task<ClientContracts.AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
@@ -162,6 +174,69 @@ namespace WesternStatesWater.WestDaat.Managers
         async Task<List<ClientContracts.WaterRightInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterSiteRightsInfoListByUuid(string siteUuid)
         {
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
+        }
+
+        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+            var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+
+            if (count > _performanceConfiguration.MaxRecordsDownload)
+            {
+                throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
+            }
+
+            var filesToGenerate = _waterAllocationAccessor.GetWaterRights(accessorSearchRequest);
+
+            using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
+            {
+                zipStream.SetLevel(9);
+                zipStream.IsStreamOwner = false;
+
+                foreach (var file in filesToGenerate)
+                {
+                    if (file.Any())
+                    {
+                        var ms = new MemoryStream();
+                        var writer = new StreamWriter(ms);
+                        var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+
+                        csv.WriteRecords(file);
+                        csv.Flush();
+
+                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
+                        zipStream.PutNextEntry(entry);
+
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                    }
+                }
+
+                // getting citation file
+                var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);
+                // String replacement for the citation file
+                citationFile = citationFile
+                    .Replace("[insert download date here]", DateTime.Now.ToString("d"))
+                    .Replace("[Insert WestDAAT URL here]", $"{searchRequest.FilterUrl}");
+
+
+                // add the citation file to the zip stream
+                var memoryStream = new MemoryStream();
+                var stringWriter = new StreamWriter(memoryStream);
+                stringWriter.Write(citationFile.ToString());
+                stringWriter.Flush();
+
+                var citationEntry = new ZipEntry(ZipEntry.CleanName("citation.txt"));
+                zipStream.PutNextEntry(citationEntry);
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                StreamUtils.Copy(memoryStream, zipStream, new byte[4096]);
+
+                zipStream.Close();
+            }
         }
     }
 }

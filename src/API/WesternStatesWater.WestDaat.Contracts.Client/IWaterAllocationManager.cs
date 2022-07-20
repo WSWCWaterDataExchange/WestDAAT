@@ -1,4 +1,5 @@
 using GeoJSON.Text.Feature;
+using System.IO;
 using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
@@ -30,5 +31,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid);
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
+
+        Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteria searchRequest);
     }
 }

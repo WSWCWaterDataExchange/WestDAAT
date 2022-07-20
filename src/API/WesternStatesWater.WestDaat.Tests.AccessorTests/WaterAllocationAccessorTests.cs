@@ -607,7 +607,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 var organization = matchedOrganizations[rand.Next(0, matchedOrganizations.Count)];
                 var allocationAmount = new AllocationAmountFactFaker()
-                    .LinkOrganizaion(organization).Generate();
+                    .LinkOrganization(organization).Generate();
 
                 matchedAllocationAmounts.Add(allocationAmount);
             }
@@ -619,7 +619,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 var organization = nonMatchedOrgizations[rand.Next(0, nonMatchedOrgizations.Count)];
                 nonMatchedAllocationAmounts.Add(new AllocationAmountFactFaker()
-                    .LinkOrganizaion(organization).Generate());
+                    .LinkOrganization(organization).Generate());
             }
 
             using (var db = CreateDatabaseContextFactory().Create())
@@ -660,11 +660,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var matchedAllocationAmount = new AllocationAmountFactFaker()
                     .LinkBeneficialUses(beneficialUse)
-                    .LinkOrganizaion(organizationFake).Generate();
+                    .LinkOrganization(organizationFake).Generate();
 
             var nonMatchedAllocationAmount = new AllocationAmountFactFaker()
                 .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate())
-                .LinkOrganizaion(new OrganizationsDimFaker().Generate())
+                .LinkOrganization(new OrganizationsDimFaker().Generate())
                 .Generate();
 
             using (var db = CreateDatabaseContextFactory().Create())
@@ -1705,6 +1705,126 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             result.Should().NotBeNull();
             result.Count.Should().Be(5);
+        }
+
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public void WaterAllocationAccessor_GetWaterRights()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(5);
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            foreach (var site in sites)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = accessor.GetWaterRights(searCriteria);
+
+            result.Should().NotBeNull();
+            result.Count().Should().Be(7);
+        }
+
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetWaterRightsCount()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string [] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsCount(searCriteria);
+
+            result.Should().Be(1);
+        }
+
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetWaterRightsCount_Multiple()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .Generate(100);
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsCount(searCriteria);
+
+            result.Should().Be(100);
+        }
+
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetWaterRightsCount_FilterByExemptUse()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var allocationAmount = new AllocationAmountFactFaker()
+                .Generate(100);
+            
+            for(var i = 0; i< allocationAmount.Count; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    allocationAmount[i].ExemptOfVolumeFlowPriority = true;
+                }
+            }
+
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                ExemptOfVolumeFlowPriority = true
+            };
+
+            // total db count
+            allocationAmount.Count.Should().Be(100);
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetWaterRightsCount(searCriteria);
+
+            result.Should().Be(50);
         }
 
         private IWaterAllocationAccessor CreateWaterAllocationAccessor()

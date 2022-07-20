@@ -18,7 +18,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
-
         }
 
         private readonly IDatabaseContextFactory _databaseContextFactory;
@@ -253,6 +252,49 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
+        }
+
+        async Task<int> IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .Where(predicate)
+                .CountAsync();
+        }
+
+        IEnumerable<IEnumerable<object>> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+
+            using var db = _databaseContextFactory.Create();
+            var waterRightDetails = db.AllocationAmountsFact
+                .AsNoTracking()
+                .Where(predicate);
+
+            var filteredSites = db.SitesDim
+                .AsNoTracking()
+                .Where(a => a.AllocationBridgeSitesFact
+                    .Select(b => b.AllocationAmount)
+                    .Intersect(waterRightDetails)
+                    .Any());
+
+            var response = new List<IEnumerable<object>>()
+            {
+                waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
+                waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
+                waterRightDetails.Select(x=>x.Method).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
+                filteredSites.SelectMany(x=>x.AllocationBridgeSitesFact).ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
+                filteredSites.SelectMany(c=>c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
+                filteredSites.SelectMany(b=>b.WaterSourceBridgeSitesFact).Select(c=>c.WaterSource).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration),
+                filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
+            };
+
+            foreach (var entry in response)
+            {
+                yield return entry;
+            }
         }
     }
 }
