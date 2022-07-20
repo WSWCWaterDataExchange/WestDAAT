@@ -13,7 +13,7 @@ interface TableViewProps {
 function TableView(props: TableViewProps) {
 
   const [show, setshow] = useState(false);
-
+  const [activeTab, setActiveTab] = useState('dataTable');
 
   const handleClose = () => handleVisibilityChange(false);
   const toggleShow = () => handleVisibilityChange(!show);
@@ -27,7 +27,7 @@ function TableView(props: TableViewProps) {
       ANALYTICS & TABLE
       <Icon path={show ? mdiChevronDown : mdiChevronUp} size="1.5em" />
     </Button>
-    <Tab.Container id="analytics-and-table" defaultActiveKey="dataTable">
+    <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'dataTable')} id="analytics-and-table">
       <Offcanvas
         className="offcanvas-analytics"
         show={show}
@@ -47,11 +47,14 @@ function TableView(props: TableViewProps) {
           </Nav>
           <Tab.Content>
             <Tab.Pane eventKey="dataTable">
-              <AnalyticsDataTable></AnalyticsDataTable>
+              {activeTab === 'dataTable' && show &&
+                <AnalyticsDataTable></AnalyticsDataTable>
+              }
             </Tab.Pane>
             <Tab.Pane eventKey="pieChart">
-              <PieCharts></PieCharts>
-
+              {activeTab === 'pieChart' && show &&
+                <PieCharts></PieCharts>
+              }
             </Tab.Pane>
           </Tab.Content>
         </Offcanvas.Body>
