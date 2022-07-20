@@ -77,7 +77,7 @@ function DownloadModal(props: DownloadModalProps) {
       riverBasinNames: filters.riverBasinNames,
       allocationOwner: filters.allocationOwner,
       states: filters.states,
-      filterUrl: window.location.href
+      filterUrl: filters !== null ? window.location.href : undefined
     });
   }
 
