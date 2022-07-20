@@ -63,11 +63,11 @@ export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCrite
     if (response.ok){
         const blob = await response.blob()
           if (blob && blob.size > 0){
-            saveAs(blob, 'WaterRigths.zip')
+            saveAs(blob, 'WaterRights.zip')
           }else{
             throw Error('Something went wrong, please try again later')
           }
     }else{
-      throw Error('Download Limit Exceeded, Please add more filters to make search smaller')
+      throw Error('Download limit exceeded. Please add more filters to reduce the result set.')
     }
 };
