@@ -54,7 +54,6 @@ export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCrite
   // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests
   //https://stackoverflow.com/questions/70969837/how-to-download-zip-file-that-i-recieve-from-a-http-response-axios-put-request#:~:text=0,fetch%20over%20axios
 
-  try {
     const response = await fetch(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
     {
       method: "POST",
@@ -66,12 +65,9 @@ export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCrite
           if (blob && blob.size > 0){
             saveAs(blob, 'WaterRigths.zip')
           }else{
-            throw Error('Download Limit Exceeded')
+            throw Error('Something went wrong, please try again later')
           }
     }else{
-      throw Error('Something went wrong, please try again later')
+      throw Error('Download Limit Exceeded')
     }
-  }catch(err){
-    return err;
-  }
 };

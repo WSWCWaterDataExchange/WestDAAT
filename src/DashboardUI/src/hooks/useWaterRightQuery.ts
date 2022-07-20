@@ -78,4 +78,5 @@ export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteria
       enabled: !!searchCriteria
     }
   );
+
 }

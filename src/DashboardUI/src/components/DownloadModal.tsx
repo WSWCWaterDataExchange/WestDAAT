@@ -14,11 +14,18 @@ interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
 }
 
-function DownloadWaterRights(props: {searchCriteria: WaterRightsSearchCriteria | null, setIsError:(isError: boolean) => void, setIsFetching: (isFetching: boolean) => void}){
+function DownloadWaterRights(props: {searchCriteria: WaterRightsSearchCriteria | null, setIsError:(isError: boolean) => void, setIsFetching: (isFetching: boolean) => void, setError: (error: any) => void}){
 
-  const {isFetching, isError} =  useWaterRightsDownload(props.searchCriteria);
+  const {isFetching, isError, error} =  useWaterRightsDownload(props.searchCriteria);
   const { setIsError } = props;
   const { setIsFetching } = props;
+  const { setError } = props;
+
+  useEffect(() => {
+    if(error){
+      setError(error)
+    }
+  }, [error, setError])
 
   useEffect(() => {
     if (isError){
@@ -32,9 +39,8 @@ function DownloadWaterRights(props: {searchCriteria: WaterRightsSearchCriteria |
     }
   }, [isFetching, setIsFetching])
 
-  return <p>We are preparing your download, this might take some time
-                <ProgressBar animated now={100} />
-            </p>
+  return<p>We are preparing your download, this might take some time
+                <ProgressBar animated now={100} /></p>
 }
 
 function DownloadModal(props: DownloadModalProps) {
@@ -44,19 +50,18 @@ function DownloadModal(props: DownloadModalProps) {
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isError, setIsError ] = useState<boolean>(false);
+  const [ error, setError ] = useState<any>();
 
   const close = () => {
     props.setShow(false);
+    setIsError(false);
   }
 
   const download = async () => 
   {
+    setIsError(false);
     setSearchFilterValues();
-
-    if (searchCriteria !== null){
-      setIsFetching(true);
-    }
-    props.setShow(isFetching);
+    setIsFetching(true);
   }
 
   // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
@@ -96,13 +101,13 @@ function DownloadModal(props: DownloadModalProps) {
         </p>}
         {/* display error message */}
         { isAuthenticated && isError &&
-          <p>Something went wrong, please try again.</p>} 
+          <p>{error.message}</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
-        { isAuthenticated && !isFetching && 
+        { isAuthenticated && !isFetching && !isError &&
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
         {/* display modal with is fetching info and progress bar with it */}
-        { isAuthenticated && isFetching &&
-          <DownloadWaterRights searchCriteria={searchCriteria} setIsError={setIsError} setIsFetching={setIsFetching}/>}
+        { isAuthenticated && isFetching && !isError &&
+        <><DownloadWaterRights searchCriteria={searchCriteria} setIsError={setIsError} setIsFetching={setIsFetching} setError={setError}/></>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
