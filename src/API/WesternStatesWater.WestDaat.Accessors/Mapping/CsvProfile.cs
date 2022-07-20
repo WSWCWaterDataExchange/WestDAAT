@@ -81,8 +81,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.EpsgCodeCv, opt => opt.MapFrom(source => source.EpsgcodeCv))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry.IsValid ? source.Geometry.ToString() : string.Empty))
                 .ForMember(dest => dest.NhdNetworkStatusCv, opt => opt.MapFrom(source => source.NhdnetworkStatusCv))
-                .ForMember(dest => dest.HUC12, opt => opt.MapFrom(source => $"\t{source.HUC12}")) //https://github.com/JoshClose/CsvHelper/issues/409 seems to be an accepted solution.
-                .ForMember(dest => dest.HUC8, opt => opt.MapFrom(source => $"\t{source.HUC8}"))
+                .ForMember(dest => dest.HUC12, opt => opt.MapFrom(source => source.HUC12))
+                .ForMember(dest => dest.HUC8, opt => opt.MapFrom(source => source.HUC8))
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(source => source.SiteId))
                 .ForMember(dest => dest.SitePoint, opt => opt.MapFrom(source => source.SitePoint.IsValid ? source.SitePoint.ToString() : string.Empty))
                 .ForMember(dest => dest.UsgsSiteId, opt => opt.MapFrom(source => source.UsgssiteId));

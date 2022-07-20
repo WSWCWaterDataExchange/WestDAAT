@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { AppContext } from '../AppProvider';
@@ -23,14 +23,17 @@ function DownloadModal(props: DownloadModalProps) {
   }
   const download = () => 
   {
+    setSearchFilterValues();
+
     if (searchCriteria !== null){
-      searchCriteria.filterUrl = window.location.href;
       downloadWaterRights(searchCriteria);
     }
+    
     props.setShow(false);
   }
 
-  useEffect(() => {
+  // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
+  const setSearchFilterValues = () => {
     setSearchCriteria({
       beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName),
       filterGeometry: filters.polyline.map(p => JSON.stringify(p.data.geometry)),
@@ -46,9 +49,10 @@ function DownloadModal(props: DownloadModalProps) {
       waterSourceTypes: filters.waterSourceTypes,
       riverBasinNames: filters.riverBasinNames,
       allocationOwner: filters.allocationOwner,
-      states: filters.states
+      states: filters.states,
+      filterUrl: window.location.href
     });
-  }, [filters, setSearchCriteria]);
+  }
 
   return (
     <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
