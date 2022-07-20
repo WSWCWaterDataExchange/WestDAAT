@@ -184,9 +184,6 @@ namespace WesternStatesWater.WestDaat.Managers
 
             if (count > _performanceConfiguration.MaxRecordsDownload)
             {
-                //var responseWriter = new StreamWriter(responseStream);
-                //responseWriter.Write($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
-                //responseWriter.Flush();
                 throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
             }
 
