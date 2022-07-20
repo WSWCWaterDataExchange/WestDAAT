@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import moment from 'moment';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
@@ -51,14 +51,16 @@ function DownloadModal(props: DownloadModalProps) {
 
   const download = async () => 
   {
+    setSearchFilterValues();
+
     if (searchCriteria !== null){
-      searchCriteria.filterUrl = window.location.href;
       setIsFetching(true);
     }
     props.setShow(isFetching);
   }
 
-  useEffect(() => {
+  // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
+  const setSearchFilterValues = () => {
     setSearchCriteria({
       beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName),
       filterGeometry: filters.polyline.map(p => JSON.stringify(p.data.geometry)),
@@ -74,9 +76,10 @@ function DownloadModal(props: DownloadModalProps) {
       waterSourceTypes: filters.waterSourceTypes,
       riverBasinNames: filters.riverBasinNames,
       allocationOwner: filters.allocationOwner,
-      states: filters.states
+      states: filters.states,
+      filterUrl: window.location.href
     });
-  }, [filters, setSearchCriteria]);
+  }
 
   return (
     <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
@@ -91,7 +94,7 @@ function DownloadModal(props: DownloadModalProps) {
           Sign up <strong>completely free</strong> or login for download access of up to 100,000
           water rights points.
         </p>}
-        {/* display error if more than 100k records */}
+        {/* display error message */}
         { isAuthenticated && isError &&
           <p>Something went wrong, please try again.</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
