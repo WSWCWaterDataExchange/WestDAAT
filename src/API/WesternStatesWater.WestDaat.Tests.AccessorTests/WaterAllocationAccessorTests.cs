@@ -1745,7 +1745,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         [TestMethod]
         [TestCategory("Accessor Tests")]
-        public async Task WaterAllocationAccessor_GetWaterRightsCount()
+        public void WaterAllocationAccessor_GetWaterRightsCount()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -1762,14 +1762,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             };
 
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsCount(searCriteria);
+            var result = accessor.GetWaterRightsCount(searCriteria);
 
             result.Should().Be(1);
         }
 
         [TestMethod]
         [TestCategory("Accessor Tests")]
-        public async Task WaterAllocationAccessor_GetWaterRightsCount_Multiple()
+        public void WaterAllocationAccessor_GetWaterRightsCount_Multiple()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -1786,14 +1786,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             };
 
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsCount(searCriteria);
+            var result = accessor.GetWaterRightsCount(searCriteria);
 
             result.Should().Be(100);
         }
 
         [TestMethod]
         [TestCategory("Accessor Tests")]
-        public async Task WaterAllocationAccessor_GetWaterRightsCount_FilterByExemptUse()
+        public void WaterAllocationAccessor_GetWaterRightsCount_FilterByExemptUse()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -1822,7 +1822,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             allocationAmount.Count.Should().Be(100);
 
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsCount(searCriteria);
+            var result = accessor.GetWaterRightsCount(searCriteria);
 
             result.Should().Be(50);
         }
