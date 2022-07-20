@@ -254,14 +254,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        async Task<int> IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
+        int IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
-            return await db.AllocationAmountsFact
+            return db.AllocationAmountsFact
                 .Where(predicate)
-                .CountAsync();
+                .Count();
         }
 
         IEnumerable<IEnumerable<object>> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)

@@ -413,7 +413,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         [DataRow(100001)]
         [DataRow(450000)]
-        public async Task WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
+        public void WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
         {
             var managerSearchRequest = new WaterRightsSearchCriteria
             {
@@ -421,23 +421,23 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(returnAmount)
+                .Returns(returnAmount)
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            await Assert.ThrowsExceptionAsync<WestDaatException>(() => manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
+            Assert.ThrowsException<WestDaatException>(() => manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
 
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
         }
 
         [TestMethod]
-        public async Task WaterRightsAsZip_ThrowsException_WhenAllSearchCriteriaPropertiesAreNull()
+        public void WaterRightsAsZip_ThrowsException_WhenAllSearchCriteriaPropertiesAreNull()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            await Assert.ThrowsExceptionAsync<NullReferenceException>(() => manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
+            Assert.ThrowsException<NullReferenceException>(() => manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
 
             // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
@@ -468,7 +468,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(5)
+                .Returns(5)
                 .Verifiable();
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -486,7 +486,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -528,7 +528,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(5)
+                .Returns(5)
                 .Verifiable();
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -546,7 +546,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -587,7 +587,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(5)
+                .Returns(5)
                 .Verifiable();
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -605,7 +605,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -684,7 +684,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(5)
+                .Returns(5)
                 .Verifiable();
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -702,7 +702,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 

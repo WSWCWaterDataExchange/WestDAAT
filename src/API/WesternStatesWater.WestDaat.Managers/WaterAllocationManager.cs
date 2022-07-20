@@ -176,10 +176,11 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public void WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
-            var count = await _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+            
+            var count = _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
             if (count > _performanceConfiguration.MaxRecordsDownload)
             {
