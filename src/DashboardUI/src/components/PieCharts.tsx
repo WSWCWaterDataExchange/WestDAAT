@@ -1,7 +1,7 @@
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
-import { useMemo, useContext, useCallback, useState, useEffect } from 'react';
+import { useContext, useCallback, useState, useEffect } from 'react';
 import { Col, ProgressBar, Row } from 'react-bootstrap';
 import { colorList } from '../config/constants';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
