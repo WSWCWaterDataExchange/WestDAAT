@@ -22,6 +22,10 @@ name: Deploy Prod
 env:
   FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
   REACT_APP_WEBAPI_URL: 'https://westdaat-prod.azurewebsites.net/api/'
+  REACT_APP_AUTH_REDIRECT_URL: 'https://westdaat.westernstateswater.org/authredirect.html' # the URL used by Azure B2C to redirect to your app after login
+  REACT_APP_AUTH_CLIENT_ID: '10beb81f-fdfd-43f3-91fd-bb463e331d41'
+  REACT_APP_AUTH_AUTHORITY: 'https://westdaat.b2clogin.com/westdaat.onmicrosoft.com/b2c_1_signupsignin'
+  REACT_APP_AUTH_KNOWN_AUTHORITY: 'https://westdaat.b2clogin.com/westdaat.onmicrosoft.com'
   REACT_APP_GA_ID: 'G-GENEQGNY1Q'             # set the Google Analytics measurement ID
   AZURE_RESOURCE_GROUP: WestDAAT_Prod         # set the resource group name
   AZURE_FUNCTIONAPP_NAME: westdaat-prod       # set this to the name of your Azure Web App
