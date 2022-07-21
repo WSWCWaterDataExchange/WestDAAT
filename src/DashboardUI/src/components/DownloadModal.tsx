@@ -14,33 +14,47 @@ interface DownloadModalProps extends ModalProps {
   setShow: (show: boolean) => void;
 }
 
-function DownloadWaterRights(props: {searchCriteria: WaterRightsSearchCriteria | null, setIsError:(isError: boolean) => void, setIsFetching: (isFetching: boolean) => void, setError: (error: any) => void}){
+function DownloadWaterRights(props: {
+  searchCriteria: WaterRightsSearchCriteria | null,
+  setIsError:(isError: boolean) => void,
+  setIsFetching: (isFetching: boolean) => void,
+  setError: (error: any) => void,
+  setIsFetched: (isFetched: boolean) => void}){
 
-  const {isFetching, isError, error} =  useWaterRightsDownload(props.searchCriteria);
+  const {isFetching, isError, error, isFetched} =  useWaterRightsDownload(props.searchCriteria);
   const { setIsError } = props;
   const { setIsFetching } = props;
   const { setError } = props;
+  const { setIsFetched } = props;
 
   useEffect(() => {
     if(error){
       setError(error)
     }
-  }, [error, setError])
+  }, [error, setError]);
 
   useEffect(() => {
     if (isError){
       setIsError(isError);
     }
-  }, [isError, setIsError])
+  }, [isError, setIsError]);
 
   useEffect(() => {
     if (!isFetching){
       setIsFetching(isFetching);
     }
-  }, [isFetching, setIsFetching])
+  }, [isFetching, setIsFetching]);
 
-  return<p>We are preparing your download, this might take some time
-                <ProgressBar animated now={100} /></p>
+  useEffect(() => {
+    if (isFetched){
+      setIsFetched(isFetched);
+    }
+  }, [isFetched, setIsFetched]);
+
+  return (<div><p>We are preparing your download, this might take some time
+                </p>
+                <ProgressBar animated now={100} /></div>
+                );
 }
 
 function DownloadModal(props: DownloadModalProps) {
@@ -51,6 +65,7 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isError, setIsError ] = useState<boolean>(false);
   const [ error, setError ] = useState<any>();
+  const [ isFetched, setIsFetched ] = useState<boolean>(false);
 
   const close = () => {
     props.setShow(false);
@@ -63,6 +78,13 @@ function DownloadModal(props: DownloadModalProps) {
     setSearchFilterValues();
     setIsFetching(true);
   }
+
+  useEffect(() => {
+    if (isFetched && !isError){
+      props.setShow(false);
+      setIsFetched(false);
+    }
+  }, [isFetched, props, setIsFetched, isError])
 
   // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
   const setSearchFilterValues = () => {
@@ -107,12 +129,17 @@ function DownloadModal(props: DownloadModalProps) {
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
         {/* display modal with is fetching info and progress bar with it */}
         { isAuthenticated && isFetching && !isError &&
-        <><DownloadWaterRights searchCriteria={searchCriteria} setIsError={setIsError} setIsFetching={setIsFetching} setError={setError}/></>}
+        <DownloadWaterRights
+          searchCriteria={searchCriteria}
+          setIsError={setIsError}
+          setIsFetching={setIsFetching}
+          setError={setError}
+          setIsFetched={setIsFetched}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
       {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
-      {isAuthenticated && <Button onClick={download}>Download</Button>}
+      {isAuthenticated && !isError && <Button onClick={download}>Download</Button>}
       </Modal.Footer>
     </Modal>
   );
