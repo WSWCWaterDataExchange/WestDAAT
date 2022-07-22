@@ -28,6 +28,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             using var db = _databaseContextFactory.Create();
             var analyticsSummary = await db.AllocationAmountsFact
+                .AsNoTracking()
                 .Where(predicate)
                 .GroupBy(a => a.PrimaryBeneficialUseCategory)
                 .Select(a => new AnalyticsSummaryInformation
@@ -48,6 +49,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             using var db = _databaseContextFactory.Create();
             var waterRightDetails = await db.AllocationAmountsFact
+                .AsNoTracking()
                 .Where(predicate)
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
                 .ThenBy(x => x.AllocationUuid)
@@ -260,6 +262,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             using var db = _databaseContextFactory.Create();
             return db.AllocationAmountsFact
+                .AsNoTracking()
                 .Where(predicate)
                 .Count();
         }
@@ -282,13 +285,13 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             var response = new List<IEnumerable<object>>()
             {
-                waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration),
-                waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration),
-                waterRightDetails.Select(x=>x.Method).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration),
-                filteredSites.SelectMany(x=>x.AllocationBridgeSitesFact).ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration),
+                waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.VariableSpecificUuid),
+                waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.OrganizationUuid),
+                waterRightDetails.Select(x=>x.Method).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.MethodUuid),
+                filteredSites.SelectMany(x=>x.AllocationBridgeSitesFact).ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.AllocationUuid),
                 filteredSites.SelectMany(c=>c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
-                filteredSites.SelectMany(b=>b.WaterSourceBridgeSitesFact).Select(c=>c.WaterSource).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration),
-                filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration),
+                filteredSites.SelectMany(b=>b.WaterSourceBridgeSitesFact).Select(c=>c.WaterSource).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.WaterSourceUuid),
+                filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.SiteUuid),
             };
 
             foreach (var entry in response)

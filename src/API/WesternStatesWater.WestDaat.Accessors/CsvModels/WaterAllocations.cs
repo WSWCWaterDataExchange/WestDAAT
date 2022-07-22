@@ -6,6 +6,7 @@
         public string OrganizationUuid { get; set; }
         public string SiteUuid { get; set; } 
         public string VariableSpecificUuid { get; set; }
+        public string AllocationUuid { get; set; }
         public DateTime? AllocationApplicationDate { get; set; }
         public string AllocationAssociatedConsumptiveUseSiteIds { get; set; }
         public string AllocationAssociatedWithdrawalSiteIds { get; set; }
