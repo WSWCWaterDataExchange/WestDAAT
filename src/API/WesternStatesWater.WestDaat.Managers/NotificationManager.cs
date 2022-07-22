@@ -82,15 +82,6 @@ namespace WesternStatesWater.WestDaat.Managers
                 }
             }
 
-            if (request.DataInterest.Any())
-            {
-                messageBody += "Data Interest: \r\n";
-                foreach (var interest in request.DataInterest)
-                {
-                    messageBody += $"        - {interest} \r\n";
-                }
-            }
-
             return messageBody;
         }
 
