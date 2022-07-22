@@ -5,7 +5,6 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Comments { get; set; }
-        public string[] DataInterest { get; set; }
         public string[] DataUsage { get; set; }
         public string Email { get; set; }
         public string Organization { get; set; }

@@ -1,7 +1,5 @@
 import { HomePageTab } from '../pages/HomePage';
 import WaterRightsTab from './WaterRightsTab';
-import AggregationsTab from './AggregationsTab';
-import SiteSpecificTab from './SiteSpecificTab';
 
 import './../styles/side-panel.scss';
 
@@ -11,12 +9,10 @@ interface SidePanelProps {
 
 function SidePanel(props: SidePanelProps) {
   const tabs: Record<HomePageTab, JSX.Element> = {
-    [HomePageTab.WaterRights]: <WaterRightsTab />,
-    [HomePageTab.Aggregations]: <AggregationsTab />,
-    [HomePageTab.SiteSpecific]: <SiteSpecificTab />
+    [HomePageTab.WaterRights]: <WaterRightsTab />
   }
   
-  var tabComponent = tabs[props.currentTab];
+  let tabComponent = tabs[props.currentTab];
 
   return (
     <div className="side-panel d-flex flex-column">
