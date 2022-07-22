@@ -2,9 +2,9 @@ import { Configuration } from "@azure/msal-browser";
 
 export const msalConfig : Configuration = {
   auth: {
-    clientId: "ab3cf308-8a7e-404e-977c-d0227f4a48c4",
-    authority: "https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin", // This is a URL (e.g. https://login.microsoftonline.com/{your tenant ID})
-    knownAuthorities: ["https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com"],
+    clientId: process.env.REACT_APP_AUTH_CLIENT_ID || "",
+    authority: process.env.REACT_APP_AUTH_AUTHORITY,
+    knownAuthorities: [process.env.REACT_APP_AUTH_KNOWN_AUTHORITY || ""],
     redirectUri: process.env.REACT_APP_AUTH_REDIRECT_URL,
   },
   cache: {
