@@ -204,7 +204,7 @@ namespace WesternStatesWater.WestDaat.Managers
                         csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                         csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                        csv.WriteRecords(file);
+                        csv.WriteRecords(file.Distinct());
                         csv.Flush();
 
                         var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
