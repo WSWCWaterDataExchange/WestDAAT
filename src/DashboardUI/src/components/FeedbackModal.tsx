@@ -19,16 +19,16 @@ const dashboardSatisfactionOptions: string[] = [
 ]
 
 const dataUsageOptions: string[] = [
- "Water Market Exchanges",
- "Auricular Water Supply Management",
- "Long-Term Trend Forecasting",
- "Public Water Supply Management",
+ "Demand Management",
+ "General Interest",
+ "Planning",
+ "Regulatory",
  "Research",
  "Reservoir Management",
  "Thermoelectric / Hydropower Management",
- "Water Quality Permit Compliance",
- "Watershed Management",
- "General Interest"
+ "Water Markets",
+ "Water Quality",
+ "Watershed Management"
 ]
 
 function FeedbackModal(props: FeedBackModalProps) {
