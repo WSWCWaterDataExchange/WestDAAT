@@ -47,9 +47,17 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
         }
 
         public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDate(this AllocationAmountFactFaker faker)
-        {        
+        {
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
                 .RuleFor(a => a.AllocationPriorityDateNavigation, () => faker.DateDimFaker.Generate());
+
+            return faker;
+        }
+
+        public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDefaultDate(this AllocationAmountFactFaker faker)
+        {
+            faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
+                .RuleFor(a => a.AllocationPriorityDateNavigation, () => default);
 
             return faker;
         }
