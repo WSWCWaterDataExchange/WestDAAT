@@ -10,18 +10,6 @@ interface FeedBackModalProps extends ModalProps {
   setShow: (show: boolean) => void;
 }
 
-const dataInsterestOptions: string[] = [
-  "Discharge (Streamflow)",
-  "Dissolved Oxygen",
-  "Groundwater Level",
-  "pH",
-  "Precipitation",
-  "River Level (Stage)",
-  "Specific Conductance",
-  "Turbidity",
-  "Water Temperature"
-]
-
 const dashboardSatisfactionOptions: string[] = [
   "Very Satisfied",
   "Somewhat satisfied",
@@ -31,26 +19,22 @@ const dashboardSatisfactionOptions: string[] = [
 ]
 
 const dataUsageOptions: string[] = [
-  "Agricultural Water Supply Management",
-  "Forecasts/Warnings",
-  "General Interest",
-  "Long-Term Trends",
-  "Navigation",
-  "Public Water Supply Management",
-  "Recreation",
-  "Research",
-  "Reservoir Management",
-  "Thermoelectric/Hydropower",
-  "Water Quality Permit Complicance",
-  "Watershed Management"
+ "Demand Management",
+ "General Interest",
+ "Planning",
+ "Regulatory",
+ "Research",
+ "Reservoir Management",
+ "Thermoelectric / Hydropower Management",
+ "Water Markets",
+ "Water Quality",
+ "Watershed Management"
 ]
 
 function FeedbackModal(props: FeedBackModalProps) {
 
   const [dataUseSelected, setDataUseSelected] = useState<string[]>([]);
-  const [dataInteresetSelected, setDataInterestSelected] = useState<string[]>([]);
   const [satisfactionLevelSelected, setSatisfactionLevelValue] = useState<string>("");
-  const [otherDataInterestValue, setOtherDataInterestValue] = useState<string>("");
   const [otherDataUseValue, setOtherDataUseValue] = useState<string>("");
   const [commentsValue, setCommentsValue] = useState<string>("");
   const [emailValue, setEmailValue] = useState<string>("");
@@ -63,7 +47,7 @@ function FeedbackModal(props: FeedBackModalProps) {
   const [isEmailInvalid, setEmailError] = useState<boolean>()
 
   const handleCheck = (event: ChangeEvent<HTMLInputElement>, dataArray: string[]) => {
-    var updatedList: string[] = [...dataArray];
+    let updatedList: string[] = [...dataArray];
     if (event.target.checked) {
       updatedList = [...dataArray, event.target.value];
     } else {
@@ -95,11 +79,6 @@ function FeedbackModal(props: FeedBackModalProps) {
     }
     feedbackRequest.dataUsage = dataUseSelected;
 
-    if (otherDataInterestValue !== null && otherDataInterestValue !== "") {
-      dataInteresetSelected.push(otherDataInterestValue);
-    }
-    feedbackRequest.dataInterest = dataInteresetSelected;
-
     // check if feedback is empty before triggering a submit request
     if (validateRequestIsValid(feedbackRequest)) {
       setShowThankYouModal(true);
@@ -126,7 +105,6 @@ function FeedbackModal(props: FeedBackModalProps) {
     || (request.organization !== null && request.organization !== "")
     || (request.role !== null && request.role !== "")
     || (request.satisfactionLevel !== null && request.satisfactionLevel !== "")
-    || (request.dataInterest?.length !== 0 && request.dataInterest?.every(interest => interest !== ""))
     || (request.dataUsage?.length !== 0 && request.dataUsage?.every(use => use !== "")))
   }
 
@@ -149,9 +127,7 @@ function FeedbackModal(props: FeedBackModalProps) {
     setOrganizationValue("");
     setRoleValue("");
     setOtherDataUseValue("");
-    setOtherDataInterestValue("");
     setSatisfactionLevelValue("");
-    setDataInterestSelected([]);
     setDataUseSelected([]);
   }
 
@@ -212,26 +188,6 @@ function FeedbackModal(props: FeedBackModalProps) {
               <input type="text" className="form-control" onChange={(e) => setOtherDataUseValue(e.target.value ?? "")} value={otherDataUseValue} />
             </div>
           </div>
-          <div className="mb-3">
-            <label className="fw-bolder">Select which data interests you the most?(Optional)</label>
-            {dataInsterestOptions.map(element =>
-              <div className="form-check" key={element}>
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  value={element}
-                  onChange={(e) => setDataInterestSelected(handleCheck(e, dataInteresetSelected))}
-                />
-                <label className="form-check-label" htmlFor={element}>
-                  {element}
-                </label>
-              </div>
-            )}
-            <div className="mt-2">
-              <label className="form-label">Other(Optional)</label>
-              <input type="text" className="form-control" onChange={(e) => setOtherDataInterestValue(e.target.value ?? "")} value={otherDataInterestValue} />
-            </div>
-          </div>
           <div className="mb-3" id="dashboardSatisfactionLevel">
             <label className="fw-bolder">How satisfied are you with the Water Data Exchange Data(WaDE) Dashboard?(Optional)</label>
             {dashboardSatisfactionOptions.map(element =>
@@ -248,12 +204,6 @@ function FeedbackModal(props: FeedBackModalProps) {
                 </label>
               </div>
             )}
-            <div className="mt-3">
-              <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's
-              </p>
-            </div>
           </div>
         </Modal.Body>
         <Modal.Footer>
