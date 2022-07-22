@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OwnerClassification, opt => opt.MapFrom(source => source.OwnerClassification.WaDEName.Length > 0 ? source.OwnerClassification.WaDEName : source.OwnerClassification.Name))
                 .ForMember(dest => dest.AllocationFlowCfs, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
                 .ForMember(dest => dest.AllocationVolumeAf, opt => opt.MapFrom(source => source.AllocationVolume_AF))
-                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateID != null ? source.AllocationPriorityDateNavigation.Date : default(DateTime)))
+                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => (source.AllocationPriorityDateID != null && source.AllocationPriorityDateNavigation.Date != default) ? source.AllocationPriorityDateNavigation.Date : (DateTime?)null))
                 .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? source.AllocationLegalStatusCvNavigation.WaDEName : source.AllocationLegalStatusCvNavigation.Name));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))

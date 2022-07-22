@@ -61,7 +61,7 @@ function AnalyticsDataTable() {
         }));
     }, [latestSearchResults]);
 
-    return <>
+    return <div className="fixedTableHead">
         <Table>
             <thead>
                 <tr>
@@ -108,7 +108,7 @@ function AnalyticsDataTable() {
                 }
             </tbody>
         </Table>
-    </>
+    </div>
 }
 
 export default AnalyticsDataTable;
