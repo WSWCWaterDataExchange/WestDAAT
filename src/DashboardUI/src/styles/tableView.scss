@@ -7,7 +7,7 @@
 
   .offcanvas-body {
     padding-right: 0px !important;
-    overflow-y: unset;
+    overflow-y: hidden;
   }
 
   &.offcanvas-bottom {
@@ -37,11 +37,11 @@
   }
 }
 
-.fixedTableHead {
+.scrollable-content {
   overflow-y: auto;
-  height: 400px;
+  height: $offcanvas-vertical-height - 4vh;
 }
-.fixedTableHead thead th {
+.scrollable-content thead th {
   position: sticky;
   top: 0;
 }

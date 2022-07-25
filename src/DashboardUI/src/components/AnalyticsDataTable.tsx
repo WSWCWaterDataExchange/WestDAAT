@@ -61,7 +61,7 @@ function AnalyticsDataTable() {
         }));
     }, [latestSearchResults]);
 
-    return <div className="fixedTableHead">
+    return <div className="scrollable-content">
         <Table>
             <thead>
                 <tr>

@@ -121,7 +121,7 @@ function PieCharts() {
         ]
     };
 
-    return <div>
+    return <div className="scrollable-content ">
         <div className="my-3 d-flex justify-content-center">
             <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank" rel="noopener noreferrer">Learn about WestDAAT analytics</a>
         </div>
