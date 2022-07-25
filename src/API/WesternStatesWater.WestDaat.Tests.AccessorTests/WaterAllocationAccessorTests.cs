@@ -192,6 +192,57 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task FindWaterRights_IgnoresNullDates()
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker()
+                .Generate(5);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } });
+
+            //Assert
+            foreach(var res in result.WaterRightsDetails)
+            {
+                res.AllocationPriorityDate.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_IgnoresDefaultDates()
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker()
+                .IncludeAllocationPriorityDefaultDate()
+                .Generate(5);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } });
+
+            //Assert
+            foreach (var res in result.WaterRightsDetails)
+            {
+                res.AllocationPriorityDate.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
         public async Task FindWaterRights_Pagination_HasMoreResults()
         {
             //Arrange

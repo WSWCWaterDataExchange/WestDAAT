@@ -5,6 +5,11 @@
   position: relative !important;
   transition: none;
 
+  .offcanvas-body {
+    padding-right: 0px !important;
+    overflow-y: unset;
+  }
+
   &.offcanvas-bottom {
     bottom: $offcanvas-vertical-height + 3vh;
     transition: none;
@@ -30,4 +35,20 @@
     transition: none;
     bottom: auto;
   }
+}
+
+.fixedTableHead {
+  overflow-y: auto;
+  height: 400px;
+}
+.fixedTableHead thead th {
+  position: sticky;
+  top: 0;
+}
+table {
+  border-collapse: collapse;        
+  width: 100%;
+}
+th {
+  background:white !important;
 }

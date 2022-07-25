@@ -61,7 +61,7 @@ function AnalyticsDataTable() {
         }));
     }, [latestSearchResults]);
 
-    return <>
+    return <div className="fixedTableHead">
         <Table>
             <thead>
                 <tr>
@@ -80,7 +80,7 @@ function AnalyticsDataTable() {
                         return <tr key={waterRightDetail.allocationUuid}>
                             <td><a href={`/details/right/${waterRightDetail.allocationUuid}`} target="_blank" rel="noopener noreferrer">{waterRightDetail.allocationUuid}</a></td>
                             <td><FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate></td>
-                            <td>{waterRightDetail.ownerClassication}</td>
+                            <td>{waterRightDetail.ownerClassification}</td>
                             <td>{waterRightDetail.allocationLegalStatus}</td>
                             <td>{waterRightDetail.allocationFlowCfs}</td>
                             <td>{waterRightDetail.allocationVolumeAf}</td>
@@ -108,7 +108,7 @@ function AnalyticsDataTable() {
                 }
             </tbody>
         </Table>
-    </>
+    </div>
 }
 
 export default AnalyticsDataTable;
