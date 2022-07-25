@@ -13,11 +13,8 @@ function SiteFooter(props: SiteFooterProps) {
   return (
     <Navbar className="footer" variant="dark">
       <Container fluid className="ms-2 me-2">
-        <div>
+        <div className="px-5">
           <Nav>
-            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">License Name</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">{new Date().getFullYear()}</Nav.Link>
-            <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="#">Contact Us</Nav.Link>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/">WaDE</Nav.Link>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/">WSWC</Nav.Link>
           </Nav>

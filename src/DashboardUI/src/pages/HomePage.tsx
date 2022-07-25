@@ -11,9 +11,7 @@ import '../styles/home-page.scss';
 import { AppContext } from '../AppProvider';
 
 export enum HomePageTab {
-  WaterRights = "Water Rights Data",
-  Aggregations = "Aggregate Area Time Series Water Data",
-  SiteSpecific = "Water Use Site-Specific Time Series Data"
+  WaterRights = "Water Rights Data"
 }
 
 function HomePage() {

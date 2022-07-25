@@ -75,7 +75,9 @@ export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteria
     ['waterRight.Download', searchCriteria],
     async () => await downloadWaterRights(searchCriteria!),
     {
-      enabled: !!searchCriteria
+      enabled: !!searchCriteria,
+      retry: false,
+      cacheTime: 0
     }
   );
 
