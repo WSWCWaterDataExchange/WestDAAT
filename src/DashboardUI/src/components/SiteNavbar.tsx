@@ -87,7 +87,6 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <div className="mx-2">
-            <Button className="ms-1">View Table Results</Button>
             <Button className="ms-1" onClick={() => props.showDownloadModal(true)}>Download Data</Button>
           </div>
         </Container>
