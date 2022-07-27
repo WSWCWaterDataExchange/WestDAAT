@@ -27,9 +27,13 @@ namespace WesternStatesWater.WestDaat.Accessors
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
+
             var analyticsSummary = await db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)
+                // Distinct forces proper grouping by beneficialUse query
+                .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
+                .Distinct()
                 .GroupBy(a => a.PrimaryBeneficialUseCategory)
                 .Select(a => new AnalyticsSummaryInformation
                 {
