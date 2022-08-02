@@ -66,7 +66,7 @@ function PieCharts() {
             type: 'pie',
         },
         title: {
-            text: 'Cumulative Flow (CFS) of Rendered Sites'
+            text: 'Cumulative Flow (CSF) of Water Rights'
         },
         subtitle: {
             text: `${flowSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`
@@ -86,7 +86,7 @@ function PieCharts() {
             type: 'pie',
         },
         title: {
-            text: 'Count of Rendered Points'
+            text: 'Count of Water Rights'
         },
         subtitle: {
             text: `${pointSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Sites`
@@ -106,7 +106,7 @@ function PieCharts() {
             type: 'pie',
         },
         title: {
-            text: 'Cumulative Volume (AF) of Rendered Sites'
+            text: 'Cumulative Volume (AF) of Water Rights'
         },
         subtitle: {
             text: `${volumeSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`
