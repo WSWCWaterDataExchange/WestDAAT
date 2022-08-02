@@ -341,12 +341,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(new string[] { "id1", "id2", "id3" })]
-        [DataRow(new string[] { "id1" })]
-        [DataRow(new string[] { "id1", "id2", "id3", "id4", "id5", "id6", "id7" })]
-        [DataRow(new string[] { })]
-        public async Task FindWaterRights_SearchByNldiIds_ReturnsOneMatch(string[] ids)
+        public async Task FindWaterRights_SearchByNldiIds_ReturnsOneMatch()
         {
+            var ids = new string[] { "id1", "id2", "id3" };
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
             var sites = new SitesDimFaker().Generate(ids.Length);
