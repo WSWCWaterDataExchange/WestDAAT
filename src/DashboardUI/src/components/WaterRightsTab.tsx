@@ -84,7 +84,8 @@ const defaultFilters: WaterRightsFilters = {
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
   polyline: [],
-  nldiFilterData: null
+  nldiFilterData: null,
+  nldiIds: []
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -168,7 +169,7 @@ function WaterRightsTab() {
   const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
 
   useEffect(() => {
-    for (var element of filters.polyline) {
+    for (let element of filters.polyline) {
       setPolylines(element.identifier, element.data);
     }
   }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
@@ -301,9 +302,9 @@ function WaterRightsTab() {
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
-    var nldiData = geoJsonData.filter(s => s.source === 'nldi');
+    let nldiData = geoJsonData.filter(s => s.source === 'nldi');
     if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
-      var arr = (nldiData[0].data as FeatureCollection).features
+      let arr = (nldiData[0].data as FeatureCollection).features
         .filter(x => x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' || x.properties?.source?.toLowerCase() === 'wade');
 
       if ((nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
@@ -311,12 +312,20 @@ function WaterRightsTab() {
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && (nldiFilterData?.directions & Directions.Downsteam)) {
         arr = arr.filter(x => x.properties?.westdaat_direction === 'Downstream');
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
+        setFilters(s => ({
+          ...s,
+          nldiIds: arr.map(x => x.properties?.identifier)
+        }));
         return
       }
+      setFilters(s => ({
+        ...s,
+        nldiIds: arr.map(x => x.properties?.identifier)
+      }));
       return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
         .map(a => a.properties?.identifier)
     }
-  }, [geoJsonData, nldiFilterData])
+  }, [geoJsonData, nldiFilterData])/* eslint-disable-line */ //Not adding the set filters as we dont want to run this code snip con any filter, but only on nldi filters
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {

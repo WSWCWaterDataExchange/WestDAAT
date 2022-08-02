@@ -29,7 +29,8 @@ function PieCharts() {
             waterSourceTypes: filters.waterSourceTypes,
             riverBasinNames: filters.riverBasinNames,
             allocationOwner: filters.allocationOwner,
-            states: filters.states
+            states: filters.states,
+            nldiWadeSiteIds: filters.nldiIds
         });
     }, [filters, setSearchCriteria]);
 

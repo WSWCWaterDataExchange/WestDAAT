@@ -341,6 +341,52 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        [DataRow(new string[] { "id1", "id2", "id3" })]
+        [DataRow(new string[] { "id1" })]
+        [DataRow(new string[] { "id1", "id2", "id3", "id4", "id5", "id6", "id7" })]
+        [DataRow(new string[] { })]
+        public async Task FindWaterRights_SearchByNldiIds_ReturnsOneMatch(string[] ids)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            foreach (var site in sites)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                NldiWadeSiteIds = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(1);
+            result.WaterRightsDetails.FirstOrDefault().AllocationUuid.Should().Be(allocationAmount.AllocationUuid);
+        }
+
+        [TestMethod]
         [DataRow("expectedName", "name2", "expectedName")]
         [DataRow("", "expectedName", "expectedName")]
         [DataRow("expectedName", "", "expectedName")]
