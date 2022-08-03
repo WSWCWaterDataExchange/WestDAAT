@@ -53,11 +53,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             using var db = _databaseContextFactory.Create();
 
-            var test = db.AllocationAmountsFact.Include(x => x.AllocationBridgeSitesFact).ThenInclude(x => x.Site).Where(c => c.AllocationBridgeSitesFact.Any()).ToList();
-
-            var test3 = test.SelectMany(z => z.AllocationBridgeSitesFact.Where(x => searchCriteria.NldiWadeSiteIds.Any(a => a == x.Site.SiteUuid))).ToList();
-            var test2 = test.Where(a => searchCriteria.NldiWadeSiteIds.Contains(a.AllocationUuid)).ToList();
-
             var waterRightDetails = await db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)

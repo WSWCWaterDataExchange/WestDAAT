@@ -314,18 +314,24 @@ function WaterRightsTab() {
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
         setFilters(s => ({
           ...s,
-          nldiIds: arr.map(x => x.properties?.identifier)
+          nldiIds: []
         }));
         return
       }
+      let mappedSites = arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
+        .map(a => a.properties?.identifier)
+        setFilters(s => ({
+          ...s,
+          nldiIds: mappedSites
+        }));
+        return mappedSites;
+    }else{ // if nldi is not active, empty the array
       setFilters(s => ({
         ...s,
-        nldiIds: arr.map(x => x.properties?.identifier)
+        nldiIds: []
       }));
-      return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
-        .map(a => a.properties?.identifier)
     }
-  }, [geoJsonData, nldiFilterData])/* eslint-disable-line */ //Not adding the set filters as we dont want to run this code snip con any filter, but only on nldi filters
+  }, [geoJsonData, nldiFilterData, setFilters])
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {

@@ -341,10 +341,20 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        public async Task FindWaterRights_SearchByNldiIds_ReturnsOneMatch()
+        public async Task FindWaterRights_SearchByNldiIds_SingleAllocation()
         {
-            var ids = new string[] { "id1", "id2", "id3" };
             // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for (var i = 0; i < randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
             using var db = CreateDatabaseContextFactory().Create();
             var sites = new SitesDimFaker().Generate(ids.Length);
 
@@ -381,6 +391,128 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
             result.WaterRightsDetails.FirstOrDefault().AllocationUuid.Should().Be(allocationAmount.AllocationUuid);
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByNldiIds_MultipleAllocation()
+        {
+            // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for (var i = 0; i < randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            for (var i = 0; i< sites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount[i].AllocationAmountId, sites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                NldiWadeSiteIds = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(ids.Length);
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByNldiIds_MatchesFromMultipleAllocation()
+        {
+            // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for(var i = 0; i<randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmount);
+            db.SaveChanges();
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount[i].AllocationAmountId, sites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var unmathchingsites = new SitesDimFaker().Generate(10);
+
+            db.SitesDim.AddRange(unmathchingsites);
+            db.SaveChanges();
+
+            var unmatchingAllocations = new AllocationAmountFactFaker().Generate(10);
+            db.AllocationAmountsFact.AddRange(unmatchingAllocations);
+            db.SaveChanges();
+
+            for (var i = 0; i < unmathchingsites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(unmatchingAllocations[i].AllocationAmountId, unmathchingsites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                NldiWadeSiteIds = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(ids.Length);
         }
 
         [TestMethod]
