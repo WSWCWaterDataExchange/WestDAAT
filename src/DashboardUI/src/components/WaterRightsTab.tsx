@@ -566,9 +566,6 @@ function WaterRightsTab() {
 
   return (
     <>
-      <div className="map-info text-center p-2">
-        {renderedFeatures.length} Points of Diversions Displayed
-      </div>
       <div className="m-3">
         <Button variant="outline-danger" className="w-100" onClick={clearMapFilters}>
           Reset All Filters
