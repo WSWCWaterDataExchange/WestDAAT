@@ -4,6 +4,7 @@ export interface WaterRightsSearchCriteria {
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
   riverBasinNames?: string[];
+  wadeSitesUuids?: string[];
   filterGeometry?: string[]; //geojson string
   states?: string[];
   allocationOwner?: string;

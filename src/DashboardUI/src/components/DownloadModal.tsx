@@ -104,7 +104,8 @@ function DownloadModal(props: DownloadModalProps) {
       riverBasinNames: filters.riverBasinNames,
       allocationOwner: filters.allocationOwner,
       states: filters.states,
-      filterUrl: filters !== null ? window.location.href : undefined
+      filterUrl: filters !== null ? window.location.href : undefined,
+      wadeSitesUuids: filters.nldiIds
     });
   }
 

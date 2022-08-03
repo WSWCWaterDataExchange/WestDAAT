@@ -341,6 +341,183 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task FindWaterRights_SearchByNldiIds_SingleAllocation()
+        {
+            // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for (var i = 0; i < randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            foreach (var site in sites)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                WadeSitesUuids = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(1);
+            result.WaterRightsDetails.FirstOrDefault().AllocationUuid.Should().Be(allocationAmount.AllocationUuid);
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByNldiIds_MultipleAllocation()
+        {
+            // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for (var i = 0; i < randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmounts);
+            db.SaveChanges();
+
+            for (var i = 0; i< sites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmounts[i].AllocationAmountId, sites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                WadeSitesUuids = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(ids.Length);
+            result.WaterRightsDetails.All(w => allocationAmounts.Any(a => a.AllocationUuid == w.AllocationUuid)).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task FindWaterRights_SearchByNldiIds_MatchesFromMultipleAllocation()
+        {
+            // Arrange
+            Random rnd = new();
+            var randomBetween1And100 = rnd.Next(1, 100);
+
+            var idList = new List<string>();
+
+            for(var i = 0; i<randomBetween1And100; i++)
+            {
+                idList.Add(Guid.NewGuid().ToString());
+            }
+
+            var ids = idList.ToArray();
+            using var db = CreateDatabaseContextFactory().Create();
+            var sites = new SitesDimFaker().Generate(ids.Length);
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                sites[i].SiteUuid = ids[i];
+            }
+
+            db.SitesDim.AddRange(sites);
+            db.SaveChanges();
+
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmounts);
+            db.SaveChanges();
+
+            for (var i = 0; i < sites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmounts[i].AllocationAmountId, sites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var unmathchingsites = new SitesDimFaker().Generate(10);
+
+            db.SitesDim.AddRange(unmathchingsites);
+            db.SaveChanges();
+
+            var unmatchingAllocations = new AllocationAmountFactFaker().Generate(10);
+            db.AllocationAmountsFact.AddRange(unmatchingAllocations);
+            db.SaveChanges();
+
+            for (var i = 0; i < unmathchingsites.Count; i++)
+            {
+                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
+                    .AllocationBridgeSiteFactFakerWithIds(unmatchingAllocations[i].AllocationAmountId, unmathchingsites[i].SiteId)
+                    .Generate();
+                db.Add(allocationSiteBridge);
+            }
+            db.SaveChanges();
+
+            var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
+            {
+                WadeSitesUuids = ids
+            };
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.FindWaterRights(searchCriteria);
+
+            //Assert
+            result.WaterRightsDetails.Count().Should().Be(ids.Length);
+            result.WaterRightsDetails.All(w => allocationAmounts.Any(a => a.AllocationUuid == w.AllocationUuid)).Should().BeTrue();
+        }
+
+        [TestMethod]
         [DataRow("expectedName", "name2", "expectedName")]
         [DataRow("", "expectedName", "expectedName")]
         [DataRow("expectedName", "", "expectedName")]

@@ -13,6 +13,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         public string[] OwnerClassifications { get; set; }
         public string[] WaterSourceTypes { get; set; }
         public string[] RiverBasinNames { get; set; }
+        public string[] WadeSitesUuids { get; set; }
 
         // Geojson string
         public string[] FilterGeometry { get; set; }

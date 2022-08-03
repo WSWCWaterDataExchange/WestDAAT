@@ -35,7 +35,8 @@ function AnalyticsDataTable() {
             waterSourceTypes: filters.waterSourceTypes,
             riverBasinNames: filters.riverBasinNames,
             allocationOwner: filters.allocationOwner,
-            states: filters.states
+            states: filters.states,
+            wadeSitesUuids: filters.nldiIds
         });
     }, [_defaultResults, filters, setSearchCriteria, setWaterRightsSearchResults]);
 

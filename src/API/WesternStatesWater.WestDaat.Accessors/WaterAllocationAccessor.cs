@@ -52,6 +52,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
             using var db = _databaseContextFactory.Create();
+
             var waterRightDetails = await db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)
@@ -85,6 +86,20 @@ namespace WesternStatesWater.WestDaat.Accessors
             predicate.And(BuildDatePredicate(searchCriteria));
 
             predicate.And(BuildGeometrySearchPredicate(searchCriteria));
+
+            predicate.And(BuildFromSiteUuids(searchCriteria));
+
+            return predicate;
+        }
+
+        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+
+            if (searchCriteria?.WadeSitesUuids != null && searchCriteria.WadeSitesUuids.Any())
+            {
+                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(searchCriteria.WadeSitesUuids.ToList()));
+            }
 
             return predicate;
         }

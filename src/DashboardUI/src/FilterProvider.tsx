@@ -19,8 +19,8 @@ export interface WaterRightsFilters{
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
   polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
-
+  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
+  nldiIds?: string[]
 }
 
 interface FilterContextState {
@@ -44,7 +44,8 @@ const defaultFilters: WaterRightsFilters = {
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
   polyline: [],
-  nldiFilterData: null
+  nldiFilterData: null,
+  nldiIds: undefined
 }
 
 const defaultState: FilterContextState = {
