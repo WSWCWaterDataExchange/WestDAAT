@@ -77,7 +77,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
             predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(b => nldiIds.Any(a => a == b.Site.SiteUuid)));
-            // predicate = predicate.Or(x => nldiIds.Any(a => x.AllocationBridgeSitesFact.Any(b => a == b.Site.SiteUuid)));
 
             return predicate;
         }
