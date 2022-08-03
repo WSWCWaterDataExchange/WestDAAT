@@ -30,7 +30,7 @@ function PieCharts() {
             riverBasinNames: filters.riverBasinNames,
             allocationOwner: filters.allocationOwner,
             states: filters.states,
-            nldiWadeSiteIds: filters.nldiIds
+            wadeSitesUuids: filters.nldiIds
         });
     }, [filters, setSearchCriteria]);
 

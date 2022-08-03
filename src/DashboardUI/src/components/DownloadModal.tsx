@@ -105,7 +105,7 @@ function DownloadModal(props: DownloadModalProps) {
       allocationOwner: filters.allocationOwner,
       states: filters.states,
       filterUrl: filters !== null ? window.location.href : undefined,
-      nldiWadeSiteIds: filters.nldiIds
+      wadeSitesUuids: filters.nldiIds
     });
   }
 

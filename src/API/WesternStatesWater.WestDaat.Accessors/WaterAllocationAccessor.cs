@@ -87,18 +87,18 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             predicate.And(BuildGeometrySearchPredicate(searchCriteria));
 
-            predicate.And(BuildNldiWadeSitesPredicate(searchCriteria));
+            predicate.And(BuildFromSiteUuids(searchCriteria));
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildNldiWadeSitesPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
-            if (searchCriteria?.NldiWadeSiteIds != null && searchCriteria.NldiWadeSiteIds.Any())
+            if (searchCriteria?.WadeSitesUuids != null && searchCriteria.WadeSitesUuids.Any())
             {
-                predicate = predicate.And(AllocationAmountsFact.HasNldiWadeSites(searchCriteria.NldiWadeSiteIds.ToList()));
+                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(searchCriteria.WadeSitesUuids.ToList()));
             }
 
             return predicate;

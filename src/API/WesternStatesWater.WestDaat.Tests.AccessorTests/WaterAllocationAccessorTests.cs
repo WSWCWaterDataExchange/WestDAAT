@@ -381,7 +381,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
-                NldiWadeSiteIds = ids
+                WadeSitesUuids = ids
             };
 
             //Act
@@ -419,14 +419,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SitesDim.AddRange(sites);
             db.SaveChanges();
 
-            var allocationAmount = new AllocationAmountFactFaker().Generate(ids.Length);
-            db.AllocationAmountsFact.AddRange(allocationAmount);
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmounts);
             db.SaveChanges();
 
             for (var i = 0; i< sites.Count; i++)
             {
                 var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
-                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount[i].AllocationAmountId, sites[i].SiteId)
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmounts[i].AllocationAmountId, sites[i].SiteId)
                     .Generate();
                 db.Add(allocationSiteBridge);
             }
@@ -434,7 +434,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
-                NldiWadeSiteIds = ids
+                WadeSitesUuids = ids
             };
 
             //Act
@@ -443,6 +443,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(ids.Length);
+            result.WaterRightsDetails.All(w => allocationAmounts.Any(a => a.AllocationUuid == w.AllocationUuid)).Should().BeTrue();
         }
 
         [TestMethod]
@@ -471,14 +472,14 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SitesDim.AddRange(sites);
             db.SaveChanges();
 
-            var allocationAmount = new AllocationAmountFactFaker().Generate(ids.Length);
-            db.AllocationAmountsFact.AddRange(allocationAmount);
+            var allocationAmounts = new AllocationAmountFactFaker().Generate(ids.Length);
+            db.AllocationAmountsFact.AddRange(allocationAmounts);
             db.SaveChanges();
 
             for (var i = 0; i < sites.Count; i++)
             {
                 var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
-                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount[i].AllocationAmountId, sites[i].SiteId)
+                    .AllocationBridgeSiteFactFakerWithIds(allocationAmounts[i].AllocationAmountId, sites[i].SiteId)
                     .Generate();
                 db.Add(allocationSiteBridge);
             }
@@ -504,7 +505,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
-                NldiWadeSiteIds = ids
+                WadeSitesUuids = ids
             };
 
             //Act
@@ -513,6 +514,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(ids.Length);
+            result.WaterRightsDetails.All(w => allocationAmounts.Any(a => a.AllocationUuid == w.AllocationUuid)).Should().BeTrue();
         }
 
         [TestMethod]
