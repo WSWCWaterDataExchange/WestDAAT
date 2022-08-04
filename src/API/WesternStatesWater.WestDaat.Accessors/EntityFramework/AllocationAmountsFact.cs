@@ -217,7 +217,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             foreach(var geometry in geometries)
             {
                 predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
-                (site.Site.Geometry != null && site.Site.Geometry.Intersects(geometry)) || (site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry))));
+                 site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry)));
             }
             
             return predicate;
