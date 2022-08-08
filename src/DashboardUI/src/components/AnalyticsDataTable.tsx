@@ -15,7 +15,7 @@ function AnalyticsDataTable() {
     const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
     const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
 
-    const { filters } = useContext(FilterContext);
+    const { filters, nldiIds } = useContext(FilterContext);
 
     const handleFiltersChange = useCallback(() => {
         setWaterRightsSearchResults(_defaultResults);
@@ -36,9 +36,9 @@ function AnalyticsDataTable() {
             riverBasinNames: filters.riverBasinNames,
             allocationOwner: filters.allocationOwner,
             states: filters.states,
-            wadeSitesUuids: filters.nldiIds
+            wadeSitesUuids: nldiIds
         });
-    }, [_defaultResults, filters, setSearchCriteria, setWaterRightsSearchResults]);
+    }, [_defaultResults, filters, nldiIds, setSearchCriteria, setWaterRightsSearchResults]);
 
     const handleLoadMoreResults = () => {
         if (waterRightsSearchResults.waterRightsDetails.length === 0) return;

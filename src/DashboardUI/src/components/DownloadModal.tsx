@@ -59,7 +59,7 @@ function DownloadWaterRights(props: {
 
 function DownloadModal(props: DownloadModalProps) {
   const { isAuthenticated } = useContext(AppContext).authenticationContext;
-  const { filters } = useContext(FilterContext);
+  const { filters, nldiIds } = useContext(FilterContext);
 
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
@@ -105,7 +105,7 @@ function DownloadModal(props: DownloadModalProps) {
       allocationOwner: filters.allocationOwner,
       states: filters.states,
       filterUrl: filters !== null ? window.location.href : undefined,
-      wadeSitesUuids: filters.nldiIds
+      wadeSitesUuids: nldiIds
     });
   }
 

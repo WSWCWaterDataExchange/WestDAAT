@@ -10,7 +10,7 @@ import { useGetAnalyticsSummaryInfo } from '../hooks';
 import { useBeneficialUses } from '../hooks/useSystemQuery';
 
 function PieCharts() {
-    const { filters } = useContext(FilterContext);
+    const { filters, nldiIds } = useContext(FilterContext);
     const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
 
     const handleFiltersChange = useCallback(() => {
@@ -30,9 +30,9 @@ function PieCharts() {
             riverBasinNames: filters.riverBasinNames,
             allocationOwner: filters.allocationOwner,
             states: filters.states,
-            wadeSitesUuids: filters.nldiIds
+            wadeSitesUuids: nldiIds
         });
-    }, [filters, setSearchCriteria]);
+    }, [filters, nldiIds, setSearchCriteria]);
 
     const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria)
     useEffect(() => {
