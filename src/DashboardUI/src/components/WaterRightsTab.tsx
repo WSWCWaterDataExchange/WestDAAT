@@ -298,7 +298,6 @@ function WaterRightsTab() {
     }
   }, [setLegend, renderedMapGroupings, isNldiMapActive])
 
-  //const [mappedSites, setMappedSites] = useState<string[]>([]);
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
