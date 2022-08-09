@@ -302,6 +302,9 @@ function WaterRightsTab() {
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
+    if(!isNldiMapActive){
+      return [];
+    }
     let nldiData = geoJsonData.filter(s => s.source === 'nldi');
     if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
       let arr = (nldiData[0].data as FeatureCollection).features
@@ -312,22 +315,22 @@ function WaterRightsTab() {
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && (nldiFilterData?.directions & Directions.Downsteam)) {
         arr = arr.filter(x => x.properties?.westdaat_direction === 'Downstream');
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
-        //setNldiIds([]);
         return [];
       }
       return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
         .map(a => a.properties?.identifier);
-      //setNldiIds(mappedSites);
-
-      //return mappedSites;
     }else{ // if nldi is not active, empty the array
-      //setNldiIds([]);
       return [];
     }
-  }, [geoJsonData, nldiFilterData]);
+  }, [geoJsonData, nldiFilterData, isNldiMapActive]);
 
   useEffect(() => {
-    setNldiIds(nldiWadeSiteIds);
+    setNldiIds(previousState => {
+      if(deepEqual(previousState, nldiWadeSiteIds)){
+        return previousState;
+      }
+      return nldiWadeSiteIds;
+    });
   }, [nldiWadeSiteIds, setNldiIds]);
 
   useEffect(() => {

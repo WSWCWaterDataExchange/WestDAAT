@@ -38,7 +38,11 @@ function AnalyticsDataTable() {
             states: filters.states,
             wadeSitesUuids: nldiIds
         });
-    }, [_defaultResults, filters, nldiIds, setSearchCriteria, setWaterRightsSearchResults]);
+    }, [_defaultResults, filters.allocationOwner, filters.beneficialUses, filters.includeExempt, 
+        filters.maxFlow, filters.maxPriorityDate, filters.maxVolume, filters.minFlow, filters.minPriorityDate, 
+        filters.minVolume, filters.ownerClassifications, filters.podPou, filters.polyline, filters.riverBasinNames, 
+        filters.states, filters.waterSourceTypes, 
+        nldiIds]); //there are properties on the filters object that need to be ignored, so the properties to subscribe to must be explicitly listed
 
     const handleLoadMoreResults = () => {
         if (waterRightsSearchResults.waterRightsDetails.length === 0) return;
@@ -46,9 +50,13 @@ function AnalyticsDataTable() {
     }
 
     const { data: latestSearchResults, isFetching: isFetchingTableData } = useFindWaterRights(searchCriteria)
+
     useEffect(() => {
         handleFiltersChange();
-    }, [filters, handleFiltersChange]);
+    }, [filters.allocationOwner, filters.beneficialUses, filters.includeExempt, filters.maxFlow, filters.maxPriorityDate, 
+        filters.maxVolume, filters.minFlow, filters.minPriorityDate, filters.minVolume, filters.ownerClassifications, 
+        filters.podPou, filters.polyline, filters.riverBasinNames, filters.states, filters.waterSourceTypes, 
+        handleFiltersChange]);
 
     useEffect(() => {
         if (!latestSearchResults) return;
