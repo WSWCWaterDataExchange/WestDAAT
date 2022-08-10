@@ -295,28 +295,43 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsNoTracking()
                 .Where(predicate);
 
+            //        var filteredSites = db.SitesDim
+            //.AsNoTracking()
+            //.Where(a => a.AllocationBridgeSitesFact
+            //    .Select(b => b.AllocationAmount)
+            //    .Intersect(waterRightDetails)
+            //    .Any());
+
             var filteredSites = db.SitesDim
                 .AsNoTracking()
                 .Where(a => a.AllocationBridgeSitesFact
-                    .Select(b => b.AllocationAmount)
-                    .Intersect(waterRightDetails)
-                    .Any());
+                    .Any(c => waterRightDetails
+                        .Any(d => d.AllocationAmountId == c.AllocationAmountId)));
+            // don't forget to make nathan look at the count function
+            Console.WriteLine("Variable Specific");
+            yield return db.VariablesDim.Where(a => waterRightDetails.Any(x => x.VariableSpecificId == a.VariableSpecificId)).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).AsEnumerable();
 
-            var response = new List<IEnumerable<object>>()
-            {
-                waterRightDetails.Select(x=>x.VariableSpecific).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.VariableSpecificUuid),
-                waterRightDetails.Select(x=>x.Organization).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.OrganizationUuid),
-                waterRightDetails.Select(x=>x.Method).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.MethodUuid),
-                filteredSites.SelectMany(x=>x.AllocationBridgeSitesFact).ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.AllocationUuid),
-                filteredSites.SelectMany(c=>c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration),
-                filteredSites.SelectMany(b=>b.WaterSourceBridgeSitesFact).Select(c=>c.WaterSource).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.WaterSourceUuid),
-                filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration).AsEnumerable().DistinctBy(x=>x.SiteUuid),
-            };
+            //yield return waterRightDetails.Select(x => x.VariableSpecific).Distinct().ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).ToList();
+            Console.WriteLine("Organization");
+            yield return db.OrganizationsDim.Where(a => waterRightDetails.Any(x => x.OrganizationId == a.OrganizationId)).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable();
 
-            foreach (var entry in response)
-            {
-                yield return entry;
-            }
+            //yield return waterRightDetails.Select(x => x.Organization).Distinct().ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable();
+            Console.WriteLine("Method");
+            yield return db.MethodsDim.Where(a => waterRightDetails.Any(x => x.MethodId == a.MethodId)).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable();
+
+            //yield return waterRightDetails.Select(x => x.Method).Distinct().ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable();
+            Console.WriteLine("WaterAllocations");
+            yield return waterRightDetails.ProjectTo<CsvModels.WaterAllocations>(DtoMapper.Configuration).AsEnumerable();
+
+
+            Console.WriteLine("PODSiteToPOU");
+            yield return db.PODSiteToPOUSiteFact.Where(a => filteredSites.Any(b => b.SiteId == a.PODSiteId) || filteredSites.Any(b => b.SiteId == a.POUSiteId)).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration);
+            //yield return filteredSites.SelectMany(c => c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration);
+            Console.WriteLine("Water source bridge site facts");
+            yield return db.WaterSourcesDim.Where(a => filteredSites.SelectMany(y => y.WaterSourceBridgeSitesFact).Any(x => x.WaterSourceId == a.WaterSourceId)).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable();
+            //yield return filteredSites.SelectMany(b => b.WaterSourceBridgeSitesFact).Select(c => c.WaterSource).Distinct().ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable();
+            Console.WriteLine("sites");
+            yield return filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration).AsEnumerable();
         }
     }
 }

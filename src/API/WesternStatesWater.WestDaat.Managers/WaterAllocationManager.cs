@@ -56,7 +56,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
-            if ( searchRequest.PageNumber == null)
+            if (searchRequest.PageNumber == null)
             {
                 throw new WestDaatException($"Required value PageNumber was not found");
             }
@@ -179,7 +179,7 @@ namespace WesternStatesWater.WestDaat.Managers
         public void WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
-            
+
             var count = _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
 
             if (count > _performanceConfiguration.MaxRecordsDownload)
@@ -196,24 +196,21 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 foreach (var file in filesToGenerate)
                 {
-                    if (file.Any())
-                    {
-                        var ms = new MemoryStream();
-                        var writer = new StreamWriter(ms);
-                        var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
-                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+                    var ms = new MemoryStream();
+                    var writer = new StreamWriter(ms);
+                    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                        csv.WriteRecords(file);
-                        csv.Flush();
+                    csv.WriteRecords(file);
+                    csv.Flush();
 
-                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
-                        zipStream.PutNextEntry(entry);
+                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
+                    zipStream.PutNextEntry(entry);
 
-                        ms.Seek(0, SeekOrigin.Begin);
+                    ms.Seek(0, SeekOrigin.Begin);
 
-                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
-                    }
+                    StreamUtils.Copy(ms, zipStream, new byte[4096]);
                 }
 
                 // getting citation file

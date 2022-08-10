@@ -4,7 +4,7 @@
     {
         public string MethodUuid { get; set; }
         public string OrganizationUuid { get; set; }
-        public string SiteUuid { get; set; } 
+        public string[] SiteUuid { get; set; } 
         public string VariableSpecificUuid { get; set; }
         public string AllocationUuid { get; set; }
         public DateTime? AllocationApplicationDate { get; set; }
