@@ -1,5 +1,6 @@
 ﻿using LinqKit;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using System.ComponentModel.DataAnnotations;
 
 namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
@@ -214,11 +215,18 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            foreach(var geometry in geometries)
+            if (geometries.Length == 0)
             {
-                predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
-                (site.Site.Geometry != null && site.Site.Geometry.Intersects(geometry)) || (site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry))));
+                return predicate;
             }
+
+            var geometryCombined = GeometryCombiner.Combine(geometries);
+
+            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+            site.Site.Geometry != null && site.Site.Geometry.Intersects(geometryCombined)));
+
+            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+            site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometryCombined)));
             
             return predicate;
         }
