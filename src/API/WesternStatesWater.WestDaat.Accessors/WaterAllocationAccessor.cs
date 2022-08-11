@@ -363,11 +363,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             var sites = GetSites(searchCriteria);
 
             yield return ("Variables", variables);
-
-            //yield return waterRightDetails.Select(x => x.VariableSpecific).Distinct().ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).ToList();
             yield return ("Organizations", organizations);
-
-            //yield return waterRightDetails.Select(x => x.Organization).Distinct().ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable();
             yield return ("Methods", methods);
 
             //yield return waterRightDetails.Select(x => x.Method).Distinct().ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable();
