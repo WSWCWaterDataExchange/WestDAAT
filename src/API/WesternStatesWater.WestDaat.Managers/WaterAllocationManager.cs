@@ -1,4 +1,5 @@
 using CsvHelper;
+using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
@@ -176,7 +177,20 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public void WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        private class WaterRightMap : ClassMap<string[]>
+        {
+            public WaterRightMap()
+            {
+                //Map( x => x.Join(",", x))
+                //Map(x => x.SiteUuid).Convert(a =>
+                //{
+                //    return $"[{string.Join(",", a.Value.SiteUuid)}]";
+                //});
+                //Map(x => x.BeneficialUseCategory).Convert(a => $"[{string.Join(",", a.Value.BeneficialUseCategory)}]");
+            }
+        }
+
+        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
@@ -194,24 +208,46 @@ namespace WesternStatesWater.WestDaat.Managers
                 zipStream.SetLevel(9);
                 zipStream.IsStreamOwner = false;
 
-                foreach (var file in filesToGenerate)
+                Parallel.ForEach(filesToGenerate, file =>
                 {
+                    Console.WriteLine($"started {file.Name}");
                     var ms = new MemoryStream();
                     var writer = new StreamWriter(ms);
                     var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
                     csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                    csv.WriteRecords(file);
+                    csv.WriteRecords(file.Data);
                     csv.Flush();
+                    lock (filesToGenerate)
+                    {
+                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
+                        zipStream.PutNextEntry(entry);
 
-                    var entry = new ZipEntry(ZipEntry.CleanName($"{file.GetType().GetGenericArguments()[0].Name}.csv"));
-                    zipStream.PutNextEntry(entry);
+                        ms.Seek(0, SeekOrigin.Begin);
 
-                    ms.Seek(0, SeekOrigin.Begin);
+                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                    }
+                    Console.WriteLine($"finished {file.Name}");
+                });
+                //foreach (var file in filesToGenerate)
+                //{
+                //    var ms = new MemoryStream();
+                //    var writer = new StreamWriter(ms);
+                //    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                //    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                //    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                    StreamUtils.Copy(ms, zipStream, new byte[4096]);
-                }
+                //    csv.WriteRecords(file.Data);
+                //    csv.Flush();
+
+                //    var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
+                //    zipStream.PutNextEntry(entry);
+
+                //    ms.Seek(0, SeekOrigin.Begin);
+
+                //    StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                //}
 
                 // getting citation file
                 var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);
@@ -234,6 +270,8 @@ namespace WesternStatesWater.WestDaat.Managers
                 StreamUtils.Copy(memoryStream, zipStream, new byte[4096]);
 
                 zipStream.Close();
+
+                await Task.CompletedTask;
             }
         }
     }

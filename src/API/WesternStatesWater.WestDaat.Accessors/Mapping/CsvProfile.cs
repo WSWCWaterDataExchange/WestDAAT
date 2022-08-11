@@ -18,11 +18,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EF.VariablesDim, Variables>();
 
+            CreateMap<EF.AllocationAmountsFact, WaterAllocationAccessor.WaterAllocationsHelper>();
+
             CreateMap<EF.AllocationAmountsFact, WaterAllocations>()
+                .Include<EF.AllocationAmountsFact, WaterAllocationAccessor.WaterAllocationsHelper>()
                 .ForMember(dest => dest.MethodUuid, opt => opt.MapFrom(source => source.Method.MethodUuid))
                 .ForMember(dest => dest.OrganizationUuid, opt => opt.MapFrom(source => source.Organization.OrganizationUuid))
                 //TODO add siteuuid back in
-                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.AllocationBridgeSitesFact.Select(x => x.Site.SiteUuid)))
+                .ForMember(dest => dest.SiteUuid, opt => opt.Ignore())
                 .ForMember(dest => dest.VariableSpecificUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.AllocationUuid, opt => opt.MapFrom(source => source.AllocationUuid))
                 .ForMember(dest => dest.AllocationApplicationDate, opt => opt.MapFrom(source => source.AllocationApplicationDateNavigation.Date))
@@ -43,7 +46,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.AllocationTimeframeStart, opt => opt.MapFrom(source => source.AllocationTimeframeStart))
                 .ForMember(dest => dest.AllocationTypeCv, opt => opt.MapFrom(source => source.AllocationTypeCv))
                 .ForMember(dest => dest.AllocationVolume_AF, opt => opt.MapFrom(source => source.AllocationVolume_AF))
-                .ForMember(dest => dest.BeneficialUseCategory, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(x => x.BeneficialUse.Name ?? x.BeneficialUseCV)))
+                .ForMember(dest => dest.BeneficialUseCategory, opt => opt.Ignore())
                 .ForMember(dest => dest.CommunityWaterSupplySystem, opt => opt.MapFrom(source => source.CommunityWaterSupplySystem))
                 .ForMember(dest => dest.CropTypeCv, opt => opt.MapFrom(source => source.CropTypeCV))
                 .ForMember(dest => dest.CustomerTypeCv, opt => opt.MapFrom(source => source.CustomerTypeCV))
@@ -77,8 +80,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EF.SitesDim, Sites>()
                 .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.SiteUuid))
-                .ForMember(dest => dest.WaterSourceUuids, opt => opt.MapFrom(source => source.WaterSourceBridgeSitesFact.Select(a => a.WaterSource.WaterSourceUuid)))
-                .ForMember(dest => dest.RegulatoryOverlayUuids, opt => opt.MapFrom(source => source.RegulatoryOverlayBridgeSitesFact.Select(x=>x.RegulatoryOverlay.RegulatoryOverlayUuid)))
+                .ForMember(dest => dest.WaterSourceUuids, opt => opt.Ignore())
+                .ForMember(dest => dest.RegulatoryOverlayUuids, opt => opt.Ignore())
                 .ForMember(dest => dest.EpsgCodeCv, opt => opt.MapFrom(source => source.EpsgcodeCv))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry.IsValid ? source.Geometry.ToString() : string.Empty))
                 .ForMember(dest => dest.NhdNetworkStatusCv, opt => opt.MapFrom(source => source.NhdnetworkStatusCv))
