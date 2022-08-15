@@ -12,7 +12,6 @@ import Icon from '@mdi/react';
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
-import { Feature, GeoJsonProperties, Geometry } from "geojson";
 
 function NldiTab(props: {isNldiMapActive: boolean}) {
   interface NldiDataType {
