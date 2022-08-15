@@ -129,7 +129,7 @@ const defaultState: MapContextState = {
   nldiFilterData: null,
   setNldiFilterData: () => { },
   mapLocationSettings: null,
-  setMapLocationSettings: () => { },
+  setMapLocationSettings: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);

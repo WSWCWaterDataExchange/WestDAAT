@@ -549,6 +549,11 @@ function WaterRightsTab() {
     })
     setNldiMapStatus(false);
     setActiveKeys(["colorSizeTools"]);
+    // clearing nldi information
+    setGeoJsonData('nldi', {
+      "type": "FeatureCollection",
+      "features": []
+    });
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
@@ -760,7 +765,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab />
+              <NldiTab isNldiMapActive={isNldiMapActive}/>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
