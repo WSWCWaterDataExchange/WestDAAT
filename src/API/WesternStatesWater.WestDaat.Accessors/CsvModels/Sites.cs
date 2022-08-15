@@ -3,8 +3,8 @@
     public class Sites
     {
         public string SiteUuid { get; set; }
-        public string[] RegulatoryOverlayUuids { get; set; }
-        public string[] WaterSourceUuids { get; set; }
+        public string RegulatoryOverlayUuids { get; set; }
+        public string WaterSourceUuids { get; set; }
         public string CoordinateAccuracy { get; set; }
         public string CoordinateMethodCv { get; set; }
         public string County { get; set; }

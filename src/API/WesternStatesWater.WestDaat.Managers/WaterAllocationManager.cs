@@ -177,19 +177,6 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        private class WaterRightMap : ClassMap<string[]>
-        {
-            public WaterRightMap()
-            {
-                //Map( x => x.Join(",", x))
-                //Map(x => x.SiteUuid).Convert(a =>
-                //{
-                //    return $"[{string.Join(",", a.Value.SiteUuid)}]";
-                //});
-                //Map(x => x.BeneficialUseCategory).Convert(a => $"[{string.Join(",", a.Value.BeneficialUseCategory)}]");
-            }
-        }
-
         public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
@@ -230,24 +217,6 @@ namespace WesternStatesWater.WestDaat.Managers
                     }
                     Console.WriteLine($"finished {file.Name}");
                 });
-                //foreach (var file in filesToGenerate)
-                //{
-                //    var ms = new MemoryStream();
-                //    var writer = new StreamWriter(ms);
-                //    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                //    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
-                //    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
-
-                //    csv.WriteRecords(file.Data);
-                //    csv.Flush();
-
-                //    var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
-                //    zipStream.PutNextEntry(entry);
-
-                //    ms.Seek(0, SeekOrigin.Begin);
-
-                //    StreamUtils.Copy(ms, zipStream, new byte[4096]);
-                //}
 
                 // getting citation file
                 var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);

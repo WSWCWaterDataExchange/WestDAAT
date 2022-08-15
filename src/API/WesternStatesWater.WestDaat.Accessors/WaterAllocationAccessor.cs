@@ -203,43 +203,6 @@ namespace WesternStatesWater.WestDaat.Accessors
             return predicate;
         }
 
-        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetBeneficialUsesForAllocations(WaterRightsSearchCriteria searchCriteria)
-        {
-            var (db, allocationAmountsFacts) = GetWaterRightsDB(searchCriteria);
-            var matchingBeneficialUses = db.AllocationBridgeBeneficialUsesFact
-                .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
-                .Select(a => new { a.AllocationAmountId, BeneficialUse = a.BeneficialUse.WaDEName ?? a.BeneficialUseCV })
-                .AsAsyncEnumerable();
-
-            var allBeneficialUses = new ConcurrentDictionary<long, ConcurrentBag<string>>();
-            await Parallel.ForEachAsync(matchingBeneficialUses, (use, ct) =>
-            {
-                allBeneficialUses.GetOrAdd(use.AllocationAmountId, new ConcurrentBag<string>())
-                    .Add(use.BeneficialUse);
-                return ValueTask.CompletedTask;
-            });
-            return allBeneficialUses;
-        }
-
-        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetSitesForAllocations(WaterRightsSearchCriteria searchCriteria)
-        {
-            var (db, allocationAmountsFacts) = GetWaterRightsDB(searchCriteria);
-            var matchingSites = db.AllocationBridgeSitesFact
-                .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
-                .Select(a => new { a.AllocationAmountId, a.Site.SiteUuid })
-                .AsAsyncEnumerable();
-
-
-            var allSiteAllocations = new ConcurrentDictionary<long, ConcurrentBag<string>>();
-            await Parallel.ForEachAsync(matchingSites, (site, ct) =>
-            {
-                allSiteAllocations.GetOrAdd(site.AllocationAmountId, new ConcurrentBag<string>())
-                    .Add(site.SiteUuid);
-                return ValueTask.CompletedTask;
-            });
-            return allSiteAllocations;
-        }
-
         Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {
             using var db = _databaseContextFactory.Create();
@@ -325,24 +288,45 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Count();
         }
 
-        private async IAsyncEnumerable<CsvModels.WaterAllocations> GetWaterRightDetails(WaterRightsSearchCriteria searchCriteria)
+        private async IAsyncEnumerable<CsvModels.WaterAllocations> BuildWaterAllocationsModel(WaterRightsSearchCriteria searchCriteria)
         {
-            var (db, allocationAmountsFacts) = GetWaterRightsDB(searchCriteria);
+            var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
 
             var allSiteAllocationsTask = GetSitesForAllocations(searchCriteria);
 
             var allBeneficialUses = await GetBeneficialUsesForAllocations(searchCriteria);
-            // TODO add comment about parallism stuff? Nathan says no
+            // run both calls, then await first call before continuing
             var allSiteAllocations = await allSiteAllocationsTask;
 
-            var test = allocationAmountsFacts
+            var waterAllocations = allocationAmountsFacts
                 .ProjectTo<WaterAllocationsHelper>(DtoMapper.Configuration)
                 .AsAsyncEnumerable();
-            await foreach(var item in test)
+            await foreach(var allocation in waterAllocations)
             {
-                item.SiteUuid = string.Join(",", allSiteAllocations.GetValueOrDefault(item.AllocationAmountId) ?? new ConcurrentBag<string>());
-                item.BeneficialUseCategory = string.Join(",", allBeneficialUses.GetValueOrDefault(item.AllocationAmountId) ?? new ConcurrentBag<string>());
-                yield return item.Map<CsvModels.WaterAllocations>();
+                allocation.SiteUuid = string.Join(",", allSiteAllocations.GetValueOrDefault(allocation.AllocationAmountId) ?? new ConcurrentBag<string>());
+                allocation.BeneficialUseCategory = string.Join(",", allBeneficialUses.GetValueOrDefault(allocation.AllocationAmountId) ?? new ConcurrentBag<string>());
+                yield return allocation.Map<CsvModels.WaterAllocations>();
+            }
+        }
+        private async IAsyncEnumerable<CsvModels.Sites> BuildSitesModel(WaterRightsSearchCriteria searchCriteria)
+        {
+            var (db, filteredSites) = GetFilteredSites(searchCriteria);
+
+            var allRegulatoryTask = GetRegulatoryOverlayForSites(searchCriteria);
+
+            var allWaterSourceUUIDS = await GetWaterSourcesForSites(searchCriteria);
+            // run both calls, then await first call before continuing
+            var allRegulatory = await allRegulatoryTask;
+
+            var sites = filteredSites
+                .ProjectTo<SitesHelper>(DtoMapper.Configuration)
+                .AsAsyncEnumerable();
+
+            await foreach (var site in sites)
+            {
+                site.WaterSourceUuids = string.Join(",", allWaterSourceUUIDS.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
+                site.RegulatoryOverlayUuids = string.Join(",", allRegulatory.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
+                yield return site.Map<CsvModels.Sites>();
             }
         }
 
@@ -351,49 +335,101 @@ namespace WesternStatesWater.WestDaat.Accessors
             public long AllocationAmountId { get; set; }
         }
 
+        internal class SitesHelper: CsvModels.Sites
+        {
+            public long SiteId { get; set; }
+        }
+
         IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
-            // TODO: build predicate here
             var variables = GetVariables(searchCriteria);
             var organizations = GetOrganizations(searchCriteria);
             var methods = GetMethods(searchCriteria);
-            var podtopou = GetPODToPOU(searchCriteria);
+            var podtopou = GetPodSiteToPouSiteRelationships(searchCriteria);
             var waterSources = GetWaterSources(searchCriteria);
-            var waterRights = GetWaterRightDetails(searchCriteria).ToEnumerable();
-            var sites = GetSites(searchCriteria);
+            var waterRights = BuildWaterAllocationsModel(searchCriteria).ToEnumerable();
+            var sites = BuildSitesModel(searchCriteria).ToEnumerable();
 
+            yield return ("WaterSources", waterSources);
+            yield return ("Sites", sites);
             yield return ("Variables", variables);
             yield return ("Organizations", organizations);
             yield return ("Methods", methods);
-
-            //yield return waterRightDetails.Select(x => x.Method).Distinct().ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable();
             yield return ("WaterAllocations", waterRights);
-
-            yield return ("PodToPou", podtopou);
-
-            //yield return filteredSites.SelectMany(c => c.PODSiteToPOUSitePODFact).ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration);
-            yield return ("WaterSources", waterSources);
-            //yield return filteredSites.SelectMany(b => b.WaterSourceBridgeSitesFact).Select(c => c.WaterSource).Distinct().ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable();
-            yield return ("Sites", sites);
-        }
-
-        private IEnumerable<Sites> GetSites(WaterRightsSearchCriteria searchCriteria)
-        {
-            var (db, filteredSites) = GetFilteredSites(searchCriteria);
-
-            return filteredSites.ProjectTo<CsvModels.Sites>(DtoMapper.Configuration).AsEnumerable();
+            yield return ("PodSiteToPouSiteRelationships", podtopou);
         }
 
         private IEnumerable<WaterSources> GetWaterSources(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
-            return db.WaterSourcesDim.Where(a => filteredSites.SelectMany(y => y.WaterSourceBridgeSitesFact).Any(x => x.WaterSourceId == a.WaterSourceId)).ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration).AsEnumerable();
+            return db.WaterSourcesDim
+                .Where(a => filteredSites
+                    .SelectMany(y => y.WaterSourceBridgeSitesFact)
+                    .Any(x => x.WaterSourceId == a.WaterSourceId))
+                .ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration)
+                .AsEnumerable();
+        }
+
+        private IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
+        {
+            var (db, filteredSites) = GetFilteredSites(searchCriteria);
+
+            return db.PODSiteToPOUSiteFact
+                .Where(a => filteredSites
+                    .Any(b => b.SiteId == a.PODSiteId) 
+                    || filteredSites.Any(b => b.SiteId == a.POUSiteId))
+                .ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration)
+                .AsEnumerable();
+        }
+
+        private IEnumerable<Methods> GetMethods(WaterRightsSearchCriteria searchCriteria)
+        {
+            var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
+
+            return db.MethodsDim
+                .Where(a => waterRightDetails
+                    .Any(x => x.MethodId == a.MethodId))
+                .ProjectTo<CsvModels.Methods>(DtoMapper.Configuration)
+                .AsEnumerable();
+        }
+
+        private IEnumerable<Organizations> GetOrganizations(WaterRightsSearchCriteria searchCriteria)
+        {
+            var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
+
+            return db.OrganizationsDim
+                .Where(a => waterRightDetails
+                    .Any(x => x.OrganizationId == a.OrganizationId))
+                .ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration)
+                .AsEnumerable();
+        }
+
+        private IEnumerable<Variables> GetVariables(WaterRightsSearchCriteria searchCriteria)
+        {
+            var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
+
+            return db.VariablesDim
+                .Where(a => waterRightDetails
+                    .Any(x => x.VariableSpecificId == a.VariableSpecificId))
+                .ProjectTo<CsvModels.Variables>(DtoMapper.Configuration)
+                .AsEnumerable();
+        }
+
+        private (DatabaseContext DB, IQueryable<AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
+        {
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
+            var db = _databaseContextFactory.Create();
+            var waterRightDetails = db.AllocationAmountsFact
+                .AsNoTracking()
+                .Where(predicate);
+
+            return (db, waterRightDetails);
         }
 
         private (DatabaseContext DB, IQueryable<SitesDim> FilteredSites) GetFilteredSites(WaterRightsSearchCriteria searchCriteria)
         {
-            var (db, waterRightDetails) = GetWaterRightsDB(searchCriteria);
+            var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
             var sites = db.SitesDim
                 .AsNoTracking()
@@ -404,47 +440,77 @@ namespace WesternStatesWater.WestDaat.Accessors
             return (db, sites);
         }
 
-        private IEnumerable<PodSiteToPouSiteRelationships> GetPODToPOU(WaterRightsSearchCriteria searchCriteria)
+        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetBeneficialUsesForAllocations(WaterRightsSearchCriteria searchCriteria)
         {
-            var (db, filteredSites) = GetFilteredSites(searchCriteria);
+            var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
+            var matchingBeneficialUses = db.AllocationBridgeBeneficialUsesFact
+                .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
+                .Select(a => new { a.AllocationAmountId, BeneficialUse = a.BeneficialUse.WaDEName ?? a.BeneficialUseCV })
+                .AsAsyncEnumerable();
 
-            return db.PODSiteToPOUSiteFact
-                .Where(a => filteredSites
-                    .Any(b => b.SiteId == a.PODSiteId) 
-                    || filteredSites.Any(b => b.SiteId == a.POUSiteId))
-                .ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration).AsEnumerable();
+            var allBeneficialUses = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            await Parallel.ForEachAsync(matchingBeneficialUses, (use, ct) =>
+            {
+                allBeneficialUses.GetOrAdd(use.AllocationAmountId, new ConcurrentBag<string>())
+                    .Add(use.BeneficialUse);
+                return ValueTask.CompletedTask;
+            });
+            return allBeneficialUses;
         }
 
-        private IEnumerable<Methods> GetMethods(WaterRightsSearchCriteria searchCriteria)
+        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetSitesForAllocations(WaterRightsSearchCriteria searchCriteria)
         {
-            var (db, waterRightDetails) = GetWaterRightsDB(searchCriteria);
+            var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
+            var matchingSites = db.AllocationBridgeSitesFact
+                .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
+                .Select(a => new { a.AllocationAmountId, a.Site.SiteUuid })
+                .AsAsyncEnumerable();
 
-            return db.MethodsDim.Where(a => waterRightDetails.Any(x => x.MethodId == a.MethodId)).ProjectTo<CsvModels.Methods>(DtoMapper.Configuration).AsEnumerable();
+
+            var allSiteAllocations = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            await Parallel.ForEachAsync(matchingSites, (site, ct) =>
+            {
+                allSiteAllocations.GetOrAdd(site.AllocationAmountId, new ConcurrentBag<string>())
+                    .Add(site.SiteUuid);
+                return ValueTask.CompletedTask;
+            });
+            return allSiteAllocations;
         }
 
-        private IEnumerable<Organizations> GetOrganizations(WaterRightsSearchCriteria searchCriteria)
+        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetRegulatoryOverlayForSites(WaterRightsSearchCriteria searchCriteria)
         {
-            var (db, waterRightDetails) = GetWaterRightsDB(searchCriteria);
+            var (db, sites) = GetFilteredSites(searchCriteria);
+            var matchingRegulatoryUUIDS = db.RegulatoryOverlayBridgeSitesFact
+                .Where(a => sites.Any(b => b.SiteId == a.SiteId))
+                .Select(a => new { a.SiteId, a.RegulatoryOverlay.RegulatoryOverlayUuid })
+                .AsAsyncEnumerable();
 
-            return db.OrganizationsDim.Where(a => waterRightDetails.Any(x => x.OrganizationId == a.OrganizationId)).ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration).AsEnumerable();
+            var allRegulatoryUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            await Parallel.ForEachAsync(matchingRegulatoryUUIDS, (regulatoryUUID, ct) =>
+            {
+                allRegulatoryUuids.GetOrAdd(regulatoryUUID.SiteId, new ConcurrentBag<string>())
+                    .Add(regulatoryUUID.RegulatoryOverlayUuid);
+                return ValueTask.CompletedTask;
+            });
+            return allRegulatoryUuids;
         }
 
-        private IEnumerable<Variables> GetVariables(WaterRightsSearchCriteria searchCriteria)
+        private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
         {
-            // don't forget to make nathan look at the count function
-            var (db, waterRightDetails) = GetWaterRightsDB(searchCriteria);
-            return db.VariablesDim.Where(a => waterRightDetails.Any(x => x.VariableSpecificId == a.VariableSpecificId)).ProjectTo<CsvModels.Variables>(DtoMapper.Configuration).AsEnumerable();
-        }
+            var (db, sites) = GetFilteredSites(searchCriteria);
+            var matchingWaterSourceUUIDs = db.WaterSourceBridgeSitesFact
+                .Where(a => sites.Any(b => b.SiteId == a.SiteId))
+                .Select(a => new { a.SiteId, a.WaterSource.WaterSourceUuid })
+                .AsAsyncEnumerable();
 
-        private (DatabaseContext DB, IQueryable<AllocationAmountsFact> AllocationAmounts) GetWaterRightsDB(WaterRightsSearchCriteria searchCriteria)
-        {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-            var db = _databaseContextFactory.Create();
-            var waterRightDetails = db.AllocationAmountsFact
-                .AsNoTracking()
-                .Where(predicate);
-
-            return (db, waterRightDetails);
+            var allRegulatoryUuids = new ConcurrentDictionary<long, ConcurrentBag<string>>();
+            await Parallel.ForEachAsync(matchingWaterSourceUUIDs, (waterSource, ct) =>
+            {
+                allRegulatoryUuids.GetOrAdd(waterSource.SiteId, new ConcurrentBag<string>())
+                    .Add(waterSource.WaterSourceUuid);
+                return ValueTask.CompletedTask;
+            });
+            return allRegulatoryUuids;
         }
     }
 }
