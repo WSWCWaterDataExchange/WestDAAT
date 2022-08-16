@@ -197,15 +197,23 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 Parallel.ForEach(filesToGenerate, file =>
                 {
-                    Console.WriteLine($"started {file.Name}");
                     var ms = new MemoryStream();
                     var writer = new StreamWriter(ms);
                     var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
-                    csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+                    if (file.Data.Any())
+                    {
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                    csv.WriteRecords(file.Data);
-                    csv.Flush();
+                        csv.WriteRecords(file.Data);
+                        csv.Flush();
+                    } 
+                    else
+                    {
+                        csv.WriteRecords($"No Data found for {file.Name}");
+                        csv.Flush();
+                    }
+
                     lock (filesToGenerate)
                     {
                         var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
@@ -215,7 +223,6 @@ namespace WesternStatesWater.WestDaat.Managers
 
                         StreamUtils.Copy(ms, zipStream, new byte[4096]);
                     }
-                    Console.WriteLine($"finished {file.Name}");
                 });
 
                 // getting citation file

@@ -18,10 +18,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EF.VariablesDim, Variables>();
 
-            CreateMap<EF.AllocationAmountsFact, WaterAllocationAccessor.WaterAllocationsHelper>();
+            CreateMap<EF.AllocationAmountsFact, WaterAllocationsHelper>();
 
             CreateMap<EF.AllocationAmountsFact, WaterAllocations>()
-                .Include<EF.AllocationAmountsFact, WaterAllocationAccessor.WaterAllocationsHelper>()
+                .Include<EF.AllocationAmountsFact, WaterAllocationsHelper>()
                 .ForMember(dest => dest.MethodUuid, opt => opt.MapFrom(source => source.Method.MethodUuid))
                 .ForMember(dest => dest.OrganizationUuid, opt => opt.MapFrom(source => source.Organization.OrganizationUuid))
                 .ForMember(dest => dest.SiteUuid, opt => opt.Ignore())
@@ -77,10 +77,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterSourceNativeId, opt => opt.MapFrom(source => source.WaterSourceNativeId))
                 .ForMember(dest => dest.WaterSourceTypeCv, opt => opt.MapFrom(source => source.WaterSourceTypeCv));
 
-            CreateMap<EF.SitesDim, WaterAllocationAccessor.SitesHelper>();
+            CreateMap<EF.SitesDim, SitesHelper>();
 
             CreateMap<EF.SitesDim, Sites>()
-                .Include<EF.SitesDim, WaterAllocationAccessor.SitesHelper>()
+                .Include<EF.SitesDim, SitesHelper>()
                 .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(source => source.SiteUuid))
                 .ForMember(dest => dest.WaterSourceUuids, opt => opt.Ignore())
                 .ForMember(dest => dest.RegulatoryOverlayUuids, opt => opt.Ignore())

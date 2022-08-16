@@ -288,7 +288,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Count();
         }
 
-        private async IAsyncEnumerable<CsvModels.WaterAllocations> BuildWaterAllocationsModel(WaterRightsSearchCriteria searchCriteria)
+        private async IAsyncEnumerable<WaterAllocations> BuildWaterAllocationsModel(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
 
@@ -305,10 +305,10 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 allocation.SiteUuid = string.Join(",", allSiteAllocations.GetValueOrDefault(allocation.AllocationAmountId) ?? new ConcurrentBag<string>());
                 allocation.BeneficialUseCategory = string.Join(",", allBeneficialUses.GetValueOrDefault(allocation.AllocationAmountId) ?? new ConcurrentBag<string>());
-                yield return allocation.Map<CsvModels.WaterAllocations>();
+                yield return allocation.Map<WaterAllocations>();
             }
         }
-        private async IAsyncEnumerable<CsvModels.Sites> BuildSitesModel(WaterRightsSearchCriteria searchCriteria)
+        private async IAsyncEnumerable<Sites> BuildSitesModel(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
@@ -326,18 +326,8 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 site.WaterSourceUuids = string.Join(",", allWaterSourceUUIDS.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
                 site.RegulatoryOverlayUuids = string.Join(",", allRegulatory.GetValueOrDefault(site.SiteId) ?? new ConcurrentBag<string>());
-                yield return site.Map<CsvModels.Sites>();
+                yield return site.Map<Sites>();
             }
-        }
-
-        internal class WaterAllocationsHelper: CsvModels.WaterAllocations
-        {
-            public long AllocationAmountId { get; set; }
-        }
-
-        internal class SitesHelper: CsvModels.Sites
-        {
-            public long SiteId { get; set; }
         }
 
         IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
@@ -364,10 +354,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
             return db.WaterSourcesDim
+                .AsNoTracking()
                 .Where(a => filteredSites
                     .SelectMany(y => y.WaterSourceBridgeSitesFact)
                     .Any(x => x.WaterSourceId == a.WaterSourceId))
-                .ProjectTo<CsvModels.WaterSources>(DtoMapper.Configuration)
+                .ProjectTo<WaterSources>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
 
@@ -376,10 +367,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
             return db.PODSiteToPOUSiteFact
+                .AsNoTracking()
                 .Where(a => filteredSites
                     .Any(b => b.SiteId == a.PODSiteId) 
                     || filteredSites.Any(b => b.SiteId == a.POUSiteId))
-                .ProjectTo<CsvModels.PodSiteToPouSiteRelationships>(DtoMapper.Configuration)
+                .ProjectTo<PodSiteToPouSiteRelationships>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
 
@@ -388,9 +380,10 @@ namespace WesternStatesWater.WestDaat.Accessors
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
             return db.MethodsDim
+                .AsNoTracking()
                 .Where(a => waterRightDetails
                     .Any(x => x.MethodId == a.MethodId))
-                .ProjectTo<CsvModels.Methods>(DtoMapper.Configuration)
+                .ProjectTo<Methods>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
 
@@ -399,9 +392,10 @@ namespace WesternStatesWater.WestDaat.Accessors
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
             return db.OrganizationsDim
+                .AsNoTracking()
                 .Where(a => waterRightDetails
                     .Any(x => x.OrganizationId == a.OrganizationId))
-                .ProjectTo<CsvModels.Organizations>(DtoMapper.Configuration)
+                .ProjectTo<Organizations>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
 
@@ -410,9 +404,10 @@ namespace WesternStatesWater.WestDaat.Accessors
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
             return db.VariablesDim
+                .AsNoTracking()
                 .Where(a => waterRightDetails
                     .Any(x => x.VariableSpecificId == a.VariableSpecificId))
-                .ProjectTo<CsvModels.Variables>(DtoMapper.Configuration)
+                .ProjectTo<Variables>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
 
@@ -444,6 +439,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
             var matchingBeneficialUses = db.AllocationBridgeBeneficialUsesFact
+                .AsNoTracking()
                 .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
                 .Select(a => new { a.AllocationAmountId, BeneficialUse = a.BeneficialUse.WaDEName ?? a.BeneficialUseCV })
                 .AsAsyncEnumerable();
@@ -462,6 +458,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var (db, allocationAmountsFacts) = GetFilteredWaterAllocations(searchCriteria);
             var matchingSites = db.AllocationBridgeSitesFact
+                .AsNoTracking()
                 .Where(a => allocationAmountsFacts.Any(b => b.AllocationAmountId == a.AllocationAmountId))
                 .Select(a => new { a.AllocationAmountId, a.Site.SiteUuid })
                 .AsAsyncEnumerable();
@@ -481,6 +478,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var (db, sites) = GetFilteredSites(searchCriteria);
             var matchingRegulatoryUUIDS = db.RegulatoryOverlayBridgeSitesFact
+                .AsNoTracking()
                 .Where(a => sites.Any(b => b.SiteId == a.SiteId))
                 .Select(a => new { a.SiteId, a.RegulatoryOverlay.RegulatoryOverlayUuid })
                 .AsAsyncEnumerable();
@@ -499,6 +497,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             var (db, sites) = GetFilteredSites(searchCriteria);
             var matchingWaterSourceUUIDs = db.WaterSourceBridgeSitesFact
+                .AsNoTracking()
                 .Where(a => sites.Any(b => b.SiteId == a.SiteId))
                 .Select(a => new { a.SiteId, a.WaterSource.WaterSourceUuid })
                 .AsAsyncEnumerable();
