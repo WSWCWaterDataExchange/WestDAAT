@@ -25,7 +25,7 @@
         public string AllocationTimeframeStart { get; set; }
         public string AllocationTypeCv { get; set; }
         public double? AllocationVolume_AF { get; set; }
-        public string[] BeneficialUseCategory { get; set; }
+        public string BeneficialUseCategory { get; set; }
         public string CommunityWaterSupplySystem { get; set; }
         public string CropTypeCv { get; set; }
         public string CustomerTypeCv { get; set; }
