@@ -19,13 +19,14 @@ export interface WaterRightsFilters{
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
   polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
-  nldiIds?: string[]
+  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
 }
 
 interface FilterContextState {
   filters: WaterRightsFilters;
   setFilters: React.Dispatch<React.SetStateAction<WaterRightsFilters>>;
+  nldiIds: string[];
+  setNldiIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const defaultFilters: WaterRightsFilters = {
@@ -44,13 +45,14 @@ const defaultFilters: WaterRightsFilters = {
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
   polyline: [],
-  nldiFilterData: null,
-  nldiIds: undefined
+  nldiFilterData: null
 }
 
 const defaultState: FilterContextState = {
   filters: defaultFilters,
-  setFilters: () => {}
+  setFilters: () => {},
+  nldiIds: [],
+  setNldiIds: () => {},
 }
 
 export const FilterContext = createContext<FilterContextState>(defaultState);
@@ -59,10 +61,13 @@ export const FilterProvider: FC = ({ children }) => {
   const { getUrlParam } = useContext(AppContext);
 
   const [ filters, setFilters ] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const [ nldiIds, setNldiIds ] = useState<string[]>([]);
 
   const filterContextProviderValue = {
     filters,
-    setFilters
+    setFilters,
+    nldiIds,
+    setNldiIds
   }
 
   return (

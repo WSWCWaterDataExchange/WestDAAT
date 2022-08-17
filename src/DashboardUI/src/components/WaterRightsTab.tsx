@@ -84,8 +84,7 @@ const defaultFilters: WaterRightsFilters = {
   minPriorityDate: undefined,
   maxPriorityDate: undefined,
   polyline: [],
-  nldiFilterData: null,
-  nldiIds: []
+  nldiFilterData: null
 }
 
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
@@ -124,7 +123,7 @@ function WaterRightsTab() {
   const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
   const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading } = useRiverBasinOptions();
   const { setUrlParam, getUrlParam } = useContext(AppContext);
-  const { filters, setFilters } = useContext(FilterContext);
+  const { filters, setFilters, setNldiIds } = useContext(FilterContext);
   const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', filters.riverBasinNames ?? []], async (): Promise<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | undefined> => {
     if ((filters?.riverBasinNames?.length ?? 0) === 0) {
       return undefined;
@@ -299,9 +298,12 @@ function WaterRightsTab() {
     }
   }, [setLegend, renderedMapGroupings, isNldiMapActive])
 
-  const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
+  const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
+    if(!isNldiMapActive){
+      return [];
+    }
     let nldiData = geoJsonData.filter(s => s.source === 'nldi');
     if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
       let arr = (nldiData[0].data as FeatureCollection).features
@@ -312,26 +314,23 @@ function WaterRightsTab() {
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && (nldiFilterData?.directions & Directions.Downsteam)) {
         arr = arr.filter(x => x.properties?.westdaat_direction === 'Downstream');
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
-        setFilters(s => ({
-          ...s,
-          nldiIds: []
-        }));
-        return
+        return [];
       }
-      let mappedSites = arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
-        .map(a => a.properties?.identifier)
-        setFilters(s => ({
-          ...s,
-          nldiIds: mappedSites
-        }));
-        return mappedSites;
+      return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
+        .map(a => a.properties?.identifier);
     }else{ // if nldi is not active, empty the array
-      setFilters(s => ({
-        ...s,
-        nldiIds: []
-      }));
+      return [];
     }
-  }, [geoJsonData, nldiFilterData, setFilters])
+  }, [geoJsonData, nldiFilterData, isNldiMapActive]);
+
+  useEffect(() => {
+    setNldiIds(previousState => {
+      if(deepEqual(previousState, nldiWadeSiteIds)){
+        return previousState;
+      }
+      return nldiWadeSiteIds;
+    });
+  }, [nldiWadeSiteIds, setNldiIds]);
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
@@ -550,6 +549,11 @@ function WaterRightsTab() {
     })
     setNldiMapStatus(false);
     setActiveKeys(["colorSizeTools"]);
+    // clearing nldi information
+    setGeoJsonData('nldi', {
+      "type": "FeatureCollection",
+      "features": []
+    });
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
@@ -761,7 +765,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab />
+              <NldiTab isNldiMapActive={isNldiMapActive}/>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
