@@ -3,6 +3,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
@@ -24,9 +25,12 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-
+            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             using var db = _databaseContextFactory.Create();
+
+            // db.database does not pick up transaction from transactionScope if we do not open connection
+            db.Database.OpenConnection();
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var analyticsSummary = await db.AllocationAmountsFact
                 .AsNoTracking()
@@ -44,14 +48,19 @@ namespace WesternStatesWater.WestDaat.Accessors
                 })
                 .ToArrayAsync();
 
+            ts.Complete();
+
             return analyticsSummary;
         }
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-
+            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             using var db = _databaseContextFactory.Create();
+
+            // db.database does not pick up transaction from transactionScope if we do not open connection
+            db.Database.OpenConnection();
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var waterRightDetails = await db.AllocationAmountsFact
                 .AsNoTracking()
@@ -63,6 +72,8 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
                 .ToArrayAsync();
 
+            ts.Complete();
+
             return new WaterRightsSearchResults
             {
                 CurrentPageNumber = searchCriteria.PageNumber,
@@ -71,7 +82,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
@@ -87,18 +98,26 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             predicate.And(BuildGeometrySearchPredicate(searchCriteria));
 
-            predicate.And(BuildFromSiteUuids(searchCriteria));
+            predicate.And(BuildFromSiteUuids(searchCriteria, db));
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
 
             if (searchCriteria?.WadeSitesUuids != null && searchCriteria.WadeSitesUuids.Any())
             {
-                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(searchCriteria.WadeSitesUuids.ToList()));
+                db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempUuidTable);
+
+                // Unsafe mode is because does not have a key
+                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new TempUuid { Uuid = a }), b => b.UnsafeMode = true);
+
+                db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempIdTable);
+                db.Database.ExecuteSqlRaw(Scripts.Scripts.FindSiteIdsFromUuids);
+
+                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(db));
             }
 
             return predicate;
@@ -277,20 +296,32 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         int IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-
+            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             using var db = _databaseContextFactory.Create();
-            return db.AllocationAmountsFact
+
+            // db.database does not pick up transaction from transactionScope if we do not open connection
+            db.Database.OpenConnection();
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
+
+            var count =  db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)
                 .Count();
+
+            ts.Complete();
+
+            return count;
         }
 
         IEnumerable<IEnumerable<object>> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
-
+            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             using var db = _databaseContextFactory.Create();
+
+            // db.database does not pick up transaction from transactionScope if we do not open connection
+            db.Database.OpenConnection();
+            var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
+
             var waterRightDetails = db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate);
@@ -317,6 +348,8 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 yield return entry;
             }
+
+            ts.Complete();
         }
     }
 }
