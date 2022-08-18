@@ -1937,42 +1937,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         [TestMethod]
         [TestCategory("Accessor Tests")]
-        public void WaterAllocationAccessor_GetWaterRights()
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-            var sites = new SitesDimFaker().Generate(5);
-            db.SitesDim.AddRange(sites);
-            db.SaveChanges();
-
-            var allocationAmount = new AllocationAmountFactFaker().Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            foreach (var site in sites)
-            {
-                var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
-                    .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId, site.SiteId)
-                    .Generate();
-                db.Add(allocationSiteBridge);
-            }
-            db.SaveChanges();
-
-            // Act
-            var searCriteria = new WaterRightsSearchCriteria
-            {
-                States = new string[] { }
-            };
-
-            var accessor = CreateWaterAllocationAccessor();
-            var result = accessor.GetWaterRights(searCriteria);
-
-            result.Should().NotBeNull();
-            result.Count().Should().Be(7);
-        }
-
-        [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount()
         {
             // Arrange
