@@ -73,11 +73,11 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
 
         #region Filters
-        public static ExpressionStarter<AllocationAmountsFact> HasSitesUuids(List<string> sitesUuids)
+        public static ExpressionStarter<AllocationAmountsFact> HasSitesUuids(DatabaseContext db)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(b => sitesUuids.Any(a => a == b.Site.SiteUuid)));
+            predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(b => db.TempId.Any(c => c.Id == b.SiteId)));
 
             return predicate;
         }
