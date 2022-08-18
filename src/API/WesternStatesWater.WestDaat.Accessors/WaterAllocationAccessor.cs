@@ -375,7 +375,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
-        IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
+        public IEnumerable<(string Name, IEnumerable<object> Data)> GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var variables = GetVariables(searchCriteria);
             var organizations = GetOrganizations(searchCriteria);
