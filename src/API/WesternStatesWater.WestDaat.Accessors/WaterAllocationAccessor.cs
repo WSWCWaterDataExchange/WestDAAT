@@ -314,6 +314,24 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return count;
         }
+        IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
+        {
+            var variables = GetVariables(searchCriteria);
+            var organizations = GetOrganizations(searchCriteria);
+            var methods = GetMethods(searchCriteria);
+            var podtopou = GetPodSiteToPouSiteRelationships(searchCriteria);
+            var waterSources = GetWaterSources(searchCriteria);
+            var waterRights = BuildWaterAllocationsModel(searchCriteria).ToEnumerable();
+            var sites = BuildSitesModel(searchCriteria).ToEnumerable();
+
+            yield return ("WaterSources", waterSources);
+            yield return ("Sites", sites);
+            yield return ("Variables", variables);
+            yield return ("Organizations", organizations);
+            yield return ("Methods", methods);
+            yield return ("WaterAllocations", waterRights);
+            yield return ("PodSiteToPouSiteRelationships", podtopou);
+        }
 
         private async IAsyncEnumerable<WaterAllocations> BuildWaterAllocationsModel(WaterRightsSearchCriteria searchCriteria)
         {
@@ -357,24 +375,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
-        IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
-        {
-            var variables = GetVariables(searchCriteria);
-            var organizations = GetOrganizations(searchCriteria);
-            var methods = GetMethods(searchCriteria);
-            var podtopou = GetPodSiteToPouSiteRelationships(searchCriteria);
-            var waterSources = GetWaterSources(searchCriteria);
-            var waterRights = BuildWaterAllocationsModel(searchCriteria).ToEnumerable();
-            var sites = BuildSitesModel(searchCriteria).ToEnumerable();
-
-            yield return ("WaterSources", waterSources);
-            yield return ("Sites", sites);
-            yield return ("Variables", variables);
-            yield return ("Organizations", organizations);
-            yield return ("Methods", methods);
-            yield return ("WaterAllocations", waterRights);
-            yield return ("PodSiteToPouSiteRelationships", podtopou);
-        }
+        
 
         private IEnumerable<WaterSources> GetWaterSources(WaterRightsSearchCriteria searchCriteria)
         {
@@ -440,10 +441,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private (DatabaseContext DB, IQueryable<AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
             var db = _databaseContextFactory.Create();
-            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
             db.Database.OpenConnection();
