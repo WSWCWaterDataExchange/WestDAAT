@@ -2,9 +2,12 @@
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading.Tasks;
+using System.Resources;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.EngineTests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tools.JSONLDGenerator")] 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tools.JSONLDGenerator")]
+
+[assembly: NeutralResourcesLanguage("en")] 
