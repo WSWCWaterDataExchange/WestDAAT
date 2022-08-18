@@ -203,7 +203,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return predicate;
         }
 
-        Organization IWaterAllocationAccessor.GetWaterAllocationAmountOrganizationById(long allocationAmountId)
+        public Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId)
         {
             using var db = _databaseContextFactory.Create();
             var org = db.AllocationAmountsFact
@@ -245,7 +245,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                     .ToListAsync();
         }
 
-        async Task<List<AllocationAmount>> IWaterAllocationAccessor.GetAllWaterAllocations()
+        public async Task<List<AllocationAmount>> GetAllWaterAllocations()
         {
             using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
@@ -256,7 +256,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return waterAllocations;
         }
 
-        async Task<List<SiteLocation>> IWaterAllocationAccessor.GetWaterRightSiteLocationsById(string allocationUuid)
+        public async Task<List<SiteLocation>> GetWaterRightSiteLocationsById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
@@ -267,7 +267,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                         .ToListAsync();
         }
 
-        async Task<List<WaterRightsDigest>> IWaterAllocationAccessor.GetWaterRightsDigestsBySite(string siteUuid)
+        public async Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid)
         {
             using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
@@ -277,7 +277,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
 
-        int IWaterAllocationAccessor.GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
+        public int GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria);
 
@@ -330,7 +330,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             }
         }
 
-        IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
+        public IEnumerable<(string Name, IEnumerable<object> Data)> GetWaterRights(WaterRightsSearchCriteria searchCriteria)
         {
             var variables = GetVariables(searchCriteria);
             var organizations = GetOrganizations(searchCriteria);
@@ -349,7 +349,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             yield return ("PodSiteToPouSiteRelationships", podtopou);
         }
 
-        private IEnumerable<WaterSources> GetWaterSources(WaterRightsSearchCriteria searchCriteria)
+        internal IEnumerable<WaterSources> GetWaterSources(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
@@ -362,7 +362,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
+        internal IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
@@ -375,7 +375,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private IEnumerable<Methods> GetMethods(WaterRightsSearchCriteria searchCriteria)
+        internal IEnumerable<Methods> GetMethods(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
@@ -387,7 +387,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private IEnumerable<Organizations> GetOrganizations(WaterRightsSearchCriteria searchCriteria)
+        internal IEnumerable<Organizations> GetOrganizations(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
@@ -399,7 +399,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private IEnumerable<Variables> GetVariables(WaterRightsSearchCriteria searchCriteria)
+        internal IEnumerable<Variables> GetVariables(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
