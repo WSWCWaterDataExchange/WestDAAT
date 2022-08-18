@@ -95,7 +95,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<SitesDim> SitesDim { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<TempUuid> TempUuid { get; set; }
-
         public virtual DbSet<TempId> TempId { get; set; }
         public virtual DbSet<Units> Units { get; set; }
         public virtual DbSet<Variable> Variable { get; set; }
