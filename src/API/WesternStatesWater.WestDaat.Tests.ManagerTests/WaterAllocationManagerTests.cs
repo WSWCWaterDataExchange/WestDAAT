@@ -413,7 +413,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         [DataRow(100001)]
         [DataRow(450000)]
-        public void WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
+        public async Task WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
         {
             var managerSearchRequest = new WaterRightsSearchCriteria
             {
@@ -425,19 +425,19 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            Assert.ThrowsException<WestDaatException>(() => manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
+            await Assert.ThrowsExceptionAsync<WestDaatException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
 
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
         }
 
         [TestMethod]
-        public void WaterRightsAsZip_ThrowsException_WhenAllSearchCriteriaPropertiesAreNull()
+        public async Task WaterRightsAsZip_ThrowsException_WhenAllSearchCriteriaPropertiesAreNull()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            Assert.ThrowsException<NullReferenceException>(() => manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
+            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
 
             // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
@@ -462,9 +462,9 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }
             };
 
-            var iEnumerableList = new List<IEnumerable<dynamic>>
+            var iEnumerableList = new List<(string, IEnumerable<dynamic>)>
             {
-                variables
+                ("Variables", variables)
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -486,7 +486,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -522,9 +522,9 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }
             };
 
-            var iEnumerableList = new List<IEnumerable<dynamic>>
+            var iEnumerableList = new List<(string, IEnumerable<dynamic>)>
             {
-                organizations
+                ("Organizations", organizations)
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -546,72 +546,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
             using (var zip = ZipFile.Read(memoryStream))
             {
                 zip.Count.Should().Be(2);
-                foreach (ZipEntry e in zip)
-                {
-                    await CheckRecords(e, e.FileName, organizations);
-                }
-            }
-        }
-
-        [TestMethod]
-        public async Task WaterRightsAsZip_BuildsStream_OnlyOneCollectionWithValues()
-        {
-            var variables = new List<CsvModels.Variables>();
-            var methods = new List<CsvModels.Methods>();
-            var organizations = new List<CsvModels.Organizations>
-            {
-                new CsvModels.Organizations
-                {
-                    OrganizationUuid = Guid.NewGuid().ToString()
-                },
-                new CsvModels.Organizations
-                {
-                    OrganizationUuid = Guid.NewGuid().ToString()
-                },
-                new CsvModels.Organizations
-                {
-                    OrganizationUuid = Guid.NewGuid().ToString()
-                }
-            };
-
-            var iEnumerableList = new List<IEnumerable<dynamic>>
-            {
-                organizations, variables, methods
-            };
-
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Returns(5)
-                .Verifiable();
-
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Returns(iEnumerableList)
-                .Verifiable();
-
-            _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
-                .Returns(_citationFile);
-
-            var managerSearchRequest = new WaterRightsSearchCriteria
-            {
-                States = new string[] { "NE" }
-            };
-
-            var memoryStream = new MemoryStream();
-
-            var manager = CreateWaterAllocationManager();
-            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
-
-            memoryStream.Seek(0, SeekOrigin.Begin);
-
-            using (var zip = ZipFile.Read(memoryStream))
-            {
-                zip.Entries.Count.Should().Be(2);
                 foreach (ZipEntry e in zip)
                 {
                     await CheckRecords(e, e.FileName, organizations);
@@ -678,9 +619,15 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }
             };
 
-            var iEnumerableList = new List<IEnumerable<dynamic>>
+            var iEnumerableList = new List<(string, IEnumerable<dynamic>)>
             {
-                organizations, methods, variables, podtopu, sites, watersources, allocations
+                ("Organizations", organizations),
+                ("Methods", methods),
+                ("Variables", variables),
+                ("PodSiteToPouSiteRelationships", podtopu),
+                ("Sites", sites),
+                ("WaterSources", watersources),
+                ("WaterAllocations", allocations)
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
@@ -702,7 +649,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var memoryStream = new MemoryStream();
 
             var manager = CreateWaterAllocationManager();
-            manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
+            await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -710,29 +657,36 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             {
                 zip.Count.Should().Be(8);
 
-                ZipEntry organizationEntry = zip[0];
-                await CheckRecords(organizationEntry, organizationEntry.FileName, organizations);
-
-                ZipEntry methodsEntry = zip[1];
-                await CheckRecords(methodsEntry, methodsEntry.FileName, methods);
-
-                ZipEntry variablesEntry = zip[2];
-                await CheckRecords(variablesEntry, variablesEntry.FileName, variables);
-
-                ZipEntry podtopuEntry = zip[3];
-                await CheckRecords(podtopuEntry, podtopuEntry.FileName, podtopu);
-
-                ZipEntry sitesEntry = zip[4];
-                await CheckRecords(sitesEntry, sitesEntry.FileName, sites);
-
-                ZipEntry waterSourcesEntry = zip[5];
-                await CheckRecords(waterSourcesEntry, waterSourcesEntry.FileName, watersources);
-
-                ZipEntry allocationsEntry = zip[6];
-                await CheckRecords(allocationsEntry, allocationsEntry.FileName, allocations);
-
-                ZipEntry citationEntry = zip[7];
-                await CheckRecords(citationEntry, citationEntry.FileName, new List<dynamic>());
+                foreach (var zipFile in zip)
+                {
+                    if(zipFile.FileName != "citation.txt")
+                    {
+                        switch (zipFile.FileName)
+                        {
+                            case "Organizations.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, organizations);
+                                break;
+                            case "Methods.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, methods);
+                                break;
+                            case "Variables.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, variables);
+                                break;
+                            case "PodSiteToPouSiteRelationships.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, podtopu);
+                                break;
+                            case "Sites.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, sites);
+                                break;
+                            case "WaterSources.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, watersources);
+                                break;
+                            case "WaterAllocations.csv":
+                                await CheckRecords(zipFile, zipFile.FileName, allocations);
+                                break;
+                        }
+                    }
+                }
             }
         }
 
