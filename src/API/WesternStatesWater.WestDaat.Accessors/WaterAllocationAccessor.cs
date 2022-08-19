@@ -314,24 +314,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return count;
         }
-        IEnumerable<(string Name, IEnumerable<object> Data)> IWaterAllocationAccessor.GetWaterRights(WaterRightsSearchCriteria searchCriteria)
-        {
-            var variables = GetVariables(searchCriteria);
-            var organizations = GetOrganizations(searchCriteria);
-            var methods = GetMethods(searchCriteria);
-            var podtopou = GetPodSiteToPouSiteRelationships(searchCriteria);
-            var waterSources = GetWaterSources(searchCriteria);
-            var waterRights = BuildWaterAllocationsModel(searchCriteria).ToEnumerable();
-            var sites = BuildSitesModel(searchCriteria).ToEnumerable();
-
-            yield return ("WaterSources", waterSources);
-            yield return ("Sites", sites);
-            yield return ("Variables", variables);
-            yield return ("Organizations", organizations);
-            yield return ("Methods", methods);
-            yield return ("WaterAllocations", waterRights);
-            yield return ("PodSiteToPouSiteRelationships", podtopou);
-        }
 
         private async IAsyncEnumerable<WaterAllocations> BuildWaterAllocationsModel(WaterRightsSearchCriteria searchCriteria)
         {

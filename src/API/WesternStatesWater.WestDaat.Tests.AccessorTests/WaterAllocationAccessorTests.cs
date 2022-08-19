@@ -1936,7 +1936,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetVariables()
         {
             // Arrange
@@ -1980,7 +1979,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetOrganizations()
         {
             // Arrange
@@ -2023,7 +2021,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetMethods()
         {
             // Arrange
@@ -2066,7 +2063,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterSources()
         {
             // Arrange
