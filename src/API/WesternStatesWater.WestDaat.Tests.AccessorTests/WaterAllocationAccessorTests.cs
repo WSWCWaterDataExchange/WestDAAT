@@ -1936,6 +1936,173 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public void WaterAllocationAccessor_GetVariables()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            // generates 1 variable linked to allocation
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            var variables = new VariablesDimFaker().Generate(5);
+            db.VariablesDim.AddRange(variables);
+            db.SaveChanges();
+
+            var variable = allocationAmount.VariableSpecific;
+            var expectedResult = new Accessors.CsvModels.Variables
+            {
+                VariableCv = allocationAmount.VariableSpecific.VariableCv,
+                VariableSpecificUuid = variable.VariableSpecificUuid,
+                AggregationInterval = allocationAmount.VariableSpecific.AggregationInterval,
+                VariableSpecificCv = allocationAmount.VariableSpecific.VariableSpecificCv,
+                AmountUnitCv = variable.AmountUnitCv,
+                AggregationIntervalUnitCv = variable.AggregationIntervalUnitCv,
+                AggregationStatisticCv = variable.AggregationStatisticCv,
+                MaximumAmountUnitCv = variable.MaximumAmountUnitCv,
+                ReportYearStartMonth = variable.ReportYearStartMonth,
+                ReportYearTypeCv = variable.ReportYearTypeCv,
+            };
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = accessor.GetVariables(searCriteria);
+
+            result.Should().NotBeNull();
+            result.Count().Should().Be(1);
+
+            result.First().Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
+        public void WaterAllocationAccessor_GetOrganizations()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            // generates 1 organization linked to allocation
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            var organizations = new OrganizationsDimFaker().Generate(5);
+            db.OrganizationsDim.AddRange(organizations);
+            db.SaveChanges();
+
+            var organization = allocationAmount.Organization;
+            var expectedResult = new Accessors.CsvModels.Organizations
+            {
+                OrganizationContactEmail = organization.OrganizationContactEmail,
+                OrganizationContactName = organization.OrganizationContactName,
+                OrganizationDataMappingUrl = organization.OrganizationDataMappingUrl,
+                OrganizationName = organization.OrganizationName,
+                OrganizationPhoneNumber = organization.OrganizationPhoneNumber,
+                OrganizationPurview = organization.OrganizationPurview,
+                OrganizationUuid = organization.OrganizationUuid,
+                OrganizationWebsite = organization.OrganizationWebsite,
+                State = organization.State,
+            };
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = accessor.GetOrganizations(searCriteria);
+
+            result.Should().NotBeNull();
+            result.Count().Should().Be(1);
+
+            result.First().Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
+        public void WaterAllocationAccessor_GetMethods()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            // generates 1 method linked to allocation
+            var allocationAmount = new AllocationAmountFactFaker().Generate();
+            db.AllocationAmountsFact.Add(allocationAmount);
+            db.SaveChanges();
+
+            var methods = new MethodsDimFaker().Generate(5);
+            db.MethodsDim.AddRange(methods);
+            db.SaveChanges();
+
+            var method = allocationAmount.Method;
+            var expectedResult = new Accessors.CsvModels.Methods
+            {
+                ApplicableResourceTypeCv = method.ApplicableResourceTypeCv,
+                DataConfidenceValue = method.DataConfidenceValue,
+                DataCoverageValue  = method.DataCoverageValue,
+                DataQualityValueCv = method.DataQualityValueCv,
+                MethodDescription = method.MethodDescription,
+                MethodName = method.MethodName,
+                MethodNemiLink = method.MethodNemilink,
+                MethodTypeCv = method.MethodTypeCv,
+                MethodUuid = method.MethodUuid,
+            };
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = accessor.GetMethods(searCriteria);
+
+            result.Should().NotBeNull();
+            result.Count().Should().Be(1);
+
+            result.First().Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
+        public void WaterAllocationAccessor_GetWaterSources()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var waterSources = new WaterSourceDimFaker().Generate();
+
+            var site = new SitesDimFaker().LinkWaterSources(waterSources).Generate();
+            var allocation = new AllocationAmountFactFaker().LinkSites(site).Generate();
+            db.AllocationAmountsFact.Add(allocation);
+            db.SaveChanges();
+
+            var waterSource = site.WaterSourceBridgeSitesFact.First().WaterSource;
+            var test = waterSource.Geometry;
+
+            var expectedResult = new Accessors.CsvModels.WaterSources
+            {
+                Geometry = string.Empty,
+                GnisFeatureNameCv = waterSource.GnisfeatureNameCv,
+                WaterQualityIndicatorCv = waterSource.WaterQualityIndicatorCv,
+                WaterSourceName = waterSource.WaterSourceName,
+                WaterSourceNativeId = waterSource.WaterSourceNativeId,
+                WaterSourceTypeCv = waterSource.WaterSourceTypeCv,
+                WaterSourceUuid = waterSource.WaterSourceUuid,
+            };
+            // Act
+            var searCriteria = new WaterRightsSearchCriteria
+            {
+                States = new string[] { }
+            };
+
+            var accessor = CreateWaterAllocationAccessor();
+            var result = accessor.GetWaterSources(searCriteria);
+
+            result.Should().NotBeNull();
+            result.Count().Should().Be(1);
+
+            result.First().Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
         [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount()
         {
@@ -2019,7 +2186,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().Be(50);
         }
 
-        private IWaterAllocationAccessor CreateWaterAllocationAccessor()
+        private WaterAllocationAccessor CreateWaterAllocationAccessor()
         {
             return new WaterAllocationAccessor(CreateLogger<WaterAllocationAccessor>(), CreateDatabaseContextFactory(), CreatePerformanceConfiguration());
         }
