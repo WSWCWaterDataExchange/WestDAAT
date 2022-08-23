@@ -18,8 +18,6 @@ import { useAuthenticationContext } from "../hooks/useAuthenticationContext";
 interface SiteNavbarProps {
   currentTab: HomePageTab;
   onTabClick: (tab: HomePageTab) => void;
-  showContactModal(show: boolean): void;
-  showTermsModal(show: boolean): void;
   showDownloadModal(show: boolean): void;
 }
 
@@ -89,7 +87,6 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav>
 
           <div className="mx-2">
-            <Button className="ms-1">View Table Results</Button>
             <Button className="ms-1" onClick={() => props.showDownloadModal(true)}>Download Data</Button>
           </div>
         </Container>
@@ -102,9 +99,8 @@ function SiteNavbar(props: SiteNavbarProps) {
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">About</Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
-            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/Aggregate-Water-Data">Aggregate Water Use Data</Nav.Link>
-            <Nav.Link onClick={() => props.showContactModal(true)}>Contact Us</Nav.Link>
-            <Nav.Link onClick={() => props.showTermsModal(true)}>Terms and Conditions</Nav.Link>
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/contact-us">Contact Us</Nav.Link>
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/westdaat-terms-of-service/">Terms of Service</Nav.Link>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>

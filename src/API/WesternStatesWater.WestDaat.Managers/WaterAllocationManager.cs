@@ -1,8 +1,15 @@
+using CsvHelper;
+using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
+using System.IO;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
@@ -19,6 +26,8 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly ISiteAccessor _siteAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
+        private readonly ITemplateResourceSdk _templateResourceSdk;
+        private readonly PerformanceConfiguration _performanceConfiguration;
 
         public WaterAllocationManager(
             INldiAccessor nldiAccessor,
@@ -26,6 +35,8 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            ITemplateResourceSdk templateResourceSdk,
+            PerformanceConfiguration performanceConfiguration,
             ILogger<WaterAllocationManager> logger) : base(logger)
         {
             _nldiAccessor = nldiAccessor;
@@ -33,10 +44,23 @@ namespace WesternStatesWater.WestDaat.Managers
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
             _locationEngine = locationEngine;
+            _templateResourceSdk = templateResourceSdk;
+            _performanceConfiguration = performanceConfiguration;
+        }
+
+        public async Task<ClientContracts.AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            return (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
+            if (searchRequest.PageNumber == null)
+            {
+                throw new WestDaatException($"Required value PageNumber was not found");
+            }
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
             return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
@@ -47,16 +71,17 @@ namespace WesternStatesWater.WestDaat.Managers
             var accessorSearchRequest = searchRequest.Map<WaterRightsSearchCriteria>();
 
             var geometryFilters = new List<NetTopologySuite.Geometries.Geometry>();
-            if (searchRequest.RiverBasinNames?.Any() ?? false)
+            if (searchRequest?.RiverBasinNames?.Any() ?? false)
             {
                 var featureCollection = _locationEngine.GetRiverBasinPolygonsByName(searchRequest.RiverBasinNames);
                 var riverBasinPolygons = GeometryHelpers.GetGeometryByFeatures(featureCollection.Features);
                 geometryFilters.AddRange(riverBasinPolygons);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchRequest.FilterGeometry))
+            if (searchRequest.FilterGeometry?.Length > 0)
             {
-                geometryFilters.Add(GeometryHelpers.GetGeometryByGeoJson(searchRequest.FilterGeometry));
+                geometryFilters.AddRange(searchRequest.FilterGeometry
+                    .Select(x => GeometryHelpers.GetGeometryByGeoJson(x)));
             }
 
             if (geometryFilters.Any())
@@ -72,24 +97,24 @@ namespace WesternStatesWater.WestDaat.Managers
             return await _nldiAccessor.GetNldiFeatures(latitude, longitude, directions, dataPoints);
         }
 
-        async Task<ClientContracts.WaterRightDetails> ClientContracts.IWaterAllocationManager.GetWaterRightDetails(long waterRightsId)
+        async Task<ClientContracts.WaterRightDetails> ClientContracts.IWaterAllocationManager.GetWaterRightDetails(string allocatioinUuid)
         {
-            return (await _waterAllocationAccessor.GetWaterRightDetailsById(waterRightsId)).Map<ClientContracts.WaterRightDetails>();
+            return (await _waterAllocationAccessor.GetWaterRightDetailsById(allocatioinUuid)).Map<ClientContracts.WaterRightDetails>();
         }
 
-        async Task<List<ClientContracts.SiteInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSiteInfoList(long waterRightsId)
+        async Task<List<ClientContracts.SiteInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSiteInfoList(string allocationUuid)
         {
-            return (await _waterAllocationAccessor.GetWaterRightSiteInfoById(waterRightsId)).Map<List<ClientContracts.SiteInfoListItem>>();
+            return (await _waterAllocationAccessor.GetWaterRightSiteInfoById(allocationUuid)).Map<List<ClientContracts.SiteInfoListItem>>();
         }
 
-        async Task<List<ClientContracts.WaterSourceInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSourceInfoList(long waterRightsId)
+        async Task<List<ClientContracts.WaterSourceInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightSourceInfoList(string allocationUuid)
         {
-            return (await _waterAllocationAccessor.GetWaterRightSourceInfoById(waterRightsId)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
+            return (await _waterAllocationAccessor.GetWaterRightSourceInfoById(allocationUuid)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
         }
 
-        public async Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId)
+        public async Task<FeatureCollection> GetWaterRightSiteLocations(string allocationUuid)
         {
-            var siteLocations = await _waterAllocationAccessor.GetWaterRightSiteLocationsById(waterRightsId);
+            var siteLocations = await _waterAllocationAccessor.GetWaterRightSiteLocationsById(allocationUuid);
 
             List<Feature> features = new List<Feature>();
 
@@ -150,6 +175,80 @@ namespace WesternStatesWater.WestDaat.Managers
         async Task<List<ClientContracts.WaterRightInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterSiteRightsInfoListByUuid(string siteUuid)
         {
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
+        }
+
+        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            var count = _waterAllocationAccessor.GetWaterRightsCount(accessorSearchRequest);
+
+            if (count > _performanceConfiguration.MaxRecordsDownload)
+            {
+                throw new WestDaatException($"The requested amount of records exceeds the system allowance of {_performanceConfiguration.MaxRecordsDownload}");
+            }
+
+            var filesToGenerate = _waterAllocationAccessor.GetWaterRights(accessorSearchRequest);
+
+            using (ZipOutputStream zipStream = new ZipOutputStream(responseStream))
+            {
+                zipStream.SetLevel(9);
+                zipStream.IsStreamOwner = false;
+
+                Parallel.ForEach(filesToGenerate, file =>
+                {
+                    var ms = new MemoryStream();
+                    var writer = new StreamWriter(ms);
+                    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    if (file.Data.Any())
+                    {
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+
+                        csv.WriteRecords(file.Data);
+                        csv.Flush();
+                    } 
+                    else
+                    {
+                        csv.WriteField($"No Data found for {file.Name}");
+                        csv.Flush();
+                    }
+
+                    lock (filesToGenerate)
+                    {
+                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
+                        zipStream.PutNextEntry(entry);
+
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                    }
+                });
+
+                // getting citation file
+                var citationFile = _templateResourceSdk.GetTemplate(ResourceType.Citation);
+                // String replacement for the citation file
+                citationFile = citationFile
+                    .Replace("[insert download date here]", DateTime.Now.ToString("d"))
+                    .Replace("[Insert WestDAAT URL here]", $"{searchRequest.FilterUrl}");
+
+
+                // add the citation file to the zip stream
+                var memoryStream = new MemoryStream();
+                var stringWriter = new StreamWriter(memoryStream);
+                stringWriter.Write(citationFile.ToString());
+                stringWriter.Flush();
+
+                var citationEntry = new ZipEntry(ZipEntry.CleanName("citation.txt"));
+                zipStream.PutNextEntry(citationEntry);
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                StreamUtils.Copy(memoryStream, zipStream, new byte[4096]);
+
+                zipStream.Close();
+
+                await Task.CompletedTask;
+            }
         }
     }
 }

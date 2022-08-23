@@ -9,5 +9,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
     public class PerformanceConfiguration
     {
         public int WaterRightsSearchPageSize { get; set; }
+        public int MaxRecordsDownload { get; set; }
     }
 }

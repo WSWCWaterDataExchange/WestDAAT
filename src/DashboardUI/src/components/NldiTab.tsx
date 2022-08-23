@@ -13,7 +13,7 @@ import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
 import "../styles/NldiFilters.scss";
 
-function NldiTab() {
+function NldiTab(props: {isNldiMapActive: boolean}) {
   interface NldiDataType {
     latitude: number | null,
     longitude: number | null,
@@ -124,6 +124,18 @@ function NldiTab() {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
+  
+  useEffect(() => {
+    if (props.isNldiMapActive === false){
+      setNldiData(defaultNldiData);
+      setPointData(s => ({
+        ...s,
+        latitude: '',
+        longitude: ''
+      }));
+      setLatLongData('','');
+    }
+  }, [defaultNldiData, props.isNldiMapActive, setNldiData, setPointData, setLatLongData])
 
   useEffect(() => {
     setNldiFilterData(nldiData);
@@ -186,7 +198,7 @@ function NldiTab() {
 
   return (
     <div className="position-relative flex-grow-1">
-      <NldiDragAndDropButton setLatLong={setLatLongData} />
+      <NldiDragAndDropButton setLatLong={setLatLongData}/>
       <Form.Group className="mb-3">
         <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
         <Form.Control id='nldiLatitude' type='number' placeholder="Enter Latitude" max={90} min={-90} step={.01} value={pointData.latitude ?? ''} onChange={handleLatitudeChanged} onBlur={handleLatitudeBlurred} />
@@ -223,7 +235,7 @@ function NldiTab() {
 export default NldiTab;
 
 function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
-  const [{ dropResult }, dragRef] = useDrag({
+  let [{ dropResult }, dragRef] = useDrag({
     type: 'nldiMapPoint',
     item: {},
     collect: monitor => ({
@@ -236,7 +248,6 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
     if (dropResult) {
       setLatLong(dropResult.latitude.toString(), dropResult.longitude.toString());
     }
-
   }, [dropResult, setLatLong])
 
   return (<div className="d-inline-flex flex-row align-items-center">

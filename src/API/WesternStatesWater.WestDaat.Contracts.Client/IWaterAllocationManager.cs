@@ -1,21 +1,24 @@
 using GeoJSON.Text.Feature;
+using System.IO;
 using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
     {
+        Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
+
         Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchRequest);
         
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
-        Task<WaterRightDetails> GetWaterRightDetails(long waterRightsId);
+        Task<WaterRightDetails> GetWaterRightDetails(string allocationUuid);
 
-        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(long waterRightsId);
+        Task<List<SiteInfoListItem>> GetWaterRightSiteInfoList(string allocationUuid);
 
-        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(long waterRightsId);
+        Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(string allocationUuid);
 
-        Task<FeatureCollection> GetWaterRightSiteLocations(long waterRightsId);
+        Task<FeatureCollection> GetWaterRightSiteLocations(string allocationUuid);
 
         Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
 
@@ -28,5 +31,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid);
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
+
+        Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteria searchRequest);
     }
 }

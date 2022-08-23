@@ -1,10 +1,14 @@
 @import './colors.scss';
 @import './custom.scss';
 
-.offcanvas {
+.offcanvas-analytics {
   position: relative !important;
   transition: none;
-  display: block;
+
+  .offcanvas-body {
+    padding-right: 0px !important;
+    overflow-y: hidden;
+  }
 
   &.offcanvas-bottom {
     bottom: $offcanvas-vertical-height + 3vh;
@@ -31,4 +35,20 @@
     transition: none;
     bottom: auto;
   }
+}
+
+.scrollable-content {
+  overflow-y: auto;
+  height: $offcanvas-vertical-height - 4vh;
+}
+.scrollable-content thead th {
+  position: sticky;
+  top: 0;
+}
+table {
+  border-collapse: collapse;        
+  width: 100%;
+}
+th {
+  background:white !important;
 }

@@ -16,7 +16,7 @@ function SiteTabs(props: siteTabsProps) {
 
     return (
         <>
-            <Tabs defaultActiveKey="source" id="uncontrolled-tab-example" className="mb-3">
+            <Tabs defaultActiveKey="source" className="mb-3 custom-tabs">
                 <Tab eventKey="source" title="Water Source Information">
                     <Table hover>
                         <thead>
@@ -43,7 +43,7 @@ function SiteTabs(props: siteTabsProps) {
                     <Table hover>
                         <thead>
                             <tr>
-                                <th>WaDE Water Right ID</th>
+                                <th>WaDE Water Right Identifier</th>
                                 <th>Water Right Native ID</th>
                                 <th>Owner</th>
                                 <th>Priority Date</th>
@@ -56,8 +56,8 @@ function SiteTabs(props: siteTabsProps) {
                         </thead>
                         <tbody>
                             {waterRightInfoList?.map((right) =>
-                                <tr key={right.waterRightId}>
-                                    <td>{right.waterRightId}</td>
+                                <tr key={right.allocationUuid}>
+                                    <td>{right.allocationUuid}</td>
                                     <td>{right.waterRightNativeId}</td>
                                     <td>{right.owner}</td>
                                     <td><FormattedDate>{right.priorityDate}</FormattedDate></td>

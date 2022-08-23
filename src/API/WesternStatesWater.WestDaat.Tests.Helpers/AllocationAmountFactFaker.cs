@@ -13,7 +13,8 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.DataPublicationDate, b => DateDimFaker.Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
-                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'));
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
+                .RuleFor(a => a.AllocationUuid, f => f.Random.String(11, 'A', 'z'));
         }
     }
 
@@ -46,9 +47,17 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
         }
 
         public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDate(this AllocationAmountFactFaker faker)
-        {        
+        {
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
                 .RuleFor(a => a.AllocationPriorityDateNavigation, () => faker.DateDimFaker.Generate());
+
+            return faker;
+        }
+
+        public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDefaultDate(this AllocationAmountFactFaker faker)
+        {
+            faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
+                .RuleFor(a => a.AllocationPriorityDateNavigation, () => default);
 
             return faker;
         }
@@ -92,7 +101,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
-        public static Faker<AllocationAmountsFact> LinkOrganizaion(this Faker<AllocationAmountsFact> faker, OrganizationsDim organization)
+        public static Faker<AllocationAmountsFact> LinkOrganization(this Faker<AllocationAmountsFact> faker, OrganizationsDim organization)
         {
             faker.RuleFor(a => a.OrganizationId, () => organization.OrganizationId)
                 .RuleFor(a => a.Organization, () => organization);

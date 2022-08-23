@@ -6,12 +6,12 @@ import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
 import { FormattedDate } from './FormattedDate';
 
 interface waterRightPropertiesProps {
-  waterRightId: string;
+  allocationUuid: string;
 }
 
 function WaterRightProperties(props: waterRightPropertiesProps) {
   // TODO: Update with loading screen after Dub update
-  const waterRightDetails = useWaterRightDetails(+props.waterRightId).data;
+  const waterRightDetails = useWaterRightDetails(props.allocationUuid).data;
 
   const getPropertyValueClass = (value: any) => {
     return value !== null ? 'property-value' : 'property-value empty';
@@ -83,8 +83,8 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
               <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Water Right Information</Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
-                  <span className='property-name'>WaDE Water Right ID</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationAmountId)}>{waterRightDetails.allocationAmountId || emptyValue}</span>
+                  <span className='property-name'>WaDE Water Right Identifier</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationUuid)}>{waterRightDetails.allocationUuid || emptyValue}</span>
 
                   <span className='property-name'>Native ID</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationNativeId)}>{waterRightDetails.allocationNativeId || emptyValue}</span>

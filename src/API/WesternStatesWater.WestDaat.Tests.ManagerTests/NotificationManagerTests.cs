@@ -34,7 +34,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Role = faker.Random.String(),
                 Comments = faker.Random.String(),
                 SatisfactionLevel = faker.Random.String(),
-                DataInterest = new string[] { faker.Random.String(), faker.Random.String() },
                 DataUsage = new string[] { faker.Random.String(), faker.Random.String() }
             };
 
@@ -60,8 +59,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             emailRequest.TextContent.Should().Contain(feedbackRequest.Role);
             emailRequest.TextContent.Should().Contain(feedbackRequest.Comments);
             emailRequest.TextContent.Should().Contain(feedbackRequest.Email);
-            emailRequest.TextContent.Should().Contain(feedbackRequest.DataInterest[0]);
-            emailRequest.TextContent.Should().Contain(feedbackRequest.DataInterest[1]);
             emailRequest.TextContent.Should().Contain(feedbackRequest.DataUsage[0]);
             emailRequest.TextContent.Should().Contain(feedbackRequest.DataUsage[1]);
             emailRequest.Body.Should().BeNullOrWhiteSpace();

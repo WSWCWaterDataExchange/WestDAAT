@@ -1,0 +1,140 @@
+﻿Water rights data downloaded from Western States Water Data Access and Analysis Tool (WestDAAT) on [insert download date here]
+
+By WaDE2 Staff
+Adel Abdallah, WaDE Program Manager
+Email: adelabdallah@wswc.utah.gov
+Ryan James, Data Analyst / Hydroinformatics Specialist
+Email: rjames@wswc.utah.gov
+
+How to cite this data?
+Adel Abdallah and Ryan James. Western States Water Data Access and Analysis Tool (WestDAAT), Western States Water Council, [insert download date here]
+
+DISCLAIMER and Terms of Service: Individual states have unique water rights administration systems. Please check metadata before making any comparisons. The purpose of WaDE is to support regional water data and availability analysis. This data is not meant for localized decisions. Before drawing any conclusions or making comparisons, please consult the state's water rights agency and their used methods. Please also consult with the WaDE team before using this tool. We look forward to hearing your feedback.
+This data and documentation are provided by the Western States Water Council “AS IS” and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the Western States Water Council nor any of the entities providing financial support be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, loss of use, loss of or corruption of data, or loss of profits; or security breach; or business interruption; procurement of substitute goods or services) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software or documentation, even if advised of the possibility of such damage.
+
+The downloaded CSV files include water rights data and metadata according to the Water Data Exchange (WaDE) 2.0 schema. For more info, visit https://westernstateswater.org/wade. 
+The WaterAllocations table is the central table that includes water rights data, key metadata, and keys to ancillary metadata into the Methods, Variables, Organizations, WaterSources, and Sites tables.
+More info on the source code and detailed documentations of the Water Data Exchange (WaDE) Data System are available here https://github.com/WSWCWaterDataExchange/WaDE_Ecosystem
+
+How to reproduce WestDAAT search filters that generated this summary? Click at this URL 
+[Insert WestDAAT URL here]
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Data dictionary of the downloaded CSV files 
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Methods table
+MethodID / bigint / Internal unique identifier integer for methods.
+MethodUUID / nvarchar(100) / Foreign key unique identifier to Methods_dim table.
+ApplicableResourceTypeCV / nvarchar(100) / A description of the types of water supply or water use for which the method is used (e.g. surface water, groundwater, storage, consumptive use, withdrawal)
+DataConfidenceValue / nvarchar(50) / An indicator of data confidence, should be a confidence interval (e.g. 90%, 50%, etc.)
+DataCoverageValue / nvarchar(100) / An indicator of data coverage (e.g., full, partial, etc.).
+DataQualityValueCV / nvarchar(50) / An indicator of the quality of data or grading (e.g. fair, good, best, unreported), or using the NEMS data quality grading system.
+MethodDescription / text / A high level / general description of the data provided. Add agency specific disclaimers here.
+MethodName / nvarchar(50) / The name of the method used by the data provider.
+MethodNEMILink / nvarchar(100) / A link back to the data provider's website or other webpage for more information about the method (e.g., https://www.nemi.gov/home/).
+MethodTypeCV / nvarchar(50) / Indicator of how the actual amount value within the data was determined (i.e. calculated, measured, estimated, reported, modeled, etc).
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Variables table
+VariableSpecificID / bigint / Internal unique identifier integer.
+VariableSpecificUUID / nvarchar(250) / Foreign key unique identifier to Variables_dim table.
+AggregationInterval  / numeric(10,1) / The time interval distance for time related data. For example, if the data are provided in 15 minute intervals, the interval would be 4 and the aggregation unit would be hourly.
+AggregationIntervalUnitCV  / nvarchar(250) / The time internval unit of measurment (e.g., day ,month, year).
+AggregationStatisticCV / nvarchar(50) / The calculated statistic associated with the site-specific variable amount. Full list is here: http://vocabulary.odm2.org/aggregationstatistic/
+AmountUnitCV / nvarchar(250) / The allocation unit of measurment (e.g., CFS, AF, etc).
+MaximumAmountUnitCV / nvarchar(250) / The allocation unit of measurment used for maxium limits (e.g., CFS, AF, etc).
+ReportYearStartMonth  / nvarchar(10) / The starting month-day the data provider annual reporting period in. Format in MM-DD.
+ReportYearTypeCV  / nvarchar(250) / The data type of the annual reporting period for this datatype (e.g., water year, irrigation year, calendar year, etc.).
+VariableCV / nvarchar(250) / The high-level description of the variable used (e.g., withdrawal, consumptive use,  return flow, etc.).
+VariableSpecificCV / nvarchar(250) / The lower-level / subcategorization of the VariableCV.  Allows the user to specify the general category of water data (e.g. Withdrawl Irrigation, Withdrawl Supply, Consumptive Use Aggregated, etc.).
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Organizations table
+OrganizationID / bigint / Internal unique identifier integer.
+OrganizationUUID / nvarchar(250) / Foreign key unique identifier to Organization_dim table.
+OrganizationContactEmail / nvarchar(250) / Email address for the contact person of the organization.
+OrganizationContactName / nvarchar(250) / Name of the contact person for the organization.
+OrganizationDataMappingURL / nvarchar(250) / A URL to WaDE GitHub repository page for the provided data.
+OrganizationName / nvarchar(250) / Name of the organization (e.g., Utah Division of Water Resources).
+OrganizationPhoneNumber / nvarchar(250) / Phone number for the organization contact person. Include area code.
+OrganizationPurview / nvarchar(250) / A description of the purview of the agency (e.g., water rights, consumptive use, etc.).
+OrganizationWebsite / nvarchar(250) / A hyperlink back to the organization's website. Include https:// header and trailing forward slash.
+State / nvarchar(2) / Two digit state abbreviation where the organization is.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+WaterSources table
+WaterSourceID / bigint / Internal unique identifier integer.
+WaterSourceUUID / nvarchar(250) / Foreign key unique identifier to WaterSource_dim table.
+Geometry / geometry / The GIS objects / shape written in Well-Known Text (WKT) format.
+GNISFeatureNameCV / nvarchar(250) / The most appropriate Geographic Names Information System (GNIS) identifier for the source location.
+WaterQualityIndicatorCV / nvarchar(100) / Description of the water quality (e.g., fresh, saline, mixed quality, etc.).
+WaterSourceName / nvarchar(250) / The water source name as recognized by the data provider.
+WaterSourceNativeID / nvarchar(250) / The water source native ID used by the data provider.
+WaterSourceTypeCV / nvarchar(100) / The high level description of the water source type (e.g., surface water, groundwater, mixed, reuse, etc.)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Sites table
+SiteID / bigint / Internal unique identifier integer
+SiteUUID / nvarchar(200) / Foreign key unique identifier to Sites_dim table.
+RegulatoryOverlayUUIDs / nvarchar(200) / Foreign key unique identifier to RegulaotryOverlay_dim table.
+WaterSourceUUID / nvarchar(200) / Foreign key unique identifier to WaterSource_dim table.
+CoordinateAccuracy / nvarchar(255) / Description of the data accuracy.  The data are accurate to +/- x of a second of a degree (using a differentially corrected GPS).
+CoordinateMethodCV / nvarchar(100) / Description of the coordinate method used to generate the GIS location portion of the data.
+County / nvarchar(20) / Name of the county the data site is located in.
+EPSGCodeCV / nvarchar(50) / EPSG Code for projection used for WaDE (e.g.,  EPSG:4326).
+Geometry / geometry / The GIS objects / shape written in Well-Known Text (WKT) format.
+GNISCodeCV / nvarchar(250) / The most appropriate Geographic Names Information System (GNIS) identifier for the source location.
+HUC12 / nvarchar(20) / The Hydrologic Unit Identifier Code at level 12 of where the data site is located in.
+HUC8 / nvarchar(20) / The Hydrologic Unit Identifier Code at level 8 of where the data site is located in.
+Latitude / float / Latitude coordinate of the data site.  Up to six significant digits in WGS 84.
+Longitude / float / Longitude coordinate of the data site.  Up to six significant digits in WGS 84.
+NHDNetworkStatusCV / nvarchar(50) / USGS NHD network status identifier term (if available).
+NHDProductCV / nvarchar(50) / NHD product used for indexing (if available) (e.g., NHDPlus V1, NHDPlus V2, NHD Med Res, NHD High Res, etc).
+PODorPOUSite / nvarchar(50) / WaDe identifier term if the data site is a point of diversion (POD), place of use (POU), or a gage station.  Used for linking sites under similar records.
+SiteName / nvarchar(500) / Recognized name of the data site by the data provider.
+SiteNativeID / nvarchar(50) / Unique identifier code / ID used by the data provider to distinguish the data site in the source data set.
+SitePoint / geometry / The GIS data point / center of area written in Well-Known Text (WKT) format.  Similar to Geometry field.
+SiteTypeCV / nvarchar(100) / The high level description of the site type recognized by the data provider (e.g., well, spring, reservoir, river, ditch, etc.).
+StateCV / nvarchar(2) / Two digit state abbreviation where the data site is.
+USGSSiteID / nvarchar(250) / Unique identifier code / ID used by the USGS to distinguish the data site in the source data set.  Typically separate from SiteNativeID.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+WaterAllocations table
+MethodUUID / nvarchar(200) / Foreign key unique identifier to Methods_dim table.
+OrganizationUUID / nvarchar(200) / Foreign key unique identifier to Organization_dim table.
+SiteUUID / nvarchar(200) / Foreign key unique identifier to Sites_dim table.
+VariableSpecificUUID / nvarchar(200) / Foreign key unique identifier to Variables_dim table.
+AllocationApplicationDateID / bigint / Foreign key unique identifier to Dates_dim table. Date of the original filing on the water right record.
+AllocationAssociatedConsumptiveUseSiteIDs / nvarchar(500) / List of other sites if this water right has one or more associate consumptive use sites. Add the consumptive use UUIDs as comma separated list here.
+AllocationAssociatedWithdrawalSiteIDs / nvarchar(500) / List of other sites if this water right has one or more associate diversion sites. Add the diversion UUIDs as comma separated list
+AllocationBasisCV / nvarchar(250) / Description of whether this water right is based on water withdrawals/diversion or consumptive use/depletion amount.
+AllocationChangeApplicationIndicator / nvarchar(100) / Indicate if this water right was the result of a change application.
+AllocationCommunityWaterSupplySystem / nvarchar(250) / If the use is municipal, the data provider can add the SDWIS identifier for the CWS. Only for site specific data. Leave it null for aggregate data
+AllocationCropDutyAmount / float / Crop Duty amount. The number of acres of land that is irrigated for the complete growth of a crop by supplying 1-meter cubes per second of water continuously throughout the crop.
+AllocationExpirationDateID / bigint / Expiration date the water right expires (only really applies if the right is a temporary one).
+AllocationFlow_CFS / float / The state recognized water right water amount in terms of flow (CFS).
+AllocationLegalStatusCV / nvarchar(250) / The state recognized legal status of the water right (e.g., proven, approved, perfected, adjudicated, etc.)
+AllocationNativeID / nvarchar(250) / The state's unique identifier for the water right and it's record.
+AllocationOwner / nvarchar(500) / Name of the owner / entity with possession of the water right.
+AllocationPriorityDateID / bigint / Date given to the water right by the state. Date the water right become legal.  Format of MM/DD/YYYY.
+AllocationTimeframeEnd / nvarchar(6) / End date when the water right no longer can legaly access the assinged water.  Format of MM/DD.
+AllocationTimeframeStart / nvarchar(6) / Start date when the water right can legaly access the assinged water.  Format of MM/DD.
+AllocationTypeCV / nvarchar(250) / Description of the type of water right (e.g., Underground Water Claim, Federal Reserved Water Right, etc).
+AllocationVolume_AF / float / The state recognized water right water amount in terms of volume (AF).
+BeneficialUseCategory / nvarchar(250) / The state recognized stated purpose for the water right (e.g., irrigation, power, etc) (if multiple, provide as a comma separated list).
+CommunityWaterSupplySystem / nvarchar(250) / Name of the community water system the water right serves (if available).
+CropTypeCV / nvarchar(100) / The type of crop watered by the water right (if available) (e.g., wheat, alfalfa, corn, hay, etc.) (applies mostly to irrigation uses).
+CustomerTypeCV / nvarchar(100) / Description of the type of customer the water right services (e.g., Residential, Commercial, Industrial, Institutional, Combined, Unspecified, etc).
+DataPublicationDateID / bigint / Date that this data was published by the data provider to the public.
+DataPublicationDOI / nvarchar(100) / A unique digital object identifier into the original dataset.
+ExemptOfVolumeFlowPriority / bit / Database indicator for special records. if yes (1), then amount flow, volume, and priority dates can be null (e.g., this case represents groundwater rights in Arizona outside the AMA and INA areas).
+GeneratedPowerCapacityMW / float / The power (GWh) to be generated by the water right record (if available) (mostly applies to power generating beneficial uses).
+IrrigatedAcreage / float / Number of acres irrigated by the water right (if available).
+IrrigationMethodCV / nvarchar(100) / A term to describe the method used for the place of use (if available) (applies mostly to irrigation beneficial uses).
+LegacyAllocationIDs / nvarchar(250) / If this water right was the result of a change application, add the legacy right IDs as a comma separated list here.
+OwnerClassificationCV / nvarchar(250) / A term that categorizes the water right owner to a predetermined WaDE defined group. Used for data query and filtering purposes.
+PopulationServed / bigint / The amount of population served by the water right (if available).
+PowerType / nvarchar(50) / Description of the type of power generated.
+PrimaryUseCategoryCV / nvarchar(100) / The primary stated purpose by the water right (if available).
+SDWISIdentifierCV / nvarchar(100) / If the use is municipal, the data provider can add the SDWIS identifier for the CWS.
+WaterAllocationNativeURL / nvarchar(250) / Refers back to the state URL that describes the water right (e.g., https://www.waterrights.utah.gov/asp_apps/wrprint/wrprint.asp?wrnum=55-12888).

@@ -2,6 +2,7 @@
 {
     public enum ResourceType
     {
-        JsonLD
+        JsonLD,
+        Citation
     }
 }

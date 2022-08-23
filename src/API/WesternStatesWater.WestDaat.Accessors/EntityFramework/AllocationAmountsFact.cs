@@ -1,5 +1,6 @@
 ﻿using LinqKit;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using System.ComponentModel.DataAnnotations;
 
 namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
@@ -11,12 +12,12 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             AllocationBridgeBeneficialUsesFact = new HashSet<AllocationBridgeBeneficialUsesFact>();
             AllocationBridgeSitesFact = new HashSet<AllocationBridgeSitesFact>();
         }
-
+        public string AllocationUuid { get; set; }
         public long AllocationAmountId { get; set; }
         public long OrganizationId { get; set; }
         public long VariableSpecificId { get; set; }
         public long MethodId { get; set; }
-        public string PrimaryUseCategoryCV { get; set; }
+        public string PrimaryBeneficialUseCategory { get; set; }
         public long DataPublicationDateId { get; set; }
         public string DataPublicationDoi { get; set; }
         public string AllocationNativeId { get; set; }
@@ -61,7 +62,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DateDim DataPublicationDate { get; set; }
         public virtual MethodsDim Method { get; set; }
         public virtual OrganizationsDim Organization { get; set; }
-        public virtual BeneficialUsesCV PrimaryBeneficialUse { get; set; }
         public virtual VariablesDim VariableSpecific { get; set; }
         public virtual CropType CropType { get; set; }
         public virtual CustomerType CustomerType { get; set; }
@@ -73,6 +73,15 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual ICollection<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
 
         #region Filters
+        public static ExpressionStarter<AllocationAmountsFact> HasSitesUuids(DatabaseContext db)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.AllocationBridgeSitesFact.Any(b => db.TempId.Any(c => c.Id == b.SiteId)));
+
+            return predicate;
+        }
+
         public static ExpressionStarter<AllocationAmountsFact> HasBeneficialUses(List<string> beneficalUses)
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
@@ -206,11 +215,18 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            foreach(var geometry in geometries)
+            if (geometries.Length == 0)
             {
-                predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
-                (site.Site.Geometry != null && site.Site.Geometry.Intersects(geometry)) || (site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometry))));
+                return predicate;
             }
+
+            var geometryCombined = GeometryCombiner.Combine(geometries);
+
+            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+            site.Site.Geometry != null && site.Site.Geometry.Intersects(geometryCombined)));
+
+            predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
+            site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometryCombined)));
             
             return predicate;
         }

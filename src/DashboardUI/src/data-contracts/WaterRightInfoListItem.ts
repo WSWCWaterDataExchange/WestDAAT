@@ -1,5 +1,5 @@
 export interface WaterRightInfoListItem {
-  waterRightId: number;
+  allocationUuid: string;
   waterRightNativeId: string;
   owner: string;
   priorityDate: Date;

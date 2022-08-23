@@ -78,6 +78,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<Nhdproduct> Nhdproduct { get; set; }
         public virtual DbSet<OrganizationsDim> OrganizationsDim { get; set; }
         public virtual DbSet<OwnerClassificationCv> OwnerClassificationCv { get; set; }
+        public virtual DbSet<PODSiteToPOUSiteFact> PODSiteToPOUSiteFact { get; set; }
         public virtual DbSet<PowerType> PowerType { get; set; }
         public virtual DbSet<RegulatoryOverlayDim> RegulatoryOverlayDim { get; set; }
         public virtual DbSet<RegulatoryOverlayType> RegulatoryOverlayType { get; set; }
@@ -93,6 +94,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<SitesBridgeBeneficialUsesFact> SitesBridgeBeneficialUsesFact { get; set; }
         public virtual DbSet<SitesDim> SitesDim { get; set; }
         public virtual DbSet<State> State { get; set; }
+        public virtual DbSet<TempUuid> TempUuid { get; set; }
+        public virtual DbSet<TempId> TempId { get; set; }
         public virtual DbSet<Units> Units { get; set; }
         public virtual DbSet<Variable> Variable { get; set; }
         public virtual DbSet<VariableSpecific> VariableSpecific { get; set; }
@@ -103,7 +106,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<WaterSourceBridgeSitesFact> WaterSourceBridgeSitesFact { get; set; }
         public virtual DbSet<WaterSourceType> WaterSourceType { get; set; }
         public virtual DbSet<WaterSourcesDim> WaterSourcesDim { get; set; }
-        public virtual DbSet<PODSiteToPOUSiteFact> PODSiteToPOUSiteFact { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -135,6 +137,22 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasConstraintName("fk_AggBridge_BeneficialUses_fact_BeneficialUses");
             });
 
+            modelBuilder.Entity<TempUuid>(entity =>
+            {
+                entity.HasNoKey();
+
+                // this only works for a single temp table during a command
+                entity.ToTable("#TempUuid");
+            });
+
+            modelBuilder.Entity<TempId>(entity =>
+            {
+                entity.HasNoKey();
+
+                // this only works for a single temp table during a command
+                entity.ToTable("#TempId");
+            });
+
             modelBuilder.Entity<AggregatedAmountsFact>(entity =>
             {
                 entity.HasKey(e => e.AggregatedAmountId)
@@ -144,7 +162,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.Property(e => e.AggregatedAmountId).HasColumnName("AggregatedAmountID");
 
-                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryUseCategoryCV");
+                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryBeneficialUseCategory");
 
                 entity.Property(e => e.DataPublicationDoi)
                     .HasColumnName("DataPublicationDOI")
@@ -337,6 +355,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.ToTable("AllocationAmounts_fact", "Core");
 
+                entity.Property(e => e.AllocationUuid).HasColumnName("AllocationUUID");
+
                 entity.Property(e => e.AllocationAmountId).HasColumnName("AllocationAmountID");
 
                 entity.Property(e => e.AllocationAssociatedConsumptiveUseSiteIds)
@@ -433,7 +453,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.Property(e => e.GeneratedPowerCapacityMW).HasColumnName("GeneratedPowerCapacityMW");
 
-                entity.Property(e => e.PrimaryUseCategoryCV).HasColumnName("PrimaryUseCategoryCV");
+                entity.Property(e => e.PrimaryBeneficialUseCategory).HasColumnName("PrimaryBeneficialUseCategory");
 
                 entity.Property(e => e.VariableSpecificId).HasColumnName("VariableSpecificID");
 
@@ -489,11 +509,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_AllocationAmounts_fact_Organizations_dim");
-
-                entity.HasOne(d => d.PrimaryBeneficialUse)
-                    .WithMany(p => p.AllocationAmountsFact)
-                    .HasForeignKey(d => d.PrimaryUseCategoryCV)
-                    .HasConstraintName("fk_AllocationAmounts_fact_BeneficialUses");
 
                 entity.HasOne(d => d.VariableSpecific)
                     .WithMany(p => p.AllocationAmountsFact)

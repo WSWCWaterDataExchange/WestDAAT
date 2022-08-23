@@ -13,7 +13,7 @@ import { useDebounceCallback } from "@react-hook/debounce";
 import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
 import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
-import { waterRightsProperties, pointSizes, nldi } from "../config/constants";
+import { waterRightsProperties, pointSizes, nldi, colorList } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
 import useLastKnownValue from "../hooks/useLastKnownValue";
@@ -29,32 +29,15 @@ import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
-import { Directions, DataPoints } from "../data-contracts/nldi";
+import { Directions } from "../data-contracts/nldi";
 import Select from "react-select";
+import { FilterContext, WaterRightsFilters } from "../FilterProvider";
+import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 
 enum MapGrouping {
   BeneficialUse = "bu",
   OwnerClassification = "oClass",
   WaterSourceType = "wsType"
-}
-
-interface WaterRightsFilters {
-  beneficialUses?: BeneficialUseListItem[],
-  ownerClassifications?: string[],
-  waterSourceTypes?: string[],
-  riverBasinNames?: string[],
-  states?: string[],
-  allocationOwner?: string,
-  includeExempt?: boolean,
-  minFlow: number | undefined,
-  maxFlow: number | undefined,
-  minVolume: number | undefined,
-  maxVolume: number | undefined,
-  podPou: "POD" | "POU" | undefined,
-  minPriorityDate: number | undefined,
-  maxPriorityDate: number | undefined,
-  polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> }[],
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
 }
 
 interface WaterRightsDisplayOptions {
@@ -75,30 +58,6 @@ const mapColorLegendOptions = [
   { value: MapGrouping.WaterSourceType, label: 'Water Source Type' }
 ];
 
-const colors = [
-  '#006400',
-  '#9ACD32',
-  '#FF00E6',
-  '#0000FF',
-  '#32CD32',
-  '#FF4500',
-  '#9370DB',
-  '#00FFFF',
-  '#FF69B4',
-  '#800080',
-  '#00BFFF',
-  '#FFD700',
-  '#A52A2A',
-  '#4B0082',
-  '#808080',
-  '#FFA500',
-  '#D2691E',
-  '#FFC0CB',
-  '#F0FFF0',
-  '#F5DEB3',
-  '#FF0000'
-]
-
 const waterRightsPointsLayer = 'waterRightsPoints';
 const waterRightsPolygonsLayer = 'waterRightsPolygons';
 const waterRightsRiverBasinLayer = 'river-basins';
@@ -110,12 +69,12 @@ const allWaterRightsLayers = [
 ]
 
 const defaultFilters: WaterRightsFilters = {
-  beneficialUses: undefined,
-  ownerClassifications: undefined,
+  beneficialUses: [],
+  ownerClassifications: [],
   allocationOwner: undefined,
-  waterSourceTypes: undefined,
-  states: undefined,
-  riverBasinNames: undefined,
+  waterSourceTypes: [],
+  states: [],
+  riverBasinNames: [],
   includeExempt: false,
   minFlow: undefined,
   maxFlow: undefined,
@@ -164,7 +123,7 @@ function WaterRightsTab() {
   const { data: allStates, isFetching: isAllStatesLoading, isError: isAllStatesError } = useStates();
   const { data: allRiverBasinOptions, isFetching: isRiverBasinOptionsLoading } = useRiverBasinOptions();
   const { setUrlParam, getUrlParam } = useContext(AppContext);
-  const [filters, setFilters] = useState<WaterRightsFilters>(getUrlParam<WaterRightsFilters>("wr") ?? defaultFilters);
+  const { filters, setFilters, setNldiIds } = useContext(FilterContext);
   const { data: riverBasinPolygons, isFetching: isRiverBasinPolygonsLoading } = useQuery(['riverBasinPolygonsByName', filters.riverBasinNames ?? []], async (): Promise<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties> | undefined> => {
     if ((filters?.riverBasinNames?.length ?? 0) === 0) {
       return undefined;
@@ -178,13 +137,13 @@ function WaterRightsTab() {
     let colorMapping: { key: string, color: string }[];
     switch (displayOptions.mapGrouping) {
       case MapGrouping.BeneficialUse:
-        colorMapping = allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
       case MapGrouping.OwnerClassification:
-        colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allOwnerClassifications?.map(a => ({ key: a, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
       case MapGrouping.WaterSourceType:
-        colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colors[colorIndex++ % colors.length] })) ?? []
+        colorMapping = allWaterSourceTypes?.map(a => ({ key: a, color: colorList[colorIndex++ % colorList.length] })) ?? []
         break;
     }
     return { property: displayOptions.mapGrouping as string, colorMapping }
@@ -205,10 +164,11 @@ function WaterRightsTab() {
     nldiFilterData
   } = useContext(MapContext);
 
-  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(false);
+  const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
 
   useEffect(() => {
-    for (var element of filters.polyline) {
+    for (let element of filters.polyline) {
       setPolylines(element.identifier, element.data);
     }
   }, [setPolylines])/* eslint-disable-line *//* we don't want to run multiple times thats why we don't add the filters.polyline */
@@ -338,12 +298,15 @@ function WaterRightsTab() {
     }
   }, [setLegend, renderedMapGroupings, isNldiMapActive])
 
-  const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "")
+  const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
-    var nldiData = geoJsonData.filter(s => s.source === 'nldi');
+    if(!isNldiMapActive){
+      return [];
+    }
+    let nldiData = geoJsonData.filter(s => s.source === 'nldi');
     if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
-      var arr = (nldiData[0].data as FeatureCollection).features
+      let arr = (nldiData[0].data as FeatureCollection).features
         .filter(x => x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' || x.properties?.source?.toLowerCase() === 'wade');
 
       if ((nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
@@ -351,12 +314,23 @@ function WaterRightsTab() {
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && (nldiFilterData?.directions & Directions.Downsteam)) {
         arr = arr.filter(x => x.properties?.westdaat_direction === 'Downstream');
       } else if (!(nldiFilterData?.directions & Directions.Upsteam) && !(nldiFilterData?.directions & Directions.Downsteam)) {
-        return
+        return [];
       }
       return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
-        .map(a => a.properties?.identifier)
+        .map(a => a.properties?.identifier);
+    }else{ // if nldi is not active, empty the array
+      return [];
     }
-  }, [geoJsonData, nldiFilterData])
+  }, [geoJsonData, nldiFilterData, isNldiMapActive]);
+
+  useEffect(() => {
+    setNldiIds(previousState => {
+      if(deepEqual(previousState, nldiWadeSiteIds)){
+        return previousState;
+      }
+      return nldiWadeSiteIds;
+    });
+  }, [nldiWadeSiteIds, setNldiIds]);
 
   useEffect(() => {
     if (deepEqual(filters, defaultFilters)) {
@@ -411,21 +385,21 @@ function WaterRightsTab() {
   const handleBeneficialUseChange = (selectedOptions: BeneficialUseListItem[]) => {
     setFilters(s => ({
       ...s,
-      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : undefined
+      beneficialUses: selectedOptions?.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleStateChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      states: selectedOptions.length > 0 ? selectedOptions : undefined
+      states: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
   const handleOwnerClassificationChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : undefined
+      ownerClassifications: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -445,7 +419,7 @@ function WaterRightsTab() {
   const handleWaterSourceTypeChange = (selectedOptions: string[]) => {
     setFilters(s => ({
       ...s,
-      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : undefined
+      waterSourceTypes: selectedOptions.length > 0 ? selectedOptions : []
     }));
   }
 
@@ -567,13 +541,19 @@ function WaterRightsTab() {
   }, [filters, setMapLayerFilters, allBeneficialUses, allOwnerClassifications, allWaterSourceTypes, allStates, allRiverBasinOptions, riverBasinPolygons, isNldiMapActive, nldiWadeSiteIds])
 
   const clearMapFilters = () => {
-    setFilters({ ...defaultFilters });
+    setFilters(defaultFilters);
     setDisplayOptions({ ...defaultDisplayOptions });
     setAllocationOwnerValue("");
     polylines.forEach(a => {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
+    setActiveKeys(["colorSizeTools"]);
+    // clearing nldi information
+    setGeoJsonData('nldi', {
+      "type": "FeatureCollection",
+      "features": []
+    });
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
@@ -583,6 +563,14 @@ function WaterRightsTab() {
   const isLoading = useMemo(() => {
     return isAllBeneficialUsesLoading || isAllWaterSourceTypesLoading || isAllOwnerClassificationsLoading || isAllStatesLoading || isRiverBasinOptionsLoading;
   }, [isAllBeneficialUsesLoading, isAllWaterSourceTypesLoading, isAllOwnerClassificationsLoading, isAllStatesLoading, isRiverBasinOptionsLoading])
+
+  useEffect(() => {
+    if (isNldiMapActive) {
+      setUrlParam("nldiActive", isNldiMapActive);
+    } else {
+      setUrlParam("nldiActive", undefined);
+    }
+  }, [setNldiMapStatus, isNldiMapActive, setUrlParam])
 
   const isError = useMemo(() => {
     return isAllBeneficialUsesError || isAllWaterSourceTypesError || isAllOwnerClassificationsError || isAllStatesError;
@@ -597,9 +585,6 @@ function WaterRightsTab() {
 
   return (
     <>
-      <div className="map-info text-center p-2">
-        {renderedFeatures.length} Points of Diversions Displayed
-      </div>
       <div className="m-3">
         <Button variant="outline-danger" className="w-100" onClick={clearMapFilters}>
           Reset All Filters
@@ -607,8 +592,8 @@ function WaterRightsTab() {
       </div>
       <div className="position-relative flex-grow-1 panel-content">
 
-        <Accordion flush defaultActiveKey={['0']} alwaysOpen>
-          <Accordion.Item eventKey="0">
+        <Accordion flush activeKey={activeKeys} alwaysOpen onSelect={(e) => setActiveKeys(e)}>
+          <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -647,11 +632,11 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="1">
+          <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
-                <a href="/filters" target="_blank" rel="noopener noreferrer">Learn about WestDAAT filters</a>
+                <a href="https://westernstateswater.org/wade/westdaat-filter-documentation/" target="_blank" rel="noopener noreferrer">Learn about WestDAAT filters</a>
               </div>
               <div className="mb-3">
                 <label>State</label>
@@ -772,15 +757,15 @@ function WaterRightsTab() {
               </div>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="2">
+          <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
               <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
               <div className="px-5">
-                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary"/>
+                <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" />
               </div>
             </Accordion.Header>
             <Accordion.Body >
-              <NldiTab />
+              <NldiTab isNldiMapActive={isNldiMapActive}/>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

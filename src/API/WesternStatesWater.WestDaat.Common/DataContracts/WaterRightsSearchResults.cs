@@ -9,6 +9,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
     public class WaterRightsSearchResults
     {
         public long CurrentPageNumber { get; set; }
+        public bool HasMoreResults { get; set; }
         public WaterRightsSearchDetail[] WaterRightsDetails { get; set; }
     }
 }

@@ -44,7 +44,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.Method.MethodDescription))
                 .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv));
             CreateMap<EF.AllocationAmountsFact, WaterRightInfoListItem>()
-                .ForMember(dest => dest.WaterRightId, opt => opt.MapFrom(source => source.AllocationAmountId))
                 .ForMember(dest => dest.Volume, opt => opt.MapFrom(source => source.AllocationVolume_AF))
                 .ForMember(dest => dest.Flow, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
                 .ForMember(dest => dest.WaterRightNativeId, opt => opt.MapFrom(source => source.AllocationNativeId))
@@ -54,12 +53,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
                 .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateNavigation.Date));
             CreateMap<EF.AllocationAmountsFact, WaterRightsSearchDetail>()
-                .ForMember(dest => dest.AllocationUuid, opt => opt.MapFrom(source => source.AllocationAmountId.ToString()))
                 .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()))
                 .ForMember(dest => dest.OwnerClassification, opt => opt.MapFrom(source => source.OwnerClassification.WaDEName.Length > 0 ? source.OwnerClassification.WaDEName : source.OwnerClassification.Name))
                 .ForMember(dest => dest.AllocationFlowCfs, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
                 .ForMember(dest => dest.AllocationVolumeAf, opt => opt.MapFrom(source => source.AllocationVolume_AF))
-                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateID != null ? source.AllocationPriorityDateNavigation.Date : default(DateTime)))
+                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => (source.AllocationPriorityDateID != null && source.AllocationPriorityDateNavigation.Date != default) ? source.AllocationPriorityDateNavigation.Date : (DateTime?)null))
                 .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? source.AllocationLegalStatusCvNavigation.WaDEName : source.AllocationLegalStatusCvNavigation.Name));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
@@ -78,7 +76,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))
                 .ForMember(dest => dest.GnisfeatureName, opt => opt.MapFrom(source => source.GnisfeatureNameCv));
             CreateMap<EF.AllocationAmountsFact, WaterRightsDigest>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(source => source.AllocationAmountId))
                 .ForMember(dest => dest.NativeId, opt => opt.MapFrom(source => source.AllocationNativeId))
                 .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
                 .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(a=>a.BeneficialUseCV)));
