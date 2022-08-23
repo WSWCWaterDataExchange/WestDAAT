@@ -124,7 +124,7 @@ function DownloadModal(props: DownloadModalProps) {
         </p>}
         {/* display error message */}
         { isAuthenticated && isError &&
-          <p>{error.message}</p>} 
+          <p>An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try again.</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
         { isAuthenticated && !isFetching && !isError &&
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
