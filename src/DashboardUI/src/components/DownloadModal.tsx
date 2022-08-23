@@ -18,20 +18,12 @@ function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
   setIsError:(isError: boolean) => void,
   setIsFetching: (isFetching: boolean) => void,
-  setError: (error: any) => void,
   setIsFetched: (isFetched: boolean) => void}){
 
-  const {isFetching, isError, error, isFetched} =  useWaterRightsDownload(props.searchCriteria);
+  const {isFetching, isError, isFetched} =  useWaterRightsDownload(props.searchCriteria);
   const { setIsError } = props;
   const { setIsFetching } = props;
-  const { setError } = props;
   const { setIsFetched } = props;
-
-  useEffect(() => {
-    if(error){
-      setError(error)
-    }
-  }, [error, setError]);
 
   useEffect(() => {
     if (isError){
@@ -64,7 +56,6 @@ function DownloadModal(props: DownloadModalProps) {
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isError, setIsError ] = useState<boolean>(false);
-  const [ error, setError ] = useState<any>();
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
 
   const close = () => {
@@ -134,7 +125,6 @@ function DownloadModal(props: DownloadModalProps) {
           searchCriteria={searchCriteria}
           setIsError={setIsError}
           setIsFetching={setIsFetching}
-          setError={setError}
           setIsFetched={setIsFetched}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
