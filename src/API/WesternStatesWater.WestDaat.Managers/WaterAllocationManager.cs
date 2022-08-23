@@ -197,40 +197,32 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 Parallel.ForEach(filesToGenerate, file =>
                 {
-                    try
+                    var ms = new MemoryStream();
+                    var writer = new StreamWriter(ms);
+                    var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    if (file.Data.Any())
                     {
-                        var ms = new MemoryStream();
-                        var writer = new StreamWriter(ms);
-                        var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                        if (file.Data.Any())
-                        {
-                            csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
-                            csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime>().Formats = new string[] { "d" };
+                        csv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().Formats = new string[] { "d" };
 
-                            csv.WriteRecords(file.Data);
-                            csv.Flush();
-                        }
-                        else
-                        {
-                            csv.WriteField($"No Data found for {file.Name}");
-                            csv.Flush();
-                        }
-
-                        lock (filesToGenerate)
-                        {
-                            var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
-                            zipStream.PutNextEntry(entry);
-
-                            ms.Seek(0, SeekOrigin.Begin);
-
-                            StreamUtils.Copy(ms, zipStream, new byte[4096]);
-                        }
+                        csv.WriteRecords(file.Data);
+                        csv.Flush();
                     }
-                    catch (Exception)
+                    else
                     {
-                        throw new TimeoutException("SQL Timeout");
+                        csv.WriteField($"No Data found for {file.Name}");
+                        csv.Flush();
                     }
 
+                    lock (filesToGenerate)
+                    {
+                        var entry = new ZipEntry(ZipEntry.CleanName($"{file.Name}.csv"));
+                        zipStream.PutNextEntry(entry);
+
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        StreamUtils.Copy(ms, zipStream, new byte[4096]);
+                    }
                 });
 
                 // getting citation file

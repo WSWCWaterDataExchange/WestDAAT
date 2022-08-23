@@ -172,6 +172,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             catch (Exception)
             {
                 response.StatusCode = StatusCodes.Status500InternalServerError;
+                throw;
             }
 
             return new EmptyResult();
