@@ -444,7 +444,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
             db.Database.OpenConnection();
-            db.Database.SetCommandTimeout(120);
+            db.Database.SetCommandTimeout(_performanceConfiguration.DownloadCommandTimeout);
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var waterRightDetails = db.AllocationAmountsFact
