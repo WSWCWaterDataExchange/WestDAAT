@@ -18,20 +18,12 @@ function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
   setIsError:(isError: boolean) => void,
   setIsFetching: (isFetching: boolean) => void,
-  setError: (error: any) => void,
   setIsFetched: (isFetched: boolean) => void}){
 
-  const {isFetching, isError, error, isFetched} =  useWaterRightsDownload(props.searchCriteria);
+  const {isFetching, isError, isFetched} =  useWaterRightsDownload(props.searchCriteria);
   const { setIsError } = props;
   const { setIsFetching } = props;
-  const { setError } = props;
   const { setIsFetched } = props;
-
-  useEffect(() => {
-    if(error){
-      setError(error)
-    }
-  }, [error, setError]);
 
   useEffect(() => {
     if (isError){
@@ -64,7 +56,6 @@ function DownloadModal(props: DownloadModalProps) {
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isError, setIsError ] = useState<boolean>(false);
-  const [ error, setError ] = useState<any>();
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
 
   const close = () => {
@@ -124,7 +115,7 @@ function DownloadModal(props: DownloadModalProps) {
         </p>}
         {/* display error message */}
         { isAuthenticated && isError &&
-          <p>{error.message}</p>} 
+          <p>An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try again.</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
         { isAuthenticated && !isFetching && !isError &&
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
@@ -134,7 +125,6 @@ function DownloadModal(props: DownloadModalProps) {
           searchCriteria={searchCriteria}
           setIsError={setIsError}
           setIsFetching={setIsFetching}
-          setError={setError}
           setIsFetched={setIsFetched}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>

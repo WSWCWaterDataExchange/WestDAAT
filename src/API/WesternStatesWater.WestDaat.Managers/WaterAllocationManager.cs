@@ -207,7 +207,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
                         csv.WriteRecords(file.Data);
                         csv.Flush();
-                    } 
+                    }
                     else
                     {
                         csv.WriteField($"No Data found for {file.Name}");

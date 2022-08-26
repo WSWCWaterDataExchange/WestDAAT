@@ -165,7 +165,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             response.Headers.Add("Content-Type", "application/octet-stream");
             response.Headers.Append("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
 
-            await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+            try
+            {
+                await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+            }
+            catch (Exception)
+            {
+                response.StatusCode = StatusCodes.Status500InternalServerError;
+                throw;
+            }
 
             return new EmptyResult();
         }
