@@ -301,7 +301,7 @@ function WaterRightsTab() {
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
-    if(!isNldiMapActive){
+    if (!isNldiMapActive) {
       return [];
     }
     let nldiData = geoJsonData.filter(s => s.source === 'nldi');
@@ -318,14 +318,14 @@ function WaterRightsTab() {
       }
       return arr.filter(x => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
         .map(a => a.properties?.identifier);
-    }else{ // if nldi is not active, empty the array
+    } else { // if nldi is not active, empty the array
       return [];
     }
   }, [geoJsonData, nldiFilterData, isNldiMapActive]);
 
   useEffect(() => {
     setNldiIds(previousState => {
-      if(deepEqual(previousState, nldiWadeSiteIds)){
+      if (deepEqual(previousState, nldiWadeSiteIds)) {
         return previousState;
       }
       return nldiWadeSiteIds;
@@ -759,13 +759,17 @@ function WaterRightsTab() {
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
-              <label className="fw-bold">NLDI MAP {isNldiMapActive}</label>
+              <label className="fw-bold">NLDI FILTER {isNldiMapActive}</label>
               <div className="px-5">
                 <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" />
               </div>
             </Accordion.Header>
+            <div className="px-4" style={{background:"ghostwhite"}}>
+              <a className="h6" target="_blank" href="https://westernstateswater.org/wade/westdaat-nldi-geoconnex-documentation/">Learn About NLDI-Geoconnex filter here</a>
+              <label className="h6"><i>Search along the stream network using the Hydro Network-Linked Data Index (NLDI) and Geoconnex Frameworks</i></label>
+            </div>
             <Accordion.Body >
-              <NldiTab isNldiMapActive={isNldiMapActive}/>
+              <NldiTab isNldiMapActive={isNldiMapActive} />
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
