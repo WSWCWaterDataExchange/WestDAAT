@@ -765,7 +765,7 @@ function WaterRightsTab() {
               </div>
             </Accordion.Header>
             <div className="px-4" style={{background:"ghostwhite"}}>
-              <a className="h6" target="_blank" href="https://westernstateswater.org/wade/westdaat-nldi-geoconnex-documentation/">Learn About NLDI-Geoconnex filter here</a>
+              <a className="h6" target="_blank" rel="noreferrer" href="https://westernstateswater.org/wade/westdaat-nldi-geoconnex-documentation/">Learn About NLDI-Geoconnex filter here</a>
               <label className="h6"><i>Search along the stream network using the Hydro Network-Linked Data Index (NLDI) and Geoconnex Frameworks</i></label>
             </div>
             <Accordion.Body >
