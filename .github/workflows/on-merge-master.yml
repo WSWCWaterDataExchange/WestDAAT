@@ -26,7 +26,7 @@ env:
   REACT_APP_AUTH_CLIENT_ID: 'a4db62cd-d2ef-425e-8c69-37f4349f925e'
   REACT_APP_AUTH_AUTHORITY: 'https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com/b2c_1_signupsignin'
   REACT_APP_AUTH_KNOWN_AUTHORITY: 'https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com'
-  REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL: 'https://api.maptiler.com/tiles/a190c617-ed1a-47fd-81fa-c4b923d40c32/tiles.json?key=IauIQDaqjd29nJc5kJse'
+  REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL: 'https://api.maptiler.com/tiles/441a16bb-0a9e-4e71-8c84-da267d516a09/tiles.json?key=IauIQDaqjd29nJc5kJse'
   REACT_APP_GA_ID: 'G-KFL0TGM4B8'             # set the Google Analytics measurement ID
   AZURE_RESOURCE_GROUP: WestDAAT_Staging         # set the resource group name
   AZURE_FUNCTIONAPP_NAME: westdaat-staging       # set this to the name of your Azure Web App
