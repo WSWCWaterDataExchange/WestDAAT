@@ -90,7 +90,7 @@ function PieCharts() {
             text: 'Count of Water Rights'
         },
         subtitle: {
-            text: `${pointSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Sites`
+            text: `${pointSum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Rights`
         },
         tooltip: {
             pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>'
