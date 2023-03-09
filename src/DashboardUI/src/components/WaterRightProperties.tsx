@@ -46,7 +46,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
               </Card.Body>
             </Card>
           </Col>
-          <Col>
+          {/* <Col>
             <Card className="h-100 shadow-sm rounded-3">
               <Card.Header className="water-rights-header"> <FormatListBulleted></FormatListBulleted> Variable Information</Card.Header>
               <Card.Body>
@@ -77,7 +77,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                 </div>
               </Card.Body>
             </Card>
-          </Col>
+          </Col> */}
           <Col>
             <Card className="h-100 shadow-sm rounded-3">
               <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Water Right Information</Card.Header>
