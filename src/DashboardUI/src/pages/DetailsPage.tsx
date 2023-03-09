@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import '../styles/detail-page.scss';
 import WaterRightMap from '../components/WaterRightMap';
 import WaterRightProperties from '../components/WaterRightProperties';
@@ -10,7 +10,7 @@ import SiteTabs from '../components/SiteTabs';
 import useProgressIndicator from '../hooks/useProgressIndicator';
 import { useMemo } from 'react';
 import { useWaterRightDetails, useWaterRightSiteInfoList, useWaterRightSiteLocations, useWaterRightSourceInfoList } from '../hooks/useWaterRightQuery';
-import ChevronLeft from 'mdi-react/ChevronLeftIcon';
+// import ChevronLeft from 'mdi-react/ChevronLeftIcon';
 
 interface detailPageProps {
   detailType: "site" | "right";

@@ -1,7 +1,7 @@
 import { Card, Col, Row } from 'react-bootstrap';
 import { useWaterRightDetails } from '../hooks/useWaterRightQuery';
 import Domain from 'mdi-react/DomainIcon';
-import FormatListBulleted from 'mdi-react/FormatListBulletedIcon';
+// import FormatListBulleted from 'mdi-react/FormatListBulletedIcon';
 import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
 import { FormattedDate } from './FormattedDate';
 
