@@ -38,12 +38,12 @@ function DetailsPage(props: detailPageProps) {
       <div className="detail-page d-flex flex-column">
         <div className='d-flex flex-row align-items-center justify-content-md-between title-header'>
           <div className='p-2'>
-            <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button>
+            {/* <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button> */}
           </div>
           <h3 className='d-flex fw-bold'>WaDE {isSiteDetail ? "Site" : "Water Right"} ID: {id} </h3>
 
           <div className='p-2'>
-            <Button size="lg">Download Data</Button>
+            {/* <Button size="lg">Download Data</Button> */}
           </div>
         </div>
         <div className='row properties-row'>
