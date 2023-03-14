@@ -86,9 +86,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
-                    beneficalUses.Contains(
-                        b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name)));
+            predicate = predicate.Or(x => beneficalUses.Contains(x.PrimaryBeneficialUseCategory));
 
             return predicate;
         }

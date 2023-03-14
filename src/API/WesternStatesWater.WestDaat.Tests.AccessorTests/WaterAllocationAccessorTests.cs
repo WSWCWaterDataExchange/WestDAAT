@@ -300,6 +300,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .LinkBeneficialUses(beneficialUse)
                 .Generate(250);
 
+            matchingAllocationAmountFacts.ForEach(x => x.PrimaryBeneficialUseCategory = "beneficialUseWadeName");
+
             var nonMatchBeneficalUse = new BeneficialUsesCVFaker().Generate();
 
             var nonMatchingAllocationAmountFacts = allocationAmountFactFaker
@@ -518,20 +520,19 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow("expectedName", "name2", "expectedName")]
-        [DataRow("", "expectedName", "expectedName")]
-        [DataRow("expectedName", "", "expectedName")]
-        public async Task FindWaterRights_SearchByBeneficalUse_ReturnsOneMatch(string beneficialUseWadeName, string beneficialUseName, string expectedName)
+        public async Task FindWaterRights_SearchByBeneficalUse_ReturnsOneMatch()
         {
             // Arrange
-            var beneficialUse = new BeneficialUsesCVFaker().Generate();
-            beneficialUse.WaDEName = beneficialUseWadeName;
-            beneficialUse.Name = beneficialUseName;
+            var expectedName = "expectedName";
 
-            var matchingAllocationAmountFacts = new AllocationAmountFactFaker()
+            var beneficialUse = new BeneficialUsesCVFaker().Generate();
+            beneficialUse.WaDEName = expectedName;
+            beneficialUse.Name = "name2";
+
+            var matchingAllocationAmountFacts = new AllocationAmountFactFaker(expectedName)
                 .LinkBeneficialUses(beneficialUse)
                 .Generate();
-            var nonMatchingAllocationAmountFacts = new AllocationAmountFactFaker()
+            var nonMatchingAllocationAmountFacts = new AllocationAmountFactFaker(Guid.NewGuid().ToString())
                 .LinkBeneficialUses(new BeneficialUsesCVFaker().Generate(1).ToArray())
                 .Generate(3);
             nonMatchingAllocationAmountFacts.AddRange(new AllocationAmountFactFaker()
@@ -886,7 +887,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             beneficialUse.WaDEName = "searchName";
             beneficialUse.Name = "searchName";
 
-            var matchedAllocationAmount = new AllocationAmountFactFaker()
+            var matchedAllocationAmount = new AllocationAmountFactFaker("searchName")
                     .LinkBeneficialUses(beneficialUse)
                     .LinkOrganization(organizationFake).Generate();
 
