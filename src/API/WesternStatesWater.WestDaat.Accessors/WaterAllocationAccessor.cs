@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using EFCore.BulkExtensions;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -113,8 +114,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempUuidTable);
 
-                // Unsafe mode is because does not have a key
-                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new TempUuid { Uuid = a }), b => b.UnsafeMode = true);
+                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new TempUuid { Uuid = a }).ToList());
 
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempIdTable);
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.FindSiteIdsFromUuids);
