@@ -7,14 +7,15 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
     {
         public DateDimFaker DateDimFaker { get; } = new DateDimFaker(); //use this to prevent collisions in Date_Dim table
 
-        public AllocationAmountFactFaker()
+        public AllocationAmountFactFaker(string primaryBeneficialUse = null)
         {
             this.RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate())
                 .RuleFor(a => a.DataPublicationDate, b => DateDimFaker.Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
                 .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
-                .RuleFor(a => a.AllocationUuid, f => f.Random.String(11, 'A', 'z'));
+                .RuleFor(a => a.AllocationUuid, f => f.Random.String(11, 'A', 'z'))
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, primaryBeneficialUse);
         }
     }
 

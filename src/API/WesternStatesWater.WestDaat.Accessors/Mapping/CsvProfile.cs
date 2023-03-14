@@ -59,7 +59,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OwnerClassificationCv, opt => opt.MapFrom(source => source.OwnerClassificationCV))
                 .ForMember(dest => dest.PopulationServed, opt => opt.MapFrom(source => source.PopulationServed))
                 .ForMember(dest => dest.PowerType, opt => opt.MapFrom(source => source.PowerType))
-                .ForMember(dest => dest.PrimaryUseCategory, opt => opt.MapFrom(source => source.PrimaryBeneficialUseCategory))
+                .ForMember(dest => dest.PrimaryBeneficialUseCategory, opt => opt.MapFrom(source => source.PrimaryBeneficialUseCategory))
                 .ForMember(dest => dest.WaterAllocationNativeUrl, opt => opt.MapFrom(source => source.WaterAllocationNativeUrl));
 
             CreateMap<EF.PODSiteToPOUSiteFact, PodSiteToPouSiteRelationships>()

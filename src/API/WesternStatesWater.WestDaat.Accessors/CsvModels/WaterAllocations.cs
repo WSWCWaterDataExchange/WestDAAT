@@ -39,7 +39,7 @@
         public string OwnerClassificationCv { get; set; }
         public string PopulationServed { get; set; }
         public string PowerType { get; set; }
-        public string PrimaryUseCategory { get; set; }
+        public string PrimaryBeneficialUseCategory { get; set; }
         public string WaterAllocationNativeUrl { get; set; }
     }
 }
