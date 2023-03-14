@@ -35,7 +35,7 @@ function DetailsPage(props: detailPageProps) {
 
   return (
     <>
-      <div className="detail-page d-flex flex-column">
+      <div className="detail-page d-flex flex-column flex-grow-1">
         <div className='d-flex flex-row align-items-center justify-content-md-between title-header'>
           <div className='p-2'>
             {/* <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button> */}
