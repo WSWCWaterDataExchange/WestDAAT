@@ -1575,10 +1575,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             // Act
             var accessor = CreateWaterAllocationAccessor();
-            Func<Task> call = async () => await accessor.GetWaterRightDetailsById("1234");
+           var result = await accessor.GetWaterRightDetailsById("1234");
 
             // Assert
-            await call.Should().ThrowAsync<Exception>();
+            result.Should().BeNull();
         }
 
         [DataTestMethod]

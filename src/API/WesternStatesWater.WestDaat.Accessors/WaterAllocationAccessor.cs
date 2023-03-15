@@ -240,7 +240,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationUuid == allocationUuid)
                 .ProjectTo<WaterRightDetails>(DtoMapper.Configuration)
-                .SingleAsync();
+                .SingleOrDefaultAsync();
         }
 
         public async Task<List<SiteInfoListItem>> GetWaterRightSiteInfoById(string allocationUuid)
