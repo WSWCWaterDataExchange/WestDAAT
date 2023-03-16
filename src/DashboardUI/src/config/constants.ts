@@ -39,6 +39,13 @@ export enum waterRightsProperties {
   maxPriorityDate = 'maxPri',
 }
 
+export enum nldiSiteProperties {
+  sourceName = 'sourceName',
+  identifier = 'identifier',
+  uri = 'uri',
+  name = 'name'
+}
+
 export const colorList = [
   '#006400',
   '#9ACD32',
