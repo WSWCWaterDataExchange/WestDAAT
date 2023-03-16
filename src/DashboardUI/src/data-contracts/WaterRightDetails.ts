@@ -26,4 +26,13 @@ export interface WaterRightDetails {
   allocationFlowCfs: number;
   allocationVolumeAF: number;
   beneficialUses: string[];
+
+  datePublished: Date;
+  allocationTimeframeStart: string;
+  allocationTimeframeEnd: string;
+  allocationCropDutyAmount: number;
+  waterAllocationNativeUrl: string;
+  ownerClassificationCV: string;
+  primaryBeneficialUseCategory: string;
+  irrigationMethodCV: string;
 }

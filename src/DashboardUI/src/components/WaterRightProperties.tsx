@@ -24,6 +24,15 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
     }
     return emptyValue;
   }
+
+  const formatUrl = (url: string) => {
+    if(!url) {
+      return emptyValue;
+    }
+
+    return <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>;
+  }
+
   return (
     <div>
       {waterRightDetails && <>
@@ -41,7 +50,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className={getPropertyValueClass(waterRightDetails.state)}>{waterRightDetails.state || emptyValue}</span>
 
                   <span className='property-name'>Website</span>
-                  <span className={getPropertyValueClass(waterRightDetails.organizationWebsite)}><a href={waterRightDetails.organizationWebsite}>{waterRightDetails.organizationWebsite || emptyValue}</a></span>
+                  <span className={getPropertyValueClass(waterRightDetails.organizationWebsite)}>{formatUrl(waterRightDetails.organizationWebsite)}</span>
                 </div>
               </Card.Body>
             </Card>
@@ -109,6 +118,30 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
 
                   <span className='property-name'>Beneficial Use</span>
                   {waterRightDetails.beneficialUses.map(a => <span key={a} className='property-value'>{a}</span>)}
+                  
+                  <span className='property-name'>Date Published</span>
+                  <span className={getPropertyValueClass(waterRightDetails.datePublished)}>{getDateString(waterRightDetails.datePublished)}</span>
+
+                  <span className='property-name'>Allocation Timeframe Start</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeStart)}>{waterRightDetails.allocationTimeframeStart || emptyValue}</span>
+
+                  <span className='property-name'>Allocation Timeframe End</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeEnd)}>{waterRightDetails.allocationTimeframeEnd || emptyValue}</span>
+
+                  <span className='property-name'>Allocation Crop Duty (inch)</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount || emptyValue}</span>
+
+                  <span className='property-name'>State Water Right Webpage</span>
+                  <span className={getPropertyValueClass(waterRightDetails.waterAllocationNativeUrl)}>{formatUrl(waterRightDetails.waterAllocationNativeUrl)}</span>
+                  
+                  <span className='property-name'>Owner Classification</span>
+                  <span className={getPropertyValueClass(waterRightDetails.ownerClassificationCV)}>{waterRightDetails.ownerClassificationCV || emptyValue}</span>
+
+                  <span className='property-name'>WaDE Primary Use Category</span>
+                  <span className={getPropertyValueClass(waterRightDetails.primaryBeneficialUseCategory)}>{waterRightDetails.primaryBeneficialUseCategory || emptyValue}</span>
+
+                  <span className='property-name'>WaDE Irrigation Method</span>
+                  <span className={getPropertyValueClass(waterRightDetails.irrigationMethodCV)}>{waterRightDetails.irrigationMethodCV || emptyValue}</span>
                 </div>
               </Card.Body>
             </Card>
@@ -125,7 +158,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className={getPropertyValueClass(waterRightDetails.methodType)}>{waterRightDetails.methodType || emptyValue}</span>
 
                   <span className='property-name'>Method Link</span>
-                  <span className={getPropertyValueClass(waterRightDetails.methodLink)}>{waterRightDetails.methodLink || emptyValue}</span>
+                  <span className={getPropertyValueClass(waterRightDetails.methodLink)}>{formatUrl(waterRightDetails.methodLink)}</span>
 
                   <span className='property-name'>Method Description</span>
                   <span className={`fw-normal ${getPropertyValueClass(waterRightDetails.methodDescription)}`}>{waterRightDetails.methodDescription || emptyValue}</span>
