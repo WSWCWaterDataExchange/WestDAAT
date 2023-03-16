@@ -56,7 +56,7 @@ export function useWaterRightsMapPopup() {
       </MapPopupCard>;
     }
     return <WaterRightsMapPopup siteUuid={clickedSiteUuid} waterRights={data} onSelectedIndexChanged={setCurrentIndex} currentIndex={currentIndex} onClosePopup={handleClosePopup} />;
-  }, [isFetching, clickedSiteUuid, data, currentIndex, handleClosePopup, setCurrentIndex]);
+  }, [clickedFeatures, isFetching, clickedSiteUuid, data, currentIndex, handleClosePopup, setCurrentIndex]);
 
   useEffect(() => {
     updatePopup(result);
