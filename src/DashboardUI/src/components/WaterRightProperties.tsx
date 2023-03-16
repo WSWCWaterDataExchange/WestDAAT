@@ -118,6 +118,9 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
 
                   <span className='property-name'>Beneficial Use</span>
                   {waterRightDetails.beneficialUses.map(a => <span key={a} className='property-value'>{a}</span>)}
+
+                  <span className='property-name'>WaDE Primary Use Category</span>
+                  <span className={getPropertyValueClass(waterRightDetails.primaryBeneficialUseCategory)}>{waterRightDetails.primaryBeneficialUseCategory || emptyValue}</span>
                   
                   <span className='property-name'>Date Published</span>
                   <span className={getPropertyValueClass(waterRightDetails.datePublished)}>{getDateString(waterRightDetails.datePublished)}</span>
@@ -136,9 +139,6 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   
                   <span className='property-name'>Owner Classification</span>
                   <span className={getPropertyValueClass(waterRightDetails.ownerClassificationCV)}>{waterRightDetails.ownerClassificationCV || emptyValue}</span>
-
-                  <span className='property-name'>WaDE Primary Use Category</span>
-                  <span className={getPropertyValueClass(waterRightDetails.primaryBeneficialUseCategory)}>{waterRightDetails.primaryBeneficialUseCategory || emptyValue}</span>
 
                   <span className='property-name'>WaDE Irrigation Method</span>
                   <span className={getPropertyValueClass(waterRightDetails.irrigationMethodCV)}>{waterRightDetails.irrigationMethodCV || emptyValue}</span>
