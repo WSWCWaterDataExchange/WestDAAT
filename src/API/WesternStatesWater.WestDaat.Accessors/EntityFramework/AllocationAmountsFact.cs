@@ -220,12 +220,17 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             var geometryCombined = GeometryCombiner.Combine(geometries);
 
+            if (!geometryCombined.IsValid)
+            {
+                geometryCombined = GeometryFixer.Fix(geometryCombined, true);
+            }
+
             predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
             site.Site.Geometry != null && site.Site.Geometry.Intersects(geometryCombined)));
 
             predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
             site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometryCombined)));
-            
+
             return predicate;
         }
 
