@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Runtime.CompilerServices;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
@@ -42,7 +43,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodType, opt => opt.MapFrom(source => source.Method.MethodTypeCv))
                 .ForMember(dest => dest.MethodLink, opt => opt.MapFrom(source => source.Method.MethodNemilink))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.Method.MethodDescription))
-                .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv));
+                .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv))
+                .ForMember(dest => dest.DatePublished, opt => opt.MapFrom(source => source.DataPublicationDate.Date));
             CreateMap<EF.AllocationAmountsFact, WaterRightInfoListItem>()
                 .ForMember(dest => dest.Volume, opt => opt.MapFrom(source => source.AllocationVolume_AF))
                 .ForMember(dest => dest.Flow, opt => opt.MapFrom(source => source.AllocationFlow_CFS))

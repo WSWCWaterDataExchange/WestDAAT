@@ -77,6 +77,20 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
             return faker;
         }
 
+        public static Faker<AllocationAmountsFact> SetPublishedDate(this Faker<AllocationAmountsFact> faker, DateTime? dateValue)
+        {
+            DateDim date = null;
+            if (dateValue != null)
+            {
+                date = new DateDimFaker()
+                    .RuleFor(a => a.Date, () => dateValue)
+                    .Generate();
+            }
+            faker.RuleFor(a => a.DataPublicationDateId, () => date.DateId)
+                .RuleFor(a => a.DataPublicationDate , () => date);
+            return faker;
+        }
+
         public static Faker<AllocationAmountsFact> SetExemptOfVolumeFlowPriority(this Faker<AllocationAmountsFact> faker, bool? isExempt)
         {
             if (isExempt != null)

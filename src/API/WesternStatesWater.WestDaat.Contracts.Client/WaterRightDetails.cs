@@ -29,5 +29,14 @@
         public double? AllocationFlowCfs { get; set; }
         public double? AllocationVolumeAF { get; set; }
         public List<string> BeneficialUses { get; set; }
+
+        public DateTime? DatePublished { get; set; }
+        public string AllocationTimeframeStart { get; set; }
+        public string AllocationTimeframeEnd { get; set; }
+        public double? AllocationCropDutyAmount { get; set; }
+        public string WaterAllocationNativeUrl { get; set; }
+        public string OwnerClassificationCV { get; set; }
+        public string PrimaryBeneficialUseCategory { get; set; }
+        public string IrrigationMethodCV { get; set; }
     }
 }
