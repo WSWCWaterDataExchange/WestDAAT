@@ -220,7 +220,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             var geometryCombined = GeometryCombiner.Combine(geometries);
 
-            if (DoesGeometryIntersect(geometries))
+            if (!geometryCombined.IsValid)
             {
                 geometryCombined = GeometryFixer.Fix(geometryCombined, true);
             }
@@ -232,32 +232,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometryCombined)));
 
             return predicate;
-        }
-
-        private static bool DoesGeometryIntersect(Geometry[] geometries)
-        {
-            if (geometries.Length <= 1)
-            {
-                return false;
-            }
-
-            var intersect = false;
-
-            var i = 0;
-
-            while (!intersect && i < geometries.Length)
-            {
-                var j = i + 1;
-
-                while (!intersect && j < geometries.Length)
-                {
-                    intersect = geometries[i].Intersects(geometries[j]);
-                    j++;
-                }
-                i++;
-            }
-
-            return intersect;
         }
 
         #endregion
