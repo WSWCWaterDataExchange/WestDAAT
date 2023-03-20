@@ -39,7 +39,7 @@ function TableView(props: TableViewProps) {
         <Offcanvas.Body>
           <Nav variant="tabs" defaultActiveKey="pieChart">           
             <Nav.Item>
-              <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
+              <Nav.Link eventKey="pieChart">Chart Summary</Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="dataTable">Data Table</Nav.Link>
