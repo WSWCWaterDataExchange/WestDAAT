@@ -165,7 +165,7 @@ function WaterRightsTab() {
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
-  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools", "siteSelectionFilters"]);
 
   useEffect(() => {
     for (let element of filters.polyline) {
@@ -548,7 +548,7 @@ function WaterRightsTab() {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
-    setActiveKeys(["colorSizeTools"]);
+    setActiveKeys(["colorSizeTools", "siteSelectionFilters"]);
     // clearing nldi information
     setGeoJsonData('nldi', {
       "type": "FeatureCollection",
