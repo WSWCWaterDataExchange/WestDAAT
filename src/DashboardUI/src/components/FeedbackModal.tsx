@@ -141,7 +141,10 @@ function FeedbackModal(props: FeedBackModalProps) {
         </Modal.Header>
         <Modal.Body>
           <p>
-            Please let us know your feedback about the Water Data Exchange Data (WaDE) Dashboard.
+            Please let us know your feedback about the Water Data Exchange Data (WaDE) Tool.
+          </p>
+          <p>
+            Contact us: <a href='https://westernstateswater.org/wade/contact-us/' target="_blank" rel="noopener noreferrer">https://westernstateswater.org/wade/contact-us/</a>
           </p>
           <div className="mb-3">
             <label className="form-label fw-bolder">First Name(Optional)</label>

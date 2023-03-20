@@ -625,6 +625,27 @@ function WaterRightsTab() {
                   ))}
                 </ButtonGroup>
               </div>
+              
+              <div className="mb-3">
+                <label>Toggle View</label>
+                <ButtonGroup className="w-100">
+                  {podPouRadios.map((radio, idx) => (
+                    <ToggleButton
+                      className="zindexzero"
+                      key={idx}
+                      id={`podPouRadio-${idx}`}
+                      type="radio"
+                      variant="outline-primary"
+                      name="podPouRadio"
+                      value={radio.value}
+                      checked={(filters.podPou ?? '') === radio.value}
+                      onChange={handlePodPouChange}
+                    >
+                      {radio.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
 
               <div className="mb-3">
                 <label>Map Layer</label>
@@ -700,26 +721,6 @@ function WaterRightsTab() {
                   name="riverBasins"
                   getOptionLabel={(option) => option.value}
                   value={filters.riverBasinNames?.map(riverBasin => ({ value: riverBasin }))} />
-              </div>
-              <div className="mb-3">
-                <label>Toggle View</label>
-                <ButtonGroup className="w-100">
-                  {podPouRadios.map((radio, idx) => (
-                    <ToggleButton
-                      className="zindexzero"
-                      key={idx}
-                      id={`podPouRadio-${idx}`}
-                      type="radio"
-                      variant="outline-primary"
-                      name="podPouRadio"
-                      value={radio.value}
-                      checked={(filters.podPou ?? '') === radio.value}
-                      onChange={handlePodPouChange}
-                    >
-                      {radio.name}
-                    </ToggleButton>
-                  ))}
-                </ButtonGroup>
               </div>
               <div className="mb-3">
                 <label>Site Content</label>
