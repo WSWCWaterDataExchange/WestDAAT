@@ -13,7 +13,7 @@ interface TableViewProps {
 function TableView(props: TableViewProps) {
 
   const [show, setshow] = useState(false);
-  const [activeTab, setActiveTab] = useState('dataTable');
+  const [activeTab, setActiveTab] = useState('pieChart');
 
   const handleClose = () => handleVisibilityChange(false);
   const toggleShow = () => handleVisibilityChange(!show);
@@ -27,7 +27,7 @@ function TableView(props: TableViewProps) {
       ANALYTICS & TABLE
       <Icon path={show ? mdiChevronDown : mdiChevronUp} size="1.5em" />
     </Button>
-    <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'dataTable')} id="analytics-and-table">
+    <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'pieChart')} id="analytics-and-table">
       <Offcanvas
         className="offcanvas-analytics"
         show={show}
@@ -37,23 +37,23 @@ function TableView(props: TableViewProps) {
         scroll={true}
         container={props.containerRef}>
         <Offcanvas.Body>
-          <Nav variant="tabs" defaultActiveKey="dataTable">
+          <Nav variant="tabs" defaultActiveKey="pieChart">           
+            <Nav.Item>
+              <Nav.Link eventKey="pieChart">Chart Summary</Nav.Link>
+            </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="dataTable">Data Table</Nav.Link>
             </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
-            </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="dataTable">
-              {activeTab === 'dataTable' && show &&
-                <AnalyticsDataTable></AnalyticsDataTable>
-              }
-            </Tab.Pane>
             <Tab.Pane eventKey="pieChart">
               {activeTab === 'pieChart' && show &&
                 <PieCharts></PieCharts>
+              }
+            </Tab.Pane>
+            <Tab.Pane eventKey="dataTable">
+              {activeTab === 'dataTable' && show &&
+                <AnalyticsDataTable></AnalyticsDataTable>
               }
             </Tab.Pane>
           </Tab.Content>

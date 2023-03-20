@@ -165,7 +165,7 @@ function WaterRightsTab() {
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
-  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools"]);
+  const [activeKeys, setActiveKeys] = useState<AccordionEventKey>(isNldiMapActive ? ["nldi"] : ["colorSizeTools", "siteSelectionFilters"]);
 
   useEffect(() => {
     for (let element of filters.polyline) {
@@ -548,7 +548,7 @@ function WaterRightsTab() {
       setPolylines(a.identifier, null);
     })
     setNldiMapStatus(false);
-    setActiveKeys(["colorSizeTools"]);
+    setActiveKeys(["colorSizeTools", "siteSelectionFilters"]);
     // clearing nldi information
     setGeoJsonData('nldi', {
       "type": "FeatureCollection",
@@ -622,6 +622,27 @@ function WaterRightsTab() {
                   >
                     {radio.name}
                   </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
+              
+              <div className="mb-3">
+                <label>Toggle View</label>
+                <ButtonGroup className="w-100">
+                  {podPouRadios.map((radio, idx) => (
+                    <ToggleButton
+                      className="zindexzero"
+                      key={idx}
+                      id={`podPouRadio-${idx}`}
+                      type="radio"
+                      variant="outline-primary"
+                      name="podPouRadio"
+                      value={radio.value}
+                      checked={(filters.podPou ?? '') === radio.value}
+                      onChange={handlePodPouChange}
+                    >
+                      {radio.name}
+                    </ToggleButton>
                   ))}
                 </ButtonGroup>
               </div>
@@ -700,26 +721,6 @@ function WaterRightsTab() {
                   name="riverBasins"
                   getOptionLabel={(option) => option.value}
                   value={filters.riverBasinNames?.map(riverBasin => ({ value: riverBasin }))} />
-              </div>
-              <div className="mb-3">
-                <label>Toggle View</label>
-                <ButtonGroup className="w-100">
-                  {podPouRadios.map((radio, idx) => (
-                    <ToggleButton
-                      className="zindexzero"
-                      key={idx}
-                      id={`podPouRadio-${idx}`}
-                      type="radio"
-                      variant="outline-primary"
-                      name="podPouRadio"
-                      value={radio.value}
-                      checked={(filters.podPou ?? '') === radio.value}
-                      onChange={handlePodPouChange}
-                    >
-                      {radio.name}
-                    </ToggleButton>
-                  ))}
-                </ButtonGroup>
               </div>
               <div className="mb-3">
                 <label>Site Content</label>

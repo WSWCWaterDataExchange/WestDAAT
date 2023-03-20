@@ -111,10 +111,10 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className={getPropertyValueClass(waterRightDetails.allocationLegalStatus)}>{waterRightDetails.allocationLegalStatus || emptyValue}</span>
 
                   <span className='property-name'>Assigned Flow (CFS)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationFlowCfs)}>{waterRightDetails.allocationFlowCfs?.toString() || emptyValue}</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationFlowCfs)}>{waterRightDetails.allocationFlowCfs?.toLocaleString() || emptyValue}</span>
 
                   <span className='property-name'>Assigned Volume (AF)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationVolumeAF)}>{waterRightDetails.allocationVolumeAF?.toString() || emptyValue}</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationVolumeAF)}>{waterRightDetails.allocationVolumeAF?.toLocaleString() || emptyValue}</span>
 
                   <span className='property-name'>Beneficial Use</span>
                   {waterRightDetails.beneficialUses.map(a => <span key={a} className='property-value'>{a}</span>)}
@@ -132,7 +132,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeEnd)}>{waterRightDetails.allocationTimeframeEnd || emptyValue}</span>
 
                   <span className='property-name'>Allocation Crop Duty (inch)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount || emptyValue}</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount.toLocaleString() || emptyValue}</span>
 
                   <span className='property-name'>State Water Right Webpage</span>
                   <span className={getPropertyValueClass(waterRightDetails.waterAllocationNativeUrl)}>{formatUrl(waterRightDetails.waterAllocationNativeUrl)}</span>
