@@ -192,7 +192,7 @@ function FeedbackModal(props: FeedBackModalProps) {
             </div>
           </div>
           <div className="mb-3" id="dashboardSatisfactionLevel">
-            <label className="fw-bolder">How satisfied are you with the Water Data Exchange Data(WaDE) Dashboard?(Optional)</label>
+            <label className="fw-bolder">How satisfied are you with the Water Data Exchange Data (WaDE) Tool? (Optional)</label>
             {dashboardSatisfactionOptions.map(element =>
               <div className="form-check" key={element}>
                 <input

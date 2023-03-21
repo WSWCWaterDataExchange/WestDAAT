@@ -132,7 +132,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeEnd)}>{waterRightDetails.allocationTimeframeEnd || emptyValue}</span>
 
                   <span className='property-name'>Allocation Crop Duty (inch)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount.toLocaleString() || emptyValue}</span>
+                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount?.toLocaleString() || emptyValue}</span>
 
                   <span className='property-name'>State Water Right Webpage</span>
                   <span className={getPropertyValueClass(waterRightDetails.waterAllocationNativeUrl)}>{formatUrl(waterRightDetails.waterAllocationNativeUrl)}</span>
