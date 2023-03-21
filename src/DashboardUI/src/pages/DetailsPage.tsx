@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import '../styles/detail-page.scss';
 import WaterRightMap from '../components/WaterRightMap';
 import WaterRightProperties from '../components/WaterRightProperties';
@@ -10,7 +10,7 @@ import SiteTabs from '../components/SiteTabs';
 import useProgressIndicator from '../hooks/useProgressIndicator';
 import { useMemo } from 'react';
 import { useWaterRightDetails, useWaterRightSiteInfoList, useWaterRightSiteLocations, useWaterRightSourceInfoList } from '../hooks/useWaterRightQuery';
-import ChevronLeft from 'mdi-react/ChevronLeftIcon';
+// import ChevronLeft from 'mdi-react/ChevronLeftIcon';
 
 interface detailPageProps {
   detailType: "site" | "right";
@@ -35,15 +35,15 @@ function DetailsPage(props: detailPageProps) {
 
   return (
     <>
-      <div className="detail-page d-flex flex-column">
+      <div className="detail-page d-flex flex-column flex-grow-1">
         <div className='d-flex flex-row align-items-center justify-content-md-between title-header'>
           <div className='p-2'>
-            <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button>
+            {/* <Button variant="link" size="lg"><ChevronLeft></ChevronLeft> Back to Map</Button> */}
           </div>
-          <h3 className='d-flex fw-bold'>WaDE {isSiteDetail ? "Site" : "Water Right"} ID: {id} </h3>
+          <h3 className='d-flex fw-bold'>Water Data Exchange (WaDE) {isSiteDetail ? "Site" : "Water Right"} Landing Page </h3>
 
           <div className='p-2'>
-            <Button size="lg">Download Data</Button>
+            {/* <Button size="lg">Download Data</Button> */}
           </div>
         </div>
         <div className='row properties-row'>

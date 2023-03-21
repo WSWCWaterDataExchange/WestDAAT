@@ -3,6 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
 import './../styles/footer.scss';
+import github_mark_white from '../assets/github_mark_white.png'
 
 interface SiteFooterProps {
   showFeedbackModal(show: boolean): void;
@@ -17,6 +18,7 @@ function SiteFooter(props: SiteFooterProps) {
           <Nav>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/">WaDE</Nav.Link>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/">WSWC</Nav.Link>
+            <Nav.Link className="p-0 s-1" target="_blank" rel="noopener noreferrer" href="https://github.com/WSWCWaterDataExchange/WestDAAT/"><img className="github-logo" src={github_mark_white} alt="GitHub logo with link to WestDAAT source code"/></Nav.Link>
           </Nav>
         </div>
 

@@ -91,8 +91,8 @@ function AnalyticsDataTable() {
                             <td><FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate></td>
                             <td>{waterRightDetail.ownerClassification}</td>
                             <td>{waterRightDetail.allocationLegalStatus}</td>
-                            <td>{waterRightDetail.allocationFlowCfs}</td>
-                            <td>{waterRightDetail.allocationVolumeAf}</td>
+                            <td>{waterRightDetail.allocationFlowCfs?.toLocaleString()}</td>
+                            <td>{waterRightDetail.allocationVolumeAf?.toLocaleString()}</td>
                             <td>{waterRightDetail.beneficialUses.join(', ')}</td>
                         </tr>
                     })

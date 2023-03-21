@@ -86,9 +86,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(x => x.AllocationBridgeBeneficialUsesFact.Any(b =>
-                    beneficalUses.Contains(
-                        b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name)));
+            predicate = predicate.Or(x => beneficalUses.Contains(x.PrimaryBeneficialUseCategory));
 
             return predicate;
         }
@@ -222,12 +220,17 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
             var geometryCombined = GeometryCombiner.Combine(geometries);
 
+            if (!geometryCombined.IsValid)
+            {
+                geometryCombined = GeometryFixer.Fix(geometryCombined, true);
+            }
+
             predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
             site.Site.Geometry != null && site.Site.Geometry.Intersects(geometryCombined)));
 
             predicate = predicate.Or(a => a.AllocationBridgeSitesFact.Any(site =>
             site.Site.SitePoint != null && site.Site.SitePoint.Intersects(geometryCombined)));
-            
+
             return predicate;
         }
 

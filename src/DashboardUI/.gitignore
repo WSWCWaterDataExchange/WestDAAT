@@ -12,6 +12,7 @@
 /build
 
 # misc
+.fleet/
 .DS_Store
 .env.development.local
 .env.test.local

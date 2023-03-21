@@ -13,8 +13,6 @@ using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 using System.IO;
 using Ionic.Zip;
 using System.Globalization;
-using CsvHelper.Configuration;
-using Newtonsoft.Json;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -318,6 +316,18 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var result = await manager.GetWaterRightDetails("99");
 
             result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task WaterAllocationManager_GetWaterRightDetails_Null()
+        {
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById("99")).ReturnsAsync((CommonContracts.WaterRightDetails)null).Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightDetails("99");
+
+            result.Should().BeNull();
             _waterAllocationAccessorMock.Verify();
         }
 
