@@ -34,7 +34,7 @@ function DownloadWaterRights(props: {
         setIsDownloadLimitError(error.message === 'Download limit exceeded.');
       }
     }
-  }, [isError, setIsError, setIsDownloadLimitError]);
+  }, [isError, error, setIsError, setIsDownloadLimitError]);
 
   useEffect(() => {
     if (!isFetching){
