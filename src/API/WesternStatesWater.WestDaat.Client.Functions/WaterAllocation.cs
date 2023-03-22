@@ -10,6 +10,7 @@ using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Microsoft.AspNetCore.Http.Features;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -168,6 +169,10 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             try
             {
                 await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+            }
+            catch(WestDaatException)
+            {
+                response.StatusCode = StatusCodes.Status413PayloadTooLarge;
             }
             catch (Exception)
             {

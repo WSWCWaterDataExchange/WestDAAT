@@ -18,18 +18,23 @@ function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
   setIsError:(isError: boolean) => void,
   setIsFetching: (isFetching: boolean) => void,
-  setIsFetched: (isFetched: boolean) => void}){
+  setIsFetched: (isFetched: boolean) => void,
+  setIsDownloadLimitError: (isFetched: boolean) => void}){
 
-  const {isFetching, isError, isFetched} =  useWaterRightsDownload(props.searchCriteria);
+  const {isFetching, isError, isFetched, error} =  useWaterRightsDownload(props.searchCriteria);
   const { setIsError } = props;
   const { setIsFetching } = props;
   const { setIsFetched } = props;
+  const { setIsDownloadLimitError } = props;
 
   useEffect(() => {
     if (isError){
       setIsError(isError);
+      if(error instanceof Error){
+        setIsDownloadLimitError(error.message === 'Download limit exceeded.');
+      }
     }
-  }, [isError, setIsError]);
+  }, [isError, setIsError, setIsDownloadLimitError]);
 
   useEffect(() => {
     if (!isFetching){
@@ -57,6 +62,7 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isError, setIsError ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
+  const [ isDownloadLimitError, setIsDownloadLimitError ] = useState<boolean>(false);
 
   const close = () => {
     props.setShow(false);
@@ -105,7 +111,8 @@ function DownloadModal(props: DownloadModalProps) {
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
         { !isAuthenticated && <label>Login for Download Access</label> }
-        { isAuthenticated && <label>Download</label> }
+        { isAuthenticated && !isDownloadLimitError && <label>Download</label> }
+        { isAuthenticated && isDownloadLimitError && <label>Download Limit</label> }
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -113,9 +120,14 @@ function DownloadModal(props: DownloadModalProps) {
           Sign up <strong>completely free</strong> or login for download access of up to 100,000
           water rights points.
         </p>}
-        {/* display error message */}
-        { isAuthenticated && isError &&
+        {/* display generic error message */}
+        { isAuthenticated && isError && !isDownloadLimitError &&
           <p>An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try again.</p>} 
+          {/* display download limit error message */}
+          { isAuthenticated && isError && isDownloadLimitError &&
+            <p>You tried downloading a water rights dataset containing more than the supported limit for software efficiency reasons.<br/><br/>
+            Please adjust your filters to reduce the dataset size to less than 100,000 water rights and try the download again.<br/><br/>
+            If not, don't hesitate to get in touch with the WaDE Team for a larger dataset request.</p>} 
         {/* display donwload message to continue with download if user is authenticated */}
         { isAuthenticated && !isFetching && !isError &&
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
@@ -125,7 +137,8 @@ function DownloadModal(props: DownloadModalProps) {
           searchCriteria={searchCriteria}
           setIsError={setIsError}
           setIsFetching={setIsFetching}
-          setIsFetched={setIsFetched}/>}
+          setIsFetched={setIsFetched}
+          setIsDownloadLimitError={setIsDownloadLimitError}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
