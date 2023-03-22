@@ -16,25 +16,24 @@ interface DownloadModalProps extends ModalProps {
 
 function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
-  setIsError:(isError: boolean) => void,
+  setError:(error: JSX.Element | null) => void,
   setIsFetching: (isFetching: boolean) => void,
-  setIsFetched: (isFetched: boolean) => void,
-  setIsDownloadLimitError: (isFetched: boolean) => void}){
+  setIsFetched: (isFetched: boolean) => void}){
 
   const {isFetching, isError, isFetched, error} =  useWaterRightsDownload(props.searchCriteria);
-  const { setIsError } = props;
-  const { setIsFetching } = props;
-  const { setIsFetched } = props;
-  const { setIsDownloadLimitError } = props;
+  const { setError, setIsFetching, setIsFetched } = props;
 
   useEffect(() => {
-    if (isError){
-      setIsError(isError);
-      if(error instanceof Error){
-        setIsDownloadLimitError(error.message === 'Download limit exceeded.');
+    if (isError) {
+      if(error instanceof Error && error.message === 'Download limit exceeded.') {
+        setError(<ErrorMessageTooMuchData />);
+      } else{
+        setError(<ErrorMessageGeneric />);
       }
+    }else {
+      setError(null);
     }
-  }, [isError, error, setIsError, setIsDownloadLimitError]);
+  }, [isError, error, setError]);
 
   useEffect(() => {
     if (!isFetching){
@@ -60,28 +59,25 @@ function DownloadModal(props: DownloadModalProps) {
 
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
-  const [ isError, setIsError ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
-  const [ isDownloadLimitError, setIsDownloadLimitError ] = useState<boolean>(false);
+  const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
 
   const close = () => {
     props.setShow(false);
-    setIsError(false);
   }
 
   const download = async () => 
   {
-    setIsError(false);
     setSearchFilterValues();
     setIsFetching(true);
   }
 
   useEffect(() => {
-    if (isFetched && !isError){
+    if (isFetched && !downloadError){
       props.setShow(false);
       setIsFetched(false);
     }
-  }, [isFetched, props, setIsFetched, isError])
+  }, [isFetched, props, setIsFetched, downloadError])
 
   // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
   const setSearchFilterValues = () => {
@@ -111,8 +107,8 @@ function DownloadModal(props: DownloadModalProps) {
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
         { !isAuthenticated && <label>Login for Download Access</label> }
-        { isAuthenticated && !isDownloadLimitError && <label>Download</label> }
-        { isAuthenticated && isDownloadLimitError && <label>Download Limit</label> }
+        { isAuthenticated && !downloadError && <label>Download</label> }
+        { isAuthenticated && downloadError && <label>Download Limit</label> }
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -120,32 +116,38 @@ function DownloadModal(props: DownloadModalProps) {
           Sign up <strong>completely free</strong> or login for download access of up to 100,000
           water rights points.
         </p>}
-        {/* display generic error message */}
-        { isAuthenticated && isError && !isDownloadLimitError &&
-          <p>An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try again.</p>} 
-          {/* display download limit error message */}
-          { isAuthenticated && isError && isDownloadLimitError &&
-            <p>You tried downloading a water rights dataset containing more than the supported limit for software efficiency reasons.<br/><br/>
-            Please adjust your filters to reduce the dataset size to less than 100,000 water rights and try the download again.<br/><br/>
-            If not, don't hesitate to get in touch with the WaDE Team for a larger dataset request.</p>} 
+        { downloadError }
         {/* display donwload message to continue with download if user is authenticated */}
-        { isAuthenticated && !isFetching && !isError &&
+        { isAuthenticated && !isFetching && !downloadError &&
           <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>}
         {/* display modal with is fetching info and progress bar with it */}
-        { isAuthenticated && isFetching && !isError &&
+        { isAuthenticated && isFetching && !downloadError &&
         <DownloadWaterRights
           searchCriteria={searchCriteria}
-          setIsError={setIsError}
+          setError={setDownloadError}
           setIsFetching={setIsFetching}
-          setIsFetched={setIsFetched}
-          setIsDownloadLimitError={setIsDownloadLimitError}/>}
+          setIsFetched={setIsFetched}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
       <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
       {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
-      {isAuthenticated && !isFetching && !isError && <Button onClick={download}>Download</Button>}
+      {isAuthenticated && !isFetching && !downloadError && <Button onClick={download}>Download</Button>}
       </Modal.Footer>
     </Modal>
+  );
+}
+
+function ErrorMessageGeneric() {
+  return (
+    <p>An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try again.</p>
+  );
+}
+
+function ErrorMessageTooMuchData() {
+  return (
+    <p>You tried downloading a water rights dataset containing more than the supported limit for software efficiency reasons.<br/><br/>
+    Please adjust your filters to reduce the dataset size to less than 100,000 water rights and try the download again.<br/><br/>
+    If not, don't hesitate to get in touch with the WaDE Team for a larger dataset request.</p>
   );
 }
 
