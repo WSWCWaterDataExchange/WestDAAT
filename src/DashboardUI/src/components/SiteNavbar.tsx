@@ -47,9 +47,9 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
             </Button>
 
             <Nav className="mx-2">
-              <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/">
+              <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/">
                 <img alt="Wade Logo" src="/logo32x32.png" />
-                Western States Water Council
+                  Water Data Exchange (WaDE) Program
               </Nav.Link>
             </Nav>
           </div>
