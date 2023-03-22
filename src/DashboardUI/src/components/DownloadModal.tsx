@@ -16,12 +16,13 @@ interface DownloadModalProps extends ModalProps {
 
 function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
+  setTitle:(title: JSX.Element | null) => void,
   setError:(error: JSX.Element | null) => void,
   setIsFetching: (isFetching: boolean) => void,
   setIsFetched: (isFetched: boolean) => void}){
 
   const {isFetching, isError, isFetched, error} =  useWaterRightsDownload(props.searchCriteria);
-  const { setError, setIsFetching, setIsFetched } = props;
+  const { setTitle, setError, setIsFetching, setIsFetched } = props;
 
   useEffect(() => {
     if (isError) {
@@ -34,6 +35,14 @@ function DownloadWaterRights(props: {
       setError(null);
     }
   }, [isError, error, setError]);
+
+  useEffect(() => {
+    if (isError && error instanceof Error && error.message === 'Download limit exceeded.') {
+      setTitle(<label>Download Limit</label>)
+    }else {
+      setTitle(<label>Download</label>);
+    }
+  }, [isError, error, setTitle]);
 
   useEffect(() => {
     if (!isFetching){
@@ -61,6 +70,7 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
+  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(null);
 
   const close = () => {
     props.setShow(false);
@@ -107,8 +117,7 @@ function DownloadModal(props: DownloadModalProps) {
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
         { !isAuthenticated && <label>Login for Download Access</label> }
-        { isAuthenticated && !downloadError && <label>Download</label> }
-        { isAuthenticated && downloadError && <label>Download Limit</label> }
+        { modalTitle }
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -124,6 +133,7 @@ function DownloadModal(props: DownloadModalProps) {
         { isAuthenticated && isFetching && !downloadError &&
         <DownloadWaterRights
           searchCriteria={searchCriteria}
+          setTitle={setModalTitle}
           setError={setDownloadError}
           setIsFetching={setIsFetching}
           setIsFetched={setIsFetched}/>}
