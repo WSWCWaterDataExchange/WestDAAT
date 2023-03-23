@@ -1,6 +1,6 @@
 export const nldi = {
   colors: {
-    mapMarker: '#007BFF',
+    mapMarker: '#FF0000',
     mainstem: '#56B4E9',
     tributaries: '#56B4E9',
     wade: '#009E73',
