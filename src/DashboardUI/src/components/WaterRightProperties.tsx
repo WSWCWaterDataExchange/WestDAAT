@@ -35,7 +35,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
 
   const formatWaterAllocationNativeUrl = (url: string) => {
     if(!url) {
-      return null;
+      return ( <><span className='property-name'>State Water Right Webpage</span><span className='property-value empty'>Unavailable</span></> );
     }
 
     return <span className='property-value'><a href={url} target="_blank" rel="noopener noreferrer">State Water Right Webpage</a></span>;

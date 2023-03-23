@@ -1,5 +1,7 @@
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting'
+import HC_Data from "highcharts/modules/export-data";
+import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import { useContext, useCallback, useState, useEffect } from 'react';
@@ -12,6 +14,8 @@ import { useBeneficialUses } from '../hooks/useSystemQuery';
 
 if (typeof Highcharts === 'object') {
     HighchartsExporting(Highcharts);
+    HC_Data(Highcharts);
+    AnnotationsModule(Highcharts);
 }
 
 function PieCharts() {
