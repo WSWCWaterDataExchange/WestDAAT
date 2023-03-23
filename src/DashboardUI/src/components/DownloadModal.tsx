@@ -137,7 +137,7 @@ function DownloadModal(props: DownloadModalProps) {
           setIsFetching={setIsFetching}
           setIsFetched={setIsFetched}/>}
       </Modal.Body>
-      <Modal.Footer style={{justifyContent: 'space-between'}}>
+          <Modal.Footer style={{ justifyContent: 'end'}}>
       {!downloadError && <Button className="btn btn-secondary" onClick={close}>Cancel</Button>}
       {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
       {isAuthenticated && !isFetching && !downloadError && <Button onClick={download}>Download</Button>}
