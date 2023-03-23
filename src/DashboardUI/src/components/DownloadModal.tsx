@@ -116,7 +116,6 @@ function DownloadModal(props: DownloadModalProps) {
     <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
-        { !isAuthenticated && <label>Login for Download Access</label> }
         { modalTitle }
         </Modal.Title>
       </Modal.Header>
