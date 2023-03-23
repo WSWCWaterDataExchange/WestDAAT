@@ -68,11 +68,11 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
-  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(<ModalTitleGeneric/>);
+  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(isAuthenticated ? <ModalTitleGeneric/> : <ModalTitleUnauthorized/>);
 
   const close = () => {
     props.setShow(false);
-    setModalTitle(<ModalTitleGeneric/>);
+    setModalTitle(isAuthenticated ?  <ModalTitleGeneric/>:<ModalTitleUnauthorized/>);
     setDownloadError(null);
   }
 
@@ -145,6 +145,12 @@ function DownloadModal(props: DownloadModalProps) {
       {downloadError && <Button className="btn btn-secondary" onClick={close}>Okay</Button>}      
       </Modal.Footer>
     </Modal>
+  );
+}
+
+function ModalTitleUnauthorized() {
+  return (
+    <label>Login for Download Access</label>
   );
 }
 
