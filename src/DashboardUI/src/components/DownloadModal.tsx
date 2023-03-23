@@ -39,8 +39,6 @@ function DownloadWaterRights(props: {
   useEffect(() => {
     if (isError && error instanceof Error && error.message === 'Download limit exceeded.') {
       setTitle(<label>Download Limit</label>)
-    }else {
-      setTitle(<label>Download</label>);
     }
   }, [isError, error, setTitle]);
 
@@ -70,10 +68,12 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
-  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(null);
+  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(<ModalTitleGeneric/>);
 
   const close = () => {
     props.setShow(false);
+    setModalTitle(<ModalTitleGeneric/>);
+    setDownloadError(null);
   }
 
   const download = async () => 
@@ -139,11 +139,18 @@ function DownloadModal(props: DownloadModalProps) {
           setIsFetched={setIsFetched}/>}
       </Modal.Body>
       <Modal.Footer style={{justifyContent: 'space-between'}}>
-      <Button className="btn btn-secondary" onClick={close}>Cancel</Button>
+      {!downloadError && <Button className="btn btn-secondary" onClick={close}>Cancel</Button>}
       {!isAuthenticated && <Button className="sign-in-button" ><SignIn /></Button>}
       {isAuthenticated && !isFetching && !downloadError && <Button onClick={download}>Download</Button>}
+      {downloadError && <Button className="btn btn-secondary" onClick={close}>Okay</Button>}      
       </Modal.Footer>
     </Modal>
+  );
+}
+
+function ModalTitleGeneric() {
+  return (
+    <label>Download</label>
   );
 }
 
