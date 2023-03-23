@@ -61,7 +61,7 @@ export function useNldiPinDropAlert(hasLatLong: boolean, isNldiMapActive: boolea
   const [header, body] = useMemo(() => {
     return [
       <h5 className="card-title">Select Search Location</h5>,
-      <>Drag and drop the 'Pin Icon' to the map to select your search location</>
+      <>Drag and drop the red 'Pin Icon' from the left bar to the map to select your search location</>
     ]
   }, []);
   useMapAlert(!hasLatLong && isNldiMapActive, header, body)
