@@ -577,7 +577,8 @@ function WaterRightsTab() {
   }, [isAllBeneficialUsesError, isAllWaterSourceTypesError, isAllOwnerClassificationsError, isAllStatesError])
 
   useMapErrorAlert(isError);
-  useNoMapResults(!hasRenderedFeatures);
+  // added isLoading check, but this only accounts for filter queries and not map queries
+  useNoMapResults(!hasRenderedFeatures && !isLoading);
 
   if (isLoading) return null;
 
