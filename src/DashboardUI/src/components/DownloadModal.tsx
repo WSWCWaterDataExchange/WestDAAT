@@ -38,7 +38,7 @@ function DownloadWaterRights(props: {
 
   useEffect(() => {
     if (isError && error instanceof Error && error.message === 'Download limit exceeded.') {
-      setTitle(<label>Download Limit</label>)
+      setTitle(<ModalTitleDownloadLimit/>)
     }
   }, [isError, error, setTitle]);
 
@@ -68,11 +68,11 @@ function DownloadModal(props: DownloadModalProps) {
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
-  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(isAuthenticated ? <ModalTitleGeneric/> : <ModalTitleUnauthorized/>);
+  const [ modalTitle, setModalTitle ] = useState<JSX.Element | null>(<ModalTitleGeneric/>);
 
   const close = () => {
     props.setShow(false);
-    setModalTitle(isAuthenticated ?  <ModalTitleGeneric/>:<ModalTitleUnauthorized/>);
+    setModalTitle(<ModalTitleGeneric/>);
     setDownloadError(null);
   }
 
@@ -116,7 +116,8 @@ function DownloadModal(props: DownloadModalProps) {
     <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
-        { modalTitle }
+        { !isAuthenticated && <label>Login for Download Access</label> }
+        { isAuthenticated && modalTitle }
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -147,15 +148,15 @@ function DownloadModal(props: DownloadModalProps) {
   );
 }
 
-function ModalTitleUnauthorized() {
-  return (
-    <label>Login for Download Access</label>
-  );
-}
-
 function ModalTitleGeneric() {
   return (
     <label>Download</label>
+  );
+}
+
+function ModalTitleDownloadLimit() {
+  return (
+    <label>Download Limit</label>
   );
 }
 
