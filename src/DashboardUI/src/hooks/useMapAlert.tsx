@@ -51,8 +51,18 @@ export function useNoMapResults(hasNoResults: boolean) {
   const [header, body] = useMemo(() => {
     return [
       <h5 className="card-title">No Matching Results</h5>,
-      <>Sorry, that filter combination has no results in view.<br />Please try different criteria or a different map location.</>
+      <>Sorry, these filter combinations have no water rights in this view or map zoom level.<br />Please try different criteria or a different map area that may have the data you're looking for.</>
     ]
   }, []);
   useMapAlert(hasNoResults, header, body)
+}
+
+export function useNldiPinDropAlert(hasLatLong: boolean, isNldiMapActive: boolean) {
+  const [header, body] = useMemo(() => {
+    return [
+      <h5 className="card-title">Select Search Location</h5>,
+      <>Drag and drop the red 'Pin Icon' from the left bar to the map to select your search location</>
+    ]
+  }, []);
+  useMapAlert(!hasLatLong && isNldiMapActive, header, body)
 }

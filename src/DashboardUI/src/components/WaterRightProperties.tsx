@@ -33,6 +33,14 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
     return <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>;
   }
 
+  const formatWaterAllocationNativeUrl = (url: string) => {
+    if(!url) {
+      return ( <><span className='property-name'>State Water Right Webpage</span><span className='property-value empty'>Unavailable</span></> );
+    }
+
+    return <span className='property-value'><a href={url} target="_blank" rel="noopener noreferrer">State Water Right Webpage</a></span>;
+  }
+
   return (
     <div>
       {waterRightDetails && <>
@@ -98,6 +106,8 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className='property-name'>Native ID</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationNativeId)}>{waterRightDetails.allocationNativeId || emptyValue}</span>
 
+                  { formatWaterAllocationNativeUrl(waterRightDetails.waterAllocationNativeUrl) }
+
                   <span className='property-name'>Owner</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationOwner)}>{waterRightDetails.allocationOwner || emptyValue}</span>
 
@@ -133,9 +143,6 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
 
                   <span className='property-name'>Allocation Crop Duty (inch)</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount?.toLocaleString() || emptyValue}</span>
-
-                  <span className='property-name'>State Water Right Webpage</span>
-                  <span className={getPropertyValueClass(waterRightDetails.waterAllocationNativeUrl)}>{formatUrl(waterRightDetails.waterAllocationNativeUrl)}</span>
                   
                   <span className='property-name'>Owner Classification</span>
                   <span className={getPropertyValueClass(waterRightDetails.ownerClassificationCV)}>{waterRightDetails.ownerClassificationCV || emptyValue}</span>

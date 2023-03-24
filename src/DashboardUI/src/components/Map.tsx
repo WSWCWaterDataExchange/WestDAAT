@@ -207,7 +207,17 @@ function Map(_props: mapProps) {
             features: e.features
           })
         }
-      })
+      });
+
+      map.on("mouseenter", a.id, e => {
+        if (e.features && e.features.length > 0) {
+          map.getCanvas().style.cursor = "pointer";          
+        }
+      });
+
+      map.on("mouseleave", a.id, () => {
+        map.getCanvas().style.cursor = "";          
+      });
     })
   }, [map, setMapRenderedFeatures, setMapClickedFeatures])
   useEffect(() => {

@@ -577,7 +577,8 @@ function WaterRightsTab() {
   }, [isAllBeneficialUsesError, isAllWaterSourceTypesError, isAllOwnerClassificationsError, isAllStatesError])
 
   useMapErrorAlert(isError);
-  useNoMapResults(!hasRenderedFeatures);
+  // added isLoading check, but this only accounts for filter queries and not map queries
+  useNoMapResults(!hasRenderedFeatures && !isLoading && !isNldiMapActive);
 
   if (isLoading) return null;
 
@@ -654,7 +655,7 @@ function WaterRightsTab() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="siteSelectionFilters">
-            <Accordion.Header>SITE SELECTION FILTERS</Accordion.Header>
+            <Accordion.Header>WATER RIGHT SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
                 <a href="https://westernstateswater.org/wade/westdaat-filter-documentation/" target="_blank" rel="noopener noreferrer">Learn about WestDAAT filters</a>

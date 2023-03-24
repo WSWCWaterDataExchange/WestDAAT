@@ -1,4 +1,7 @@
 import Highcharts from 'highcharts';
+import HighchartsExporting from 'highcharts/modules/exporting'
+import HC_Data from "highcharts/modules/export-data";
+import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import { useContext, useCallback, useState, useEffect } from 'react';
@@ -8,6 +11,12 @@ import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCr
 import { FilterContext } from '../FilterProvider';
 import { useGetAnalyticsSummaryInfo } from '../hooks';
 import { useBeneficialUses } from '../hooks/useSystemQuery';
+
+if (typeof Highcharts === 'object') {
+    HighchartsExporting(Highcharts);
+    HC_Data(Highcharts);
+    AnnotationsModule(Highcharts);
+}
 
 function PieCharts() {
     const { filters, nldiIds } = useContext(FilterContext);
@@ -62,6 +71,18 @@ function PieCharts() {
         }
     });
 
+    const chartExporting = {
+      chartOptions: {
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              enabled: true,
+                  format: '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
+            }
+          }
+        }}
+    };
+
     const flowOptions = {
         chart: {
             type: 'pie',
@@ -79,7 +100,8 @@ function PieCharts() {
             {
                 data: pieChartSearchResults?.map(x => ({ name: x.primaryUseCategoryName, y: x.flow, color: x.color }))
             }
-        ]
+        ],
+        exporting: chartExporting
     };
 
     const countOptions = {
@@ -99,7 +121,8 @@ function PieCharts() {
             {
                 data: pieChartSearchResults?.map(x => ({ name: x.primaryUseCategoryName, y: x.points, color: x.color }))
             }
-        ]
+        ],
+        exporting: chartExporting
     };
 
     const volumeOptions = {
@@ -119,7 +142,8 @@ function PieCharts() {
             {
                 data: pieChartSearchResults?.map(x => ({ name: x.primaryUseCategoryName, y: x.volume, color: x.color }))
             }
-        ]
+        ],
+        exporting: chartExporting
     };
 
     return <div className="scrollable-content ">

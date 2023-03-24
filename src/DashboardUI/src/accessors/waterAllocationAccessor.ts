@@ -68,6 +68,7 @@ export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCrite
             throw Error('Something went wrong, please try again later')
           }
     }else{
-      throw Error('Download limit exceeded. Please add more filters to reduce the result set.')
+      const errorMessage = response.status === 413 ? 'Download limit exceeded.' : 'Something went wrong';
+      throw Error(errorMessage)
     }
 };

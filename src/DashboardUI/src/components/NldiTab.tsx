@@ -7,7 +7,7 @@ import { nldi } from '../config/constants';
 import { useDrag } from 'react-dnd';
 import { AppContext } from "../AppProvider";
 import { useNldiFeatures } from "../hooks/useNldiQuery";
-import { useMapErrorAlert } from "../hooks/useMapAlert";
+import { useMapErrorAlert, useNldiPinDropAlert, useNoMapResults } from "../hooks/useMapAlert";
 import Icon from '@mdi/react';
 import deepEqual from 'fast-deep-equal/es6';
 import useProgressIndicator from "../hooks/useProgressIndicator";
@@ -114,7 +114,7 @@ function NldiTab(props: {isNldiMapActive: boolean}) {
     }));
   }
 
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiFilterData } = useContext(MapContext);
+  const { renderedFeatures, setGeoJsonData, setLayerFilters: setMapLayerFilters, setNldiFilterData } = useContext(MapContext);
   const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiData.latitude, nldiData.longitude);
 
   useProgressIndicator([!isNldiDataFetching], "Loading NLDI Data");
@@ -124,18 +124,6 @@ function NldiTab(props: {isNldiMapActive: boolean}) {
       setGeoJsonData('nldi', nldiGeoJsonData)
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
-  
-  useEffect(() => {
-    if (props.isNldiMapActive === false){
-      setNldiData(defaultNldiData);
-      setPointData(s => ({
-        ...s,
-        latitude: '',
-        longitude: ''
-      }));
-      setLatLongData('','');
-    }
-  }, [defaultNldiData, props.isNldiMapActive, setNldiData, setPointData, setLatLongData])
 
   useEffect(() => {
     setNldiFilterData(nldiData);
@@ -194,7 +182,12 @@ function NldiTab(props: {isNldiMapActive: boolean}) {
     }
   }, [nldiData, setUrlParam, defaultNldiData])
 
+
+  const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
+
   useMapErrorAlert(isNldiDataError);
+  useNldiPinDropAlert(!!pointData.latitude && !!pointData.longitude, props.isNldiMapActive);
+  useNoMapResults(!hasRenderedFeatures && !isNldiDataFetching && props.isNldiMapActive);
 
   return (
     <div className="position-relative flex-grow-1">
@@ -252,9 +245,9 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
 
   return (<div className="d-inline-flex flex-row align-items-center">
     <Button type="button" ref={dragRef} variant="no-outline" className="grabbable me-2" >
-      <Icon path={mdiMapMarker} size="48px" />
+      <Icon path={mdiMapMarker} color={nldi.colors.mapMarker} size="48px" />
     </Button>
-    <span>Drag and drop pin on the map to select your search location</span>
+    <span>Drag and drop the "Pin Icon" on the map to select your search location</span>
   </div>
   );
 }
