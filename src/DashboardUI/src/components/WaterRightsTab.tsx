@@ -578,7 +578,7 @@ function WaterRightsTab() {
 
   useMapErrorAlert(isError);
   // added isLoading check, but this only accounts for filter queries and not map queries
-  useNoMapResults(!hasRenderedFeatures && !isLoading);
+  useNoMapResults(!hasRenderedFeatures && !isLoading && !isNldiMapActive);
 
   if (isLoading) return null;
 
