@@ -1566,7 +1566,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 IrrigationMethodCV = allocationAmount.IrrigationMethodCV,
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
-                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl
+                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
+                IrrigatedAcreage = allocationAmount.IrrigatedAcreage,
+                CropTypeCV = allocationAmount.CropTypeCV,
+
             };
 
             // Act

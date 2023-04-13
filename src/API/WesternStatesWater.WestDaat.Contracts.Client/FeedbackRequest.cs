@@ -10,5 +10,6 @@
         public string Organization { get; set; }
         public string Role { get; set; }
         public string SatisfactionLevel { get; set; }
+        public string Url { get; set; }
     }
 }

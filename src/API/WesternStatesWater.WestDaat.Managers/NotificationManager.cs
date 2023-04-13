@@ -73,6 +73,11 @@ namespace WesternStatesWater.WestDaat.Managers
                 messageBody += GetBasicTextConfig(nameof(request.Role), request.Role);
             }
 
+            if (!string.IsNullOrWhiteSpace(request.Url))
+            {
+                messageBody += GetBasicTextConfig(nameof(request.Url), request.Url);
+            }
+
             if (request.DataUsage.Any())
             {
                 messageBody += "Data Usage: \r\n";
