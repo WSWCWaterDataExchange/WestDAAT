@@ -73,6 +73,7 @@ function FeedbackModal(props: FeedBackModalProps) {
     feedbackRequest.organization = organizationValue;
     feedbackRequest.role = roleValue;
     feedbackRequest.satisfactionLevel = satisfactionLevelSelected;
+    feedbackRequest.url = window.location.href;
 
     if (otherDataUseValue !== null && otherDataUseValue !== "") {
       dataUseSelected.push(otherDataUseValue);

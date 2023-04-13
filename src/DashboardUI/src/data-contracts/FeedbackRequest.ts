@@ -7,4 +7,5 @@ export class FeedbackRequest {
   organization?: string;
   role?: string;
   satisfactionLevel?: string;
+  url?: string;
 }
