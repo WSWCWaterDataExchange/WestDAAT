@@ -9,5 +9,6 @@
         public double? AllocationVolumeAf { get; set; }
         public string AllocationLegalStatus { get; set; }
         public string OwnerClassification { get; set; }
+        public string AllocationOwner { get; set; }
     }
 }

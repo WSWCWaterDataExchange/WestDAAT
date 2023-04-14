@@ -57,7 +57,9 @@ function SiteTabs(props: siteTabsProps) {
                         <tbody>
                             {waterRightInfoList?.map((right) =>
                                 <tr key={right.allocationUuid}>
-                                    <td>{right.allocationUuid}</td>
+                                    <td>
+                                        <a href={`/details/right/${right.allocationUuid}`} target="_blank" rel="noopener noreferrer">{right.allocationUuid}</a>
+                                    </td>
                                     <td>{right.waterRightNativeId}</td>
                                     <td>{right.owner}</td>
                                     <td><FormattedDate>{right.priorityDate}</FormattedDate></td>

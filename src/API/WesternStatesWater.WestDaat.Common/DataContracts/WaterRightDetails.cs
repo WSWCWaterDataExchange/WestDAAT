@@ -38,5 +38,9 @@
         public string OwnerClassificationCV { get; set; }
         public string PrimaryBeneficialUseCategory { get; set; }
         public string IrrigationMethodCV { get; set; }
+        public double? IrrigatedAcreage { get; set; }
+        public string CropTypeCV { get; set; }
+        public string WaDEIrrigationMethod { get; set; }
+
     }
 }

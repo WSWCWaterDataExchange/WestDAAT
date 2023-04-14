@@ -70,13 +70,13 @@ function AnalyticsDataTable() {
         }));
     }, [latestSearchResults]);
 
-    return <div className="scrollable-content">
-        <Table>
+    return <Table>
             <thead>
                 <tr>
                     <th>Allocation UUID</th>
                     <th>Priority Date</th>
                     <th>WaDE Owner Classification</th>
+                    <th>Owner</th>
                     <th>WaDE Legal Status</th>
                     <th>Allocation Flow (CFS)</th>
                     <th>Allocation Volume (AF)</th>
@@ -90,6 +90,7 @@ function AnalyticsDataTable() {
                             <td><a href={`/details/right/${waterRightDetail.allocationUuid}`} target="_blank" rel="noopener noreferrer">{waterRightDetail.allocationUuid}</a></td>
                             <td><FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate></td>
                             <td>{waterRightDetail.ownerClassification}</td>
+                            <td>{waterRightDetail.allocationOwner}</td>
                             <td>{waterRightDetail.allocationLegalStatus}</td>
                             <td>{waterRightDetail.allocationFlowCfs?.toLocaleString()}</td>
                             <td>{waterRightDetail.allocationVolumeAf?.toLocaleString()}</td>
@@ -99,25 +100,23 @@ function AnalyticsDataTable() {
                 }
                 {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetchingTableData &&
                     <tr key="noResults">
-                        <td colSpan={7} align="center">No results found</td>
+                        <td colSpan={8} align="center">No results found</td>
                     </tr>
                 }
                 {hasMoreResults && !isFetchingTableData &&
                     <tr>
-                        <td colSpan={7} align="center"><Button onClick={handleLoadMoreResults}>Load more results</Button></td>
+                        <td colSpan={8} align="center"><Button onClick={handleLoadMoreResults}>Load more results</Button></td>
                     </tr>
                 }
                 {isFetchingTableData &&
                     <tr>
-                        <td colSpan={7} align="center">
+                        <td colSpan={8} align="center">
                             Loading... <ProgressBar animated now={100} />
                         </td>
                     </tr>
-
                 }
             </tbody>
         </Table>
-    </div>
 }
 
 export default AnalyticsDataTable;
