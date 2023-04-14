@@ -15,28 +15,15 @@ function TableView(props: TableViewProps) {
   const [show, setshow] = useState(false);
   const [activeTab, setActiveTab] = useState('pieChart');
 
-  const handleClose = () => handleVisibilityChange(false);
-  const toggleShow = () => handleVisibilityChange(!show);
-
-  const handleVisibilityChange = (shouldShow: boolean) => {
-    setshow(shouldShow);
-  }
+  const toggleShow = () => setshow(!show);
 
   return <>
-    <Button type="button" className={`table-view-toggle-btn ${show ? "toggle-on" : null}`} onClick={toggleShow}>
+    <Button type="button" className={`table-view-toggle-btn ${show ? "toggle-on" : 'toggle-off'}`} onClick={toggleShow}>
       ANALYTICS & TABLE
       <Icon path={show ? mdiChevronDown : mdiChevronUp} size="1.5em" />
     </Button>
+    <div className={`analytics-and-table-content ${show ? "toggle-on" : 'toggle-off'}`}>
     <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'pieChart')} id="analytics-and-table">
-      <Offcanvas
-        className="offcanvas-analytics"
-        show={show}
-        onHide={handleClose}
-        placement={'bottom'}
-        backdrop={false}
-        scroll={true}
-        container={props.containerRef}>
-        <Offcanvas.Body>
           <Nav variant="tabs" defaultActiveKey="pieChart">           
             <Nav.Item>
               <Nav.Link eventKey="pieChart">Chart Summary</Nav.Link>
@@ -57,9 +44,8 @@ function TableView(props: TableViewProps) {
               }
             </Tab.Pane>
           </Tab.Content>
-        </Offcanvas.Body>
-      </Offcanvas>
-    </Tab.Container>
+        </Tab.Container>
+        </div>
   </>
 }
 

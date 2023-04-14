@@ -5,7 +5,7 @@ import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import { useContext, useCallback, useState, useEffect } from 'react';
-import { Col, ProgressBar, Row } from 'react-bootstrap';
+import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
 import { colorList } from '../config/constants';
 import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
 import { FilterContext } from '../FilterProvider';
@@ -146,13 +146,14 @@ function PieCharts() {
         exporting: chartExporting
     };
 
-    return <div className="scrollable-content ">
+    return <div>
         <div className="my-3 d-flex justify-content-center">
             <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank" rel="noopener noreferrer">Learn about WestDAAT analytics</a>
         </div>
 
 
         {pieChartSearchResults && pieChartSearchResults?.length > 0 &&
+        <Container fluid={true}>
             <Row>
                 <Col lg="4">
                     <HighchartsReact highcharts={Highcharts} options={countOptions} />
@@ -163,7 +164,8 @@ function PieCharts() {
                 <Col lg="4">
                     <HighchartsReact highcharts={Highcharts} options={volumeOptions} />
                 </Col>
-            </Row>}
+            </Row>
+        </Container>}
         {pieChartSearchResults?.length === 0 && !isFetching &&
             <div className="d-flex justify-content-center">No results found</div>
         }
