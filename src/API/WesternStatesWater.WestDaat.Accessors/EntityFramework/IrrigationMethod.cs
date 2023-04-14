@@ -14,6 +14,7 @@
         public string Definition { get; set; }
         public string State { get; set; }
         public string SourceVocabularyUri { get; set; }
+        public string WaDEName { get; set; }
 
         public virtual ICollection<SiteVariableAmountsFact> SiteVariableAmountsFact { get; set; }
 

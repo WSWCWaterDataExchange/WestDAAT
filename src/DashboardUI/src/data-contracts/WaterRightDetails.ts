@@ -35,4 +35,7 @@ export interface WaterRightDetails {
   ownerClassificationCV: string;
   primaryBeneficialUseCategory: string;
   irrigationMethodCV: string;
+  irrigatedAcreage: number;
+  cropTypeCV: string;
+  waDEIrrigationMethod: string;
 }

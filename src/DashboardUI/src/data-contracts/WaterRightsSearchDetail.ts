@@ -6,4 +6,5 @@ export interface WaterRightsSearchDetail {
   allocationVolumeAf?: number;
   allocationLegalStatus: string;
   ownerClassification: string;
+  allocationOwner: string;
 }

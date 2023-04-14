@@ -1519,12 +1519,16 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var expirationDate = new Faker().Date.Past(150);
             var priorityDate = new Faker().Date.Past(100);
             var publishedDate = new Faker().Date.Past(50);
+            var irrigationMethod = new IrrigationMethodCVFaker().Generate();
+            db.IrrigationMethod.Add(irrigationMethod);
+
             var allocationAmount = new AllocationAmountFactFaker()
                 .SetAllocationPriorityDate(priorityDate)
                 .SetAllocationExpirationDate(expirationDate)
                 .SetPublishedDate(publishedDate)
                 .Generate();
             allocationAmount.VariableSpecific.AggregationInterval = 5.0M;
+            allocationAmount.IrrigationMethodCV = irrigationMethod.Name;
 
             db.AllocationAmountsFact.Add(allocationAmount);
             db.SaveChanges();
@@ -1564,6 +1568,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 AllocationTimeframeStart = allocationAmount.AllocationTimeframeStart,
                 DatePublished = allocationAmount.DataPublicationDate.Date.Date,
                 IrrigationMethodCV = allocationAmount.IrrigationMethodCV,
+                IrrigatedAcreage = allocationAmount.IrrigatedAcreage,
+                CropTypeCV = allocationAmount.CropTypeCV,
+                WaDEIrrigationMethod = irrigationMethod.WaDEName,
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
                 WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl

@@ -147,8 +147,17 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className='property-name'>Owner Classification</span>
                   <span className={getPropertyValueClass(waterRightDetails.ownerClassificationCV)}>{waterRightDetails.ownerClassificationCV || emptyValue}</span>
 
-                  <span className='property-name'>WaDE Irrigation Method</span>
+                  <span className='property-name'>Irrigation Method</span>
                   <span className={getPropertyValueClass(waterRightDetails.irrigationMethodCV)}>{waterRightDetails.irrigationMethodCV || emptyValue}</span>
+
+                  <span className='property-name'>Irrigated Acreage</span>
+                  <span className={getPropertyValueClass(waterRightDetails.irrigatedAcreage)}>{waterRightDetails.irrigatedAcreage || emptyValue}</span>
+
+                  <span className='property-name'>Crop Type</span>
+                  <span className={getPropertyValueClass(waterRightDetails.cropTypeCV)}>{waterRightDetails.cropTypeCV || emptyValue}</span>
+
+                  <span className='property-name'>WaDE Irrigation Method</span>
+                  <span className={getPropertyValueClass(waterRightDetails.waDEIrrigationMethod)}>{waterRightDetails.waDEIrrigationMethod || emptyValue}</span>
                 </div>
               </Card.Body>
             </Card>

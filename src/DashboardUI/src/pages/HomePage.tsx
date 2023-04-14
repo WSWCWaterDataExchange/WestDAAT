@@ -41,7 +41,7 @@ function HomePage() {
     } else {
       setUrlParam("tab", currentTab)
     }
-  }, [currentTab, setUrlParam])
+  }, [currentTab, setUrlParam]);
 
   return (
     <div className="home-page d-flex flex-column">
@@ -50,9 +50,9 @@ function HomePage() {
         currentTab={currentTab}
         showDownloadModal={shouldShowDownloadModal}
       />
-      <div className="d-flex flex-grow-1 overflow-hidden">
+      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         <SidePanel currentTab={currentTab} />
-        <div className="flex-grow-1" ref={containerRef}>
+        <div className="flex-grow-1 position-relative" ref={containerRef}>
           <Map />
           <TableView containerRef={containerRef} />
         </div>

@@ -1,54 +1,66 @@
 @import './colors.scss';
 @import './custom.scss';
 
-.offcanvas-analytics {
-  position: relative !important;
-  transition: none;
-
-  .offcanvas-body {
-    padding-right: 0px !important;
-    overflow-y: hidden;
-  }
-
-  &.offcanvas-bottom {
-    bottom: $offcanvas-vertical-height + 3vh;
-    transition: none;
-  }
-}
-
 .table-view-toggle-btn {
-  position: relative !important;
+  position: sticky !important;
   display: block !important;
-  bottom: 3vh;
+  left: 0;
+  right: 0;
   margin: 0 auto;
+  bottom: 0;
   background-color: $bs-gray-900;
   color: $text-color-light;
-  z-index: $zindex-offcanvas;
+  z-index: 3;
   border-bottom-left-radius: 0px !important;
   border-bottom-right-radius: 0px !important;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;  
-  transition: none;
 
   &.toggle-on {
-    transform: translateY(-1*($offcanvas-vertical-height+3vh));    
-    transition: none;
-    bottom: auto;
+    bottom: 65%;
+    transition: bottom .5s ease-in-out;
+  }
+
+  &.toggle-off {
+    bottom: 0;
+    transition: bottom .5s ease-in-out;
+  }
+}
+.analytics-and-table-content{
+  position: absolute !important;
+  display: block !important;
+  top: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+  background-color: $white;
+  z-index: 4;
+  transition: top .5s ease-in-out;
+  overflow: auto;
+
+  &.toggle-on {
+    top: 35%;
+  }
+
+  &.toggle-off {
+    top: 100%;
   }
 }
 
-.scrollable-content {
-  overflow-y: auto;
-  height: $offcanvas-vertical-height - 4vh;
-}
-.scrollable-content thead th {
-  position: sticky;
-  top: 0;
-}
-table {
-  border-collapse: collapse;        
-  width: 100%;
-}
-th {
-  background:white !important;
+.table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+  margin-bottom: 0 !important;
+
+  & thead tr {
+    position: sticky;
+    top: calc(-1rem - 1px);
+    background-color: $white;
+    border-bottom: 1px solid $black; 
+  }
+
+  & tbody tr:last-child td{
+    border-bottom: 0px none;
+  }
 }
