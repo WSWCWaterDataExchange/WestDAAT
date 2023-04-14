@@ -29,7 +29,7 @@ import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
-import { Directions } from "../data-contracts/nldi";
+import { DataPoints, Directions } from "../data-contracts/nldi";
 import Select from "react-select";
 import { FilterContext, WaterRightsFilters } from "../FilterProvider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
@@ -305,7 +305,7 @@ function WaterRightsTab() {
       return [];
     }
     let nldiData = geoJsonData.filter(s => s.source === 'nldi');
-    if (nldiData && nldiData.length > 0 && nldiFilterData !== null) {
+    if (nldiData && nldiData.length > 0 && nldiFilterData !== null && (nldiFilterData.dataPoints & DataPoints.Wade)) {
       let arr = (nldiData[0].data as FeatureCollection).features
         .filter(x => x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' || x.properties?.source?.toLowerCase() === 'wade');
 
