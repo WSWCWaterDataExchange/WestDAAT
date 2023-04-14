@@ -77,6 +77,7 @@ function AnalyticsDataTable() {
                     <th>Allocation UUID</th>
                     <th>Priority Date</th>
                     <th>WaDE Owner Classification</th>
+                    <th>Owner</th>
                     <th>WaDE Legal Status</th>
                     <th>Allocation Flow (CFS)</th>
                     <th>Allocation Volume (AF)</th>
@@ -90,6 +91,7 @@ function AnalyticsDataTable() {
                             <td><a href={`/details/right/${waterRightDetail.allocationUuid}`} target="_blank" rel="noopener noreferrer">{waterRightDetail.allocationUuid}</a></td>
                             <td><FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate></td>
                             <td>{waterRightDetail.ownerClassification}</td>
+                            <td>{waterRightDetail.allocationOwner}</td>
                             <td>{waterRightDetail.allocationLegalStatus}</td>
                             <td>{waterRightDetail.allocationFlowCfs?.toLocaleString()}</td>
                             <td>{waterRightDetail.allocationVolumeAf?.toLocaleString()}</td>
