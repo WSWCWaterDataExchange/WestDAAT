@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Nav, Offcanvas, Tab } from "react-bootstrap";
+import { Button, Nav, Tab } from "react-bootstrap";
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import "../styles/tableView.scss";
 import Icon from "@mdi/react";
