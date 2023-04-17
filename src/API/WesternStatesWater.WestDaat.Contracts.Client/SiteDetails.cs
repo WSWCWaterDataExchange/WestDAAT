@@ -10,5 +10,7 @@
         public string County { get; set; }
         public string PodOrPou { get; set; }
         public string SiteType { get; set; }
+        public string CoordinateMethodCv { get; set; }
+        public string CoordinateAccuracy { get; set; }
     }
 }
