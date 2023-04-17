@@ -126,7 +126,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
-            var site = new SitesDimFaker().Generate();
+            var site = new SitesDimFaker()
+                .RuleFor(a=>a.CoordinateAccuracy, f=> f.Random.AlphaNumeric(5))
+                .Generate();
             db.SitesDim.Add(site);
             db.SaveChanges();
 
@@ -140,6 +142,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 SiteName = site.SiteName,
                 SiteNativeId = site.SiteNativeId,
                 SiteType = site.SiteTypeCv,
+                CoordinateMethodCv = site.CoordinateMethodCv,
+                CoordinateAccuracy = site.CoordinateAccuracy,
             };
 
             // Act
