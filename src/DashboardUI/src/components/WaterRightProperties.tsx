@@ -1,8 +1,8 @@
 import { Card, Col, Row } from 'react-bootstrap';
 import { useWaterRightDetails } from '../hooks/useWaterRightQuery';
 import Domain from 'mdi-react/DomainIcon';
-// import FormatListBulleted from 'mdi-react/FormatListBulletedIcon';
 import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
+import WaterCircle from 'mdi-react/WaterCircleIcon';
 import { FormattedDate } from './FormattedDate';
 
 interface waterRightPropertiesProps {
@@ -13,30 +13,21 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
   // TODO: Update with loading screen after Dub update
   const waterRightDetails = useWaterRightDetails(props.allocationUuid).data;
 
-  const getPropertyValueClass = (value: any) => {
-    return value !== null ? 'property-value' : 'property-value empty';
+  const buildPropertyElements = (label: string, value: string | number | JSX.Element, isVerbose: boolean = false) => {
+    return <>
+        <span className='property-name'>{label}</span>
+        <span className={`property-value${isVerbose ? ' is-verbose' : ''}`}>{value}</span>
+    </>
   }
-  const emptyValue = 'Unknown';
 
   const getDateString = (date: Date) => {
-    if (date) {
-      return <FormattedDate>{date}</FormattedDate>;
-    }
-    return emptyValue;
+    return date && <FormattedDate>{date}</FormattedDate>;
   }
 
-  const formatUrl = (url: string) => {
-    if(!url) {
-      return emptyValue;
-    }
-
-    return <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>;
-  }
-
-  const formatUrlLink = (url: string, title: string) => {
+  const buildPropertyUrlElements = (title: string, url: string) => {
     return <>
       <span className='property-name'>{title}</span>
-      <span className='property-value empty'>{url ? <a href={url} target="_blank" rel="noopener noreferrer">View</a> : emptyValue}</span>
+      <span className='property-value'>{url && <a href={url} target="_blank" rel="noopener noreferrer">View</a>}</span>
     </>
   }
 
@@ -46,103 +37,57 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
         <Row className="pt-4">
           <Col>
             <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <Domain></Domain> Managing Organization Agency</Card.Header>
+              <Card.Header className="water-rights-header"> <Domain /><span>Managing Organization Agency</span></Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
-
-                  <span className='property-name'>Organization Name</span>
-                  <span className={getPropertyValueClass(waterRightDetails.organizationName)}>{waterRightDetails.organizationName || emptyValue}</span>
-
-                  <span className='property-name'>State</span>
-                  <span className={getPropertyValueClass(waterRightDetails.state)}>{waterRightDetails.state || emptyValue}</span>
-
-                  { formatUrlLink(waterRightDetails.organizationWebsite, 'Website') }
+                  {buildPropertyElements('Organization Name', waterRightDetails.organizationName)}
+                  {buildPropertyElements('State', waterRightDetails.state)}
+                  {buildPropertyUrlElements('Website', waterRightDetails.organizationWebsite)}
                 </div>
               </Card.Body>
             </Card>
           </Col>
           <Col>
             <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Water Right Information</Card.Header>
+              <Card.Header className="water-rights-header"> <WaterCircle /><span>Water Right Information</span></Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
-                  <span className='property-name'>WaDE Water Right Identifier</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationUuid)}>{waterRightDetails.allocationUuid || emptyValue}</span>
-
-                  <span className='property-name'>Native ID</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationNativeId)}>{waterRightDetails.allocationNativeId || emptyValue}</span>
-
-                  { formatUrlLink(waterRightDetails.waterAllocationNativeUrl, 'State Water Right Webpage') }
-
-                  <span className='property-name'>Owner</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationOwner)}>{waterRightDetails.allocationOwner || emptyValue}</span>
-
-                  <span className='property-name'>Priority Date</span>
-                  <span className={getPropertyValueClass(waterRightDetails.priorityDate)}>{getDateString(waterRightDetails.priorityDate)}</span>
-
-                  <span className='property-name'>Expiration Date</span>
-                  <span className={getPropertyValueClass(waterRightDetails.expirationDate)}>{getDateString(waterRightDetails.expirationDate)} </span>
-
-                  <span className='property-name'>Legal Status</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationLegalStatus)}>{waterRightDetails.allocationLegalStatus || emptyValue}</span>
-
-                  <span className='property-name'>Assigned Flow (CFS)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationFlowCfs)}>{waterRightDetails.allocationFlowCfs?.toLocaleString() || emptyValue}</span>
-
-                  <span className='property-name'>Assigned Volume (AF)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationVolumeAF)}>{waterRightDetails.allocationVolumeAF?.toLocaleString() || emptyValue}</span>
-
+                  {buildPropertyElements('WaDE Water Right Identifier', waterRightDetails.allocationUuid)}
+                  {buildPropertyElements('Native ID', waterRightDetails.allocationNativeId)}
+                  {buildPropertyUrlElements('State Water Right Webpage', waterRightDetails.waterAllocationNativeUrl)}
+                  {buildPropertyElements('Owner', waterRightDetails.allocationOwner)}
+                  {buildPropertyElements('Priority Date', getDateString(waterRightDetails.priorityDate))}
+                  {buildPropertyElements('Expiration Date', getDateString(waterRightDetails.expirationDate))}
+                  {buildPropertyElements('Legal Status', waterRightDetails.allocationLegalStatus)}
+                  {buildPropertyElements('Assigned Flow (CFS)', waterRightDetails.allocationFlowCfs)}
+                  {buildPropertyElements('Assigned Volume (AF)', waterRightDetails.allocationVolumeAF)}
+                  
                   <span className='property-name'>Beneficial Use</span>
                   {waterRightDetails.beneficialUses.map(a => <span key={a} className='property-value'>{a}</span>)}
 
-                  <span className='property-name'>WaDE Primary Use Category</span>
-                  <span className={getPropertyValueClass(waterRightDetails.primaryBeneficialUseCategory)}>{waterRightDetails.primaryBeneficialUseCategory || emptyValue}</span>
-                  
-                  <span className='property-name'>Date Published</span>
-                  <span className={getPropertyValueClass(waterRightDetails.datePublished)}>{getDateString(waterRightDetails.datePublished)}</span>
-
-                  <span className='property-name'>Allocation Timeframe Start</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeStart)}>{waterRightDetails.allocationTimeframeStart || emptyValue}</span>
-
-                  <span className='property-name'>Allocation Timeframe End</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationTimeframeEnd)}>{waterRightDetails.allocationTimeframeEnd || emptyValue}</span>
-
-                  <span className='property-name'>Allocation Crop Duty (inch)</span>
-                  <span className={getPropertyValueClass(waterRightDetails.allocationCropDutyAmount)}>{waterRightDetails.allocationCropDutyAmount?.toLocaleString() || emptyValue}</span>
-                  
-                  <span className='property-name'>Owner Classification</span>
-                  <span className={getPropertyValueClass(waterRightDetails.ownerClassificationCV)}>{waterRightDetails.ownerClassificationCV || emptyValue}</span>
-
-                  <span className='property-name'>Irrigation Method</span>
-                  <span className={getPropertyValueClass(waterRightDetails.irrigationMethodCV)}>{waterRightDetails.irrigationMethodCV || emptyValue}</span>
-
-                  <span className='property-name'>Irrigated Acreage</span>
-                  <span className={getPropertyValueClass(waterRightDetails.irrigatedAcreage)}>{waterRightDetails.irrigatedAcreage || emptyValue}</span>
-
-                  <span className='property-name'>Crop Type</span>
-                  <span className={getPropertyValueClass(waterRightDetails.cropTypeCV)}>{waterRightDetails.cropTypeCV || emptyValue}</span>
-
-                  <span className='property-name'>WaDE Irrigation Method</span>
-                  <span className={getPropertyValueClass(waterRightDetails.waDEIrrigationMethod)}>{waterRightDetails.waDEIrrigationMethod || emptyValue}</span>
+                  {buildPropertyElements('WaDE Primary Use Category', waterRightDetails.primaryBeneficialUseCategory)}
+                  {buildPropertyElements('Date Published', getDateString(waterRightDetails.datePublished))}
+                  {buildPropertyElements('Allocation Timeframe Start', waterRightDetails.allocationTimeframeStart)}
+                  {buildPropertyElements('Allocation Timeframe End', waterRightDetails.allocationTimeframeEnd)}
+                  {buildPropertyElements('Allocation Crop Duty (inch)', waterRightDetails.allocationCropDutyAmount)}
+                  {buildPropertyElements('Owner Classification', waterRightDetails.ownerClassificationCV)}
+                  {buildPropertyElements('Irrigation Method', waterRightDetails.irrigationMethodCV)}
+                  {buildPropertyElements('Irrigated Acreage', waterRightDetails.irrigatedAcreage)}
+                  {buildPropertyElements('Crop Type', waterRightDetails.cropTypeCV)}
+                  {buildPropertyElements('WaDE Irrigation Method', waterRightDetails.waDEIrrigationMethod)}
                 </div>
               </Card.Body>
             </Card>
           </Col>
           <Col>
             <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Method Information</Card.Header>
+              <Card.Header className="water-rights-header"> <ClipBoardSearch /><span>Method Information</span></Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
-                  <span className='property-name'>Applicable Resource Type</span>
-                  <span className={getPropertyValueClass(waterRightDetails.applicableResourceType)}>{waterRightDetails.applicableResourceType || emptyValue}</span>
-
-                  <span className='property-name'>Method Type</span>
-                  <span className={getPropertyValueClass(waterRightDetails.methodType)}>{waterRightDetails.methodType || emptyValue}</span>
-
-                  { formatUrlLink(waterRightDetails.methodLink, 'Method Link') }
-
-                  <span className='property-name'>Method Description</span>
-                  <span className={`fw-normal ${getPropertyValueClass(waterRightDetails.methodDescription)}`}>{waterRightDetails.methodDescription || emptyValue}</span>
+                  {buildPropertyElements('Applicable Resource Type', waterRightDetails.applicableResourceType)}
+                  {buildPropertyElements('Method Type', waterRightDetails.methodType)}
+                  {buildPropertyUrlElements('Method Link', waterRightDetails.methodLink)}
+                  {buildPropertyElements('Method Description', waterRightDetails.methodDescription, true)}
                 </div>
               </Card.Body>
             </Card>

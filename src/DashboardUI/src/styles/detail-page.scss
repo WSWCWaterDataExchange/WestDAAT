@@ -13,18 +13,28 @@
 }
 
 .card {
-  .water-rights-header{
-    background-color: $card-header-color-red;
+  .card-header{
+    font-size: 20px;
+    color: $white;
+    padding: 1rem;
     font-size: 20px;
     color: $white;
     padding: 15px;
-  }
-
-  .site-header{
-    background-color: $card-header-color-blue;
-    font-size: 20px;
-    color: $white;
-    padding: 15px;
+    display: flex;
+    align-items: center;
+    column-gap: .5rem;
+    > svg {
+      flex-shrink: 0;
+    }
+    > span{
+      line-height: 1;
+    }
+    &.water-rights-header{
+      background-color: $card-header-color-red;
+    }
+    &.site-header{
+      background-color: $card-header-color-blue;
+    }
   }
 }
 
@@ -41,8 +51,14 @@
   font-size: 18px;
   font-weight: bold;
   color: $text-color-black;
-  &.empty {
+  &:empty{
     color: $text-color-grey;
+    &:before{
+      content: "Unknown";
+    }
+  }
+  &.is-verbose{
+    font-weight: normal;
   }
 }
 
