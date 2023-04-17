@@ -5,71 +5,73 @@
   background-color: $white;
   overflow-y: auto;
   padding: 15px;
-}
 
-.title-header {
-  padding: 10px;
-  border-bottom: 1px solid $bs-gray-600;
-}
-
-.card {
-  .card-header{
-    font-size: 20px;
-    color: $white;
-    padding: 1rem;
-    font-size: 20px;
-    color: $white;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    column-gap: .5rem;
-    > svg {
-      flex-shrink: 0;
-    }
-    > span{
-      line-height: 1;
-    }
-    &.water-rights-header{
-      background-color: $card-header-color-red;
-    }
-    &.site-header{
-      background-color: $card-header-color-blue;
+  .title-header {
+    padding: 10px;
+    border-bottom: 1px solid $bs-gray-600;
+  }
+  
+  .card {
+    .card-header{
+      font-size: 20px;
+      color: $white;
+      padding: 1rem;
+      font-size: 20px;
+      color: $white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      column-gap: .5rem;
+      > svg {
+        flex-shrink: 0;
+      }
+      > span{
+        line-height: 1;
+      }
+      &.water-rights-header{
+        background-color: $card-header-color-red;
+      }
+      &.site-header{
+        background-color: $card-header-color-blue;
+      }
     }
   }
-}
-
-.property-name {
-  font-size: 16px;
-  margin-top: 18px;
-  color: $text-color-grey;
-  &:first-of-type{
-    margin-top: 0;
-  }
-}
-
-.property-value {
-  font-size: 18px;
-  font-weight: bold;
-  color: $text-color-black;
-  &:empty{
+  
+  .property-name {
+    font-size: 16px;
+    margin-top: 18px;
     color: $text-color-grey;
-    &:before{
-      content: "Unknown";
+    &:first-of-type{
+      margin-top: 0;
     }
   }
-  &.is-verbose{
-    font-weight: normal;
+  
+  .property-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: $text-color-black;
+    &:empty{
+      color: $text-color-grey;
+      &:before{
+        content: "Unknown";
+      }
+    }
+    &.is-verbose{
+      font-weight: normal;
+    }
   }
-}
-
-.custom-tabs > .nav-item{
-  .nav-link.active{  
-    background-color: $white;
-    border-bottom: none;
+  
+  .custom-tabs > .nav-item{
+    .nav-link.active{  
+      background-color: $white;
+      border-bottom: none;
+    }
   }
+  
+  
+  .map-container {
+    min-height: 700px;
+  }
+  
 }
 
-
-.map-container {
-  min-height: 700px;
-}
