@@ -33,12 +33,11 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
     return <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>;
   }
 
-  const formatWaterAllocationNativeUrl = (url: string) => {
-    if(!url) {
-      return ( <><span className='property-name'>State Water Right Webpage</span><span className='property-value empty'>Unavailable</span></> );
-    }
-
-    return <span className='property-value'><a href={url} target="_blank" rel="noopener noreferrer">State Water Right Webpage</a></span>;
+  const formatUrlLink = (url: string, title: string) => {
+    return <>
+      <span className='property-name'>{title}</span>
+      <span className='property-value empty'>{url ? <a href={url} target="_blank" rel="noopener noreferrer">View</a> : emptyValue}</span>
+    </>
   }
 
   return (
@@ -57,44 +56,11 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className='property-name'>State</span>
                   <span className={getPropertyValueClass(waterRightDetails.state)}>{waterRightDetails.state || emptyValue}</span>
 
-                  <span className='property-name'>Website</span>
-                  <span className={getPropertyValueClass(waterRightDetails.organizationWebsite)}>{formatUrl(waterRightDetails.organizationWebsite)}</span>
+                  { formatUrlLink(waterRightDetails.organizationWebsite, 'Website') }
                 </div>
               </Card.Body>
             </Card>
           </Col>
-          {/* <Col>
-            <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <FormatListBulleted></FormatListBulleted> Variable Information</Card.Header>
-              <Card.Body>
-                <div className='d-flex p-2 flex-column'>
-                  <span className='property-name'>Interval</span>
-                  <span className={getPropertyValueClass(waterRightDetails.aggregationInterval)}>{waterRightDetails.aggregationInterval || emptyValue}</span>
-
-                  <span className='property-name'>Interval Unit</span>
-                  <span className={getPropertyValueClass(waterRightDetails.aggregationIntervalUnit)}>{waterRightDetails.aggregationIntervalUnit || emptyValue}</span>
-
-                  <span className='property-name'>Statistic</span>
-                  <span className={getPropertyValueClass(waterRightDetails.aggregationStatistic)}>{waterRightDetails.aggregationStatistic || emptyValue}</span>
-
-                  <span className='property-name'>Maximum Amount Unit</span>
-                  <span className={getPropertyValueClass(waterRightDetails.amountUnitCv)}>{waterRightDetails.amountUnitCv || emptyValue}</span>
-
-                  <span className='property-name'>Report Year Start Month</span>
-                  <span className={getPropertyValueClass(waterRightDetails.reportYearStartMonth)}>{waterRightDetails.reportYearStartMonth || emptyValue}</span>
-
-                  <span className='property-name'>Report Year Type</span>
-                  <span className={getPropertyValueClass(waterRightDetails.reportYearTypeCv)}>{waterRightDetails.reportYearTypeCv || emptyValue}</span>
-
-                  <span className='property-name'>Variable</span>
-                  <span className={getPropertyValueClass(waterRightDetails.variableCv)}>{waterRightDetails.variableCv || emptyValue}</span>
-
-                  <span className='property-name'>Variable Specific</span>
-                  <span className={getPropertyValueClass(waterRightDetails.variableSpecific)}>{waterRightDetails.variableSpecific || emptyValue}</span>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col> */}
           <Col>
             <Card className="h-100 shadow-sm rounded-3">
               <Card.Header className="water-rights-header"> <ClipBoardSearch></ClipBoardSearch> Water Right Information</Card.Header>
@@ -106,7 +72,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className='property-name'>Native ID</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationNativeId)}>{waterRightDetails.allocationNativeId || emptyValue}</span>
 
-                  { formatWaterAllocationNativeUrl(waterRightDetails.waterAllocationNativeUrl) }
+                  { formatUrlLink(waterRightDetails.waterAllocationNativeUrl, 'State Water Right Webpage') }
 
                   <span className='property-name'>Owner</span>
                   <span className={getPropertyValueClass(waterRightDetails.allocationOwner)}>{waterRightDetails.allocationOwner || emptyValue}</span>
@@ -173,8 +139,7 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
                   <span className='property-name'>Method Type</span>
                   <span className={getPropertyValueClass(waterRightDetails.methodType)}>{waterRightDetails.methodType || emptyValue}</span>
 
-                  <span className='property-name'>Method Link</span>
-                  <span className={getPropertyValueClass(waterRightDetails.methodLink)}>{formatUrl(waterRightDetails.methodLink)}</span>
+                  { formatUrlLink(waterRightDetails.methodLink, 'Method Link') }
 
                   <span className='property-name'>Method Description</span>
                   <span className={`fw-normal ${getPropertyValueClass(waterRightDetails.methodDescription)}`}>{waterRightDetails.methodDescription || emptyValue}</span>
