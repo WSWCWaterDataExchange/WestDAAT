@@ -7,4 +7,6 @@ export interface SiteDetails {
   county: string;
   siteType: string;
   podOrPou: string;
+  coordinateMethodCv: string;
+  coordinateAccuracy: string;
 }
