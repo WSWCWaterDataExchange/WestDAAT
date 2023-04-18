@@ -1075,35 +1075,31 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(5, 5, null)]
-        [DataRow(10, 0, true)]
-        [DataRow(5, 5, false)]
-        [DataRow(10, 2, true)]
-        [DataRow(10, 3, false)]
-        public async Task FindWaterRights_SearchByExemptOfVolumeFlowPriority_ReturnsMatches(int totalRecordCount, int expectedResultCount, bool searchInput)
+        [DataRow(null, null, true)]
+        [DataRow(null, true, false)]
+        [DataRow(null, false, true)]
+        [DataRow(true, null, true)]
+        [DataRow(true, true, true)]
+        [DataRow(true, false, false)]
+        [DataRow(false, null, true)]
+        [DataRow(false, true, false)]
+        [DataRow(false, false, true)]
+        public async Task FindWaterRights_SearchByExemptOfVolumeFlowPriority(bool? recordExempt, bool? queryExempt, bool shouldReturn)
         {
             //Arrange
-            var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetExemptOfVolumeFlowPriority(searchInput)
-                .Generate(expectedResultCount);
-
-            //generate non-matching allocationAmounts
-            var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetExemptOfVolumeFlowPriority(null)
-                .Generate(totalRecordCount - expectedResultCount);
+            var dbAllocationAmount = new AllocationAmountFactFaker()
+                .SetExemptOfVolumeFlowPriority(recordExempt)
+                .Generate();
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
-                db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
-                db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
+                db.AllocationAmountsFact.Add(dbAllocationAmount);
                 db.SaveChanges();
             }
 
-            var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();
-
             var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
             {
-                ExemptOfVolumeFlowPriority = searchInput
+                ExemptOfVolumeFlowPriority = queryExempt
             };
 
             //Act
@@ -1111,10 +1107,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(searchCriteria);
 
             result.WaterRightsDetails.Should().NotBeNull();
-            result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
-
-            expectedAllocationUuids.TrueForAll(expected => result.WaterRightsDetails.SingleOrDefault(actual => actual.AllocationUuid == expected) != null)
-                .Should().BeTrue();
+            if(shouldReturn)
+            {
+                result.WaterRightsDetails.Should().HaveCount(1);
+                result.WaterRightsDetails[0].AllocationUuid.Should().Be(dbAllocationAmount.AllocationUuid);
+            } 
+            else
+            {
+                result.WaterRightsDetails.Should().BeEmpty();
+            }
         }
 
         [TestMethod]
