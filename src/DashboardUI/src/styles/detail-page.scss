@@ -11,8 +11,8 @@
     border-bottom: 1px solid $bs-gray-600;
   }
   
-  .card {
-    .card-header{
+  .water-rights-card, .site-card {
+    .card-header {
       font-size: 20px;
       color: $white;
       padding: 1rem;
@@ -25,13 +25,17 @@
       > svg {
         flex-shrink: 0;
       }
-      > span{
+      > span {
         line-height: 1;
       }
-      &.water-rights-header{
+    }
+    &.water-rights-card {
+      .card-header{ 
         background-color: $card-header-color-red;
       }
-      &.site-header{
+    }
+    &.site-card {
+      .card-header{ 
         background-color: $card-header-color-blue;
       }
     }
