@@ -139,7 +139,7 @@ const mapsJson = {
       "type": "symbol",
       "layout": {
         "visibility": "visible",
-        "text-field": ["get", "siteUuid"],
+        "text-field": ["get", "uuid"],
         "text-size": 16,
         "text-anchor": "top",
         "text-allow-overlap": true,

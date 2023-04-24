@@ -23,8 +23,10 @@ function SiteProperties(props: sitePropertiesProps) {
             {siteDetails && <>
                 <Row className="pt-4">
                     <Col>
-                        <Card className="h-100 shadow-sm rounded-3">
-                            <Card.Header className="site-header"><Domain /><span>Site Information</span></Card.Header>
+                        <Card className="site-card h-100 shadow-sm rounded-3">
+                            <Card.Header>
+                                <Domain /><span>Site Information</span>
+                            </Card.Header>
                             <Card.Body>
                                 <div className='d-flex p-2 flex-column'>
                                     {buildPropertyElements('WaDE Site ID', siteDetails.siteUuid)}
@@ -37,8 +39,10 @@ function SiteProperties(props: sitePropertiesProps) {
                         </Card>
                     </Col>
                     <Col>
-                        <Card className="h-100 shadow-sm rounded-3">
-                            <Card.Header className="site-header"><MapMarker /><span>Location</span></Card.Header>
+                        <Card className="site-card h-100 shadow-sm rounded-3">
+                            <Card.Header>
+                                <MapMarker /><span>Location</span>
+                            </Card.Header>
                             <Card.Body>
                                 <div className='d-flex p-2 flex-column'>
                                     {buildPropertyElements('Longitude', siteDetails.longitude)}

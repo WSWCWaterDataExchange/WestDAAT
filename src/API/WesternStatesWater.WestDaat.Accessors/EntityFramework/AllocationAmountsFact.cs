@@ -135,7 +135,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
-            predicate = predicate.Or(x => x.ExemptOfVolumeFlowPriority == isExempt);
+            predicate = predicate.Or(x => (x.ExemptOfVolumeFlowPriority ?? false) == isExempt);
 
             return predicate;
         }

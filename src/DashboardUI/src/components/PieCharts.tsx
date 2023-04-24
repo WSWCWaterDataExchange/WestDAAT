@@ -26,7 +26,7 @@ function PieCharts() {
         setSearchCriteria({
             beneficialUses: filters.beneficialUses?.map(b => b.beneficialUseName),
             filterGeometry: filters.polyline.map(p => JSON.stringify(p.data.geometry)),
-            expemptofVolumeFlowPriority: filters.includeExempt,
+            exemptofVolumeFlowPriority: filters.includeExempt,
             minimumFlow: filters.minFlow,
             maximumFlow: filters.maxFlow,
             minimumVolume: filters.minVolume,

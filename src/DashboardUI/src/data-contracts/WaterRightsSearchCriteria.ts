@@ -8,7 +8,7 @@ export interface WaterRightsSearchCriteria {
   filterGeometry?: string[]; //geojson string
   states?: string[];
   allocationOwner?: string;
-  expemptofVolumeFlowPriority?: boolean;
+  exemptofVolumeFlowPriority?: boolean;
   minimumFlow?: number;
   maximumFlow?: number;
   minimumVolume?: number;
