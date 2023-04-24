@@ -123,7 +123,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 features.Add(
                     new Feature(
                         siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
                         )
                     );
             }
@@ -161,7 +161,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
             Feature feature = new Feature(
                         siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
                         );
 
             return feature;
