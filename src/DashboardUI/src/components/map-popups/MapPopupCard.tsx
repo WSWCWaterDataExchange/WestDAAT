@@ -9,7 +9,7 @@ interface MapPopupCardProps {
   },
   onClosePopup: () => void;
 }
-export function MapPopupCard(props: MapPopupCardProps) {
+function MapPopupCard(props: MapPopupCardProps) {
   return (
     <Card className="map-popup-card">
       <CardHeader>
@@ -24,3 +24,4 @@ export function MapPopupCard(props: MapPopupCardProps) {
     </Card>
   );
 }
+export default MapPopupCard;

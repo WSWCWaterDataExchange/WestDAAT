@@ -12,7 +12,6 @@ import useProgressIndicator from "../hooks/useProgressIndicator";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMapErrorAlert, useNoMapResults } from "../hooks/useMapAlert";
 import { PriorityDateRange } from "./PriorityDateRange";
-import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 import { waterRightsProperties, pointSizes, nldi, colorList } from "../config/constants";
 import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../hooks/useSystemQuery";
 import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, volumePointCircleSortKey } from "../config/maps";
@@ -33,6 +32,8 @@ import { DataPoints, Directions } from "../data-contracts/nldi";
 import Select from "react-select";
 import { FilterContext, WaterRightsFilters } from "../FilterProvider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
+import useNldiMapPopup from "../hooks/map-popups/useNldiMapPopup";
+import useWaterRightDigestMapPopup from "../hooks/map-popups/useWaterRightDigestMapPopup";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -557,7 +558,8 @@ function WaterRightsTab() {
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
-  useWaterRightsMapPopup();
+  useNldiMapPopup();
+  useWaterRightDigestMapPopup();
   useWaterRightMapPointScaling(displayOptions.pointSize, filters);
 
   const isLoading = useMemo(() => {

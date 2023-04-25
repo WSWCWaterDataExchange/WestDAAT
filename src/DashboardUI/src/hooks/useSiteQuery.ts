@@ -4,13 +4,24 @@ import {
   getWaterRightsDigests,
   getWaterSiteLocation,
   getWaterSiteSourceInfoList,
-  getWaterRightInfoList
+  getWaterRightInfoList,
+  getSiteDigest
 } from '../accessors/siteAccessor';
 
 export function useWaterRightsDigests(siteUuid: string) {
   return useQuery(
     ['site.waterRightsDigests', siteUuid],
     async () => await getWaterRightsDigests(siteUuid),
+    {
+      enabled: !!siteUuid
+    }
+  );
+}
+
+export function useSiteDigest(siteUuid: string) {
+  return useQuery(
+    ['site.siteDigest', siteUuid],
+    async () => await getSiteDigest(siteUuid),
     {
       enabled: !!siteUuid
     }

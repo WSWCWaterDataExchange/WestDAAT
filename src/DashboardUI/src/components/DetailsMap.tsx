@@ -6,7 +6,6 @@ import { FeatureCollection, GeoJsonProperties, Geometry, Position,  } from "geoj
 import { nldi } from "../config/constants";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
-import { useWaterRightsMapPopup } from "../hooks/useWaterRightsMapPopup";
 
 interface detailsMapProps {
   isDataLoading: boolean;
@@ -82,8 +81,6 @@ function DetailsMap(props: detailsMapProps) {
       padding: 50,
     });
   }, [props.mapData, setMapBounds]);
-
-  useWaterRightsMapPopup();
 
   if (props.isDataLoading) return null;
 
