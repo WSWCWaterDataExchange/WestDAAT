@@ -1,5 +1,5 @@
 import Icon from "@mdi/react";
-import { MapPopupCard } from "./MapPopupCard";
+import MapPopupCard from "./MapPopupCard";
 import { mdiOpenInNew } from '@mdi/js';
 
 interface NldiSiteMapPopupProps {
@@ -10,7 +10,7 @@ interface NldiSiteMapPopupProps {
   onClosePopup: () => void;
 
 }
-function NldiSiteMapPopUp(props: NldiSiteMapPopupProps) {
+function NldiSiteCard(props: NldiSiteMapPopupProps) {
   const { sourceName, identifier, uri, name, onClosePopup } = props;
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
@@ -42,4 +42,4 @@ function NldiSiteMapPopUp(props: NldiSiteMapPopupProps) {
     </MapPopupCard>
   );
 }
-export default NldiSiteMapPopUp;
+export default NldiSiteCard;

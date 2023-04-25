@@ -27,6 +27,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .SingleAsync();
         }
 
+        async Task<SiteDigest> ISiteAccessor.GetSiteDigestByUuid(string siteUuid)
+        {
+            using var db = _databaseContextFactory.Create();
+            
+            return await db.SitesDim
+                .Where(x => x.SiteUuid == siteUuid)
+                .ProjectTo<SiteDigest>(DtoMapper.Configuration)
+                .SingleAsync();
+        }
+
         async Task<List<Site>> ISiteAccessor.GetSites()
         {
             var db = _databaseContextFactory.Create();

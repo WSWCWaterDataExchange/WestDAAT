@@ -1,4 +1,5 @@
 import { useWaterRightSiteLocations } from "../hooks";
+import useSiteDigestMapPopup from "../hooks/map-popups/useSiteDigestMapPopup";
 import DetailsMap from "./DetailsMap";
 
 interface waterRightMapProps {
@@ -10,6 +11,8 @@ function WaterRightMap(props: waterRightMapProps) {
     data: waterRightSiteLocations,
     isFetching: isWaterRightSiteLocationsLoading,
   } = useWaterRightSiteLocations(props.allocationUuid);
+
+  useSiteDigestMapPopup();
 
   return (
     <DetailsMap isDataLoading={isWaterRightSiteLocationsLoading} mapData={waterRightSiteLocations} />
