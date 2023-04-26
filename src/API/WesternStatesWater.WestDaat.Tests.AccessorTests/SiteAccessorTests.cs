@@ -167,6 +167,34 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task GetSiteDigestByUuid_Matches()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker()
+                .RuleFor(a => a.CoordinateAccuracy, f => f.Random.AlphaNumeric(5))
+                .Generate();
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            var expectedResult = new Common.DataContracts.SiteDigest
+            {
+                SiteUuid = site.SiteUuid,
+                SiteName = site.SiteName,
+                SiteNativeId = site.SiteNativeId,
+                SiteType = site.SiteTypeCv,
+            };
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestMethod]
         public async Task SiteAccessor_GetWaterRightInfoListByUuid_Matches()
         {
             // Arrange

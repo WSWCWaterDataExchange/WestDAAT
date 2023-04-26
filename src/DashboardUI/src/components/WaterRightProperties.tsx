@@ -36,8 +36,10 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
       {waterRightDetails && <>
         <Row className="pt-4">
           <Col>
-            <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <Domain /><span>Managing Organization Agency</span></Card.Header>
+            <Card className="water-rights-card h-100 shadow-sm rounded-3">
+              <Card.Header>
+                <Domain /><span>Managing Organization Agency</span>
+              </Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
                   {buildPropertyElements('Organization Name', waterRightDetails.organizationName)}
@@ -48,8 +50,10 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
             </Card>
           </Col>
           <Col>
-            <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <WaterCircle /><span>Water Right Information</span></Card.Header>
+            <Card className="water-rights-card h-100 shadow-sm rounded-3">
+              <Card.Header>
+                <WaterCircle /><span>Water Right Information</span>
+              </Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
                   {buildPropertyElements('WaDE Water Right Identifier', waterRightDetails.allocationUuid)}
@@ -80,8 +84,10 @@ function WaterRightProperties(props: waterRightPropertiesProps) {
             </Card>
           </Col>
           <Col>
-            <Card className="h-100 shadow-sm rounded-3">
-              <Card.Header className="water-rights-header"> <ClipBoardSearch /><span>Method Information</span></Card.Header>
+            <Card className="water-rights-card h-100 shadow-sm rounded-3">
+              <Card.Header>
+                <ClipBoardSearch /><span>Method Information</span>
+              </Card.Header>
               <Card.Body>
                 <div className='d-flex p-2 flex-column'>
                   {buildPropertyElements('Applicable Resource Type', waterRightDetails.applicableResourceType)}

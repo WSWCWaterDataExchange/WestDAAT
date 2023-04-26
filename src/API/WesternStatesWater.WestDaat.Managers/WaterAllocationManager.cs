@@ -123,7 +123,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 features.Add(
                     new Feature(
                         siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
                         )
                     );
             }
@@ -150,6 +150,11 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetSiteDetailsByUuid(siteUuid)).Map<ClientContracts.SiteDetails>();
         }
 
+        async Task<ClientContracts.SiteDigest> ClientContracts.IWaterAllocationManager.GetSiteDigest(string siteUuid)
+        {
+            return (await _siteAccessor.GetSiteDigestByUuid(siteUuid)).Map<ClientContracts.SiteDigest>();
+        }
+
         async Task<List<ClientContracts.WaterRightsDigest>> ClientContracts.IWaterAllocationManager.GetWaterRightsDigestsBySite(string siteUuid)
         {
             return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
@@ -161,7 +166,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
             Feature feature = new Feature(
                         siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "siteUuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+                        new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
                         );
 
             return feature;
