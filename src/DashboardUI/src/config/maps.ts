@@ -139,15 +139,16 @@ const mapsJson = {
       "type": "symbol",
       "layout": {
         "visibility": "visible",
-        "text-field": ["get", "siteUuid"],
-        "text-size": 16,
+        "text-field": ["get", "uuid"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 5, 12, 15, 20],
         "text-anchor": "top",
         "text-allow-overlap": true,
       },
       "paint": {
         "text-color": "#000000",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 2,
+        "text-halo-color": "#eee",
+        "text-halo-width": ["interpolate", ["linear"], ["zoom"], 5, .1, 15, 1],
+        "text-halo-blur": ["interpolate", ["linear"], ["zoom"], 5, .1, 15, 1],
       },
     },
     {

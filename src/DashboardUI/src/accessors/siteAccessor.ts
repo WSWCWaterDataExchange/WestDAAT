@@ -1,10 +1,19 @@
 import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem } from "@data-contracts";
 import axios from "axios";
 import WaterRightDigest from "../data-contracts/WaterRightsDigest";
+import SiteDigest from "../data-contracts/SiteDigest";
 
 export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {
   const url = new URL(`Sites/${siteUuid}/WaterRightsDigest`, process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<WaterRightDigest[]>(
+    url.toString()
+  );
+  return data;
+};
+
+export const getSiteDigest = async (siteUuid: string): Promise<SiteDigest> => {
+  const url = new URL(`Sites/${siteUuid}/Digest`, process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<SiteDigest>(
     url.toString()
   );
   return data;

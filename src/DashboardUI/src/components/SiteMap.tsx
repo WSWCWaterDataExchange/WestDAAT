@@ -1,12 +1,8 @@
-import { useContext, useEffect } from "react";
-import Map from './Map';
-import { MapContext, MapStyle } from './MapProvider';
-import mapboxgl from 'mapbox-gl';
+import { useMemo } from "react";
 import { useWaterSiteLocation } from "../hooks";
-import { Position } from "geojson";
-import { nldi } from "../config/constants";
-import Icon from "@mdi/react";
-import { mdiMapMarker } from "@mdi/js";
+import DetailsMap from "./DetailsMap";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
+import useWaterRightDigestMapPopup from "../hooks/map-popups/useWaterRightDigestMapPopup";
 
 interface siteMapProps {
   siteUuid: string;
@@ -15,74 +11,17 @@ interface siteMapProps {
 function SiteMap(props: siteMapProps) {
   const { data: waterSiteLocation, isFetching: isWaterSiteLocationLoading } = useWaterSiteLocation(props.siteUuid);
 
-  const {
-    setVisibleLayers,
-    setGeoJsonData,
-    setMapBoundSettings: setMapBounds,
-    setLegend,
-    setMapStyle
-  } = useContext(MapContext);
-
-  useEffect(() => {
-    setMapStyle(MapStyle.Satellite);
-  }, [setMapStyle])
-
-  useEffect(() => {
-    setVisibleLayers(["site-locations-label", "site-locations-points", "site-locations-polygons"]);
-  }, [setVisibleLayers])
-
-  useEffect(() => {
-    setLegend(<>
-      <div className="legend-item">
-        <Icon path={mdiMapMarker} size="48px" color={nldi.colors.sitePOD} />
-        Point of Diversion (POD)
-      </div>
-      <div className="legend-item">
-        <Icon path={mdiMapMarker} size="48px" color={nldi.colors.sitePOU} />
-        Place of Use (POU)
-      </div>
-    </>);
-  }, [setLegend])
-
-  useEffect(() => {
-    if (waterSiteLocation) {
-      setGeoJsonData("site-locations", waterSiteLocation);
+  const featureCollection = useMemo<FeatureCollection<Geometry, GeoJsonProperties> | undefined>(() => {
+    if (!waterSiteLocation) return undefined;
+    return {
+      features: [waterSiteLocation],
+      type: "FeatureCollection"
     }
-  }, [waterSiteLocation, setGeoJsonData])
+  }, [waterSiteLocation])
 
-  useEffect(() => {
-    let positions: Position[] = [];
+  useWaterRightDigestMapPopup();
 
-    if (waterSiteLocation?.geometry.type === 'Point') {
-      positions.push(waterSiteLocation?.geometry.coordinates)
-    } else if (waterSiteLocation?.geometry.type === 'MultiPoint') {
-      positions = positions.concat(waterSiteLocation?.geometry.coordinates)
-    } else if (waterSiteLocation?.geometry.type === 'Polygon') {
-      waterSiteLocation?.geometry.coordinates.forEach(y => {
-        positions = positions.concat(y)
-      })
-    } else if (waterSiteLocation?.geometry.type === 'MultiPolygon') {
-      waterSiteLocation.geometry.coordinates.forEach(y => {
-        y.forEach(z => {
-          positions = positions.concat(z)
-        })
-      })
-    }
-
-    setMapBounds({
-      LngLatBounds: positions.map(a => new mapboxgl.LngLat(a[0], a[1])),
-      maxZoom: 10,
-      padding: 50
-    })
-  }, [waterSiteLocation, setMapBounds])
-
-  if (isWaterSiteLocationLoading) return null;
-
-  return (
-    <div className="map-container h-100">
-      <Map hideDrawControl={true} />
-    </div>
-  )
+  return <DetailsMap isDataLoading={isWaterSiteLocationLoading} mapData={featureCollection} />
 }
 
 export default SiteMap;

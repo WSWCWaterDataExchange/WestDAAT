@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { MapPopupCard } from "./MapPopupCard";
+import MapPopupCard from "./MapPopupCard";
 import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';
 import Icon from "@mdi/react";
-import WaterRightDigest from "../data-contracts/WaterRightsDigest";
-import { FormattedDate } from "./FormattedDate";
+import WaterRightDigest from "../../data-contracts/WaterRightsDigest";
+import { FormattedDate } from "../FormattedDate";
 
 interface WaterRightsMapPopupToggleProps {
   count: number, currentIndex: number, setCurrentIndex: (index: number) => void;
@@ -31,7 +31,7 @@ interface WaterRightsMapPopupProps {
   onSelectedIndexChanged: (index: number) => void,
   onClosePopup: () => void;
 }
-function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
+function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
   const { waterRights, siteUuid, currentIndex, onSelectedIndexChanged, onClosePopup } = props;
   const currWaterRight = useMemo(() => {
     return waterRights[currentIndex];
@@ -68,5 +68,4 @@ function WaterRightsMapPopup(props: WaterRightsMapPopupProps) {
     </MapPopupCard>
   );
 }
-
-export default WaterRightsMapPopup;
+export default WaterRightsDigestCard;

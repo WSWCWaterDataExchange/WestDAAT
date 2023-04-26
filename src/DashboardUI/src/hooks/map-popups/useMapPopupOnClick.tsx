@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useContext } from "react";
-import { MapContext } from "../components/MapProvider";
+import { MapContext } from "../../components/MapProvider";
 
 function useMapPopupOnClick() {
   const {
@@ -20,3 +20,5 @@ function useMapPopupOnClick() {
   return { updatePopup, clickedFeatures: mapClickedFeatures?.features };
 }
 export default useMapPopupOnClick;
+
+

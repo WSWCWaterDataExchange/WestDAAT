@@ -304,7 +304,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.Should().NotBeNull();
             _siteAccessorMock.Verify();
 
-            result.Properties.First(x => x.Key.ToLower() == "siteuuid").Value.Should().Be(location.SiteUuid);
+            result.Properties.First(x => x.Key.ToLower() == "uuid").Value.Should().Be(location.SiteUuid);
         }
 
         [TestMethod]
@@ -388,7 +388,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _waterAllocationAccessorMock.Verify();
 
             result.Features.Count.Should().Be(1);
-            result.Features[0].Properties.First(x => x.Key.ToLower() == "siteuuid").Value.Should().Be(location.SiteUuid);
+            result.Features[0].Properties.First(x => x.Key.ToLower() == "uuid").Value.Should().Be(location.SiteUuid);
         }
 
         [TestMethod]
