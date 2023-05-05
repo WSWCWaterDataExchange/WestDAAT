@@ -86,6 +86,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build
+    - run: rm src/DashboardUI/build/robots.allowall.txt
     
     - name: Azure login
       uses: azure/login@v1
