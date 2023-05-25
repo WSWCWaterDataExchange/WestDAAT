@@ -50,6 +50,7 @@ function Map(_props: mapProps) {
     setRenderedFeatures,
     setMapClickedFeatures,
     setPolylines,
+    setIsMapRendering,
     polylines } = useContext(MapContext);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState(null as LngLat | null);
@@ -113,6 +114,7 @@ function Map(_props: mapProps) {
   }
 
   useEffect(() => {
+    setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
     const mapInstance = new mapboxgl.Map({
       container: "map",
@@ -143,6 +145,14 @@ function Map(_props: mapProps) {
       if (!_props.hideDrawControl) {
         mapboxDrawControl(mapInstance);
       }
+
+      mapInstance.on('render', () => {
+        setIsMapRenderingDebounce(true);
+      });
+      mapInstance.on('idle', () => {
+        setMapRenderedFeatures(mapInstance);
+        setIsMapRenderingDebounce(false);
+      });
 
       mapInstance.on('move', (e) => {
         const mapSettings: MapSettings = {
@@ -191,12 +201,11 @@ function Map(_props: mapProps) {
     })
   }, 500)
 
+  const setIsMapRenderingDebounce = useDebounceCallback(setIsMapRendering, 500)
+
   useEffect(() => {
     if (!map) return;
     setMapRenderedFeatures(map);
-    map.on('idle', () => {
-      setMapRenderedFeatures(map);
-    });
     mapConfig.layers.forEach((a) => {
       map.on('click', a.id, e => {
         if (e.features && e.features.length > 0) {

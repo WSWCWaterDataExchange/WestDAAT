@@ -19,7 +19,14 @@ export interface WaterRightsFilters{
   minPriorityDate: number | undefined,
   maxPriorityDate: number | undefined,
   polyline: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null
+  nldiFilterData: NldiFilters | null
+}
+
+export interface NldiFilters{ 
+  latitude: number | null,
+  longitude: number | null,
+  directions: Directions,
+  dataPoints: DataPoints
 }
 
 interface FilterContextState {
@@ -29,7 +36,7 @@ interface FilterContextState {
   setNldiIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const defaultFilters: WaterRightsFilters = {
+export const defaultFilters: WaterRightsFilters = {
   beneficialUses: undefined,
   ownerClassifications: undefined,
   allocationOwner: undefined,

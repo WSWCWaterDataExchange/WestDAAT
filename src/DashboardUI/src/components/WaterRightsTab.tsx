@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
@@ -23,17 +23,18 @@ import { Accordion } from "react-bootstrap";
 import '../App.scss';
 import BeneficialUseSelect from "./BeneficialUseSelect";
 import { BeneficialUseListItem } from "../data-contracts/BeneficialUseListItem";
-import NldiTab from "./NldiTab";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
 import { DataPoints, Directions } from "../data-contracts/nldi";
 import Select from "react-select";
-import { FilterContext, WaterRightsFilters } from "../FilterProvider";
+import { FilterContext, NldiFilters, WaterRightsFilters, defaultFilters } from "../FilterProvider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import useNldiMapPopup from "../hooks/map-popups/useNldiMapPopup";
 import useWaterRightDigestMapPopup from "../hooks/map-popups/useWaterRightDigestMapPopup";
+import NldiTab from "./NldiTab";
+import useNldiMapFiltering from "../hooks/useNldiMapFiltering";
 
 enum MapGrouping {
   BeneficialUse = "bu",
@@ -69,28 +70,16 @@ const allWaterRightsLayers = [
   waterRightsPolygonsLayer
 ]
 
-const defaultFilters: WaterRightsFilters = {
-  beneficialUses: [],
-  ownerClassifications: [],
-  allocationOwner: undefined,
-  waterSourceTypes: [],
-  states: [],
-  riverBasinNames: [],
-  includeExempt: false,
-  minFlow: undefined,
-  maxFlow: undefined,
-  minVolume: undefined,
-  maxVolume: undefined,
-  podPou: undefined,
-  minPriorityDate: undefined,
-  maxPriorityDate: undefined,
-  polyline: [],
-  nldiFilterData: null
-}
-
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
   pointSize: 'd',
   mapGrouping: MapGrouping.BeneficialUse
+}
+
+const defaultNldiFilters = {
+  latitude: null as number | null,
+  longitude: null as number | null,
+  directions: Directions.Upsteam | Directions.Downsteam as Directions,
+  dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
 }
 
 const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
@@ -161,8 +150,7 @@ function WaterRightsTab() {
     setLayerFillColors,
     setVectorUrl,
     geoJsonData,
-    setGeoJsonData,
-    nldiFilterData
+    setGeoJsonData
   } = useContext(MapContext);
 
   const [isNldiMapActive, setNldiMapStatus] = useState<boolean>(getUrlParam("nldiActive") ?? false);
@@ -180,13 +168,6 @@ function WaterRightsTab() {
       polyline: polylines
     }))
   }, [setFilters, polylines])
-
-  useEffect(() => {
-    setFilters((s) => ({
-      ...s,
-      nldiFilterData: nldiFilterData
-    }))
-  }, [setFilters, nldiFilterData])
 
   useEffect(() => {
     let params = (new URL(document.location.href)).searchParams;
@@ -285,28 +266,32 @@ function WaterRightsTab() {
                 </span>
                 Tributaries
               </div>
-              <div className="legend-item">
-                <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
-                USGS NWIS Sites
-              </div>
-              <div className="legend-item">
-                <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
-                EPA Water Quality Portal<br /> Sites OSM Standard
-              </div>
+              {!!((filters.nldiFilterData?.dataPoints ?? DataPoints.None) & DataPoints.Usgs) &&
+                <div className="legend-item">
+                  <span className="legend-circle" style={{ "backgroundColor": nldi.colors.usgs }}></span>
+                  USGS NWIS Sites
+                </div>
+              }
+              {!!((filters.nldiFilterData?.dataPoints ?? DataPoints.None) & DataPoints.Epa) &&
+                <div className="legend-item">
+                  <span className="legend-circle" style={{ "backgroundColor": nldi.colors.epa }}></span>
+                  EPA Water Quality Portal<br /> Sites OSM Standard
+                </div>
+              }
             </div>
           }
         </>);
     }
-  }, [setLegend, renderedMapGroupings, isNldiMapActive])
+  }, [setLegend, renderedMapGroupings, isNldiMapActive, filters.nldiFilterData?.dataPoints])
 
   const [allocationOwnerValue, setAllocationOwnerValue] = useState(filters.allocationOwner ?? "");
-  const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const nldiWadeSiteIds = useMemo(() => {
-    if (!isNldiMapActive) {
+    const nldiFilterData = filters.nldiFilterData;
+    if (!isNldiMapActive || !nldiFilterData || !(nldiFilterData.dataPoints & DataPoints.Wade)) {
       return [];
     }
     let nldiData = geoJsonData.filter(s => s.source === 'nldi');
-    if (nldiData && nldiData.length > 0 && nldiFilterData !== null && (nldiFilterData.dataPoints & DataPoints.Wade)) {
+    if (nldiData && nldiData.length > 0) {
       let arr = (nldiData[0].data as FeatureCollection).features
         .filter(x => x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' || x.properties?.source?.toLowerCase() === 'wade');
 
@@ -322,7 +307,7 @@ function WaterRightsTab() {
     } else { // if nldi is not active, empty the array
       return [];
     }
-  }, [geoJsonData, nldiFilterData, isNldiMapActive]);
+  }, [geoJsonData, filters.nldiFilterData, isNldiMapActive]);
 
   useEffect(() => {
     setNldiIds(previousState => {
@@ -429,6 +414,32 @@ function WaterRightsTab() {
       ...s,
       riverBasinNames: riverBasinNames
     }));
+  }
+
+  const toggleNldiFilterStatus = useCallback(() => {
+    if(isNldiMapActive)
+    {
+      setNldiMapStatus(false);
+    } else {
+      setNldiMapStatus(true);
+      setFilters(s => ({
+        ...s,
+        nldiFilterData: s.nldiFilterData ?? defaultNldiFilters
+      }))
+    }
+  }, [isNldiMapActive, setFilters, setNldiMapStatus]);
+
+  const handleNldiFilterChange = async (nldiFilters: Partial<NldiFilters>) => {
+    setFilters(s => {
+      const filterData = s.nldiFilterData || defaultNldiFilters;
+      return {
+          ...s,
+          nldiFilterData: {
+            ...filterData,
+            ...nldiFilters
+          }
+        }
+    });
   }
 
   useEffect(() => {
@@ -558,6 +569,7 @@ function WaterRightsTab() {
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
+  const [isNldiDataFetching] = useNldiMapFiltering(filters.nldiFilterData);
   useNldiMapPopup();
   useWaterRightDigestMapPopup();
   useWaterRightMapPointScaling(displayOptions.pointSize, filters);
@@ -580,7 +592,7 @@ function WaterRightsTab() {
 
   useMapErrorAlert(isError);
   // added isLoading check, but this only accounts for filter queries and not map queries
-  useNoMapResults(!hasRenderedFeatures && !isLoading && !isNldiMapActive);
+  useNoMapResults(!isLoading && !isNldiDataFetching);
 
   if (isLoading) return null;
 
@@ -762,7 +774,7 @@ function WaterRightsTab() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
-            <Accordion.Header onClick={() => setNldiMapStatus(!isNldiMapActive)}>
+            <Accordion.Header onClick={toggleNldiFilterStatus}>
               <label className="fw-bold">NLDI FILTER {isNldiMapActive}</label>
               <div className="px-5">
                 <BootstrapSwitchButton checked={isNldiMapActive} onstyle="primary" offstyle="secondary" />
@@ -772,8 +784,8 @@ function WaterRightsTab() {
               <a className="h6" target="_blank" rel="noreferrer" href="https://westernstateswater.org/wade/westdaat-nldi-geoconnex-documentation/">Learn About NLDI-Geoconnex filter here</a>
               <label className="h6"><i>Search along the stream network using the Hydro Network-Linked Data Index (NLDI) and Geoconnex Frameworks</i></label>
             </div>
-            <Accordion.Body >
-              <NldiTab isNldiMapActive={isNldiMapActive} />
+            <Accordion.Body>
+              {isNldiMapActive && <NldiTab nldiFilters={filters.nldiFilterData ?? defaultNldiFilters} setNldiFilters={handleNldiFilterChange} />}
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

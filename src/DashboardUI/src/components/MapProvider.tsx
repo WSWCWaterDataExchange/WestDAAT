@@ -86,10 +86,10 @@ interface MapContextState {
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>,
   polylines: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[],
   setPolylines: (identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> | null) => void,
-  nldiFilterData: { latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null,
-  setNldiFilterData: React.Dispatch<React.SetStateAction<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>>,
   mapLocationSettings: { latitude: number, longitude: number, zoomLevel: number } | null,
-  setMapLocationSettings: React.Dispatch<React.SetStateAction<{ latitude: number, longitude: number, zoomLevel: number }>>
+  setMapLocationSettings: React.Dispatch<React.SetStateAction<{ latitude: number, longitude: number, zoomLevel: number }>>,
+  isMapRendering: boolean,
+  setIsMapRendering: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const defaultState: MapContextState = {
@@ -126,10 +126,10 @@ const defaultState: MapContextState = {
   setMapPopup: () => { },
   polylines: [],
   setPolylines: () => { },
-  nldiFilterData: null,
-  setNldiFilterData: () => { },
   mapLocationSettings: null,
-  setMapLocationSettings: () => { }
+  setMapLocationSettings: () => { },
+  isMapRendering: false,
+  setIsMapRendering: () => { }
 };
 
 export const MapContext = createContext<MapContextState>(defaultState);
@@ -311,7 +311,7 @@ const MapProvider: FC = ({ children }) => {
     });
   }, [setAllPolylines])
 
-  const [nldiFilterData, setNldiFilterData] = useState<{ latitude: number | null, longitude: number | null, directions: Directions, dataPoints: DataPoints } | null>(null);
+  const [isMapRendering, setIsMapRendering] = useState<boolean>(false);
 
   const mapContextProviderValue = {
     mapStyle,
@@ -347,10 +347,10 @@ const MapProvider: FC = ({ children }) => {
     setMapPopup,
     polylines,
     setPolylines,
-    nldiFilterData,
-    setNldiFilterData,
     mapLocationSettings,
     setMapLocationSettings,
+    isMapRendering,
+    setIsMapRendering
   };
 
   return (
