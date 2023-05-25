@@ -27,6 +27,7 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 Subject = "WestDAAT Feedback",
                 TextContent = messageBody,
+                ReplyTo = request.Email,
                 From = _emailConfig.FeedbackFrom,
                 To = _emailConfig.FeedbackTo,
             };
