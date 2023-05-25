@@ -57,9 +57,9 @@ const AppProvider: FC = ({ children }) => {
 
   useEffect(() => {
     if ((Object.keys(stateUrlParams).length ?? 0) > 0) {
-      setUrlParams({ state: compress.compressToEncodedURIComponent(JSON.stringify(stateUrlParams)) })
+      setUrlParams({ state: compress.compressToEncodedURIComponent(JSON.stringify(stateUrlParams)) }, {replace: true})
     } else {
-      setUrlParams({});
+      setUrlParams({}, {replace: true});
     }
 
   }, [stateUrlParams, setUrlParams])

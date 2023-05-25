@@ -6,6 +6,7 @@ import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import MenuIcon from 'mdi-react/MenuIcon';
 
 import { HomePageTab } from '../pages/HomePage';
 import { SignIn } from "./SignIn";
@@ -43,11 +44,11 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
         <Container fluid>
           <div className="d-flex">
             <Button variant="link" onClick={handleShow}>
-              <span className="navbar-toggler-icon"></span>
+              <MenuIcon />
             </Button>
 
             <Nav className="mx-2">
-              <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/">
+              <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/" active={false}>
                 <img alt="Wade Logo" src="/logo32x32.png" />
                   Water Data Exchange (WaDE) Program
               </Nav.Link>
@@ -55,12 +56,12 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
           </div>
 
           <Nav className="mx-2">
-            <Nav.Link href="/">Western States Water Data Access and Analysis Tool (WestDAAT)</Nav.Link>
+            <Nav.Link href="/" active={false}>Western States Water Data Access and Analysis Tool (WestDAAT)</Nav.Link>
           </Nav>
 
           <Nav className="mx-2">
             <UnauthenticatedTemplate>
-              <Nav.Link>
+              <Nav.Link active={false}>
                 <SignIn />
               </Nav.Link>
             </UnauthenticatedTemplate>
