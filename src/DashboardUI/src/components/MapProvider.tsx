@@ -2,7 +2,6 @@ import React, { createContext, FC, ReactElement, useCallback, useContext, useEff
 import { AppContext } from "../AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
-import { Directions, DataPoints } from "../data-contracts/nldi";
 
 export enum MapTypes {
   WaterRights = "waterRights",
