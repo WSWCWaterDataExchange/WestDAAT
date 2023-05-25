@@ -6,6 +6,7 @@ import { MapContext } from "../components/MapProvider";
 import { useMapErrorAlert } from "./useMapAlert";
 import useProgressIndicator from "./useProgressIndicator";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
+import { mapLayerNames } from "../config/maps";
 
 const pointFeatureDataSourceNameKeys = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa];
 const pointFeatureDataSourceNames: Record<DataPoints, string> = {
@@ -55,7 +56,7 @@ function useNldiMapFiltering(nldiFilters: NldiFilters | null) {
       }
 
       setMapLayerFilters([{
-        layer: 'nldi-usgs-points',
+        layer: mapLayerNames.nldiUsgsPointsLayer,
         filter: ["all",
           ["==", ["get", "westdaat_featuredatatype"], "Point"],
           ["!=", ["get", "westdaat_pointdatasource"], "Wade"],
@@ -63,7 +64,7 @@ function useNldiMapFiltering(nldiFilters: NldiFilters | null) {
           directionFilters
         ]
       }, {
-        layer: 'nldi-flowlines',
+        layer: mapLayerNames.nldiFlowlinesLayer,
         filter: ["all",
           ["==", ["get", "westdaat_featuredatatype"], "Flowline"],
           directionFilters

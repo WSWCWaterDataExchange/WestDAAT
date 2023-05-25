@@ -6,6 +6,7 @@ import { FeatureCollection, GeoJsonProperties, Geometry, Position,  } from "geoj
 import { nldi } from "../config/constants";
 import Icon from "@mdi/react";
 import { mdiMapMarker } from "@mdi/js";
+import { mapLayerNames } from "../config/maps";
 
 interface detailsMapProps {
   isDataLoading: boolean;
@@ -23,9 +24,8 @@ function DetailsMap(props: detailsMapProps) {
 
   useEffect(() => {
     setVisibleLayers([
-      "site-locations-label",
-      "site-locations-points",
-      "site-locations-polygons",
+      mapLayerNames.siteLocationsPointsLayer,
+      mapLayerNames.siteLocationsPolygonsLayer,
     ]);
   }, [setVisibleLayers]);
 
