@@ -5,6 +5,7 @@ import { NldiFilters } from "../FilterProvider";
 import { MapContext } from "../components/MapProvider";
 import { useMapErrorAlert } from "./useMapAlert";
 import useProgressIndicator from "./useProgressIndicator";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 const pointFeatureDataSourceNameKeys = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa];
 const pointFeatureDataSourceNames: Record<DataPoints, string> = {
@@ -18,6 +19,11 @@ const directionNames: Record<Directions, string> = {
   [Directions.Upsteam]: "Upstream",
   [Directions.Downsteam]: "Downstream"
 };
+
+const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
+  "type": "FeatureCollection",
+  "features": []
+}
 function useNldiMapFiltering(nldiFilters: NldiFilters | null) {
   const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
   const { data: nldiGeoJsonData, isFetching: isNldiDataFetching, isError: isNldiDataError } = useNldiFeatures(nldiFilters?.latitude ?? null, nldiFilters?.longitude ?? null);
@@ -27,12 +33,13 @@ function useNldiMapFiltering(nldiFilters: NldiFilters | null) {
   useEffect(() => {
     if (nldiGeoJsonData) {
       setGeoJsonData('nldi', nldiGeoJsonData)
+    } else {
+      setGeoJsonData('nldi', emptyGeoJsonData);
     }
   }, [nldiGeoJsonData, setGeoJsonData]);
 
   useEffect(() => {
-    if(nldiFilters)
-    {
+    if(nldiFilters) {
       let pointsTypeFilters: any[] = ["any"];
       for (const key of pointFeatureDataSourceNameKeys) {
         if (nldiFilters.dataPoints & key) {

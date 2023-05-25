@@ -554,11 +554,6 @@ function WaterRightsTab() {
     })
     setNldiMapStatus(false);
     setActiveKeys(["colorSizeTools", "siteSelectionFilters"]);
-    // clearing nldi information
-    setGeoJsonData('nldi', {
-      "type": "FeatureCollection",
-      "features": []
-    });
   }
 
   useProgressIndicator([!isAllBeneficialUsesLoading, !isAllWaterSourceTypesLoading, !isAllOwnerClassificationsLoading, !isAllStatesLoading, !isRiverBasinOptionsLoading, !isRiverBasinPolygonsLoading], "Loading Filter Data");
