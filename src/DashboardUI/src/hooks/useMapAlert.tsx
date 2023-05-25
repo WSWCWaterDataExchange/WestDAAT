@@ -47,22 +47,27 @@ export function useMapErrorAlert(isError: boolean) {
   useMapAlert(isError, header, body, options, MapAlertPriority.Error)
 }
 
-export function useNoMapResults(hasNoResults: boolean) {
+export function useNoMapResults(isNoResultsEnabled: boolean) {
+  const {
+    isMapRendering,
+    renderedFeatures
+  } = useContext(MapContext);
+  const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const [header, body] = useMemo(() => {
     return [
       <h5 className="card-title">No Matching Results</h5>,
       <>Sorry, these filter combinations have no water rights in this view or map zoom level.<br />Please try different criteria or a different map area that may have the data you're looking for.</>
     ]
   }, []);
-  useMapAlert(hasNoResults, header, body)
+  useMapAlert(isNoResultsEnabled && !isMapRendering && !hasRenderedFeatures, header, body)
 }
 
-export function useNldiPinDropAlert(hasLatLong: boolean, isNldiMapActive: boolean) {
+export function useNldiPinDropAlert(hasLatLong: boolean) {
   const [header, body] = useMemo(() => {
     return [
       <h5 className="card-title">Select Search Location</h5>,
       <>Drag and drop the red 'Pin Icon' from the left bar to the map to select your search location</>
     ]
   }, []);
-  useMapAlert(!hasLatLong && isNldiMapActive, header, body)
+  useMapAlert(!hasLatLong, header, body)
 }

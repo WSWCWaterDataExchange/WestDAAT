@@ -74,7 +74,7 @@ namespace WesternStatesWater.WestDaat.Utilities
             var responseContent = await response.Content.ReadAsStringAsync();
             if(string.IsNullOrWhiteSpace(responseContent))
             {
-                _logger.LogInformation($"USGK NLDI Api returned a success status code but no payload.");
+                _logger.LogInformation($"USGS NLDI Api returned a success status code but no payload.");
                 return new FeatureCollection();
             }
             try

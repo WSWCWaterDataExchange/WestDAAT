@@ -1,5 +1,17 @@
 import { nldi, pointSizes, waterRightsProperties } from "./constants";
 
+export const mapLayerNames = {
+  waterRightsPointsLayer: 'waterRightsPoints',
+  waterRightsPolygonsLayer: 'waterRightsPolygons',
+  riverBasinsLayer: 'river-basins',
+  siteLocationsPolygonsLayer: 'site-locations-polygons',
+  siteLocationsPointsLayer: 'site-locations-points',
+  nldiFlowlinesLayer: 'nldi-flowlines',
+  nldiUsgsPointsLayer: 'nldi-usgs-points',
+  nldiUsgsLocationLayer: 'nldi-usgs-location'
+}
+
+
 export const defaultPointCircleRadius = [
   "interpolate",
   ["linear"],
@@ -61,7 +73,7 @@ const mapsJson = {
   ],
   "layers": [
     {
-      "id": "river-basins",
+      "id": mapLayerNames.riverBasinsLayer,
       "friendlyName": "RiverBasins",
       "source": "river-basins",
       "layout": {
@@ -74,7 +86,7 @@ const mapsJson = {
       }
     },
     {
-      "id": "waterRightsPolygons",
+      "id": mapLayerNames.waterRightsPolygonsLayer,
       "friendlyName": "Water Rights Polygons",
       "source-layer": "polygons",
       "source": "allocation-sites_1",
@@ -88,7 +100,7 @@ const mapsJson = {
       }
     },
     {
-      "id": "waterRightsPoints",
+      "id": mapLayerNames.waterRightsPointsLayer,
       "friendlyName": "Water Rights Points",
       "source-layer": "points",
       "source": "allocation-sites_1",
@@ -100,7 +112,7 @@ const mapsJson = {
       "paint": defaultPointPaintConfiguration,
     },
     {
-      "id": "site-locations-polygons",
+      "id": mapLayerNames.siteLocationsPolygonsLayer,
       "friendlyName": "SiteLocations",
       "source": "site-locations",
       "layout": {
@@ -116,7 +128,7 @@ const mapsJson = {
       "filter": ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]]
     },
     {
-      "id": "site-locations-points",
+      "id": mapLayerNames.siteLocationsPointsLayer,
       "friendlyName": "SiteLocations",
       "source": "site-locations",
       "layout": {
@@ -133,26 +145,7 @@ const mapsJson = {
       "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
     },
     {
-      "id": "site-locations-label",
-      "friendlyName": "SiteLocationsLabel",
-      "source": "site-locations",
-      "type": "symbol",
-      "layout": {
-        "visibility": "visible",
-        "text-field": ["get", "uuid"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 5, 12, 15, 20],
-        "text-anchor": "top",
-        "text-allow-overlap": true,
-      },
-      "paint": {
-        "text-color": "#000000",
-        "text-halo-color": "#eee",
-        "text-halo-width": ["interpolate", ["linear"], ["zoom"], 5, .1, 15, 1],
-        "text-halo-blur": ["interpolate", ["linear"], ["zoom"], 5, .1, 15, 1],
-      },
-    },
-    {
-      "id": "nldi-flowlines",
+      "id": mapLayerNames.nldiFlowlinesLayer,
       "source": "nldi",
       "layout": {
         "visibility": "visible"
@@ -177,7 +170,7 @@ const mapsJson = {
       ]
     },
     {
-      "id": "nldi-usgs-points",
+      "id": mapLayerNames.nldiUsgsPointsLayer,
       "source": "nldi",
       "layout": {
         "visibility": "visible"
@@ -197,7 +190,7 @@ const mapsJson = {
       ]
     },
     {
-      "id": "nldi-usgs-location",
+      "id": mapLayerNames.nldiUsgsLocationLayer,
       "source": "nldi",
       "layout": {
         "visibility": "visible",

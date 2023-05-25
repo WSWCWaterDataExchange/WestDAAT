@@ -25,8 +25,13 @@ namespace WesternStatesWater.WestDaat.Utilities
                 Subject = message.Subject,
                 PlainTextContent = message.TextContent,
                 HtmlContent = message.Body,
-                From = new EmailAddress(message.From),
+                From = new EmailAddress(message.From)
             };
+
+            if (!string.IsNullOrWhiteSpace(message.ReplyTo))
+            {
+                msg.ReplyTo = new EmailAddress(message.ReplyTo);
+            }
 
             foreach (var address in message.To)
             {
