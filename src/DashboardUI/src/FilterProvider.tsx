@@ -55,6 +55,13 @@ export const defaultFilters: WaterRightsFilters = {
   nldiFilterData: null
 }
 
+export const defaultNldiFilters = {
+  latitude: null as number | null,
+  longitude: null as number | null,
+  directions: Directions.Upsteam | Directions.Downsteam as Directions,
+  dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
+}
+
 const defaultState: FilterContextState = {
   filters: defaultFilters,
   setFilters: () => {},

@@ -29,7 +29,7 @@ import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { FeatureCollection } from "geojson";
 import { DataPoints, Directions } from "../data-contracts/nldi";
 import Select from "react-select";
-import { FilterContext, NldiFilters, WaterRightsFilters, defaultFilters } from "../FilterProvider";
+import { FilterContext, NldiFilters, WaterRightsFilters, defaultFilters, defaultNldiFilters } from "../FilterProvider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import useNldiMapPopup from "../hooks/map-popups/useNldiMapPopup";
 import useWaterRightDigestMapPopup from "../hooks/map-popups/useWaterRightDigestMapPopup";
@@ -73,13 +73,6 @@ const allWaterRightsLayers = [
 const defaultDisplayOptions: WaterRightsDisplayOptions = {
   pointSize: 'd',
   mapGrouping: MapGrouping.BeneficialUse
-}
-
-const defaultNldiFilters = {
-  latitude: null as number | null,
-  longitude: null as number | null,
-  directions: Directions.Upsteam | Directions.Downsteam as Directions,
-  dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
 }
 
 const exemptMapping = new Map<boolean | undefined, '' | '0' | '1'>([
