@@ -33,6 +33,18 @@
     box-shadow: 0px 3px 6px #00000029;
     z-index: 100;
   }
+
+  .btn, a {
+    transition: color .3s ease-in-out;
+  }
+
+  .btn {
+    color: hsla(0,0%,100%,.55);
+    
+    &:hover, &:focus {
+      color: hsla(0,0%,100%,.75);
+    }
+  }
 }
 
 .ham-menu a {
