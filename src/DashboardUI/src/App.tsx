@@ -4,9 +4,7 @@ import Layout from './pages/Layout';
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from 'react-query/devtools';
 import DetailLayout from './pages/DetailLayout';
-import DetailsPage from './pages/DetailsPage';
-import AppProvider from "./AppProvider";
-import MapProvider from "./components/MapProvider";
+import AppProvider from "./contexts/AppProvider";
 import { ToastContainer } from "react-toastify";
 import { DndProvider } from 'react-dnd'
 import { TouchBackend } from "react-dnd-touch-backend"; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
@@ -17,7 +15,8 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
-import { FilterProvider } from "./FilterProvider";
+import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
+import SiteDetailsPage from "./pages/SiteDetailsPage";
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
@@ -35,16 +34,16 @@ function App({ msalInstance }: AppProps) {
     }
   })
 
-  const [googleAnalyticsInitialized, setgoogleAnalyticsInitialized] = useState(false);
+  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     //initialize Google Analytics
     if (process.env.REACT_APP_GA_ID) {
       ReactGA.initialize(process.env.REACT_APP_GA_ID);
-      setgoogleAnalyticsInitialized(true);
+      setGoogleAnalyticsInitialized(true);
     }
-  }, []); //only run once
+  }, [setGoogleAnalyticsInitialized]);
 
   useEffect(() => {
     if (googleAnalyticsInitialized) {
@@ -55,25 +54,21 @@ function App({ msalInstance }: AppProps) {
   return (
     <MsalProvider instance={msalInstance}>
       <AppProvider>
-        <MapProvider>
-          <FilterProvider>
-            <QueryClientProvider client={queryClient}>
-              <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-                <Routes>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<HomePage />} />
-                    <Route path="details" element={<DetailLayout />}>
-                      <Route path="site/:id" element={<DetailsPage detailType={"site"} />} />
-                      <Route path="right/:id" element={<DetailsPage detailType={"right"} />} />
-                    </Route>
-                  </Route>
-                </Routes>
-                <ReactQueryDevtools initialIsOpen={false} />
-                <ToastContainer />
-              </DndProvider>
-            </QueryClientProvider>
-          </FilterProvider>
-        </MapProvider>
+        <QueryClientProvider client={queryClient}>
+          <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<HomePage />} />
+                <Route path="details" element={<DetailLayout />}>
+                  <Route path="site/:id" element={<SiteDetailsPage />} />
+                  <Route path="right/:id" element={<WaterRightDetailsPage />} />
+                </Route>
+              </Route>
+            </Routes>
+            <ReactQueryDevtools initialIsOpen={false} />
+            <ToastContainer />
+          </DndProvider>
+        </QueryClientProvider>
       </AppProvider>
     </MsalProvider>
   );

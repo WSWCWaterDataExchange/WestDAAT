@@ -81,7 +81,8 @@ function FeedbackModal(props: FeedBackModalProps) {
       toast.error("Something went wrong sending the feedback",
         {
           position: toast.POSITION.TOP_CENTER,
-          theme: 'colored'
+          theme: 'colored',
+          autoClose: false
         })
     } else {
       setFeedbackRequest(defaultFeedbackRequest);

@@ -6,10 +6,6 @@ import reportWebVitals from './reportWebVitals';
 import { AuthenticationResult, EventMessage, EventType, PublicClientApplication } from "@azure/msal-browser";
 import { msalConfig } from "./authConfig";
 
-import 'mapbox-gl/dist/mapbox-gl.css';
-import './styles/custom.scss';
-import './index.scss';
-
 const msalInstance = new PublicClientApplication(msalConfig);
 
 const accounts = msalInstance.getAllAccounts();

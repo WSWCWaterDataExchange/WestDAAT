@@ -1,0 +1,9 @@
+@import '../../../styles/colors';
+
+.detail-page {
+  .site-card {
+    .card-header {
+      background-color: $card-header-color-blue;
+    }
+  }
+}

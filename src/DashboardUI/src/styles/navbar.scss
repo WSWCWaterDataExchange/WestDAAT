@@ -38,7 +38,7 @@
     transition: color .3s ease-in-out;
   }
 
-  .btn {
+  &.navbar-dark .btn {
     color: hsla(0,0%,100%,.55);
     
     &:hover, &:focus {

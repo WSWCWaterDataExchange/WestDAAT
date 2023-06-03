@@ -1,0 +1,9 @@
+@import '../../../styles/colors';
+
+.detail-page {
+  .water-rights-card {
+    .card-header {
+      background-color: $card-header-color-red;
+    }
+  }
+}
