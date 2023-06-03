@@ -11,12 +11,12 @@ let mockGetIsNldiParameterActive = jest.fn();
 let mockSetIsNldiParameterActive = jest.fn();
 
 const filtersWithUndefinedNldiActive: Optional<WaterRightsFilters, 'isNldiFilterActive'> = {
-  beneficialUseNames: [],
-  ownerClassifications: [],
-  waterSourceTypes: [],
-  riverBasinNames: [],
-  states: [],
-  allocationOwner: '',
+  beneficialUseNames: undefined,
+  ownerClassifications: undefined,
+  waterSourceTypes: undefined,
+  riverBasinNames: undefined,
+  states: undefined,
+  allocationOwner: undefined,
   includeExempt: undefined,
   minFlow: undefined,
   maxFlow: undefined,
@@ -52,6 +52,12 @@ const geoJsonDataOld: GeoJSON.Feature<GeoJSON.Geometry> = {
 };
 
 beforeEach(() =>{
+  mockSetParameterWaterRights.mockImplementation((a) =>{
+    mockGetParameterWaterRights.mockReturnValue(a);
+  })
+  mockSetIsNldiParameterActive.mockImplementation((a) =>{
+    mockGetIsNldiParameterActive.mockReturnValue(a);
+  })
   jest.spyOn(urlParameters, 'useUrlParameters')
     .mockReturnValueOnce({
       getParameter: mockGetParameterWaterRights,
