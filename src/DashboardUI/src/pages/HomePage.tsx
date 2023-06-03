@@ -1,71 +1,18 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import Map from '../components/Map';
-import SidePanel from '../components/SidePanel';
-import SiteFooter from '../components/SiteFooter';
-import SiteNavbar from '../components/SiteNavbar';
-import FeedbackModal from '../components/FeedbackModal';
-import DownloadModal from '../components/DownloadModal';
-import TableView from '../components/TableView';
-
-import '../styles/home-page.scss';
-import { AppContext } from '../AppProvider';
+import { HomePageProvider } from '../components/home-page/Provider';
+import { Layout } from '../components/home-page/Layout';
 
 export enum HomePageTab {
   WaterRights = "Water Rights Data"
 }
 
 function HomePage() {
-
-  const { setUrlParam, getUrlParam } = useContext(AppContext);
-  const [currentTab, setCurrentTab] = useState(getUrlParam<HomePageTab>("tab") ?? HomePageTab.WaterRights);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-
-  const containerRef = useRef(null);
-
-  const shouldShowFeedbackModal = (show: boolean) => {
-    setShowFeedbackModal(show);
-  }
-
-  const shouldShowDownloadModal = (show: boolean) => {
-    setShowDownloadModal(show);
-  }
-
-  useEffect(() => {
-    document.title = `WestDAAT - ${currentTab}`
-  }, [currentTab]);
-
-  useEffect(() => {
-    if (currentTab === HomePageTab.WaterRights) {
-      setUrlParam("tab", undefined);
-    } else {
-      setUrlParam("tab", currentTab)
-    }
-  }, [currentTab, setUrlParam]);
-
+  
   return (
-    <div className="home-page d-flex flex-column">
-      <SiteNavbar
-        onTabClick={setCurrentTab}
-        currentTab={currentTab}
-        showDownloadModal={shouldShowDownloadModal}
-      />
-      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
-        <SidePanel currentTab={currentTab} />
-        <div className="flex-grow-1 position-relative" ref={containerRef}>
-          <Map />
-          <TableView containerRef={containerRef} />
-        </div>
-      </div>
-
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal}
-      />
-
-      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
-      <DownloadModal show={showDownloadModal} setShow={shouldShowDownloadModal} />
-    </div>
+    <HomePageProvider>
+      <Layout />
+    </HomePageProvider>
   );
+  
 }
 
 export default HomePage;

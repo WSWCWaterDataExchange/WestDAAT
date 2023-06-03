@@ -10,6 +10,18 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}"
-        }
+        },
+        {
+            "name": "Debug tests single run",
+            "type": "node",
+            "request": "launch",
+            "env": { "CI": "true" },
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+            "args": ["test", "--runInBand", "--no-cache"],
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+          }
     ]
 }

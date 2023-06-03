@@ -1,7 +1,22 @@
 @import "styles/colors";
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import './styles/custom.scss';
 
-a {
-  color: $text-color-light;
+body {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+input[type='date'][value='']{
+  color: $input-placeholder-color;
 }
 
 .group-styles {

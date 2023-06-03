@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useContext } from "react";
-import { MapContext } from "../../components/MapProvider";
+import { MapContext } from "../../contexts/MapProvider";
 
 function useMapPopupOnClick() {
   const {

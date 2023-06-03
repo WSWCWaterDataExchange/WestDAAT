@@ -1,5 +1,5 @@
 import { ReactChild, useContext, useEffect, useMemo, useState } from "react";
-import { MapAlertPriority, MapContext } from "../components/MapProvider";
+import { MapAlertPriority, MapContext } from "../contexts/MapProvider";
 import { MapAlertCard } from "../components/MapAlertCard";
 import { CardProps } from "react-bootstrap";
 import { v4 as uuidv4 } from 'uuid';
@@ -36,17 +36,6 @@ export function useMapAlert(isActive: boolean, header?: ReactChild, body?: React
   }, [isActive, isManuallyClosed, alert, key, priority, changeAlertDisplay, removeAlertDisplay]);
 }
 
-export function useMapErrorAlert(isError: boolean) {
-  const [header, body, options] = useMemo(() => {
-    return [
-      <h5 className="card-title">Error</h5>,
-      <>Something went wrong.  Please try again.</>,
-      { className: "text-white bg-danger" }
-    ]
-  }, []);
-  useMapAlert(isError, header, body, options, MapAlertPriority.Error)
-}
-
 export function useNoMapResults(isNoResultsEnabled: boolean) {
   const {
     isMapRendering,
@@ -62,12 +51,12 @@ export function useNoMapResults(isNoResultsEnabled: boolean) {
   useMapAlert(isNoResultsEnabled && !isMapRendering && !hasRenderedFeatures, header, body)
 }
 
-export function useNldiPinDropAlert(hasLatLong: boolean) {
+export function useNldiPinDropAlert(needsToSetNldiLocation: boolean) {
   const [header, body] = useMemo(() => {
     return [
       <h5 className="card-title">Select Search Location</h5>,
       <>Drag and drop the red 'Pin Icon' from the left bar to the map to select your search location</>
     ]
   }, []);
-  useMapAlert(!hasLatLong, header, body)
+  useMapAlert(needsToSetNldiLocation, header, body)
 }

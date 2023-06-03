@@ -1,7 +1,6 @@
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
-import '../styles/home-page.scss';
 
 function handleLogin(msalContext: IPublicClientApplication | null) {    
 

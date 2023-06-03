@@ -3,5 +3,4 @@ export class AnalyticsSummaryInformation {
   points?: number;
   flow?: number;
   volume?: number;
-  color?: string;
 }
