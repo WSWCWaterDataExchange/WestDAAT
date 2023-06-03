@@ -7,7 +7,7 @@ export function useChildrenByTypes(type: string | string[]) {
   }, [type])
 
   const typeOfComponent = (component: any) => {
-    const result = component?.props?.__TYPE ||
+    const result = component?.props?.__type ||
       component?.type?.name ||
       undefined;
     return result;
