@@ -2,9 +2,9 @@ import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useBeneficialUsesFilter } from '../hooks/filters/useBeneficialUsesFilter';
-import { WaterRightsContext } from '../Provider';
+import { useWaterRightsContext } from '../Provider';
 
 interface GroupedOption {
   readonly label: string;
@@ -34,7 +34,7 @@ function BeneficialUseSelect() {
     hostData:{
       beneficialUsesQuery: { data: allBeneficialUses}
     }
-  } = useContext(WaterRightsContext);
+  } = useWaterRightsContext();
 
   const mapBeneficialUseToBeneficialUseListItem = useCallback((name: string) =>({
     beneficialUseName: name,

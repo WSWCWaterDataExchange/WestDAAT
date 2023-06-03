@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
-import { WaterRightsContext } from "../../Provider";
+import { useEffect } from "react";
+import { useWaterRightsContext } from "../../Provider";
 import { useMapPointScaling } from "./useMapPointScaling";
 import { mapLayerNames } from "../../../../../config/maps";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import { useMapLegend } from "./useMapLegend";
 import useNldiMapPopup from "../../../../../hooks/map-popups/useNldiMapPopup";
 import useWaterRightDigestMapPopup from "../../../../../hooks/map-popups/useWaterRightDigestMapPopup";
@@ -18,11 +18,11 @@ const nldiLayers = [
   mapLayerNames.nldiUsgsPointsLayer
 ];
 export function useDisplayOptions() {
-  const {filters: {riverBasinNames, isNldiFilterActive}} = useContext(WaterRightsContext);
+  const {filters: {riverBasinNames, isNldiFilterActive}} = useWaterRightsContext();
 
   const {
     setVisibleLayers
-  } = useContext(MapContext);
+  } = useMapContext();
 
   useEffect(() => {
     let visible = [...allWaterRightsLayers];

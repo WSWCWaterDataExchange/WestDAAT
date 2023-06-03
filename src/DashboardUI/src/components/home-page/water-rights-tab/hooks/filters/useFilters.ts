@@ -1,5 +1,5 @@
-import { useContext, useEffect, useMemo } from "react";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useEffect, useMemo } from "react";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import { mapLayerNames } from "../../../../../config/maps";
 import { useRiverBasinFilter } from "./useRiverBasinFilter";
 import { useBeneficialUsesFilter } from "./useBeneficialUsesFilter";
@@ -20,7 +20,7 @@ const allWaterRightsLayers = [
   mapLayerNames.waterRightsPolygonsLayer
 ]
 export function useFilters() {
-  const {setLayerFilters: setMapLayerFilters} = useContext(MapContext);
+  const {setLayerFilters: setMapLayerFilters} = useMapContext();
 
   const {mapFilters: podPouMapFilters} = usePodPouFilter();
   const {mapFilters: includeExemptMapFilters} = useIncludeExemptFilter();

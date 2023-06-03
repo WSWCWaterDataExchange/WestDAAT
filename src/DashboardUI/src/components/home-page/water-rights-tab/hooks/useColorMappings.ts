@@ -1,5 +1,5 @@
-import { useCallback, useContext, useMemo } from "react";
-import { WaterRightsContext } from "../Provider";
+import { useCallback, useMemo } from "react";
+import { useWaterRightsContext } from "../Provider";
 import { useColorMappings as useColorMappingsBase } from "../../../../hooks/useColorMappings"
 
 export function useColorMappings() {
@@ -9,7 +9,7 @@ export function useColorMappings() {
         ownerClassificationsQuery: {data: allOwnerClassifications},
         waterSourcesQuery: {data: allWaterSourceTypes}
       }
-    } = useContext(WaterRightsContext);
+    } = useWaterRightsContext();
 
     const {fallbackColor, getColorByIndex} = useColorMappingsBase();
 

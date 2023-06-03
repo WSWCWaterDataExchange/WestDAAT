@@ -1,7 +1,7 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import useProgressIndicator from "../../../../hooks/useProgressIndicator";
 import { toast } from "react-toastify";
-import { WaterRightDetailsContext } from "../Provider";
+import { useWaterRightDetailsContext } from "../Provider";
 
 export function useAlerts(){
   const {
@@ -23,7 +23,7 @@ export function useAlerts(){
         isError: sourceInfoListIsError
       }
     }
-  } = useContext(WaterRightDetailsContext);
+  } = useWaterRightDetailsContext();
 
   const isError = useMemo(() =>{
     return detailsIsError ||

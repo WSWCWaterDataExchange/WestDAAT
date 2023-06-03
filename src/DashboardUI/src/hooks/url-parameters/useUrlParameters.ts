@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
-import { AppContext } from "../../contexts/AppProvider";
+import { useCallback, useEffect, useMemo } from "react";
+import { useAppContext } from "../../contexts/AppProvider";
 import deepEqual from 'fast-deep-equal/es6';
 
 export function useUrlParameters<T>(parameterKey: string | string[], defaultValue: T) {
-  const { setUrlParam, getUrlParam } = useContext(AppContext);
+  const { setUrlParam, getUrlParam } = useAppContext();
   
   const keys = useMemo(() =>{
     return Array.isArray(parameterKey) ? parameterKey : [parameterKey];

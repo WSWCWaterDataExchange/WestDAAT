@@ -1,4 +1,4 @@
-import { createContext, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import * as compress from "lz-string";
 import { IAuthenticationContext, useAuthenticationContext } from "../hooks/useAuthenticationContext";
@@ -17,7 +17,8 @@ let defaultAppContextState = {
   getUrlParam: <T,>(key: string): T | undefined => undefined
 }
 
-export const AppContext = createContext<AppContextState>(defaultAppContextState);
+const AppContext = createContext<AppContextState>(defaultAppContextState);
+export const useAppContext = () => useContext(AppContext)
 
 const AppProvider: FC = ({ children }) => {
 
@@ -64,7 +65,7 @@ const AppProvider: FC = ({ children }) => {
   const debouncedStateUrlParams = useDebounce(stateUrlParams, 1000)
   useEffect(() => {
     if ((Object.keys(debouncedStateUrlParams).length ?? 0) > 0) {
-      setUrlParams({ state: compress.compressToEncodedURIComponent(JSON.stringify(debouncedStateUrlParams)) }, {replace: true})
+      setUrlParams({state: compress.compressToEncodedURIComponent(JSON.stringify(debouncedStateUrlParams)) }, {replace: true})
     } else {
       setUrlParams({}, {replace: true});
     }

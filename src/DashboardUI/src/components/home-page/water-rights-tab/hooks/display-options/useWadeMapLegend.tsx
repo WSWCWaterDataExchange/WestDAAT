@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo } from "react";
-import { MapContext } from "../../../../../contexts/MapProvider";
-import { WaterRightsContext } from "../../Provider";
+import { useEffect, useMemo } from "react";
+import { useMapContext } from "../../../../../contexts/MapProvider";
+import { useWaterRightsContext } from "../../Provider";
 import { mapLayerNames } from "../../../../../config/maps";
 import { MapGrouping } from "../../MapGrouping";
 import { useColorMappings } from "../useColorMappings";
@@ -11,7 +11,7 @@ export function useWadeLegend() {
       renderedFeatures,
       setLayerCircleColors,
       setLayerFillColors,
-    } = useContext(MapContext);
+    } = useMapContext();
 
     const { 
       filters: {
@@ -22,7 +22,7 @@ export function useWadeLegend() {
       displayOptions: {
         mapGrouping: mapGroupingOption
       }
-    } = useContext(WaterRightsContext);
+    } = useWaterRightsContext();
 
     const {beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, fallbackColor} = useColorMappings();
 

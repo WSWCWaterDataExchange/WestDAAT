@@ -1,4 +1,4 @@
-import { createContext, FC, useCallback, useEffect, useState } from "react";
+import { createContext, FC, useCallback, useContext, useEffect, useState } from "react";
 import { BeneficialUseListItem } from "../../../data-contracts/BeneficialUseListItem";
 import { DataPoints, Directions } from "../../../data-contracts/nldi";
 import { useDisplayOptionsUrlParameters } from "./hooks/url-parameters/useDisplayOptionsUrlParameters";
@@ -47,7 +47,7 @@ export interface HostData{
   riverBasinsQuery: Query<string[]>;
 }
 
-interface WaterRightsContextState {
+export interface WaterRightsContextState {
   filters: WaterRightsFilters;
   setFilters: React.Dispatch<React.SetStateAction<WaterRightsFilters>>;
   nldiIds: string[];
@@ -85,7 +85,7 @@ export const defaultNldiFilters = {
   dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade as DataPoints
 }
 
-const defaultState: WaterRightsContextState = {
+export const defaultState: WaterRightsContextState = {
   filters: defaultFilters,
   setFilters: () => {},
   nldiIds: [],
@@ -102,7 +102,8 @@ const defaultState: WaterRightsContextState = {
   },
 }
 
-export const WaterRightsContext = createContext<WaterRightsContextState>(defaultState);
+const WaterRightsContext = createContext<WaterRightsContextState>(defaultState);
+export const useWaterRightsContext = () => useContext(WaterRightsContext)
 
 export const WaterRightsProvider: FC = ({ children }) => {
   const { getParameter: getDisplayOptionsParameter, setParameter: setDisplayOptionsParameter } = useDisplayOptionsUrlParameters();

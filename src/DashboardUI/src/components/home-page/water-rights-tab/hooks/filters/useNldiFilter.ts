@@ -1,11 +1,11 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
-import { WaterRightsContext, defaultNldiFilters } from "../../Provider";
+import { useCallback, useEffect, useMemo } from "react";
+import { useWaterRightsContext, defaultNldiFilters } from "../../Provider";
 import { waterRightsProperties } from "../../../../../config/constants";
 import { DataPoints, Directions } from "../../../../../data-contracts/nldi";
 import { useNldiFeatures } from "../../../../../hooks/queries/useNldiQuery";
 import deepEqual from 'fast-deep-equal/es6';
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import { mapLayerNames, mapSourceNames } from "../../../../../config/maps";
 import { useDebounce } from "usehooks-ts";
 
@@ -28,8 +28,8 @@ const directionNames: Record<DirectionsType, string> = {
   [Directions.Downsteam]: "Downstream"
 };
 export function useNldiFilter() {
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useContext(MapContext);
-  const { filters: { nldiFilterData, isNldiFilterActive }, setFilters, setNldiIds } = useContext(WaterRightsContext);
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useMapContext();
+  const { filters: { nldiFilterData, isNldiFilterActive }, setFilters, setNldiIds } = useWaterRightsContext();
 
   const [debouncedLatitude, debouncedLongitude] = useDebounce([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null], 400)
   const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);
@@ -72,7 +72,6 @@ export function useNldiFilter() {
   }, [nldiWadeSiteIds, setNldiIds]);
 
   useEffect(() => {
-    
     let pointsTypeFilters: any[] = ["any"];
     if(nldiFilterData?.dataPoints){
       for (const key of pointFeatureDataSourceNameKeys) {
@@ -118,7 +117,7 @@ export function useNldiFilter() {
     setFilters(s => ({
       ...s,
       isNldiFilterActive: isActive,
-      nldiFilterData: s.nldiFilterData ?? isActive ? defaultNldiFilters : undefined
+      nldiFilterData: s.nldiFilterData ?? (isActive ? defaultNldiFilters : undefined)
     }));
   }, [setFilters]);
 

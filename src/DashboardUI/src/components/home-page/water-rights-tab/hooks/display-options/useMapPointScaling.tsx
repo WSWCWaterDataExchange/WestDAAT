@@ -1,7 +1,7 @@
-import { useContext, useEffect, useMemo } from "react";
-import { WaterRightsContext } from "../../Provider";
+import { useEffect, useMemo } from "react";
+import { useWaterRightsContext } from "../../Provider";
 import { pointSizes, waterRightsProperties } from "../../../../../config/constants";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import useLastKnownValue from "../../../../../hooks/useLastKnownValue";
 import { defaultPointCircleRadius, defaultPointCircleSortKey, flowPointCircleSortKey, mapLayerNames, volumePointCircleSortKey } from "../../../../../config/maps";
 
@@ -16,8 +16,8 @@ export function useMapPointScaling() {
     renderedFeatures,
     setLayerCircleRadii,
     setLayerCircleSortKeys
-  } = useContext(MapContext);
-  const {filters, displayOptions: {pointSize}} = useContext(WaterRightsContext);
+  } = useMapContext();
+  const {filters, displayOptions: {pointSize}} = useWaterRightsContext();
 
   const pointScaleTimeDelay = 1000;
   useEffect(() => {

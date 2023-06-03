@@ -1,5 +1,5 @@
-import { useContext, useEffect, useMemo } from "react";
-import { SiteDetailsContext } from "../Provider";
+import { useEffect, useMemo } from "react";
+import { useSiteDetailsContext } from "../Provider";
 import useProgressIndicator from "../../../../hooks/useProgressIndicator";
 import { toast } from "react-toastify";
 
@@ -23,7 +23,7 @@ export function useAlerts(){
         isError: sourceInfoListIsError
       }
     }
-  } = useContext(SiteDetailsContext);
+  } = useSiteDetailsContext();
 
   const isError = useMemo(() =>{
     return detailsIsError ||

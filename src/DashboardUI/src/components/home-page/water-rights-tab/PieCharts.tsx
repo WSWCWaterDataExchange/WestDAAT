@@ -4,9 +4,9 @@ import HC_Data from "highcharts/modules/export-data";
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
-import { WaterRightsContext } from './Provider';
+import { useWaterRightsContext } from './Provider';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 
@@ -84,7 +84,7 @@ type ChartDataType = {
   data: ChartSeriesDataType[]
 }
 function PieCharts() {
-  const { filters, nldiIds } = useContext(WaterRightsContext);
+  const { filters, nldiIds } = useWaterRightsContext();
 
   const searchCriteria = useMemo(() => {
     return {

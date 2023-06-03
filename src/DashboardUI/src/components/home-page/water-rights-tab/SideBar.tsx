@@ -1,16 +1,16 @@
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { Accordion } from "react-bootstrap";
 import BeneficialUseSelect from "./filters/BeneficialUseSelect";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
-import { WaterRightsContext } from "./Provider";
+import { useWaterRightsContext } from "./Provider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import { AllocationOwnerSearch, StatesSelect, WaterSourceTypesSelect, OwnerClassificationType, RiverBasinSelect, SiteContent, PriorityDateRange, FlowRange, PodPou, VolumeRange, Nldi } from "./filters";
 import { MapTheme, MapGrouping, PointSize } from "./display-options";
 import { useNldiFilter } from "./hooks/filters/useNldiFilter";
 
 function SideBar() {
-  const {resetUserOptions} = useContext(WaterRightsContext)
+  const {resetUserOptions} = useWaterRightsContext();
   const { isNldiFilterActive, setNldiMapActiveStatus} = useNldiFilter()
  
   const [activeKeys, setActiveKeys] = useState(isNldiFilterActive ? ["nldi"] : ["colorSizeTools", "siteSelectionFilters"]);

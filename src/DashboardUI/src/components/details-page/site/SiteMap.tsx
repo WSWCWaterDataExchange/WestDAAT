@@ -1,8 +1,8 @@
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import DetailsMap from "../DetailsMap";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import useWaterRightDigestMapPopup from "../../../hooks/map-popups/useWaterRightDigestMapPopup";
-import { SiteDetailsContext } from "./Provider";
+import { useSiteDetailsContext } from "./Provider";
 import MapProvider from "../../../contexts/MapProvider";
 import { useMapLegend } from "./hooks/useMapLegend";
 
@@ -19,7 +19,7 @@ function Layout() {
     hostData: {
       locationsQuery
     }
-  } = useContext(SiteDetailsContext)
+  } = useSiteDetailsContext()
 
   const featureCollection = useMemo<FeatureCollection<Geometry, GeoJsonProperties> | undefined>(() => {
     if (!locationsQuery.data) return undefined;

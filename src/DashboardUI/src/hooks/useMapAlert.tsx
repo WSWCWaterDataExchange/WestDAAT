@@ -1,5 +1,5 @@
-import { ReactChild, useContext, useEffect, useMemo, useState } from "react";
-import { MapAlertPriority, MapContext } from "../contexts/MapProvider";
+import { ReactChild, useEffect, useMemo, useState } from "react";
+import { MapAlertPriority, useMapContext } from "../contexts/MapProvider";
 import { MapAlertCard } from "../components/MapAlertCard";
 import { CardProps } from "react-bootstrap";
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,7 @@ export function useMapAlert(isActive: boolean, header?: ReactChild, body?: React
   const {
     changeAlertDisplay,
     removeAlertDisplay
-  } = useContext(MapContext);
+  } = useMapContext();
   const [isManuallyClosed, setIsManuallyClosed] = useState(false);
   const key = useMemo(() => {
     return uuidv4();
@@ -40,7 +40,7 @@ export function useNoMapResults(isNoResultsEnabled: boolean) {
   const {
     isMapRendering,
     renderedFeatures
-  } = useContext(MapContext);
+  } = useMapContext();
   const hasRenderedFeatures = useMemo(() => renderedFeatures.length > 0, [renderedFeatures.length]);
   const [header, body] = useMemo(() => {
     return [

@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo } from "react";
-import { MapContext } from "../../../../contexts/MapProvider";
-import { WaterRightDetailsContext } from "../Provider";
+import { useEffect, useMemo } from "react";
+import { useMapContext } from "../../../../contexts/MapProvider";
+import { useWaterRightDetailsContext } from "../Provider";
 import { Feature, GeoJsonProperties, Geometry } from "geojson";
 import { colorList, nldi } from "../../../../config/constants";
 import { MapLegendMarkerItem } from "../../../map/MapLegendItem";
@@ -14,9 +14,9 @@ export function useMapLegend() {
       setLegend,
       setLayerFillColors,
       setLayerIconImages
-    } = useContext(MapContext);
+    } = useMapContext();
 
-    const {hostData: {siteLocationsQuery: {data: siteLocations}}} = useContext(WaterRightDetailsContext);
+    const {hostData: {siteLocationsQuery: {data: siteLocations}}} = useWaterRightDetailsContext();
 
     const sites = useMemo(() => {
       const buildMapLegend = (feature: Feature<Geometry, GeoJsonProperties>)=>{

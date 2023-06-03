@@ -1,6 +1,5 @@
 import { Tab, Table, Tabs } from 'react-bootstrap';
-import { useContext } from 'react';
-import { WaterRightDetailsContext } from './Provider';
+import { useWaterRightDetailsContext } from './Provider';
 
 export enum WaterRightTab {
   SiteInfo = 'SiteInfo',
@@ -13,7 +12,7 @@ function WaterRightTabs() {
       siteInfoListQuery: {data: siteInfoList},
       sourceInfoListQuery: {data: sourceInfoList}
     }
-  } = useContext(WaterRightDetailsContext);
+  } = useWaterRightDetailsContext();
 
   return (
     <>

@@ -1,7 +1,6 @@
-import { useContext } from "react";
 import useSiteDigestMapPopup from "../../../hooks/map-popups/useSiteDigestMapPopup";
 import DetailsMap from "../DetailsMap";
-import { WaterRightDetailsContext } from "./Provider";
+import { useWaterRightDetailsContext } from "./Provider";
 import MapProvider from "../../../contexts/MapProvider";
 import { useMapLegend } from "./hooks/useMapLegend";
 
@@ -14,7 +13,7 @@ function WaterRightMap() {
 }
 
 function Layout() {
-  const {hostData: {siteLocationsQuery}} = useContext(WaterRightDetailsContext);
+  const {hostData: {siteLocationsQuery}} = useWaterRightDetailsContext();
   
   useSiteDigestMapPopup();
   useMapLegend();

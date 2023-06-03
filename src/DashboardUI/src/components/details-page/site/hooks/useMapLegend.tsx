@@ -1,5 +1,5 @@
-import { useContext, useEffect } from "react";
-import { MapContext } from "../../../../contexts/MapProvider";
+import { useEffect } from "react";
+import { useMapContext } from "../../../../contexts/MapProvider";
 import { nldi } from "../../../../config/constants";
 import { MapLegendMarkerItem } from "../../../map/MapLegendItem";
 import { mapLayerNames, siteLocationPointsIconImage, siteLocationPolygonFillColor } from "../../../../config/maps";
@@ -11,7 +11,7 @@ export function useMapLegend() {
       setLegend,
       setLayerFillColors,
       setLayerIconImages
-    } = useContext(MapContext);
+    } = useMapContext();
 
     useEffect(() => {
       setLegend(<>

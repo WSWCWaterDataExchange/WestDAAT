@@ -1,4 +1,4 @@
-import { createContext, FC, useState } from "react";
+import { createContext, FC, useContext, useState } from "react";
 
 interface HomePageContextState {
   downloadModal: JSX.Element | undefined,
@@ -14,7 +14,8 @@ const defaultState: HomePageContextState = {
   setShowDownloadModal: () => {}
 }
 
-export const HomePageContext = createContext<HomePageContextState>(defaultState);
+const HomePageContext = createContext<HomePageContextState>(defaultState);
+export const useHomePageContext = () => useContext(HomePageContext)
 
 export const HomePageProvider: FC = ({ children }) => {
   const [ downloadModal, setDownloadModal ] = useState<JSX.Element | undefined>(undefined);

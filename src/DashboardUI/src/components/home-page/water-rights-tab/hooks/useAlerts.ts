@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNldiPinDropAlert, useNoMapResults } from "../../../../hooks/useMapAlert";
-import { WaterRightsContext } from "../Provider";
+import { useWaterRightsContext } from "../Provider";
 import useProgressIndicator from "../../../../hooks/useProgressIndicator";
 import { useNldiFilter } from "./filters/useNldiFilter";
 import { useRiverBasinFilter } from "./filters/useRiverBasinFilter";
@@ -30,7 +30,7 @@ export function useAlerts(){
         isError: statesIsError
       }
     }
-  } = useContext(WaterRightsContext);
+  } = useWaterRightsContext();
 
   const {isNldiFilterActive, nldiFeaturesQuery: {isLoading: isNldiDataLoading, isError: isNldiDataError}, nldiFilterData: {latitude, longitude} = {}} = useNldiFilter();
   const {riverBasinPolygonsQuery: {isLoading: isRiverBasinPolygonLoading, isError: isRiverBasinPolygonError}} = useRiverBasinFilter();

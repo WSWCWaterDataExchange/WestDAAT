@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import { MapContext, MapStyle } from "../../contexts/MapProvider";
+import { useMapContext, MapStyle } from "../../contexts/MapProvider";
 
 export function MapThemeSelector() {
   const {
     mapStyle, setMapStyle
-  } = useContext(MapContext);
+  } = useMapContext();
 
   return (
     <div className="map-themes">

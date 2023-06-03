@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, ProgressBar, Table } from "react-bootstrap";
 import { WaterRightsSearchCriteria } from "../../../data-contracts/WaterRightsSearchCriteria";
 import { WaterRightsSearchResults } from "../../../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "../../FormattedDate";
-import { WaterRightsContext } from "./Provider";
+import { useWaterRightsContext } from "./Provider";
 import moment from "moment";
 import { useFindWaterRights } from "../../../hooks/queries/useWaterRightQuery";
 
@@ -14,7 +14,7 @@ function AnalyticsDataTable() {
     const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
     const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
 
-    const { filters, nldiIds } = useContext(WaterRightsContext);
+    const { filters, nldiIds } = useWaterRightsContext();
 
     const handleFiltersChange = useCallback(() => {
         setWaterRightsSearchResults(_defaultResults);

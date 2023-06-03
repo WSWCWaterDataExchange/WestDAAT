@@ -16,7 +16,22 @@ export function useFiltersUrlParameters() {
   const {getParameter: getIsNldiParameterActive, setParameter: setIsNldiParameterActive} = useUrlParameters<boolean | undefined>(depricatedUrlParameterKeys.isWaterRightsNldiFilterActive, undefined)
 
   const setParameter = useCallback((filters: WaterRightsFilters | undefined) =>{
-    setParameterOptionalNldi(filters)
+    if(filters === undefined){
+      setParameterOptionalNldi(undefined);
+      return;
+    }
+    const slimmedFilters: WaterRightsFilters = {
+      ...filters,
+      allocationOwner: (filters.allocationOwner?.trim().length ?? 0) > 0 ? filters.allocationOwner?.trim() : defaultFilters.allocationOwner,
+      beneficialUseNames: (filters.beneficialUseNames?.length ?? 0) > 0 ? filters.beneficialUseNames : defaultFilters.beneficialUseNames,
+      nldiFilterData: filters.isNldiFilterActive ? filters.nldiFilterData : defaultFilters.nldiFilterData,
+      ownerClassifications: (filters.ownerClassifications?.length ?? 0) > 0 ? filters.ownerClassifications : defaultFilters.ownerClassifications,
+      polylines: (filters.polylines?.length ?? 0) > 0 ? filters.polylines : defaultFilters.polylines,
+      riverBasinNames: (filters.riverBasinNames?.length ?? 0) > 0 ? filters.riverBasinNames : defaultFilters.riverBasinNames,
+      states: (filters.states?.length ?? 0) > 0 ? filters.states : defaultFilters.states,
+      waterSourceTypes: (filters.waterSourceTypes?.length ?? 0) > 0 ? filters.waterSourceTypes :  defaultFilters.waterSourceTypes,
+    }
+    setParameterOptionalNldi(slimmedFilters);
   }, [setParameterOptionalNldi]);
 
   const getParameter = useCallback((): (WaterRightsFilters | undefined) =>{

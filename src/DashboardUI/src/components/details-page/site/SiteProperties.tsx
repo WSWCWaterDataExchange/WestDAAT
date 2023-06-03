@@ -1,8 +1,7 @@
 import { Card, Col, Row } from 'react-bootstrap';
 import Domain from 'mdi-react/DomainIcon';
 import MapMarker from 'mdi-react/MapMarkerIcon';
-import { useContext } from 'react';
-import { SiteDetailsContext } from './Provider';
+import { useSiteDetailsContext } from './Provider';
 import { PropertyValue } from '../PropertyValue';
 
 function SiteProperties() {
@@ -10,7 +9,7 @@ function SiteProperties() {
     hostData: {
       detailsQuery: {data: siteDetails}
     }
-  } = useContext(SiteDetailsContext);
+  } = useSiteDetailsContext();
 
   return (
     <div>

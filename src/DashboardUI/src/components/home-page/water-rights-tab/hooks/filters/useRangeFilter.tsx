@@ -1,12 +1,12 @@
-import { useCallback, useContext } from "react";
-import { WaterRightsContext, WaterRightsFilters } from "../../Provider";
+import { useCallback } from "react";
+import { useWaterRightsContext, WaterRightsFilters } from "../../Provider";
 import { waterRightsProperties } from "../../../../../config/constants";
 import { useRangeFilter as useRangeFilterBase } from "../../../../../hooks/filters/useRangeFilter";
 
 type ValidRangeFilterFields = 'maxFlow' | 'minFlow' | 'maxVolume' | 'minVolume' | 'minPriorityDate' | 'maxPriorityDate';
 type ValidRangeWaterRightsProperties = waterRightsProperties.minFlowRate | waterRightsProperties.maxFlowRate | waterRightsProperties.minVolume | waterRightsProperties.maxVolume | waterRightsProperties.minPriorityDate | waterRightsProperties.maxPriorityDate;
 export function useRangeFilter<K1 extends keyof Pick<WaterRightsFilters, ValidRangeFilterFields>>(minField: K1, maxField: K1, minMapField: ValidRangeWaterRightsProperties, maxMapField: ValidRangeWaterRightsProperties) {
-  const { filters: { [minField]: minValue, [maxField]: maxValue }, setFilters } = useContext(WaterRightsContext);
+  const { filters: { [minField]: minValue, [maxField]: maxValue }, setFilters } = useWaterRightsContext();
 
   const {mapFilters} = useRangeFilterBase(minValue, maxValue, minMapField, maxMapField);
 

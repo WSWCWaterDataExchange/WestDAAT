@@ -1,11 +1,11 @@
-import { ReactElement, useCallback, useContext } from "react";
-import { MapContext } from "../../contexts/MapProvider";
+import { ReactElement, useCallback } from "react";
+import { useMapContext } from "../../contexts/MapProvider";
 
 function useMapPopupOnClick() {
   const {
     mapClickedFeatures,
     setMapPopup
-  } = useContext(MapContext);
+  } = useMapContext();
   const updatePopup = useCallback((element: ReactElement | undefined) => {
     if (element && mapClickedFeatures?.latitude && mapClickedFeatures?.longitude) {
       setMapPopup({

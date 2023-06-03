@@ -1,9 +1,10 @@
 import * as urlParameters from '../../../../../hooks/url-parameters/useUrlParameters';
 import { renderHook } from '@testing-library/react-hooks'
-import { WaterRightsFilters } from '../../Provider';
+import { NldiFilters, WaterRightsFilters, defaultFilters } from '../../Provider';
 import { useFiltersUrlParameters } from './useFiltersUrlParameters';
 import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../data-contracts/BeneficialUseListItem';
+import { DataPoints, Directions } from '../../../../../data-contracts/nldi';
 
 let mockGetParameterWaterRights = jest.fn();
 let mockSetParameterWaterRights = jest.fn();
@@ -32,6 +33,13 @@ const filtersWithUndefinedNldiActive: Optional<WaterRightsFilters, 'isNldiFilter
 const filtersWithDefinedNldiActive = {
   ...filtersWithUndefinedNldiActive,
   isNldiFilterActive: false,
+}
+
+const populatedNldiFilterData: NldiFilters = {
+  latitude: 40,
+  longitude: -100,
+  dataPoints: DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa,
+  directions: Directions.Upsteam | Directions.Downsteam
 }
 
 const geoJsonDataNew: GeoJSON.Feature<GeoJSON.Geometry> = {
@@ -77,6 +85,138 @@ afterEach(() => {
   mockSetIsNldiParameterActive.mockReset();
 });
 
+describe('setParameter', () => {
+  test('undefined', () =>{
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(undefined);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0]).toBeUndefined();
+  })
+  test.each([
+    [undefined, defaultFilters.allocationOwner],
+    ['', defaultFilters.allocationOwner],
+    [' ', defaultFilters.allocationOwner],
+    ['a', 'a'],
+    [' a', 'a'],
+    ['a ', 'a'],
+    [' a ', 'a'],
+  ])('allocationOwner %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, allocationOwner: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].allocationOwner).toBe(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.beneficialUseNames],
+    [[], defaultFilters.beneficialUseNames],
+    [['a'], ['a']],
+  ])('beneficialUseNames %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, beneficialUseNames: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].beneficialUseNames).toEqual(expected);
+  });
+
+  test.each([
+    [false, undefined, defaultFilters.nldiFilterData],
+    [false, populatedNldiFilterData, defaultFilters.nldiFilterData],
+    [true, undefined, defaultFilters.nldiFilterData],
+    [true, populatedNldiFilterData, populatedNldiFilterData],
+  ])('beneficialUseNames %j', (initialIsNldiFilterActive, initialNldiFilterData, expected) =>{
+    const filters = {
+      ...filtersWithDefinedNldiActive,
+      isNldiFilterActive: initialIsNldiFilterActive,
+      nldiFilterData: initialNldiFilterData
+    }
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive).toEqual(initialIsNldiFilterActive);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].nldiFilterData).toEqual(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.ownerClassifications],
+    [[], defaultFilters.ownerClassifications],
+    [['a'], ['a']],
+  ])('ownerClassifications %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, ownerClassifications: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].ownerClassifications).toEqual(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.polylines],
+    [[], defaultFilters.polylines],
+    [[geoJsonDataNew], [geoJsonDataNew]],
+  ])('polylines %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, polylines: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].polylines).toEqual(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.riverBasinNames],
+    [[], defaultFilters.riverBasinNames],
+    [['a'], ['a']],
+  ])('riverBasinNames %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, riverBasinNames: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].riverBasinNames).toEqual(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.states],
+    [[], defaultFilters.states],
+    [['a'], ['a']],
+  ])('states %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, states: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].states).toEqual(expected);
+  });
+
+  test.each([
+    [undefined, defaultFilters.waterSourceTypes],
+    [[], defaultFilters.waterSourceTypes],
+    [['a'], ['a']],
+  ])('states %j', (initial, expected) =>{
+    const filters = {...filtersWithDefinedNldiActive, waterSourceTypes: initial}
+    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
+
+    setParameter(filters);
+
+    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
+    expect(mockSetParameterWaterRights.mock.calls[0][0].waterSourceTypes).toEqual(expected);
+  });
+
+})
 describe('getParameter', () => {
   test('no existing URL parameters', () =>{
     mockGetParameterWaterRights.mockReturnValue(undefined);
@@ -139,8 +279,8 @@ describe('getParameter', () => {
       test.each([
         [undefined, [], undefined],
         [undefined, [{beneficialUseName: "b", consumptionCategory: ConsumptionCategoryType.NonConsumptive}], ["b"]],
-        [[], [], []],
-        [[], [{beneficialUseName: "b", consumptionCategory: ConsumptionCategoryType.NonConsumptive}], []],
+        [[], [], undefined],
+        [[], [{beneficialUseName: "b", consumptionCategory: ConsumptionCategoryType.NonConsumptive}], undefined],
         [["a"], [], ["a"]],
         [["a"], [{beneficialUseName: "b", consumptionCategory: ConsumptionCategoryType.NonConsumptive}], ["a"]]
       ])('Has Migration - names %j, uses: %j', (initialNames: string[] | undefined, initialUses: BeneficialUseListItem[] | undefined, expectedNames: string[] |  undefined) =>{
@@ -180,8 +320,8 @@ describe('getParameter', () => {
       test.each([
         [undefined, [], undefined],
         [undefined, [{identifier: "b", data: geoJsonDataOld}], [geoJsonDataOld]],
-        [[], [{identifier: "b", data: geoJsonDataOld}], []],
-        [[], [{identifier: "b", data: geoJsonDataOld}], []],
+        [[], [{identifier: "b", data: geoJsonDataOld}], undefined],
+        [[], [{identifier: "b", data: geoJsonDataOld}], undefined],
         [[geoJsonDataNew], [], [geoJsonDataNew]],
         [[geoJsonDataNew], [{identifier: "b", data: geoJsonDataOld}], [geoJsonDataNew]]
       ])('Has Migration - new %j, old: %j', (initialNew: GeoJSON.Feature<GeoJSON.Geometry>[] | undefined, initialOld: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[] | undefined, expectedNames: GeoJSON.Feature<GeoJSON.Geometry>[] |  undefined) =>{

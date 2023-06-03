@@ -1,4 +1,4 @@
-import React, { createContext, FC, ReactElement, useCallback, useMemo, useState } from "react";
+import React, { createContext, FC, ReactElement, useCallback, useContext, useMemo, useState } from "react";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
 
@@ -142,7 +142,8 @@ const defaultState: MapContextState = {
   setIsMapRendering: () => { }
 };
 
-export const MapContext = createContext<MapContextState>(defaultState);
+const MapContext = createContext<MapContextState>(defaultState);
+export const useMapContext = () => useContext(MapContext)
 
 const MapProvider: FC = ({ children }) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);

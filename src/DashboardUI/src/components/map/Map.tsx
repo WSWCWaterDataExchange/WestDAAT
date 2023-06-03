@@ -1,9 +1,9 @@
 import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { AppContext } from "../../contexts/AppProvider";
-import { defaultMapLocationData, MapContext, MapSettings, MapStyle } from "../../contexts/MapProvider";
+import { useAppContext } from "../../contexts/AppProvider";
+import { defaultMapLocationData, useMapContext, MapSettings, MapStyle } from "../../contexts/MapProvider";
 import mapConfig from "../../config/maps";
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from "canvg";
@@ -27,7 +27,7 @@ const createMapMarkerIcon = (color: string) =>{
 }
 
 function Map(_props: mapProps) {
-  const { isAuthenticated } = useContext(AppContext).authenticationContext;
+  const { authenticationContext: {isAuthenticated} } = useAppContext();
   const {
     legend,
     mapStyle,
@@ -51,7 +51,7 @@ function Map(_props: mapProps) {
     setRenderedFeatures,
     setMapClickedFeatures,
     setIsMapRendering,
-  } = useContext(MapContext);
+  } = useMapContext();
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const [coords, setCoords] = useState(null as LngLat | null);

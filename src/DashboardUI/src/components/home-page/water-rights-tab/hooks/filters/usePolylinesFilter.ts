@@ -1,11 +1,11 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useGeoJsonFilter } from "./useGeoJsonFilter";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import { Feature, GeoJsonProperties, Geometry } from "geojson";
 
 export function usePolylinesFilter() {
   const { value: filterPolylines, mapFilters, setValue: setFilterPolylines } = useGeoJsonFilter("polylines");
-  const { setPolylines: setMapPolylines } = useContext(MapContext)
+  const { setPolylines: setMapPolylines } = useMapContext()
 
   useEffect(() =>{
     setMapPolylines(filterPolylines ?? [])

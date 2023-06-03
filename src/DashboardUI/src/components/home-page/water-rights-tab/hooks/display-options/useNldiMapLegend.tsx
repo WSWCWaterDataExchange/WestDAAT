@@ -1,6 +1,6 @@
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { nldi } from "../../../../../config/constants";
-import { WaterRightsContext } from "../../Provider";
+import { useWaterRightsContext } from "../../Provider";
 import { DataPoints } from "../../../../../data-contracts/nldi";
 import { MapLegendCircleItem, MapLegendItem, MapLegendMarkerItem } from "../../../../map/MapLegendItem";
 
@@ -10,7 +10,7 @@ export function useNldiMapLegend() {
         isNldiFilterActive,
         nldiFilterData: {dataPoints: nldiDataPoints} = {dataPoints: DataPoints.None}
       }
-    } = useContext(WaterRightsContext);
+    } = useWaterRightsContext();
 
     const legendItems = useMemo(() => {
       if (!isNldiFilterActive) {

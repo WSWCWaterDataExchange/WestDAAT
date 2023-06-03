@@ -1,7 +1,6 @@
 import { Tab, Table, Tabs } from 'react-bootstrap';
 import { FormattedDate } from '../../FormattedDate';
-import { useContext } from 'react';
-import { SiteDetailsContext } from './Provider';
+import { useSiteDetailsContext } from './Provider';
 
 function SiteTabs() {
     const {
@@ -9,7 +8,7 @@ function SiteTabs() {
             sourceInfoListQuery: {data: sourceInfoList},
             waterRightInfoListQuery: {data: waterRightInfoList}
         }
-    } = useContext(SiteDetailsContext);
+    } = useSiteDetailsContext();
 
     const getFormattedBeneficialUses = (beneficialUses: string[]) => {
         return beneficialUses.map(use => use !== beneficialUses[beneficialUses.length - 1] ? `${use}, ` : use);

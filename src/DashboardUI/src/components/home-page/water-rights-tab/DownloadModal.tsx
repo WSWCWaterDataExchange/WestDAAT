@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import moment from 'moment';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
-import { AppContext } from '../../../contexts/AppProvider';
+import { useAppContext } from '../../../contexts/AppProvider';
 import { SignIn } from "../../SignIn";
 import { WaterRightsSearchCriteria } from '../../../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsFilters } from './Provider';
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../../../hooks/queries';
-import { HomePageContext } from '../Provider';
+import { useHomePageContext } from '../Provider';
 
 function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteria | null,
@@ -62,8 +62,8 @@ interface DownloadModalProps extends ModalProps {
 }
 function DownloadModal(props: DownloadModalProps) {
   const {filters, nldiIds} = props;
-  const { isAuthenticated } = useContext(AppContext).authenticationContext;
-  const { showDownloadModal, setShowDownloadModal } = useContext(HomePageContext);
+  const { authenticationContext: {isAuthenticated} } = useAppContext();
+  const { showDownloadModal, setShowDownloadModal } = useHomePageContext();
   
   const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);

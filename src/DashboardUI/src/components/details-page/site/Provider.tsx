@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { createContext, FC } from "react";
+import { createContext, FC, useContext } from "react";
 import { UseQueryResult } from "react-query";
 import { useSiteDetails, useWaterRightInfoList, useWaterSiteLocation, useWaterSiteSourceInfoList } from "../../../hooks/queries";
 import { Feature, GeoJsonProperties, Geometry } from "geojson";
@@ -33,7 +33,8 @@ const defaultState: SiteDetailsPageContextState = {
   },
 }
 
-export const SiteDetailsContext = createContext<SiteDetailsPageContextState>(defaultState);
+const SiteDetailsContext = createContext<SiteDetailsPageContextState>(defaultState);
+export const useSiteDetailsContext = () => useContext(SiteDetailsContext)
 
 export const SiteDetailsProvider: FC = ({ children }) => {
   const { id: siteUuid } = useParams();

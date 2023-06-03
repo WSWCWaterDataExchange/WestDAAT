@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { WaterRightsContext } from "../../Provider";
+import { useWaterRightsContext } from "../../Provider";
 import { useRiverBasinPolygons } from "../../../../../hooks/queries/useSystemQuery";
 import { useGeoJsonFilter } from "../../../../../hooks/filters/useGeoJsonFilter";
-import { MapContext } from "../../../../../contexts/MapProvider";
+import { useMapContext } from "../../../../../contexts/MapProvider";
 import { mapSourceNames } from "../../../../../config/maps";
 import { useDebounce } from "usehooks-ts";
 
@@ -12,8 +12,8 @@ const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   "features": []
 }
 export function useRiverBasinFilter() {
-  const {setGeoJsonData} = useContext(MapContext);
-  const { filters: { riverBasinNames: rbn }, setFilters } = useContext(WaterRightsContext);
+  const {setGeoJsonData} = useMapContext();
+  const { filters: { riverBasinNames: rbn }, setFilters } = useWaterRightsContext();
 
   const riverBasinNames = useMemo(() => {
     return rbn ?? [];

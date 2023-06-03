@@ -1,5 +1,5 @@
-import { useContext, useEffect } from "react";
-import { MapContext, defaultMapLocationData, defaultMapStyle } from "../../../contexts/MapProvider";
+import { useEffect } from "react";
+import { useMapContext, defaultMapLocationData, defaultMapStyle } from "../../../contexts/MapProvider";
 import { useUrlParameters } from "../../../hooks/url-parameters/useUrlParameters";
 import urlParameterKeys from "../../../hooks/url-parameters/urlParameterKeys";
 import { useFiltersUrlParameters } from "../water-rights-tab/hooks/url-parameters/useFiltersUrlParameters";
@@ -12,7 +12,7 @@ export function useMapUrlParameters() {
     setMapLocationSettings,
     setMapStyle,
     setPolylines
-  } = useContext(MapContext);
+  } = useMapContext();
   const {getParameter: getMapLocationParameter, setParameter: setMapLocationParameter} = useUrlParameters(urlParameterKeys.homePage.map, defaultMapLocationData);
   const {getParameter: getMapStyleParameter, setParameter: setMapStyleParameter} = useUrlParameters(urlParameterKeys.homePage.mapStyle, defaultMapStyle);
   const {getParameter: getFiltersUrlParameter} = useFiltersUrlParameters();

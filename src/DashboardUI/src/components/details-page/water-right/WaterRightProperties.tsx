@@ -3,11 +3,10 @@ import Domain from 'mdi-react/DomainIcon';
 import ClipBoardSearch from 'mdi-react/ClipboardSearchIcon';
 import WaterCircle from 'mdi-react/WaterCircleIcon';
 import { PropertyValue } from '../PropertyValue';
-import { useContext } from 'react';
-import { WaterRightDetailsContext } from './Provider';
+import { useWaterRightDetailsContext } from './Provider';
 
 function WaterRightProperties() {
-  const { hostData: { detailsQuery: {data: details}}} = useContext(WaterRightDetailsContext)
+  const { hostData: { detailsQuery: {data: details}}} = useWaterRightDetailsContext()
   return (
     <div>
       {details && <>

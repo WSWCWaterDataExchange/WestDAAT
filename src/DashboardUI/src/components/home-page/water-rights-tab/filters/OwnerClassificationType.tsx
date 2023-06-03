@@ -1,7 +1,7 @@
 import Select from "react-select";
 import { useOwnerClassificationsFilter } from "../hooks/filters/useOwnerClassificationsFilter";
-import { useCallback, useContext } from "react";
-import { WaterRightsContext } from "../Provider";
+import { useCallback } from "react";
+import { useWaterRightsContext } from "../Provider";
 
 export function OwnerClassificationType() {
   const {ownerClassifications, setOwnerClassifications} = useOwnerClassificationsFilter();
@@ -10,7 +10,7 @@ export function OwnerClassificationType() {
     hostData:{
       ownerClassificationsQuery: { data: allOwnerClassifications}
     }
-  } = useContext(WaterRightsContext);
+  } = useWaterRightsContext();
 
   const handleOwnerClassificationChange = useCallback((selectedOptions: string[]) => {
     setOwnerClassifications(selectedOptions.length > 0 ? selectedOptions : undefined)
