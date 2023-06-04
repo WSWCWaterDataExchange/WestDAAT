@@ -4,6 +4,7 @@ import { useMapContext } from "../../contexts/MapProvider";
 import mapboxgl from "mapbox-gl";
 import { FeatureCollection, GeoJsonProperties, Geometry, Position,  } from "geojson";
 import { mapLayerNames, mapSourceNames } from "../../config/maps";
+import { MapThemeSelector } from "../map/MapThemeSelector";
 
 interface detailsMapProps {
   isDataLoading: boolean;
@@ -61,8 +62,13 @@ function DetailsMap(props: detailsMapProps) {
   if (props.isDataLoading) return null;
 
   return (
-    <div className="map-container h-100">
-      <Map />
+    <div className="map-group h-100">
+      <div className="map-container h-100">
+        <Map />
+      </div>
+      <div className="theme-selector-container py-3">
+        <MapThemeSelector />
+      </div>
     </div>
   );
 }

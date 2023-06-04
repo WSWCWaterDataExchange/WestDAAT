@@ -1,0 +1,68 @@
+@import '../../styles/colors';
+
+.map-themes {
+  gap: 15px;
+  display: flex;
+  justify-content: space-between;
+  max-width: 375px;
+
+  > button {
+    margin: 0;
+    border-radius: 10px;
+    height: 48px;
+    width: 48px;
+    outline: 2px solid $bs-gray-200;
+    transition-property: outline-color, outline-width;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    background-clip: border-box;
+    background-size: cover;
+    background-origin: border-box;
+    background-position: center;
+    
+    &.light-v10 {
+      background-image: url('../../../public/map-themes/light.png');
+    }
+
+    &.dark-v10 {
+      background-image: url('../../../public/map-themes/dark.png');
+    }
+
+    &.streets-v11 {
+      background-image: url('../../../public/map-themes/streets.png');
+    }
+
+    &.outdoors-v11 {
+      background-image: url('../../../public/map-themes/outdoor.png');
+    }
+
+    &.satellite-v9 {
+      background-image: url('../../../public/map-themes/satelite.png');
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: 2px solid $bs-gray-200;
+      box-shadow: none;
+    }
+    
+    &.active {
+      outline-width: 0.25rem;
+      outline-color: $primary-color;
+      &:focus, &:focus:not(:focus-visible) {
+        outline: 0.25rem solid $primary-color;
+        box-shadow: none;
+      }
+    }
+    
+    
+
+    img{
+      height: 53px;
+      aspect-ratio: 1;
+      border-radius: 10px;
+    }
+  }
+  img {
+    
+  }
+}
