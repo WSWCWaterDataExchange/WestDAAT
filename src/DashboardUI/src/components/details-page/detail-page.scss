@@ -63,10 +63,24 @@
     }
   }
   
-  
-  .map-container {
-    min-height: 700px;
+  .map-group{
+    display: flex;
+    flex-direction: column;
+    
+    > .map-container {
+      flex-grow: 1;
+      min-height: 450px;
+    }
+    
+    .theme-selector-container{
+      display: flex;
+      justify-content: center;
+      .map-themes {
+        flex-grow: 1;
+      }
+    }
   }
+  
   
 }
 
