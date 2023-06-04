@@ -40,6 +40,7 @@
       background-image: url('../../../public/map-themes/satelite.png');
     }
 
+    //while they seem repetitive focus and focus-visible styles are necessary to win the war with reboot.scss
     &:focus:not(:focus-visible) {
       outline: 2px solid $bs-gray-200;
       box-shadow: none;
@@ -53,16 +54,5 @@
         box-shadow: none;
       }
     }
-    
-    
-
-    img{
-      height: 53px;
-      aspect-ratio: 1;
-      border-radius: 10px;
-    }
-  }
-  img {
-    
   }
 }
