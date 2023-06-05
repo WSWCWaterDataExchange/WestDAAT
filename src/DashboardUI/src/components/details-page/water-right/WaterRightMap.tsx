@@ -18,9 +18,8 @@ function Layout() {
   useSiteDigestMapPopup();
   useMapLegend();
 
-  return (
-    <DetailsMap isDataLoading={siteLocationsQuery.isLoading} mapData={siteLocationsQuery.data} />
-  );
+  if (siteLocationsQuery.isLoading || !siteLocationsQuery.data) return null;
+  return <DetailsMap mapData={siteLocationsQuery.data} />;
 }
 
 export default WaterRightMap;

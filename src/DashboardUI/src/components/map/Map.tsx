@@ -10,6 +10,7 @@ import { Canvg, presets } from "canvg";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomShareControl";
+import { CustomFitControl } from "./CustomFitControl";
 import ReactDOM from "react-dom";
 import { Feature, GeoJsonProperties, Geometry } from "geojson";
 
@@ -18,6 +19,7 @@ import { useDebounce } from "usehooks-ts";
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
+  handleMapFitChange?: () => void;
 }
 // Fix transpile errors. Mapbox is working on a fix for this
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -26,7 +28,7 @@ const createMapMarkerIcon = (color: string) =>{
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`
 }
 
-function Map(_props: mapProps) {
+function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   const { authenticationContext: {isAuthenticated} } = useAppContext();
   const {
     legend,
@@ -92,7 +94,7 @@ function Map(_props: mapProps) {
   }
 
   const mapboxDrawControl = (mapInstance: mapboxgl.Map) => {
-    if(!_props.handleMapDrawnPolygonChange) return;
+    if(!handleMapDrawnPolygonChange) return;
     const dc = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
@@ -104,8 +106,8 @@ function Map(_props: mapProps) {
     mapInstance.addControl(dc);
 
     const callback = () => {
-      if(_props.handleMapDrawnPolygonChange)
-        _props.handleMapDrawnPolygonChange(dc.getAll().features);
+      if(handleMapDrawnPolygonChange)
+      handleMapDrawnPolygonChange(dc.getAll().features);
     }
 
     mapInstance.on('draw.create', callback);
@@ -138,8 +140,9 @@ function Map(_props: mapProps) {
       mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
       mapInstance.zoomTo(mapSettings.zoomLevel);
 
-      mapInstance.addControl(new NavigationControl());
+      mapInstance.addControl(new NavigationControl({showCompass: false}));
 
+      if(handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
