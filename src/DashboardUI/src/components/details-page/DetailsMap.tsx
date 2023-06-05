@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Map from "../map/Map";
 import { useMapContext } from "../../contexts/MapProvider";
 import mapboxgl from "mapbox-gl";
@@ -7,8 +7,7 @@ import { mapLayerNames, mapSourceNames } from "../../config/maps";
 import { MapThemeSelector } from "../map/MapThemeSelector";
 
 interface detailsMapProps {
-  isDataLoading: boolean;
-  mapData: FeatureCollection<Geometry, GeoJsonProperties> | undefined;
+  mapData: FeatureCollection<Geometry, GeoJsonProperties>;
 }
 
 function DetailsMap(props: detailsMapProps) {
@@ -26,15 +25,13 @@ function DetailsMap(props: detailsMapProps) {
   }, [setVisibleLayers]);
 
   useEffect(() => {
-    if (props.mapData) {
-      setGeoJsonData(mapSourceNames.detailsMapGeoJson, props.mapData);
-    }
+    setGeoJsonData(mapSourceNames.detailsMapGeoJson, props.mapData);
   }, [props.mapData, setGeoJsonData]);
 
-  useEffect(() => {
+  const mapBounds = useMemo(() => {
     let positions: Position[] = [];
     
-    props.mapData?.features.forEach((x) => {
+    props.mapData.features.forEach((x) => {
       if (x.geometry.type === "Point") {
         positions.push(x.geometry.coordinates);
       } else if (x.geometry.type === "MultiPoint") {
@@ -52,19 +49,25 @@ function DetailsMap(props: detailsMapProps) {
       }
     });
 
+    return positions;
+  }, [props.mapData]);
+
+  const handleMapFitChange = useCallback(() => {
     setMapBounds({
-      LngLatBounds: positions.map((a) => new mapboxgl.LngLat(a[0], a[1])),
+      LngLatBounds: mapBounds.map((a) => new mapboxgl.LngLat(a[0], a[1])),
       maxZoom: 18,
       padding: 50,
     });
-  }, [props.mapData, setMapBounds]);
+  }, [mapBounds, setMapBounds]);
 
-  if (props.isDataLoading) return null;
+  useEffect(() => {
+    handleMapFitChange();
+  }, [handleMapFitChange]);
 
   return (
     <div className="map-group h-100">
       <div className="map-container h-100">
-        <Map />
+        <Map handleMapFitChange={handleMapFitChange} />
       </div>
       <div className="theme-selector-container py-3">
         <MapThemeSelector />

@@ -32,7 +32,8 @@ function Layout() {
   useWaterRightDigestMapPopup();
   useMapLegend();
 
-  return <DetailsMap isDataLoading={locationsQuery.isLoading} mapData={featureCollection} />
+  if (locationsQuery.isLoading || !featureCollection) return null;
+  return <DetailsMap mapData={featureCollection} />
 }
 
 export default SiteMap;
