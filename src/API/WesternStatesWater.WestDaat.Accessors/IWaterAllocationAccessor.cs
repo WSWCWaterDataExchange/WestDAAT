@@ -1,3 +1,5 @@
+using GeoJSON.Text.Feature;
+using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -6,6 +8,8 @@ namespace WesternStatesWater.WestDaat.Accessors
     public interface IWaterAllocationAccessor : IServiceContractBase
     {
         Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria accessorRequest);
+
+        Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria accessorRequest);
 
         Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
 

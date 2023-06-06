@@ -1,3 +1,4 @@
+using AutoMapper.Features;
 using CsvHelper;
 using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
@@ -53,6 +54,20 @@ namespace WesternStatesWater.WestDaat.Managers
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
             return (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+        }
+
+        public async Task<FeatureCollection> GetWaterRightsEnvelope(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        {
+            var accessorSearchRequest = MapSearchRequest(searchRequest);
+
+            var geometry = await _waterAllocationAccessor.GetWaterRightsEnvelope(accessorSearchRequest);
+            var features = new List<Feature>();
+            if (geometry != null)
+            {
+                features.Add(new Feature(geometry.AsGeoJsonGeometry()));
+            }
+
+            return new FeatureCollection(features);
         }
 
         public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)

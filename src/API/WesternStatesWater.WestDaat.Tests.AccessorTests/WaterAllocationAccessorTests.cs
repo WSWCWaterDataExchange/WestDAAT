@@ -5,6 +5,9 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.CsvModels;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -46,7 +49,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [TestMethod]
         [DataRow(new double[] { 5, 1, 9 }, new double[] { 10, 2, 0 }, 15, 12, 3)]
         [DataRow(new double[] { -1, 1, 9 }, new double[] { 10, 2, -1 }, 10, 12, 3)]
-        [DataRow(new double[] {3.5553, 2.5533, 23.1}, new double[] {1, 1, 1}, 29.2086, 3, 3)]
+        [DataRow(new double[] { 3.5553, 2.5533, 23.1 }, new double[] { 1, 1, 1 }, 29.2086, 3, 3)]
         public async Task GetAnalyticsSummary_CorrectSums(double[] flow, double[] volume, double flowSum, double volumeSum, int dataCount)
         {
             //Arrange
@@ -86,9 +89,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(4)]
-        [DataRow(1)]
-        public async Task GetAnalyticsSummary_CorrectSliceAndValues(int uniquePrimaryUseCount)
+        public async Task GetAnalyticsSummary_CorrectSliceAndValues()
         {
             //Arrange
             List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
@@ -116,7 +117,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     Flow = 5,
                     Points = 5,
                     Volume = 10,
-                }, 
+                },
                 new AnalyticsSummaryInformation
                 {
                     PrimaryUseCategoryName = "Primary Use 2",
@@ -139,6 +140,519 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        [DataRow(1, 1)]
+        [DataRow(3, 1)]
+        [DataRow(1, 3)]
+        [DataRow(3, 3)]
+        public async Task GetWaterRightsEnvelope_HasSiteGeometries(int allocationCount, int sitesPerAllocation)
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var sites = new SitesDimFaker()
+                .Generate(allocationCount * sitesPerAllocation)
+                .ToArray();
+            for (var i = 0; i < allocationCount; i++)
+            {
+                var allocations = new AllocationAmountFactFaker()
+                   .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
+                   .Generate();
+                allocationAmountFacts.Add(allocations);
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
+
+            Console.Write(results.ToString());
+
+            //Assert
+            results.Should().NotBeNull();
+            foreach (var site in sites)
+            {
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(1, 1)]
+        [DataRow(3, 1)]
+        [DataRow(1, 3)]
+        [DataRow(3, 3)]
+        public async Task GetWaterRightsEnvelope_HasSiteWithSitePoints(int allocationCount, int sitesPerAllocation)
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var sites = new SitesDimFaker()
+                .RuleFor(a => a.Geometry, () => null)
+                .RuleFor(a => a.SitePoint, () => new PointFaker().Generate())
+                .Generate(allocationCount * sitesPerAllocation)
+                .ToArray();
+            for (var i = 0; i < allocationCount; i++)
+            {
+                var allocations = new AllocationAmountFactFaker()
+                   .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
+                   .Generate();
+                allocationAmountFacts.Add(allocations);
+            }
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
+
+            Console.Write(results.ToString());
+
+            //Assert
+            results.Should().NotBeNull();
+            foreach (var site in sites)
+            {
+                results.Covers(site.SitePoint).Should().BeTrue();
+            }
+        }
+
+        [TestMethod]
+        public async Task GetWaterRightsEnvelope_NoSites()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var allocations = new AllocationAmountFactFaker()
+                   .Generate();
+            allocationAmountFacts.Add(allocations);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetWaterRightsEnvelope_HasSiteWithoutGeometries()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var site = new SitesDimFaker()
+                .RuleFor(a => a.Geometry, () => null)
+                .RuleFor(a => a.SitePoint, () => null)
+                .Generate();
+            var allocations = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .Generate();
+            allocationAmountFacts.Add(allocations);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetWaterRightsEnvelope_HasSiteWithMultiPolygon()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var site = new SitesDimFaker()
+                .RuleFor(a => a.Geometry, () => new MultiPolygonFaker().Generate())
+                .Generate();
+            var allocations = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .Generate();
+            allocationAmountFacts.Add(allocations);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
+
+            //Assert
+            results.Should().NotBeNull();
+            results.Covers(site.Geometry).Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public async Task GetWaterRightsEnvelope_Criteria_AllocationOwner(bool matches)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationOwner, f => f.Person.FullName)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+            allocation.AllocationOwner.Should().NotBeNullOrEmpty("Validate Faker Setup Component Correctly");
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                AllocationOwner = matches ? allocation.AllocationOwner : "doesn't match"
+            });
+
+            //Assert
+            if (matches)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow("test", new string[0], true)]
+        [DataRow("test", new string[] { "test" }, true)]
+        [DataRow("test", new string[] { "test", "another" }, true)]
+        [DataRow("test", new string[] { "another", "test" }, true)]
+        [DataRow("test", new string[] { "another" }, false)]
+        public async Task GetWaterRightsEnvelope_Criteria_BeneficialUses(string allocationBeneficialUse, string[] criteriaBeneficialUses, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, f => allocationBeneficialUse)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                BeneficialUses = criteriaBeneficialUses
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(null, null, true)]
+        [DataRow(null, false, true)]
+        [DataRow(null, true, false)]
+        [DataRow(false, null, true)]
+        [DataRow(false, false, true)]
+        [DataRow(false, true, false)]
+        [DataRow(true, null, true)]
+        [DataRow(true, false, false)]
+        [DataRow(true, true, true)]
+        public async Task GetWaterRightsEnvelope_Criteria_ExemptOfVolumeFlowPriority(bool? allocationExempt, bool? criteriaExempt, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.ExemptOfVolumeFlowPriority, f => allocationExempt)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                ExemptOfVolumeFlowPriority = criteriaExempt
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(null, null, true)]
+        [DataRow(null, 1.0, false)]
+        [DataRow(1.0, null, true)]
+        [DataRow(1.0, 0.9, true)]
+        [DataRow(1.0, 1.0, true)]
+        [DataRow(1.0, 1.1, false)]
+        public async Task GetWaterRightsEnvelope_Criteria_MinimumFlow(double? allocationFlow, double? criteriaMinimumFlow, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationFlow_CFS, f => allocationFlow)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                MinimumFlow = criteriaMinimumFlow
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(null, null, true)]
+        [DataRow(null, 1.0, false)]
+        [DataRow(1.0, null, true)]
+        [DataRow(1.0, 0.9, false)]
+        [DataRow(1.0, 1.0, true)]
+        [DataRow(1.0, 1.1, true)]
+        public async Task GetWaterRightsEnvelope_Criteria_MaximumFlow(double? allocationFlow, double? criteriaMaximumFlow, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationFlow_CFS, f => allocationFlow)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                MaximumFlow = criteriaMaximumFlow
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(null, null, true)]
+        [DataRow(null, 1.0, false)]
+        [DataRow(1.0, null, true)]
+        [DataRow(1.0, 0.9, true)]
+        [DataRow(1.0, 1.0, true)]
+        [DataRow(1.0, 1.1, false)]
+        public async Task GetWaterRightsEnvelope_Criteria_MinimumVolume(double? allocationVolume, double? criteriaMinimumVolume, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationVolume_AF, f => allocationVolume)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                MinimumVolume = criteriaMinimumVolume
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(null, null, true)]
+        [DataRow(null, 1.0, false)]
+        [DataRow(1.0, null, true)]
+        [DataRow(1.0, 0.9, false)]
+        [DataRow(1.0, 1.0, true)]
+        [DataRow(1.0, 1.1, true)]
+        public async Task GetWaterRightsEnvelope_Criteria_MaximumVolume(double? allocationVolume, double? criteriaMaximumVolume, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationVolume_AF, f => allocationVolume)
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                MaximumVolume = criteriaMaximumVolume
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
+        }
+
+        [TestMethod]
+        [DataRow("uuid1", new string[0], true)]
+        [DataRow("uuid1", new string[] { "uuid1" }, true)]
+        [DataRow("uuid1", new string[] { "uuid1", "uuid2" }, true)]
+        [DataRow("uuid1", new string[] { "uuid2", "uuid1" }, true)]
+        [DataRow("uuid1", new string[] { "uuid2" }, false)]
+        public async Task GetWaterRightsEnvelope_Criteria_WadeSitesUuids(string allocationSiteUuid, string[] criteriaSiteUuid, bool shouldMatch)
+        {
+            //Arrange
+            var site = new SitesDimFaker()
+                .RuleFor(a => a.SiteUuid, () => allocationSiteUuid)
+                .Generate();
+            var allocation = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .Generate();
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                db.AllocationAmountsFact.Add(allocation);
+                db.SaveChanges();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria
+            {
+                WadeSitesUuids = criteriaSiteUuid
+            });
+
+            //Assert
+            if (shouldMatch)
+            {
+                results.Should().NotBeNull();
+                results.Covers(site.Geometry).Should().BeTrue();
+            }
+            else
+            {
+                results.Should().BeNull();
+            }
         }
 
         [TestMethod]
@@ -210,7 +724,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } });
 
             //Assert
-            foreach(var res in result.WaterRightsDetails)
+            foreach (var res in result.WaterRightsDetails)
             {
                 res.AllocationPriorityDate.Should().BeNull();
             }
@@ -425,7 +939,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.AllocationAmountsFact.AddRange(allocationAmounts);
             db.SaveChanges();
 
-            for (var i = 0; i< sites.Count; i++)
+            for (var i = 0; i < sites.Count; i++)
             {
                 var allocationSiteBridge = new AllocationBridgeSiteFactFaker()
                     .AllocationBridgeSiteFactFakerWithIds(allocationAmounts[i].AllocationAmountId, sites[i].SiteId)
@@ -457,7 +971,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var idList = new List<string>();
 
-            for(var i = 0; i<randomBetween1And100; i++)
+            for (var i = 0; i < randomBetween1And100; i++)
             {
                 idList.Add(Guid.NewGuid().ToString());
             }
@@ -1107,11 +1621,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(searchCriteria);
 
             result.WaterRightsDetails.Should().NotBeNull();
-            if(shouldReturn)
+            if (shouldReturn)
             {
                 result.WaterRightsDetails.Should().HaveCount(1);
                 result.WaterRightsDetails[0].AllocationUuid.Should().Be(dbAllocationAmount.AllocationUuid);
-            } 
+            }
             else
             {
                 result.WaterRightsDetails.Should().BeEmpty();
@@ -1593,7 +2107,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             // Act
             var accessor = CreateWaterAllocationAccessor();
-           var result = await accessor.GetWaterRightDetailsById("1234");
+            var result = await accessor.GetWaterRightDetailsById("1234");
 
             // Assert
             result.Should().BeNull();
@@ -2058,7 +2572,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 ApplicableResourceTypeCv = method.ApplicableResourceTypeCv,
                 DataConfidenceValue = method.DataConfidenceValue,
-                DataCoverageValue  = method.DataCoverageValue,
+                DataCoverageValue = method.DataCoverageValue,
                 DataQualityValueCv = method.DataQualityValueCv,
                 MethodDescription = method.MethodDescription,
                 MethodName = method.MethodName,
@@ -2136,7 +2650,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Act
             var searCriteria = new WaterRightsSearchCriteria
             {
-                States = new string [] { }
+                States = new string[] { }
             };
 
             var accessor = CreateWaterAllocationAccessor();
@@ -2178,8 +2692,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var allocationAmount = new AllocationAmountFactFaker()
                 .Generate(100);
-            
-            for(var i = 0; i< allocationAmount.Count; i++)
+
+            for (var i = 0; i < allocationAmount.Count; i++)
             {
                 if (i % 2 == 0)
                 {

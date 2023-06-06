@@ -101,6 +101,21 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return new OkObjectResult(result);
         }
 
+        [FunctionName(nameof(GetWaterRightsEnvelope)), AllowAnonymous]
+        public async Task<IActionResult> GetWaterRightsEnvelope([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/DataEnvelope")] HttpRequest request)
+        {
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+
+            var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
+
+            return new OkObjectResult(result);
+        }
+
         // Site Routes
         [FunctionName(nameof(GetWaterAllocationSiteDetails)), AllowAnonymous]
         public async Task<IActionResult> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequest request, string siteUuid)
@@ -178,7 +193,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
             }
-            catch(WestDaatException)
+            catch (WestDaatException)
             {
                 response.StatusCode = StatusCodes.Status413PayloadTooLarge;
             }

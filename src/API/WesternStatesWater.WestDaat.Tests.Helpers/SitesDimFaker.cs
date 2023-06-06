@@ -1,6 +1,6 @@
-﻿using NetTopologySuite.Geometries;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {
@@ -21,7 +21,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.GniscodeCvNavigation, b => new GnisfeatureNameFaker().Generate())
                 .RuleFor(a => a.PODorPOUSite, b => b.Random.String(3, 'A', 'z'))
                 .RuleFor(a => a.SiteNativeId, b => b.Random.String(5, 'A', 'z'))
-                .RuleFor(a => a.Geometry, b => new NetTopologySuite.Geometries.Point(new Coordinate(b.Random.Double(-180, 180), b.Random.Double(-90, 90))));
+                .RuleFor(a => a.Geometry, b => new PolygonFaker().Generate());
         }
     }
 

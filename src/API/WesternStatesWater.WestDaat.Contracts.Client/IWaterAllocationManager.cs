@@ -8,8 +8,10 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
     {
         Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
 
+        Task<FeatureCollection> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchRequest);
+
         Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchRequest);
-        
+
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
         Task<WaterRightDetails> GetWaterRightDetails(string allocationUuid);

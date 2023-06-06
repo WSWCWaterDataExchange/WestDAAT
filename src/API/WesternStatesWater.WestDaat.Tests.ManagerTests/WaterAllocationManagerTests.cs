@@ -13,6 +13,7 @@ using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 using System.IO;
 using Ionic.Zip;
 using System.Globalization;
+using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -120,6 +121,28 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public async Task GetWaterRightsEnvelope_ResultsReturned(bool hasResults)
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsEnvelope(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(hasResults ? new PolygonFaker().Generate() : null)
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightsEnvelope(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Features.Should().HaveCount(hasResults ? 1 : 0);
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
         public async Task FindWaterRights_ResultsReturned()
         {
             //Arrange
@@ -203,7 +226,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var searchCriteria = new WaterRightsSearchCriteria
             {
                 PageNumber = 0,
-                FilterGeometry = new string[] 
+                FilterGeometry = new string[]
                 {
                     "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}",
                     "{\"coordinates\":[[[-99.88974043488068,42.5970189859552],[-99.89330729367737,42.553083043677304],[-99.78662578967582,42.547588874524024],[-99.78143763142621,42.59487066530488],[-99.88974043488068,42.5970189859552]]],\"type\":\"Polygon\"}"
@@ -334,7 +357,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem>{ }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem> { }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSiteInfoList("99");
@@ -346,7 +369,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem>{ }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem> { }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSourceInfoList("99");
@@ -669,7 +692,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
                 foreach (var zipFile in zip)
                 {
-                    if(zipFile.FileName != "citation.txt")
+                    if (zipFile.FileName != "citation.txt")
                     {
                         switch (zipFile.FileName)
                         {
