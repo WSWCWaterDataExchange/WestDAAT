@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import Map from "../map/Map";
 import { useMapContext } from "../../contexts/MapProvider";
-import mapboxgl from "mapbox-gl";
-import { FeatureCollection, GeoJsonProperties, Geometry, Position,  } from "geojson";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { mapLayerNames, mapSourceNames } from "../../config/maps";
 import { MapThemeSelector } from "../map/MapThemeSelector";
 import { getLatsLongsFromFeatureCollection } from "../../utilities/geometryHelpers";
