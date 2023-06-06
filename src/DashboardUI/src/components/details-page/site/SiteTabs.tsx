@@ -4,6 +4,8 @@ import { useSiteDetailsContext } from './Provider';
 
 function SiteTabs() {
     const {
+        activeTab,
+        setActiveTab,
         hostData: {
             sourceInfoListQuery: {data: sourceInfoList},
             waterRightInfoListQuery: {data: waterRightInfoList}
@@ -16,7 +18,7 @@ function SiteTabs() {
 
     return (
         <>
-            <Tabs defaultActiveKey="source" className="mb-3 custom-tabs">
+            <Tabs onSelect={a=>setActiveTab(a === 'right' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs">
                 <Tab eventKey="source" title="Water Source Information">
                     <Table hover>
                         <thead>
