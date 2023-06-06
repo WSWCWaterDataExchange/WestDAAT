@@ -146,7 +146,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         public async Task FindWaterRights_ResultsReturned()
         {
             //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -160,7 +160,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
             };
@@ -175,41 +175,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(WestDaatException))]
-        public async Task FindWaterRights_PageNumberRequired()
-        {
-            //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
-                {
-                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
-                    {
-                        new CommonContracts.WaterRightsSearchDetail
-                        {
-                            AllocationUuid = "abc123"
-                        }
-                    }
-                })
-                .Verifiable();
-
-            var searchCriteria = new WaterRightsSearchCriteria();
-
-            //Act
-            var manager = CreateWaterAllocationManager();
-            var result = await manager.FindWaterRights(searchCriteria);
-
-            //Assert
-            _waterAllocationAccessorMock.Verify();
-        }
-
-        [TestMethod]
         public async Task FindWaterRights_SearchByGeometry_GeoJsonConvertedToGeometry()
         {
             //Arrange
             Geometry[] actualFilterGeometryParam = null;
 
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x, int pageNumber) => actualFilterGeometryParam = x.FilterGeometry)
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -223,7 +195,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
                 FilterGeometry = new string[]
@@ -256,8 +228,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             //Arrange
             Geometry[] actualFilterGeometryParam = null;
 
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x, int pageNumber) => actualFilterGeometryParam = x.FilterGeometry)
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -277,7 +249,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var expectedFilterGeometryParam = GeometryHelpers.GetGeometryByFeatures(new List<Feature> { ColoradoRiverBasin.Feature });
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
                 RiverBasinNames = new[] { ColoradoRiverBasin.BasinName }
@@ -448,7 +420,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [DataRow(450000)]
         public async Task WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
         {
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -470,7 +442,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
+            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteriaWithFilterUrl>()));
 
             // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
@@ -511,7 +483,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -571,7 +543,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -674,7 +646,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };

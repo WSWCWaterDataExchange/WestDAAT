@@ -70,15 +70,11 @@ namespace WesternStatesWater.WestDaat.Managers
             return new FeatureCollection(features);
         }
 
-        public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteriaWithPaging searchRequest)
         {
-            if (searchRequest.PageNumber == null)
-            {
-                throw new WestDaatException($"Required value PageNumber was not found");
-            }
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest)).Map<ClientContracts.WaterRightsSearchResults>();
+            return (await _waterAllocationAccessor.FindWaterRights(accessorSearchRequest, searchRequest.PageNumber)).Map<ClientContracts.WaterRightsSearchResults>();
         }
 
         private WaterRightsSearchCriteria MapSearchRequest(ClientContracts.WaterRightsSearchCriteria searchRequest)
@@ -197,7 +193,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
 
-        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteriaWithFilterUrl searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 

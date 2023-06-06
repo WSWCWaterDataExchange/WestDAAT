@@ -77,7 +77,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .SelectMany(a => a.AllocationBridgeSitesFact.Select(b => b.SiteId))
                 .CreateDbCommand();
 
-            var sqlCommandText = "select geometry::EnvelopeAggregate(coalesce(geometry, sitepoint)).ToString() Geometry " +
+            siteIdsCommand.CommandText = "select geometry::EnvelopeAggregate(coalesce(geometry, sitepoint)).ToString() Geometry " +
                                 "from core.Sites_Dim sdf " +
                                 $"where sdf.SiteId in ({siteIdsCommand.CommandText})";
 
@@ -87,15 +87,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 parameters[i] = siteIdsCommand.Parameters[i];
             }
 
-            //Can't use FirstOrDefaultAsync here because it errors with an invalid column name error.  Get the array then first or default.
-            var geometry = (await db.Database.SqlQueryRaw<string>(sqlCommandText, parameters).ToArrayAsync()).FirstOrDefault();
+            var geometry = (await siteIdsCommand.ExecuteScalarAsync()) as string;
 
             ts.Complete();
 
             return GeometryHelpers.GetGeometryByWkt(geometry);
         }
 
-        public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria)
+        public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria, int pageNumber)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             using var db = _databaseContextFactory.Create();
@@ -109,7 +108,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Where(predicate)
                 .OrderBy(x => x.AllocationPriorityDateNavigation.Date)
                 .ThenBy(x => x.AllocationUuid)
-                .Skip(searchCriteria.PageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
+                .Skip(pageNumber * _performanceConfiguration.WaterRightsSearchPageSize)
                 .Take(_performanceConfiguration.WaterRightsSearchPageSize + 1)
                 .ProjectTo<WaterRightsSearchDetail>(DtoMapper.Configuration)
                 .ToArrayAsync();
@@ -118,7 +117,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return new WaterRightsSearchResults
             {
-                CurrentPageNumber = searchCriteria.PageNumber,
+                CurrentPageNumber = pageNumber,
                 HasMoreResults = waterRightDetails.Length > _performanceConfiguration.WaterRightsSearchPageSize,
                 WaterRightsDetails = waterRightDetails.Take(_performanceConfiguration.WaterRightsSearchPageSize).ToArray()
             };

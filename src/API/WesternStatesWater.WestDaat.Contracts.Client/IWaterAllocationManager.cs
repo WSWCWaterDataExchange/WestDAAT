@@ -10,7 +10,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<FeatureCollection> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchRequest);
 
-        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchRequest);
+        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteriaWithPaging searchRequest);
 
         Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
 
@@ -36,6 +36,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
 
-        Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteria searchRequest);
+        Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteriaWithFilterUrl searchRequest);
     }
 }

@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithPaging>(requestBody);
 
             var result = await _waterAllocationManager.FindWaterRights(searchRequest);
 
@@ -183,7 +183,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             using var streamReader = new StreamReader(request.Body);
             var requestBody = await streamReader.ReadToEndAsync();
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithFilterUrl>(requestBody);
 
             var response = request.HttpContext.Response;
             response.Headers.Add("Content-Type", "application/octet-stream");

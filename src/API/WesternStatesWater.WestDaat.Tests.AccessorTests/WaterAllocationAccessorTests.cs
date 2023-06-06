@@ -686,12 +686,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             for (var i = 0; i < numberOfPages; i++)
             {
-                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
-                {
-                    PageNumber = i
-                };
+                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria();
 
-                results.Add(await accessor.FindWaterRights(searchCriteria));
+                results.Add(await accessor.FindWaterRights(searchCriteria, i));
             }
 
             var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
@@ -721,7 +718,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } });
+            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } }, 0);
 
             //Assert
             foreach (var res in result.WaterRightsDetails)
@@ -747,7 +744,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } });
+            var result = await accessor.FindWaterRights(new WaterRightsSearchCriteria { States = new string[] { } }, 0);
 
             //Assert
             foreach (var res in result.WaterRightsDetails)
@@ -781,12 +778,9 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             for (var i = 0; i < 5; i++)
             {
-                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria
-                {
-                    PageNumber = i
-                };
+                var searchCriteria = new CommonContracts.WaterRightsSearchCriteria();
 
-                results.Add(await accessor.FindWaterRights(searchCriteria));
+                results.Add(await accessor.FindWaterRights(searchCriteria, i));
             }
 
             var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
@@ -837,14 +831,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var searchCriteria = new WaterRightsSearchCriteria
             {
-                PageNumber = 2,
                 BeneficialUses = new[] { "beneficialUseWadeName" }
             };
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 2);
 
             var expectedResults = DtoMapper.Map<List<WaterRightsSearchDetail>>(orderedAllocationAmountsFacts);
 
@@ -902,7 +895,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
@@ -955,7 +948,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(ids.Length);
@@ -1026,7 +1019,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(ids.Length);
@@ -1065,7 +1058,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
@@ -1101,7 +1094,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
@@ -1169,7 +1162,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             expectedResults.Count.Should().Be(expectedResultCount);
@@ -1225,7 +1218,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.WaterRightsDetails.Count().Should().Be(1);
@@ -1299,7 +1292,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             expectedResults.Count.Should().Be(expectedResultCount);
@@ -1381,7 +1374,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1425,7 +1418,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().HaveCount(1);
             result.WaterRightsDetails[0].AllocationUuid.Should().Be(matchedAllocationAmount.AllocationUuid);
@@ -1463,7 +1456,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().HaveCount(1);
             result.WaterRightsDetails[0].AllocationUuid.Should().NotBeNull();
@@ -1496,7 +1489,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().HaveCount(2);
             result.WaterRightsDetails.First(x => x.AllocationUuid == matchedAllocationAmountWithWadeName.AllocationUuid)
@@ -1538,7 +1531,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1579,7 +1572,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1618,7 +1611,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             if (shouldReturn)
@@ -1682,7 +1675,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1742,7 +1735,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1791,7 +1784,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1856,7 +1849,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             result.WaterRightsDetails.Should().NotBeNull();
             result.WaterRightsDetails.Should().HaveCount(expectedResultCount);
@@ -1921,7 +1914,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.Should().NotBeNull();
@@ -1989,7 +1982,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.FindWaterRights(searchCriteria);
+            var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
             result.Should().NotBeNull();

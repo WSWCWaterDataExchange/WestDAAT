@@ -11,7 +11,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria accessorRequest);
 
-        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
+        Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria accessorSearchRequest, int pageNumber);
 
         Organization GetWaterAllocationAmountOrganizationById(long allocationAmountId);
 
