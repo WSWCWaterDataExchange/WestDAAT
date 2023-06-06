@@ -10,11 +10,15 @@ import {
   getWaterRightDataEnvelope
 } from '../../accessors/waterAllocationAccessor';
 import { WaterRightsSearchCriteria, WaterRightsSearchCriteriaWithFilterUrl, WaterRightsSearchCriteriaWithPaging } from '../../data-contracts/WaterRightsSearchCriteria';
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import { UseQueryOptionsParameter } from '../../HelperTypes';
+import { SiteInfoListItem } from '../../data-contracts/SiteInfoListItem';
+import { WaterSourceInfoListItem } from '../../data-contracts/WaterSourceInfoListItem';
 
-export function useWaterRightDetails(allocationUuid: string) {
+export function useWaterRightDetails(allocationUuid: string | undefined) {
   return useQuery(
     ['waterRight.Details', allocationUuid],
-    async () => await getWaterRightDetails(allocationUuid),
+    async () => await getWaterRightDetails(allocationUuid!),
     {
       enabled: !!allocationUuid,
     }
@@ -54,30 +58,36 @@ export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteriaWith
   );
 }
 
-export function useWaterRightSiteInfoList(waterRightId: string) {
+type WaterRightSiteInfoListOptionsType = UseQueryOptionsParameter<undefined, SiteInfoListItem[]>
+export function useWaterRightSiteInfoList(waterRightId: string | undefined, options?: WaterRightSiteInfoListOptionsType) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!waterRightId
+  }
   return useQuery(
     ['waterRight.SiteInfoList', waterRightId],
-    async () => await getWaterRightSiteInfoList(waterRightId),
-    {
-      enabled: !!waterRightId,
-    }
+    async () => await getWaterRightSiteInfoList(waterRightId!),
+    setOptions
   );
 }
 
-export function useWaterRightSourceInfoList(allocationUuid: string) {
+type WaterRightSourceInfoListOptionsType = UseQueryOptionsParameter<undefined, WaterSourceInfoListItem[]>
+export function useWaterRightSourceInfoList(allocationUuid: string | undefined, options?: WaterRightSourceInfoListOptionsType) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!allocationUuid
+  }
   return useQuery(
     ['waterRight.SourceInfoList', allocationUuid],
-    async () => await getWaterRightSourceInfoList(allocationUuid),
-    {
-      enabled: !!allocationUuid,
-    }
+    async () => await getWaterRightSourceInfoList(allocationUuid!),
+    setOptions
   );
 }
 
-export function useWaterRightSiteLocations(allocationUuid: string) {
+export function useWaterRightSiteLocations(allocationUuid: string | undefined) {
   return useQuery(
     ['waterRight.SiteLocations', allocationUuid],
-    async () => await getWaterRightSiteLocations(allocationUuid),
+    async () => await getWaterRightSiteLocations(allocationUuid!),
     {
       enabled: !!allocationUuid,
     }

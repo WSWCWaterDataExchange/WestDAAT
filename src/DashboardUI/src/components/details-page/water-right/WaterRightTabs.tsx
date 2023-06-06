@@ -8,6 +8,8 @@ export enum WaterRightTab {
 
 function WaterRightTabs() {
   const {
+    activeTab,
+    setActiveTab,
     hostData:{
       siteInfoListQuery: {data: siteInfoList},
       sourceInfoListQuery: {data: sourceInfoList}
@@ -16,7 +18,7 @@ function WaterRightTabs() {
 
   return (
     <>
-      <Tabs defaultActiveKey="site" className="mb-3 custom-tabs">
+      <Tabs onSelect={a=>setActiveTab(a === 'site' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs">
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>
