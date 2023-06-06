@@ -1,61 +1,36 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, ProgressBar, Table } from "react-bootstrap";
-import { WaterRightsSearchCriteria } from "../../../data-contracts/WaterRightsSearchCriteria";
 import { WaterRightsSearchResults } from "../../../data-contracts/WaterRightsSearchResults";
 import { FormattedDate } from "../../FormattedDate";
-import { useWaterRightsContext } from "./Provider";
-import moment from "moment";
 import { useFindWaterRights } from "../../../hooks/queries/useWaterRightQuery";
+import { useWaterRightsSearchCriteria } from "./hooks/useWaterRightsSearchCriteria";
 
 function AnalyticsDataTable() {
     const _defaultResults = useMemo(() => ({ currentPageNumber: 0, hasMoreResults: false, waterRightsDetails: [] }), []);
 
     const [hasMoreResults, setHasMoreResults] = useState(false);
-    const [searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
     const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
+    const [pageNumber, setPageNumber] = useState(0);
 
-    const { filters, nldiIds } = useWaterRightsContext();
+    const {searchCriteria} = useWaterRightsSearchCriteria();
 
-    const handleFiltersChange = useCallback(() => {
+    useEffect(() =>{
+        setPageNumber(0);
         setWaterRightsSearchResults(_defaultResults);
-        setSearchCriteria({
-            pageNumber: 0,
-            beneficialUses: filters.beneficialUseNames,
-            filterGeometry: filters.polylines?.map(p => JSON.stringify(p.geometry)),
-            exemptofVolumeFlowPriority: filters.includeExempt,
-            minimumFlow: filters.minFlow,
-            maximumFlow: filters.maxFlow,
-            minimumVolume: filters.minVolume,
-            maximumVolume: filters.maxVolume,
-            podOrPou: filters.podPou,
-            minimumPriorityDate: filters.minPriorityDate ? moment.unix(filters.minPriorityDate).toDate() : undefined,
-            maximumPriorityDate: filters.maxPriorityDate ? moment.unix(filters.maxPriorityDate).toDate() : undefined,
-            ownerClassifications: filters.ownerClassifications,
-            waterSourceTypes: filters.waterSourceTypes,
-            riverBasinNames: filters.riverBasinNames,
-            allocationOwner: filters.allocationOwner,
-            states: filters.states,
-            wadeSitesUuids: nldiIds
-        });
-    }, [_defaultResults, filters.allocationOwner, filters.beneficialUseNames, filters.includeExempt, 
-        filters.maxFlow, filters.maxPriorityDate, filters.maxVolume, filters.minFlow, filters.minPriorityDate, 
-        filters.minVolume, filters.ownerClassifications, filters.podPou, filters.polylines, filters.riverBasinNames, 
-        filters.states, filters.waterSourceTypes, 
-        nldiIds]); //there are properties on the filters object that need to be ignored, so the properties to subscribe to must be explicitly listed
+    }, [searchCriteria, _defaultResults]);
 
-    const handleLoadMoreResults = () => {
-        if (waterRightsSearchResults.waterRightsDetails.length === 0) return;
-        setSearchCriteria({ ...searchCriteria, pageNumber: waterRightsSearchResults.currentPageNumber + 1 })
-    }
+    const handleLoadMoreResults = useCallback(() => {
+        setPageNumber(s=>s+1);
+    }, [setPageNumber]);
 
-    const { data: latestSearchResults, isFetching: isFetchingTableData } = useFindWaterRights(searchCriteria)
+    const searchCriteriaWithPaging = useMemo(() =>{
+      return {
+        ...searchCriteria,
+        pageNumber
+      }
+    }, [pageNumber, searchCriteria])
 
-    useEffect(() => {
-        handleFiltersChange();
-    }, [filters.allocationOwner, filters.beneficialUseNames, filters.includeExempt, filters.maxFlow, filters.maxPriorityDate, 
-        filters.maxVolume, filters.minFlow, filters.minPriorityDate, filters.minVolume, filters.ownerClassifications, 
-        filters.podPou, filters.polylines, filters.riverBasinNames, filters.states, filters.waterSourceTypes, 
-        handleFiltersChange]);
+    const { data: latestSearchResults, isFetching: isFetchingTableData } = useFindWaterRights(searchCriteriaWithPaging)
 
     useEffect(() => {
         if (!latestSearchResults) return;

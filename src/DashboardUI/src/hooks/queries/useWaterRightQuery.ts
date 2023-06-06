@@ -6,9 +6,10 @@ import {
   getWaterRightSiteLocations,
   findWaterRight,
   getWaterRightAnalyticsSummaryInfo,
-  downloadWaterRights
+  downloadWaterRights,
+  getWaterRightDataEnvelope
 } from '../../accessors/waterAllocationAccessor';
-import { WaterRightsSearchCriteria } from '../../data-contracts/WaterRightsSearchCriteria';
+import { WaterRightsSearchCriteria, WaterRightsSearchCriteriaWithFilterUrl, WaterRightsSearchCriteriaWithPaging } from '../../data-contracts/WaterRightsSearchCriteria';
 
 export function useWaterRightDetails(allocationUuid: string) {
   return useQuery(
@@ -30,7 +31,17 @@ export function useGetAnalyticsSummaryInfo(searchCriteria: WaterRightsSearchCrit
   );
 }
 
-export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteria | null) {
+export function useGetWaterRightDataEnvelope(searchCriteria: WaterRightsSearchCriteria | null) {
+  return useQuery(
+    ['waterRight.DataEnvelope', searchCriteria],
+    async () => await getWaterRightDataEnvelope(searchCriteria!),
+    {
+      enabled: searchCriteria !== null
+    }
+  );
+}
+
+export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteriaWithPaging | null) {
   return useQuery(
     ['waterRight.Find', searchCriteria],
     async () => await findWaterRight(searchCriteria!),
@@ -70,7 +81,7 @@ export function useWaterRightSiteLocations(allocationUuid: string) {
   );
 }
 
-export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteria | null) {
+export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null) {
   return useQuery(
     ['waterRight.Download', searchCriteria],
     async () => await downloadWaterRights(searchCriteria!),

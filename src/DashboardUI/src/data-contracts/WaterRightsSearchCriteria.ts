@@ -1,5 +1,4 @@
 export interface WaterRightsSearchCriteria {
-  pageNumber?: number;
   beneficialUses?: string[];
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
@@ -16,5 +15,12 @@ export interface WaterRightsSearchCriteria {
   podOrPou?: string;
   minimumPriorityDate?: Date;
   maximumPriorityDate?: Date;
-  filterUrl?: string;
+}
+
+export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCriteria {
+  pageNumber: number;
+}
+
+export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearchCriteria {
+  filterUrl: string;
 }
