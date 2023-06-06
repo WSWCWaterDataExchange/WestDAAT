@@ -3,7 +3,7 @@ import useSiteClickedOnMap from "./useSiteClickedOnMap";
 import ErrorCard from "../../components/map-popups/ErrorCard";
 import LoadingCard from "../../components/map-popups/LoadingCard";
 import SiteDigestCard from "../../components/map-popups/SiteDigestCard";
-import { useSiteDigest } from "../useSiteQuery";
+import { useSiteDigest } from "../queries";
 
 function useSiteDigestMapPopup() {
   //Because of how we are rendering the water rights to the UI, we cannot manage state inside of the components like WaterRightsDigestCard.  State has to be managed here.

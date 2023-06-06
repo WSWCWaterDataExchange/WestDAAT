@@ -6,8 +6,9 @@ import {
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
-import { WaterRightsSearchCriteria } from '../data-contracts/WaterRightsSearchCriteria';
+import { WaterRightsSearchCriteria, WaterRightsSearchCriteriaWithFilterUrl, WaterRightsSearchCriteriaWithPaging } from '../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
+import { FeatureCollection } from 'geojson';
 
 export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
@@ -21,7 +22,12 @@ export const getWaterRightAnalyticsSummaryInfo = async (searchCriteria: WaterRig
   return data;
 };
 
-export const findWaterRight = async (searchCriteria: WaterRightsSearchCriteria) => {
+export const getWaterRightDataEnvelope = async (searchCriteria: WaterRightsSearchCriteria) => {
+  const { data } = await axios.post<FeatureCollection>(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/DataEnvelope`, searchCriteria);
+  return data;
+};
+
+export const findWaterRight = async (searchCriteria: WaterRightsSearchCriteriaWithPaging) => {
   const { data } = await axios.post<WaterRightsSearchResults>(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/find`, searchCriteria);
   return data;
 };
@@ -49,7 +55,7 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
   return data;
 };
 
-export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCriteria) => {
+export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCriteriaWithFilterUrl) => {
 
   // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests
   //https://stackoverflow.com/questions/70969837/how-to-download-zip-file-that-i-recieve-from-a-http-response-axios-put-request#:~:text=0,fetch%20over%20axios

@@ -1,19 +1,21 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Form, InputGroup } from "react-bootstrap";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { Form, FormControlProps, InputGroup } from "react-bootstrap";
 
+type ControlProps = Omit<FormControlProps, 'onChange' | 'type' | 'value' | 'max' | 'step'>
 export interface NumericRangeProps {
   initialMin: number | undefined,
   initialMax: number | undefined,
   units: string,
-  placeholderText: string,
   precision: number,
   onChange: (min: number | undefined, max: number | undefined) => void;
+  minControlProps?: ControlProps
+  maxControlProps?: ControlProps
 }
 function NumericRange(props: NumericRangeProps) {
-  const [minValue, setMinValue] = useState(props.initialMin);
-  const [maxValue, setMaxValue] = useState(props.initialMax);
+  const { initialMin, initialMax, units, precision, onChange, minControlProps, maxControlProps } = props;
 
-  const { onChange } = props;
+  const [minValue, setMinValue] = useState(initialMin);
+  const [maxValue, setMaxValue] = useState(initialMax);
 
   const parseValue = (val: string): number | undefined => {
     let value: number | undefined = parseFloat(val);
@@ -33,22 +35,22 @@ function NumericRange(props: NumericRangeProps) {
   }, [minValue, maxValue, onChange]);
 
   useEffect(() => {
-    setMinValue(props.initialMin);
-  }, [props.initialMin, setMinValue]);
+    setMinValue(initialMin);
+  }, [initialMin, setMinValue]);
 
   useEffect(() => {
-    setMaxValue(props.initialMax);
-  }, [props.initialMax, setMaxValue]);
+    setMaxValue(initialMax);
+  }, [initialMax, setMaxValue]);
 
-  const step = 1 / (10 ** props.precision);
+  const step = useMemo(() => 1 / (10 ** precision), [precision]);
 
   return (
     <InputGroup className="mb-3">
-      <Form.Control min={0 - step} type="number" value={minValue ?? ""} step={step} placeholder={`Min ${props.placeholderText}`} aria-label={`Minimum ${props.placeholderText}`} onChange={handleMinChange} />
-      {props.units && <InputGroup.Text>{props.units}</InputGroup.Text>}
+      <Form.Control {...minControlProps} min={0 - step} type="number" value={minValue ?? ""} step={step} onChange={handleMinChange} />
+      {units && <InputGroup.Text>{units}</InputGroup.Text>}
       <InputGroup.Text className="px-2">to</InputGroup.Text>
-      <Form.Control min={0 - step} type="number" value={maxValue ?? ""} step={step} placeholder={`Max ${props.placeholderText}`} aria-label={`Maximum ${props.placeholderText}`} onChange={handleMaxChange} />
-      {props.units && <InputGroup.Text>{props.units}</InputGroup.Text>}
+      <Form.Control {...maxControlProps} min={0 - step} type="number" value={maxValue ?? ""} step={step} onChange={handleMaxChange} />
+      {units && <InputGroup.Text>{units}</InputGroup.Text>}
     </InputGroup>
   );
 }

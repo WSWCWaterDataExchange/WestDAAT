@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithPaging>(requestBody);
 
             var result = await _waterAllocationManager.FindWaterRights(searchRequest);
 
@@ -99,6 +99,21 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
 
             return new OkObjectResult(result);
+        }
+
+        [FunctionName(nameof(GetWaterRightsEnvelope)), AllowAnonymous]
+        public async Task<IActionResult> GetWaterRightsEnvelope([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/DataEnvelope")] HttpRequest request)
+        {
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+
+            var result = await _waterAllocationManager.GetWaterRightsEnvelope(searchRequest);
+
+            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
         // Site Routes
@@ -168,7 +183,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             using var streamReader = new StreamReader(request.Body);
             var requestBody = await streamReader.ReadToEndAsync();
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithFilterUrl>(requestBody);
 
             var response = request.HttpContext.Response;
             response.Headers.Add("Content-Type", "application/octet-stream");
@@ -178,7 +193,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
             }
-            catch(WestDaatException)
+            catch (WestDaatException)
             {
                 response.StatusCode = StatusCodes.Status413PayloadTooLarge;
             }
