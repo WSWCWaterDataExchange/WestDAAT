@@ -31,13 +31,16 @@ export function useGetAnalyticsSummaryInfo(searchCriteria: WaterRightsSearchCrit
   );
 }
 
-export function useGetWaterRightDataEnvelope(searchCriteria: WaterRightsSearchCriteria | null) {
+type WaterRightDataEnvelopeOptionsType = UseQueryOptionsParameter<WaterRightsSearchCriteria | null, FeatureCollection<Geometry, GeoJsonProperties>>
+export function useGetWaterRightDataEnvelope(searchCriteria: WaterRightsSearchCriteria | null, options?: WaterRightDataEnvelopeOptionsType) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && searchCriteria !== null
+  }
   return useQuery(
     ['waterRight.DataEnvelope', searchCriteria],
     async () => await getWaterRightDataEnvelope(searchCriteria!),
-    {
-      enabled: searchCriteria !== null
-    }
+    setOptions
   );
 }
 

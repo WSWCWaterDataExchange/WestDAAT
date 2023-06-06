@@ -5,6 +5,7 @@ import useProgressIndicator from "../../../../hooks/useProgressIndicator";
 import { useNldiFilter } from "./filters/useNldiFilter";
 import { useRiverBasinFilter } from "./filters/useRiverBasinFilter";
 import { toast } from "react-toastify";
+import { useMapFitRequested } from "./useMapFitRequested";
 
 export function useAlerts(){
   const {
@@ -34,6 +35,7 @@ export function useAlerts(){
 
   const {isNldiFilterActive, nldiFeaturesQuery: {isLoading: isNldiDataLoading, isError: isNldiDataError}, nldiFilterData: {latitude, longitude} = {}} = useNldiFilter();
   const {riverBasinPolygonsQuery: {isLoading: isRiverBasinPolygonLoading, isError: isRiverBasinPolygonError}} = useRiverBasinFilter();
+  const {isLoading: isFilterEnvelopeLoading, isError: isFilterEnvelopeError} = useMapFitRequested()
 
   const isLoaded = useMemo(() =>{
     return !(beneficialUseIsLoading ||
@@ -69,6 +71,7 @@ export function useAlerts(){
 
   useProgressIndicator([!isNldiDataLoading], "Loading NLDI Data");
   useProgressIndicator([!isRiverBasinPolygonLoading], "Loading River Basin Data");
+  useProgressIndicator([!isFilterEnvelopeLoading], "Finding Water Right Locations");
 
   useNldiPinDropAlert(needsToSetNldiLocation);
   useEffect(() =>{
@@ -81,5 +84,15 @@ export function useAlerts(){
       })
     }
   }, [isError])
+  useEffect(() => {
+    if(isFilterEnvelopeError){
+      toast.error("Unable to find water right locations",
+      {
+        position: toast.POSITION.TOP_CENTER,
+        theme: 'colored',
+        autoClose: 3000
+      })
+    }
+  }, [isFilterEnvelopeError])
   useNoMapResults(isLoaded);
 }

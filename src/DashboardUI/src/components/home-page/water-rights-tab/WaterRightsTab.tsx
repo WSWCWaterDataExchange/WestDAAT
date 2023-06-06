@@ -12,6 +12,7 @@ import { usePolylinesFilter } from "./hooks/filters/usePolylinesFilter";
 import DownloadModal from "./DownloadModal";
 import { useEffect } from "react";
 import { useHomePageContext } from "../Provider";
+import { useMapFitRequested } from "./hooks/useMapFitRequested";
 
 export function WaterRightsTab () {
   return <MapProvider>
@@ -27,12 +28,13 @@ function WaterRightsLayout() {
   useMapUrlParameters();
   useDownloadModal();
   const {polylinesOnMapUpdated} = usePolylinesFilter();
+  const {handleMapFitRequested} = useMapFitRequested();
   return <>
            <SidePanel>
              <SideBar />
            </SidePanel>
            <MainPanel>
-             <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} />
+             <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
              <TableView />
            </MainPanel>
          </>
