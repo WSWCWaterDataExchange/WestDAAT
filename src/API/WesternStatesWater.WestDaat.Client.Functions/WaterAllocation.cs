@@ -111,9 +111,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             }
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
-            var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
+            var result = await _waterAllocationManager.GetWaterRightsEnvelope(searchRequest);
 
-            return new OkObjectResult(result);
+            return new OkObjectResult(JsonSerializer.Serialize(result));
         }
 
         // Site Routes
