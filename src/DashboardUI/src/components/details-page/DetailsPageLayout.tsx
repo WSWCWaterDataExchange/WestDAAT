@@ -47,7 +47,7 @@ const DetailsPage: DetailsPageComponent = function DetailsPage({children}: Props
           {map}
         </div>
       </div>
-      <div className='row'>
+      <div className='row mt-3'>
         <div className='col'>
           {tabs}
         </div>

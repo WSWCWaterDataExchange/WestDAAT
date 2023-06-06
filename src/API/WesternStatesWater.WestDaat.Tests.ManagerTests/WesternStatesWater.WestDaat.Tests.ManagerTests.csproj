@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Managers\WesternStatesWater.WestDaat.Managers.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,12 +3,11 @@ import HighchartsExporting from 'highcharts/modules/exporting'
 import HC_Data from "highcharts/modules/export-data";
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
-import moment from 'moment';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
-import { useWaterRightsContext } from './Provider';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
+import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -84,28 +83,7 @@ type ChartDataType = {
   data: ChartSeriesDataType[]
 }
 function PieCharts() {
-  const { filters, nldiIds } = useWaterRightsContext();
-
-  const searchCriteria = useMemo(() => {
-    return {
-      beneficialUses: filters.beneficialUseNames,
-      filterGeometry: filters.polylines?.map(p => JSON.stringify(p.geometry)),
-      exemptofVolumeFlowPriority: filters.includeExempt,
-      minimumFlow: filters.minFlow,
-      maximumFlow: filters.maxFlow,
-      minimumVolume: filters.minVolume,
-      maximumVolume: filters.maxVolume,
-      podOrPou: filters.podPou,
-      minimumPriorityDate: filters.minPriorityDate ? moment.unix(filters.minPriorityDate).toDate() : undefined,
-      maximumPriorityDate: filters.maxPriorityDate ? moment.unix(filters.maxPriorityDate).toDate() : undefined,
-      ownerClassifications: filters.ownerClassifications,
-      waterSourceTypes: filters.waterSourceTypes,
-      riverBasinNames: filters.riverBasinNames,
-      allocationOwner: filters.allocationOwner,
-      states: filters.states,
-      wadeSitesUuids: nldiIds
-    };
-  }, [filters, nldiIds]);
+  const { searchCriteria } = useWaterRightsSearchCriteria();
 
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria)
   const { getBeneficialUseColor } = useColorMappings();

@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import Map from "../map/Map";
 import { useMapContext } from "../../contexts/MapProvider";
-import mapboxgl from "mapbox-gl";
-import { FeatureCollection, GeoJsonProperties, Geometry, Position,  } from "geojson";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { mapLayerNames, mapSourceNames } from "../../config/maps";
 import { MapThemeSelector } from "../map/MapThemeSelector";
+import { getLatsLongsFromFeatureCollection } from "../../utilities/geometryHelpers";
 
 interface detailsMapProps {
   mapData: FeatureCollection<Geometry, GeoJsonProperties>;
@@ -28,37 +28,15 @@ function DetailsMap(props: detailsMapProps) {
     setGeoJsonData(mapSourceNames.detailsMapGeoJson, props.mapData);
   }, [props.mapData, setGeoJsonData]);
 
-  const mapBounds = useMemo(() => {
-    let positions: Position[] = [];
-    
-    props.mapData.features.forEach((x) => {
-      if (x.geometry.type === "Point") {
-        positions.push(x.geometry.coordinates);
-      } else if (x.geometry.type === "MultiPoint") {
-        positions = positions.concat(x.geometry.coordinates);
-      } else if (x.geometry.type === "Polygon") {
-        x.geometry.coordinates.forEach((y) => {
-          positions = positions.concat(y);
-        });
-      } else if (x.geometry.type === "MultiPolygon") {
-        x.geometry.coordinates.forEach((y) => {
-          y.forEach((z) => {
-            positions = positions.concat(z);
-          });
-        });
-      }
-    });
-
-    return positions;
-  }, [props.mapData]);
-
   const handleMapFitChange = useCallback(() => {
-    setMapBounds({
-      LngLatBounds: mapBounds.map((a) => new mapboxgl.LngLat(a[0], a[1])),
-      maxZoom: 18,
-      padding: 50,
-    });
-  }, [mapBounds, setMapBounds]);
+    if(props.mapData){
+      setMapBounds({
+        LngLatBounds: getLatsLongsFromFeatureCollection(props.mapData),
+        maxZoom: 12,
+        padding: 25,
+      });
+    }
+  }, [props.mapData, setMapBounds]);
 
   useEffect(() => {
     handleMapFitChange();

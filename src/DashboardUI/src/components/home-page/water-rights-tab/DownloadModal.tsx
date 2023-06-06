@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Button from 'react-bootstrap/Button';
-import moment from 'moment';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { useAppContext } from '../../../contexts/AppProvider';
 import { SignIn } from "../../SignIn";
-import { WaterRightsSearchCriteria } from '../../../data-contracts/WaterRightsSearchCriteria';
+import { WaterRightsSearchCriteriaWithFilterUrl } from '../../../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsFilters } from './Provider';
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../../../hooks/queries';
 import { useHomePageContext } from '../Provider';
+import { useWaterRightsSearchCriteriaWithoutContext } from './hooks/useWaterRightsSearchCriteria';
 
 function DownloadWaterRights(props: {
-  searchCriteria: WaterRightsSearchCriteria | null,
+  searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null,
   setTitle:(title: JSX.Element | null) => void,
   setError:(error: JSX.Element | null) => void,
   setIsFetching: (isFetching: boolean) => void,
@@ -61,11 +61,9 @@ interface DownloadModalProps extends ModalProps {
   nldiIds: string[]
 }
 function DownloadModal(props: DownloadModalProps) {
-  const {filters, nldiIds} = props;
+  //this runs outside of the WaterRightsTab.  Thus, we don't have access to the WaterRightsContext.
   const { authenticationContext: {isAuthenticated} } = useAppContext();
   const { showDownloadModal, setShowDownloadModal } = useHomePageContext();
-  
-  const [ searchCriteria, setSearchCriteria] = useState<WaterRightsSearchCriteria | null>(null);
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
@@ -79,7 +77,6 @@ function DownloadModal(props: DownloadModalProps) {
 
   const download = async () => 
   {
-    setSearchFilterValues();
     setIsFetching(true);
   }
 
@@ -90,28 +87,14 @@ function DownloadModal(props: DownloadModalProps) {
     }
   }, [isFetched, setIsFetched, downloadError, setShowDownloadModal])
 
-  // technical debt, move this to a shared space and also update TableView to use this share space. to clean copy pasted code
-  const setSearchFilterValues = () => {
-    setSearchCriteria({
-      beneficialUses: filters.beneficialUseNames,
-      filterGeometry: filters.polylines?.map(p => JSON.stringify(p.geometry)),
-      exemptofVolumeFlowPriority: filters.includeExempt,
-      minimumFlow: filters.minFlow,
-      maximumFlow: filters.maxFlow,
-      minimumVolume: filters.minVolume,
-      maximumVolume: filters.maxVolume,
-      podOrPou: filters.podPou,
-      minimumPriorityDate: filters.minPriorityDate ? moment.unix(filters.minPriorityDate).toDate() : undefined,
-      maximumPriorityDate: filters.maxPriorityDate ? moment.unix(filters.maxPriorityDate).toDate() : undefined,
-      ownerClassifications: filters.ownerClassifications,
-      waterSourceTypes: filters.waterSourceTypes,
-      riverBasinNames: filters.riverBasinNames,
-      allocationOwner: filters.allocationOwner,
-      states: filters.states,
-      filterUrl: filters !== null ? window.location.href : undefined,
-      wadeSitesUuids: nldiIds
-    });
-  }
+  const {searchCriteria} = useWaterRightsSearchCriteriaWithoutContext(props);
+
+  const searchCriteriaWithFilterUrl = useMemo(() =>{
+    return {
+      ...searchCriteria,
+      filterUrl: window.location.href,
+    }
+  }, [searchCriteria])
 
   return (
     <Modal show={showDownloadModal} aria-labelledby="contained-modal-title-vcenter" centered>
@@ -133,7 +116,7 @@ function DownloadModal(props: DownloadModalProps) {
         {/* display modal with is fetching info and progress bar with it */}
         { isAuthenticated && isFetching && !downloadError &&
         <DownloadWaterRights
-          searchCriteria={searchCriteria}
+          searchCriteria={searchCriteriaWithFilterUrl}
           setTitle={setModalTitle}
           setError={setDownloadError}
           setIsFetching={setIsFetching}

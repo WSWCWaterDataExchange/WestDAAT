@@ -13,6 +13,7 @@ using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 using System.IO;
 using Ionic.Zip;
 using System.Globalization;
+using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -120,10 +121,32 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public async Task GetWaterRightsEnvelope_ResultsReturned(bool hasResults)
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsEnvelope(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync(hasResults ? new PolygonFaker().Generate() : null)
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetWaterRightsEnvelope(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Features.Should().HaveCount(hasResults ? 1 : 0);
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
         public async Task FindWaterRights_ResultsReturned()
         {
             //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -137,7 +160,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
             };
@@ -152,41 +175,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(WestDaatException))]
-        public async Task FindWaterRights_PageNumberRequired()
-        {
-            //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
-                {
-                    WaterRightsDetails = new CommonContracts.WaterRightsSearchDetail[]
-                    {
-                        new CommonContracts.WaterRightsSearchDetail
-                        {
-                            AllocationUuid = "abc123"
-                        }
-                    }
-                })
-                .Verifiable();
-
-            var searchCriteria = new WaterRightsSearchCriteria();
-
-            //Act
-            var manager = CreateWaterAllocationManager();
-            var result = await manager.FindWaterRights(searchCriteria);
-
-            //Assert
-            _waterAllocationAccessorMock.Verify();
-        }
-
-        [TestMethod]
         public async Task FindWaterRights_SearchByGeometry_GeoJsonConvertedToGeometry()
         {
             //Arrange
             Geometry[] actualFilterGeometryParam = null;
 
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x, int pageNumber) => actualFilterGeometryParam = x.FilterGeometry)
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -200,10 +195,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
-                FilterGeometry = new string[] 
+                FilterGeometry = new string[]
                 {
                     "{\"type\":\"Point\",\"coordinates\":[-96.7014,40.8146]}",
                     "{\"coordinates\":[[[-99.88974043488068,42.5970189859552],[-99.89330729367737,42.553083043677304],[-99.78662578967582,42.547588874524024],[-99.78143763142621,42.59487066530488],[-99.88974043488068,42.5970189859552]]],\"type\":\"Polygon\"}"
@@ -233,8 +228,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             //Arrange
             Geometry[] actualFilterGeometryParam = null;
 
-            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .Callback((CommonContracts.WaterRightsSearchCriteria x) => actualFilterGeometryParam = x.FilterGeometry)
+            _waterAllocationAccessorMock.Setup(x => x.FindWaterRights(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<int>()))
+                .Callback((CommonContracts.WaterRightsSearchCriteria x, int pageNumber) => actualFilterGeometryParam = x.FilterGeometry)
                 .ReturnsAsync(new CommonContracts.WaterRightsSearchResults
                 {
                     CurrentPageNumber = 0,
@@ -254,7 +249,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var expectedFilterGeometryParam = GeometryHelpers.GetGeometryByFeatures(new List<Feature> { ColoradoRiverBasin.Feature });
 
-            var searchCriteria = new WaterRightsSearchCriteria
+            var searchCriteria = new WaterRightsSearchCriteriaWithPaging
             {
                 PageNumber = 0,
                 RiverBasinNames = new[] { ColoradoRiverBasin.BasinName }
@@ -334,7 +329,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem>{ }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem> { }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSiteInfoList("99");
@@ -346,7 +341,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
         {
-            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem>{ }).Verifiable();
+            _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem> { }).Verifiable();
 
             var manager = CreateWaterAllocationManager();
             var result = await manager.GetWaterRightSourceInfoList("99");
@@ -425,7 +420,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [DataRow(450000)]
         public async Task WaterRightsAsZip_ThrowsException_CountMoreThanPerformanceMaxDownload(int returnAmount)
         {
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -447,7 +442,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
-            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteria>()));
+            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteriaWithFilterUrl>()));
 
             // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
@@ -488,7 +483,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -548,7 +543,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -651,7 +646,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _templateResourceSdk.Setup(s => s.GetTemplate(Common.ResourceType.Citation))
                 .Returns(_citationFile);
 
-            var managerSearchRequest = new WaterRightsSearchCriteria
+            var managerSearchRequest = new WaterRightsSearchCriteriaWithFilterUrl
             {
                 States = new string[] { "NE" }
             };
@@ -669,7 +664,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
                 foreach (var zipFile in zip)
                 {
-                    if(zipFile.FileName != "citation.txt")
+                    if (zipFile.FileName != "citation.txt")
                     {
                         switch (zipFile.FileName)
                         {

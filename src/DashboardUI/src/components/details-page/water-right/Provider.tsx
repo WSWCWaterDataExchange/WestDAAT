@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { createContext, FC, useContext } from "react";
+import { createContext, FC, useContext, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useWaterRightDetails, useWaterRightSiteInfoList, useWaterRightSiteLocations, useWaterRightSourceInfoList } from "../../../hooks/queries";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
@@ -18,13 +18,18 @@ export interface HostData{
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
 }
 
+type ActiveTabType = 'site' | 'source';
 interface WaterRightDetailsPageContextState {
-  allocationUuid: string,
+  allocationUuid: string | undefined,
+  activeTab: ActiveTabType,
+  setActiveTab: (tab: ActiveTabType) => void,
   hostData: HostData
 }
 
 const defaultState: WaterRightDetailsPageContextState = {
-  allocationUuid: '',
+  allocationUuid: undefined,
+  activeTab: 'site',
+  setActiveTab: () => {},
   hostData: {
     detailsQuery: defaultQuery,
     siteLocationsQuery: defaultQuery,
@@ -37,15 +42,19 @@ const WaterRightDetailsContext = createContext<WaterRightDetailsPageContextState
 export const useWaterRightDetailsContext = () => useContext(WaterRightDetailsContext)
 
 export const WaterRightDetailsProvider: FC = ({ children }) => {
-  const { id: allocationUuid = "" } = useParams();
+  const { id: allocationUuid } = useParams();
+
+  const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab)
 
   const detailsQuery = useWaterRightDetails(allocationUuid);
   const siteLocationsQuery = useWaterRightSiteLocations(allocationUuid)
-  const siteInfoListQuery = useWaterRightSiteInfoList(allocationUuid);
-  const sourceInfoListQuery = useWaterRightSourceInfoList(allocationUuid);
+  const siteInfoListQuery = useWaterRightSiteInfoList(allocationUuid, {enabled: activeTab === 'site'});
+  const sourceInfoListQuery = useWaterRightSourceInfoList(allocationUuid, {enabled: activeTab === 'source'});
   
   const filterContextProviderValue: WaterRightDetailsPageContextState  = {
     allocationUuid,
+    activeTab,
+    setActiveTab,
     hostData: {
       detailsQuery,
       siteLocationsQuery,

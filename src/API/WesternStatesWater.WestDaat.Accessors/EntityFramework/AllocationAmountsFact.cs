@@ -86,6 +86,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         {
             var predicate = PredicateBuilder.New<AllocationAmountsFact>();
 
+            //Not sure this is correct.  It should probably be searching the beneficial uses bridge table
             predicate = predicate.Or(x => beneficalUses.Contains(x.PrimaryBeneficialUseCategory));
 
             return predicate;

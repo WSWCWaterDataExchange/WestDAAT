@@ -14,7 +14,7 @@ function SiteFooter(props: SiteFooterProps) {
   return (
     <Navbar className="footer" variant="dark">
       <Container fluid className="ms-3 me-3">
-        <div className="px-5">
+        <div>
           <Nav>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/" active={false}>WaDE</Nav.Link>
             <Nav.Link className="p-0" target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/" active={false}>WSWC</Nav.Link>
