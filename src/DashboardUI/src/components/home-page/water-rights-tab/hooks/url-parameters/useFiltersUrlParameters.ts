@@ -70,17 +70,17 @@ export function useFiltersUrlParameters() {
         hasUpdate = true;
       }
     }
-    return [filters, hasUpdate];
+    return {filters: filters as WaterRightsFilters | undefined, hasUpdate};
   }, [getIsNldiParameterActive, getParameterOptionalNldi])
 
   const getParameter = useCallback((): (WaterRightsFilters | undefined) =>{
-    return migrateFilterData()[0] as (WaterRightsFilters | undefined);
+    return migrateFilterData().filters;
   }, [migrateFilterData]);
 
   useEffect(() =>{
-    const [filters, hasUpdate] = migrateFilterData();
+    const {filters, hasUpdate} = migrateFilterData();
     if(hasUpdate){
-      setParameter(filters as WaterRightsFilters);
+      setParameter(filters);
     }
     setIsNldiParameterActive(undefined)
   }, [migrateFilterData, setIsNldiParameterActive, setParameter]);
