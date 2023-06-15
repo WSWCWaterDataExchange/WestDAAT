@@ -34,17 +34,17 @@ export function useFiltersUrlParameters() {
     setParameterOptionalNldi(slimmedFilters);
   }, [setParameterOptionalNldi]);
 
-  const getParameter = useCallback((): (WaterRightsFilters | undefined) =>{
-    return getParameterOptionalNldi() as (WaterRightsFilters | undefined);
-  }, [getParameterOptionalNldi]);
-
-  useEffect(() =>{
+  const migrateFilterData = useCallback(() => {
     //migrate the old  water rights filter structure to the new structure
     let filters = getParameterOptionalNldi();
+    let hasUpdate = false;
     if(filters){
-      let hasUpdate = false;
       if(filters.isNldiFilterActive === undefined){
         filters = {...filters, isNldiFilterActive: getIsNldiParameterActive() || false};
+        hasUpdate = true;
+      }
+      if(filters.nldiFilterData === null){
+        filters = {...filters, nldiFilterData: undefined};
         hasUpdate = true;
       }
       if(filters.beneficialUses){
@@ -69,12 +69,21 @@ export function useFiltersUrlParameters() {
         }
         hasUpdate = true;
       }
-      if(hasUpdate){
-        setParameter(filters as WaterRightsFilters);
-      }
+    }
+    return {filters: filters as WaterRightsFilters | undefined, hasUpdate};
+  }, [getIsNldiParameterActive, getParameterOptionalNldi])
+
+  const getParameter = useCallback((): (WaterRightsFilters | undefined) =>{
+    return migrateFilterData().filters;
+  }, [migrateFilterData]);
+
+  useEffect(() =>{
+    const {filters, hasUpdate} = migrateFilterData();
+    if(hasUpdate){
+      setParameter(filters);
     }
     setIsNldiParameterActive(undefined)
-  }, [getParameterOptionalNldi, getIsNldiParameterActive, setIsNldiParameterActive, setParameter]);
+  }, [migrateFilterData, setIsNldiParameterActive, setParameter]);
 
   return {getParameter, setParameter}
 }
