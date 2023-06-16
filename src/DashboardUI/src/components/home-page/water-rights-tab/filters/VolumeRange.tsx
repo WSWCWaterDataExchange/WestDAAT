@@ -20,7 +20,7 @@ export function VolumeRange() {
   }, 400);
 
   return <div className="mb-3">
-    <label>Flow Range (CFS)</label>
+    <label>Volume Range (AF)</label>
     <NumericRange initialMin={minValue} initialMax={maxValue} onChange={handleVolumeChange} units="" precision={1} minControlProps={minControlProps} maxControlProps={maxControlProps} />
   </div>;
 }

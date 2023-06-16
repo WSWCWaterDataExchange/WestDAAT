@@ -4,6 +4,7 @@ import { WaterRightsSearchResults } from "../../../data-contracts/WaterRightsSea
 import { FormattedDate } from "../../FormattedDate";
 import { useFindWaterRights } from "../../../hooks/queries/useWaterRightQuery";
 import { useWaterRightsSearchCriteria } from "./hooks/useWaterRightsSearchCriteria";
+import { formatNumber } from "../../../utilities/valueFormatters";
 
 function AnalyticsDataTable() {
     const _defaultResults = useMemo(() => ({ currentPageNumber: 0, hasMoreResults: false, waterRightsDetails: [] }), []);
@@ -66,8 +67,8 @@ function AnalyticsDataTable() {
                             <td>{waterRightDetail.ownerClassification}</td>
                             <td>{waterRightDetail.allocationOwner}</td>
                             <td>{waterRightDetail.allocationLegalStatus}</td>
-                            <td>{waterRightDetail.allocationFlowCfs?.toLocaleString()}</td>
-                            <td>{waterRightDetail.allocationVolumeAf?.toLocaleString()}</td>
+                            <td>{formatNumber(waterRightDetail.allocationFlowCfs)}</td>
+                            <td>{formatNumber(waterRightDetail.allocationVolumeAf)}</td>
                             <td>{waterRightDetail.beneficialUses.join(', ')}</td>
                         </tr>
                     })
