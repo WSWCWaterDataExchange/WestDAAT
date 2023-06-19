@@ -2080,7 +2080,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
                 WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
-                WaDEDataMappingURL = allocationAmount.Method.WaDEDataMappingUrl
+                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl
             };
 
             // Act
@@ -2570,7 +2570,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MethodNemiLink = method.MethodNemilink,
                 MethodTypeCv = method.MethodTypeCv,
                 MethodUuid = method.MethodUuid,
-                WaDEDataMappingURL = method.WaDEDataMappingUrl
+                WaDEDataMappingUrl = method.WaDEDataMappingUrl
             };
             // Act
             var searCriteria = new WaterRightsSearchCriteria

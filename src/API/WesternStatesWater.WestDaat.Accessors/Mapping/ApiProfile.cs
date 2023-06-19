@@ -46,7 +46,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApplicableResourceType, opt => opt.MapFrom(source => source.Method.ApplicableResourceTypeCv))
                 .ForMember(dest => dest.DatePublished, opt => opt.MapFrom(source => source.DataPublicationDate.Date))
                 .ForMember(dest => dest.WaDEIrrigationMethod, opt => opt.MapFrom(source => source.IrrigationMethod.WaDEName))
-                .ForMember(dest => dest.WaDEDataMappingURL, opt => opt.MapFrom(source => source.Method.WaDEDataMappingUrl));
+                .ForMember(dest => dest.WaDEDataMappingUrl, opt => opt.MapFrom(source => source.Method.WaDEDataMappingUrl));
             CreateMap<EF.AllocationAmountsFact, WaterRightInfoListItem>()
                 .ForMember(dest => dest.Volume, opt => opt.MapFrom(source => source.AllocationVolume_AF))
                 .ForMember(dest => dest.Flow, opt => opt.MapFrom(source => source.AllocationFlow_CFS))

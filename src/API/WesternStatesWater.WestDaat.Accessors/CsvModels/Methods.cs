@@ -11,6 +11,6 @@
         public string MethodName { get; set; }
         public string MethodNemiLink { get; set; }
         public string MethodTypeCv { get; set; }
-        public string WaDEDataMappingURL { get; set; }
+        public string WaDEDataMappingUrl { get; set; }
     }
 }
