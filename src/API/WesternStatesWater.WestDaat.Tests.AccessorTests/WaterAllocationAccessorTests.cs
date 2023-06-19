@@ -2080,6 +2080,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
                 WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
+                WaDEDataMappingURL = allocationAmount.Method.WaDEDataMappingUrl
             };
 
             // Act
