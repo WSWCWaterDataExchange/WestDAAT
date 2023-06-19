@@ -33,6 +33,7 @@ MethodDescription / text / A high level / general description of the data provid
 MethodName / nvarchar(50) / The name of the method used by the data provider.
 MethodNEMILink / nvarchar(100) / A link back to the data provider's website or another webpage for more information about the method (e.g., https://www.nemi.gov/home/).
 MethodTypeCV / nvarchar(50) / Indicator of how the actual amount value within the data was determined (i.e., calculated, measured, estimated, reported, modeled, etc.).
+WaDEDataMappingURL / nvarchar(250) / A URL to WaDE GitHub repository page for the provided data.
 
 Variables table
 VariableSpecificID / bigint / Internal unique identifier integer.

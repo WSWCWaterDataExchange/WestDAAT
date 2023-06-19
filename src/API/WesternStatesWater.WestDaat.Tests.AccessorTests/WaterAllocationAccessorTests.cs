@@ -2570,6 +2570,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MethodNemiLink = method.MethodNemilink,
                 MethodTypeCv = method.MethodTypeCv,
                 MethodUuid = method.MethodUuid,
+                WaDEDataMappingURL = method.WaDEDataMappingUrl
             };
             // Act
             var searCriteria = new WaterRightsSearchCriteria
