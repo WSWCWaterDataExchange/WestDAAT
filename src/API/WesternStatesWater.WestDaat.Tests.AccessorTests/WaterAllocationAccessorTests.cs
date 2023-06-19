@@ -2013,7 +2013,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.OrganizationDataMappingUrl.Should().NotBeNullOrWhiteSpace();
             result.OrganizationName.Should().Be(expectedOrg.OrganizationName);
             result.OrganizationId.Should().Be(expectedOrg.OrganizationId);
         }
@@ -2080,7 +2079,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 WaDEIrrigationMethod = irrigationMethod.WaDEName,
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
-                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl
+                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
             };
 
             // Act

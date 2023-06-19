@@ -52,7 +52,6 @@ OrganizationID / bigint / Internal unique identifier integer.
 OrganizationUUID / nvarchar(250) / Foreign key unique identifier to Organization_dim table.
 OrganizationContactEmail / nvarchar(250) / Email address for the contact person of the organization.
 OrganizationContactName / nvarchar(250) / Name of the contact person for the organization.
-OrganizationDataMappingURL / nvarchar(250) / A URL to WaDE GitHub repository page for the provided data.
 OrganizationName / nvarchar(250) / Name of the organization (e.g., Utah Division of Water Resources).
 OrganizationPhoneNumber / nvarchar(250) / Phone number for the organization contact person. Include the area code.
 OrganizationPurview / nvarchar(250) / A description of the purview of the agency (e.g., water rights, consumptive use, etc.).

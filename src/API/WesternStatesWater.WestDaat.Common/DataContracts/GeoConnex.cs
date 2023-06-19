@@ -9,6 +9,5 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string SiteTypeCv { get; set; }
         public string SiteUuid { get; set; }
         public string SiteName { get; set; }
-        public string OrganizationDataMappingUrl { get; set; }
     }
 }
