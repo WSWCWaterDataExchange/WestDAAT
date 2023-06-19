@@ -2014,7 +2014,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             result.Should().NotBeNull();
             result.OrganizationDataMappingUrl.Should().NotBeNullOrWhiteSpace();
-            result.OrganizationDataMappingUrl.Should().Be(expectedOrg.OrganizationDataMappingUrl);
             result.OrganizationName.Should().Be(expectedOrg.OrganizationName);
             result.OrganizationId.Should().Be(expectedOrg.OrganizationId);
         }
@@ -2523,7 +2522,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 OrganizationContactEmail = organization.OrganizationContactEmail,
                 OrganizationContactName = organization.OrganizationContactName,
-                OrganizationDataMappingUrl = organization.OrganizationDataMappingUrl,
                 OrganizationName = organization.OrganizationName,
                 OrganizationPhoneNumber = organization.OrganizationPhoneNumber,
                 OrganizationPurview = organization.OrganizationPurview,

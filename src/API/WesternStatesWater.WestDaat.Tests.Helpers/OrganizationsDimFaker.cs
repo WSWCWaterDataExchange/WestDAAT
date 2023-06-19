@@ -6,8 +6,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
     {
         public OrganizationsDimFaker()
         {
-            this.RuleFor(a => a.OrganizationDataMappingUrl, b => b.Internet.Url())
-                .RuleFor(a => a.OrganizationUuid, b => b.Random.AlphaNumeric(7))
+            this.RuleFor(a => a.OrganizationUuid, b => b.Random.AlphaNumeric(7))
                 .RuleFor(a => a.OrganizationName, b => b.Company.CompanyName())
                 .RuleFor(a => a.OrganizationPhoneNumber, b => b.Phone.PhoneNumber())
                 .RuleFor(a => a.OrganizationWebsite, b => b.Internet.Url())
