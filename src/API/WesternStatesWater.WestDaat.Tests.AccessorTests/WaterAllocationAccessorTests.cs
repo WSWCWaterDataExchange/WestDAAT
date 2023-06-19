@@ -2013,8 +2013,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.OrganizationDataMappingUrl.Should().NotBeNullOrWhiteSpace();
-            result.OrganizationDataMappingUrl.Should().Be(expectedOrg.OrganizationDataMappingUrl);
             result.OrganizationName.Should().Be(expectedOrg.OrganizationName);
             result.OrganizationId.Should().Be(expectedOrg.OrganizationId);
         }
@@ -2081,7 +2079,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 WaDEIrrigationMethod = irrigationMethod.WaDEName,
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
-                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl
+                WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
+                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl
             };
 
             // Act
@@ -2523,7 +2522,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 OrganizationContactEmail = organization.OrganizationContactEmail,
                 OrganizationContactName = organization.OrganizationContactName,
-                OrganizationDataMappingUrl = organization.OrganizationDataMappingUrl,
                 OrganizationName = organization.OrganizationName,
                 OrganizationPhoneNumber = organization.OrganizationPhoneNumber,
                 OrganizationPurview = organization.OrganizationPurview,
@@ -2572,6 +2570,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MethodNemiLink = method.MethodNemilink,
                 MethodTypeCv = method.MethodTypeCv,
                 MethodUuid = method.MethodUuid,
+                WaDEDataMappingUrl = method.WaDEDataMappingUrl
             };
             // Act
             var searCriteria = new WaterRightsSearchCriteria

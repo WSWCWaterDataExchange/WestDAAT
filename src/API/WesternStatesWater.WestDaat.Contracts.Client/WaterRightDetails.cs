@@ -19,6 +19,7 @@
         public string MethodType { get; set; }
         public string MethodLink { get; set; }
         public string MethodDescription { get; set; }
+        public string WaDEDataMappingUrl { get; set; }
 
         public string AllocationUuid { get; set; }
         public string AllocationNativeId { get; set; }

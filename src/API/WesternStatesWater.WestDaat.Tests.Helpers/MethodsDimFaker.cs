@@ -13,7 +13,8 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.MethodDescription, b => b.Random.String(10, 'A', 'z'))
                 .RuleFor(a => a.ApplicableResourceTypeCv, b => applicableResourceType.Name)
                 .RuleFor(a => a.ApplicableResourceTypeCvNavigation, b => applicableResourceType)
-                .RuleFor(a => a.MethodTypeCvNavigation, b => new MethodTypeFaker().Generate());
+                .RuleFor(a => a.MethodTypeCvNavigation, b => new MethodTypeFaker().Generate())
+                .RuleFor(a => a.WaDEDataMappingUrl, b => b.Internet.Url());
         }
     }
 }

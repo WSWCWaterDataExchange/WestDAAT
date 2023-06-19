@@ -254,6 +254,23 @@ describe('getParameter', () => {
         expect(mockSetIsNldiParameterActive).toBeCalledWith(undefined);
         expect(mockSetParameterWaterRights).not.toBeCalled();
       })
+
+      test.each([
+        [null],
+        [undefined],
+        [{latitude: 40, longitude: -110, directions: Directions.Downsteam, dataPoints: DataPoints.Usgs}]
+      ])('nldiFilterData null migration, %j', (initialNldiFilterData: NldiFilters | null | undefined) =>{
+        mockGetParameterWaterRights.mockReturnValue({...filtersWithUndefinedNldiActive, nldiFilterData: initialNldiFilterData, isNldiFilterActive: true});
+    
+        const {result: {current: {getParameter}}} = renderHook(() => useFiltersUrlParameters());
+    
+        const paramResult = getParameter();
+    
+        expect(paramResult?.nldiFilterData).toBe(initialNldiFilterData || undefined);
+    
+        expect(mockSetIsNldiParameterActive).toBeCalledWith(undefined);
+        expect(mockSetParameterWaterRights).toBeCalledTimes(initialNldiFilterData === null ? 1 : 0);
+      })
   
       test.each([
         [true, true],

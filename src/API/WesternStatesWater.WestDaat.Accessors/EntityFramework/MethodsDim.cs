@@ -19,6 +19,7 @@
         public string DataCoverageValue { get; set; }
         public string DataQualityValueCv { get; set; }
         public string DataConfidenceValue { get; set; }
+        public string WaDEDataMappingUrl { get; set; }
 
         public virtual ApplicableResourceType ApplicableResourceTypeCvNavigation { get; set; }
         public virtual DataQualityValue DataQualityValueCvNavigation { get; set; }

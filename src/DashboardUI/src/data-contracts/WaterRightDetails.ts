@@ -16,6 +16,7 @@ export interface WaterRightDetails {
   methodType: string;
   methodLink: string;
   methodDescription: string;
+  waDEDataMappingUrl: string;
 
   allocationUuid: string;
   allocationNativeId: string;

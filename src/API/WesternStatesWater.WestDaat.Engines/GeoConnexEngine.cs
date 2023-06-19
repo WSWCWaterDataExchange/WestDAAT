@@ -23,8 +23,7 @@ namespace WesternStatesWater.WestDaat.Engines
                     site.Latitude,                  // {1}
                     site.SiteTypeCv,                // {2}
                     site.SiteUuid,                  // {3}
-                    site.SiteName,                  // {4}
-                    org.OrganizationDataMappingUrl  // {6}
+                    site.SiteName                   // {4}
                 )
             );
 
