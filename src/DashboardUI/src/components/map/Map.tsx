@@ -5,7 +5,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from "../../contexts/AppProvider";
 import { defaultMapLocationData, useMapContext, MapSettings, MapStyle } from "../../contexts/MapProvider";
 import mapConfig from "../../config/maps";
-import { mdiMapMarker } from '@mdi/js';
+import { mdiMapMarker, mdiFullscreen  } from '@mdi/js';
 import { Canvg, presets } from "canvg";
 import { useDrop } from "react-dnd";
 import { useDebounceCallback } from "@react-hook/debounce";
@@ -420,12 +420,32 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       [MapStyle.Satellite]: "legend-light",
     }[mapStyle];
   }, [mapStyle])
+  const handleFullScreenClick = () => {
+    const mapContainer = document.querySelector(".map-container");
+    if (mapContainer && mapContainer instanceof HTMLElement) {
+      if (mapContainer.requestFullscreen) {
+        mapContainer.requestFullscreen();
+      } else if ((mapContainer as any).webkitRequestFullscreen) {
+        // Use vendor-prefixed method for Safari
+        (mapContainer as any).webkitRequestFullscreen();
+      } else if ((mapContainer as any).msRequestFullscreen) {
+        // Use vendor-prefixed method for Internet Explorer and Edge
+        (mapContainer as any).msRequestFullscreen();
+      }
+    }
+  };
 
   return (
     <div className="position-relative h-100">
       {coords && map &&
         <div className="map-coordinates">{coords.lat.toFixed(4)} {coords.lng.toFixed(4)}</div>
       }
+      {/* Full-screen icon link */}
+      <button className="fullscreen-button" onClick={handleFullScreenClick}>
+        <svg viewBox="0 0 23 23" role="presentation" style={{ width: '21px', height: '21px' }}>
+          <path d={mdiFullscreen} style={{ fill: 'black' }} />
+        </svg>
+      </button>
       {legend && map &&
         <div className={`legend ${legendClass}`}>
           {legend}

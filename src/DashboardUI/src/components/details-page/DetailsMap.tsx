@@ -32,7 +32,7 @@ function DetailsMap(props: detailsMapProps) {
     if(props.mapData){
       setMapBounds({
         LngLatBounds: getLatsLongsFromFeatureCollection(props.mapData),
-        maxZoom: 12,
+        maxZoom: 16,
         padding: 25,
       });
     }
@@ -43,7 +43,7 @@ function DetailsMap(props: detailsMapProps) {
   }, [handleMapFitChange]);
 
   return (
-    <div className="map-group h-100">
+    <div className="map-group h-50">
       <div className="map-container h-100">
         <Map handleMapFitChange={handleMapFitChange} />
       </div>

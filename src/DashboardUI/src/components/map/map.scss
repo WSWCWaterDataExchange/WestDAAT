@@ -180,3 +180,23 @@ body.dragging-nldi, .grabbable:hover {
 .containerElement:hover:after{
   display:block;
 }
+.fullscreen-button {//fullscreen map button
+  position: absolute;
+  top: 155px;
+  right: 7px;
+  z-index: 1;
+  opacity: 0.85;
+  border-radius: 15%;
+
+  background-color: $white;
+  border-color: $bs-gray-100;
+  color: $text-color-dark;
+  border-color: rgba($bs-gray-800, .2);
+
+  padding: 5px;
+  cursor: pointer;
+}
+.fullscreen-button:hover{
+  background: rgba($bs-gray-800, .03);
+}
+

@@ -1,3 +1,4 @@
+//Water Rights Landing Page
 @import '../../styles/colors';
 
 .detail-page {
@@ -12,13 +13,13 @@
   }
   
   .water-rights-card, .site-card {
-    .card-header {
+    .card-header, .water-right-information {
       font-size: 20px;
       color: $white;
       padding: 1rem;
       font-size: 20px;
       color: $white;
-      padding: 15px;
+      padding: 1rem;
       display: flex;
       align-items: center;
       column-gap: .5rem;
@@ -31,9 +32,18 @@
       
     }
   }
+  .water-right-information{
+    max-width: 50vw; // setting water right to half screen size. 
+    min-height: 33vh;
+    color: $white;
+  }
+  .water-rights-card{
+    
+  }
+
   
   .property-name {
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 18px;
     color: $text-color-grey;
     &:first-of-type{
@@ -42,9 +52,10 @@
   }
   
   .property-value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: $text-color-black;
+    display: flex;// For aligning correctly
     &:empty{
       color: $text-color-grey;
       &:before{
@@ -66,13 +77,19 @@
   .map-group{
     display: flex;
     flex-direction: column;
+    min-height: 60vh;
     
     > .map-container {
       flex-grow: 1;
-      min-height: 450px;
+      min-height: 60vh;
+      max-height: 440px;// to make map squarish
+      max-width:50vw;///////////////////////// Trying to make map half screen size
+      padding: 5px;
     }
     
-    .theme-selector-container{
+    .theme-selector-container{//Map layout tabs 
+      position: absolute; // Overlayed Layout tabs over map
+      transform:rotate(90deg) translateX(120px)translateY(110px);//rotatiny map option layouts and positioning them in right spot
       display: flex;
       justify-content: center;
       .map-themes {
