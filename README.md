@@ -19,7 +19,7 @@
    - Open Solution: path to file WestDAAT\src\API\WesternStatesWater.WestDaat.sln
    - Right-click on **Client.Functions** project and choose **Set as Startup Project**
    - create `local.settings.json` file in the **Client.Functions** project
-   - If necessary, create personal.settings.json to override any developer specific settings( e.g. Insert: {“Database”:{“ConnectionString”: “Server = ‘Insert server name here’ ; Initial Catalog = ‘Insert local db name here’ ; Integrated Security = true;”}})
+   - If necessary, create personal.settings.json to override any developer specific settings. As an example( e.g. Insert: {“Database”:{“ConnectionString”: “Server = ‘Insert server name here’ ; Initial Catalog = ‘Insert local db name here’ ; Integrated Security = true;”}}) However this may vary. 
    - Set the listening port to 5001
       - Right-click on **Client.Functions** project
       - Choose Properties
@@ -27,7 +27,7 @@
       - In the command line arguments enter the following
          - `host start --port 5001`
       - Run the Function App
-7. Setup React App
+6. Setup React App
    - install NPM packages.
       - From the DashboardUI directory: `npm install`
    - Requires Node version 16+
