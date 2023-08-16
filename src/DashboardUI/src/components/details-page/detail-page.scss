@@ -1,3 +1,4 @@
+//Water Rights Landing Page
 @import '../../styles/colors';
 
 .detail-page {
@@ -12,13 +13,11 @@
   }
   
   .water-rights-card, .site-card {
-    .card-header {
+    .card-header{
       font-size: 20px;
       color: $white;
-      padding: 1rem;
-      font-size: 20px;
       color: $white;
-      padding: 15px;
+      padding: 10px;
       display: flex;
       align-items: center;
       column-gap: .5rem;
@@ -31,9 +30,10 @@
       
     }
   }
+
   
   .property-name {
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 18px;
     color: $text-color-grey;
     &:first-of-type{
@@ -42,9 +42,10 @@
   }
   
   .property-value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: $text-color-black;
+    display: flex;// For aligning correctly
     &:empty{
       color: $text-color-grey;
       &:before{
@@ -66,19 +67,32 @@
   .map-group{
     display: flex;
     flex-direction: column;
+    min-height: 60vh;
     
     > .map-container {
       flex-grow: 1;
-      min-height: 450px;
+      min-height: 80vh;
+      max-height: 80vh;
+      max-width:50vw;// map half screen size
+      padding: 5px;
     }
     
-    .theme-selector-container{
+    .theme-selector-container{//Map layout tabs 
+      position: absolute; // Overlayed Layout tabs over map
+      transform:rotate(90deg) translateX(120px)translateY(110px);//rotatiny map option layouts and positioning them in right spot
       display: flex;
       justify-content: center;
       .map-themes {
         flex-grow: 1;
       }
     }
+  }
+  .paragraph-truncate{//setting the legth to the truncated text to 3 lines.
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    
   }
   
   

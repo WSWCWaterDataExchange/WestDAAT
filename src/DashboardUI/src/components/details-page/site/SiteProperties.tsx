@@ -14,7 +14,7 @@ function SiteProperties() {
   return (
     <div>
       {siteDetails && 
-        <Row className="pt-4">
+        <Row className="pt-2">
           <Col>
             <Card className="site-card h-100 shadow-sm rounded-3">
               <Card.Header>
