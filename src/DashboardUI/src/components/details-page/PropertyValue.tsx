@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { FormattedDate } from "../FormattedDate";
 import moment from "moment";
 import { formatNumber } from "../../utilities/valueFormatters";
-import TextTruncate from "./water-right/WaterMethodExpand"; // Import the TextTruncate component
+import TruncatedText from "../TruncatedText";
 
 interface PropertyValueProps {
   label: string;
@@ -10,9 +10,10 @@ interface PropertyValueProps {
   decimalPositions?: number;
   isVerbose?: boolean;
   isUrl?: boolean;
+  isTruncated?: boolean;
 }
 
-export function PropertyValue({ label, value, decimalPositions = undefined, isVerbose = false, isUrl = false }: PropertyValueProps) {
+export function PropertyValue({ label, value, decimalPositions = undefined, isVerbose = false, isUrl = false, isTruncated = false,}: PropertyValueProps) {
   const formattedValue = useMemo(() => {
     if (isUrl && typeof value === 'string') {
       return value && <a href={value} target="_blank" rel="noopener noreferrer">View</a>;
@@ -26,15 +27,17 @@ export function PropertyValue({ label, value, decimalPositions = undefined, isVe
     return value;
   }, [value, isUrl, decimalPositions]);
 
-  // Added text truncation logic for the "Method Description" label
-  const truncatedValue = label === 'Method Description' && typeof value === 'string'
-    ? <TextTruncate text={value} maxLength={100} />
-    : formattedValue;
+  // Added text truncation logic 
+  const content = isTruncated ? (
+    <TruncatedText text={String(formattedValue)} />
+  ) : (
+    formattedValue
+  );
 
   return (
     <>
       <span className='property-name'>{label}</span>
-      <span className={`property-value${isVerbose ? ' is-verbose' : ''}`}>{truncatedValue}</span>
+      <span className={`property-value${isVerbose ? ' is-verbose' : ''}`}>{content}</span>
     </>
   );
 }

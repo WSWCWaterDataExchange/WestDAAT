@@ -13,13 +13,11 @@
   }
   
   .water-rights-card, .site-card {
-    .card-header, .water-right-information {
+    .card-header{
       font-size: 20px;
       color: $white;
-      padding: 1rem;
-      font-size: 20px;
       color: $white;
-      padding: 1rem;
+      padding: 10px;
       display: flex;
       align-items: center;
       column-gap: .5rem;
@@ -31,14 +29,6 @@
       }
       
     }
-  }
-  .water-right-information{
-    max-width: 50vw; // setting water right to half screen size. 
-    min-height: 33vh;
-    color: $white;
-  }
-  .water-rights-card{
-    
   }
 
   
@@ -81,9 +71,9 @@
     
     > .map-container {
       flex-grow: 1;
-      min-height: 60vh;
-      max-height: 440px;// to make map squarish
-      max-width:50vw;///////////////////////// Trying to make map half screen size
+      min-height: 80vh;
+      max-height: 80vh;
+      max-width:50vw;// map half screen size
       padding: 5px;
     }
     
@@ -96,6 +86,13 @@
         flex-grow: 1;
       }
     }
+  }
+  .paragraph-truncate{//setting the legth to the truncated text to 3 lines.
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    
   }
   
   

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
-interface TextTruncateProps {
+interface TruncatedTextProps {
   text: string;
-  maxLength: number;
 }
 
-const TextTruncate: React.FC<TextTruncateProps> = ({ text, maxLength }) => {
+const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
   const [showFullText, setShowFullText] = useState(false);
 
   const toggleShowFullText = () => {
@@ -28,7 +27,10 @@ const TextTruncate: React.FC<TextTruncateProps> = ({ text, maxLength }) => {
       ) : (
         <>
           <p>
-            {text.length > maxLength ? text.slice(0, maxLength) + '...' : text}
+            <div className='paragraph-truncate'>
+                {   text}
+            </div>
+            
             <span
               style={{ color: 'blue', cursor: 'pointer' }}
               onClick={toggleShowFullText}
@@ -43,4 +45,4 @@ const TextTruncate: React.FC<TextTruncateProps> = ({ text, maxLength }) => {
   );
 };
 
-export default TextTruncate;
+export default TruncatedText;
