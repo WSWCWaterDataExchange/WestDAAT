@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
 import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
 import SiteDetailsPage from "./pages/SiteDetailsPage";
+import { clarity } from 'clarity-js'
 
 export interface AppProps {
   msalInstance: IPublicClientApplication
@@ -50,6 +51,18 @@ function App({ msalInstance }: AppProps) {
       ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
     }
   }, [googleAnalyticsInitialized, location])
+
+  useEffect(() => {
+    if((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0){
+      console.log(`starting clarity: ${process.env.REACT_APP_CLARITY_ID}`)
+      clarity.start({
+        projectId: process.env.REACT_APP_CLARITY_ID,
+        upload: 'https://m.clarity.ms/collect',
+        track: true,
+        content: true
+      })	
+    }
+  }, [])
 
   return (
     <MsalProvider instance={msalInstance}>
