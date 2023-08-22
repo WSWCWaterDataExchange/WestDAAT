@@ -70,7 +70,7 @@ function WaterRightProperties() {
                   <PropertyValue label='Method Type' value={details.methodType} />
                   <PropertyValue label='Method Link' value={details.methodLink} isUrl={true} />
                   <PropertyValue label='WaDE Data Mapping Process' value={details.waDEDataMappingUrl} isUrl={true} />
-                  <PropertyValue label='Method Description' value={details.methodDescription} isVerbose={true} isTruncated={true}/>
+                  <PropertyValue label='Method Description' value={details.methodDescription} isVerbose={true} />
                 </div>
               </Card.Body>
             </Card>

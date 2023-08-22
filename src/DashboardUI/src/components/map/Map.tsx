@@ -147,9 +147,6 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
-      //mapInstance.addControl(new mapboxgl.FullscreenControl());// This is to make map fullscreen.
-      
-
       mapboxDrawControl(mapInstance);
 
       mapInstance.on('render', () => {

@@ -61,3 +61,42 @@ input[type='date'][value='']{
   // stops radio buttons from showing in front of dropdowns
   z-index: 0 !important;
 }
+
+.line-clamp{
+  p {
+    --line-clamp: 3;
+    --expanded-height: auto;
+    --truncated-height: auto;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--line-clamp);
+    overflow: hidden;
+    height: var(--truncated-height);
+    transition: height 0.3s ease;
+  }
+  &.truncated{
+    p {
+      margin-bottom: 0;
+    }
+    button::after {
+      content: 'Show More';
+    }
+    &.open{
+      p {
+        -webkit-line-clamp: unset;
+        height: var(--expanded-height);
+      }
+      button::after {
+        content: 'Show Less';
+      }
+    }
+  }
+  &:not(.truncated){
+    p {
+      height: auto;
+    }
+    button {
+      display: none;
+    }
+  }
+}
