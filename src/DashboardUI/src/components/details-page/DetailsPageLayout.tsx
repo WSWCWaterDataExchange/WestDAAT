@@ -40,10 +40,10 @@ const DetailsPage: DetailsPageComponent = function DetailsPage({children}: Props
         </div>
       </div>
       <div className='row properties-row'>
-        <div className='col-md-6'>
+        <div className='col-6'>
           {properties}
         </div>
-        <div className='col-md-6'>
+        <div className='col-6'>
           {map}
         </div>
       </div>
