@@ -54,7 +54,6 @@ function App({ msalInstance }: AppProps) {
 
   useEffect(() => {
     if((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0){
-      console.log(`starting clarity: ${process.env.REACT_APP_CLARITY_ID}`)
       clarity.start({
         projectId: process.env.REACT_APP_CLARITY_ID,
         upload: 'https://m.clarity.ms/collect',
