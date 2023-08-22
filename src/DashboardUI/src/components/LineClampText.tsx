@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-interface TruncatedTextProps {
+interface LineClampTextProps {
   text: string;
 }
 
-const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
+const LineClampText: React.FC<LineClampTextProps> = ({ text }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClamped, setIsClamped] = useState(true);
   const paragraphRef = useRef<HTMLParagraphElement>(null);
@@ -42,7 +42,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
 
   return (
     <div>
-      <div className={`paragraph-truncate${isOpen ? ' open' : ''}${isClamped ? ' truncated' : ''}`}>
+      <div className={`line-clamp${isOpen ? ' open' : ''}${isClamped ? ' truncated' : ''}`}>
         <p ref={paragraphRef}>{text}</p>
         <button className='btn btn-link p-0 m-0' onClick={toggleShowFullText}></button>
       </div>
@@ -50,4 +50,4 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
   );
 };
 
-export default TruncatedText;
+export default LineClampText;
