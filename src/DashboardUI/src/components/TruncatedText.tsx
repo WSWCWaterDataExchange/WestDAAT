@@ -15,7 +15,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
 
   useEffect(() => {
     let clone: HTMLDivElement | undefined = undefined;
-    if(paragraphRef && paragraphRef.current){
+    if(paragraphRef?.current){
       clone = paragraphRef.current.parentElement?.cloneNode(true) as HTMLDivElement || document.createElement('div');
       clone.style.visibility='hidden';
       clone.style.position = 'fixed';
@@ -23,7 +23,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text }) => {
       paragraphRef.current.parentElement?.parentElement?.appendChild(clone);
     }
     function handleResize() {
-      if (paragraphRef && paragraphRef.current && clone) {
+      if (paragraphRef?.current && clone) {
         clone.style.width = `${paragraphRef.current.parentElement?.clientWidth}px`;
         const clientHeight = clone.querySelector('p')?.clientHeight || 0;
         const scrollHeight = clone.querySelector('p')?.scrollHeight || 0;
