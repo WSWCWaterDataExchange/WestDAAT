@@ -89,7 +89,7 @@
   }
   .paragraph-truncate{//setting the legth to the truncated text to 3 lines.
     p {
-      --line-clamp: 5;
+      --line-clamp: 3;
       --expanded-height: auto;
       --truncated-height: auto;
       display: -webkit-box;
