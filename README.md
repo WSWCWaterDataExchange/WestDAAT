@@ -5,7 +5,7 @@
 1. Clone this repo.
 2. Make sure you have the .NET 6 SDK installed.
 3. Start SQL Server (Docker or Host machine)
-   - If you already have a SQL Server container running, just use that
+   - If you already have a SQL Server container running, just use that as the Host machine no need for docker. 
    - To spin up a new SQL server docker container:
       - `docker-compose` file supplied in `src/API/BackendServices/WesternStatesWater.WaDE.Docker/docker-compose.dev.yml`
       - `docker-compose up -d`
@@ -16,9 +16,10 @@
    - If not using the default SQL server, update the connection string in launchSettings.json in the DbUp project
    - May need to run this twice if using docker
 5. Setup Function App
+   - Open Solution: path to file WestDAAT\src\API\WesternStatesWater.WestDaat.sln
    - Right-click on **Client.Functions** project and choose **Set as Startup Project**
    - create `local.settings.json` file in the **Client.Functions** project
-   - If necessary, create `personal.settings.json` to override any developer specific settings
+   - If necessary, create personal.settings.json to override any developer specific settings. As an example( e.g. Insert: {“Database”:{“ConnectionString”: “Server = ‘Insert server name here’ ; Initial Catalog = ‘Insert local db name here’ ; Integrated Security = true;”}}) However this may vary. 
    - Set the listening port to 5001
       - Right-click on **Client.Functions** project
       - Choose Properties
@@ -28,13 +29,13 @@
       - Run the Function App
 6. Setup React App
    - install NPM packages.
-      - From the DashboardUI directory `npm install`
+      - From the DashboardUI directory: `npm install`
    - Requires Node version 16+
    - Requires NPM version 8+
       - For Windows download the Node installer here: https://nodejs.org/en/download/
          - this installer includes NPM update
    - Start React App
-     - `npm run start`
+     - From the DashboardUI directory: `npm run start`
    
 
 ## CORS errors

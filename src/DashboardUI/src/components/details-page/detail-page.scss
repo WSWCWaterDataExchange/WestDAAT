@@ -1,3 +1,4 @@
+//Water Rights Landing Page
 @import '../../styles/colors';
 
 .detail-page {
@@ -12,13 +13,11 @@
   }
   
   .water-rights-card, .site-card {
-    .card-header {
+    .card-header{
       font-size: 20px;
       color: $white;
-      padding: 1rem;
-      font-size: 20px;
       color: $white;
-      padding: 15px;
+      padding: 10px;
       display: flex;
       align-items: center;
       column-gap: .5rem;
@@ -31,9 +30,10 @@
       
     }
   }
+
   
   .property-name {
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 18px;
     color: $text-color-grey;
     &:first-of-type{
@@ -42,9 +42,10 @@
   }
   
   .property-value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: $text-color-black;
+    display: flex;// For aligning correctly
     &:empty{
       color: $text-color-grey;
       &:before{
@@ -68,19 +69,18 @@
     flex-direction: column;
     
     > .map-container {
-      flex-grow: 1;
-      min-height: 450px;
+      height: 100%;
+      max-height: 80vh;
+      min-height: 750px;
+      padding: 5px;
     }
     
-    .theme-selector-container{
-      display: flex;
-      justify-content: center;
+    .theme-selector-container{ 
+      position: absolute;
       .map-themes {
-        flex-grow: 1;
+        flex-direction: column;
       }
     }
   }
-  
-  
 }
 
