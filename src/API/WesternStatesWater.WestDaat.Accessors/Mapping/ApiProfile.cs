@@ -68,7 +68,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCvNavigation.WaDEName.Length > 0 ? c.SiteTypeCvNavigation.WaDEName : c.SiteTypeCv))
                 .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint))
                 .ForMember(a => a.PodPou, b => b.MapFrom(c => c.PODorPOUSite))
-                .ForMember(a => a.WaterSourceTypes, b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d => d.WaterSource.WaterSourceTypeCv)));
+                .ForMember(a => a.WaterSourceTypes, b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d => d.WaterSource.WaterSourceTypeCvNavigation.WaDEName.Length > 0 ? d.WaterSource.WaterSourceTypeCvNavigation.WaDEName : d.WaterSource.WaterSourceTypeCv)));
             CreateMap<EF.SitesDim, SiteInfoListItem>()
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
             CreateMap<EF.SitesDim, SiteLocation>();
