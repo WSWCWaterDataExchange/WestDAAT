@@ -1181,9 +1181,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow("expectedName", "name2", "expectedName")]
-        [DataRow("", "expectedName", "expectedName")]
-        public async Task FindWaterRights_WaterSourceTypes_MatchByWadeNameOrName(string waterSourceTypeWadeName, string waterSourceTypeName, string searchInput)
+        [DataRow("expectedName", "name2", "expectedName", true)]
+        [DataRow("", "expectedName", "expectedName", true)]
+        [DataRow("", "name2", "expectedName", false)]
+        [DataRow("name2", "expectedName", "expectedName", false)]
+        public async Task FindWaterRights_WaterSourceTypes_MatchByWadeNameOrName(string waterSourceTypeWadeName, string waterSourceTypeName, string searchInput, bool shouldMatch)
         {
             // Arrange
             var waterSourceType = new WaterSourceTypeFaker().Generate();
@@ -1221,8 +1223,16 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = await accessor.FindWaterRights(searchCriteria, 0);
 
             //Assert
-            result.WaterRightsDetails.Count().Should().Be(1);
-            result.WaterRightsDetails.FirstOrDefault().AllocationUuid.Should().Be(expectedAllocationUuid);
+            if (shouldMatch)
+            {
+                result.WaterRightsDetails.Count().Should().Be(1);
+                result.WaterRightsDetails.FirstOrDefault().AllocationUuid.Should().Be(expectedAllocationUuid);
+            }
+            else
+            {
+                result.WaterRightsDetails.Should().BeEmpty();
+            }
+            
         }
 
         [TestMethod]

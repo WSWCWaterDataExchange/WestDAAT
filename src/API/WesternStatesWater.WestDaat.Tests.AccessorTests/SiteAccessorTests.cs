@@ -1,4 +1,5 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -335,6 +336,74 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
                 justOne.Count().Should().Be(1);
             });
+        }
+
+        [DataTestMethod]
+        [DataRow("", "name", "name")]
+        [DataRow("wadeName", "name", "wadeName")]
+        public async Task GetSites_UseWaterSourceTypeWaDEName(string wadeName, string name, string expectedName)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var waterSourceType = new WaterSourceTypeFaker()
+                .RuleFor(a => a.Name, () => name)
+                .RuleFor(a => a.WaDEName, () => wadeName);
+            var waterSource = new WaterSourceDimFaker()
+                .RuleFor(a => a.WaterSourceTypeCvNavigation, () => waterSourceType);
+
+            var site = new SitesDimFaker();
+            site.LinkWaterSources(waterSource);
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSites();
+
+            result.Should().HaveCount(1);
+            result[0].WaterSourceTypes.Should().HaveCount(1);
+            result[0].WaterSourceTypes[0].Should().Be(expectedName);
+        }
+
+        [DataTestMethod]
+        [DataRow("", "name1", "name1", "", "name2", "name2", "", "name3", "name3")]
+        [DataRow("wadeName1", "name1", "wadeName1", "wadeName2", "name2", "wadeName2", "wadeName3", "name3", "wadeName3")]
+        [DataRow("", "name1", "name1", "wadeName2", "name2", "wadeName2", "", "name3", "name3")]
+        [DataRow("wadeName1", "name1", "wadeName1", "", "name2", "name2", "wadeName3", "name3", "wadeName3")]
+        public async Task GetSites_UseWaterSourceTypeWaDEName_Multiple(string wadeName1, string name1, string expectedName1, string wadeName2, string name2, string expectedName2, string wadeName3, string name3, string expectedName3)
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var waterSourceType1 = new WaterSourceTypeFaker()
+                .RuleFor(a => a.Name, () => name1)
+                .RuleFor(a => a.WaDEName, () => wadeName1);
+            var waterSource1 = new WaterSourceDimFaker()
+                .RuleFor(a => a.WaterSourceTypeCvNavigation, () => waterSourceType1);
+
+            var waterSourceType2 = new WaterSourceTypeFaker()
+                .RuleFor(a => a.Name, () => name2)
+                .RuleFor(a => a.WaDEName, () => wadeName2);
+            var waterSource2 = new WaterSourceDimFaker()
+                .RuleFor(a => a.WaterSourceTypeCvNavigation, () => waterSourceType2);
+
+            var waterSourceType3 = new WaterSourceTypeFaker()
+                .RuleFor(a => a.Name, () => name3)
+                .RuleFor(a => a.WaDEName, () => wadeName3);
+            var waterSource3 = new WaterSourceDimFaker()
+                .RuleFor(a => a.WaterSourceTypeCvNavigation, () => waterSourceType3);
+
+            var site = new SitesDimFaker();
+            site.LinkWaterSources(waterSource1, waterSource2, waterSource3);
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSites();
+
+            result.Should().HaveCount(1);
+            result[0].WaterSourceTypes.Should().BeEquivalentTo(new[] { expectedName1, expectedName2, expectedName3 } );
         }
 
         private ISiteAccessor CreateSiteAccessor()
