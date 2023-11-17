@@ -7,6 +7,7 @@ import { useHomePageContext } from './Provider';
 import { HomePageTab } from '../../pages/HomePage';
 
 import './home-page.scss'
+import { Nav } from 'react-bootstrap';
 
 export function Layout() {
   const { downloadModal, setShowDownloadModal } = useHomePageContext();
@@ -32,6 +33,13 @@ export function Layout() {
         currentTab={currentTab}
         showDownloadModal={setShowDownloadModal} />
 
+        <Nav>
+          <Nav.Item>
+              <Nav.Link href ="/details/time">Time Series Data</Nav.Link>
+          </Nav.Item>
+        </Nav>
+
+
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         {currentTabElement}
       </div>
@@ -42,5 +50,6 @@ export function Layout() {
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
       {downloadModal}
     </div>
+    
   );
 }

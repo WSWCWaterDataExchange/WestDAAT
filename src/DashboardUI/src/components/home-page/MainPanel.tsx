@@ -3,6 +3,7 @@ function MainPanel(props: { children: JSX.Element | JSX.Element[]; }) {
     <div className="flex-grow-1 position-relative">
       {props.children}
     </div>
+    
   );
 }
 

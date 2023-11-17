@@ -1,0 +1,211 @@
+@import '../../../styles/colors';
+
+.detail-page {
+  .site-card {
+    .card-header {
+      background-color: $card-header-color-blue;
+    }
+  }
+}
+
+.cards {
+  padding-top: 10px;
+}
+
+.title-header {
+  padding: 10px;
+  border-bottom: 1px solid $bs-gray-600;
+}
+
+.water-rights-card,
+.site-card {
+  .card-header {
+    font-size: 20px;
+    color: $white;
+    color: $white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    column-gap: .5rem;
+
+    >svg {
+      flex-shrink: 0;
+    }
+
+    >span {
+      line-height: 1;
+    }
+
+  }
+}
+
+.tbl-header:hover {
+  cursor: pointer;
+}
+
+.sort-header {
+  display: inline-block;
+}
+
+.sqp-input {
+  border: bold;
+  font-size: large;
+  padding-left: 15px;
+  padding-top: 10px;
+  overflow-y: auto;
+}
+
+.site-header {
+  background-color: $card-header-color-blue;
+  color: white;
+}
+
+.p-header {
+  font-weight: bold;
+
+}
+
+.p-description {
+  color: #676767;
+}
+
+.all-cards {
+  padding: 15px;
+}
+
+.tabs-chart {
+  padding: 15px;
+}
+
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid #ccc;
+}
+
+.tab-results table {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tab-results th,
+.tab-results td {
+  white-space: wrap;
+}
+
+.bottom-row {
+  width: 100%;
+}
+.error-message{
+  color: red;
+  display: inline;
+}
+
+.download-button {
+  float: right;
+}
+
+.api-link {
+  padding-top: 10px;
+}
+
+.tabs-chart {
+  background-color: white;
+}
+
+.time-series-page {
+  background-color: white;
+  overflow-y: scroll;
+}
+
+.pagination {
+  padding-top: 10px;
+  width: 35vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-buttons {
+  background-color: #e1ecf4;
+  border-radius: 3px;
+  border: 1px solid #7aa7c7;
+  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  color: #39739d;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.15385;
+  margin: 0;
+  outline: none;
+  padding: 8px .8em;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  white-space: nowrap;
+  width: 80px;
+  height: 30px;
+  text-align: center;
+}
+
+.page-buttons:hover,
+.page-buttons:focus {
+  background-color: #b3d3ea;
+  color: #2c5777;
+}
+
+.page-buttons:focus {
+  box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+}
+
+.page-buttons.active {
+  background-color: #007BFF;
+  /* Change the background color for the active page */
+  color: white;
+}
+
+
+.time-series-theme {
+  position: absolute; // Overlayed Layout tabs over map
+  transform: rotate(90deg) translateX(140px)translateY(110px); //rotate map option themes and position them in right spot
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  z-index: 10;
+}
+
+.download-button {
+  color: #ffffff;
+  background-color: #0069d9;
+
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+.download-button:hover {
+  color: #ffffff;
+  background-color: #007bff;
+  border-color: #007bff;
+  transition: color 0.3s ease-in-out;
+}
+.dropdown{
+  margin: 5px;
+  padding: 5px;
+  background-color: #e1ecf4;
+  border-radius: 3px;
+  border: 1px solid #7aa7c7;
+  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  color: #39739d;
+  cursor: pointer;
+
+}

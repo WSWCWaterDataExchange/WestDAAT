@@ -21,5 +21,9 @@
     "LogLevel": {
       "Default": "Information"
     }
+  },
+  "ConnectionStrings": {
+    "AzureStorage": "UseDevelopmentStorage=true",
+    "wadeDatabase": "Server = LAPTOP-OF0AMRKK\\SQLEXPRESS2022;Initaial Catalog = WaDE2;Integrated Security=true;"
   }
 }

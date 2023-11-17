@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
 import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
 import SiteDetailsPage from "./pages/SiteDetailsPage";
-
+import TimeSeriesPage from "./pages/TimeSeriesPage";
 export interface AppProps {
   msalInstance: IPublicClientApplication
 }
@@ -62,6 +62,7 @@ function App({ msalInstance }: AppProps) {
                 <Route path="details" element={<DetailLayout />}>
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
+                  <Route path="time" element={<TimeSeriesPage />} />
                 </Route>
               </Route>
             </Routes>

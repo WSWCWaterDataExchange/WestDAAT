@@ -25,6 +25,7 @@ export const getWaterSiteLocation = async (siteUuid: string) => {
     GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
   >(
     url.toString()
+    
   );
   return data;
 };
