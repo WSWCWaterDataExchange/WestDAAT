@@ -6,9 +6,6 @@ import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
 import { useHomePageContext } from './Provider';
 import { HomePageTab } from '../../pages/HomePage';
 
-import './home-page.scss'
-import { Nav } from 'react-bootstrap';
-
 export function Layout() {
   const { downloadModal, setShowDownloadModal } = useHomePageContext();
   const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
@@ -32,14 +29,6 @@ export function Layout() {
         onTabClick={setCurrentTab}
         currentTab={currentTab}
         showDownloadModal={setShowDownloadModal} />
-
-        <Nav>
-          <Nav.Item>
-              <Nav.Link href ="/details/time">Time Series Data</Nav.Link>
-          </Nav.Item>
-        </Nav>
-
-
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         {currentTabElement}
       </div>

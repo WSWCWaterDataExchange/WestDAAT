@@ -67,8 +67,6 @@ function SiteSpecificAmount({ apiData }: TimeSeriesPropertiesProps) {
     setCurrentPage(newPage);
   };
 
-
-
   return (
     <div className="site-specific-amount">
       <div className="table-container">

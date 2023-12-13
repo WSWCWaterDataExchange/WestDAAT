@@ -18,11 +18,17 @@ import ReactGA from 'react-ga4';
 import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
 import SiteDetailsPage from "./pages/SiteDetailsPage";
 import TimeSeriesPage from "./pages/TimeSeriesPage";
+import TimeSeriesMapPage from "./pages/TimeSeriesMapPage";
+import TimeFullMap from "./components/details-page/timeseries/time-series-map/TimeFullMap";
+import {SiteUUIDContext}   from "./components/details-page/timeseries/Context/SiteUUIDContext"
+import APISearch from "./components/details-page/timeseries/APISearch";
+
 export interface AppProps {
   msalInstance: IPublicClientApplication
 }
 
 function App({ msalInstance }: AppProps) {
+  const initialSiteUUID: string | null = null;
   const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
@@ -51,23 +57,30 @@ function App({ msalInstance }: AppProps) {
     }
   }, [googleAnalyticsInitialized, location])
 
+  const [storedSiteUUID, setStoredSiteUUID] = useState("");
+
   return (
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <QueryClientProvider client={queryClient}>
           <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+          <SiteUUIDContext.Provider value={{storedSiteUUID,setStoredSiteUUID}}>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />
                 <Route path="details" element={<DetailLayout />}>
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
-                  <Route path="time" element={<TimeSeriesPage />} />
+                  <Route path="timeSeriesPage/:siteUUID" element={<TimeSeriesPage />} />
+                  <Route path = "timeSeriesMap" element={<TimeSeriesMapPage/>}/>
+                  <Route path = "timeFullMap" element={ <TimeFullMap/>}/>
+                  <Route path = "apiSearch" element={ <APISearch/>}/>
                 </Route>
               </Route>
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} />
             <ToastContainer />
+            </SiteUUIDContext.Provider>
           </DndProvider>
         </QueryClientProvider>
       </AppProvider>

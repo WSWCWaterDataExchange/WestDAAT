@@ -1,0 +1,52 @@
+.time-series-home-map {
+  display: flex;
+  background-color: white;
+}
+
+.time-series-home-filter {
+  width: 25%;
+  padding: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+}
+
+/* Ensure that the filters stack vertically */
+.time-series-home-filter select {
+  display: block;
+  margin-bottom: 10px; /* Add margin to separate filters */
+}
+
+.series-map {
+  flex: 1; /* Adjust the flex value based on your layout */
+  height: 100vh;
+}
+.popup-card{
+  margin:-15px;
+}
+.popup-header{
+ font-size: 14px;
+ padding-top: 25px;
+}
+.popup-body{
+  padding: 15px;
+}
+.link-text {
+  color: blue; /* Set the text color to blue (or your preferred color) */
+  text-decoration: underline; /* Underline the text to indicate a link */
+  cursor: pointer; /* Change the cursor to a pointer on hover */
+
+  border:none
+}
+
+.link-text:hover {
+  color: darkblue; /* Change the color on hover (optional) */
+}
+.series-map{
+  cursor: pointer;
+}
+.map-popup-card-time-site-link-icon{
+  fill: #FF0000;
+  line-height: 1;
+  height: 1em;
+  width: 1em;
+}
