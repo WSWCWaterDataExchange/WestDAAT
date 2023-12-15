@@ -50,3 +50,30 @@
   height: 1em;
   width: 1em;
 }
+.map-legend {
+  position: absolute;
+  bottom: 55px;
+  left: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border: 1px solid #000;
+  border-radius: 50px;
+}
+
+.legend-name {
+  font-size: 14px;
+}
