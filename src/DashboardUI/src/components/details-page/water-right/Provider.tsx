@@ -18,7 +18,7 @@ export interface HostData{
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
 }
 
-type ActiveTabType = 'site' | 'source';
+type ActiveTabType = 'site' | 'source' |'regulatory';
 interface WaterRightDetailsPageContextState {
   allocationUuid: string | undefined,
   activeTab: ActiveTabType,

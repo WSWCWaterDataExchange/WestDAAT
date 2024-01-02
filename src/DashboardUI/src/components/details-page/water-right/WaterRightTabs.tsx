@@ -3,7 +3,8 @@ import { useWaterRightDetailsContext } from './Provider';
 
 export enum WaterRightTab {
   SiteInfo = 'SiteInfo',
-  WaterRightInfo = 'WaterRightInfo'
+  WaterRightInfo = 'WaterRightInfo',
+  RegulatoryInfo = 'RegulatoryInfo'
 }
 
 function WaterRightTabs() {
@@ -13,12 +14,14 @@ function WaterRightTabs() {
     hostData:{
       siteInfoListQuery: {data: siteInfoList},
       sourceInfoListQuery: {data: sourceInfoList}
+      // regulatoryInfoListQuery: {data: regulatoryInfoList}
     }
   } = useWaterRightDetailsContext();
 
   return (
     <>
-      <Tabs onSelect={a=>setActiveTab(a === 'site' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs">
+      {/* <Tabs onSelect={a=>setActiveTab(a === 'site' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs"> */}
+      <Tabs onSelect={(a) => setActiveTab(a === 'site' ? a : (a === 'source' ? a : 'regulatory'))} activeKey={activeTab} className="mb-3 custom-tabs">
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>
@@ -73,6 +76,34 @@ function WaterRightTabs() {
             </tbody>
           </Table>
         </Tab>
+
+        <Tab eventKey="regulatory" title="Regulatory Info">
+          <Table hover>
+            <thead>
+              <tr>
+                <th>WaDE Regulatory ID</th>
+                <th>Regulatory Native ID</th>
+                <th>Regulatory Name</th>
+                <th>Regulatory Type</th>
+                <th>Oversight Agency</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sourceInfoList?.map((source) =>
+                <tr key={source.waterSourceUuid}>
+                  <td>{source.waterSourceUuid}</td>
+                  <td>{source.waterSourceNativeId}</td>
+                  <td>{source.waterSourceName}</td>
+                  <td>{source.waterSourceType}</td>
+                  <td>{source.gnisfeatureNameCv}</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Tab>
+
+
+
       </Tabs>
     </>
   )
