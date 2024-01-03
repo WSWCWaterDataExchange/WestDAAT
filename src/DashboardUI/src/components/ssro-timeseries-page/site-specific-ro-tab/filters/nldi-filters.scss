@@ -1,0 +1,4 @@
+// overriding form check label padding top, if not the switch will look like a staircase
+.form-check-label {
+  padding-top: 4px !important;
+}

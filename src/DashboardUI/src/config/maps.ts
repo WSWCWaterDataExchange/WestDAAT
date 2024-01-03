@@ -13,6 +13,7 @@ export const mapLayerNames = {
 
 export const mapSourceNames = {
   waterRightsVectorTiles: 'water-rights-vector-tiles',
+  sitespecificROVectorTiles: 'site-specific-ro-vector-tiles',
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson'
@@ -56,6 +57,12 @@ const mapsJson = {
       "id": mapSourceNames.waterRightsVectorTiles,
       "type": "vector",
       "url": process.env.REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL,
+      "volatile": true
+    },
+    {
+      "id": mapSourceNames.sitespecificROVectorTiles,
+      "type": "vector",
+      "url": process.env.REACT_APP_SITE_SPECIFIC_RO_VECTOR_TILE_URL,
       "volatile": true
     },
     {
