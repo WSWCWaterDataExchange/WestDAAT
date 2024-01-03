@@ -15,6 +15,7 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
+import SSROTimeSeriesMapPage from "./pages/SSROTimeSeriesMapPage";
 import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
 import SiteDetailsPage from "./pages/SiteDetailsPage";
 import { clarity } from 'clarity-js'
@@ -71,6 +72,7 @@ function App({ msalInstance }: AppProps) {
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />
+                <Route path="ssroTimeSeriesPage" element={<SSROTimeSeriesMapPage />}/>
                 <Route path="details" element={<DetailLayout />}>
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
