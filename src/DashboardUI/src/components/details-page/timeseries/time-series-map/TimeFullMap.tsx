@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from "mapbox-gl";
 import "./TimeSeriesMap.scss";
 import Icon from "@mdi/react";
@@ -8,6 +8,10 @@ import { Card } from "react-bootstrap";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import Select from "react-select";
 import MapLegend from "./MapLegend";
+
+// import * as maptilersdk from '@maptiler/sdk';
+// import "@maptiler/sdk/dist/maptiler-sdk.css";
+
 
 interface OptionType {
   label: string;
@@ -27,9 +31,10 @@ function TimeFullMap() {
     setSelectedWadeNameS(selectedOption?.value || null);
   };
 
+
+
   useEffect(() => {
     mapboxgl.accessToken = mapboxgl.accessToken;
-
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/amabdallah/clpa0f7dx001901op5ihpfqev",
@@ -37,6 +42,15 @@ function TimeFullMap() {
       zoom: 5,
     });
     setMapInstance(map);
+
+
+    //  const map = new maptilersdk.Map({
+    //   container: "map",
+    //   style: "https://api.maptiler.com/tiles/d57c6c3e-9eed-4da6-bc87-13a5e7a0aeee/tiles.json?key=IauIQDaqjd29nJc5kJse",
+    //   center: [-110, 40],
+    //   zoom: 5,
+    // });
+
 
     map.on("load", async () => {
       // Add a click event listener to the map
