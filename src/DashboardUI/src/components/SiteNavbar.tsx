@@ -104,7 +104,7 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/water-rights-data">Water Rights Data</Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/contact-us">Contact Us</Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/westdaat-terms-of-service/">Terms of Service</Nav.Link>
-            <Nav.Link target="_blank" rel="noopener noreferrer" href="/details/timeSeriesMap">RJ Time Series Data Demo</Nav.Link> 
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="/ss-timeseries-page/ss-timeseries.tsx">RJ Time Series Data Demo</Nav.Link> 
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
