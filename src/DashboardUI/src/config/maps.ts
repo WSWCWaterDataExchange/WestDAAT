@@ -3,6 +3,7 @@ import { nldi, pointSizes, waterRightsProperties } from "./constants";
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
   waterRightsPolygonsLayer: 'waterRightsPolygons',
+  sitespecificROLayer: 'siteSpecificROPoints',
   riverBasinsLayer: 'river-basins',
   siteLocationsPolygonsLayer: 'site-locations-polygons',
   siteLocationsPointsLayer: 'site-locations-points',
@@ -123,6 +124,18 @@ const mapsJson = {
       "friendlyName": "Water Rights Points",
       "source-layer": "points",
       "source": mapSourceNames.waterRightsVectorTiles,
+      "layout": {
+        "visibility": "none",
+        "circle-sort-key": defaultPointCircleSortKey
+      },
+      "type": "circle",
+      "paint": defaultPointPaintConfiguration,
+    },
+    {
+      "id": mapLayerNames.sitespecificROLayer,
+      "friendlyName": "Site Specific Reservoir Observation Site Points",
+      "source-layer": "points",
+      "source": mapSourceNames.sitespecificROVectorTiles,
       "layout": {
         "visibility": "none",
         "circle-sort-key": defaultPointCircleSortKey
