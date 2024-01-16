@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useMapContext } from "../../../../../contexts/MapProvider";
-import { useWaterRightsContext } from "../../Provider";
+import { useSiteSpecificContext } from "../../Provider";
 import { mapLayerNames } from "../../../../../config/maps";
 import { MapGrouping } from "../../MapGrouping";
 import { useColorMappings } from "../useColorMappings";
@@ -16,26 +16,23 @@ export function useWadeLegend() {
     const { 
       filters: {
         beneficialUseNames: beneficialUseFilters, 
-        waterSourceTypes: waterSourceTypeFilters, 
-        ownerClassifications: ownerClassificationsFilters
+        waterSourceTypes: waterSourceTypeFilters
       },
       displayOptions: {
         mapGrouping: mapGroupingOption
       }
-    } = useWaterRightsContext();
+    } = useSiteSpecificContext();
 
-    const {beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, fallbackColor} = useColorMappings();
+    const {beneficialUseColors, waterSourceTypeColors, fallbackColor} = useColorMappings();
 
     const mapGroupingColors = useMemo(() => {
       switch (mapGroupingOption) {
         case MapGrouping.BeneficialUse:
           return beneficialUseColors
-        case MapGrouping.OwnerClassification:
-          return ownerClassificationColors
         case MapGrouping.WaterSourceType:
           return waterSourceTypeColors
       }
-    }, [mapGroupingOption, beneficialUseColors, ownerClassificationColors, waterSourceTypeColors])
+    }, [mapGroupingOption, beneficialUseColors, waterSourceTypeColors])
   
     const renderedMapGroupingsColors = useMemo(() => {
       const tryParseJsonArray = (value: any) => {
@@ -53,13 +50,10 @@ export function useWadeLegend() {
       if (mapGroupingOption === MapGrouping.WaterSourceType as string && waterSourceTypeFilters && waterSourceTypeFilters.length > 0) {
         colorMappings = colorMappings.filter(a => waterSourceTypeFilters?.some(b => b === a.key));
       }
-      if (mapGroupingOption === MapGrouping.OwnerClassification as string && ownerClassificationsFilters && ownerClassificationsFilters.length > 0) {
-        colorMappings = colorMappings.filter(a => ownerClassificationsFilters?.some(b => b === a.key));
-      }
       colorMappings = colorMappings.filter(a => renderedFeatures.some(b => b.properties && tryParseJsonArray(b.properties[mapGroupingOption]).some((c: string) => c === a.key)));
   
       return colorMappings;
-    }, [mapGroupingOption, mapGroupingColors, renderedFeatures, beneficialUseFilters, waterSourceTypeFilters, ownerClassificationsFilters])
+    }, [mapGroupingOption, mapGroupingColors, renderedFeatures, beneficialUseFilters, waterSourceTypeFilters])
 
     const legendItems = useMemo(() => {
       if (renderedMapGroupingsColors.length === 0) {

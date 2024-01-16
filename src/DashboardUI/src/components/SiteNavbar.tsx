@@ -9,10 +9,11 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import MenuIcon from 'mdi-react/MenuIcon';
 
 import { HomePageTab } from '../pages/HomePage';
+import { SiteSpecificROTab } from '../pages/SiteSpecificROPage';
 import { SignIn } from "./SignIn";
 
 import '../styles/navbar.scss';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { NavDropdown } from "react-bootstrap";
 import { useAuthenticationContext } from "../hooks/useAuthenticationContext";
 

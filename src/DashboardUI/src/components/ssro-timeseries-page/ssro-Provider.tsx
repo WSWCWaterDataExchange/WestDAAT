@@ -1,23 +1,23 @@
 import { createContext, FC, useContext, useState } from "react";
 
-interface HomePageContextState {
+interface SiteSpecificPageContextState {
   downloadModal: JSX.Element | undefined,
   setDownloadModal: (modal: JSX.Element| undefined) => void,
   showDownloadModal: boolean,
   setShowDownloadModal: (shouldShow: boolean) => void
 }
 
-const defaultState: HomePageContextState = {
+const defaultState: SiteSpecificPageContextState = {
   downloadModal: undefined,
   setDownloadModal: () => {},
   showDownloadModal: false,
   setShowDownloadModal: () => {}
 }
 
-const HomePageContext = createContext<HomePageContextState>(defaultState);
-export const useHomePageContext = () => useContext(HomePageContext)
+const SiteSpecificPageContext = createContext<SiteSpecificPageContextState>(defaultState);
+export const useSiteSpecificPageContext = () => useContext(SiteSpecificPageContext)
 
-export const HomePageProvider: FC = ({ children }) => {
+export const SiteSpecificPageProvider: FC = ({ children }) => {
   const [ downloadModal, setDownloadModal ] = useState<JSX.Element | undefined>(undefined);
   const [ showDownloadModal, setShowDownloadModal ] = useState(false);
   
@@ -29,8 +29,8 @@ export const HomePageProvider: FC = ({ children }) => {
   }
 
   return (
-    <HomePageContext.Provider value={filterContextProviderValue}>
+    <SiteSpecificPageContext.Provider value={filterContextProviderValue}>
       {children}
-    </HomePageContext.Provider>
+    </SiteSpecificPageContext.Provider>
   );
 }

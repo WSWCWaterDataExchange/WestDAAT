@@ -1,4 +1,4 @@
-import { nldi, pointSizes, waterRightsProperties } from "./constants";
+import { nldi, pointSizes, waterRightsProperties, siteSpecificProperties} from "./constants";
 
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',

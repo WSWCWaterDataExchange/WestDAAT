@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { useWaterRightsContext, WaterRightsFilters } from "../../Provider";
+import { useSiteSpecificContext, SiteSpecificFilters } from "../../Provider";
 import { useGeoJsonFilter as useGeoJsonFilterBase } from "../../../../../hooks/filters/useGeoJsonFilter";
 
 type ValidGeoJsonFilters = 'polylines';
-export function useGeoJsonFilter<K1 extends keyof Pick<WaterRightsFilters, ValidGeoJsonFilters>>(field: K1) {
-  const { filters: { [field]: value }, setFilters } = useWaterRightsContext();
+export function useGeoJsonFilter<K1 extends keyof Pick<SiteSpecificFilters, ValidGeoJsonFilters>>(field: K1) {
+  const { filters: { [field]: value }, setFilters } = useSiteSpecificContext();
 
   const { mapFilters } = useGeoJsonFilterBase(value);
 

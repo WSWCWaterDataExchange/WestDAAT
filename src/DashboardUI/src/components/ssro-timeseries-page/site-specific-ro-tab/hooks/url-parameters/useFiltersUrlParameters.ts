@@ -1,13 +1,13 @@
 import urlParameterKeys, {depricatedUrlParameterKeys} from "../../../../../hooks/url-parameters/urlParameterKeys";
 import { useUrlParameters } from "../../../../../hooks/url-parameters/useUrlParameters";
-import { WaterRightsFilters, defaultFilters } from "../../Provider";
+import { SiteSpecificFilters, defaultFilters } from "../../Provider";
 import { useCallback, useEffect } from "react";
 import { Optional } from "../../../../../HelperTypes";
 import { BeneficialUseListItem } from "../../../../../data-contracts/BeneficialUseListItem";
 
-const paramName = urlParameterKeys.homePage.waterRightsFilters;
+const paramName = urlParameterKeys.siteSpecificPage.siteSpecificFilters;
 
-type WaterRightsFiltersV1Type = Optional<WaterRightsFilters, 'isNldiFilterActive'> 
+type WaterRightsFiltersV1Type = Optional<SiteSpecificFilters, 'isNldiFilterActive'> 
   & {beneficialUses?: BeneficialUseListItem[]}
   & {polyline?: { identifier: string, data: GeoJSON.Feature<GeoJSON.Geometry> }[]}
 
@@ -15,17 +15,15 @@ export function useFiltersUrlParameters() {
   const {getParameter: getParameterOptionalNldi, setParameter: setParameterOptionalNldi}  = useUrlParameters<WaterRightsFiltersV1Type>(paramName, defaultFilters);
   const {getParameter: getIsNldiParameterActive, setParameter: setIsNldiParameterActive} = useUrlParameters<boolean | undefined>(depricatedUrlParameterKeys.isWaterRightsNldiFilterActive, undefined)
 
-  const setParameter = useCallback((filters: WaterRightsFilters | undefined) =>{
+  const setParameter = useCallback((filters: SiteSpecificFilters | undefined) =>{
     if(filters === undefined){
       setParameterOptionalNldi(undefined);
       return;
     }
-    const slimmedFilters: WaterRightsFilters = {
+    const slimmedFilters: SiteSpecificFilters = {
       ...filters,
-      allocationOwner: (filters.allocationOwner?.trim().length ?? 0) > 0 ? filters.allocationOwner?.trim() : defaultFilters.allocationOwner,
       beneficialUseNames: (filters.beneficialUseNames?.length ?? 0) > 0 ? filters.beneficialUseNames : defaultFilters.beneficialUseNames,
       nldiFilterData: filters.isNldiFilterActive ? filters.nldiFilterData : defaultFilters.nldiFilterData,
-      ownerClassifications: (filters.ownerClassifications?.length ?? 0) > 0 ? filters.ownerClassifications : defaultFilters.ownerClassifications,
       polylines: (filters.polylines?.length ?? 0) > 0 ? filters.polylines : defaultFilters.polylines,
       riverBasinNames: (filters.riverBasinNames?.length ?? 0) > 0 ? filters.riverBasinNames : defaultFilters.riverBasinNames,
       states: (filters.states?.length ?? 0) > 0 ? filters.states : defaultFilters.states,
@@ -70,10 +68,10 @@ export function useFiltersUrlParameters() {
         hasUpdate = true;
       }
     }
-    return {filters: filters as WaterRightsFilters | undefined, hasUpdate};
+    return {filters: filters as SiteSpecificFilters | undefined, hasUpdate};
   }, [getIsNldiParameterActive, getParameterOptionalNldi])
 
-  const getParameter = useCallback((): (WaterRightsFilters | undefined) =>{
+  const getParameter = useCallback((): (SiteSpecificFilters | undefined) =>{
     return migrateFilterData().filters;
   }, [migrateFilterData]);
 

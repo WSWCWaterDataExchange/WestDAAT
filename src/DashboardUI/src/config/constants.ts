@@ -39,6 +39,16 @@ export enum waterRightsProperties {
   maxPriorityDate = 'maxPri',
 }
 
+export enum siteSpecificProperties {
+  siteUuid = 'SiteUUID',
+  beneficialUses = 'PrimaryUseCategory',
+  sitePodOrPou = 'PODorPOUSite',
+  waterSourceTypes = 'WaDENameWS',
+  siteTypes = 'WaDENameS',
+  variableTypes = 'WaDENameV',
+  states = 'State',
+}
+
 export enum nldiSiteProperties {
   sourceName = 'sourceName',
   identifier = 'identifier',

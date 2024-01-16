@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { MultiValue } from "react-select";
 import Select from "react-select";
-import { useWaterRightsContext } from "../Provider";
+import { useSiteSpecificContext } from "../Provider";
 import { useRiverBasinFilter } from "../hooks/filters/useRiverBasinFilter";
 
 export function RiverBasinSelect() {
@@ -11,7 +11,7 @@ export function RiverBasinSelect() {
     hostData:{
       riverBasinsQuery: {data: allRiverBasinOptions}
     }
-  } = useWaterRightsContext();
+  } = useSiteSpecificContext();
 
   const handleRiverBasinChange = useCallback((values: MultiValue<{ value: string; }>) => {
     const result = values.map(option => option.value);

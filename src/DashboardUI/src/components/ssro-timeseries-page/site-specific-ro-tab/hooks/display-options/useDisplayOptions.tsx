@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { useWaterRightsContext } from "../../Provider";
-import { useMapPointScaling } from "./useMapPointScaling";
+import { useSiteSpecificContext } from "../../Provider";
 import { mapLayerNames } from "../../../../../config/maps";
 import { useMapContext } from "../../../../../contexts/MapProvider";
 import { useMapLegend } from "./useMapLegend";
 import useNldiMapPopup from "../../../../../hooks/map-popups/useNldiMapPopup";
-import useWaterRightDigestMapPopup from "../../../../../hooks/map-popups/useWaterRightDigestMapPopup";
+import useSiteSpecificDigestMapPopup from "../../../../../hooks/map-popups/useSiteSpecificDigestMapPopup";
 import { useAlerts } from "../useAlerts";
 
 const allSiteSpecificLayers = [
@@ -17,7 +16,7 @@ const nldiLayers = [
   mapLayerNames.nldiUsgsPointsLayer
 ];
 export function useDisplayOptions() {
-  const {filters: {riverBasinNames, isNldiFilterActive}} = useWaterRightsContext();
+  const {filters: {riverBasinNames, isNldiFilterActive}} = useSiteSpecificContext();
 
   const {
     setVisibleLayers
@@ -32,10 +31,9 @@ export function useDisplayOptions() {
   }, [riverBasinNames, isNldiFilterActive, setVisibleLayers])
 
   useMapLegend();
-  useMapPointScaling();
 
   useNldiMapPopup();
-  useWaterRightDigestMapPopup();
+  useSiteSpecificDigestMapPopup();
 
   useAlerts();
 }

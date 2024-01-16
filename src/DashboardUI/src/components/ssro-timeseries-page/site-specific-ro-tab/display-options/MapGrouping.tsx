@@ -4,7 +4,6 @@ import { useMapGroupingDisplayOption } from "../hooks/display-options/useMapGrou
 
 const mapColorLegendOptions = [
   { value: MG.BeneficialUse, label: 'Beneficial Use' },
-  { value: MG.OwnerClassification, label: 'Owner Classification' },
   { value: MG.WaterSourceType, label: 'Water Source Type' }
 ];
 export function MapGrouping() {

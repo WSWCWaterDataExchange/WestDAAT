@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { MultiValue } from "react-select";
 import Select from "react-select";
 import { useStatesFilter } from "../hooks/filters/useStatesFilter";
-import { useWaterRightsContext } from "../Provider";
+import { useSiteSpecificContext } from "../Provider";
 
 export function StatesSelect() {
   const {states, setStates} = useStatesFilter();
@@ -11,7 +11,7 @@ export function StatesSelect() {
     hostData:{
       statesQuery: { data: allStates}
     }
-  } = useWaterRightsContext();
+  } = useSiteSpecificContext();
 
   const handleStateChange = useCallback((values: MultiValue<{value: string}>) => {
     const result = values.map(option => option.value)

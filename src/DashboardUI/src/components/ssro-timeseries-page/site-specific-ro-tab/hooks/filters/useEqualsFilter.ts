@@ -1,11 +1,11 @@
 import { useCallback } from "react";
-import { useWaterRightsContext, WaterRightsFilters } from "../../Provider";
-import { waterRightsProperties } from "../../../../../config/constants";
+import { useSiteSpecificContext, SiteSpecificFilters } from "../../Provider";
+import { siteSpecificProperties } from "../../../../../config/constants";
 import { useEqualsFilter as useEqualsFilterBase } from "../../../../../hooks/filters/useEqualsFilter";
 
-type ValidEqualsFilters = 'podPou' | 'includeExempt';
-export function useEqualsFilter<K1 extends keyof Pick<WaterRightsFilters, ValidEqualsFilters>>(field: K1, mapField: waterRightsProperties) {
-  const { filters: { [field]: value }, setFilters } = useWaterRightsContext();
+type ValidEqualsFilters = 'podPou';
+export function useEqualsFilter<K1 extends keyof Pick<SiteSpecificFilters, ValidEqualsFilters>>(field: K1, mapField: siteSpecificProperties) {
+  const { filters: { [field]: value }, setFilters } = useSiteSpecificContext();
 
   const { mapFilters } = useEqualsFilterBase(value, mapField);
 

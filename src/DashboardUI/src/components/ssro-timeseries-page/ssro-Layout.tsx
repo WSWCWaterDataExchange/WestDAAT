@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import SiteFooter from '../SiteFooter';
 import SiteNavbar from '../SiteNavbar';
 import FeedbackModal from '../FeedbackModal';
-import { WaterRightsTab } from './site-specific-ro-tab/SiteSpecificROTab';
-import { useHomePageContext } from './ssro-Provider';
+import { SiteSpecificTab } from './site-specific-ro-tab/SiteSpecificROTab';
+import { useSiteSpecificPageContext } from './ssro-Provider';
+import { SiteSpecificROTab } from '../../pages/SiteSpecificROPage';
 import { HomePageTab } from '../../pages/HomePage';
 import './ssro-timeseries-page.scss'
 
 export function Layout() {
-  const { downloadModal, setShowDownloadModal } = useHomePageContext();
-  const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
+  const { downloadModal, setShowDownloadModal } = useSiteSpecificPageContext();
+  const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights); // temp fix keep it HomePageTab
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const shouldShowFeedbackModal = (show: boolean) => {
@@ -21,11 +22,11 @@ export function Layout() {
   }, [currentTab]);
 
   const currentTabElement = useMemo(() => {
-    return <WaterRightsTab />;
+    return <SiteSpecificTab />;
   }, []);
 
   return (
-    <div className="home-page d-flex flex-column">
+    <div className="site-specific-page d-flex flex-column">
       <SiteNavbar
         onTabClick={setCurrentTab}
         currentTab={currentTab}

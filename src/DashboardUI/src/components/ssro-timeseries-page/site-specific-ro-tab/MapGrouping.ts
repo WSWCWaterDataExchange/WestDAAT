@@ -1,5 +1,4 @@
 export enum MapGrouping {
-  BeneficialUse = "bu",
-  OwnerClassification = "oClass",
-  WaterSourceType = "wsType"
+  BeneficialUse = "PrimaryUseCategory",
+  WaterSourceType = "WaDENameWS"
 }

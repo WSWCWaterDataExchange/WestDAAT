@@ -4,6 +4,12 @@ const urlParameterKeys = {
     waterRightsFilters: 'wr',
     map: 'map',
     mapStyle: 'ms'
+  },
+  siteSpecificPage: {
+    siteSpecificDisplayOptions: 'ssd',
+    siteSpecificFilters: 'ss',
+    map: 'map',
+    mapStyle: 'ms'
   }
 }
 

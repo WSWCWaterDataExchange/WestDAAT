@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useWaterRightsContext, defaultNldiFilters } from "../../Provider";
+import { useSiteSpecificContext, defaultNldiFilters } from "../../Provider";
 import { waterRightsProperties } from "../../../../../config/constants";
 import { DataPoints, Directions } from "../../../../../data-contracts/nldi";
 import { useNldiFeatures } from "../../../../../hooks/queries/useNldiQuery";
@@ -29,7 +29,7 @@ const directionNames: Record<DirectionsType, string> = {
 };
 export function useNldiFilter() {
   const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useMapContext();
-  const { filters: { nldiFilterData, isNldiFilterActive }, setFilters, setNldiIds } = useWaterRightsContext();
+  const { filters: { nldiFilterData, isNldiFilterActive }, setFilters, setNldiIds } = useSiteSpecificContext();
 
   const [debouncedLatitude, debouncedLongitude] = useDebounce([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null], 400)
   const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);

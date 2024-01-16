@@ -1,28 +1,27 @@
 import MapProvider from "../../../contexts/MapProvider";
 import MainPanel from "../MainPanel";
 import SidePanel from "../SidePanel";
-import TableView from "../TableView";
-import { useWaterRightsContext, WaterRightsProvider } from "./Provider";
+import { useSiteSpecificContext, SiteSpecificProvider } from "./Provider";
 import SideBar from "./SideBar";
-import Map from '../../map/Map';
+import SSROMap from "../ssro-map";
 import { useDisplayOptions } from "./hooks/display-options/useDisplayOptions";
 import { useFilters } from "./hooks/filters/useFilters";
 import { useMapUrlParameters } from "../hooks/useMapUrlParameters";
 import { usePolylinesFilter } from "./hooks/filters/usePolylinesFilter";
 import DownloadModal from "./DownloadModal";
 import { useEffect } from "react";
-import { useHomePageContext } from "../ssro-Provider";
+import { useSiteSpecificPageContext } from "../ssro-Provider";
 import { useMapFitRequested } from "./hooks/useMapFitRequested";
 
-export function WaterRightsTab () {
+export function SiteSpecificTab () {
   return <MapProvider>
-           <WaterRightsProvider>
-             <WaterRightsLayout />
-           </WaterRightsProvider>
+           <SiteSpecificProvider>
+             <SiteSpecificLayout />
+           </SiteSpecificProvider>
          </MapProvider>
 }
 
-function WaterRightsLayout() {
+function SiteSpecificLayout() {
   useDisplayOptions();
   useFilters();
   useMapUrlParameters();
@@ -34,15 +33,14 @@ function WaterRightsLayout() {
              <SideBar />
            </SidePanel>
            <MainPanel>
-             <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
-             <TableView />
+             <SSROMap handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
            </MainPanel>
          </>
 }
 
 function useDownloadModal() {
-  const {setDownloadModal} = useHomePageContext()
-  const {filters, nldiIds} = useWaterRightsContext()
+  const {setDownloadModal} = useSiteSpecificPageContext()
+  const {filters, nldiIds} = useSiteSpecificContext()
   useEffect(() =>{
     setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />)
   }, [filters, nldiIds, setDownloadModal])

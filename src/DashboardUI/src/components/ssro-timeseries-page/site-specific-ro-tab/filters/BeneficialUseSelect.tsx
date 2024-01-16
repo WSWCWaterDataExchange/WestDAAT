@@ -4,7 +4,7 @@ import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
 import { useCallback, useEffect, useState } from 'react';
 import { useBeneficialUsesFilter } from '../hooks/filters/useBeneficialUsesFilter';
-import { useWaterRightsContext } from '../Provider';
+import { useSiteSpecificContext } from '../Provider';
 
 interface GroupedOption {
   readonly label: string;
@@ -34,7 +34,7 @@ function BeneficialUseSelect() {
     hostData:{
       beneficialUsesQuery: { data: allBeneficialUses}
     }
-  } = useWaterRightsContext();
+  } = useSiteSpecificContext();
 
   const mapBeneficialUseToBeneficialUseListItem = useCallback((name: string) =>({
     beneficialUseName: name,

@@ -28,7 +28,7 @@ const createMapMarkerIcon = (color: string) =>{
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`
 }
 
-function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
+function SSROMap({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   const { authenticationContext: {isAuthenticated} } = useAppContext();
   const {
     legend,
@@ -241,6 +241,8 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     })
   }, [map, setMapRenderedFeatures, setMapClickedFeatures])
 
+
+  // this SHOULD set my popup, but it doesn't appear to be working
   useEffect(() => {
     if(!map) return;
     if (currentMapPopup.current) {
@@ -436,10 +438,11 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       }
       <div id="map" className="map h-100" ref={dropRef}></div>
     </div>
+ 
   );
 }
 
-export default Map;
+export default SSROMap;
 
 
 

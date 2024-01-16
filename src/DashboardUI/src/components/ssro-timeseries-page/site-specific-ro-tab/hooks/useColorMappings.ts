@@ -1,15 +1,14 @@
 import { useCallback, useMemo } from "react";
-import { useWaterRightsContext } from "../Provider";
+import { useSiteSpecificContext } from "../Provider";
 import { useColorMappings as useColorMappingsBase } from "../../../../hooks/useColorMappings"
 
 export function useColorMappings() {
     const { 
       hostData: {
         beneficialUsesQuery: {data: allBeneficialUses},
-        ownerClassificationsQuery: {data: allOwnerClassifications},
         waterSourcesQuery: {data: allWaterSourceTypes}
       }
-    } = useWaterRightsContext();
+    } = useSiteSpecificContext();
 
     const {fallbackColor, getColorByIndex} = useColorMappingsBase();
 
@@ -17,11 +16,6 @@ export function useColorMappings() {
       let colorIndex = 0;
       return allBeneficialUses?.map(a => ({ key: a.beneficialUseName, color: getColorByIndex(colorIndex++) })) ?? [];
     }, [allBeneficialUses, getColorByIndex]);
-
-    const ownerClassificationColors = useMemo(()=>{
-      let colorIndex = 0;
-      return allOwnerClassifications?.map(a => ({ key: a, color: getColorByIndex(colorIndex++) })) ?? [];
-    }, [allOwnerClassifications, getColorByIndex]);
 
     const waterSourceTypeColors = useMemo(()=>{
       let colorIndex = 0;
@@ -32,13 +26,9 @@ export function useColorMappings() {
       return beneficialUseColors.find(item => item.key === beneficialUseName)?.color ?? fallbackColor
     }, [beneficialUseColors, fallbackColor])
 
-    const getOwnerClassificationColor = useCallback((ownerClassification: string) =>{
-      return ownerClassificationColors.find(item => item.key === ownerClassification)?.color ?? fallbackColor
-    }, [ownerClassificationColors, fallbackColor])
-
     const getWaterSourceTypeColor = useCallback((waterSourceType: string) =>{
       return waterSourceTypeColors.find(item => item.key === waterSourceType)?.color ?? fallbackColor
     }, [waterSourceTypeColors, fallbackColor])
 
-    return {beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, getBeneficialUseColor, getOwnerClassificationColor, getWaterSourceTypeColor, fallbackColor}
+    return {beneficialUseColors, waterSourceTypeColors, getBeneficialUseColor, getWaterSourceTypeColor, fallbackColor}
 }

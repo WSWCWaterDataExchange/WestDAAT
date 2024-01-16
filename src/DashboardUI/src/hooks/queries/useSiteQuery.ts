@@ -2,6 +2,7 @@ import { useQuery } from 'react-query';
 import {
   getSiteDetails,
   getWaterRightsDigests,
+  getSiteSpecificDigests,
   getWaterSiteLocation,
   getWaterSiteSourceInfoList,
   getWaterRightInfoList,
@@ -15,6 +16,16 @@ export function useWaterRightsDigests(siteUuid: string) {
   return useQuery(
     ['site.waterRightsDigests', siteUuid],
     async () => await getWaterRightsDigests(siteUuid),
+    {
+      enabled: !!siteUuid
+    }
+  );
+}
+
+export function useSiteSpecificDigests(siteUuid: string) {
+  return useQuery(
+    ['site.siteSpecificDigests', siteUuid],
+    async () => await getSiteSpecificDigests(siteUuid),
     {
       enabled: !!siteUuid
     }

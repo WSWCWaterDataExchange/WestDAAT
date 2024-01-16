@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { MultiValue } from "react-select";
 import Select from "react-select";
 import { useWaterSourceTypesFilter } from "../hooks/filters/useWaterSourceTypesFilter";
-import { useWaterRightsContext } from "../Provider";
+import { useSiteSpecificContext } from "../Provider";
 
 export function WaterSourceTypesSelect() {
   const {waterSourceTypes, setWaterSourceTypes} = useWaterSourceTypesFilter();
@@ -11,7 +11,7 @@ export function WaterSourceTypesSelect() {
     hostData:{
       waterSourcesQuery: {data: allWaterSourceTypes}
     }
-  } = useWaterRightsContext();
+  } = useSiteSpecificContext();
 
   const handleWaterSourceTypeChange = useCallback((values: MultiValue<{ value: string; }>) => {
     const result = values.map(option => option.value);

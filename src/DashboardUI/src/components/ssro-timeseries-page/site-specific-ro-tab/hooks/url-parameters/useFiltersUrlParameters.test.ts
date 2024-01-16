@@ -1,6 +1,6 @@
 import * as urlParameters from '../../../../../hooks/url-parameters/useUrlParameters';
 import { renderHook } from '@testing-library/react-hooks'
-import { NldiFilters, WaterRightsFilters, defaultFilters } from '../../Provider';
+import { NldiFilters, SiteSpecificFilters, defaultFilters } from '../../Provider';
 import { useFiltersUrlParameters } from './useFiltersUrlParameters';
 import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../data-contracts/BeneficialUseListItem';
@@ -11,21 +11,12 @@ let mockSetParameterWaterRights = jest.fn();
 let mockGetIsNldiParameterActive = jest.fn();
 let mockSetIsNldiParameterActive = jest.fn();
 
-const filtersWithUndefinedNldiActive: Optional<WaterRightsFilters, 'isNldiFilterActive'> = {
+const filtersWithUndefinedNldiActive: Optional<SiteSpecificFilters, 'isNldiFilterActive'> = {
   beneficialUseNames: undefined,
-  ownerClassifications: undefined,
   waterSourceTypes: undefined,
   riverBasinNames: undefined,
   states: undefined,
-  allocationOwner: undefined,
-  includeExempt: undefined,
-  minFlow: undefined,
-  maxFlow: undefined,
-  minVolume: undefined,
-  maxVolume: undefined,
   podPou: undefined,
-  minPriorityDate: undefined,
-  maxPriorityDate: undefined,
   isNldiFilterActive: undefined,
   nldiFilterData: undefined,
 }
@@ -94,23 +85,6 @@ describe('setParameter', () => {
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(mockSetParameterWaterRights.mock.calls[0][0]).toBeUndefined();
   })
-  test.each([
-    [undefined, defaultFilters.allocationOwner],
-    ['', defaultFilters.allocationOwner],
-    [' ', defaultFilters.allocationOwner],
-    ['a', 'a'],
-    [' a', 'a'],
-    ['a ', 'a'],
-    [' a ', 'a'],
-  ])('allocationOwner %j', (initial, expected) =>{
-    const filters = {...filtersWithDefinedNldiActive, allocationOwner: initial}
-    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
-
-    setParameter(filters);
-
-    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
-    expect(mockSetParameterWaterRights.mock.calls[0][0].allocationOwner).toBe(expected);
-  });
 
   test.each([
     [undefined, defaultFilters.beneficialUseNames],
@@ -144,20 +118,6 @@ describe('setParameter', () => {
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive).toEqual(initialIsNldiFilterActive);
     expect(mockSetParameterWaterRights.mock.calls[0][0].nldiFilterData).toEqual(expected);
-  });
-
-  test.each([
-    [undefined, defaultFilters.ownerClassifications],
-    [[], defaultFilters.ownerClassifications],
-    [['a'], ['a']],
-  ])('ownerClassifications %j', (initial, expected) =>{
-    const filters = {...filtersWithDefinedNldiActive, ownerClassifications: initial}
-    const {result: {current: {setParameter}}} = renderHook(() => useFiltersUrlParameters());
-
-    setParameter(filters);
-
-    expect(mockSetParameterWaterRights).toBeCalledTimes(1);
-    expect(mockSetParameterWaterRights.mock.calls[0][0].ownerClassifications).toEqual(expected);
   });
 
   test.each([

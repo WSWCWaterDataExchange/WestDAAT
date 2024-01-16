@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useGetWaterRightDataEnvelope } from "../../../../hooks/queries";
-import { useWaterRightsSearchCriteria } from "./useWaterRightsSearchCriteria";
+import { useSiteSpecificSearchCriteria } from "./useSiteSpecificSearchCriteria";
 import { useMapContext } from "../../../../contexts/MapProvider";
 import { getLatsLongsFromFeatureCollection } from "../../../../utilities/geometryHelpers";
 
 export function useMapFitRequested() {
   const [fitRequested, setFitRequested] = useState(false);
-  const {searchCriteria} = useWaterRightsSearchCriteria();
+  const {searchCriteria} = useSiteSpecificSearchCriteria();
   const {data, isLoading, isError} = useGetWaterRightDataEnvelope(searchCriteria, {enabled: fitRequested})
   const { setMapBoundSettings } = useMapContext();
 

@@ -4,11 +4,11 @@ import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { useAppContext } from '../../../contexts/AppProvider';
 import { SignIn } from "../../SignIn";
 import { WaterRightsSearchCriteriaWithFilterUrl } from '../../../data-contracts/WaterRightsSearchCriteria';
-import { WaterRightsFilters } from './Provider';
+import { SiteSpecificFilters } from './Provider';
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../../../hooks/queries';
-import { useHomePageContext } from '../ssro-Provider';
-import { useWaterRightsSearchCriteriaWithoutContext } from './hooks/useWaterRightsSearchCriteria';
+import { useSiteSpecificPageContext } from '../ssro-Provider';
+import { useSiteSpecificSearchCriteriaWithoutContext } from './hooks/useSiteSpecificSearchCriteria';
 
 function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null,
@@ -57,13 +57,13 @@ function DownloadWaterRights(props: {
 }
 
 interface DownloadModalProps extends ModalProps {
-  filters: WaterRightsFilters,
+  filters: SiteSpecificFilters,
   nldiIds: string[]
 }
 function DownloadModal(props: DownloadModalProps) {
   //this runs outside of the WaterRightsTab.  Thus, we don't have access to the WaterRightsContext.
   const { authenticationContext: {isAuthenticated} } = useAppContext();
-  const { showDownloadModal, setShowDownloadModal } = useHomePageContext();
+  const { showDownloadModal, setShowDownloadModal } = useSiteSpecificPageContext();
   const [ isFetching, setIsFetching ] = useState<boolean>(false);
   const [ isFetched, setIsFetched ] = useState<boolean>(false);
   const [ downloadError, setDownloadError ] = useState<JSX.Element | null>(null);
@@ -87,7 +87,7 @@ function DownloadModal(props: DownloadModalProps) {
     }
   }, [isFetched, setIsFetched, downloadError, setShowDownloadModal])
 
-  const {searchCriteria} = useWaterRightsSearchCriteriaWithoutContext(props);
+  const {searchCriteria} = useSiteSpecificSearchCriteriaWithoutContext(props);
 
   const searchCriteriaWithFilterUrl = useMemo(() =>{
     return {

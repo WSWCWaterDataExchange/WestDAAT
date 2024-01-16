@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
-import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
+import { useSiteSpecificSearchCriteria } from './hooks/useSiteSpecificSearchCriteria';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -83,7 +83,7 @@ type ChartDataType = {
   data: ChartSeriesDataType[]
 }
 function PieCharts() {
-  const { searchCriteria } = useWaterRightsSearchCriteria();
+  const { searchCriteria } = useSiteSpecificSearchCriteria();
 
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria)
   const { getBeneficialUseColor } = useColorMappings();

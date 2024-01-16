@@ -15,7 +15,7 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import ReactGA from 'react-ga4';
-import SSROTimeSeriesMapPage from "./pages/SSROTimeSeriesMapPage";
+import SSROTimeSeriesMapPage from "./pages/SiteSpecificROPage";
 import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
 import SiteDetailsPage from "./pages/SiteDetailsPage";
 import { clarity } from 'clarity-js'
