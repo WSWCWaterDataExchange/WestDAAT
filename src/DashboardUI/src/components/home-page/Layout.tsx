@@ -5,7 +5,6 @@ import FeedbackModal from '../FeedbackModal';
 import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
 import { useHomePageContext } from './Provider';
 import { HomePageTab } from '../../pages/HomePage';
-
 import './home-page.scss'
 
 export function Layout() {
@@ -28,8 +27,8 @@ export function Layout() {
   return (
     <div className="home-page d-flex flex-column">
       <SiteNavbar
-        onTabClick={setCurrentTab}
-        currentTab={currentTab}
+        onTabClickHP={setCurrentTab}
+        currentTabHP={currentTab}
         showDownloadModal={setShowDownloadModal} />
 
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">

@@ -1,4 +1,3 @@
-import { waterRightsProperties } from "../../../../../config/constants";
 import { siteSpecificProperties } from "../../../../../config/constants";
 import { useInFilter } from "./useInFilter";
 

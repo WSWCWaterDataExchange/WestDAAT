@@ -13,8 +13,8 @@ export function useMapUrlParameters() {
     setMapStyle,
     setPolylines
   } = useMapContext();
-  const {getParameter: getMapLocationParameter, setParameter: setMapLocationParameter} = useUrlParameters(urlParameterKeys.homePage.map, defaultMapLocationData);
-  const {getParameter: getMapStyleParameter, setParameter: setMapStyleParameter} = useUrlParameters(urlParameterKeys.homePage.mapStyle, defaultMapStyle);
+  const {getParameter: getMapLocationParameter, setParameter: setMapLocationParameter} = useUrlParameters(urlParameterKeys.siteSpecificPage.map, defaultMapLocationData);
+  const {getParameter: getMapStyleParameter, setParameter: setMapStyleParameter} = useUrlParameters(urlParameterKeys.siteSpecificPage.mapStyle, defaultMapStyle);
   const {getParameter: getFiltersUrlParameter} = useFiltersUrlParameters();
 
   useEffect(() =>{

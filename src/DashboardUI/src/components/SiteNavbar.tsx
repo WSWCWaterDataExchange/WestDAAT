@@ -9,7 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import MenuIcon from 'mdi-react/MenuIcon';
 
 import { HomePageTab } from '../pages/HomePage';
-import { SiteSpecificROTab } from '../pages/SiteSpecificROPage';
+import { SiteSpecificROTab } from '../pages/SiteSpecificROPage'; // I added this
 import { SignIn } from "./SignIn";
 
 import '../styles/navbar.scss';
@@ -18,8 +18,14 @@ import { NavDropdown } from "react-bootstrap";
 import { useAuthenticationContext } from "../hooks/useAuthenticationContext";
 
 interface SiteNavbarProps {
-  currentTab?: HomePageTab;
-  onTabClick?: (tab: HomePageTab) => void;
+  // currentTab?: HomePageTab; 
+  // onTabClick?: (tab: HomePageTab) => void;
+
+  currentTabHP?: HomePageTab; // I added this
+  currentTabSS?: SiteSpecificROTab; // I added this
+  onTabClickHP?: (tab: HomePageTab) => void; // I added this
+  onTabClickSS?: (tab: SiteSpecificROTab) => void; // I added this
+  
   showDownloadModal?: (show: boolean) => void;
 }
 
@@ -31,7 +37,7 @@ function handleLogout(msalContext: IPublicClientApplication | null) {
     });
 }
 
-function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps = {}) {
+function SiteNavbar({currentTabHP, currentTabSS, onTabClickHP, onTabClickSS, showDownloadModal}: SiteNavbarProps = {}) {
   const { instance: msalContext } = useMsal();
   const { user } = useAuthenticationContext();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -78,12 +84,20 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
         </Container>
       </Navbar>
 
-      {onTabClick && showDownloadModal && currentTab &&
+      {onTabClickHP && onTabClickSS && showDownloadModal && currentTabHP && currentTabSS &&
         <Navbar bg="light" className="p-0 second-nav">
           <Container fluid className="p-0">
             <Nav>
               {(Object.values(HomePageTab)).map(tab =>
-                <Nav.Link onClick={() => onTabClick(tab)} className={`py-3 px-4 ${currentTab === tab ? 'active-tab' : ''}`} key={tab}>
+                <Nav.Link onClick={() => onTabClickHP(tab)} className={`py-3 px-4 ${currentTabHP === tab ? 'active-tab' : ''}`} key={tab}>
+                  {tab}
+                </Nav.Link>
+                )}
+            </Nav>
+
+            <Nav>
+              {(Object.values(SiteSpecificROTab)).map(tab =>
+                <Nav.Link onClick={() => onTabClickSS(tab)} className={`py-3 px-4 ${currentTabSS === tab ? 'active-tab' : ''}`} key={tab}>
                   {tab}
                 </Nav.Link>
                 )}

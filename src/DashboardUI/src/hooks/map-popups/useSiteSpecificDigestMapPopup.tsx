@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useSiteClickedOnMap from "./useSiteClickedOnMap";
+import useSiteClickedOnMapSSRO from "./useSiteClickedOnMapSSRO";
 import ErrorCard from "../../components/map-popups/ErrorCard";
 import LoadingCard from "../../components/map-popups/LoadingCard";
 import SiteSpecificDigestCard from "../../components/map-popups/SiteSpecificDigestCard";
@@ -7,7 +7,7 @@ import { useSiteSpecificDigests } from "../queries";
 
 function useSiteSpecificDigestMapPopup() {
   //Because of how we are rendering the water rights to the UI, we cannot manage state inside of the components like SiteSpecificDigestCard.  State has to be managed here.
-  const { updatePopup, siteUuid } = useSiteClickedOnMap();
+  const { updatePopup, siteUuid } = useSiteClickedOnMapSSRO();
   const [currentIndex, setCurrentIndex] = useState(0);
   const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 

@@ -64,12 +64,12 @@ export function useAlerts(){
 
   useProgressIndicator([!isNldiDataLoading], "Loading NLDI Data");
   useProgressIndicator([!isRiverBasinPolygonLoading], "Loading River Basin Data");
-  useProgressIndicator([!isFilterEnvelopeLoading], "Finding Water Right Locations");
+  useProgressIndicator([!isFilterEnvelopeLoading], "Finding Site Specific Locations");
 
   useNldiPinDropAlert(needsToSetNldiLocation);
   useEffect(() =>{
     if(isError){
-      toast.error("Error loading water rights data.  Please try again.",
+      toast.error("Error loading site-specific data.  Please try again.",
       {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
@@ -79,7 +79,7 @@ export function useAlerts(){
   }, [isError])
   useEffect(() => {
     if(isFilterEnvelopeError){
-      toast.error("Unable to find water right locations",
+      toast.error("Unable to find site-specific locations",
       {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',

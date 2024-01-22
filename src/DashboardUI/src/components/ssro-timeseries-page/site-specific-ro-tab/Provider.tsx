@@ -4,7 +4,7 @@ import { DataPoints, Directions } from "../../../data-contracts/nldi";
 import { useDisplayOptionsUrlParameters } from "./hooks/url-parameters/useDisplayOptionsUrlParameters";
 import { defaultDisplayOptions, DisplayOptions } from "./DisplayOptions";
 import { useFiltersUrlParameters } from "./hooks/url-parameters/useFiltersUrlParameters";
-import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../../../hooks/queries/useSystemQuery";
+import { useBeneficialUses, useStates, useWaterSourceTypes } from "../../../hooks/queries/useSystemQuery";
 import { useRiverBasinOptions } from "../../../hooks/queries/useRiverBasinOptions";
 import { UseQueryResult } from "react-query";
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useGetWaterRightDataEnvelope } from "../../../../hooks/queries";
+import { useGetWaterRightDataEnvelope } from "../../../../hooks/queries/useSiteSpecificQuery";
 import { useSiteSpecificSearchCriteria } from "./useSiteSpecificSearchCriteria";
 import { useMapContext } from "../../../../contexts/MapProvider";
 import { getLatsLongsFromFeatureCollection } from "../../../../utilities/geometryHelpers";

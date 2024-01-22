@@ -6,7 +6,7 @@ import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { useSiteSpecificContext } from "./Provider";
 import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import { StatesSelect, WaterSourceTypesSelect, RiverBasinSelect, Nldi } from "./filters";
-import { MapTheme, MapGrouping, PointSize } from "./display-options";
+import { MapTheme, MapGrouping } from "./display-options";
 import { useNldiFilter } from "./hooks/filters/useNldiFilter";
 
 function SideBar() {
@@ -49,7 +49,6 @@ function SideBar() {
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
               <MapGrouping />
-              <PointSize />
               <MapTheme />
             </Accordion.Body>
           </Accordion.Item>
