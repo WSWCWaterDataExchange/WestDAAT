@@ -8,6 +8,8 @@ import { DetailsPage } from "../components/details-page/DetailsPageLayout";
 import { SiteUUIDContext } from "../components/details-page/timeseries/Context/SiteUUIDContext";
 
 function TimeSeriesPage() {
+  const [PageTypeNameString, setPageTypeNameString] = useState(""); // setting up react hook
+
   const contextValue = useContext(SiteUUIDContext);
   const { setStoredSiteUUID } = contextValue || {};
   const { siteUUID } = useParams<{ siteUUID: string }>();
@@ -27,9 +29,14 @@ function TimeSeriesPage() {
 
   return (
     <div className="time-series-page">
-      <DetailsPage.Header>Time Series Data Landing Page</DetailsPage.Header>
+      <DetailsPage.Header>
+        Time Series Data Landing Page: {PageTypeNameString}
+      </DetailsPage.Header>
       <APISearch onApiDataFetched={handleApiDataFetched} />
-      <TimeSeriesProperties apiData={apiData} />
+      <TimeSeriesProperties
+        apiData={apiData}
+        setPageTypeNameString={setPageTypeNameString}
+      />
       <TimeSeriesTabs apiData={apiData} />
     </div>
   );

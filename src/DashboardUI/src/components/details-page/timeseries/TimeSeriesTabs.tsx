@@ -7,7 +7,6 @@ import SiteSpecificAmount from "./SiteSpecificAmount";
 import SortableHeader from "../../SortableHeader";
 import Downloads from "./Downloads";
 
-
 interface TimeSeriesPropertiesProps {
   apiData: ApiData[] | null;
 }
@@ -17,23 +16,19 @@ function TimeSeriesTabs({ apiData }: TimeSeriesPropertiesProps) {
 
   let variableSpecificObjects;
   let waterSourceObjects;
+  let waterRightObjects;
 
   let apiToView = "";
   useEffect(() => {
     setActiveTab("variable");
   }, [apiData]);
 
-  if (
-    Object(apiData) !== null &&
-    Object(apiData).TotalSiteVariableAmountsCount !== undefined
-  ) {
+  if (Object(apiData) !== null && Object(apiData).TotalSiteVariableAmountsCount !== undefined) {
     if (Object(apiData).TotalSiteVariableAmountsCount !== 0) {
-      apiToView = `https://wade-api-uat.azure-api.net/v1/SiteVariableAmounts?SiteUUID=${
-        Object(apiData).Organizations[0].Sites[0].SiteUUID
-      }&key=38f422d1ada34907a91aff4532fa4669`;
-      variableSpecificObjects =
-        Object(apiData).Organizations[0].VariableSpecifics;
+      apiToView = `https://wade-api-uat.azure-api.net/v1/SiteVariableAmounts?SiteUUID=${Object(apiData).Organizations[0].Sites[0].SiteUUID}&key=38f422d1ada34907a91aff4532fa4669`;
+      variableSpecificObjects = Object(apiData).Organizations[0].VariableSpecifics;
       waterSourceObjects = Object(apiData).Organizations[0].WaterSources;
+      waterRightObjects = Object(apiData).Organizations[0].SiteVariableAmounts;
     }
   }
 
@@ -45,15 +40,14 @@ function TimeSeriesTabs({ apiData }: TimeSeriesPropertiesProps) {
     data = variableSpecificObjects;
   } else if (activeTab === "source") {
     data = waterSourceObjects;
+  } else if (activeTab === "right") {
+    data = waterRightObjects;
   }
 
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const handleSortChange = (
-    newSortBy: string,
-    newSortOrder: "asc" | "desc"
-  ) => {
+  const handleSortChange = (newSortBy: string, newSortOrder: "asc" | "desc") => {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
   };
@@ -73,7 +67,6 @@ function TimeSeriesTabs({ apiData }: TimeSeriesPropertiesProps) {
       })
     : [];
 
-
   const displayItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -84,100 +77,36 @@ function TimeSeriesTabs({ apiData }: TimeSeriesPropertiesProps) {
     <div className="tabs-chart">
       {Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
         <div className="download-button">
-        <Downloads apiData={apiData}/>
-      </div>
-      ): (
-        <div></div>)}
+          <Downloads apiData={apiData} />
+        </div>
+      ) : (
+        <div></div>
+      )}
 
-      <Tabs
-        activeKey={activeTab}
-        onSelect={(key) => setActiveTab(key as string)}
-        className="table-light"
-      >
+      <Tabs activeKey={activeTab} onSelect={(key) => setActiveTab(key as string)} className="table-light">
         <Tab eventKey="variable" title="Variable Specifics Info" />
         <Tab eventKey="specific" title="Site Specific Amount Info" />
         <Tab eventKey="source" title="Water Source Info" />
+        <Tab eventKey="right" title="Water Right Information" />
       </Tabs>
 
       {/* conditionally renders table based on what is clicked */}
-      {activeTab === "variable" &&
-      Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
+      {activeTab === "variable" && Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
         <div>
-
           <div className="table-container">
             <Table striped bordered className="tab-results">
               <thead className="tbl-header">
                 <tr className="tr-header">
-                  <SortableHeader
-                    label="VariableSpecificUUID"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="VariableSpecificTypeCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="VariableCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="AmountUnitCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="AggregationStatisticsCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="AggregationInterval"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="AggregationIntervalUnitCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="ReportYearStartMonth"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="ReportYearType"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                  <SortableHeader
-                    label="MaximumAmountUnitCV"
-                    dataType="string"
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
+                  <SortableHeader label="VariableSpecificUUID" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="VariableSpecificTypeCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="VariableCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="AmountUnitCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="AggregationStatisticsCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="AggregationInterval" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="AggregationIntervalUnitCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="ReportYearStartMonth" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="ReportYearType" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="MaximumAmountUnitCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
                 </tr>
               </thead>
               <tbody>
@@ -218,88 +147,73 @@ function TimeSeriesTabs({ apiData }: TimeSeriesPropertiesProps) {
             <Chart apiData={apiData} />
           </div>
         </div>
-      ) : activeTab === "specific" &&
-        Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
+      ) : activeTab === "specific" && Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
         <div>
-          {/* Render SiteSpecificAmount component */}
           <SiteSpecificAmount apiData={apiData} />
         </div>
-      ) : activeTab === "source" &&
-        Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
-          <div>
+      ) : activeTab === "source" && Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
         <div>
-          <Table striped bordered className="tab-results">
-            <thead className="tbl-header">
-              <tr className="tr-header">
-                <SortableHeader
-                  label="WaterSourceName"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-                <SortableHeader
-                  label="WaterSourceNativeID"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-                <SortableHeader
-                  label="WaterSourceUUID"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-                <SortableHeader
-                  label="WaterSourceTypeCV"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-                <SortableHeader
-                  label="FreshSalineIndicatorCV"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-                <SortableHeader
-                  label="WaterSourceGeometry"
-                  dataType="string"
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
-                />
-              </tr>
-            </thead>
-            <tbody>
-              {displayItems().map(
-                (
-                  item: {
-                    WaterSourceName: string | number | null;
-                    WaterSourceNativeID: string | number | null;
-                    WaterSourceUUID: string | number | null;
-                    WaterSourceTypeCV: string | number | null;
-                    FreshSalineIndicatorCV: string | number | null;
-                    WaterSourceGeometry: string | number | null;
-                  },
-                  index: Key | null | undefined
-                ) => (
-                  <tr key={index}>
-                    <td>{item.WaterSourceName}</td>
-                    <td>{item.WaterSourceNativeID}</td>
-                    <td>{item.WaterSourceUUID}</td>
-                    <td>{item.WaterSourceTypeCV}</td>
-                    <td>{item.FreshSalineIndicatorCV}</td>
-                    <td>{item.WaterSourceGeometry}</td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </Table>
+          <div>
+            <Table striped bordered className="tab-results">
+              <thead className="tbl-header">
+                <tr className="tr-header">
+                  <SortableHeader label="WaterSourceName" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="WaterSourceNativeID" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="WaterSourceUUID" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="WaterSourceTypeCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="FreshSalineIndicatorCV" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                  <SortableHeader label="WaterSourceGeometry" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                </tr>
+              </thead>
+              <tbody>
+                {displayItems().map(
+                  (
+                    item: {
+                      WaterSourceName: string | number | null;
+                      WaterSourceNativeID: string | number | null;
+                      WaterSourceUUID: string | number | null;
+                      WaterSourceTypeCV: string | number | null;
+                      FreshSalineIndicatorCV: string | number | null;
+                      WaterSourceGeometry: string | number | null;
+                    },
+                    index: Key | null | undefined
+                  ) => (
+                    <tr key={index}>
+                      <td>{item.WaterSourceName}</td>
+                      <td>{item.WaterSourceNativeID}</td>
+                      <td>{item.WaterSourceUUID}</td>
+                      <td>{item.WaterSourceTypeCV}</td>
+                      <td>{item.FreshSalineIndicatorCV}</td>
+                      <td>{item.WaterSourceGeometry}</td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </Table>
+          </div>
+          <div>
+            <Chart apiData={apiData} />
+          </div>
+        </div>
+      ) : activeTab === "right" && Object(apiData).TotalSiteVariableAmountsCount > 0 ? (
+        <div>
+          <div className="table-container">
+            <Table striped bordered className="tab-results">
+              <thead className="tbl-header">
+                <tr className="tr-header">
+                  <SortableHeader label="Water Right Native ID" dataType="string" sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <a target="_blank" href={`https://westdaat.westernstateswater.org/details/site/${Object(apiData).Organizations[0].Sites[0].SiteUUID}`} rel="noopener noreferrer">
+                      {Object(apiData).Organizations[0].SiteVariableAmounts[0].AssociatedNativeAllocationIDs}{" "}
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </Table>
           </div>
           <div>
             <Chart apiData={apiData} />

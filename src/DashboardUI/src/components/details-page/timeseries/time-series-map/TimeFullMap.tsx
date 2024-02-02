@@ -56,7 +56,7 @@ function TimeFullMap() {
       // Add a click event listener to the map
       setWadeNameSData(new Set());
       map
-        ?.queryRenderedFeatures({ layers: ["50"] } as any)
+        ?.queryRenderedFeatures({ layers: ["ss1"] } as any)
         ?.forEach((feature: { properties: any }) => {
           const properties = feature.properties;
 
@@ -70,7 +70,7 @@ function TimeFullMap() {
 
       map.on(
         "click",
-        "50",
+        "ss1",
         (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
           // Check if e.features is not undefined and contains at least one feature
           if (e.features && e.features.length > 0) {
@@ -130,11 +130,11 @@ function TimeFullMap() {
         }
       );
 
-      map.on("mouseenter", "50", () => {
+      map.on("mouseenter", "ss1", () => {
         map.getCanvas().style.cursor = "pointer";
       });
 
-      map.on("mouseleave", "50", () => {
+      map.on("mouseleave", "ss1", () => {
         map.getCanvas().style.cursor = "";
       });
     });
@@ -149,11 +149,12 @@ function TimeFullMap() {
         ? ["all", ["==", "WaDENameS", selectedWadeNameS]]
         : ["!=", "", ""]; // Show all points when no specific site type is selected
       const combinedFilter = ["all", wadeNameSFilter];
-      mapInstance.setFilter("50", combinedFilter);
+      mapInstance.setFilter("ss1", combinedFilter);
     }
   }, [isMapLoaded, selectedWadeNameS]);
 
   const legendItems = [
+    { name: 'Water Right Withdrawal', color: '#D7E25A' },
     { name: 'Stream Gage', color: '#9a6ce5' },
     { name: 'Surface Water Point', color: '#79db75' },
     { name: 'Canal / Ditch', color: '#e47777' },

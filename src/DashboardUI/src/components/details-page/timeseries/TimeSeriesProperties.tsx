@@ -10,9 +10,10 @@ import WaterCircle from "mdi-react/WaterCircleIcon";
 
 interface TimeSeriesPropertiesProps {
   apiData: ApiData[] | null;
+  setPageTypeNameString: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function TimeSeriesProperties({ apiData }: TimeSeriesPropertiesProps) {
+function TimeSeriesProperties({ apiData, setPageTypeNameString }: TimeSeriesPropertiesProps) {
   // Initialize organizationName with an empty string or some default value because of typescript
   let organizationName = "";
   let organizationState = "";
@@ -44,19 +45,24 @@ function TimeSeriesProperties({ apiData }: TimeSeriesPropertiesProps) {
   let hUC8 = "";
   let hUC12 = "";
 
+  let variableCV = "";
+
+  let associatedNativeAllocationIDs = "";
+
   function checkIfEmpty(obj: string) {
     if(obj === "" ||obj === null){
       return "..."
     }
     return obj;
   }
-
+  
 
   if (
     Object(apiData) !== null &&
     Object(apiData).TotalSiteVariableAmountsCount !== undefined
   ) {
     if (Object(apiData).TotalSiteVariableAmountsCount !== 0) {
+
       // Check if apiData is not null assign to api members
       organizationName = Object(apiData).Organizations[0].OrganizationName;
       organizationState = Object(apiData).Organizations[0].OrganizationState;
@@ -64,9 +70,7 @@ function TimeSeriesProperties({ apiData }: TimeSeriesPropertiesProps) {
       organizationPhoneNumber = Object(apiData).Organizations[0].OrganizationPhoneNumber;
       organizationPurview = Object(apiData).Organizations[0].OrganizationPurview;
       organizationContactName = Object(apiData).Organizations[0].OrganizationContactName;
-      organizationContactEmail = Object(apiData).Organizations[0].OrganizationContactEmail;
-      
-      
+      organizationContactEmail = Object(apiData).Organizations[0].OrganizationContactEmail;   
 
       applicableResourceType = Object(apiData).Organizations[0].Methods[0].ApplicableResourceType;
       methodType = Object(apiData).Organizations[0].Methods[0].MethodTypeCV;
@@ -92,8 +96,15 @@ function TimeSeriesProperties({ apiData }: TimeSeriesPropertiesProps) {
       allocationGNISIDCV = Object(apiData).Organizations[0].Sites[0].AllocationGNISIDCV;
       hUC8 = Object(apiData).Organizations[0].Sites[0].HUC8;
       hUC12 = Object(apiData).Organizations[0].Sites[0].HUC12;
+
+      variableCV = Object(apiData).Organizations[0].VariableSpecifics[0].VariableCV;
     }
   }
+
+
+  setPageTypeNameString(variableCV)
+
+
   return (
     <>
 

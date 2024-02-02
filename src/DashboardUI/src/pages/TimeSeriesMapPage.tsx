@@ -8,6 +8,7 @@ function TimeSeriesMapPage(){
 
     return(
         <div>
+            <h2>Non-Federal Streamgage, Reservoir, Groundwater Well Time Series Data</h2>
             <TimeFullMap/>
         </div>
 
