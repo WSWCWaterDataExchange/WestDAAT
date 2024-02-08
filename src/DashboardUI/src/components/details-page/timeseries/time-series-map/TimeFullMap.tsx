@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "./TimeSeriesMap.scss";
 import Icon from "@mdi/react";
@@ -12,7 +12,6 @@ import MapLegend from "./MapLegend";
 // import * as maptilersdk from '@maptiler/sdk';
 // import "@maptiler/sdk/dist/maptiler-sdk.css";
 
-
 interface OptionType {
   label: string;
   value: string;
@@ -20,9 +19,7 @@ interface OptionType {
 
 function TimeFullMap() {
   const [wadeNameSData, setWadeNameSData] = useState<Set<any>>(new Set());
-  const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(
-    null
-  );
+  const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(null);
 
   const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -30,8 +27,6 @@ function TimeFullMap() {
   const handleWadeNameSChange = (selectedOption: OptionType | null) => {
     setSelectedWadeNameS(selectedOption?.value || null);
   };
-
-
 
   useEffect(() => {
     mapboxgl.accessToken = mapboxgl.accessToken;
@@ -43,7 +38,6 @@ function TimeFullMap() {
     });
     setMapInstance(map);
 
-
     //  const map = new maptilersdk.Map({
     //   container: "map",
     //   style: "https://api.maptiler.com/tiles/d57c6c3e-9eed-4da6-bc87-13a5e7a0aeee/tiles.json?key=IauIQDaqjd29nJc5kJse",
@@ -51,84 +45,64 @@ function TimeFullMap() {
     //   zoom: 5,
     // });
 
-
     map.on("load", async () => {
       // Add a click event listener to the map
       setWadeNameSData(new Set());
-      map
-        ?.queryRenderedFeatures({ layers: ["ss1"] } as any)
-        ?.forEach((feature: { properties: any }) => {
+      map?.queryRenderedFeatures({ layers: ["ss1"] } as any)?.forEach((feature: { properties: any }) => {
+        const properties = feature.properties;
+
+        if (properties) {
+          setIsMapLoaded(true);
+          setWadeNameSData((prevData) => new Set([...prevData, properties.WaDENameS]));
+        }
+      });
+
+      map.on("click", "ss1", (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
+        // Check if e.features is not undefined and contains at least one feature
+        if (e.features && e.features.length > 0) {
+          const feature = e.features[0];
+
           const properties = feature.properties;
 
           if (properties) {
-            setIsMapLoaded(true);
-            setWadeNameSData(
-              (prevData) => new Set([...prevData, properties.WaDENameS])
-            );
-          }
-        });
+            const coordinates = (feature.geometry as any).coordinates;
 
-      map.on(
-        "click",
-        "ss1",
-        (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
-          // Check if e.features is not undefined and contains at least one feature
-          if (e.features && e.features.length > 0) {
-            const feature = e.features[0];
-
-            const properties = feature.properties;
-
-            if (properties) {
-              const coordinates = (feature.geometry as any).coordinates;
-
-              const popupContent = (
-                <div>
-                  <Card className="popup-card">
-                    <CardHeader className="popup-header">
-                      <div>
-                        Site ID:{" "}
-                        <a
-                          href={`/details/timeSeriesPage/${properties.SiteUUID}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {properties.SiteUUID}{" "}
-                          <Icon
-                            path={mdiOpenInNew}
-                            className="map-popup-card-time-site-link-icon"
-                          />
-                        </a>
-                      </div>
-                    </CardHeader>
-                    <div className="popup-body">
-                      <p>
-                        <b>SiteNativeID:</b>
-                        <br /> {properties.SiteNativeID}
-                      </p>
-                      <p>
-                        <b>SiteName:</b>
-                        <br /> {properties.SiteName}
-                      </p>
-                      <p>
-                        <b>SiteTypeCV:</b>
-                        <br /> {properties.SiteTypeCV}
-                      </p>
+            const popupContent = (
+              <div>
+                <Card className="popup-card">
+                  <CardHeader className="popup-header">
+                    <div>
+                      Site ID:{" "}
+                      <a href={`/details/timeSeriesPage/${properties.SiteUUID}`} target="_blank" rel="noopener noreferrer">
+                        {properties.SiteUUID} <Icon path={mdiOpenInNew} className="map-popup-card-time-site-link-icon" />
+                      </a>
                     </div>
-                  </Card>
-                </div>
-              );
+                  </CardHeader>
+                  <div className="popup-body">
+                    <p>
+                      <b>SiteNativeID:</b>
+                      <br /> {properties.SiteNativeID}
+                    </p>
+                    <p>
+                      <b>SiteName:</b>
+                      <br /> {properties.SiteName}
+                    </p>
+                    <p>
+                      <b>SiteTypeCV:</b>
+                      <br /> {properties.SiteTypeCV}
+                    </p>
+                  </div>
+                </Card>
+              </div>
+            );
 
-              const popupNode = document.createElement("div");
-              ReactDOM.render(popupContent, popupNode);
+            const popupNode = document.createElement("div");
+            ReactDOM.render(popupContent, popupNode);
 
-              const popup = new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setDOMContent(popupNode)
-                .addTo(map);
-            }
+            const popup = new mapboxgl.Popup().setLngLat(coordinates).setDOMContent(popupNode).addTo(map);
           }
         }
-      );
+      });
 
       map.on("mouseenter", "ss1", () => {
         map.getCanvas().style.cursor = "pointer";
@@ -145,22 +119,20 @@ function TimeFullMap() {
   useEffect(() => {
     if (mapInstance && isMapLoaded) {
       // Check if a specific site type is selected
-      const wadeNameSFilter = selectedWadeNameS
-        ? ["all", ["==", "WaDENameS", selectedWadeNameS]]
-        : ["!=", "", ""]; // Show all points when no specific site type is selected
+      const wadeNameSFilter = selectedWadeNameS ? ["all", ["==", "WaDENameS", selectedWadeNameS]] : ["!=", "", ""]; // Show all points when no specific site type is selected
       const combinedFilter = ["all", wadeNameSFilter];
       mapInstance.setFilter("ss1", combinedFilter);
     }
   }, [isMapLoaded, selectedWadeNameS]);
 
   const legendItems = [
-    { name: 'Water Right Related Withdrawal', color: '#D7E25A' },
-    { name: 'Stream Gage', color: '#9a6ce5' },
-    { name: 'Surface Water Point', color: '#79db75' },
-    { name: 'Canal / Ditch', color: '#e47777' },
-    { name: 'Well / Pump / Spring / Groundwater', color: '#6f44d5' },
-    { name: 'Reservoir / Dam', color: '#ed1dca' },
-    { name: 'Unspecified', color: '#49a0da' },
+    { name: "Water Right Related Withdrawal", color: "#D7E25A" },
+    { name: "Stream Gage", color: "#9a6ce5" },
+    { name: "Surface Water Point", color: "#79db75" },
+    { name: "Canal / Ditch", color: "#e47777" },
+    { name: "Well / Pump / Spring / Groundwater", color: "#6f44d5" },
+    { name: "Reservoir / Dam", color: "#ed1dca" },
+    { name: "Unspecified", color: "#49a0da" },
   ];
 
   return (
@@ -186,11 +158,7 @@ function TimeFullMap() {
           ]}
         />
       </div>
-      <div
-        id="map"
-        className="series-map"
-        style={{ width: "100%", height: "90vh" }}
-      ></div>
+      <div id="map" className="series-map" style={{ width: "100%", height: "90vh" }}></div>
       <MapLegend items={legendItems} />
     </div>
   );
