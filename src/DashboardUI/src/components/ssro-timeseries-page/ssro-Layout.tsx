@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import SiteFooter from '../SiteFooter';
-import SiteNavbar from '../SiteNavbar';
-import FeedbackModal from '../FeedbackModal';
-import { SiteSpecificTab } from './site-specific-ro-tab/SiteSpecificROTab';
-import { useSiteSpecificPageContext } from './ssro-Provider';
-import { SiteSpecificROTab } from '../../pages/SiteSpecificROPage';
-import './ssro-timeseries-page.scss'
+import { useEffect, useMemo, useState } from "react";
+import SiteFooter from "../SiteFooter";
+import SiteNavbar from "../SiteNavbar";
+import FeedbackModal from "../FeedbackModal";
+import { SiteSpecificTab } from "./site-specific-ro-tab/SiteSpecificROTab";
+import { useSiteSpecificPageContext } from "./ssro-Provider";
+import { SiteSpecificROTab } from "../../pages/SiteSpecificROPage";
+import "./ssro-timeseries-page.scss";
 
 export function Layout() {
   const { downloadModal, setShowDownloadModal } = useSiteSpecificPageContext();
@@ -19,7 +19,6 @@ export function Layout() {
 
   useEffect(() => {
     document.title = `WestDAAT - ${currentTab}`;
-
   }, [currentTab]);
 
   const currentTabElement = useMemo(() => {
@@ -28,17 +27,11 @@ export function Layout() {
 
   return (
     <div className="site-specific-page d-flex flex-column">
-      <SiteNavbar
-        onTabClickSS={setCurrentTab}
-        currentTabSS={currentTab}
-        showDownloadModal={setShowDownloadModal} />
+      <SiteNavbar onTabClickSS={setCurrentTab} currentTabSS={currentTab} showDownloadModal={setShowDownloadModal} />
 
-      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
-        {currentTabElement}
-      </div>
+      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">{currentTabElement}</div>
 
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal} />
+      <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
       {downloadModal}

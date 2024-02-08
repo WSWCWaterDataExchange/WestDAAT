@@ -13,12 +13,14 @@ import { useEffect } from "react";
 import { useSiteSpecificPageContext } from "../ssro-Provider";
 import { useMapFitRequested } from "./hooks/useMapFitRequested";
 
-export function SiteSpecificTab () {
-  return <MapProvider>
-           <SiteSpecificProvider>
-             <SiteSpecificLayout />
-           </SiteSpecificProvider>
-         </MapProvider>
+export function SiteSpecificTab() {
+  return (
+    <MapProvider>
+      <SiteSpecificProvider>
+        <SiteSpecificLayout />
+      </SiteSpecificProvider>
+    </MapProvider>
+  );
 }
 
 function SiteSpecificLayout() {
@@ -26,22 +28,24 @@ function SiteSpecificLayout() {
   useFilters();
   useMapUrlParameters();
   useDownloadModal();
-  const {polylinesOnMapUpdated} = usePolylinesFilter();
-  const {handleMapFitRequested} = useMapFitRequested();
-  return <>
-           <SidePanel>
-             <SideBar />
-           </SidePanel>
-           <MainPanel>
-             <SSROMap handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
-           </MainPanel>
-         </>
+  const { polylinesOnMapUpdated } = usePolylinesFilter();
+  const { handleMapFitRequested } = useMapFitRequested();
+  return (
+    <>
+      <SidePanel>
+        <SideBar />
+      </SidePanel>
+      <MainPanel>
+        <SSROMap handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
+      </MainPanel>
+    </>
+  );
 }
 
 function useDownloadModal() {
-  const {setDownloadModal} = useSiteSpecificPageContext()
-  const {filters, nldiIds} = useSiteSpecificContext()
-  useEffect(() =>{
-    setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />)
-  }, [filters, nldiIds, setDownloadModal])
+  const { setDownloadModal } = useSiteSpecificPageContext();
+  const { filters, nldiIds } = useSiteSpecificContext();
+  useEffect(() => {
+    setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />);
+  }, [filters, nldiIds, setDownloadModal]);
 }
