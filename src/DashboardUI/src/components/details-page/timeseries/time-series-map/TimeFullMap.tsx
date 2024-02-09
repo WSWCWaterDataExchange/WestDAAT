@@ -9,6 +9,8 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 import Select from "react-select";
 import MapLegend from "./MapLegend";
 
+import { Accordion } from "react-bootstrap";
+
 // import * as maptilersdk from '@maptiler/sdk';
 // import "@maptiler/sdk/dist/maptiler-sdk.css";
 
@@ -138,7 +140,7 @@ function TimeFullMap() {
   return (
     <div className="time-series-home-map">
       <div className="time-series-home-filter">
-        <label>Select WaDE Type:</label>
+        <label>Select WaDE Site Type:</label>
         <Select
           onChange={handleWadeNameSChange}
           value={

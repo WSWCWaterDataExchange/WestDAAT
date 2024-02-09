@@ -5,7 +5,7 @@ import Layout from "./Layout";
 function TimeSeriesMapPage() {
   return (
     <div>
-      <h2>Non-Federal Streamgage/Diversion, Reservoir, Groundwater Pumping, and Water Right-Related Withdrawal Site-Specific Time Series Data.</h2>
+      <h2 id='h2TsHeader'>Non-Federal Streamgage/Diversion, Reservoir, Groundwater Pumping, and Water Right-Related Withdrawal Site-Specific Time Series Data</h2>
       <TimeFullMap />
     </div>
   );

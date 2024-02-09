@@ -1,3 +1,11 @@
+#h2TsHeader {
+  text-align: center;
+  font-size: 25px;
+  font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
+} 
+
+
+
 .time-series-home-map {
   display: flex;
   background-color: white;
@@ -76,4 +84,26 @@
 
 .legend-name {
   font-size: 14px;
+}
+
+
+.accordion {
+  .accordion-body {
+    background-color: #FAFAFA;
+  }
+
+  .accordion-button,
+  .accordion-button:not(.collapsed),
+  .accordion-button:focus {
+    background-color: #FAFAFA;
+    color: black;
+    border: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: none;
+  }
+
+  .accordion-item {
+    border: none;
+  }
 }

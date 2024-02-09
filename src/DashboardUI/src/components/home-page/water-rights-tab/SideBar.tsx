@@ -54,7 +54,7 @@ function SideBar() {
               <MapTheme />
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="siteSelectionFilters">
+          <Accordion.Item eventKey="">
             <Accordion.Header>WATER RIGHT SELECTION FILTERS</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
