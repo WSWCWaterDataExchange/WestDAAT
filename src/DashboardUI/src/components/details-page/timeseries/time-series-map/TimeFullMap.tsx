@@ -128,7 +128,7 @@ function TimeFullMap() {
   }, [isMapLoaded, selectedWadeNameS]);
 
   const legendItems = [
-    { name: "Water Right Related Withdrawal", color: "#D7E25A" },
+    { name: "Water Right Related Withdrawal", color: "#FFD700" },
     { name: "Stream Gage", color: "#9a6ce5" },
     { name: "Surface Water Point", color: "#79db75" },
     { name: "Canal / Ditch", color: "#e47777" },
