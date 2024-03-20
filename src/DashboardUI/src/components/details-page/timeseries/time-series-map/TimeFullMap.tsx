@@ -9,11 +9,6 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 import Select from "react-select";
 import MapLegend from "./MapLegend";
 
-import { Accordion } from "react-bootstrap";
-
-// import * as maptilersdk from '@maptiler/sdk';
-// import "@maptiler/sdk/dist/maptiler-sdk.css";
-
 interface OptionType {
   label: string;
   value: string;
@@ -40,13 +35,7 @@ function TimeFullMap() {
     });
     setMapInstance(map);
 
-    //  const map = new maptilersdk.Map({
-    //   container: "map",
-    //   style: "https://api.maptiler.com/tiles/d57c6c3e-9eed-4da6-bc87-13a5e7a0aeee/tiles.json?key=IauIQDaqjd29nJc5kJse",
-    //   center: [-110, 40],
-    //   zoom: 5,
-    // });
-
+    //ss1
     map.on("load", async () => {
       // Add a click event listener to the map
       setWadeNameSData(new Set());
@@ -63,7 +52,6 @@ function TimeFullMap() {
         // Check if e.features is not undefined and contains at least one feature
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];
-
           const properties = feature.properties;
 
           if (properties) {
@@ -129,6 +117,7 @@ function TimeFullMap() {
 
   const legendItems = [
     { name: "Water Right Related Withdrawal", color: "#FFD700" },
+    { name: "Site Specific Public Supply", color: "#d10000" },
     { name: "Stream Gage", color: "#9a6ce5" },
     { name: "Surface Water Point", color: "#79db75" },
     { name: "Canal / Ditch", color: "#e47777" },

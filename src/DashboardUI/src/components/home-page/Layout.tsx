@@ -33,8 +33,7 @@ export function Layout() {
         {currentTabElement}
       </div>
 
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal} />
+      <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
       {downloadModal}

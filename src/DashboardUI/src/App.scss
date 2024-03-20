@@ -1,6 +1,6 @@
 @import "styles/colors";
-@import 'mapbox-gl/dist/mapbox-gl.css';
-@import './styles/custom.scss';
+@import "mapbox-gl/dist/mapbox-gl.css";
+@import "./styles/custom.scss";
 
 body {
   position: absolute;
@@ -15,7 +15,7 @@ body {
   height: 100%;
 }
 
-input[type='date'][value='']{
+input[type="date"][value=""] {
   color: $input-placeholder-color;
 }
 
@@ -38,13 +38,13 @@ input[type='date'][value='']{
 
 .accordion {
   .accordion-body {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
   }
 
   .accordion-button,
   .accordion-button:not(.collapsed),
   .accordion-button:focus {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
     color: black;
     border: none;
     font-weight: bold;
@@ -57,7 +57,7 @@ input[type='date'][value='']{
   }
 }
 
-.zindexzero{
+.zindexzero {
   // stops radio buttons from showing in front of dropdowns
   z-index: 0 !important;
 }
