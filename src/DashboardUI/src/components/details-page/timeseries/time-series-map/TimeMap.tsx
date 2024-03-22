@@ -50,12 +50,8 @@ function TimeMap({ apiData }: TimeMapProps) {
     resetMap();
     if (map && Object(apiData).TotalSiteVariableAmountsCount > 0) {
       map.resize();
-      const longitude = Number(
-        Object(apiData).Organizations[0].Sites[0].Longitude
-      );
-      const latitude = Number(
-        Object(apiData).Organizations[0].Sites[0].Latitude
-      );
+      const longitude = Number(Object(apiData).Organizations[0].Sites[0].Longitude);
+      const latitude = Number(Object(apiData).Organizations[0].Sites[0].Latitude);
 
       // Use map.flyTo to smoothly animate to the new location and zoom level
       map.flyTo({
@@ -65,33 +61,17 @@ function TimeMap({ apiData }: TimeMapProps) {
       });
 
       // Create a marker and popup
-      const newMarker = new mapboxgl.Marker()
-        .setLngLat([longitude, latitude])
-        .addTo(map);
+      const newMarker = new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(map);
 
       setMarker(newMarker);
       newMarker.setPopup(
         new mapboxgl.Popup().setHTML(
-          `<p><strong>Native Site ID: </strong>${
-            Object(apiData).Organizations[0].Sites[0].NativeSiteID
-          }</p>
-                <p><strong>WaDE Site ID: </strong>${
-                  Object(apiData).Organizations[0].Sites[0].SiteUUID
-                }</p>
-                <p><strong>Site Name: </strong>${
-                  Object(apiData).Organizations[0].Sites[0].SiteName
-                }</p>
-                <p><strong>Site Type: </strong>${
-                  Object(apiData).Organizations[0].Sites[0].SiteTypeCV
-                }</p>
-                <p><strong>Water Source Type: </strong>${
-                  Object(apiData).Organizations[0].WaterSources[0]
-                    .WaterSourceTypeCV
-                }</p>
-                <p><strong>Varaible Type: </strong>${
-                  Object(apiData).Organizations[0].VariableSpecifics[0]
-                    .VariableSpecificTypeCV
-                }</p>`
+          `<p><strong>Native Site ID: </strong>${Object(apiData).Organizations[0].Sites[0].NativeSiteID}</p>
+                <p><strong>WaDE Site ID: </strong>${Object(apiData).Organizations[0].Sites[0].SiteUUID}</p>
+                <p><strong>Site Name: </strong>${Object(apiData).Organizations[0].Sites[0].SiteName}</p>
+                <p><strong>Site Type: </strong>${Object(apiData).Organizations[0].Sites[0].SiteTypeCV}</p>
+                <p><strong>Water Source Type: </strong>${Object(apiData).Organizations[0].WaterSources[0].WaterSourceTypeCV}</p>
+                <p><strong>Varaible Type: </strong>${Object(apiData).Organizations[0].VariableSpecifics[0].VariableSpecificTypeCV}</p>`
         )
       );
     }

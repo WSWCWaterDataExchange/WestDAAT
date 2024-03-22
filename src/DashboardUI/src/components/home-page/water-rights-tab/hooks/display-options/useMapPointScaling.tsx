@@ -19,7 +19,7 @@ export function useMapPointScaling() {
   } = useMapContext();
   const {filters, displayOptions: {pointSize}} = useWaterRightsContext();
 
-  const pointScaleTimeDelay = 1000;
+  const pointScaleTimeDelay = 3000;
   useEffect(() => {
     //we delay these to give the map time to get new rendered features after the filters change
     //check this if there are issues setting point sizes

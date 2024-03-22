@@ -7,7 +7,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public static Dictionary<string, string> DefaultConfiguration => new Dictionary<string, string>
             {
                 { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2;Integrated Security=true;" },
+                { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=tcp:wade-production-server.database.windows.net,1433;Initial Catalog=wade_prod;Persist Security Info=False;User ID=wade-admin;Password= Orange2019!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" },
                 { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi/" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
                 { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },

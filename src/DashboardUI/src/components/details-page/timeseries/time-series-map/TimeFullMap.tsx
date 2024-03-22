@@ -17,10 +17,8 @@ interface OptionType {
 function TimeFullMap() {
   const [wadeNameSData, setWadeNameSData] = useState<Set<any>>(new Set());
   const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(null);
-
   const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-
   const handleWadeNameSChange = (selectedOption: OptionType | null) => {
     setSelectedWadeNameS(selectedOption?.value || null);
   };
@@ -35,13 +33,12 @@ function TimeFullMap() {
     });
     setMapInstance(map);
 
-    //ss1
     map.on("load", async () => {
       // Add a click event listener to the map
       setWadeNameSData(new Set());
-      map?.queryRenderedFeatures({ layers: ["ss1"] } as any)?.forEach((feature: { properties: any }) => {
-        const properties = feature.properties;
 
+      map?.queryRenderedFeatures({ layers: ["ss1", "ss2"] } as any)?.forEach((feature: { properties: any }) => {
+        const properties = feature.properties;
         if (properties) {
           setIsMapLoaded(true);
           setWadeNameSData((prevData) => new Set([...prevData, properties.WaDENameS]));
@@ -55,8 +52,6 @@ function TimeFullMap() {
           const properties = feature.properties;
 
           if (properties) {
-            const coordinates = (feature.geometry as any).coordinates;
-
             const popupContent = (
               <div>
                 <Card className="popup-card">
@@ -85,20 +80,70 @@ function TimeFullMap() {
                 </Card>
               </div>
             );
-
+            let coordinates = { lng: properties.Longitude, lat: properties.Latitude };
             const popupNode = document.createElement("div");
             ReactDOM.render(popupContent, popupNode);
-
-            const popup = new mapboxgl.Popup().setLngLat(coordinates).setDOMContent(popupNode).addTo(map);
+            new mapboxgl.Popup().setLngLat(coordinates).setDOMContent(popupNode).addTo(map);
           }
         }
       });
 
+      map.on("click", "ss2", (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
+        // Check if e.features is not undefined and contains at least one feature
+        if (e.features && e.features.length > 0) {
+          const feature = e.features[0];
+          const properties = feature.properties;
+
+          if (properties) {
+            const popupContent = (
+              <div>
+                <Card className="popup-card">
+                  <CardHeader className="popup-header">
+                    <div>
+                      Site ID:{" "}
+                      <a href={`/details/timeSeriesPage/${properties.SiteUUID}`} target="_blank" rel="noopener noreferrer">
+                        {properties.SiteUUID} <Icon path={mdiOpenInNew} className="map-popup-card-time-site-link-icon" />
+                      </a>
+                    </div>
+                  </CardHeader>
+                  <div className="popup-body">
+                    <p>
+                      <b>SiteNativeID:</b>
+                      <br /> {properties.SiteNativeID}
+                    </p>
+                    <p>
+                      <b>SiteName:</b>
+                      <br /> {properties.SiteName}
+                    </p>
+                    <p>
+                      <b>SiteTypeCV:</b>
+                      <br /> {properties.SiteTypeCV}
+                    </p>
+                  </div>
+                </Card>
+              </div>
+            );
+            let coordinates = { lng: properties.Longitude, lat: properties.Latitude };
+            const popupNode = document.createElement("div");
+            ReactDOM.render(popupContent, popupNode);
+            new mapboxgl.Popup().setLngLat(coordinates).setDOMContent(popupNode).addTo(map);
+          }
+        }
+      });
+
+      // Change the cursor to a pointer when the mouse is over the places layer.
       map.on("mouseenter", "ss1", () => {
         map.getCanvas().style.cursor = "pointer";
       });
+      map.on("mouseenter", "ss2", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
 
+      // Change the cursor back to a pointer when it leaves.
       map.on("mouseleave", "ss1", () => {
+        map.getCanvas().style.cursor = "";
+      });
+      map.on("mouseleave", "ss2", () => {
         map.getCanvas().style.cursor = "";
       });
     });
@@ -112,6 +157,7 @@ function TimeFullMap() {
       const wadeNameSFilter = selectedWadeNameS ? ["all", ["==", "WaDENameS", selectedWadeNameS]] : ["!=", "", ""]; // Show all points when no specific site type is selected
       const combinedFilter = ["all", wadeNameSFilter];
       mapInstance.setFilter("ss1", combinedFilter);
+      mapInstance.setFilter("ss2", combinedFilter);
     }
   }, [isMapLoaded, selectedWadeNameS]);
 
