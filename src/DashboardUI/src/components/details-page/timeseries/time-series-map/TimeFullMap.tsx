@@ -14,11 +14,33 @@ interface OptionType {
   value: string;
 }
 
+const siteNameArray = [
+  { label: "Canal / Ditch / Diversion", value: "Canal / Ditch / Diversion" },
+  { label: "Reservoir/Dam", value: "Reservoir/Dam" },
+  { label: "Site Specific Public Supply", value: "Site Specific Public Supply" },
+  { label: "Stream Gage", value: "Stream Gage" },
+  { label: "Surface Water Point", value: "Surface Water Point" },
+  { label: "Water Right Related Withdrawal", value: "Water Right Related Withdrawal" },
+  { label: "Well / Pump / Spring / Groundwater Point", value: "Well / Pump / Spring / Groundwater Point" },
+  { label: "Unspecified", value: "Unspecified" },
+];
+
+const legendItems = [
+  { name: "Canal / Ditch / Diversion", color: "#e47777" },
+  { name: "Reservoir / Dam", color: "#ed1dca" },
+  { name: "Site Specific Public Supply", color: "#d10000" },
+  { name: "Stream Gage", color: "#9a6ce5" },
+  { name: "Surface Water Point", color: "#79db75" },
+  { name: "Water Right Related Withdrawal", color: "#FFD700" },
+  { name: "Well / Pump / Spring / Groundwater", color: "#6f44d5" },
+  { name: "Unspecified", color: "#49a0da" },
+];
+
 function TimeFullMap() {
-  const [wadeNameSData, setWadeNameSData] = useState<Set<any>>(new Set());
-  const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(null);
-  const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [wadeNameSData, setWadeNameSData] = useState<OptionType[]>(siteNameArray);
+  const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
+  const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(null);
   const handleWadeNameSChange = (selectedOption: OptionType | null) => {
     setSelectedWadeNameS(selectedOption?.value || null);
   };
@@ -34,16 +56,8 @@ function TimeFullMap() {
     setMapInstance(map);
 
     map.on("load", async () => {
-      // Add a click event listener to the map
-      setWadeNameSData(new Set());
-
-      map?.queryRenderedFeatures({ layers: ["ss1", "ss2"] } as any)?.forEach((feature: { properties: any }) => {
-        const properties = feature.properties;
-        if (properties) {
-          setIsMapLoaded(true);
-          setWadeNameSData((prevData) => new Set([...prevData, properties.WaDENameS]));
-        }
-      });
+      setIsMapLoaded(true);
+      setWadeNameSData(siteNameArray);
 
       map.on("click", "ss1", (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
         // Check if e.features is not undefined and contains at least one feature
@@ -161,39 +175,11 @@ function TimeFullMap() {
     }
   }, [isMapLoaded, selectedWadeNameS]);
 
-  const legendItems = [
-    { name: "Water Right Related Withdrawal", color: "#FFD700" },
-    { name: "Site Specific Public Supply", color: "#d10000" },
-    { name: "Stream Gage", color: "#9a6ce5" },
-    { name: "Surface Water Point", color: "#79db75" },
-    { name: "Canal / Ditch", color: "#e47777" },
-    { name: "Well / Pump / Spring / Groundwater", color: "#6f44d5" },
-    { name: "Reservoir / Dam", color: "#ed1dca" },
-    { name: "Unspecified", color: "#49a0da" },
-  ];
-
   return (
     <div className="time-series-home-map">
       <div className="time-series-home-filter">
         <label>Select WaDE Site Type:</label>
-        <Select
-          onChange={handleWadeNameSChange}
-          value={
-            wadeNameSData.has(selectedWadeNameS)
-              ? {
-                  label: selectedWadeNameS || "",
-                  value: selectedWadeNameS || "",
-                }
-              : null
-          }
-          options={[
-            { value: "", label: "All" },
-            ...Array.from(wadeNameSData).map((value) => ({
-              value,
-              label: value,
-            })),
-          ]}
-        />
+        <Select onChange={handleWadeNameSChange} value={{ label: selectedWadeNameS || "", value: selectedWadeNameS || "" }} options={[{ value: "", label: "All" }, ...wadeNameSData]} />
       </div>
       <div id="map" className="series-map" style={{ width: "100%", height: "90vh" }}></div>
       <MapLegend items={legendItems} />
