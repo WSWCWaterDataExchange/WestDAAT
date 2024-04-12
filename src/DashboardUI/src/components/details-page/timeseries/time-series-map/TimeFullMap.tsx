@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "./TimeSeriesMap.scss";
 import Icon from "@mdi/react";
@@ -9,12 +9,16 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 import Select from "react-select";
 import MapLegend from "./MapLegend";
 
+// import Select, { SelectChangeEvent } from "@mui/material/Select";
+// import OutlinedInput from "@mui/material/OutlinedInput";
+// import MenuItem from "@mui/material/MenuItem";
+
 interface OptionType {
   label: string;
   value: string;
 }
 
-const siteNameArray = [
+const siteNameArray: OptionType[] = [
   { label: "Canal / Ditch / Diversion", value: "Canal / Ditch / Diversion" },
   { label: "Reservoir/Dam", value: "Reservoir/Dam" },
   { label: "Site Specific Public Supply", value: "Site Specific Public Supply" },
@@ -38,18 +42,25 @@ const legendItems = [
 
 function TimeFullMap() {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [wadeNameSData, setWadeNameSData] = useState<OptionType[]>(siteNameArray);
   const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
   const [selectedWadeNameS, setSelectedWadeNameS] = useState<string | null>(null);
   const handleWadeNameSChange = (selectedOption: OptionType | null) => {
     setSelectedWadeNameS(selectedOption?.value || null);
   };
+  // const [selectedWadeNameS, setSelectedWadeNameS] = useState<string[]>([]);
+  // const handleWadeNameSChange = (event: SelectChangeEvent<typeof selectedWadeNameS>) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setSelectedWadeNameS(typeof value === "string" ? value.split(",") : value);
+  // };
 
   useEffect(() => {
     mapboxgl.accessToken = mapboxgl.accessToken;
     const map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/amabdallah/clpa0f7dx001901op5ihpfqev",
+      //style: "mapbox://styles/amabdallah/clpa0f7dx001901op5ihpfqev",
+      style: "mapbox://styles/amabdallah/clua7068302hb01oif099hspo",
       center: [-110, 40],
       zoom: 5,
     });
@@ -57,8 +68,70 @@ function TimeFullMap() {
 
     map.on("load", async () => {
       setIsMapLoaded(true);
-      setWadeNameSData(siteNameArray);
 
+      // use third party tileset
+      map.addSource("maptiler", {
+        type: "vector",
+        tiles: ["https://api.maptiler.com/tiles/d57c6c3e-9eed-4da6-bc87-13a5e7a0aeee/{z}/{x}/{y}.pbf?key=IauIQDaqjd29nJc5kJse"],
+      });
+      map.addLayer({
+        id: "ss1",
+        type: "circle",
+        source: "maptiler",
+        "source-layer": "points",
+      });
+      map.addLayer({
+        id: "ss2",
+        type: "fill",
+        source: "maptiler",
+        "source-layer": "polygons",
+      });
+
+      map.setPaintProperty("ss1", "circle-color", [
+        "match",
+        ["get", "WaDENameS"],
+        "Canal / Ditch / Diversion",
+        "#e47777",
+        "Reservoir / Dam",
+        "#ed1dca",
+        "Site Specific Public Supply",
+        "#d10000",
+        "Stream Gage",
+        "#9a6ce5",
+        "Surface Water Point",
+        "#79db75",
+        "Water Right Related Withdrawal",
+        "#FFD700",
+        "Well / Pump / Spring / Groundwater",
+        "#6f44d5",
+        "Unspecified",
+        "#49a0da",
+        "#49a0da",
+      ]);
+
+      map.setPaintProperty("ss2", "fill-color", [
+        "match",
+        ["get", "WaDENameS"],
+        "Canal / Ditch / Diversion",
+        "#e47777",
+        "Reservoir / Dam",
+        "#ed1dca",
+        "Site Specific Public Supply",
+        "#d10000",
+        "Stream Gage",
+        "#9a6ce5",
+        "Surface Water Point",
+        "#79db75",
+        "Water Right Related Withdrawal",
+        "#FFD700",
+        "Well / Pump / Spring / Groundwater",
+        "#6f44d5",
+        "Unspecified",
+        "#49a0da",
+        "#49a0da",
+      ]);
+
+      // create popup card for ss1 point layer
       map.on("click", "ss1", (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
         // Check if e.features is not undefined and contains at least one feature
         if (e.features && e.features.length > 0) {
@@ -102,6 +175,7 @@ function TimeFullMap() {
         }
       });
 
+      // create popup card for ss2 polygon layer
       map.on("click", "ss2", (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
         // Check if e.features is not undefined and contains at least one feature
         if (e.features && e.features.length > 0) {
@@ -167,11 +241,13 @@ function TimeFullMap() {
 
   useEffect(() => {
     if (mapInstance && isMapLoaded) {
-      // Check if a specific site type is selected
       const wadeNameSFilter = selectedWadeNameS ? ["all", ["==", "WaDENameS", selectedWadeNameS]] : ["!=", "", ""]; // Show all points when no specific site type is selected
       const combinedFilter = ["all", wadeNameSFilter];
+      // console.log(combinedFilter);
       mapInstance.setFilter("ss1", combinedFilter);
       mapInstance.setFilter("ss2", combinedFilter);
+
+      // take a look at this, try & figure out setFilter() https://docs.mapbox.com/mapbox-gl-js/api/map/#map#setfilter
     }
   }, [isMapLoaded, selectedWadeNameS]);
 
@@ -179,7 +255,14 @@ function TimeFullMap() {
     <div className="time-series-home-map">
       <div className="time-series-home-filter">
         <label>Select WaDE Site Type:</label>
-        <Select onChange={handleWadeNameSChange} value={{ label: selectedWadeNameS || "", value: selectedWadeNameS || "" }} options={[{ value: "", label: "All" }, ...wadeNameSData]} />
+        <Select options={[{ value: "", label: "All" }, ...siteNameArray]} value={{ label: selectedWadeNameS || "", value: selectedWadeNameS || "" }} onChange={handleWadeNameSChange} />
+        {/* <Select multiple value={selectedWadeNameS} onChange={handleWadeNameSChange} input={<OutlinedInput label="Name" />}>
+          {siteNameArray.map((name) => (
+            <MenuItem key={name.value} value={name.value}>
+              {name.label}
+            </MenuItem>
+          ))}
+        </Select> */}
       </div>
       <div id="map" className="series-map" style={{ width: "100%", height: "90vh" }}></div>
       <MapLegend items={legendItems} />

@@ -2,9 +2,7 @@
   text-align: center;
   font-size: 25px;
   font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
-} 
-
-
+}
 
 .time-series-home-map {
   display: flex;
@@ -28,14 +26,14 @@
   flex: 1; /* Adjust the flex value based on your layout */
   height: 100vh;
 }
-.popup-card{
-  margin:-15px;
+.popup-card {
+  margin: -15px;
 }
-.popup-header{
- font-size: 14px;
- padding-top: 25px;
+.popup-header {
+  font-size: 14px;
+  padding-top: 25px;
 }
-.popup-body{
+.popup-body {
   padding: 15px;
 }
 .link-text {
@@ -43,17 +41,17 @@
   text-decoration: underline; /* Underline the text to indicate a link */
   cursor: pointer; /* Change the cursor to a pointer on hover */
 
-  border:none
+  border: none;
 }
 
 .link-text:hover {
   color: darkblue; /* Change the color on hover (optional) */
 }
-.series-map{
+.series-map {
   cursor: pointer;
 }
-.map-popup-card-time-site-link-icon{
-  fill: #FF0000;
+.map-popup-card-time-site-link-icon {
+  fill: #ff0000;
   line-height: 1;
   height: 1em;
   width: 1em;
@@ -71,7 +69,6 @@
   display: flex;
   align-items: center;
   margin-bottom: 5px;
-  
 }
 
 .legend-color {
@@ -86,16 +83,15 @@
   font-size: 14px;
 }
 
-
 .accordion {
   .accordion-body {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
   }
 
   .accordion-button,
   .accordion-button:not(.collapsed),
   .accordion-button:focus {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
     color: black;
     border: none;
     font-weight: bold;

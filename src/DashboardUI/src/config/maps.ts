@@ -1,215 +1,180 @@
 import { nldi, pointSizes, waterRightsProperties } from "./constants";
 
 export const mapLayerNames = {
-  waterRightsPointsLayer: 'waterRightsPoints',
-  waterRightsPolygonsLayer: 'waterRightsPolygons',
-  riverBasinsLayer: 'river-basins',
-  siteLocationsPolygonsLayer: 'site-locations-polygons',
-  siteLocationsPointsLayer: 'site-locations-points',
-  nldiFlowlinesLayer: 'nldi-flowlines',
-  nldiUsgsPointsLayer: 'nldi-usgs-points',
-  nldiUsgsLocationLayer: 'nldi-usgs-location'
-}
+  waterRightsPointsLayer: "waterRightsPoints",
+  waterRightsPolygonsLayer: "waterRightsPolygons",
+  riverBasinsLayer: "river-basins",
+  siteLocationsPolygonsLayer: "site-locations-polygons",
+  siteLocationsPointsLayer: "site-locations-points",
+  nldiFlowlinesLayer: "nldi-flowlines",
+  nldiUsgsPointsLayer: "nldi-usgs-points",
+  nldiUsgsLocationLayer: "nldi-usgs-location",
+};
 
 export const mapSourceNames = {
-  waterRightsVectorTiles: 'water-rights-vector-tiles',
-  nldiGeoJson: 'nldi-geojson',
-  detailsMapGeoJson: 'details-map-geojson',
-  riverBasinsGeoJson: 'river-basins-geojson'
-}
+  waterRightsVectorTiles: "water-rights-vector-tiles",
+  nldiGeoJson: "nldi-geojson",
+  detailsMapGeoJson: "details-map-geojson",
+  riverBasinsGeoJson: "river-basins-geojson",
+};
 
-export const defaultPointCircleRadius = [
-  "interpolate",
-  ["linear"],
-  ["zoom"],
-  pointSizes.minPointSizeZoomLevel, pointSizes.minPointSize,
-  pointSizes.maxPointSizeZoomLevel, pointSizes.maxPointSize,
-];
+export const defaultPointCircleRadius = ["interpolate", ["linear"], ["zoom"], pointSizes.minPointSizeZoomLevel, pointSizes.minPointSize, pointSizes.maxPointSizeZoomLevel, pointSizes.maxPointSize];
 
 const defaultPointPaintConfiguration = {
   "circle-radius": defaultPointCircleRadius,
   "circle-stroke-width": 1,
-  "circle-stroke-opacity": [
-    "interpolate",
-    ["linear"],
-    ["zoom"],
-    pointSizes.minPointSizeZoomLevel, 0,
-    pointSizes.maxPointSizeZoomLevel, .3,
-  ],
+  "circle-stroke-opacity": ["interpolate", ["linear"], ["zoom"], pointSizes.minPointSizeZoomLevel, 0, pointSizes.maxPointSizeZoomLevel, 0.3],
   "circle-color": "#ff0000",
-  "circle-opacity": .75
-}
+  "circle-opacity": 0.75,
+};
 
 export const defaultPointCircleSortKey = ["-", 0, ["get", waterRightsProperties.minPriorityDate]];
 export const flowPointCircleSortKey = ["-", 0, ["get", waterRightsProperties.maxFlowRate]];
 export const volumePointCircleSortKey = ["-", 0, ["get", waterRightsProperties.maxVolume]];
-export const siteLocationPolygonFillColor = ["case",
-  ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD,
-  nldi.colors.sitePOU];
-export const siteLocationPointsIconImage = ["case",
-  ["==", ["get", "podOrPou"], "POD"], `mapMarker${nldi.colors.sitePOD}`,
-  `mapMarker${nldi.colors.sitePOU}`]
+export const siteLocationPolygonFillColor = ["case", ["==", ["get", "podOrPou"], "POD"], nldi.colors.sitePOD, nldi.colors.sitePOU];
+export const siteLocationPointsIconImage = ["case", ["==", ["get", "podOrPou"], "POD"], `mapMarker${nldi.colors.sitePOD}`, `mapMarker${nldi.colors.sitePOU}`];
 
 const mapsJson = {
-  "sources": [
+  sources: [
     {
-      "id": mapSourceNames.waterRightsVectorTiles,
-      "type": "vector",
-      "url": process.env.REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL,
-      "volatile": true
+      id: mapSourceNames.waterRightsVectorTiles,
+      type: "vector",
+      url: process.env.REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL,
+      volatile: true,
     },
     {
-      "id": mapSourceNames.nldiGeoJson,
-      "type": "geojson",
-      "data": {
-        "type": "FeatureCollection",
-        "features": []
-      }
+      id: mapSourceNames.nldiGeoJson,
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [],
+      },
     },
     {
-      "id": mapSourceNames.detailsMapGeoJson,
-      "type": "geojson",
-      "data": {
-        "type": "FeatureCollection",
-        "features": []
-      }
+      id: mapSourceNames.detailsMapGeoJson,
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [],
+      },
     },
     {
-      "id": mapSourceNames.riverBasinsGeoJson,
-      "type": "geojson",
-      "data": {
-        "type": "FeatureCollection",
-        "features": []
-      }
+      id: mapSourceNames.riverBasinsGeoJson,
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [],
+      },
     },
   ],
-  "layers": [
+  layers: [
     {
-      "id": mapLayerNames.riverBasinsLayer,
-      "friendlyName": "RiverBasins",
-      "source": mapSourceNames.riverBasinsGeoJson,
-      "layout": {
-        "visibility": "visible"
+      id: mapLayerNames.riverBasinsLayer,
+      friendlyName: "RiverBasins",
+      source: mapSourceNames.riverBasinsGeoJson,
+      layout: {
+        visibility: "visible",
       },
-      "type": "fill",
-      'paint': {
-        'fill-color': nldi.colors.riverBasin,
-        'fill-opacity': 0.3
-      }
+      type: "fill",
+      paint: {
+        "fill-color": nldi.colors.riverBasin,
+        "fill-opacity": 0.3,
+      },
     },
     {
-      "id": mapLayerNames.waterRightsPolygonsLayer,
-      "friendlyName": "Water Rights Polygons",
+      id: mapLayerNames.waterRightsPolygonsLayer,
+      friendlyName: "Water Rights Polygons",
       "source-layer": "polygons",
-      "source": mapSourceNames.waterRightsVectorTiles,
-      "layout": {
-        "visibility": "visible"
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: "visible",
       },
-      "type": "fill",
-      "paint": {
+      type: "fill",
+      paint: {
         "fill-color": "#ff0000",
-        "fill-opacity": .5
-      }
+        "fill-opacity": 0.5,
+      },
     },
     {
-      "id": mapLayerNames.waterRightsPointsLayer,
-      "friendlyName": "Water Rights Points",
+      id: mapLayerNames.waterRightsPointsLayer,
+      friendlyName: "Water Rights Points",
       "source-layer": "points",
-      "source": mapSourceNames.waterRightsVectorTiles,
-      "layout": {
-        "visibility": "none",
-        "circle-sort-key": defaultPointCircleSortKey
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: "none",
+        "circle-sort-key": defaultPointCircleSortKey,
       },
-      "type": "circle",
-      "paint": defaultPointPaintConfiguration,
+      type: "circle",
+      paint: defaultPointPaintConfiguration,
     },
     {
-      "id": mapLayerNames.siteLocationsPolygonsLayer,
-      "friendlyName": "SiteLocations",
-      "source": mapSourceNames.detailsMapGeoJson,
-      "layout": {
-        "visibility": "visible"
+      id: mapLayerNames.siteLocationsPolygonsLayer,
+      friendlyName: "SiteLocations",
+      source: mapSourceNames.detailsMapGeoJson,
+      layout: {
+        visibility: "visible",
       },
-      "type": "fill",
-      "paint": {
-        "fill-opacity": .5,
+      type: "fill",
+      paint: {
+        "fill-opacity": 0.5,
         "fill-color": siteLocationPolygonFillColor,
       },
-      "filter": ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]]
+      filter: ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]],
     },
     {
-      "id": mapLayerNames.siteLocationsPointsLayer,
-      "friendlyName": "SiteLocations",
-      "source": mapSourceNames.detailsMapGeoJson,
-      "layout": {
-        "visibility": "visible",
+      id: mapLayerNames.siteLocationsPointsLayer,
+      friendlyName: "SiteLocations",
+      source: mapSourceNames.detailsMapGeoJson,
+      layout: {
+        visibility: "visible",
         "icon-image": siteLocationPointsIconImage,
         "icon-anchor": "bottom",
-        "icon-size": ["interpolate", ["linear"], ["zoom"], 5, .5, 15, 1],
+        "icon-size": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 15, 1],
         "icon-allow-overlap": true,
-
       },
-      "type": "symbol",
-      "filter": ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]]
+      type: "symbol",
+      filter: ["in", ["geometry-type"], ["literal", ["Point", "MultiPoint"]]],
     },
     {
-      "id": mapLayerNames.nldiFlowlinesLayer,
-      "source": mapSourceNames.nldiGeoJson,
-      "layout": {
-        "visibility": "visible"
+      id: mapLayerNames.nldiFlowlinesLayer,
+      source: mapSourceNames.nldiGeoJson,
+      layout: {
+        visibility: "visible",
       },
-      "type": "line",
-      "paint": {
-        "line-color": ["case",
-          ["==", ["get", "westdaat_channeltype"], "Main"], nldi.colors.mainstem,
-          nldi.colors.tributaries],
+      type: "line",
+      paint: {
+        "line-color": ["case", ["==", ["get", "westdaat_channeltype"], "Main"], nldi.colors.mainstem, nldi.colors.tributaries],
         "line-opacity": 1,
-        "line-width": ["case",
-          ["==", ["get", "westdaat_channeltype"], "Main"], 2,
-          1]
+        "line-width": ["case", ["==", ["get", "westdaat_channeltype"], "Main"], 2, 1],
       },
-      "filter": [
-        "==",
-        [
-          "get",
-          "westdaat_featuredatatype"
-        ],
-        "Flowline"
-      ]
+      filter: ["==", ["get", "westdaat_featuredatatype"], "Flowline"],
     },
     {
-      "id": mapLayerNames.nldiUsgsPointsLayer,
-      "source": mapSourceNames.nldiGeoJson,
-      "layout": {
-        "visibility": "visible"
+      id: mapLayerNames.nldiUsgsPointsLayer,
+      source: mapSourceNames.nldiGeoJson,
+      layout: {
+        visibility: "visible",
       },
-      "type": "circle",
-      "paint": {
+      type: "circle",
+      paint: {
         ...defaultPointPaintConfiguration,
-        "circle-color": ["case",
-          ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs,
-          ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa,
-          ["==", ["get", "westdaat_pointdatasource"], "Wade"], nldi.colors.wade,
-          nldi.colors.unknown]
+        "circle-color": ["case", ["==", ["get", "westdaat_pointdatasource"], "UsgsSurfaceWaterSite"], nldi.colors.usgs, ["==", ["get", "westdaat_pointdatasource"], "EpaWaterQualitySite"], nldi.colors.epa, ["==", ["get", "westdaat_pointdatasource"], "Wade"], nldi.colors.wade, nldi.colors.unknown],
       },
-      "filter": ["all",
-        ["==", ["get", "westdaat_featuredatatype"], "Point"],
-        ["!=", ["get", "westdaat_pointdatasource"], "Location"]
-      ]
+      filter: ["all", ["==", ["get", "westdaat_featuredatatype"], "Point"], ["!=", ["get", "westdaat_pointdatasource"], "Location"]],
     },
     {
-      "id": mapLayerNames.nldiUsgsLocationLayer,
-      "source": mapSourceNames.nldiGeoJson,
-      "layout": {
-        "visibility": "visible",
+      id: mapLayerNames.nldiUsgsLocationLayer,
+      source: mapSourceNames.nldiGeoJson,
+      layout: {
+        visibility: "visible",
         "icon-image": `mapMarker${nldi.colors.mapMarker}`,
         "icon-anchor": "bottom",
-        "icon-size": ["interpolate", ["linear"], ["zoom"], 5, .5, 15, 1]
+        "icon-size": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 15, 1],
       },
-      "type": "symbol",
-      "filter": ["==", ["get", "westdaat_pointdatasource"], "Location"]
-    }
-  ]
-}
+      type: "symbol",
+      filter: ["==", ["get", "westdaat_pointdatasource"], "Location"],
+    },
+  ],
+};
 
 export default mapsJson;

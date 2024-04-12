@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import  { useEffect, useContext } from "react";
 import "./time.scss";
 import { ApiData } from "./ApiInterface";
 import { SiteUUIDContext } from "./Context/SiteUUIDContext";
@@ -10,6 +10,7 @@ interface APISearchProps {
 function APISearch({ onApiDataFetched }: APISearchProps) {
   const contextValue = useContext(SiteUUIDContext);
   const { storedSiteUUID = "" } = contextValue || {};
+  console.log("APISearch(storedSiteUUID): ", storedSiteUUID);
 
   useEffect(() => {
     fetchData();
@@ -18,15 +19,15 @@ function APISearch({ onApiDataFetched }: APISearchProps) {
   const fetchData = async () => {
     if (storedSiteUUID) {
       try {
-        const response = await fetch(
-          `/v1/SiteVariableAmounts?SiteUUID=${storedSiteUUID}&key=38f422d1ada34907a91aff4532fa4669`
-        );
-
+        const response = await fetch(`/v1/SiteVariableAmounts?SiteUUID=${storedSiteUUID}&key=38f422d1ada34907a91aff4532fa4669`);
+        console.log("string is: ", response);
         if (!response.ok) {
           throw new Error("Network response was not ok");
+          console.log("response not okay...");
         }
 
         const data = await response.json();
+        console.log("the data:", data);
         onApiDataFetched?.(data);
 
         if (Object(data).TotalSiteVariableAmountsCount !== 0) {
@@ -40,10 +41,7 @@ function APISearch({ onApiDataFetched }: APISearchProps) {
     }
   };
 
-  return (
-    <>
-    </>
-  );
+  return <></>;
 }
 
 export default APISearch;

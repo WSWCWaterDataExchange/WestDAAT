@@ -1,4 +1,4 @@
-@import '../../../styles/colors';
+@import "../../../styles/colors";
 
 .detail-page {
   .site-card {
@@ -26,16 +26,15 @@
     padding: 10px;
     display: flex;
     align-items: center;
-    column-gap: .5rem;
+    column-gap: 0.5rem;
 
-    >svg {
+    > svg {
       flex-shrink: 0;
     }
 
-    >span {
+    > span {
       line-height: 1;
     }
-
   }
 }
 
@@ -62,7 +61,6 @@
 
 .p-header {
   font-weight: bold;
-
 }
 
 .p-description {
@@ -76,7 +74,6 @@
 .tabs-chart {
   padding: 15px;
 }
-
 
 .table-container {
   width: 100%;
@@ -98,7 +95,7 @@
 .bottom-row {
   width: 100%;
 }
-.error-message{
+.error-message {
   color: red;
   display: inline;
 }
@@ -132,7 +129,7 @@
   background-color: #e1ecf4;
   border-radius: 3px;
   border: 1px solid #7aa7c7;
-  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-shadow: rgba(255, 255, 255, 0.7) 0 1px 0 0 inset;
   box-sizing: border-box;
   color: #39739d;
   cursor: pointer;
@@ -143,7 +140,7 @@
   line-height: 1.15385;
   margin: 0;
   outline: none;
-  padding: 8px .8em;
+  padding: 8px 0.8em;
   position: relative;
   text-align: center;
   text-decoration: none;
@@ -164,19 +161,18 @@
 }
 
 .page-buttons:focus {
-  box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+  box-shadow: 0 0 0 4px rgba(0, 149, 255, 0.15);
 }
 
 .page-buttons.active {
-  background-color: #007BFF;
+  background-color: #007bff;
   /* Change the background color for the active page */
   color: white;
 }
 
-
 .time-series-theme {
   position: absolute; // Overlayed Layout tabs over map
-  transform: rotate(90deg) translateX(140px)translateY(110px); //rotate map option themes and position them in right spot
+  transform: rotate(90deg) translateX(140px) translateY(110px); //rotate map option themes and position them in right spot
   display: flex;
   justify-content: center;
   flex-grow: 1;
@@ -197,15 +193,14 @@
   border-color: #007bff;
   transition: color 0.3s ease-in-out;
 }
-.dropdown{
+.dropdown {
   margin: 5px;
   padding: 5px;
   background-color: #e1ecf4;
   border-radius: 3px;
   border: 1px solid #7aa7c7;
-  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-shadow: rgba(255, 255, 255, 0.7) 0 1px 0 0 inset;
   box-sizing: border-box;
   color: #39739d;
   cursor: pointer;
-
 }

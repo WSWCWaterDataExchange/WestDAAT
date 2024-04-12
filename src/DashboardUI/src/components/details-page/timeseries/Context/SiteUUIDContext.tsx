@@ -1,5 +1,5 @@
 // SiteUUIDContext.tsx
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode } from "react";
 
 interface SiteUUIDContextProps {
   storedSiteUUID: string;
@@ -7,7 +7,7 @@ interface SiteUUIDContextProps {
 }
 
 export const SiteUUIDContext = createContext<SiteUUIDContextProps>({
-  storedSiteUUID: '',
+  storedSiteUUID: "",
   setStoredSiteUUID: () => {},
 });
 
@@ -16,13 +16,9 @@ interface SiteUUIDProviderProps {
 }
 
 export const SiteUUIDProvider: React.FC<SiteUUIDProviderProps> = ({ children }) => {
-  const [storedSiteUUID, setStoredSiteUUID] = useState('');
+  const [storedSiteUUID, setStoredSiteUUID] = useState("");
 
   console.log("Context Provider - storedSiteUUID:", storedSiteUUID);
 
-  return (
-    <SiteUUIDContext.Provider value={{ storedSiteUUID, setStoredSiteUUID }}>
-      {children}
-    </SiteUUIDContext.Provider>
-  );
+  return <SiteUUIDContext.Provider value={{ storedSiteUUID, setStoredSiteUUID }}>{children}</SiteUUIDContext.Provider>;
 };

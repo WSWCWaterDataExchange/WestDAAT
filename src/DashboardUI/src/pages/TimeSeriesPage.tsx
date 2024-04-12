@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import APISearch from "../components/details-page/timeseries/APISearch";
 import TimeSeriesProperties from "../components/details-page/timeseries/TimeSeriesProperties";
-import TimeSeriesTabs from "../components/details-page/timeseries/TimeSeriesTabs";
+// import TimeSeriesTabs from "../components/details-page/timeseries/TimeSeriesTabs";
 
 import "../components/details-page/timeseries/time.scss";
 import { DetailsPage } from "../components/details-page/DetailsPageLayout";
@@ -24,7 +24,6 @@ function TimeSeriesPage() {
   }, [siteUUID, setStoredSiteUUID]);
 
   const [apiData, setApiData] = useState<any>(null);
-
   const handleApiDataFetched = (data: any) => {
     setApiData(data);
   };
