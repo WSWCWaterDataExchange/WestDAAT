@@ -7,9 +7,14 @@
       "System": "Warning"
     },
     "applicationInsights": {
-      "samplingSettings": { "isEnabled": false },
+      "samplingSettings": {
+        "isEnabled": false,
+        "excludedTypes": "Request"
+      },
       "EnableDependencyTracking": true,
-      "DependencyTrackingOptions": { "enableSqlCommandTextInstrumentation": true }
+      "DependencyTrackingOptions": {
+        "enableSqlCommandTextInstrumentation": true
+      }
     }
   }
 }

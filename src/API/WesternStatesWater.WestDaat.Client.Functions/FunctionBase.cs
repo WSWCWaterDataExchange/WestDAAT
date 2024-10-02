@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -8,15 +9,13 @@ namespace WesternStatesWater.WestDaat.Client.Functions
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = CreateJsonSerializerOptions();
 
-        public IActionResult JsonResult(object obj)
+        public HttpResponseData JsonResult(HttpRequestData request, object obj)
         {
+            var jsonResult = request.CreateResponse(HttpStatusCode.OK);
+            jsonResult.Headers.Add("ContentType", "application/json");
             var jsonToReturn = JsonSerializer.Serialize(obj, _jsonSerializerOptions);
-            return new ContentResult
-            {
-                Content = jsonToReturn,
-                ContentType = "application/json",
-                StatusCode = 200
-            };
+            jsonResult.WriteString(jsonToReturn);
+            return jsonResult;
         }
 
         private static JsonSerializerOptions CreateJsonSerializerOptions()

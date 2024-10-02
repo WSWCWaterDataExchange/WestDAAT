@@ -1,15 +1,13 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class Function1
+    public class Function1 : FunctionBase
     {
         private readonly ITestManager _testManager;
 
@@ -18,9 +16,10 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             _testManager = testManager;
         }
 
-        [FunctionName("TestMe")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+        [Function("TestMe")]
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
+            HttpRequestData req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -33,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = _testManager.TestMe("Test Me");
 
-            return new OkObjectResult(result);
+            return JsonResult(req, result);
         }
     }
 }
