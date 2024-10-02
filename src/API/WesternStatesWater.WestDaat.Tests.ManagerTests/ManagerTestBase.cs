@@ -5,6 +5,7 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
+    [TestCategory("Manager Tests")]
     public abstract class ManagerTestBase
     {
         private ILoggerFactory _loggerFactory;
