@@ -6,8 +6,6 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Accessors.CsvModels;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -158,15 +156,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             for (var i = 0; i < allocationCount; i++)
             {
                 var allocations = new AllocationAmountFactFaker()
-                   .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
-                   .Generate();
+                    .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
+                    .Generate();
                 allocationAmountFacts.Add(allocations);
             }
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmountFacts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             //Act
@@ -178,8 +176,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             results.Should().NotBeNull();
+            Console.WriteLine(results.ToString());
             foreach (var site in sites)
             {
+                Console.WriteLine(site.Geometry.ToString());
                 results.Covers(site.Geometry).Should().BeTrue();
             }
         }
@@ -217,8 +217,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateWaterAllocationAccessor();
 
             var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
-
-            Console.Write(results.ToString());
 
             //Assert
             results.Should().NotBeNull();
@@ -1551,26 +1549,28 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(10, 0, "ownerName")]
-        [DataRow(5, 5, "ownerName")]
-        [DataRow(10, 2, "ownerName")]
-        public async Task FindWaterRights_SearchByAllocationOwner_StringContainsMatches(int totalRecordCount, int expectedResultCount, string searchInput)
+        [DataRow(10, 0)]
+        [DataRow(5, 5)]
+        [DataRow(10, 2)]
+        public async Task FindWaterRights_SearchByAllocationOwner_StringContainsMatches(int totalRecordCount, int expectedResultCount)
         {
             //Arrange
+            const string searchInput = "ownerName";
+            
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f => $"{f.Random.String(1, 5)}{searchInput}{f.Random.String(0, 5)}")
+                .RuleFor(x => x.AllocationOwner, f => $"{searchInput}_{f.Random.AlphaNumeric(8)}")
                 .Generate(expectedResultCount);
 
             //generate non-matching allocationAmounts
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f => f.Random.String(20, 'A', 'z'))
+                .RuleFor(x => x.AllocationOwner, f => f.Random.AlphaNumeric(20))
                 .Generate(totalRecordCount - expectedResultCount);
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
                 db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();  
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();
@@ -1816,37 +1816,32 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             DateTime? maximumPriorityDate = maximumPriorityDateString == null ? null : DateTime.Parse(maximumPriorityDateString);
 
             //Arrange
-            var rand = new Random();
+            var date = minimumPriorityDate ?? new DateTime(1901, 1, 1);
+            
+            var matchedAllocationAmounts = Enumerable.Range(1, expectedResultCount)
+                .Select(i =>
+                {
+                    var dateDimFaker = new DateDimFaker().RuleFor(a => a.Date, date.AddDays(i));
+                    return new AllocationAmountFactFaker()
+                        .RuleFor(a => a.AllocationPriorityDateNavigation, _ => dateDimFaker)
+                        .RuleFor(a => a.AllocationPriorityDateID, () => null)
+                        .Generate();
+                })
+                .ToList();
 
-            var dateFaker = new Faker().Date;
-
-            var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))
-                .Generate(expectedResultCount);
-
-            DateTime nonMatchingDate;
-            if (minimumPriorityDate.HasValue)
-            {
-                nonMatchingDate = dateFaker.Past(1, minimumPriorityDate);
-            }
-            else if (maximumPriorityDate.HasValue)
-            {
-                nonMatchingDate = dateFaker.Future(1, maximumPriorityDate);
-            }
-            else
-            {
-                nonMatchingDate = default(DateTime);
-            }
+            var nonMatchingDate = minimumPriorityDate?.AddYears(-1) 
+                                  ?? maximumPriorityDate?.AddYears(1) 
+                                  ?? default;
 
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
                 .SetAllocationPriorityDate(nonMatchingDate)
                 .Generate(totalRecordCount - expectedResultCount);
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
                 db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();

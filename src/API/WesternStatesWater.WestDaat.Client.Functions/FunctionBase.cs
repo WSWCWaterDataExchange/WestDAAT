@@ -7,14 +7,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class FunctionBase
     {
-        private static readonly JsonSerializerOptions _jsonSerializerOptions = CreateJsonSerializerOptions();
+        private static readonly JsonSerializerOptions JsonSerializerOptions = CreateJsonSerializerOptions();
 
-        public HttpResponseData JsonResult(HttpRequestData request, object obj)
+        protected static async Task<HttpResponseData> JsonResult(HttpRequestData request, object obj)
         {
             var jsonResult = request.CreateResponse(HttpStatusCode.OK);
             jsonResult.Headers.Add("ContentType", "application/json");
-            var jsonToReturn = JsonSerializer.Serialize(obj, _jsonSerializerOptions);
-            jsonResult.WriteString(jsonToReturn);
+            var jsonToReturn = JsonSerializer.Serialize(obj, JsonSerializerOptions);
+            await jsonResult.WriteStringAsync(jsonToReturn);
             return jsonResult;
         }
 

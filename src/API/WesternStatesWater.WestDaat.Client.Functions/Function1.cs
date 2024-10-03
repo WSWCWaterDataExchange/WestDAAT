@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = _testManager.TestMe("Test Me");
 
-            return JsonResult(req, result);
+            return await JsonResult(req, result);
         }
     }
 }

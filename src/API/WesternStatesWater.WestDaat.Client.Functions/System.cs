@@ -28,7 +28,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableBeneficialUseNormalizedNames();
 
-            return JsonResult(req, results);
+            return await JsonResult(req, results);
         }
 
         [Function(nameof(GetOwnerClassifications))]
@@ -38,7 +38,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableOwnerClassificationNormalizedNames();
 
-            return JsonResult(request, results);
+            return await JsonResult(request, results);
         }
 
         [Function(nameof(GetWaterSourceTypes))]
@@ -48,7 +48,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableWaterSourceTypeNormalizedNames();
 
-            return JsonResult(request, results);
+            return await JsonResult(request, results);
         }
 
         [Function(nameof(GetStates))]
@@ -58,15 +58,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableStateNormalizedNames();
 
-            return JsonResult(request, results);
+            return await JsonResult(request, results);
         }
 
         [Function(nameof(GetRiverBasinNames))]
-        public HttpResponseData GetRiverBasinNames([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/RiverBasins")] HttpRequestData request)
+        public async Task<HttpResponseData> GetRiverBasinNames([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/RiverBasins")] HttpRequestData request)
         {
             var result = _systemManager.GetRiverBasinNames();
 
-            return JsonResult(request, result);
+            return await JsonResult(request, result);
         }
 
         [Function(nameof(GetRiverBasinPolygonsByName))]
@@ -82,7 +82,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
 
-            return JsonResult(request, result);
+            return await JsonResult(request, result);
         }
 
         [Function(nameof(PostFeedback))]
