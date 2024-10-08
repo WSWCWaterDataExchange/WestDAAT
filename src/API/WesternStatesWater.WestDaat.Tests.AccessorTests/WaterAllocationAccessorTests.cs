@@ -1558,7 +1558,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             const string searchInput = "ownerName";
             
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f => $"{searchInput}_{f.Random.AlphaNumeric(8)}")
+                .RuleFor(x => x.AllocationOwner, f => $"{f.Random.AlphaNumeric(5)}{searchInput}{f.Random.AlphaNumeric(5)}")
                 .Generate(expectedResultCount);
 
             //generate non-matching allocationAmounts
