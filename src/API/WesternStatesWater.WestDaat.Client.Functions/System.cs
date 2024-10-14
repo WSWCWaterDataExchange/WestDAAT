@@ -28,7 +28,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableBeneficialUseNormalizedNames();
 
-            return await JsonResult(req, results);
+            return await JsonResult(req, results, convertEnumToString: false);
         }
 
         [Function(nameof(GetOwnerClassifications))]
