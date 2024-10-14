@@ -176,10 +176,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Assert
             results.Should().NotBeNull();
-            Console.WriteLine(results.ToString());
             foreach (var site in sites)
             {
-                Console.WriteLine(site.Geometry.ToString());
                 results.Covers(site.Geometry).Should().BeTrue();
             }
         }
