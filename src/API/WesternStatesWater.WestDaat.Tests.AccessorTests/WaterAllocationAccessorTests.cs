@@ -1547,14 +1547,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [DataRow(10, 0)]
-        [DataRow(5, 5)]
-        [DataRow(10, 2)]
-        public async Task FindWaterRights_SearchByAllocationOwner_StringContainsMatches(int totalRecordCount, int expectedResultCount)
+        [DataRow(10, 0, "ownerName")]
+        [DataRow(5, 5, "ownerName")]
+        [DataRow(10, 2, "ownerName")]
+        public async Task FindWaterRights_SearchByAllocationOwner_StringContainsMatches(int totalRecordCount, int expectedResultCount, string searchInput)
         {
             //Arrange
-            const string searchInput = "ownerName";
-            
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
                 .RuleFor(x => x.AllocationOwner, f => $"{f.Random.AlphaNumeric(5)}{searchInput}{f.Random.AlphaNumeric(5)}")
                 .Generate(expectedResultCount);

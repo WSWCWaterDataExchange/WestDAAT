@@ -7,6 +7,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class FunctionBase
     {
+        private static readonly JsonSerializerOptions DefaultJsonSerializerOptions = CreateDefaultJsonSerializerOptions();
         private static readonly JsonSerializerOptions JsonSerializerOptions = CreateJsonSerializerOptions();
         
         protected static async Task<HttpResponseData> JsonResult(HttpRequestData request, object obj, bool convertEnumToString = true)
@@ -14,11 +15,18 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var jsonResult = request.CreateResponse(HttpStatusCode.OK);
             jsonResult.Headers.Add("ContentType", "application/json");
             string jsonToReturn = null;
-            jsonToReturn = convertEnumToString ? JsonSerializer.Serialize(obj, JsonSerializerOptions) : JsonSerializer.Serialize(obj);
+            jsonToReturn = convertEnumToString ? JsonSerializer.Serialize(obj, JsonSerializerOptions) : JsonSerializer.Serialize(obj, DefaultJsonSerializerOptions);
             await jsonResult.WriteStringAsync(jsonToReturn);
             return jsonResult;
         }
 
+        private static JsonSerializerOptions CreateDefaultJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        }
         private static JsonSerializerOptions CreateJsonSerializerOptions()
         {
             var opts = new JsonSerializerOptions();

@@ -7,6 +7,7 @@ using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -175,35 +176,36 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
 
         [Function(nameof(DownloadWaterRights))]
-        public async Task<HttpResponseData> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequestData request)
+        public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {
             // the IO operations have to be synchronous 
-            var feature = request.FunctionContext.Features.Get<IHttpBodyControlFeature>();
+            var feature = request.HttpContext.Features.Get<IHttpBodyControlFeature>();
             feature.AllowSynchronousIO = true;
 
             using var streamReader = new StreamReader(request.Body);
             var requestBody = await streamReader.ReadToEndAsync();
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithFilterUrl>(requestBody);
-
-            var response = request.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/octet-stream");
-            response.Headers.Add("Content-Disposition", "attachment; filename=\"WaterRights.zip\"");
-
+            var ms = new MemoryStream();
             try
             {
-                await _waterAllocationManager.WaterRightsAsZip(response.Body, searchRequest);
+                await _waterAllocationManager.WaterRightsAsZip(ms, searchRequest);
             }
-            catch (WestDaatException)
+            catch (WestDaatException wex)
             {
-                response.StatusCode = HttpStatusCode.RequestEntityTooLarge;
+                request.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                response.StatusCode = HttpStatusCode.InternalServerError;
+                request.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 throw;
             }
 
-            return response;
+            request.HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "Content-Disposition");
+            ms.Seek(0, SeekOrigin.Begin);
+            return new FileStreamResult(ms, "application/octet-stream")
+            {
+                FileDownloadName = "WaterRights.zip"
+            };
         }
     }
 }
