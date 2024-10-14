@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using System.Text.Json;
+using Azure.Core.Serialization;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -28,7 +30,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableBeneficialUseNormalizedNames();
 
-            return await JsonResult(req, results, convertEnumToString: false);
+            // This cannot run thru CreateOKResponse because the serializer options will convert enum to string
+            // This will break the UI.
+            var data = req.CreateResponse(HttpStatusCode.OK);
+            await data.WriteAsJsonAsync<object>(results, new JsonObjectSerializer(
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            }));
+            return data;
         }
 
         [Function(nameof(GetOwnerClassifications))]
@@ -38,7 +48,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableOwnerClassificationNormalizedNames();
 
-            return await JsonResult(request, results);
+            return await CreateOkResponse(request, results);
         }
 
         [Function(nameof(GetWaterSourceTypes))]
@@ -48,7 +58,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableWaterSourceTypeNormalizedNames();
 
-            return await JsonResult(request, results);
+            return await CreateOkResponse(request, results);
         }
 
         [Function(nameof(GetStates))]
@@ -58,7 +68,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _systemManager.GetAvailableStateNormalizedNames();
 
-            return await JsonResult(request, results);
+            return await CreateOkResponse(request, results);
         }
 
         [Function(nameof(GetRiverBasinNames))]
@@ -66,7 +76,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = _systemManager.GetRiverBasinNames();
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetRiverBasinPolygonsByName))]
@@ -82,7 +92,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(PostFeedback))]

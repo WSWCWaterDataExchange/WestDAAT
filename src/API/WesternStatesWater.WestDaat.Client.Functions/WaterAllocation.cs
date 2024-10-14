@@ -35,7 +35,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var results = await _waterAllocationManager.GetNldiFeatures(latitude, longitude, directions, dataPoints);
 
-            return await JsonResult(req, results);
+            return await CreateOkResponse(req, results);
         }
 
         // Water Right Routes
@@ -52,7 +52,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = await _waterAllocationManager.FindWaterRights(searchRequest);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightDetails))]
@@ -60,7 +60,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightDetails(allocationUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightSiteInfoList))]
@@ -68,7 +68,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightSiteInfoList(allocationUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightSourceInfoList))]
@@ -76,7 +76,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightSourceInfoList(allocationUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightSiteLocations))]
@@ -84,7 +84,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightSiteLocations(allocationUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetAnalyticsSummaryInformation))]
@@ -99,7 +99,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightsEnvelope))]
@@ -114,7 +114,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var result = await _waterAllocationManager.GetWaterRightsEnvelope(searchRequest);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         // Site Routes
@@ -123,7 +123,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetSiteDetails))]
@@ -131,7 +131,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetSiteDetails(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterRightSiteDigest))]
@@ -139,7 +139,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterRightsDigestsBySite(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetSiteDigest))]
@@ -147,7 +147,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetSiteDigest(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetSiteLocation))]
@@ -155,7 +155,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterSiteLocation(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterSiteSourceListByUuid))]
@@ -163,7 +163,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterSiteSourceInfoListByUuid(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(GetWaterSiteRightsListByUuid))]
@@ -171,7 +171,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             var result = await _waterAllocationManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
 
-            return await JsonResult(request, result);
+            return await CreateOkResponse(request, result);
         }
 
 
