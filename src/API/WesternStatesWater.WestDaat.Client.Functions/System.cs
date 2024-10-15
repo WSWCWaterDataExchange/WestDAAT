@@ -101,8 +101,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 Route = "system/AllocationTypes")]
             HttpRequestData request)
         {
-            string[] allocationTypes = { "Type A", "Type B", "Type C" };
-            return await CreateOkResponse(request, allocationTypes);
+            var result = await _systemManager.GetAvailableAllocationTypeNormalizedNames();
+            return await CreateOkResponse(request, result);
         }
 
         [Function(nameof(PostFeedback))]

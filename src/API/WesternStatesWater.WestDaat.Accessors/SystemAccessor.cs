@@ -57,5 +57,15 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .OrderBy(a => a)
                 .ToListAsync();
         }
+
+        async Task<List<string>> ISystemAccessor.GetAvailableAllocationTypeNormalizedNames()
+        {
+            await using var db = _databaseContextFactory.Create();
+            return await db.WaterAllocationType
+                .Select(a => a.Name)
+                .Distinct()
+                .OrderBy(a => a)
+                .ToListAsync();
+        }
     }
 }
