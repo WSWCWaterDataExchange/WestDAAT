@@ -14,11 +14,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         static AccessorTestBase()
         {
             Configuration = new ConfigurationBuilder()
+                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                                         .AddInMemoryCollection(DefaultTestConfiguration)
                                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                                         .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
                                         .AddEnvironmentVariables()
                                         .Build();
         }
