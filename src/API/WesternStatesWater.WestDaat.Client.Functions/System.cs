@@ -12,7 +12,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class System : FunctionBase
     {
-        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<WaterAllocation> logger)
+        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<System> logger)
         {
             _systemManager = systemManager;
             _notificationManager = notificationManager;
