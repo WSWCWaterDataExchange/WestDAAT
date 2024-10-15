@@ -11,7 +11,10 @@
         "isEnabled": false,
         "excludedTypes": "Request"
       },
-      "EnableDependencyTracking": true
+      "dependencyTrackingOptions": {
+        "enableSqlCommandTextInstrumentation": true
+      },
+      "enableDependencyTracking": true
     }
   }
 }
