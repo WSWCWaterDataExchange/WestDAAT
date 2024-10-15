@@ -37,6 +37,7 @@ export enum waterRightsProperties {
   maxVolume = 'maxVol',
   minPriorityDate = 'minPri',
   maxPriorityDate = 'maxPri',
+  allocationTypes = 'allocType'
 }
 
 export enum nldiSiteProperties {

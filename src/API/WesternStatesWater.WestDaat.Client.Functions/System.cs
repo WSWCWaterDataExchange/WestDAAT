@@ -95,6 +95,16 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
 
+        [Function(nameof(GetAllocationTypes))]
+        public async Task<HttpResponseData> GetAllocationTypes(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get",
+                Route = "system/AllocationTypes")]
+            HttpRequestData request)
+        {
+            string[] allocationTypes = { "Type A", "Type B", "Type C" };
+            return await CreateOkResponse(request, allocationTypes);
+        }
+
         [Function(nameof(PostFeedback))]
         public async Task<HttpResponseData> PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequestData request)
         {

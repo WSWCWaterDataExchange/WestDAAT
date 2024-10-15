@@ -35,6 +35,7 @@ export function useFilters() {
   const {mapFilters: priorityDateMapFilters} = usePriorityDateFilters();
   const {mapFilters: polylinesMapFilters} = usePolylinesFilter();
   const {mapFilters: nldiMapFilters} = useNldiFilter();
+  const {mapFilters: allocationTypesFilter} = useAllocationOwnerFilter();
 
   const allMapFilters = useMemo(() => {
     const filterSet = ["all"] as any[];
@@ -56,8 +57,9 @@ export function useFilters() {
     pushIfSet(priorityDateMapFilters);
     pushIfSet(polylinesMapFilters);
     pushIfSet(nldiMapFilters);
+    pushIfSet(allocationTypesFilter);
     return filterSet;
-  }, [podPouMapFilters, includeExemptMapFilters, beneficialUsesMapFilters, ownerClassificationsMapFilters, waterSourceTypesMapFilters, riverBasinMapFilters, statesMapFilters, allocationOwnerMapFilters, flowMapFilters, volumeMapFilters, priorityDateMapFilters, polylinesMapFilters, nldiMapFilters])
+  }, [podPouMapFilters, includeExemptMapFilters, beneficialUsesMapFilters, ownerClassificationsMapFilters, waterSourceTypesMapFilters, riverBasinMapFilters, statesMapFilters, allocationOwnerMapFilters, flowMapFilters, volumeMapFilters, priorityDateMapFilters, polylinesMapFilters, nldiMapFilters, allocationTypesFilter])
 
   useEffect(() =>{
     setMapLayerFilters(allWaterRightsLayers.map(a => {

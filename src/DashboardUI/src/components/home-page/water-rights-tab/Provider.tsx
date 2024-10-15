@@ -4,7 +4,13 @@ import { DataPoints, Directions } from "../../../data-contracts/nldi";
 import { useDisplayOptionsUrlParameters } from "./hooks/url-parameters/useDisplayOptionsUrlParameters";
 import { defaultDisplayOptions, DisplayOptions } from "./DisplayOptions";
 import { useFiltersUrlParameters } from "./hooks/url-parameters/useFiltersUrlParameters";
-import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../../../hooks/queries/useSystemQuery";
+import {
+  useAllocationTypes,
+  useBeneficialUses,
+  useOwnerClassifications,
+  useStates,
+  useWaterSourceTypes
+} from "../../../hooks/queries/useSystemQuery";
 import { useRiverBasinOptions } from "../../../hooks/queries/useRiverBasinOptions";
 import { UseQueryResult } from "react-query";
 
@@ -15,6 +21,7 @@ export interface WaterRightsFilters{
   riverBasinNames?: string[],
   states?: string[],
   allocationOwner?: string,
+  allocationTypes?: string[],
   includeExempt: boolean | undefined,
   minFlow: number | undefined,
   maxFlow: number | undefined,
@@ -45,6 +52,7 @@ export interface HostData{
   ownerClassificationsQuery: Query<string[]>;
   statesQuery: Query<string[]>;
   riverBasinsQuery: Query<string[]>;
+  allocationTypesQuery: Query<string[]>;
 }
 
 export interface WaterRightsContextState {
@@ -75,7 +83,8 @@ export const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined,
   polylines: undefined,
   isNldiFilterActive: false,
-  nldiFilterData: undefined
+  nldiFilterData: undefined,
+  allocationTypes: undefined,
 }
 
 export const defaultNldiFilters = {
@@ -98,7 +107,8 @@ export const defaultState: WaterRightsContextState = {
     waterSourcesQuery: defaultQuery,
     ownerClassificationsQuery: defaultQuery,
     statesQuery: defaultQuery,
-    riverBasinsQuery: defaultQuery
+    riverBasinsQuery: defaultQuery,
+    allocationTypesQuery: defaultQuery
   },
 }
 
@@ -118,6 +128,7 @@ export const WaterRightsProvider: FC = ({ children }) => {
   const ownerClassificationsQuery = useOwnerClassifications();
   const statesQuery = useStates();
   const riverBasinsQuery = useRiverBasinOptions();
+  const allocationTypesQuery = useAllocationTypes();
 
   useEffect(() =>{
     setDisplayOptionsParameter(displayOptions);
@@ -147,7 +158,8 @@ export const WaterRightsProvider: FC = ({ children }) => {
       waterSourcesQuery,
       ownerClassificationsQuery,
       statesQuery,
-      riverBasinsQuery
+      riverBasinsQuery,
+      allocationTypesQuery,
     }
   }
 

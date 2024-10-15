@@ -1,5 +1,12 @@
 import { useQuery } from 'react-query';
-import { getBeneficialUses, getOwnerClassifications, getRiverBasinPolygonsByName, getStates, getWaterSourceTypes } from '../../accessors/systemAccessor';
+import {
+  getAllocationTypes,
+  getBeneficialUses,
+  getOwnerClassifications,
+  getRiverBasinPolygonsByName,
+  getStates,
+  getWaterSourceTypes
+} from '../../accessors/systemAccessor';
 
 export function useBeneficialUses() {
   return useQuery(
@@ -23,6 +30,13 @@ export function useStates() {
   return useQuery(
     ['system.states'],
     getStates);
+}
+
+export function useAllocationTypes() {
+  return useQuery(
+      ['system.allocationTypes'],
+      getAllocationTypes
+  );
 }
 
 export function useRiverBasinPolygons(riverBasinNames: string[]) {

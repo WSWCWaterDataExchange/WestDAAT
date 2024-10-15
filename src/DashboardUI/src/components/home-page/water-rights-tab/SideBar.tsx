@@ -8,6 +8,7 @@ import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import { AllocationOwnerSearch, StatesSelect, WaterSourceTypesSelect, OwnerClassificationType, RiverBasinSelect, SiteContent, PriorityDateRange, FlowRange, PodPou, VolumeRange, Nldi } from "./filters";
 import { MapTheme, MapGrouping, PointSize } from "./display-options";
 import { useNldiFilter } from "./hooks/filters/useNldiFilter";
+import {AllocationTypeSelect} from "./filters/AllocationTypeSelect";
 
 function SideBar() {
   const {resetUserOptions} = useWaterRightsContext();
@@ -65,6 +66,7 @@ function SideBar() {
               <WaterSourceTypesSelect />
               <AllocationOwnerSearch />
               <OwnerClassificationType />
+              <AllocationTypeSelect />
               <RiverBasinSelect />
               <SiteContent />
               <PriorityDateRange />

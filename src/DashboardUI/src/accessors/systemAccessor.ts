@@ -35,6 +35,15 @@ export const getStates = async (): Promise<string[]> => {
   return data;
 };
 
+export const getAllocationTypes = async(): Promise<string[]> => {
+  const url = new URL(
+      'system/allocationtypes',
+      process.env.REACT_APP_WEBAPI_URL
+  );
+  const {data} = await axios.get<string[]>(url.toString());
+  return data;
+}
+
 export const getRiverBasinOptions = async () => {
   const { data } = await axios.get<string[]>(
     `${process.env.REACT_APP_WEBAPI_URL}system/RiverBasins`
