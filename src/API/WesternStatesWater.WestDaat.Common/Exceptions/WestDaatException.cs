@@ -1,8 +1,5 @@
-﻿using System.Runtime.Serialization;
-
-namespace WesternStatesWater.WestDaat.Common.Exceptions
+﻿namespace WesternStatesWater.WestDaat.Common.Exceptions
 {
-    [Serializable]
     public class WestDaatException : Exception
     {
         public WestDaatException()
@@ -16,11 +13,6 @@ namespace WesternStatesWater.WestDaat.Common.Exceptions
 
         public WestDaatException(string message, Exception inner)
             : base(message, inner)
-        {
-        }
-
-        protected WestDaatException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

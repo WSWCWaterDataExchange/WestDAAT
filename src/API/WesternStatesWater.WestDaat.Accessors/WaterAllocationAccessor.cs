@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using System.Collections.Concurrent;
-using System.Data;
 using System.Transactions;
+using NetTopologySuite.Geometries.Utilities;
 using WesternStatesWater.WestDaat.Accessors.CsvModels;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -31,10 +32,10 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var analyticsSummary = await db.AllocationAmountsFact
@@ -61,46 +62,39 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchCriteria)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
-            //EF Core 7 is supposed to support geometry::EnvelopeAggregate (https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/whatsnew#spatial-aggregate-functions).
-            //It does work with the basic style that is referenced in the docs.
-            //However, as soon as you try to aggregate with a SelectMany or nested queries, it either fails to translate or pulls all records into memory and performs the aggregation locally (without erroring which is weird).
-            //Thus, we hack this together instead.  Hopefully EF gets better at translating these aggregates and we can go back to more native EF methods.
-            var siteIdsCommand = db.AllocationAmountsFact
+            // Get SiteIds based on search predicate
+            var siteIds = db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)
-                .SelectMany(a => a.AllocationBridgeSitesFact.Select(b => b.SiteId))
-                .CreateDbCommand();
+                .SelectMany(a => a.AllocationBridgeSitesFact.Select(b => b.SiteId));
 
-            siteIdsCommand.CommandText = "select geometry::EnvelopeAggregate(coalesce(geometry, sitepoint)).ToString() Geometry " +
-                                "from core.Sites_Dim sdf " +
-                                $"where sdf.SiteId in ({siteIdsCommand.CommandText})";
+            // Retrieve geometries based on the SiteIds
+            var geometries = db.SitesDim
+                .AsNoTracking()
+                .Where(sdf => siteIds.Contains(sdf.SiteId))
+                .Select(sdf => sdf.Geometry ?? sdf.SitePoint);
 
-            object[] parameters = new object[siteIdsCommand.Parameters.Count];
-            for (var i = 0; i < siteIdsCommand.Parameters.Count; i++)
-            {
-                parameters[i] = siteIdsCommand.Parameters[i];
-            }
-
-            var geometry = (await siteIdsCommand.ExecuteScalarAsync()) as string;
+            // Combine geometries using EnvelopeCombiner
+            var geometry = EnvelopeCombiner.CombineAsGeometry(geometries);
 
             ts.Complete();
 
-            return GeometryHelpers.GetGeometryByWkt(geometry);
+            return geometry.IsEmpty ? null : GeometryHelpers.GetGeometryByWkt(geometry.ToString());
         }
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria, int pageNumber)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var waterRightDetails = await db.AllocationAmountsFact
@@ -264,10 +258,10 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             var org = db.AllocationAmountsFact
-              .Where(a => a.AllocationAmountId == allocationAmountId)
-              .Select(a => a.Organization)
-              .ProjectTo<Organization>(DtoMapper.Configuration)
-              .Single();
+                .Where(a => a.AllocationAmountId == allocationAmountId)
+                .Select(a => a.Organization)
+                .ProjectTo<Organization>(DtoMapper.Configuration)
+                .Single();
 
             return org;
         }
@@ -285,21 +279,21 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                        .Select(x => x.Site)
-                        .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
-                        .ToListAsync();
+                .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(x => x.Site)
+                .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
+                .ToListAsync();
         }
 
         public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                    .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
+                .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
                     .Select(a => a.WaterSource))
-                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
-                    .Distinct()
-                    .ToListAsync();
+                .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<List<AllocationAmount>> GetAllWaterAllocations()
@@ -317,16 +311,16 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                        .Select(x => x.Site)
-                        .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
-                        .ProjectTo<SiteLocation>(DtoMapper.Configuration)
-                        .ToListAsync();
+                .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(x => x.Site)
+                .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
+                .ProjectTo<SiteLocation>(DtoMapper.Configuration)
+                .ToListAsync();
         }
 
         public async Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid)
         {
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
@@ -373,6 +367,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 yield return allocation.Map<WaterAllocations>();
             }
         }
+
         private async IAsyncEnumerable<Sites> BuildSitesModel(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
@@ -427,15 +422,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        internal IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
+        private IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
             return db.PODSiteToPOUSiteFact
                 .AsNoTracking()
-                .Where(a => filteredSites
-                    .Any(b => b.SiteId == a.PODSiteId)
-                    || filteredSites.Any(b => b.SiteId == a.POUSiteId))
+                .Where(a => filteredSites.Any(b => b.SiteId == a.PODSiteId)
+                            || filteredSites.Any(b => b.SiteId == a.POUSiteId))
                 .ProjectTo<PodSiteToPouSiteRelationships>(DtoMapper.Configuration)
                 .AsEnumerable();
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
@@ -13,6 +14,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         static AccessorTestBase()
         {
             Configuration = new ConfigurationBuilder()
+                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
                                         .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                                         .AddInMemoryCollection(DefaultTestConfiguration)
                                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -23,7 +25,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
-            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2Test;Integrated Security=true;" },
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2Test;Integrated Security=true;TrustServerCertificate=true;" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "5" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "4" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "3" },
