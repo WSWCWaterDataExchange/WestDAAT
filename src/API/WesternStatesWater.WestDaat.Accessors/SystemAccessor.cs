@@ -9,7 +9,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class SystemAccessor : AccessorBase, ISystemAccessor
     {
-        public SystemAccessor(ILogger<SystemAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        public SystemAccessor(ILogger<SystemAccessor> logger, IDatabaseContextFactory databaseContextFactory) :
+            base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
         }
@@ -63,6 +64,16 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _databaseContextFactory.Create();
             return await db.WaterAllocationType
                 .Select(a => a.Name)
+                .Distinct()
+                .OrderBy(a => a)
+                .ToListAsync();
+        }
+
+        async Task<List<string>> ISystemAccessor.GetAvailableLegalStatusNormalizedNames()
+        {
+            await using var db = _databaseContextFactory.Create();
+            return await db.LegalStatus
+                .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
                 .Distinct()
                 .OrderBy(a => a)
                 .ToListAsync();

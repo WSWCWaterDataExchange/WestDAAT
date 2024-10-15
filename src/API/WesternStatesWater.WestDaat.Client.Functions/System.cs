@@ -105,6 +105,16 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
 
+        [Function(nameof(GetLegalStatuses))]
+        public async Task<HttpResponseData> GetLegalStatuses(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get",
+                Route = "system/LegalStatuses")]
+            HttpRequestData request)
+        {
+            var result = await _systemManager.GetAvailableLegalStatusNormalizedNames();
+            return await CreateOkResponse(request, result);
+        }
+
         [Function(nameof(PostFeedback))]
         public async Task<HttpResponseData> PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequestData request)
         {
