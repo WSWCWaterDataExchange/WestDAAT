@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
@@ -17,6 +18,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                                         .AddInMemoryCollection(DefaultTestConfiguration)
                                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                                         .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
                                         .AddEnvironmentVariables()
                                         .Build();
         }

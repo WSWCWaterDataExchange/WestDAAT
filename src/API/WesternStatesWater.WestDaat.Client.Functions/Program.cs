@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +30,7 @@ var host = new HostBuilder()
             .AddInMemoryCollection(azureFunctionConfiguration)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+            .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
             .AddEnvironmentVariables();
     })
     .ConfigureServices((context, services) =>

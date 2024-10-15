@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>c1737752-7419-4b21-a3f0-09d1f742fd1d</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Accessors\WesternStatesWater.WestDaat.Accessors.csproj" />
