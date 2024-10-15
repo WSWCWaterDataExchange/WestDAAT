@@ -11,5 +11,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<string>> GetAvailableStateNormalizedNames();
         Task<List<string>> GetAvailableAllocationTypeNormalizedNames();
         Task<List<string>> GetAvailableLegalStatusNormalizedNames();
+        Task<List<string>> GetAvailableSiteTypeNormalizedNames();
     }
 }

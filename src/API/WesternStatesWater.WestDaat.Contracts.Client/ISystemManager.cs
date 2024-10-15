@@ -11,6 +11,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<string>> GetAvailableStateNormalizedNames();
         Task<List<string>> GetAvailableAllocationTypeNormalizedNames();
         Task<List<string>> GetAvailableLegalStatusNormalizedNames();
+        Task<List<string>> GetAvailableSiteTypeNormalizedNames();
 
         List<string> GetRiverBasinNames();
 

@@ -52,6 +52,11 @@ namespace WesternStatesWater.WestDaat.Managers
             return await _systemAccessor.GetAvailableLegalStatusNormalizedNames();
         }
 
+        async Task<List<string>> ISystemManager.GetAvailableSiteTypeNormalizedNames()
+        {
+            return await _systemAccessor.GetAvailableSiteTypeNormalizedNames();
+        }
+
         public List<string> GetRiverBasinNames()
         {
             return _locationEngine.GetRiverBasinNames();
