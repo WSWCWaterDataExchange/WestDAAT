@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, ProgressBar, Table } from "react-bootstrap";
 import { WaterRightsSearchResults } from "../../../data-contracts/WaterRightsSearchResults";

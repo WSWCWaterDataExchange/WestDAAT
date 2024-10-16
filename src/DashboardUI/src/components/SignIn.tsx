@@ -1,3 +1,4 @@
+import React from 'react';
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";

@@ -1,3 +1,4 @@
+import React from 'react';
 import { mdiInformationOutline } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useState } from "react";

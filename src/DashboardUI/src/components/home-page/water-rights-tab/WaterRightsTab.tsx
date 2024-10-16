@@ -1,3 +1,4 @@
+import React from 'react';
 import MapProvider from "../../../contexts/MapProvider";
 import MainPanel from "../MainPanel";
 import SidePanel from "../SidePanel";

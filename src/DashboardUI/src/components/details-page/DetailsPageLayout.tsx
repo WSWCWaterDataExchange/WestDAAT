@@ -1,3 +1,4 @@
+import React from 'react';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { useChildrenByTypes } from '../../hooks/useChildrenByTypes';
 

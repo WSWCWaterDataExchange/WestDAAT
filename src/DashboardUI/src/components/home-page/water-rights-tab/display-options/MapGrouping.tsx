@@ -1,3 +1,4 @@
+import React from 'react';
 import Select from "react-select";
 import { MapGrouping as MG } from "../MapGrouping";
 import { useMapGroupingDisplayOption } from "../hooks/display-options/useMapGroupingDisplayOption"

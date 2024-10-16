@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import * as compress from "lz-string";

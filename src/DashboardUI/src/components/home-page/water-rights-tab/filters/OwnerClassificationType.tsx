@@ -1,3 +1,4 @@
+import React from 'react';
 import Select from "react-select";
 import { useOwnerClassificationsFilter } from "../hooks/filters/useOwnerClassificationsFilter";
 import { useCallback } from "react";

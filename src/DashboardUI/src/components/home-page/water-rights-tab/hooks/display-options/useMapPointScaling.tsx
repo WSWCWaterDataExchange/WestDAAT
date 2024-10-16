@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useMemo } from "react";
 import { useWaterRightsContext } from "../../Provider";
 import { pointSizes, waterRightsProperties } from "../../../../../config/constants";

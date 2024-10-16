@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useSiteClickedOnMap from "./useSiteClickedOnMap";
 import ErrorCard from "../../components/map-popups/ErrorCard";

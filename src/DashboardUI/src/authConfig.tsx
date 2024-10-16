@@ -1,3 +1,4 @@
+import React from 'react';
 import { Configuration } from "@azure/msal-browser";
 
 export const msalConfig : Configuration = {

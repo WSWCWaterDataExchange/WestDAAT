@@ -1,3 +1,4 @@
+import React from 'react';
 import MapPopupCard from "./MapPopupCard";
 import { mdiOpenInNew } from '@mdi/js';
 import Icon from "@mdi/react";

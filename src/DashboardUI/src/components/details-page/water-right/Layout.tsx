@@ -1,3 +1,4 @@
+import React from 'react';
 import { DetailsPage } from "../DetailsPageLayout";
 import WaterRightMap from "./WaterRightMap";
 import WaterRightProperties from "./WaterRightProperties";

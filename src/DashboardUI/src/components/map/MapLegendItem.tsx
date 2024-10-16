@@ -1,3 +1,4 @@
+import React from 'react';
 import { mdiMapMarker } from "@mdi/js";
 import Icon from "@mdi/react";
 import { PropsWithChildren } from "react";

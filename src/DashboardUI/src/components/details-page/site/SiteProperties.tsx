@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import Domain from 'mdi-react/DomainIcon';
 import MapMarker from 'mdi-react/MapMarkerIcon';

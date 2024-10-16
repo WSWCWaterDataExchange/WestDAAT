@@ -1,3 +1,4 @@
+import React from 'react';
 import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';

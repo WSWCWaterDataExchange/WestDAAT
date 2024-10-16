@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from "react";
 import { useWaterRightsContext } from "../../Provider";
 import { useMapPointScaling } from "./useMapPointScaling";
