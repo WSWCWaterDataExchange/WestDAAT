@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 import {
   getAllocationTypes,
-  getBeneficialUses,
+  getBeneficialUses, getLegalStatuses,
   getOwnerClassifications,
-  getRiverBasinPolygonsByName,
+  getRiverBasinPolygonsByName, getSiteTypes,
   getStates,
   getWaterSourceTypes
 } from '../../accessors/systemAccessor';
@@ -36,6 +36,20 @@ export function useAllocationTypes() {
   return useQuery(
       ['system.allocationTypes'],
       getAllocationTypes
+  );
+}
+
+export function useLegalStatuses() {
+  return useQuery(
+      ['system.legalstatuses'],
+      getLegalStatuses
+  );
+}
+
+export function useSiteTypes(){
+  return useQuery(
+      ['system.sitetypes'],
+      getSiteTypes
   );
 }
 
