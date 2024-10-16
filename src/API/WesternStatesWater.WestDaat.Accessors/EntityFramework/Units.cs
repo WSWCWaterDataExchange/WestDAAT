@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
-    public partial class Units
+    public partial class Units : ControlledVocabularyBase
     {
         public Units()
         {
@@ -8,12 +8,6 @@
             VariablesDimAmountUnitCvNavigation = new HashSet<VariablesDim>();
             VariablesDimMaximumAmountUnitCvNavigation = new HashSet<VariablesDim>();
         }
-
-        public string Name { get; set; }
-        public string Term { get; set; }
-        public string Definition { get; set; }
-        public string State { get; set; }
-        public string SourceVocabularyUri { get; set; }
 
         public virtual ICollection<VariablesDim> VariablesDimAggregationIntervalUnitCvNavigation { get; set; }
         public virtual ICollection<VariablesDim> VariablesDimAmountUnitCvNavigation { get; set; }

@@ -10,7 +10,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.Term, b => b.Random.String(10, 'A', 'z'))
                 .RuleFor(a => a.Definition, b => b.Lorem.Slug(10))
                 .RuleFor(a => a.State, b => b.Address.StateAbbr())
-                .RuleFor(a => a.SourceVocabularyURI, b => b.Internet.Url())
+                .RuleFor(a => a.SourceVocabularyUri, b => b.Internet.Url())
                 .RuleFor(a => a.WaDEName, b => b.Random.String(10, 'A', 'z'))
                 .RuleFor(a => a.ConsumptionCategoryType, Common.ConsumptionCategory.NonConsumptive);
         }

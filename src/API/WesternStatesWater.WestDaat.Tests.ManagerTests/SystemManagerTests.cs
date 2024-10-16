@@ -11,6 +11,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ILocationEngine> _locationEngineMock = new(MockBehavior.Strict);
 
         private readonly Mock<ISystemAccessor> _systemAccessorMock = new(MockBehavior.Strict);
+        
+        [TestMethod]
 
         [TestMethod]
         public async Task GetAvailableBeneficialUseNormalizedNames_Success()
