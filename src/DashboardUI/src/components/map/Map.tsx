@@ -23,7 +23,7 @@ interface mapProps {
   handleMapFitChange?: () => void;
 }
 // Fix transpile errors. Mapbox is working on a fix for this
-// eslint-disable-next-line import/no-webpack-loader-syntax
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 const createMapMarkerIcon = (color: string) =>{
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`
@@ -136,8 +136,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     })
 
     mapInstance.once("load", () => {
-      let mapSettings: MapSettings;
-      mapSettings = defaultMapLocationData;
+      const mapSettings: MapSettings = defaultMapLocationData;
       mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
       mapInstance.zoomTo(mapSettings.zoomLevel);
 

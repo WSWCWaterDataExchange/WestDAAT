@@ -22,14 +22,20 @@ export default [
   pluginReact.configs.flat.recommended,
   {
     rules: {
-      // Remove this when we get a handle of the missing "key" prop violations
-      'react/jsx-key': 'off',
-
-      // Remove this when we get a handle of the "any" violations
+      // Remove this to get a handle of the "any" violations
       '@typescript-eslint/no-explicit-any': 'off',
 
-      // Remove this when we get a handle of unused variables
+      // Remove this to get a handle of using empty object violations
+      '@typescript-eslint/no-empty-object-type': 'off',
+
+      // Remove this to get a handle of unused variables
       '@typescript-eslint/no-unused-vars': 'off',
+
+      // Remove this to get a handle of the missing "key" prop violations
+      'react/jsx-key': 'off',
+
+      // Remove this to get a handle of unescaped single quotes in template strings
+      'react/no-unescaped-entities': 'off',
     },
   },
 ];
