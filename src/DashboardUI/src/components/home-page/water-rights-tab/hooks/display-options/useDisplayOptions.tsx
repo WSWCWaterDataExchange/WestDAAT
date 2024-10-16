@@ -25,7 +25,7 @@ export function useDisplayOptions() {
   } = useMapContext();
 
   useEffect(() => {
-    let visible = [...allWaterRightsLayers];
+    const visible = [...allWaterRightsLayers];
     if ((riverBasinNames?.length ?? 0) > 0) visible.push(mapLayerNames.riverBasinsLayer);
     if (isNldiFilterActive) visible.push(...nldiLayers);
 

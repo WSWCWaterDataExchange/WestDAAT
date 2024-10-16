@@ -11,7 +11,7 @@ interface AppContextState {
   getUrlParam: <T, >(key: string) => T | undefined
 }
 
-let defaultAppContextState = {
+const defaultAppContextState = {
   authenticationContext: { isAuthenticated: false, user: null },
   setUrlParam: (key: string, value: any) => { },
   getUrlParam: <T,>(key: string): T | undefined => undefined
@@ -22,7 +22,7 @@ export const useAppContext = () => useContext(AppContext)
 
 const AppProvider: FC = ({ children }) => {
 
-  let [urlParams, setUrlParams] = useSearchParams();
+  const [urlParams, setUrlParams] = useSearchParams();
 
   const authenticationContext = useAuthenticationContext();
 
@@ -42,7 +42,7 @@ const AppProvider: FC = ({ children }) => {
 
   const setUrlParam = useCallback((key: string, value: {} | undefined): void => {
     setStateUrlParams(s => {
-      let updated = !deepEqual(s[key], value);
+      const updated = !deepEqual(s[key], value);
       if(!updated) return s
       const updatedValues = { ...s };
       if(value === undefined){
@@ -56,7 +56,7 @@ const AppProvider: FC = ({ children }) => {
   }, [])
 
   const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
-    var param = stateUrlParamsRef.current[key];
+    const param = stateUrlParamsRef.current[key];
     if (param) {
       return param as T;
     }

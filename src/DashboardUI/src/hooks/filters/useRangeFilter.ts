@@ -14,7 +14,7 @@ export function useRangeFilter<T>(minValue: T | undefined, maxValue: T | undefin
       }
       return [operator, value, ["coalesce", ["get", fieldStr], coalesceValue]];
     };
-    let mapFilters = [];
+    const mapFilters = [];
     if (minValue !== undefined) {
       mapFilters.push(buildRangeFilter(minMapField, minValue, true));
     }

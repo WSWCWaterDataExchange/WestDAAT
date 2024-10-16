@@ -5,14 +5,14 @@ import * as NldiQueries from "../../../../../hooks/queries/useNldiQuery";
 import { DataPoints, Directions } from '../../../../../data-contracts/nldi';
 
 let currFilters = {...WaterRightsProvider.defaultFilters}
-let differentNldiFilters = {
+const differentNldiFilters = {
    latitude: 30,
    longitude: -90,
    directions: Directions.Downsteam,
    dataPoints: DataPoints.Epa,
   }
-let mockSetFilters = jest.fn((a) => currFilters = a());
-let mockSetNldiIds = jest.fn();
+const mockSetFilters = jest.fn((a) => currFilters = a());
+const mockSetNldiIds = jest.fn();
 
 beforeEach(() =>{
   jest.spyOn(WaterRightsProvider, 'useWaterRightsContext')

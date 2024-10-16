@@ -61,7 +61,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   const [styleFlag, setStyleFlag] = useState(0);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
-  let geocoderControl = useRef(new MapboxGeocoder({
+  const geocoderControl = useRef(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken
   }));
 
@@ -176,7 +176,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       });
 
       mapConfig.sources.forEach(a => {
-        var { id, ...src } = a;
+        const { id, ...src } = a;
         mapInstance.addSource(id, src as AnySourceImpl)
       })
 
@@ -194,7 +194,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   
   useEffect(() => {
     drawControl?.deleteAll();
-    for (var element of polylines) {
+    for (const element of polylines) {
       drawControl?.add(element);
     }
   }, [polylines, drawControl])
@@ -279,8 +279,8 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     if(!map) return;
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
       await new Promise(resolve => {
-        var currLayers = map.getStyle().layers;
-        var currSources = map.getStyle().sources;
+        const currLayers = map.getStyle().layers;
+        const currSources = map.getStyle().sources;
         map.once("styledata", () => {
           sourceIds?.forEach(sourceId => {
             if (!map.getSource(sourceId)) {
@@ -324,7 +324,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   useEffect(() => {
     if(!map) return;
     geoJsonData.forEach(a => {
-      var source = map.getSource(a.source);
+      const source = map.getSource(a.source);
       if (source?.type === 'geojson') {
         source.setData(a.data);
       }
@@ -334,7 +334,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   useEffect(() => {
     if(!map) return;
     vectorUrls.forEach(a => {
-      var source = map.getSource(a.source);
+      const source = map.getSource(a.source);
       if (source.type === 'vector') {
         if (source.url !== a.url) {
           source.setUrl(a.url);
@@ -345,42 +345,42 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
   useEffect(() => {
     if(!map) return;
-    for (let key in filters) {
+    for (const key in filters) {
       map.setFilter(key, filters[key]);
     }
   }, [map, filters]);
 
   useEffect(() => {
     if(!map) return;
-    for (let key in circleColors) {
+    for (const key in circleColors) {
       map.setPaintProperty(key, "circle-color", circleColors[key]);
     }
   }, [map, circleColors]);
 
   useEffect(() => {
     if(!map) return;
-    for (let key in circleRadii) {
+    for (const key in circleRadii) {
       map.setPaintProperty(key, "circle-radius", circleRadii[key]);
     }
   }, [map, circleRadii]);
 
   useEffect(() => {
     if(!map) return;
-    for (let key in circleSortKeys) {
+    for (const key in circleSortKeys) {
       map.setLayoutProperty(key, "circle-sort-key", circleSortKeys[key]);
     }
   }, [map, circleSortKeys]);
 
   useEffect(() => {
     if(!map) return;
-    for (let key in fillColors) {
+    for (const key in fillColors) {
       map.setPaintProperty(key, "fill-color", fillColors[key]);
     }
   }, [map, fillColors]);
 
   useEffect(() => {
     if(!map) return;
-    for (let key in iconImages) {
+    for (const key in iconImages) {
       map.setLayoutProperty(key, "icon-image", iconImages[key]);
     }
   }, [map, iconImages]);
