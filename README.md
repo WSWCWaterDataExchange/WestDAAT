@@ -7,8 +7,8 @@
 3. Start SQL Server (Docker or Host machine)
    - If you already have a SQL Server container running, just use that as the Host machine no need for docker. 
    - To spin up a new SQL server docker container:
-      - `docker-compose` file supplied in `src/API/BackendServices/WesternStatesWater.WaDE.Docker/docker-compose.dev.yml`
-      - `docker-compose up -d`
+      - `docker compose` file supplied in `src/API/BackendServices/WesternStatesWater.WaDE.Docker/docker-compose.dev.yml`
+      - `docker compose up -d`
 4. Run DbUp project from WaDE2 repo 
    - **Note: No need to run DbUp if you imported bacpac files for the DBs** 
    - **Need two databases WaDE2 and WaDE2Test**
