@@ -51,7 +51,7 @@ function useDownloadModal() {
 }
 
 function useUploadModal() {
-    const { setUploadModal } = useHomePageContext(); // Use setUploadModal for upload modal state
+    const { setUploadModal } = useHomePageContext();
     useEffect(() => {
         setUploadModal(<UploadModal/>);
     }, [setUploadModal]);
