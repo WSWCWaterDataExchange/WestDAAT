@@ -30,15 +30,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             _logger.LogInformation("Loading filters");
             var results = await _systemManager.LoadFilters();
-            // This cannot run through CreateOKResponse because the serializer options will convert enum to string
-            // This will break the UI.
-            var data = req.CreateResponse(HttpStatusCode.OK);
-            await data.WriteAsJsonAsync<object>(results, new JsonObjectSerializer(
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                }));
-            return data;
+            return await CreateOkResponse(req, results);
         }
 
         [Function(nameof(GetRiverBasinPolygonsByName))]
