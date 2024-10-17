@@ -82,14 +82,20 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal}: SiteNavbarProps
           <Container fluid className="p-0">
             <Nav>
               {(Object.values(HomePageTab)).map(tab =>
-                <Nav.Link onClick={() => onTabClick(tab)} className={`py-3 px-4 ${currentTab === tab ? 'active-tab' : ''}`} key={tab}>
-                  {tab}
-                </Nav.Link>
-                )}
+                  <Nav.Link onClick={() => onTabClick(tab)}
+                            className={`py-3 px-4 ${currentTab === tab ? 'active-tab' : ''}`} key={tab}>
+                    {tab}
+                  </Nav.Link>
+              )}
             </Nav>
 
-            <div className="mx-2">
-              <Button className="ms-1" onClick={() => showDownloadModal(true)}>Download Data</Button>
+            <div className="d-flex">
+              <div className="mx-2">
+                <Button className="ms-1" onClick={() => showDownloadModal(true)}>Download Data</Button>
+              </div>
+              <div className="mx-2">
+                <Button className="ms-1">Upload Data</Button>
+              </div>
             </div>
           </Container>
         </Navbar>
