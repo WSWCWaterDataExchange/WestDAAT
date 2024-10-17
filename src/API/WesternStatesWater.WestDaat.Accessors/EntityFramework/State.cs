@@ -10,9 +10,6 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
             SitesDims = new HashSet<SitesDim>();
         }
         
-        [MaxLength(10)]
-        public string StateAbbr { get; set; }
-        
         public virtual ICollection<ReportingUnitsDim> ReportingUnitsDim { get; set; }
         public virtual ICollection<SitesDim> SitesDims { get; set; }
     }

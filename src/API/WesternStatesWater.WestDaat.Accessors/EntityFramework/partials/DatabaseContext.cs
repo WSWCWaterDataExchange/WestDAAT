@@ -1839,7 +1839,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasColumnName("SourceVocabularyURI")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.StateAbbr)
+                entity.Property(e => e.State)
                     .HasColumnName("State")
                     .HasMaxLength(10);
 
