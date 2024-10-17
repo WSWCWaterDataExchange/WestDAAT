@@ -6,10 +6,11 @@ using Azure.Core.Serialization;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class System(ISystemManager systemManager, INotificationManager notificationManager)
+    public class System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<System> logger)
         : FunctionBase
     {
         [Function(nameof(GetDashboardFilters))]
@@ -17,6 +18,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 Route = "system/filters")]
             HttpRequestData req)
         {
+            logger.LogInformation("Loading filters");
             var results = await systemManager.LoadFilters();
             // This cannot run through CreateOKResponse because the serializer options will convert enum to string
             // This will break the UI.
@@ -31,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
         [Function(nameof(GetRiverBasinPolygonsByName))]
         public async Task<HttpResponseData> GetRiverBasinPolygonsByName(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/RiverBasins")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/riverBasins")]
             HttpRequestData request)
         {
             string requestBody = String.Empty;
@@ -42,6 +44,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
 
+            logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
             var result = systemManager.GetRiverBasinPolygonsByName(basinNames);
 
             return await CreateOkResponse(request, result);
