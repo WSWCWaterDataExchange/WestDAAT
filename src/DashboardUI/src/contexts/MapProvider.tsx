@@ -1,4 +1,3 @@
-import React from 'react';
 import React, { createContext, FC, ReactElement, useCallback, useContext, useMemo, useState } from "react";
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '../data-contracts/MapBoundSettings';

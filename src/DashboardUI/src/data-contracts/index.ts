@@ -4,7 +4,6 @@ export * from './WaterSourceInfoListItem';
 export * from './SiteLocation';
 export * from './MapBoundSettings';
 export * from './BeneficialUseListItem';
-export * from './feature';
 export * from './SiteDetails';
 export * from './WaterRightInfoListItem';
 export * from './WaterSourceInfoListItem';
