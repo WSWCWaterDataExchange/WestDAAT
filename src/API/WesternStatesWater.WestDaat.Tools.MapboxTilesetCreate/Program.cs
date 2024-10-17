@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
@@ -24,6 +25,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
                 .Build();
 
             var hostBuilder = Host.CreateDefaultBuilder();

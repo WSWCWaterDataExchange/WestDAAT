@@ -18,18 +18,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Create Database Container
-      run: docker-compose -f ci-compose.yml up -d
+      run: docker compose -f ci-compose.yml up -d
       working-directory: .github
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: .NET Build
       run: dotnet build --no-restore
     - name: Create Database
-      run: docker exec -i mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
+      run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
     - name: Check out WaDE2.0
       uses: actions/checkout@v2
       with:
@@ -42,5 +42,5 @@ jobs:
     - name: .NET Test
       run: dotnet test
       env:
-          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;"
+          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       working-directory: src/API

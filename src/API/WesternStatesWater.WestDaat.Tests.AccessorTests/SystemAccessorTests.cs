@@ -1,4 +1,5 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
@@ -198,24 +199,37 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [TestMethod]
         public async Task GetAvailableStateNormalizedNames_RemovesDuplicates()
         {
-            var duplicateOwnerClassifications = new StateFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .Generate(2);
+            const string duplicateName = "Duplicate Name";
+            const string uniqueName = "Unique Name";
+            
+            // specify Name (which gets copied to StateAbbr) or this will fail intermittently because Name need to be unique
+            State[] duplicateOwnerClassifications =
+            [
+                new StateFaker()
+                    .RuleFor(a => a.WaDEName, _ => duplicateName)
+                    .RuleFor(a => a.Name, _ => "AR")
+                    .Generate(),
+                new StateFaker()
+                    .RuleFor(a => a.WaDEName, _ => duplicateName)
+                    .RuleFor(a => a.Name, _ => "AK")
+                    .Generate()
+            ];
             var uniqueOwnerClassification = new StateFaker()
-                .RuleFor(a => a.WaDEName, b => "Unique Name")
+                .RuleFor(a => a.WaDEName, _ => uniqueName)
+                .RuleFor(a => a.Name, _ => "AL")
                 .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
+
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.State.AddRange(duplicateOwnerClassifications);
                 db.State.Add(uniqueOwnerClassification);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             var accessor = CreateSystemAccessor();
             var result = await accessor.GetAvailableStateNormalizedNames();
 
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
+            result.Should().NotBeNull().And.BeEquivalentTo(uniqueName, duplicateName);
         }
 
         [DataTestMethod]

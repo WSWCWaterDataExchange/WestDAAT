@@ -5,6 +5,7 @@ using System.Transactions;
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {
     [TestClass]
+    [TestCategory("Integration Tests")]
     public class IntegrationTestBase : IDisposable
     {
         private ILoggerFactory _loggerFactory;
