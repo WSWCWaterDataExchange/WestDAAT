@@ -10,16 +10,26 @@ using Microsoft.Extensions.Logging;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<System> logger)
-        : FunctionBase
+    public class System : FunctionBase
     {
+        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<System> logger)
+        {
+            _systemManager = systemManager;
+            _notificationManager = notificationManager;
+            _logger = logger;
+        }
+
+        private readonly INotificationManager _notificationManager;
+        private readonly ISystemManager _systemManager;
+        private readonly ILogger _logger;
+
         [Function(nameof(GetDashboardFilters))]
         public async Task<HttpResponseData> GetDashboardFilters([HttpTrigger(AuthorizationLevel.Anonymous, "get",
                 Route = "system/filters")]
             HttpRequestData req)
         {
-            logger.LogInformation("Loading filters");
-            var results = await systemManager.LoadFilters();
+            _logger.LogInformation("Loading filters");
+            var results = await _systemManager.LoadFilters();
             // This cannot run through CreateOKResponse because the serializer options will convert enum to string
             // This will break the UI.
             var data = req.CreateResponse(HttpStatusCode.OK);
@@ -44,8 +54,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
 
-            logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
-            var result = systemManager.GetRiverBasinPolygonsByName(basinNames);
+            _logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
+            var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
 
             return await CreateOkResponse(request, result);
         }
@@ -63,7 +73,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
 
-            await notificationManager.SendFeedback(feedbackRequest);
+            await _notificationManager.SendFeedback(feedbackRequest);
 
             return request.CreateResponse(HttpStatusCode.OK);
         }

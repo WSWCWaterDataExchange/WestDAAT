@@ -9,12 +9,19 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
-    internal class SystemAccessor(ILogger<SystemAccessor> logger, IDatabaseContextFactory databaseContextFactory)
-        : AccessorBase(logger), ISystemAccessor
+    internal class SystemAccessor : AccessorBase, ISystemAccessor
     {
+        private readonly IDatabaseContextFactory _databaseContextFactory;
+
+        public SystemAccessor(ILogger<SystemAccessor> logger, IDatabaseContextFactory databaseContextFactory)
+            : base(logger)
+        {
+            _databaseContextFactory = databaseContextFactory;
+        }
+
         async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
-            await using var db = databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
             return new DashboardFilters
             {
                 AllocationTypes = await db.WaterAllocationType.GetControlledVocabularyNames(),
