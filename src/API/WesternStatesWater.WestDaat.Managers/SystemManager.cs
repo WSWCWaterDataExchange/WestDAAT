@@ -21,25 +21,10 @@ namespace WesternStatesWater.WestDaat.Managers
             _locationEngine = locationEngine;
             _systemAccessor = systemAccessor;
         }
-
-        async Task<List<BeneficialUseItem>> ISystemManager.GetAvailableBeneficialUseNormalizedNames()
+        
+        async Task<DashboardFilters> ISystemManager.LoadFilters()
         {
-            return (await _systemAccessor.GetAvailableBeneficialUseNormalizedNames()).Map<List<BeneficialUseItem>>();
-        }
-
-        async Task<List<string>> ISystemManager.GetAvailableOwnerClassificationNormalizedNames()
-        {
-            return await _systemAccessor.GetAvailableOwnerClassificationNormalizedNames();
-        }
-
-        async Task<List<string>> ISystemManager.GetAvailableWaterSourceTypeNormalizedNames()
-        {
-            return await _systemAccessor.GetAvailableWaterSourceTypeNormalizedNames();
-        }
-
-        async Task<List<string>> ISystemManager.GetAvailableStateNormalizedNames()
-        {
-            return await _systemAccessor.GetAvailableStateNormalizedNames();
+            return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();
         }
 
         public List<string> GetRiverBasinNames()

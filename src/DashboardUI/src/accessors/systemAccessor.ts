@@ -1,39 +1,15 @@
 import axios from 'axios';
-import { BeneficialUseListItem } from '@data-contracts';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
+import {DashboardFilters} from "../data-contracts/DashboardFilters";
 
-export const getBeneficialUses = async (): Promise<BeneficialUseListItem[]> => {
+export const getFilters = async(): Promise<DashboardFilters> => {
   const url = new URL(
-    'system/beneficialuses',
-    process.env.REACT_APP_WEBAPI_URL
+      'system/filters',
+      process.env.REACT_APP_WEBAPI_URL
   );
-  const { data } = await axios.get<BeneficialUseListItem[]>(url.toString());
+  const { data } = await axios.get<DashboardFilters>(url.toString());
   return data;
-};
-
-export const getOwnerClassifications = async (): Promise<string[]> => {
-  const url = new URL(
-    'system/ownerclassifications',
-    process.env.REACT_APP_WEBAPI_URL
-  );
-  const { data } = await axios.get<string[]>(url.toString());
-  return data;
-};
-
-export const getWaterSourceTypes = async (): Promise<string[]> => {
-  const url = new URL(
-    'system/watersourcetypes',
-    process.env.REACT_APP_WEBAPI_URL
-  );
-  const { data } = await axios.get<string[]>(url.toString());
-  return data;
-};
-
-export const getStates = async (): Promise<string[]> => {
-  const url = new URL('system/states', process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<string[]>(url.toString());
-  return data;
-};
+}
 
 export const getRiverBasinOptions = async () => {
   const { data } = await axios.get<string[]>(

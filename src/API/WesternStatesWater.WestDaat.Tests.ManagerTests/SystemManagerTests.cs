@@ -2,6 +2,7 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
+using DashboardFilters = WesternStatesWater.WestDaat.Common.DataContracts.DashboardFilters;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -13,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<ISystemAccessor> _systemAccessorMock = new(MockBehavior.Strict);
 
         [TestMethod]
-        public async Task GetAvailableBeneficialUseNormalizedNames_Success()
+        public async Task SystemManager_LoadFilters_ShouldBeEquivalent()
         {
             var faker = new Faker();
 
@@ -28,75 +29,44 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
             };
 
-            _systemAccessorMock.Setup(a => a.GetAvailableBeneficialUseNormalizedNames())
-                        .ReturnsAsync(new List<Common.DataContracts.BeneficialUseItem> { beneficialUse1, beneficialUse2 })
-                        .Verifiable();
-
-            var sut = CreateSystemManager();
-            var result = await sut.GetAvailableBeneficialUseNormalizedNames();
-
-            result.Should().NotBeNull().And
-                .BeEquivalentTo(new[] { beneficialUse2, beneficialUse1 });
-            _systemAccessorMock.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task GetAvailableOwnerClassificationNormalizedNames_Success()
-        {
-            var faker = new Faker();
             var ownerClassification1 = faker.Random.AlphaNumeric(10);
             var ownerClassification2 = faker.Random.AlphaNumeric(10);
-
-            _systemAccessorMock.Setup(a => a.GetAvailableOwnerClassificationNormalizedNames())
-                             .ReturnsAsync(new List<string> { ownerClassification1, ownerClassification2 })
-                             .Verifiable();
-
-            var sut = CreateSystemManager();
-            var result = await sut.GetAvailableOwnerClassificationNormalizedNames();
-
-            result.Should().NotBeNull().And
-                .BeEquivalentTo(new[] { ownerClassification2, ownerClassification1 });
-            _systemAccessorMock.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task GetAvailableWaterSourceTypeNormalizedNames_Success()
-        {
-            var faker = new Faker();
+            
             var waterSourceType1 = faker.Random.AlphaNumeric(10);
             var waterSourceType2 = faker.Random.AlphaNumeric(10);
-
-            _systemAccessorMock.Setup(a => a.GetAvailableWaterSourceTypeNormalizedNames())
-                             .ReturnsAsync(new List<string> { waterSourceType1, waterSourceType2 })
-                             .Verifiable();
-
-            var sut = CreateSystemManager();
-            var result = await sut.GetAvailableWaterSourceTypeNormalizedNames();
-
-            result.Should().NotBeNull().And
-                .BeEquivalentTo(new[] { waterSourceType2, waterSourceType1 });
-            _systemAccessorMock.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task GetAvailableStateNormalizedNames_Success()
-        {
-            var faker = new Faker();
+            
             var state1 = faker.Address.StateAbbr();
             var state2 = faker.Address.StateAbbr();
 
-            _systemAccessorMock.Setup(a => a.GetAvailableStateNormalizedNames())
-                             .ReturnsAsync(new List<string> { state1, state2 })
-                             .Verifiable();
+            _systemAccessorMock.Setup(a => a.LoadFilters())
+                .ReturnsAsync(new DashboardFilters
+                {
+                    AllocationTypes = null,
+                    BeneficialUses = [beneficialUse1, beneficialUse2],
+                    LegalStatuses = null,
+                    OwnerClassifications = [ownerClassification1, ownerClassification2],
+                    RiverBasins = null,
+                    SiteTypes = null,
+                    States = [state1, state2],
+                    WaterSources = [waterSourceType1, waterSourceType2]
+                })
+                .Verifiable();
 
             var sut = CreateSystemManager();
-            var result = await sut.GetAvailableStateNormalizedNames();
+            var result = await sut.LoadFilters();
 
-            result.Should().NotBeNull().And
-                .BeEquivalentTo(new[] { state2, state1 });
+            result.BeneficialUses.Should().NotBeNull().And
+                .BeEquivalentTo([beneficialUse2, beneficialUse1]);
+            result.OwnerClassifications.Should().NotBeNull().And
+                .BeEquivalentTo(ownerClassification2, ownerClassification1);
+            result.States.Should().NotBeNull().And
+                .BeEquivalentTo(state2, state1);
+            result.WaterSources.Should().NotBeNull().And
+                .BeEquivalentTo(waterSourceType2, waterSourceType1);
+
             _systemAccessorMock.VerifyAll();
         }
-
+        
         private ISystemManager CreateSystemManager()
         {
             return new SystemManager(

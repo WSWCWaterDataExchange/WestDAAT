@@ -4,8 +4,9 @@ import { DataPoints, Directions } from "../../../data-contracts/nldi";
 import { useDisplayOptionsUrlParameters } from "./hooks/url-parameters/useDisplayOptionsUrlParameters";
 import { defaultDisplayOptions, DisplayOptions } from "./DisplayOptions";
 import { useFiltersUrlParameters } from "./hooks/url-parameters/useFiltersUrlParameters";
-import { useBeneficialUses, useOwnerClassifications, useStates, useWaterSourceTypes } from "../../../hooks/queries/useSystemQuery";
-import { useRiverBasinOptions } from "../../../hooks/queries/useRiverBasinOptions";
+import {
+  useDashboardFilters
+} from "../../../hooks/queries/useSystemQuery";
 import { UseQueryResult } from "react-query";
 
 export interface WaterRightsFilters{
@@ -15,6 +16,9 @@ export interface WaterRightsFilters{
   riverBasinNames?: string[],
   states?: string[],
   allocationOwner?: string,
+  allocationTypes?: string[],
+  legalStatuses?: string[],
+  siteTypes?: string[],
   includeExempt: boolean | undefined,
   minFlow: number | undefined,
   maxFlow: number | undefined,
@@ -45,6 +49,9 @@ export interface HostData{
   ownerClassificationsQuery: Query<string[]>;
   statesQuery: Query<string[]>;
   riverBasinsQuery: Query<string[]>;
+  allocationTypesQuery: Query<string[]>;
+  legalStatusesQuery: Query<string[]>;
+  siteTypesQuery: Query<string[]>;
 }
 
 export interface WaterRightsContextState {
@@ -63,6 +70,9 @@ export const defaultFilters: WaterRightsFilters = {
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
+  allocationTypes: undefined,
+  legalStatuses: undefined,
+  siteTypes: undefined,
   states: undefined,
   riverBasinNames: undefined,
   includeExempt: undefined,
@@ -75,7 +85,7 @@ export const defaultFilters: WaterRightsFilters = {
   maxPriorityDate: undefined,
   polylines: undefined,
   isNldiFilterActive: false,
-  nldiFilterData: undefined
+  nldiFilterData: undefined,
 }
 
 export const defaultNldiFilters = {
@@ -98,7 +108,10 @@ export const defaultState: WaterRightsContextState = {
     waterSourcesQuery: defaultQuery,
     ownerClassificationsQuery: defaultQuery,
     statesQuery: defaultQuery,
-    riverBasinsQuery: defaultQuery
+    riverBasinsQuery: defaultQuery,
+    allocationTypesQuery: defaultQuery,
+    legalStatusesQuery: defaultQuery,
+    siteTypesQuery: defaultQuery,
   },
 }
 
@@ -113,11 +126,7 @@ export const WaterRightsProvider: FC = ({ children }) => {
   const [ displayOptions, setDisplayOptions ] = useState<DisplayOptions>(getDisplayOptionsParameter() ?? defaultDisplayOptions)
   const [ nldiIds, setNldiIds ] = useState<string[]>([]);
 
-  const beneficialUsesQuery = useBeneficialUses();
-  const waterSourcesQuery = useWaterSourceTypes();
-  const ownerClassificationsQuery = useOwnerClassifications();
-  const statesQuery = useStates();
-  const riverBasinsQuery = useRiverBasinOptions();
+  const dashboardFiltersQuery = useDashboardFilters();
 
   useEffect(() =>{
     setDisplayOptionsParameter(displayOptions);
@@ -133,6 +142,8 @@ export const WaterRightsProvider: FC = ({ children }) => {
     setNldiIds([]);
   }, [setFilters, setDisplayOptions]);
 
+  const isLoading = dashboardFiltersQuery.isLoading;
+  const isError = dashboardFiltersQuery.isError
 
   const filterContextProviderValue = {
     filters,
@@ -143,11 +154,14 @@ export const WaterRightsProvider: FC = ({ children }) => {
     setDisplayOptions,
     resetUserOptions,
     hostData: {
-      beneficialUsesQuery,
-      waterSourcesQuery,
-      ownerClassificationsQuery,
-      statesQuery,
-      riverBasinsQuery
+      beneficialUsesQuery: { data: dashboardFiltersQuery.data?.beneficialUses, isLoading, isError},
+      waterSourcesQuery: { data: dashboardFiltersQuery.data?.waterSources, isLoading, isError},
+      ownerClassificationsQuery: { data: dashboardFiltersQuery.data?.ownerClassifications, isLoading, isError},
+      statesQuery: { data: dashboardFiltersQuery.data?.states, isLoading: isLoading, isError},
+      riverBasinsQuery: { data: dashboardFiltersQuery.data?.riverBasins, isLoading, isError},
+      allocationTypesQuery: { data: dashboardFiltersQuery.data?.allocationTypes, isLoading, isError},
+      legalStatusesQuery: { data: dashboardFiltersQuery.data?.legalStatuses, isLoading, isError},
+      siteTypesQuery: { data: dashboardFiltersQuery.data?.siteTypes, isLoading, isError},
     }
   }
 
