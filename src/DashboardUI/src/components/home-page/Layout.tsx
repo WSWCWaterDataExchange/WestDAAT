@@ -9,7 +9,7 @@ import { HomePageTab } from '../../pages/HomePage';
 import './home-page.scss'
 
 export function Layout() {
-  const { downloadModal, setShowDownloadModal } = useHomePageContext();
+  const { downloadModal, setShowDownloadModal, uploadModal, setShowUploadModal } = useHomePageContext();
   const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
@@ -30,7 +30,8 @@ export function Layout() {
       <SiteNavbar
         onTabClick={setCurrentTab}
         currentTab={currentTab}
-        showDownloadModal={setShowDownloadModal} />
+        showDownloadModal={setShowDownloadModal}
+        showUploadModal={setShowUploadModal} />
 
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         {currentTabElement}
@@ -40,7 +41,7 @@ export function Layout() {
         showFeedbackModal={shouldShowFeedbackModal} />
 
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
-      {downloadModal}
+      {downloadModal}{uploadModal}
     </div>
   );
 }
