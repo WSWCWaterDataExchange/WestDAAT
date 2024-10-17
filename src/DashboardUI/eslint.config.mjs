@@ -22,6 +22,11 @@ export default [
   pluginReact.configs.flat.recommended,
   {
     rules: {
+      // Mapbox is currently using a require() and there is some kind of conflict
+      // between eslint and the react build, so we need to disable the rule here
+      // instead of in the file.
+      '@typescript-eslint/no-require-imports': 'off',
+
       // Remove this to get a handle of the "any" violations
       '@typescript-eslint/no-explicit-any': 'off',
 
