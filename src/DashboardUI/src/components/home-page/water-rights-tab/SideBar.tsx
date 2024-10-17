@@ -45,7 +45,7 @@ function SideBar() {
       keys.push('siteSelectionFilters');
     }
     return keys
-  }, [activeKeys, isNldiFilterActive])
+  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive])
 
   return (
     <>
