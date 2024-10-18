@@ -1,5 +1,5 @@
 import React from 'react';
-import mapboxgl, { AnyLayer, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
+import mapboxgl, { AnyLayer, AnySourceData, AnySourceImpl, LngLat, NavigationControl } from "mapbox-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
@@ -69,9 +69,13 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     const canvas = new OffscreenCanvas(24, 24);
     const ctx = canvas.getContext('2d');
     if (ctx != null) {
-      const v = await Canvg.from(ctx, svg, presets.offscreen())
+      // ctx and presets.offscreen() don't match the types in the Canvg library.
+      // ESLint is throwing an error here. Casting to any for now to get it to build.
+      const v = await Canvg.from(ctx as any, svg, presets.offscreen() as any);
       await v.render()
-      const blob = await canvas.convertToBlob()
+
+      // Build errors here without the any case. We need to update some packages.
+      const blob = await (canvas as any).convertToBlob()
       const pngUrl = URL.createObjectURL(blob);
       map.loadImage(pngUrl, (_, result) => {
         if (result && !map.hasImage(id)) {
@@ -87,7 +91,9 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     } else if (isAuthenticated) {
       geocoderControl.current = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
-        mapboxgl: map
+        // Lots of missing properties here. Adding ESLint highlights the problem.
+        // Casting to any for now to get it to build.
+        mapboxgl: map as any
       });
       map.addControl(geocoderControl.current);
     }
@@ -176,7 +182,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
       mapConfig.sources.forEach(a => {
         const { id, ...src } = a;
-        mapInstance.addSource(id, src as AnySourceImpl)
+        mapInstance.addSource(id, src as AnySourceData)
       })
 
       mapConfig.layers.forEach((a: any) => {
@@ -283,7 +289,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
         map.once("styledata", () => {
           sourceIds?.forEach(sourceId => {
             if (!map.getSource(sourceId)) {
-              map.addSource(sourceId, currSources?.[sourceId] as AnySourceImpl);
+              map.addSource(sourceId, currSources?.[sourceId] as AnySourceData);
             }
           });
           layerIds?.forEach(layerId => {
