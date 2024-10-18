@@ -8,3 +8,5 @@ export * from './feature';
 export * from './SiteDetails';
 export * from './WaterRightInfoListItem';
 export * from './WaterSourceInfoListItem';
+export * from './RegulationDetails';
+export * from './RegulatoryOverlayInfoListItem';
