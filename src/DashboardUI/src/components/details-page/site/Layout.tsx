@@ -1,3 +1,4 @@
+import React from 'react';
 import { DetailsPage } from "../DetailsPageLayout";
 import SiteMap from "./SiteMap";
 import SiteProperties from "./SiteProperties";

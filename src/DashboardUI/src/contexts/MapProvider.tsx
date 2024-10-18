@@ -73,8 +73,8 @@ interface MapContextState {
   setLayerFillColors: (fillColors: setFillColorsParamType) => void;
   iconImages: MapLayerIconImagesType;
   setLayerIconImages: (iconImages: setIconImagesParamType) => void;
-  geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]
-  setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => void;
+  geoJsonData: { source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string }[]
+  setGeoJsonData: (source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string) => void;
   vectorUrls: { source: string, url: string }[]
   setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[],
@@ -241,8 +241,8 @@ const MapProvider: FC = ({ children }) => {
     })
   }, [setIconImages]);
 
-  const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String }[]>([]);
-  const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | String) => {
+  const [geoJsonData, setAllGeoJsonData] = useState<{ source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string }[]>([]);
+  const setGeoJsonData = useCallback((source: string, data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string) => {
     setAllGeoJsonData(s => {
       const unchangedData = s.filter(a => a.source !== source);
       const updatedData = [...unchangedData, { source, data }];

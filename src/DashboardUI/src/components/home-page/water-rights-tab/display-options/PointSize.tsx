@@ -1,3 +1,4 @@
+import React from 'react';
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { usePointSizeDisplayOption } from "../hooks/display-options/usePointSizeDisplayOption";
 import { ChangeEvent } from "react";

@@ -1,3 +1,4 @@
+import React from 'react';
 import DangerousIcon from 'mdi-react/DangerousIcon';
 import MapPopupCard from "./MapPopupCard";
 

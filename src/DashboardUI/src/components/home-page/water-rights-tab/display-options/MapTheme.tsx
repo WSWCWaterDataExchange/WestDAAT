@@ -1,3 +1,4 @@
+import React from 'react';
 import { MapThemeSelector } from "../../../map/MapThemeSelector";
 
 export function MapTheme() {

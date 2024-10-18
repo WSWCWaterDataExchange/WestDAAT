@@ -1,3 +1,4 @@
+import React from 'react';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Directions, DataPoints } from "../../../../data-contracts/nldi";
 import { Button, Form } from "react-bootstrap";
@@ -38,8 +39,8 @@ export function Nldi() {
   const setLatLongData = useCallback((latValue: string, longValue: string) => {
     let lat = parseFloat(latValue);
     let long = parseFloat(longValue);
-    let pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
-    let pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
+    const pointLat = isNaN(lat) ? "" : lat.toFixed(nldi.latLongPrecision);
+    const pointLong = isNaN(long) ? "" : long.toFixed(nldi.latLongPrecision);
     if (isNaN(lat) || isNaN(long)) {
       setPointData(s => ({
         ...s,
@@ -124,7 +125,7 @@ export function Nldi() {
 }
 
 function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
-  let [{ dropResult, isDragging }, dragRef] = useDrag({
+  const [{ dropResult, isDragging }, dragRef] = useDrag({
     type: 'nldiMapPoint',
     item: {},
     collect: monitor => ({

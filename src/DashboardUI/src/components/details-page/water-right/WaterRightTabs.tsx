@@ -1,3 +1,4 @@
+import React from 'react';
 import { Tab, Table, Tabs } from 'react-bootstrap';
 import { useWaterRightDetailsContext } from './Provider';
 

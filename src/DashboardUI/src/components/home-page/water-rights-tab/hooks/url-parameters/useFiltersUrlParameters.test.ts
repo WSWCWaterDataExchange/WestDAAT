@@ -6,10 +6,10 @@ import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../data-contracts/BeneficialUseListItem';
 import { DataPoints, Directions } from '../../../../../data-contracts/nldi';
 
-let mockGetParameterWaterRights = jest.fn();
-let mockSetParameterWaterRights = jest.fn();
-let mockGetIsNldiParameterActive = jest.fn();
-let mockSetIsNldiParameterActive = jest.fn();
+const mockGetParameterWaterRights = jest.fn();
+const mockSetParameterWaterRights = jest.fn();
+const mockGetIsNldiParameterActive = jest.fn();
+const mockSetIsNldiParameterActive = jest.fn();
 
 const filtersWithUndefinedNldiActive: Optional<WaterRightsFilters, 'isNldiFilterActive'> = {
   beneficialUseNames: undefined,

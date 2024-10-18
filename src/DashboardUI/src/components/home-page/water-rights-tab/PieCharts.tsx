@@ -1,3 +1,4 @@
+import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HC_Data from "highcharts/modules/export-data";

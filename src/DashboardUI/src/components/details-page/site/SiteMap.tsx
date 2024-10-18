@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMemo } from "react";
 import DetailsMap from "../DetailsMap";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";

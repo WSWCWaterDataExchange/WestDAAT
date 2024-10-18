@@ -2,8 +2,8 @@ import { useUrlParameters } from './useUrlParameters';
 import { act, renderHook } from '@testing-library/react-hooks'
 
 let mockUrlParams: Record<string, any> = {}
-let mockSetUrlParam = jest.fn();
-let mockGetUrlParam = jest.fn();
+const mockSetUrlParam = jest.fn();
+const mockGetUrlParam = jest.fn();
 
 const sampleObject = { a: 'has value' };
 const diffObject = {...sampleObject, a: "diff value"};
@@ -25,7 +25,7 @@ beforeEach(() =>{
   });
 
   mockGetUrlParam.mockImplementation(<T>(key: string): T | undefined =>{
-    var param = mockUrlParams[key];
+    const param = mockUrlParams[key];
       if (param) {
         return param as T;
       }
@@ -192,7 +192,7 @@ describe('Sets Url Parameter', () => {
       [true, sampleObject, sampleObject, diffObject, sampleObject],
       [true, sampleObject, diffObject, diffObject, undefined],
     ])('useArray: %s Initial: %j, Set: %j, Default: %j', (useArray, initialObject, setObject, defaultObject, expectedObject) => {
-      let keys = useArray ? ["test-key"] : "test-key";
+      const keys = useArray ? ["test-key"] : "test-key";
       mockSetUrlParam("test-key", initialObject)
       
       const {result} = renderHook(() => useUrlParameters(keys, defaultObject));

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from "react";
 import { useWaterRightsContext } from "../../Provider";
 import { useMapPointScaling } from "./useMapPointScaling";
@@ -25,7 +26,7 @@ export function useDisplayOptions() {
   } = useMapContext();
 
   useEffect(() => {
-    let visible = [...allWaterRightsLayers];
+    const visible = [...allWaterRightsLayers];
     if ((riverBasinNames?.length ?? 0) > 0) visible.push(mapLayerNames.riverBasinsLayer);
     if (isNldiFilterActive) visible.push(...nldiLayers);
 

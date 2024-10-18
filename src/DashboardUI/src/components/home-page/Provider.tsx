@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext, FC, useContext, useState } from "react";
 
 interface HomePageContextState {

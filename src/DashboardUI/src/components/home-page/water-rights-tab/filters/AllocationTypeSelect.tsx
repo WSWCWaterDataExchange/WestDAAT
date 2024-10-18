@@ -1,6 +1,6 @@
+import React, {useCallback, useMemo} from "react";
 import {useAllocationTypesFilter} from "../hooks/filters/useAllocationTypesFilter";
 import {useWaterRightsContext} from "../Provider";
-import {useCallback, useMemo} from "react";
 import Select, {MultiValue} from "react-select";
 
 export function AllocationTypeSelect() {

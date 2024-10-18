@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import DisclaimerModal from "../components/DisclaimerModal";
