@@ -1,28 +1,12 @@
 import { useQuery } from 'react-query';
-import { getBeneficialUses, getOwnerClassifications, getRiverBasinPolygonsByName, getStates, getWaterSourceTypes } from '../../accessors/systemAccessor';
+import {
+  getFilters, getRiverBasinPolygonsByName
+} from '../../accessors/systemAccessor';
 
-export function useBeneficialUses() {
+export function useDashboardFilters() {
   return useQuery(
-    ['system.beneficialUses'],
-    getBeneficialUses);
-}
-
-export function useWaterSourceTypes() {
-  return useQuery(
-    ['system.waterSourceTypes'],
-    getWaterSourceTypes);
-}
-
-export function useOwnerClassifications() {
-  return useQuery(
-    ['system.ownerClassifications'],
-    getOwnerClassifications);
-}
-
-export function useStates() {
-  return useQuery(
-    ['system.states'],
-    getStates);
+      ['system.filters'],
+      getFilters);
 }
 
 export function useRiverBasinPolygons(riverBasinNames: string[]) {

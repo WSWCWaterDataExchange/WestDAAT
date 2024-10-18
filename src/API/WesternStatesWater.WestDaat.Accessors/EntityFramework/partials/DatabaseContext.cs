@@ -335,6 +335,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasMaxLength(50)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.WaDEName)
+                    .HasMaxLength(150);
+
                 entity.Property(e => e.Definition).HasMaxLength(4000);
 
                 entity.Property(e => e.SourceVocabularyUri)
@@ -613,6 +616,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasMaxLength(100)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.WaDEName)
+                    .HasMaxLength(150);
+
                 entity.Property(e => e.SourceVocabularyUri)
                     .HasColumnName("SourceVocabularyURI")
                     .HasMaxLength(250);
@@ -628,32 +634,33 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasName("PK__Benefici__737584F7133E924E");
 
                 entity.ToTable("BeneficialUses", "CVs");
-
-
-
+                
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100);
 
+                entity.Property(e => e.WaDEName)
+                    .HasMaxLength(150);
+
                 entity.Property(e => e.Term)
                     .HasColumnName("Term")
-                    .HasMaxLength(100);
+                    .HasMaxLength(250);
 
                 entity.Property(e => e.Definition)
                     .HasColumnName("Definition")
-                    .HasMaxLength(100);
+                    .HasMaxLength(4000);
 
-                entity.Property(e => e.State).HasMaxLength(100);
+                entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.UsgscategoryNameCv)
                     .HasColumnName("USGSCategory")
-                    .HasMaxLength(100);
+                    .HasMaxLength(250);
                 entity.Property(e => e.NaicscodeNameCv)
                    .HasColumnName("NAICSCode")
-                   .HasMaxLength(100);
-                entity.Property(e => e.SourceVocabularyURI)
+                   .HasMaxLength(250);
+                entity.Property(e => e.SourceVocabularyUri)
                    .HasColumnName("SourceVocabularyURI")
-                   .HasMaxLength(100);
+                   .HasMaxLength(250);
 
                 entity.Property(e => e.ConsumptionCategoryType)
                     .HasColumnName("ConsumptionCategoryType");
@@ -670,6 +677,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Name)
                     .HasMaxLength(100)
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.WaDEName)
+                    .HasMaxLength(150);
 
                 entity.Property(e => e.Definition).HasMaxLength(4000);
 
@@ -692,6 +702,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Name)
                     .HasMaxLength(100)
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.WaDEName)
+                    .HasMaxLength(150);
 
                 entity.Property(e => e.Definition).HasMaxLength(4000);
 
@@ -724,6 +737,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<SDWISIdentifier>(entity =>
@@ -746,6 +761,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<DataQualityValue>(entity =>
@@ -759,6 +776,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasMaxLength(50)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.Definition);
+
                 entity.Property(e => e.SourceVocabularyUri)
                     .HasColumnName("SourceVocabularyURI")
                     .HasMaxLength(250);
@@ -766,6 +785,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(10);
 
                 entity.Property(e => e.Term).HasMaxLength(100);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<DateDim>(entity =>
@@ -804,6 +825,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<GnisfeatureName>(entity =>
@@ -828,6 +851,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<ImportErrors>(entity =>
@@ -865,6 +890,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<LegalStatus>(entity =>
@@ -889,6 +916,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<MethodType>(entity =>
@@ -913,6 +942,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<MethodsDim>(entity =>
@@ -1026,6 +1057,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<Nhdproduct>(entity =>
@@ -1050,6 +1083,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<OrganizationsDim>(entity =>
@@ -1107,7 +1142,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 
                 entity.Property(e => e.Definition).HasMaxLength(4000);
 
-                entity.Property(e => e.SourceVocabularyURI)
+                entity.Property(e => e.SourceVocabularyUri)
                     .HasColumnName("SourceVocabularyURI")
                     .HasMaxLength(250);
 
@@ -1116,6 +1151,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<PowerType>(entity =>
@@ -1138,6 +1175,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<RegulatoryOverlayDim>(entity =>
@@ -1223,6 +1262,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<RegulatoryReportingUnitsFact>(entity =>
@@ -1315,6 +1356,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<ReportYearCv>(entity =>
@@ -1337,6 +1380,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<ReportYearType>(entity =>
@@ -1361,6 +1406,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<ReportingUnitType>(entity =>
@@ -1385,6 +1432,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<ReportingUnitsDim>(entity =>
@@ -1468,6 +1517,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(250);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<SiteVariableAmountsFact>(entity =>
@@ -1788,11 +1839,13 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                     .HasColumnName("SourceVocabularyURI")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.StateAbbr)
+                entity.Property(e => e.State)
                     .HasColumnName("State")
                     .HasMaxLength(10);
 
                 entity.Property(e => e.Term).HasMaxLength(2);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<Units>(entity =>
@@ -1817,6 +1870,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             //modelBuilder.Entity<Usgscategory>(entity =>
@@ -1863,6 +1918,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<VariableSpecific>(entity =>
@@ -1887,6 +1944,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<VariablesDim>(entity =>
@@ -2007,6 +2066,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<WaterAllocationType>(entity =>
@@ -2027,6 +2088,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.State).HasMaxLength(2);
 
                 entity.Property(e => e.Term).HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<WaterQualityIndicator>(entity =>
@@ -2051,6 +2114,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<WaterSourceBridgeSitesFact>(entity =>
@@ -2100,6 +2165,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.Term)
                     .IsRequired()
                     .HasMaxLength(250);
+                
+                entity.Property(e => e.WaDEName).HasMaxLength(150);
             });
 
             modelBuilder.Entity<WaterSourcesDim>(entity =>

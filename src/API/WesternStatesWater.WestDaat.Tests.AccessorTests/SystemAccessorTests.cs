@@ -9,250 +9,200 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class SystemAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        public async Task GetAvailableBeneficialUseNormalizedNames_RemovesDuplicates()
+        public async Task LoadFilters_ControlledVocabularies_ShouldBeAlphabeticalAndDistinct()
         {
-            var duplicateBeneficialUses = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .Generate(2);
-            var uniqueBeneficialUse = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, b => "Unique Name")
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.BeneficialUsesCV.AddRange(duplicateBeneficialUses);
-                db.BeneficialUsesCV.Add(uniqueBeneficialUse);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
-
-            var expectedResult1 = new Common.DataContracts.BeneficialUseItem
-            {
-                BeneficialUseName = "Unique Name",
-                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
-            };
-
-            var expectedResult2 = new Common.DataContracts.BeneficialUseItem
-            {
-                BeneficialUseName = "Duplicate Name",
-                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
-            };
-
-            result.Should().NotBeNull().And
-                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] {expectedResult1, expectedResult2 });
-        }
-
-        [TestMethod]
-        public async Task GetAvailableBeneficialUseNormalizedNames_RemovesMultipleConsumptionTypes()
-        {
-            var beneficialUseConsumptive = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .RuleFor(a => a.ConsumptionCategoryType, b => Common.ConsumptionCategory.Consumptive)
-                .Generate();
-            var beneficialUseNonconsumptive = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .RuleFor(a => a.ConsumptionCategoryType, b => Common.ConsumptionCategory.NonConsumptive)
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.BeneficialUsesCV.Add(beneficialUseConsumptive);
-                db.BeneficialUsesCV.Add(beneficialUseNonconsumptive);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
-
-            var expectedResult = new Common.DataContracts.BeneficialUseItem
-            {
-                BeneficialUseName = "Duplicate Name",
-                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
-            };
-
-            result.Should().NotBeNull().And
-                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { expectedResult });
-        }
-
-        [DataTestMethod]
-        [DataRow("Name1", null, "Name1")]
-        [DataRow("Name1", "", "Name1")]
-        [DataRow("Name1", "Name2", "Name2")]
-        public async Task GetAvailableBeneficialUseNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedBeneficialUseName)
-        {
-            var uniqueBeneficialUse = new BeneficialUsesCVFaker()
-                .RuleFor(a => a.Name, b => name)
-                .RuleFor(a => a.WaDEName, b => waDEName)
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.BeneficialUsesCV.Add(uniqueBeneficialUse);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableBeneficialUseNormalizedNames();
-
-
-            var expectedResult = new Common.DataContracts.BeneficialUseItem
-            {
-                BeneficialUseName = expectedBeneficialUseName,
-                ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
-            };
-
-            result.Should().NotBeNull().And
-                   .BeEquivalentTo(new Common.DataContracts.BeneficialUseItem[] { expectedResult });
-        }
-
-        [TestMethod]
-        public async Task GetAvailableOwnerClassificationNormalizedNames_RemovesDuplicates()
-        {
-            var duplicateOwnerClassifications = new OwnerClassificationCvFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .Generate(2);
-            var uniqueOwnerClassification = new OwnerClassificationCvFaker()
-                .RuleFor(a => a.WaDEName, b => "Unique Name")
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.OwnerClassificationCv.AddRange(duplicateOwnerClassifications);
-                db.OwnerClassificationCv.Add(uniqueOwnerClassification);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableOwnerClassificationNormalizedNames();
-
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
-        }
-
-        [DataTestMethod]
-        [DataRow("Name1", null, "Name1")]
-        [DataRow("Name1", "", "Name1")]
-        [DataRow("Name1", "Name2", "Name2")]
-        public async Task GetAvailableOwnerClassificationNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
-        {
-            var uniqueOwnerClassification = new OwnerClassificationCvFaker()
-                .RuleFor(a => a.Name, b => name)
-                .RuleFor(a => a.WaDEName, b => waDEName)
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.OwnerClassificationCv.Add(uniqueOwnerClassification);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableOwnerClassificationNormalizedNames();
-
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { expectedResult });
-        }
-
-        [TestMethod]
-        public async Task GetAvailableWaterSourceTypeNormalizedNames_RemovesDuplicates()
-        {
-            var duplicateWaterSourceTypes = new WaterSourceTypeFaker()
-                .RuleFor(a => a.WaDEName, b => "Duplicate Name")
-                .Generate(2);
-            var uniqueWaterSourceType = new WaterSourceTypeFaker()
-                .RuleFor(a => a.WaDEName, b => "Unique Name")
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.WaterSourceType.AddRange(duplicateWaterSourceTypes);
-                db.WaterSourceType.Add(uniqueWaterSourceType);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableWaterSourceTypeNormalizedNames();
-
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { "Unique Name", "Duplicate Name" });
-        }
-
-        [DataTestMethod]
-        [DataRow("Name1", null, "Name1")]
-        [DataRow("Name1", "", "Name1")]
-        [DataRow("Name1", "Name2", "Name2")]
-        public async Task GetAvailableWaterSourceTypeNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
-        {
-           var uniqueWaterSourceType = new WaterSourceTypeFaker()
-                .RuleFor(a => a.Name, b => name)
-                .RuleFor(a => a.WaDEName, b => waDEName)
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.WaterSourceType.Add(uniqueWaterSourceType);
-                db.SaveChanges();
-            }
-
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableWaterSourceTypeNormalizedNames();
-
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { expectedResult });
-        }
-
-        [TestMethod]
-        public async Task GetAvailableStateNormalizedNames_RemovesDuplicates()
-        {
-            const string duplicateName = "Duplicate Name";
-            const string uniqueName = "Unique Name";
-            
-            // specify Name (which gets copied to StateAbbr) or this will fail intermittently because Name need to be unique
-            State[] duplicateOwnerClassifications =
+            List<WaterAllocationType> waterAllocationTypes =
             [
-                new StateFaker()
-                    .RuleFor(a => a.WaDEName, _ => duplicateName)
-                    .RuleFor(a => a.Name, _ => "AR")
+                new WaterAllocationTypeCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 1")
+                    .RuleFor(a => a.WaDEName, _ => null)
                     .Generate(),
-                new StateFaker()
-                    .RuleFor(a => a.WaDEName, _ => duplicateName)
-                    .RuleFor(a => a.Name, _ => "AK")
+
+                new WaterAllocationTypeCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 2")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new WaterAllocationTypeCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 3")
+                    .RuleFor(a => a.WaDEName, _ => "Official Name")
                     .Generate()
             ];
-            var uniqueOwnerClassification = new StateFaker()
-                .RuleFor(a => a.WaDEName, _ => uniqueName)
-                .RuleFor(a => a.Name, _ => "AL")
-                .Generate();
 
-            await using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.State.AddRange(duplicateOwnerClassifications);
-                db.State.Add(uniqueOwnerClassification);
-                await db.SaveChangesAsync();
-            }
+            var duplicateBeneficialUses = new BeneficialUsesCVFaker()
+                .RuleFor(a => a.WaDEName, _ => "Duplicate Name")
+                .RuleFor(a => a.ConsumptionCategoryType, _ => Common.ConsumptionCategory.Consumptive)
+                .Generate(2);
+            var uniqueBeneficialUse = new BeneficialUsesCVFaker()
+                .RuleFor(a => a.WaDEName, _ => "Unique Name")
+                .RuleFor(a => a.ConsumptionCategoryType, _ => Common.ConsumptionCategory.NonConsumptive)
+                .Generate();
+            List<BeneficialUsesCV> beneficialUses = [];
+            beneficialUses.AddRange(duplicateBeneficialUses);
+            beneficialUses.Add(uniqueBeneficialUse);
+
+            List<LegalStatus> legalStatuses =
+            [
+                new LegalStatusCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 1")
+                    .RuleFor(a => a.WaDEName, _ => null)
+                    .Generate(),
+
+                new LegalStatusCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 2")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new LegalStatusCVFaker()
+                    .RuleFor(a => a.Name, _ => "Name 3")
+                    .RuleFor(a => a.WaDEName, _ => "Official Name")
+                    .Generate()
+            ];
+
+            List<OwnerClassificationCv> ownerClassifications =
+            [
+                new OwnerClassificationCvFaker()
+                    .RuleFor(a => a.Name, _ => "Name 1")
+                    .RuleFor(a => a.WaDEName, _ => null)
+                    .Generate(),
+
+                new OwnerClassificationCvFaker()
+                    .RuleFor(a => a.Name, _ => "Name 2")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new OwnerClassificationCvFaker()
+                    .RuleFor(a => a.Name, _ => "Name 3")
+                    .RuleFor(a => a.WaDEName, _ => "Official Name")
+                    .Generate()
+            ];
+
+            List<SiteType> siteTypes =
+            [
+                new SiteTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 1")
+                    .RuleFor(a => a.WaDEName, _ => null)
+                    .Generate(),
+
+                new SiteTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 2")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new SiteTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 3")
+                    .RuleFor(a => a.WaDEName, _ => "Official Name")
+                    .Generate()
+            ];
+
+            List<State> states =
+            [
+                new StateFaker()
+                    .RuleFor(a => a.Name, _ => "A")
+                    .RuleFor(a => a.WaDEName, _ => null)
+                    .Generate(),
+
+                new StateFaker()
+                    .RuleFor(a => a.Name, _ => "B")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new StateFaker()
+                    .RuleFor(a => a.Name, _ => "C")
+                    .RuleFor(a => a.WaDEName, _ => "Z")
+                    .Generate()
+            ];
+
+            List<WaterSourceType> waterSourceTypes =
+            [
+                new WaterSourceTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 1")
+                    .RuleFor(a => a.WaDEName, _ => null)
+                    .Generate(),
+
+                new WaterSourceTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 2")
+                    .RuleFor(a => a.WaDEName, _ => "")
+                    .Generate(),
+
+                new WaterSourceTypeFaker()
+                    .RuleFor(a => a.Name, _ => "Name 3")
+                    .RuleFor(a => a.WaDEName, _ => "Official Name")
+                    .Generate()
+            ];
+
+            await using var db = CreateDatabaseContextFactory().Create();
+            db.WaterAllocationType.AddRange(waterAllocationTypes);
+            db.BeneficialUsesCV.AddRange(beneficialUses);
+            db.LegalStatus.AddRange(legalStatuses);
+            db.OwnerClassificationCv.AddRange(ownerClassifications);
+            db.SiteType.AddRange(siteTypes);
+            db.State.AddRange(states);
+            db.WaterSourceType.AddRange(waterSourceTypes);
+            await db.SaveChangesAsync();
 
             var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableStateNormalizedNames();
+            var result = await accessor.LoadFilters();
 
-            result.Should().NotBeNull().And.BeEquivalentTo(uniqueName, duplicateName);
-        }
+            result.AllocationTypes.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
 
-        [DataTestMethod]
-        [DataRow("NE", null, "NE")]
-        [DataRow("NE", "", "NE")]
-        [DataRow("NE", "CA", "CA")]
-        public async Task GetAvailableStateNormalizedNames_UseWaDENameWhenAvailable(string name, string waDEName, string expectedResult)
-        {
-            var uniqueOwnerClassification = new StateFaker()
-                .RuleFor(a => a.Name, b => name)
-                .RuleFor(a => a.WaDEName, b => waDEName)
-                .Generate();
-            using (var db = CreateDatabaseContextFactory().Create())
-            {
-                db.State.Add(uniqueOwnerClassification);
-                db.SaveChanges();
-            }
+            result.BeneficialUses.Should()
+                .BeInAscendingOrder(b => b.BeneficialUseName)
+                .And
+                .OnlyHaveUniqueItems(b => b.BeneficialUseName)
+                .And
+                .BeEquivalentTo([
+                    new Common.DataContracts.BeneficialUseItem
+                    {
+                        BeneficialUseName = "Duplicate Name",
+                        ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
+                    },
+                    new Common.DataContracts.BeneficialUseItem
+                    {
+                        BeneficialUseName = "Unique Name",
+                        ConsumptionCategory = Common.ConsumptionCategory.NonConsumptive,
+                    }
+                ]);
 
-            var accessor = CreateSystemAccessor();
-            var result = await accessor.GetAvailableStateNormalizedNames();
+            result.LegalStatuses.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
 
-            result.Should().NotBeNull().And
-                  .BeEquivalentTo(new[] { expectedResult });
+            result.OwnerClassifications.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
+
+            result.SiteTypes.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
+
+            result.States.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["A", "B", "Z"]);
+
+            result.WaterSources.Should()
+                .BeInAscendingOrder()
+                .And
+                .OnlyHaveUniqueItems()
+                .And
+                .BeEquivalentTo(["Name 1", "Name 2", "Official Name"]);
         }
 
         private ISystemAccessor CreateSystemAccessor()

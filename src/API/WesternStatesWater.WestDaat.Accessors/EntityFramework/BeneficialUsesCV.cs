@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
 {
-    public partial class BeneficialUsesCV
+    public partial class BeneficialUsesCV : ControlledVocabularyBase
     {
         public BeneficialUsesCV()
         {
@@ -10,13 +10,7 @@
             SitesBridgeBeneficialUsesFact = new HashSet<SitesBridgeBeneficialUsesFact>();
             SiteVariableAmountsFact = new HashSet<SiteVariableAmountsFact>();
         }
-
-        public string Name { get; set; }
-        public string WaDEName { get; set; }
-        public string Term { get; set; }
-        public string Definition { get; set; }
-        public string State { get; set; }
-        public string SourceVocabularyURI { get; set; }
+        
         public string UsgscategoryNameCv { get; set; }
         public string NaicscodeNameCv { get; set; }
         public Common.ConsumptionCategory? ConsumptionCategoryType { get; set; }

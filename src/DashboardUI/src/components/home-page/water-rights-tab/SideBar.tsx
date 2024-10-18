@@ -9,12 +9,20 @@ import { AccordionEventKey } from "react-bootstrap/esm/AccordionContext";
 import { AllocationOwnerSearch, StatesSelect, WaterSourceTypesSelect, OwnerClassificationType, RiverBasinSelect, SiteContent, PriorityDateRange, FlowRange, PodPou, VolumeRange, Nldi } from "./filters";
 import { MapTheme, MapGrouping, PointSize } from "./display-options";
 import { useNldiFilter } from "./hooks/filters/useNldiFilter";
+import {AllocationTypeSelect} from "./filters/AllocationTypeSelect";
+import {LegalStatusSelect} from "./filters/LegalStatusSelect";
+import {SiteTypeSelect} from "./filters/SiteTypeSelect";
 
 function SideBar() {
   const {resetUserOptions} = useWaterRightsContext();
-  const { isNldiFilterActive, setNldiMapActiveStatus} = useNldiFilter()
+  const { isNldiFilterActive, setNldiMapActiveStatus} = useNldiFilter();
+  const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
  
   const [activeKeys, setActiveKeys] = useState(isNldiFilterActive ? ["nldi"] : ["colorSizeTools", "siteSelectionFilters"]);
+
+  const toggleWaterRightFilters = useCallback(() => {
+    setWaterRightsFilterActive(!isWaterRightsFilterActive);
+  }, [isWaterRightsFilterActive, setWaterRightsFilterActive]);
 
   const toggleNldiFilterStatus = useCallback(() => {
     setNldiMapActiveStatus(!isNldiFilterActive);
@@ -30,12 +38,15 @@ function SideBar() {
     }
   }, [setActiveKeys])
   const openAccordionKeys = useMemo(() =>{
-    const keys = [...activeKeys].filter(a=>a!=="nldi");
+    const keys = [...activeKeys].filter(a=>a!=="nldi" && a !== 'siteSelectionFilters');
     if(isNldiFilterActive){
       keys.push("nldi");
     }
+    if (isWaterRightsFilterActive){
+      keys.push('siteSelectionFilters');
+    }
     return keys
-  }, [activeKeys, isNldiFilterActive])
+  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive])
 
   return (
     <>
@@ -56,7 +67,12 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="siteSelectionFilters">
-            <Accordion.Header>WATER RIGHT SELECTION FILTERS</Accordion.Header>
+            <Accordion.Header onClick={toggleWaterRightFilters}>
+              <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive}</label>
+              <div className="px-1">
+                <BootstrapSwitchButton checked={isWaterRightsFilterActive} onstyle="primary" offstyle="secondary" />
+              </div>
+            </Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
                 <a href="https://westernstateswater.org/wade/westdaat-filter-documentation/" target="_blank" rel="noopener noreferrer">Learn about WestDAAT filters</a>
@@ -66,6 +82,9 @@ function SideBar() {
               <WaterSourceTypesSelect />
               <AllocationOwnerSearch />
               <OwnerClassificationType />
+              <AllocationTypeSelect />
+              <LegalStatusSelect />
+              <SiteTypeSelect />
               <RiverBasinSelect />
               <SiteContent />
               <PriorityDateRange />
