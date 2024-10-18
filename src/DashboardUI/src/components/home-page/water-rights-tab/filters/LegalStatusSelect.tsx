@@ -8,7 +8,7 @@ export function LegalStatusSelect() {
     const {legalStatuses, setLegalStatuses} = useLegalStatusesFilter();
 
     const {
-        hostData: {
+        state: {
             legalStatusesQuery: {data: allLegalStatuses}
         }
     } = useWaterRightsContext();

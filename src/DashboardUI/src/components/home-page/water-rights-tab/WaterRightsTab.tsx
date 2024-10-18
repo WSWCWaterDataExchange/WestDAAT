@@ -43,7 +43,7 @@ function WaterRightsLayout() {
 
 function useDownloadModal() {
   const {setDownloadModal} = useHomePageContext()
-  const {filters, nldiIds} = useWaterRightsContext()
+  const {filters, nldiIds} = useWaterRightsContext().state;
   useEffect(() =>{
     setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />)
   }, [filters, nldiIds, setDownloadModal])

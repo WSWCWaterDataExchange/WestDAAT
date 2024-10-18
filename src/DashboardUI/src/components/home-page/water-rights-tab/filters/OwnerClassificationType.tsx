@@ -8,7 +8,7 @@ export function OwnerClassificationType() {
   const {ownerClassifications, setOwnerClassifications} = useOwnerClassificationsFilter();
 
   const {
-    hostData:{
+    state:{
       ownerClassificationsQuery: { data: allOwnerClassifications}
     }
   } = useWaterRightsContext();

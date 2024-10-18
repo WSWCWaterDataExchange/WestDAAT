@@ -9,7 +9,7 @@ import { useMapFitRequested } from "./useMapFitRequested";
 
 export function useAlerts(){
   const {
-    hostData: {
+    state: {
       beneficialUsesQuery: {
         isLoading: beneficialUseIsLoading,
         isError: beneficialUseIsError

@@ -32,7 +32,7 @@ function BeneficialUseSelect() {
   const {beneficialUseNames, setBeneficialUseNames} = useBeneficialUsesFilter();
 
   const {
-    hostData:{
+    state:{
       beneficialUsesQuery: { data: allBeneficialUses}
     }
   } = useWaterRightsContext();

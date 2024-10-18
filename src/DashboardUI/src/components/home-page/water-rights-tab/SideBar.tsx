@@ -1,5 +1,4 @@
-import React from 'react';
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { Accordion } from "react-bootstrap";
 import BeneficialUseSelect from "./filters/BeneficialUseSelect";
@@ -14,7 +13,7 @@ import {LegalStatusSelect} from "./filters/LegalStatusSelect";
 import {SiteTypeSelect} from "./filters/SiteTypeSelect";
 
 function SideBar() {
-  const {resetUserOptions} = useWaterRightsContext();
+  const { dispatch } = useWaterRightsContext();
   const { isNldiFilterActive, setNldiMapActiveStatus} = useNldiFilter();
   const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
  
@@ -51,7 +50,7 @@ function SideBar() {
   return (
     <>
       <div className="m-3">
-        <Button variant="outline-danger" className="w-100" onClick={resetUserOptions}>
+        <Button variant="outline-danger" className="w-100" onClick={() => dispatch({ type: "RESET_USER_OPTIONS" })}>
           Reset All Filters
         </Button>
       </div>

@@ -9,7 +9,7 @@ export function RiverBasinSelect() {
   const {riverBasinNames, setRiverBasinNames} = useRiverBasinFilter();
 
   const {
-    hostData:{
+    state:{
       riverBasinsQuery: {data: allRiverBasinOptions}
     }
   } = useWaterRightsContext();

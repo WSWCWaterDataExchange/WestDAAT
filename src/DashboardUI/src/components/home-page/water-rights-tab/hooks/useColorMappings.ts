@@ -4,7 +4,7 @@ import { useColorMappings as useColorMappingsBase } from "../../../../hooks/useC
 
 export function useColorMappings() {
     const { 
-      hostData: {
+      state: {
         beneficialUsesQuery: {data: allBeneficialUses},
         ownerClassificationsQuery: {data: allOwnerClassifications},
         waterSourcesQuery: {data: allWaterSourceTypes}

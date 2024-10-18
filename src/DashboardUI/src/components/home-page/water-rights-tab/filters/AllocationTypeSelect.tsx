@@ -7,7 +7,7 @@ export function AllocationTypeSelect() {
     const {allocationTypes, setAllocationTypes} = useAllocationTypesFilter();
 
     const {
-        hostData: {
+        state: {
             allocationTypesQuery: {data: allAllocationTypes}
         }
     } = useWaterRightsContext();
