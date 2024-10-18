@@ -1,3 +1,4 @@
+import React from "react";
 import {useLegalStatusesFilter} from "../hooks/filters/useLegalStatusesFilter";
 import {useWaterRightsContext} from "../Provider";
 import {useCallback, useMemo} from "react";

@@ -1,3 +1,4 @@
+import React from "react";
 import {useSiteTypesFilter} from "../hooks/filters/useSiteTypesFilter";
 import {useWaterRightsContext} from "../Provider";
 import {useCallback, useMemo} from "react";
