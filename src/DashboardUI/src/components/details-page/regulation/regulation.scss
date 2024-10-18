@@ -1,0 +1,13 @@
+@import '../../../styles/colors';
+
+.detail-page {
+  .regulation-card {
+    .card-header {
+      background-color: $card-header-color-red;
+    }
+
+    .rotate-90 {
+      transform: rotate(90deg);
+    }
+  }
+}
