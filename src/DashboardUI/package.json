@@ -50,7 +50,7 @@
     "react-toastify": "^8.2.0",
     "sass": "^1.49.7",
     "typescript": "^4.9.5",
-    "usehooks-ts": "^2.9.1",
+    "usehooks-ts": "^3.1.0",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
     "web-vitals": "^2.1.4",
