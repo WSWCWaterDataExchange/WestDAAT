@@ -1,10 +1,9 @@
-import React from 'react';
-import { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import * as compress from "lz-string";
 import { IAuthenticationContext, useAuthenticationContext } from "../hooks/useAuthenticationContext";
 import deepEqual from 'fast-deep-equal/es6';
-import { useDebounce } from "usehooks-ts";
+import { useDebounce } from '@react-hook/debounce';
 
 interface AppContextState {
   authenticationContext: IAuthenticationContext,
@@ -63,7 +62,7 @@ const AppProvider: FC = ({ children }) => {
     }
   }, [])
 
-  const debouncedStateUrlParams = useDebounce(stateUrlParams, 1000)
+  const [debouncedStateUrlParams] = useDebounce(stateUrlParams, 1000)
   useEffect(() => {
     if ((Object.keys(debouncedStateUrlParams).length ?? 0) > 0) {
       setUrlParams({state: compress.compressToEncodedURIComponent(JSON.stringify(debouncedStateUrlParams)) }, {replace: true})

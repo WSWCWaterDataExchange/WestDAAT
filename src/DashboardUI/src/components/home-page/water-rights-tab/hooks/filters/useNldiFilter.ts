@@ -7,7 +7,7 @@ import deepEqual from 'fast-deep-equal/es6';
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { useMapContext } from "../../../../../contexts/MapProvider";
 import { mapLayerNames, mapSourceNames } from "../../../../../config/maps";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce } from '@react-hook/debounce';
 
 const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   "type": "FeatureCollection",
@@ -31,7 +31,7 @@ export function useNldiFilter() {
   const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useMapContext();
   const { filters: { nldiFilterData, isNldiFilterActive }, setFilters, setNldiIds } = useWaterRightsContext();
 
-  const [debouncedLatitude, debouncedLongitude] = useDebounce([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null], 400)
+  const [[debouncedLatitude, debouncedLongitude]] = useDebounce([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null], 400)
   const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);
   const { data: nldiGeoJsonData } = nldiFeaturesQuery
 
