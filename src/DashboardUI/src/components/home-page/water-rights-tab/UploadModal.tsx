@@ -4,19 +4,13 @@ import { useHomePageContext } from '../Provider';
 import * as geojson from 'geojson';
 
 function UploadModal() {
-    const { showUploadModal, setShowUploadModal } = useHomePageContext();
-    const [isUploading, setIsUploading] = useState(false);
-    const [isUploaded, setIsUploaded] = useState(false);
-    const [uploadError, setUploadError] = useState<JSX.Element | null>(null);
-    const [geoJSONData, setGeoJSONData] = useState<geojson.FeatureCollection | null>(null);
-    const [fileInputValue, setFileInputValue] = useState('');
+    const { showUploadModal, setShowUploadModal, setUploadedGeoJSON } = useHomePageContext();
+    const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'uploaded'>('idle');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const resetState = () => {
-        setUploadError(null);
-        setIsUploaded(false);
-        setIsUploading(false);
-        setGeoJSONData(null);
-        setFileInputValue('');
+        setErrorMessage(null);
+        setUploadStatus('idle');
     };
 
     const closeModal = () => {
@@ -27,13 +21,12 @@ function UploadModal() {
     const handleError = (errorType: string) => {
         switch (errorType) {
             case 'Invalid JSON':
-                setUploadError(<ErrorMessageInvalidJSON />);
+                setErrorMessage('The uploaded file is not valid JSON. Please upload a properly formatted JSON or GeoJSON file.');
                 break;
             default:
-                setUploadError(<ErrorMessageNotGeoJSONOrPolygon />);
+                setErrorMessage('The uploaded file is either not valid GeoJSON or does not contain a Polygon or MultiPolygon geometry. Please ensure that the file follows the correct GeoJSON format.');
         }
-        setIsUploading(false);
-        setFileInputValue('');
+        setUploadStatus('idle');
     };
 
     const validateGeoJSONPolygon = (data: any): boolean => {
@@ -52,8 +45,8 @@ function UploadModal() {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        setIsUploading(true);
-        setUploadError(null);
+        setUploadStatus('uploading');
+        setErrorMessage(null);
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -65,9 +58,8 @@ function UploadModal() {
                     throw new Error('Invalid GeoJSON or no Polygon/MultiPolygon');
                 }
 
-                setGeoJSONData(parsedData);
-                setIsUploaded(true);
-                setIsUploading(false);
+                setUploadedGeoJSON(parsedData); // Save the GeoJSON in context
+                setUploadStatus('uploaded');
             } catch (err) {
                 handleError((err as Error).message || 'Invalid JSON');
             }
@@ -76,22 +68,19 @@ function UploadModal() {
     };
 
     useEffect(() => {
-        if (isUploaded && !uploadError) {
-            console.log("Uploaded GeoJSON Data:", geoJSONData);
+        if (uploadStatus === 'uploaded' && !errorMessage) {
             const timer = setTimeout(() => closeModal(), 1500);
             return () => clearTimeout(timer);
         }
-    }, [isUploaded, uploadError, geoJSONData]);
+    }, [uploadStatus, errorMessage]);
 
     return (
         <Modal show={showUploadModal} onHide={closeModal} centered>
             <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    Upload GeoJSON Data
-                </Modal.Title>
+                <Modal.Title>Upload GeoJSON Data</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {!isUploading && !isUploaded && (
+                {uploadStatus === 'idle' && (
                     <>
                         <Form>
                             <Form.Group controlId="formFile">
@@ -100,39 +89,22 @@ function UploadModal() {
                                     type="file"
                                     accept=".json, .geojson"
                                     onChange={handleFileUpload}
-                                    value={fileInputValue}
                                 />
                             </Form.Group>
                         </Form>
-                        {uploadError && <div>{uploadError}</div>}
+                        {errorMessage && <p className="text-danger">{errorMessage}</p>}
                     </>
                 )}
 
-                {isUploading && <p>Uploading your file, please wait...</p>}
+                {uploadStatus === 'uploading' && <p>Uploading your file, please wait...</p>}
 
-                {isUploaded && <p className="text-success mt-3">GeoJSON Polygon uploaded and processed successfully!</p>}
+                {uploadStatus === 'uploaded' && <p className="text-success mt-3">GeoJSON Polygon uploaded successfully!</p>}
             </Modal.Body>
             <Modal.Footer style={{ justifyContent: 'end' }}>
-                {!uploadError && !isUploading && <Button className="btn btn-secondary" onClick={closeModal}>Cancel</Button>}
-                {uploadError && <Button className="btn btn-secondary" onClick={closeModal}>Okay</Button>}
+                {uploadStatus === 'idle' && <Button className="btn btn-secondary" onClick={closeModal}>Cancel</Button>}
+                {errorMessage && <Button className="btn btn-secondary" onClick={closeModal}>Okay</Button>}
             </Modal.Footer>
         </Modal>
-    );
-}
-
-function ErrorMessageInvalidJSON() {
-    return (
-        <p className="text-danger">
-            The uploaded file is not valid JSON. Please upload a properly formatted JSON or GeoJSON file.
-        </p>
-    );
-}
-
-function ErrorMessageNotGeoJSONOrPolygon() {
-    return (
-        <p className="text-danger">
-            The uploaded file is either not valid GeoJSON or does not contain a Polygon or MultiPolygon geometry. Please ensure that the file follows the correct GeoJSON format.
-        </p>
     );
 }
 
