@@ -15,7 +15,7 @@ import {
   useAuthenticationContext,
 } from '../hooks/useAuthenticationContext';
 import deepEqual from 'fast-deep-equal/es6';
-import { useDebounce } from 'usehooks-ts';
+import { useDebounce } from '@react-hook/debounce';
 
 interface AppContextState {
   authenticationContext: IAuthenticationContext;
@@ -34,7 +34,6 @@ export const useAppContext = () => useContext(AppContext);
 
 const AppProvider: FC = ({ children }) => {
   const [urlParams, setUrlParams] = useSearchParams();
-
   const authenticationContext = useAuthenticationContext();
 
   const initUrlParams = useMemo(() => {
@@ -76,7 +75,7 @@ const AppProvider: FC = ({ children }) => {
     }
   }, []);
 
-  const debouncedStateUrlParams = useDebounce(stateUrlParams, 1000);
+  const [debouncedStateUrlParams] = useDebounce(stateUrlParams, 1000);
   useEffect(() => {
     if ((Object.keys(debouncedStateUrlParams).length ?? 0) > 0) {
       setUrlParams(

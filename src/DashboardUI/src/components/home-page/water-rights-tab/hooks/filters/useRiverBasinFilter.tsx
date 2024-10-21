@@ -1,12 +1,11 @@
-import React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { useWaterRightsContext } from '../../Provider';
 import { useRiverBasinPolygons } from '../../../../../hooks/queries/useSystemQuery';
 import { useGeoJsonFilter } from '../../../../../hooks/filters/useGeoJsonFilter';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import { mapSourceNames } from '../../../../../config/maps';
-import { useDebounce } from 'usehooks-ts';
+import { useDebounce } from '@react-hook/debounce';
 
 const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   type: 'FeatureCollection',
@@ -27,7 +26,7 @@ export function useRiverBasinFilter() {
     return riverBasinNames.length > 0;
   }, [riverBasinNames.length]);
 
-  const debouncedRiverBasinNames = useDebounce(riverBasinNames, 500);
+  const [debouncedRiverBasinNames] = useDebounce(riverBasinNames, 500);
   const riverBasinPolygonsQuery = useRiverBasinPolygons(
     debouncedRiverBasinNames,
   );
