@@ -1,17 +1,17 @@
 import { useQuery } from 'react-query';
 import {
-  getFilters, getRiverBasinPolygonsByName
+  getFilters,
+  getRiverBasinPolygonsByName,
 } from '../../accessors/systemAccessor';
 
 export function useDashboardFilters() {
-  return useQuery(
-      ['system.filters'],
-      getFilters);
+  return useQuery(['system.filters'], getFilters);
 }
 
 export function useRiverBasinPolygons(riverBasinNames: string[]) {
   return useQuery(
     ['system.riverBasinPolygonsByName', ...[...riverBasinNames].sort()],
     () => getRiverBasinPolygonsByName(riverBasinNames),
-    {enabled: riverBasinNames.length > 0});
+    { enabled: riverBasinNames.length > 0 },
+  );
 }

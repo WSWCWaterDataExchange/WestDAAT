@@ -7,7 +7,7 @@ import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
 import { useHomePageContext } from './Provider';
 import { HomePageTab } from '../../pages/HomePage';
 
-import './home-page.scss'
+import './home-page.scss';
 
 export function Layout() {
   const { downloadModal, setShowDownloadModal } = useHomePageContext();
@@ -31,16 +31,19 @@ export function Layout() {
       <SiteNavbar
         onTabClick={setCurrentTab}
         currentTab={currentTab}
-        showDownloadModal={setShowDownloadModal} />
+        showDownloadModal={setShowDownloadModal}
+      />
 
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         {currentTabElement}
       </div>
 
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal} />
+      <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
-      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
+      <FeedbackModal
+        show={showFeedbackModal}
+        setShow={shouldShowFeedbackModal}
+      />
       {downloadModal}
     </div>
   );

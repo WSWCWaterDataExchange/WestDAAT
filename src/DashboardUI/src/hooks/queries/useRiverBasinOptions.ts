@@ -4,6 +4,6 @@ import { getRiverBasinOptions } from '../../accessors/systemAccessor';
 export function useRiverBasinOptions() {
   return useQuery(
     ['riverBasinOptions'],
-    async () => await getRiverBasinOptions()
+    async () => await getRiverBasinOptions(),
   );
 }
