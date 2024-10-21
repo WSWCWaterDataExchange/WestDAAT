@@ -1,53 +1,58 @@
-import { useEffect, useMemo } from "react";
-import { useSiteDetailsContext } from "../Provider";
-import useProgressIndicator from "../../../../hooks/useProgressIndicator";
-import { toast } from "react-toastify";
+import { useEffect, useMemo } from 'react';
+import { useSiteDetailsContext } from '../Provider';
+import useProgressIndicator from '../../../../hooks/useProgressIndicator';
+import { toast } from 'react-toastify';
 
-export function useAlerts(){
+export function useAlerts() {
   const {
     hostData: {
-      detailsQuery: {
-        isLoading: detailsIsLoading,
-        isError: detailsIsError
-      },
+      detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
       locationsQuery: {
         isLoading: locationsIsLoading,
-        isError: locationsIsError
+        isError: locationsIsError,
       },
       waterRightInfoListQuery: {
         isLoading: waterRightInfoListIsLoading,
-        isError: waterRightInfoListIsError
+        isError: waterRightInfoListIsErro,
       },
       sourceInfoListQuery: {
         isLoading: sourceInfoListIsLoading,
-        isError: sourceInfoListIsError
-      }
-    }
+        isError: sourceInfoListIsError,
+      },
+    },
   } = useSiteDetailsContext();
 
-  const isError = useMemo(() =>{
-    return detailsIsError ||
-           locationsIsError ||
-           waterRightInfoListIsError ||
-           sourceInfoListIsError
-  }, [detailsIsError, locationsIsError, waterRightInfoListIsError, sourceInfoListIsError])
-  
+  const isError = useMemo(() => {
+    return (
+      detailsIsError ||
+      locationsIsError ||
+      waterRightInfoListIsError ||
+      sourceInfoListIsError
+    );
+  }, [
+    detailsIsError,
+    locationsIsError,
+    waterRightInfoListIsError,
+    sourceInfoListIsErro,
+  ]);
+
   useProgressIndicator(
     [
       !detailsIsLoading,
       !locationsIsLoading,
       !waterRightInfoListIsLoading,
-      !sourceInfoListIsLoading
-    ], "Loading Site Data");
+      !sourceInfoListIsLoading,
+    ],
+    'Loading Site Data',
+  );
 
-  useEffect(() =>{
-    if(isError){
-      toast.error("Error loading site data.  Please try again.",
-      {
+  useEffect(() => {
+    if (isError) {
+      toast.error('Error loading site data.  Please try again.', {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
-        autoClose: false
-      })
+        autoClose: false,
+      });
     }
-  }, [isError])
+  }, [isError]);
 }

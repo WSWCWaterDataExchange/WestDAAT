@@ -1,8 +1,8 @@
 import React from 'react';
-import { useCallback, useMemo } from "react";
-import { useMapContext, MapStyle } from "../../contexts/MapProvider";
+import { useCallback, useMemo } from 'react';
+import { useMapContext, MapStyle } from '../../contexts/MapProvider';
 
-import './map-theme-selector.scss'
+import './map-theme-selector.scss';
 
 export function MapThemeSelector() {
   return (
@@ -12,34 +12,44 @@ export function MapThemeSelector() {
       <StyleButton style={MapStyle.Street} friendlyName="Street" />
       <StyleButton style={MapStyle.Outdoor} friendlyName="Outdoor" />
       <StyleButton style={MapStyle.Satellite} friendlyName="Satellite" />
-    </div>);
+    </div>
+  );
 }
 
-interface StyleButtonProps{
-  style: MapStyle,
-  friendlyName: string
+interface StyleButtonProps {
+  style: MapStyle;
+  friendlyName: string;
 }
-function StyleButton({style, friendlyName}: StyleButtonProps) {
-  const {
-    mapStyle, setMapStyle
-  } = useMapContext();
 
-  const isActive = useMemo(() =>{
-    return style === mapStyle
+function StyleButton({ style, friendlyName }: StyleButtonProps) {
+  const { mapStyle, setMapStyle } = useMapContext();
+
+  const isActive = useMemo(() => {
+    return style === mapStyle;
   }, [style, mapStyle]);
 
-  const classes = useMemo(() =>{
-    return `btn btn-link p-0 ${style}${isActive ? ' active' : ''}`
+  const classes = useMemo(() => {
+    return `btn btn-link p-0 ${style}${isActive ? ' active' : ''}`;
   }, [isActive, style]);
 
-  const onClickAction = useCallback(() =>{
-    if(isActive) return undefined;
+  const onClickAction = useCallback(() => {
+    if (isActive) return undefined;
     return setMapStyle(style);
-  }, [isActive, style, setMapStyle])
+  }, [isActive, style, setMapStyle]);
 
-  const tabIndex = useMemo(() =>{
+  const tabIndex = useMemo(() => {
     return isActive ? -1 : undefined;
-  }, [isActive])
+  }, [isActive]);
 
-  return <button type="button" title={`${friendlyName} Map Theme`} aria-label={`Select ${friendlyName} Map Theme`} aria-pressed={isActive} tabIndex={tabIndex} onClick={onClickAction} className={classes}></button>
+  return (
+    <button
+      type="button"
+      title={`${friendlyName} Map Theme`}
+      aria-label={`Select ${friendlyName} Map Theme`}
+      aria-pressed={isActive}
+      tabIndex={tabIndex}
+      onClick={onClickAction}
+      className={classes}
+    ></button>
+  );
 }

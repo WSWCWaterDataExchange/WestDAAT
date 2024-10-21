@@ -63,7 +63,7 @@ the `.prettierrc.json` file.
 
 1. If you haven't already run, this installs the necessary dependencies including prettier.
 
-```bash 
+```bash
 npm install
 ```
 

@@ -19,19 +19,20 @@
 
   &.toggle-on {
     bottom: 65%;
-    transition: bottom .5s ease-in-out;
+    transition: bottom 0.5s ease-in-out;
   }
 
   &.toggle-off {
     bottom: 0;
-    transition: bottom .5s ease-in-out;
+    transition: bottom 0.5s ease-in-out;
   }
 
-  > svg{
+  > svg {
     height: 1.5em;
   }
 }
-.analytics-and-table-content{
+
+.analytics-and-table-content {
   position: absolute !important;
   display: block !important;
   top: 100%;
@@ -41,7 +42,7 @@
   padding: 1rem;
   background-color: $white;
   z-index: 4;
-  transition: top .5s ease-in-out;
+  transition: top 0.5s ease-in-out;
   overflow: auto;
 
   &.toggle-on {
@@ -62,10 +63,10 @@
     position: sticky;
     top: calc(-1rem - 1px);
     background-color: $white;
-    border-bottom: 1px solid $black; 
+    border-bottom: 1px solid $black;
   }
 
-  & tbody tr:last-child td{
+  & tbody tr:last-child td {
     border-bottom: 0px none;
   }
 }
