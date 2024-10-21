@@ -46,7 +46,7 @@ export enum nldiSiteProperties {
   sourceName = 'sourceName',
   identifier = 'identifier',
   uri = 'uri',
-  name = 'name'
+  name = 'name',
 }
 
 export const colorList = [

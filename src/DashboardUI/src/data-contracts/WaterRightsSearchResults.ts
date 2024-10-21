@@ -1,7 +1,7 @@
-import { WaterRightsSearchDetail } from "./WaterRightsSearchDetail";
+import { WaterRightsSearchDetail } from './WaterRightsSearchDetail';
 
 export interface WaterRightsSearchResults {
   currentPageNumber: number;
   hasMoreResults: boolean;
-  waterRightsDetails: WaterRightsSearchDetail[];  
+  waterRightsDetails: WaterRightsSearchDetail[];
 }

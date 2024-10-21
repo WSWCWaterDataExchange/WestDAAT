@@ -4,22 +4,26 @@ import { useWaterRightDetailsContext } from './Provider';
 
 export enum WaterRightTab {
   SiteInfo = 'SiteInfo',
-  WaterRightInfo = 'WaterRightInfo'
+  WaterRightInfo = 'WaterRightInfo',
 }
 
 function WaterRightTabs() {
   const {
     activeTab,
     setActiveTab,
-    hostData:{
-      siteInfoListQuery: {data: siteInfoList},
-      sourceInfoListQuery: {data: sourceInfoList}
-    }
+    hostData: {
+      siteInfoListQuery: { data: siteInfoList },
+      sourceInfoListQuery: { data: sourceInfoList },
+    },
   } = useWaterRightDetailsContext();
 
   return (
     <>
-      <Tabs onSelect={a=>setActiveTab(a === 'site' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs">
+      <Tabs
+        onSelect={(a) => setActiveTab(a === 'site' ? a : 'source')}
+        activeKey={activeTab}
+        className="mb-3 custom-tabs"
+      >
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>
@@ -35,9 +39,17 @@ function WaterRightTabs() {
               </tr>
             </thead>
             <tbody>
-              {siteInfoList?.map((site) =>
+              {siteInfoList?.map((site) => (
                 <tr key={site.siteUuid}>
-                  <td><a href={`/details/site/${site.siteUuid}`} target="_blank" rel="noopener noreferrer">{site.siteUuid}</a></td>
+                  <td>
+                    <a
+                      href={`/details/site/${site.siteUuid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {site.siteUuid}
+                    </a>
+                  </td>
                   <td>{site.siteNativeId}</td>
                   <td>{site.siteName}</td>
                   <td>{site.latitude}</td>
@@ -46,7 +58,7 @@ function WaterRightTabs() {
                   <td>{site.siteType}</td>
                   <td>{site.poDorPOUSite}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </Table>
         </Tab>
@@ -62,7 +74,7 @@ function WaterRightTabs() {
               </tr>
             </thead>
             <tbody>
-              {sourceInfoList?.map((source) =>
+              {sourceInfoList?.map((source) => (
                 <tr key={source.waterSourceUuid}>
                   <td>{source.waterSourceUuid}</td>
                   <td>{source.waterSourceNativeId}</td>
@@ -70,13 +82,13 @@ function WaterRightTabs() {
                   <td>{source.waterSourceType}</td>
                   <td>{source.gnisfeatureNameCv}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </Table>
         </Tab>
       </Tabs>
     </>
-  )
+  );
 }
 
 export default WaterRightTabs;

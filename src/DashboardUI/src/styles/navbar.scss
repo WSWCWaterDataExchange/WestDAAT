@@ -1,4 +1,4 @@
-@import "_colors.scss";
+@import '_colors.scss';
 
 .navbar {
   color: $text-color-light;
@@ -34,15 +34,17 @@
     z-index: 100;
   }
 
-  .btn, a {
-    transition: color .3s ease-in-out;
+  .btn,
+  a {
+    transition: color 0.3s ease-in-out;
   }
 
   &.navbar-dark .btn {
-    color: hsla(0,0%,100%,.55);
-    
-    &:hover, &:focus {
-      color: hsla(0,0%,100%,.75);
+    color: hsla(0, 0%, 100%, 0.55);
+
+    &:hover,
+    &:focus {
+      color: hsla(0, 0%, 100%, 0.75);
     }
   }
 }

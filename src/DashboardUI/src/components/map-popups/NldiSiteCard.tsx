@@ -1,15 +1,14 @@
 import React from 'react';
-import Icon from "@mdi/react";
-import MapPopupCard from "./MapPopupCard";
+import Icon from '@mdi/react';
+import MapPopupCard from './MapPopupCard';
 import { mdiOpenInNew } from '@mdi/js';
 
 interface NldiSiteMapPopupProps {
-  sourceName: string,
-  identifier: string, 
-  uri: string,
-  name: string,
+  sourceName: string;
+  identifier: string;
+  uri: string;
+  name: string;
   onClosePopup: () => void;
-
 }
 function NldiSiteCard(props: NldiSiteMapPopupProps) {
   const { sourceName, identifier, uri, name, onClosePopup } = props;
@@ -17,28 +16,36 @@ function NldiSiteCard(props: NldiSiteMapPopupProps) {
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
         header: <div>{identifier}</div>,
-        body: <div className="map-popup-card-water-rights-body">
-        <div className="mb-2">
-          <div>
-            <strong>Source:</strong>
+        body: (
+          <div className="map-popup-card-water-rights-body">
+            <div className="mb-2">
+              <div>
+                <strong>Source:</strong>
+              </div>
+              {sourceName}
+            </div>
+            <div className="mb-2">
+              <div>
+                <strong>Name:</strong>
+              </div>
+              {name}
+            </div>
+            <div className="mb-2">
+              <div className="map-popup-card-water-rights-native-id-row">
+                <strong>Identifier:</strong>
+              </div>
+              <div>
+                <a href={uri} target="_blank" rel="noopener noreferrer">
+                  {identifier}{' '}
+                  <Icon
+                    path={mdiOpenInNew}
+                    className="map-popup-card-water-rights-link-icon"
+                  />
+                </a>
+              </div>
+            </div>
           </div>
-          {sourceName}
-        </div>
-        <div className="mb-2">
-          <div>
-            <strong>Name:</strong>
-          </div>
-            {name}
-        </div>
-        <div className="mb-2">
-          <div className="map-popup-card-water-rights-native-id-row">
-            <strong>Identifier:</strong>
-          </div>
-          <div>
-            <a href={uri} target="_blank" rel="noopener noreferrer">{identifier} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a>
-          </div>
-        </div>
-      </div>
+        ),
       }}
     </MapPopupCard>
   );
