@@ -86,11 +86,8 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal, showUploadModal}
                     <Nav.Link
                         onClick={() => onTabClick(tab)}
                         className={`py-3 px-4 ${currentTab === tab ? 'active-tab' : ''}`}
-                        key={tab}
-                    >
-                      {tab}
-                    </Nav.Link>
-                ))}
+                        key={tab}> {tab}
+                    </Nav.Link> ))}
               </Nav>
 
               <div className="d-flex">
@@ -98,15 +95,13 @@ function SiteNavbar({currentTab, onTabClick, showDownloadModal, showUploadModal}
                   {showDownloadModal && (
                       <Button className="ms-1" onClick={() => showDownloadModal(true)}>
                         Download Data
-                      </Button>
-                  )}
+                      </Button> )}
                 </div>
                 <div className="mx-2">
                   {showUploadModal && (
                       <Button className="ms-1" onClick={() => showUploadModal(true)}>
                         Upload Data
-                      </Button>
-                  )}
+                      </Button> )}
                 </div>
               </div>
             </Container>
