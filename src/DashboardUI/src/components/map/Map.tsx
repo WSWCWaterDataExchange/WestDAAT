@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl, {
   AnyLayer,
   AnySourceData,
-  AnySourceImpl,
   LngLat,
   NavigationControl,
 } from 'mapbox-gl';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
@@ -20,14 +18,13 @@ import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
-import { useDebounceCallback } from '@react-hook/debounce';
+import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 import './map.scss';
-import { useDebounce } from 'usehooks-ts';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (
@@ -319,7 +316,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
 
-  const debouncedStyleFlag = useDebounce(styleFlag, 100);
+  const [debouncedStyleFlag] = useDebounce(styleFlag, 100);
   useEffect(() => {
     if (!map) return;
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
