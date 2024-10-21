@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6", // Use ES6 or later
+    "target": "ES2020", // Use ES6 or later
     "module": "ESNext", // Use ESNext to support ES modules
     "jsx": "react-jsx", // Modern JSX transform for React 17+
     "esModuleInterop": true, // Enable interoperability between CommonJS and ES Modules

@@ -1,19 +1,26 @@
-import { FeatureCollection, GeoJsonProperties, Geometry, Position } from "geojson";
-import mapboxgl from "mapbox-gl";
+import {
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+  Position,
+} from 'geojson';
+import mapboxgl from 'mapbox-gl';
 
-export function getLatsLongsFromFeatureCollection(featureCollection: FeatureCollection<Geometry, GeoJsonProperties>) {
+export function getLatsLongsFromFeatureCollection(
+  featureCollection: FeatureCollection<Geometry, GeoJsonProperties>,
+) {
   let positions: Position[] = [];
-    
+
   featureCollection.features.forEach((x) => {
-    if (x.geometry.type === "Point") {
+    if (x.geometry.type === 'Point') {
       positions.push(x.geometry.coordinates);
-    } else if (x.geometry.type === "MultiPoint") {
+    } else if (x.geometry.type === 'MultiPoint') {
       positions = positions.concat(x.geometry.coordinates);
-    } else if (x.geometry.type === "Polygon") {
+    } else if (x.geometry.type === 'Polygon') {
       x.geometry.coordinates.forEach((y) => {
         positions = positions.concat(y);
       });
-    } else if (x.geometry.type === "MultiPolygon") {
+    } else if (x.geometry.type === 'MultiPolygon') {
       x.geometry.coordinates.forEach((y) => {
         y.forEach((z) => {
           positions = positions.concat(z);
