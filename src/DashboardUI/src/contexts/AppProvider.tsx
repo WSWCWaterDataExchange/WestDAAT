@@ -1,20 +1,7 @@
-import React from 'react';
-import {
-  createContext,
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import * as compress from 'lz-string';
-import {
-  IAuthenticationContext,
-  useAuthenticationContext,
-} from '../hooks/useAuthenticationContext';
+import { IAuthenticationContext, useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import deepEqual from 'fast-deep-equal/es6';
 import { useDebounce } from 'usehooks-ts';
 
@@ -52,23 +39,20 @@ const AppProvider: FC = ({ children }) => {
   const [stateUrlParams, setStateUrlParams] = useState(initUrlParams);
   const stateUrlParamsRef = useRef(stateUrlParams);
 
-  const setUrlParam = useCallback(
-    (key: string, value: {} | undefined): void => {
-      setStateUrlParams((s) => {
-        const updated = !deepEqual(s[key], value);
-        if (!updated) return s;
-        const updatedValues = { ...s };
-        if (value === undefined) {
-          delete updatedValues[key];
-        } else {
-          updatedValues[key] = value;
-        }
-        stateUrlParamsRef.current = updatedValues;
-        return updatedValues;
-      });
-    },
-    [],
-  );
+  const setUrlParam = useCallback((key: string, value: Record<string, any> | undefined): void => {
+    setStateUrlParams((s) => {
+      const updated = !deepEqual(s[key], value);
+      if (!updated) return s;
+      const updatedValues = { ...s };
+      if (value === undefined) {
+        delete updatedValues[key];
+      } else {
+        updatedValues[key] = value;
+      }
+      stateUrlParamsRef.current = updatedValues;
+      return updatedValues;
+    });
+  }, []);
 
   const getUrlParam = useCallback(<T,>(key: string): T | undefined => {
     const param = stateUrlParamsRef.current[key];
@@ -81,12 +65,8 @@ const AppProvider: FC = ({ children }) => {
   useEffect(() => {
     if ((Object.keys(debouncedStateUrlParams).length ?? 0) > 0) {
       setUrlParams(
-        {
-          state: compress.compressToEncodedURIComponent(
-            JSON.stringify(debouncedStateUrlParams),
-          ),
-        },
-        { replace: true },
+        { state: compress.compressToEncodedURIComponent(JSON.stringify(debouncedStateUrlParams)) },
+        { replace: true }
       );
     } else {
       setUrlParams({}, { replace: true });
@@ -99,11 +79,7 @@ const AppProvider: FC = ({ children }) => {
     getUrlParam,
   };
 
-  return (
-    <AppContext.Provider value={appContextProviderValue}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={appContextProviderValue}>{children}</AppContext.Provider>;
 };
 
 export default AppProvider;
