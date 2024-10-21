@@ -11,6 +11,7 @@ import { useFilters } from "./hooks/filters/useFilters";
 import { useMapUrlParameters } from "../hooks/useMapUrlParameters";
 import { usePolylinesFilter } from "./hooks/filters/usePolylinesFilter";
 import DownloadModal from "./DownloadModal";
+import UploadModal from "./UploadModal"
 import { useEffect } from "react";
 import { useHomePageContext } from "../Provider";
 import { useMapFitRequested } from "./hooks/useMapFitRequested";
@@ -28,6 +29,7 @@ function WaterRightsLayout() {
   useFilters();
   useMapUrlParameters();
   useDownloadModal();
+  useUploadModal();
   const {polylinesOnMapUpdated} = usePolylinesFilter();
   const {handleMapFitRequested} = useMapFitRequested();
   return <>
@@ -47,4 +49,11 @@ function useDownloadModal() {
   useEffect(() =>{
     setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />)
   }, [filters, nldiIds, setDownloadModal])
+}
+
+function useUploadModal() {
+    const { setUploadModal } = useHomePageContext();
+    useEffect(() => {
+        setUploadModal(<UploadModal/>);
+    }, [setUploadModal]);
 }
