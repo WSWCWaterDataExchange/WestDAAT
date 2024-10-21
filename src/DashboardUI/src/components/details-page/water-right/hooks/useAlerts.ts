@@ -1,53 +1,58 @@
-import { useEffect, useMemo } from "react";
-import useProgressIndicator from "../../../../hooks/useProgressIndicator";
-import { toast } from "react-toastify";
-import { useWaterRightDetailsContext } from "../Provider";
+import { useEffect, useMemo } from 'react';
+import useProgressIndicator from '../../../../hooks/useProgressIndicator';
+import { toast } from 'react-toastify';
+import { useWaterRightDetailsContext } from '../Provider';
 
-export function useAlerts(){
+export function useAlerts() {
   const {
     hostData: {
-      detailsQuery: {
-        isLoading: detailsIsLoading,
-        isError: detailsIsError
-      },
+      detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
       siteLocationsQuery: {
         isLoading: siteLocationsIsLoading,
-        isError: siteLocationsIsError
+        isError: siteLocationsIsError,
       },
       siteInfoListQuery: {
         isLoading: siteInfoListIsLoading,
-        isError: siteInfoListIsError
+        isError: siteInfoListIsError,
       },
       sourceInfoListQuery: {
         isLoading: sourceInfoListIsLoading,
-        isError: sourceInfoListIsError
-      }
-    }
+        isError: sourceInfoListIsError,
+      },
+    },
   } = useWaterRightDetailsContext();
 
-  const isError = useMemo(() =>{
-    return detailsIsError ||
-           siteLocationsIsError ||
-           siteInfoListIsError ||
-           sourceInfoListIsError
-  }, [detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError])
-  
+  const isError = useMemo(() => {
+    return (
+      detailsIsError ||
+      siteLocationsIsError ||
+      siteInfoListIsError ||
+      sourceInfoListIsError
+    );
+  }, [
+    detailsIsError,
+    siteLocationsIsError,
+    siteInfoListIsError,
+    sourceInfoListIsError,
+  ]);
+
   useProgressIndicator(
     [
       !detailsIsLoading,
       !siteLocationsIsLoading,
       !siteInfoListIsLoading,
-      !sourceInfoListIsLoading
-    ], "Loading Water Right Data");
+      !sourceInfoListIsLoading,
+    ],
+    'Loading Water Right Data',
+  );
 
-  useEffect(() =>{
-    if(isError){
-      toast.error("Error loading water right data.  Please try again.",
-      {
+  useEffect(() => {
+    if (isError) {
+      toast.error('Error loading water right data.  Please try again.', {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
-        autoClose: false
-      })
+        autoClose: false,
+      });
     }
-  }, [isError])
+  }, [isError]);
 }
