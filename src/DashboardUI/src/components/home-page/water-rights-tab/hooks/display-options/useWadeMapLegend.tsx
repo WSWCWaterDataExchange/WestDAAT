@@ -24,7 +24,7 @@ export function useWadeLegend() {
     beneficialUseColors,
     ownerClassificationColors,
     waterSourceTypeColors,
-    fallbackColr,
+    fallbackColor,
   } = useColorMappings();
 
   const mapGroupingColors = useMemo(() => {

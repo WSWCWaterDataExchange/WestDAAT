@@ -17,7 +17,7 @@ export function AllocationTypeSelect() {
       const result = values.map((option) => option.value);
       setAllocationTypes(result.length > 0 ? result : undefined);
     },
-    [setAllocationType],
+    [setAllocationTypes],
   );
 
   const options = useMemo(() => {

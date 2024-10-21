@@ -13,7 +13,7 @@ export function useAlerts() {
       },
       waterRightInfoListQuery: {
         isLoading: waterRightInfoListIsLoading,
-        isError: waterRightInfoListIsErro,
+        isError: waterRightInfoListIsError,
       },
       sourceInfoListQuery: {
         isLoading: sourceInfoListIsLoading,
@@ -33,7 +33,7 @@ export function useAlerts() {
     detailsIsError,
     locationsIsError,
     waterRightInfoListIsError,
-    sourceInfoListIsErro,
+    sourceInfoListIsError,
   ]);
 
   useProgressIndicator(

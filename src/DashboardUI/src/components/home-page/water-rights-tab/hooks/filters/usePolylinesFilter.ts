@@ -24,6 +24,6 @@ export function usePolylinesFilter() {
 
   return {
     mapFilters,
-    polylinesOnMapUpdate,
+    polylinesOnMapUpdated,
   };
 }

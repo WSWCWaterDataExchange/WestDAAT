@@ -65,5 +65,4 @@ function useWaterRightDigestMapPopup() {
     }
   }, [result, updatePopup]);
 }
-
 export default useWaterRightDigestMapPopup;

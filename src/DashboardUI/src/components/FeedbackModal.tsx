@@ -30,7 +30,7 @@ const dataUsageOptions: string[] = [
   'Thermoelectric / Hydropower Management',
   'Water Markets',
   'Water Quality',
-  'Watershed Management,
+  'Watershed Management',
 ];
 
 const defaultFeedbackRequest = new FeedbackRequest();
@@ -38,7 +38,7 @@ const defaultFeedbackRequest = new FeedbackRequest();
 function FeedbackModal(props: FeedBackModalProps) {
   const [showThankYouModal, setShowThankYouModal] = useState<boolean>(false);
   const [feedbackRequest, setFeedbackRequest] = useState(
-    defaultFeedbackRequest
+    defaultFeedbackRequest,
   );
 
   const handleDataCheckChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +48,7 @@ function FeedbackModal(props: FeedBackModalProps) {
       const dataArray = [...feedbackRequest.dataUsage];
       dataArray.splice(
         feedbackRequest.dataUsage.indexOf(event.target.value),
-        1
+        1,
       );
       return dataArray;
     }
@@ -86,13 +86,13 @@ function FeedbackModal(props: FeedBackModalProps) {
     props.setShow(false);
     const result = await postFeedback({
       ...feedbackRequest,
-      url: window.location.href
+      url: window.location.href,
     });
     if (result === false) {
       toast.error('Something went wrong sending the feedback', {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
-        autoClose: false
+        autoClose: false,
       });
     } else {
       setFeedbackRequest(defaultFeedbackRequest);
@@ -107,7 +107,7 @@ function FeedbackModal(props: FeedBackModalProps) {
     return (
       isEmailValid &&
       ((feedbackRequest.comments !== null &&
-          feedbackRequest.comments.trim() !== '') ||
+        feedbackRequest.comments.trim() !== '') ||
         (feedbackRequest.email !== null &&
           feedbackRequest.email.trim() !== '') ||
         (feedbackRequest.firstName !== null &&
@@ -161,7 +161,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    firstName: e.target.value ?? ''
+                    firstName: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.firstName}
@@ -175,7 +175,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    lastName: e.target.value ?? ''
+                    lastName: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.lastName}
@@ -192,7 +192,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    email: e.target.value ?? ''
+                    email: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.email}
@@ -214,7 +214,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    organization: e.target.value ?? ''
+                    organization: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.organization}
@@ -227,7 +227,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    role: e.target.value ?? ''
+                    role: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.role}
@@ -242,7 +242,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                 onChange={(e) =>
                   setFeedbackRequest({
                     ...feedbackRequest,
-                    comments: e.target.value ?? ''
+                    comments: e.target.value ?? '',
                   })
                 }
                 value={feedbackRequest.comments}
@@ -267,7 +267,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                         onChange={(e) =>
                           setFeedbackRequest({
                             ...feedbackRequest,
-                            dataUsage: handleDataCheckChange(e)
+                            dataUsage: handleDataCheckChange(e),
                           })
                         }
                       />
@@ -294,7 +294,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                     onChange={(e) =>
                       setFeedbackRequest({
                         ...feedbackRequest,
-                        dataUsage: handleOtherDataChange(e)
+                        dataUsage: handleOtherDataChange(e),
                       })
                     }
                     value={otherDataText}
@@ -324,7 +324,7 @@ function FeedbackModal(props: FeedBackModalProps) {
                   onChange={() =>
                     setFeedbackRequest({
                       ...feedbackRequest,
-                      satisfactionLevel: element ?? ''
+                      satisfactionLevel: element ?? '',
                     })
                   }
                 >

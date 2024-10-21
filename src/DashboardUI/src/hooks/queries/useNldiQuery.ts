@@ -13,7 +13,7 @@ export function useNldiFeatures(
         latitude ?? 0,
         longitude ?? 0,
         Directions.Upsteam | Directions.Downsteam,
-        DataPoints.Usgs | DataPoints.Epa | DataPoints.Wad,
+        DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade,
       ),
     {
       enabled: !!latitude && !!longitude,

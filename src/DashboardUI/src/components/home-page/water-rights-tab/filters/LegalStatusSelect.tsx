@@ -18,7 +18,7 @@ export function LegalStatusSelect() {
       const result = values.map((option) => option.value);
       setLegalStatuses(result.length > 0 ? result : undefined);
     },
-    [setLegalStatuse],
+    [setLegalStatuses],
   );
 
   const options = useMemo(() => {

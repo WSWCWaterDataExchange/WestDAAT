@@ -19,7 +19,7 @@ export function useAlerts() {
       },
       waterSourcesQuery: {
         isLoading: waterSourcesIsLoading,
-        isError: waterSourcesIsErro,
+        isError: waterSourcesIsError,
       },
       ownerClassificationsQuery: {
         isLoading: ownerClassificationsIsLoading,
@@ -27,7 +27,7 @@ export function useAlerts() {
       },
       riverBasinsQuery: {
         isLoading: riverBasinsIsLoading,
-        isError: riverBasinsIsErro,
+        isError: riverBasinsIsError,
       },
       statesQuery: { isLoading: statesIsLoading, isError: statesIsError },
     },
@@ -37,15 +37,15 @@ export function useAlerts() {
     isNldiFilterActive,
     nldiFeaturesQuery: {
       isLoading: isNldiDataLoading,
-      isError: isNldiDataErro,
+      isError: isNldiDataError,
     },
-    nldiFilterData: { latitude, longitude } = {,
+    nldiFilterData: { latitude, longitude } = {},
   } = useNldiFilter();
   const {
     riverBasinPolygonsQuery: {
       isLoading: isRiverBasinPolygonLoading,
-      isError: isRiverBasinPolygonErro,
-    ,
+      isError: isRiverBasinPolygonError,
+    },
   } = useRiverBasinFilter();
   const { isLoading: isFilterEnvelopeLoading, isError: isFilterEnvelopeError } =
     useMapFitRequested();
@@ -65,7 +65,7 @@ export function useAlerts() {
     riverBasinsIsLoading,
     statesIsLoading,
     waterSourcesIsLoading,
-    isNldiDataLoading
+    isNldiDataLoading,
   ]);
 
   const isError = useMemo(() => {
@@ -85,7 +85,7 @@ export function useAlerts() {
     isRiverBasinPolygonError,
     statesIsError,
     waterSourcesIsError,
-    isNldiDataError
+    isNldiDataError,
   ]);
 
   const needsToSetNldiLocation = useMemo(() => {
@@ -98,19 +98,19 @@ export function useAlerts() {
       !ownerClassificationsIsLoading,
       !riverBasinsIsLoading,
       !statesIsLoading,
-      !waterSourcesIsLoading
+      !waterSourcesIsLoading,
     ],
-    'Loading Filter Data'
+    'Loading Filter Data',
   );
 
   useProgressIndicator([!isNldiDataLoading], 'Loading NLDI Data');
   useProgressIndicator(
     [!isRiverBasinPolygonLoading],
-    'Loading River Basin Data'
+    'Loading River Basin Data',
   );
   useProgressIndicator(
     [!isFilterEnvelopeLoading],
-    'Finding Water Right Locations'
+    'Finding Water Right Locations',
   );
 
   useNldiPinDropAlert(needsToSetNldiLocation);
@@ -119,7 +119,7 @@ export function useAlerts() {
       toast.error('Error loading water rights data.  Please try again.', {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
-        autoClose: false
+        autoClose: false,
       });
     }
   }, [isError]);
@@ -128,7 +128,7 @@ export function useAlerts() {
       toast.error('Unable to find water right locations', {
         position: toast.POSITION.TOP_CENTER,
         theme: 'colored',
-        autoClose: 3000
+        autoClose: 3000,
       });
     }
   }, [isFilterEnvelopeError]);

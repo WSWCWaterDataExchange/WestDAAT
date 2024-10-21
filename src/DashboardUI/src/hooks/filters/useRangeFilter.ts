@@ -10,7 +10,7 @@ export function useRangeFilter<T>(
     const buildRangeFilter = (
       field: string,
       value: T,
-      isMin: boolea,
+      isMin: boolean,
     ): any[] => {
       const fieldStr = field as string;
       const operator = isMin ? '<=' : '>=';

@@ -5,7 +5,7 @@ import { useUrlParameters } from '../../../../../hooks/url-parameters/useUrlPara
 import { WaterRightsFilters, defaultFilters } from '../../Provider';
 import { useCallback, useEffect } from 'react';
 import { Optional } from '../../../../../HelperTypes';
-import { BeneficialUseListItem } from '../../../../../data-contracts/BeneficialUseListItem';
+import { BeneficialUseListItem } from '@data-contracts';
 
 const paramName = urlParameterKeys.homePage.waterRightsFilters;
 
@@ -67,11 +67,11 @@ export function useFiltersUrlParameters() {
         waterSourceTypes:
           (filters.waterSourceTypes?.length ?? 0) > 0
             ? filters.waterSourceTypes
-            : defaultFilters.waterSourceTyes,
+            : defaultFilters.waterSourceTypes,
       };
       setParameterOptionalNldi(slimmedFilters);
     },
-    [setParameterOptionalNli],
+    [setParameterOptionalNldi],
   );
 
   const migrateFilterData = useCallback(() => {

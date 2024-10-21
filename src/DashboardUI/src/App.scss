@@ -74,7 +74,6 @@ input[type='date'][value=''] {
     height: var(--truncated-height);
     transition: height 0.3s ease;
   }
-
   &.truncated {
     p {
       margin-bottom: 0;
@@ -82,7 +81,6 @@ input[type='date'][value=''] {
     button::after {
       content: 'Show More';
     }
-
     &.open {
       p {
         -webkit-line-clamp: unset;
@@ -93,7 +91,6 @@ input[type='date'][value=''] {
       }
     }
   }
-
   &:not(.truncated) {
     p {
       height: auto;

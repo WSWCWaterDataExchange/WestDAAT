@@ -50,7 +50,7 @@ export function useMapAlert(
     key,
     priority,
     changeAlertDisplay,
-    removeAlertDispla,
+    removeAlertDisplay,
   ]);
 }
 
@@ -86,7 +86,7 @@ export function useNldiPinDropAlert(needsToSetNldiLocation: boolean) {
       <>
         Drag and drop the red 'Pin Icon' from the left bar to the map to select
         your search location
-      </,
+      </>,
     ];
   }, []);
   useMapAlert(needsToSetNldiLocation, header, body);

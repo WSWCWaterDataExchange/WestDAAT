@@ -28,7 +28,7 @@ export function useChildrenByTypes(type: string | string[]) {
       const results = findChildren(children);
       return results.at(0);
     },
-    [findChildre],
+    [findChildren],
   );
 
   return { findChild, findChildren };

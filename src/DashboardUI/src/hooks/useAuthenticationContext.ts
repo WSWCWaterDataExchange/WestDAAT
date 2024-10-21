@@ -43,7 +43,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
     } else {
       setAuthContext({
         isAuthenticated,
-        user: nul,
+        user: null,
       });
     }
   }, [result, isAuthenticated, inProgress]);

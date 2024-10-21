@@ -10,6 +10,6 @@ export function useBeneficialUsesFilter() {
   return {
     beneficialUseNames: values,
     setBeneficialUseNames: setValues,
-    mapFilter,
+    mapFilters,
   };
 }

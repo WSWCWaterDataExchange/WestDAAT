@@ -14,7 +14,7 @@ import {
   defaultMapLocationData,
   useMapContext,
   MapSettings,
-  MapStyl,
+  MapStyle,
 } from '../../contexts/MapProvider';
 import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
@@ -79,14 +79,14 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   const geocoderControl = useRef(
     new MapboxGeocoder({
-      accessToken: mapboxgl.accessToke,
-    },
+      accessToken: mapboxgl.accessToken,
+    }),
   );
 
   const addSvgImage = async (
     map: mapboxgl.Map,
     id: string,
-    svg: string
+    svg: string,
   ): Promise<void> => {
     const canvas = new OffscreenCanvas(24, 24);
     const ctx = canvas.getContext('2d');
@@ -115,7 +115,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         accessToken: mapboxgl.accessToken,
         // Lots of missing properties here. Adding ESLint highlights the problem.
         // Casting to any for now to get it to build.
-        mapboxgl: map as any
+        mapboxgl: map as any,
       });
       map.addControl(geocoderControl.current);
     }
@@ -127,7 +127,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       displayControlsDefault: false,
       controls: {
         polygon: true,
-        trash: true
+        trash: true,
       },
     });
 
@@ -165,7 +165,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     mapInstance.once('load', () => {
       const mapSettings: MapSettings = defaultMapLocationData;
       mapInstance.setCenter(
-        new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude)
+        new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude),
       );
       mapInstance.zoomTo(mapSettings.zoomLevel);
 
@@ -217,7 +217,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       setMap(mapInstance);
     });
   }, [
-    setMap
+    setMap,
   ]); /* eslint-disable-line */ /* We don't want to run this when mapStyle updates */
 
   useEffect(() => {
@@ -249,7 +249,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   const setIsMapRenderingDebounce = useDebounceCallback(
     setIsMapRendering,
     550,
-    true
+    true,
   );
 
   useEffect(() => {
@@ -262,7 +262,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
             latitude: e.lngLat.lat,
             longitude: e.lngLat.lng,
             layer: a.id,
-            features: e.features
+            features: e.features,
           });
         }
       });
@@ -288,13 +288,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
         .setLngLat({
           lat: mapPopup.latitude,
-          lng: mapPopup.longitude
+          lng: mapPopup.longitude,
         })
         .setHTML("<div id='mapboxPopupId'></div>")
         .once('open', () => {
           ReactDOM.render(
             mapPopup.element,
-            document.getElementById('mapboxPopupId')
+            document.getElementById('mapboxPopupId'),
           );
         })
         .addTo(map);
@@ -314,7 +314,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       map.setLayoutProperty(
         a.id,
         'visibility',
-        visibleLayers.some((b) => b === a.id) ? 'visible' : 'none'
+        visibleLayers.some((b) => b === a.id) ? 'visible' : 'none',
       );
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
@@ -335,7 +335,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
           layerIds?.forEach((layerId) => {
             if (!map.getLayer(layerId)) {
               map.addLayer(
-                currLayers?.find((a) => a.id === layerId) as AnyLayer
+                currLayers?.find((a) => a.id === layerId) as AnyLayer,
               );
             }
           });
@@ -365,7 +365,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     layerIds,
     sourceIds,
     debouncedStyleFlag,
-    setStyleLoadRequired
+    setStyleLoadRequired,
   ]);
 
   useEffect(() => {
@@ -378,7 +378,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     styleLoadRequired,
     isMapRendering,
     setStyleLoadRequired,
-    setStyleFlag
+    setStyleFlag,
   ]);
 
   useEffect(() => {
@@ -450,7 +450,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (mapLocationSettings) {
       map.setCenter({
         lat: mapLocationSettings.latitude,
-        lng: mapLocationSettings.longitude
+        lng: mapLocationSettings.longitude,
       });
       map.setZoom(mapLocationSettings.zoomLevel);
     }
@@ -461,14 +461,14 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       return;
     const bounds = new mapboxgl.LngLatBounds(
       mapBoundSettings.LngLatBounds[0],
-      mapBoundSettings.LngLatBounds[0]
+      mapBoundSettings.LngLatBounds[0],
     );
     mapBoundSettings.LngLatBounds.forEach((x) => {
       bounds.extend(x);
     });
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
-      maxZoom: mapBoundSettings.maxZoom
+      maxZoom: mapBoundSettings.maxZoom,
     });
   }, [map, mapBoundSettings]);
 
@@ -476,7 +476,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     accept: 'nldiMapPoint',
     drop: () =>
       coords ? { latitude: coords.lat, longitude: coords.lng } : undefined,
-    collect: () => {}
+    collect: () => {},
   });
 
   const legendClass = useMemo(() => {
@@ -485,7 +485,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       [MapStyle.Light]: 'legend-light',
       [MapStyle.Outdoor]: 'legend-light',
       [MapStyle.Street]: 'legend-light',
-      [MapStyle.Satellite]: 'legend-light'
+      [MapStyle.Satellite]: 'legend-light',
     }[mapStyle];
   }, [mapStyle]);
 

@@ -16,7 +16,6 @@ type ValidInFilters =
   | 'allocationTypes'
   | 'legalStatuses'
   | 'siteTypes';
-
 export function useInFilter<
   K1 extends keyof Pick<WaterRightsFilters, ValidInFilters>,
   K2 extends keyof HostData,
@@ -25,24 +24,24 @@ export function useInFilter<
     filters: { [field]: val },
     setFilters,
     hostData: {
-      [hostData]: { data: allValues ,
-    ,
+      [hostData]: { data: allValues },
+    },
   } = useWaterRightsContext();
 
   const { values, mapFilters } = useInFilterBase(
     val,
     allValues?.length,
-    mapField
+    mapField,
   );
 
   const setValues = useCallback(
     (values: typeof val) => {
       setFilters((s) => ({
         ...s,
-        [field]: values === undefined ? undefined : [...new Set(values)]
+        [field]: values === undefined ? undefined : [...new Set(values)],
       }));
     },
-    [field, setFilters]
+    [field, setFilters],
   );
 
   return { values, setValues, mapFilters };

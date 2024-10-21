@@ -21,5 +21,4 @@ function useSiteClickedOnMap() {
   }, [clickedFeatures]);
   return { updatePopup, siteUuid };
 }
-
 export default useSiteClickedOnMap;

@@ -18,7 +18,7 @@ export function SiteTypeSelect() {
       const result = values.map((option) => option.value);
       setSiteTypes(result.length > 0 ? result : undefined);
     },
-    [setSiteType],
+    [setSiteTypes],
   );
 
   const options = useMemo(() => {

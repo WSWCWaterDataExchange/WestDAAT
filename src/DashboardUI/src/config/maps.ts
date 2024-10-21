@@ -15,7 +15,7 @@ export const mapSourceNames = {
   waterRightsVectorTiles: 'water-rights-vector-tiles',
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
-  riverBasinsGeoJson: 'river-basins-geojson,
+  riverBasinsGeoJson: 'river-basins-geojson',
 };
 
 export const defaultPointCircleRadius = [
@@ -25,7 +25,7 @@ export const defaultPointCircleRadius = [
   pointSizes.minPointSizeZoomLevel,
   pointSizes.minPointSize,
   pointSizes.maxPointSizeZoomLevel,
-  pointSizes.maxPointSize
+  pointSizes.maxPointSize,
 ];
 
 const defaultPointPaintConfiguration = {
@@ -38,38 +38,38 @@ const defaultPointPaintConfiguration = {
     pointSizes.minPointSizeZoomLevel,
     0,
     pointSizes.maxPointSizeZoomLevel,
-    0.3
+    0.3,
   ],
   'circle-color': '#ff0000',
-  'circle-opacity': 0.75
+  'circle-opacity': 0.75,
 };
 
 export const defaultPointCircleSortKey = [
   '-',
   0,
-  ['get', waterRightsProperties.minPriorityDate]
+  ['get', waterRightsProperties.minPriorityDate],
 ];
 export const flowPointCircleSortKey = [
   '-',
   0,
-  ['get', waterRightsProperties.maxFlowRate]
+  ['get', waterRightsProperties.maxFlowRate],
 ];
 export const volumePointCircleSortKey = [
   '-',
   0,
-  ['get', waterRightsProperties.maxVolume]
+  ['get', waterRightsProperties.maxVolume],
 ];
 export const siteLocationPolygonFillColor = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
   nldi.colors.sitePOD,
-  nldi.colors.sitePOU
+  nldi.colors.sitePOU,
 ];
 export const siteLocationPointsIconImage = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
   `mapMarker${nldi.colors.sitePOD}`,
-  `mapMarker${nldi.colors.sitePOU}`
+  `mapMarker${nldi.colors.sitePOU}`,
 ];
 
 const mapsJson = {
@@ -78,31 +78,31 @@ const mapsJson = {
       id: mapSourceNames.waterRightsVectorTiles,
       type: 'vector',
       url: process.env.REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL,
-      volatile: true
+      volatile: true,
     },
     {
       id: mapSourceNames.nldiGeoJson,
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features: []
-      }
+        features: [],
+      },
     },
     {
       id: mapSourceNames.detailsMapGeoJson,
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features: []
-      }
+        features: [],
+      },
     },
     {
       id: mapSourceNames.riverBasinsGeoJson,
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features: []
-      }
+        features: [],
+      },
     },
   ],
   layers: [
@@ -111,12 +111,12 @@ const mapsJson = {
       friendlyName: 'RiverBasins',
       source: mapSourceNames.riverBasinsGeoJson,
       layout: {
-        visibility: 'visible'
+        visibility: 'visible',
       },
       type: 'fill',
       paint: {
         'fill-color': nldi.colors.riverBasin,
-        'fill-opacity': 0.3
+        'fill-opacity': 0.3,
       },
     },
     {
@@ -125,13 +125,13 @@ const mapsJson = {
       'source-layer': 'polygons',
       source: mapSourceNames.waterRightsVectorTiles,
       layout: {
-        visibility: 'visible'
+        visibility: 'visible',
       },
       type: 'fill',
       paint: {
         'fill-color': '#ff0000',
-        'fill-opacity': 0.5
-      }
+        'fill-opacity': 0.5,
+      },
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,
@@ -140,28 +140,28 @@ const mapsJson = {
       source: mapSourceNames.waterRightsVectorTiles,
       layout: {
         visibility: 'none',
-        'circle-sort-key': defaultPointCircleSortKey
+        'circle-sort-key': defaultPointCircleSortKey,
       },
       type: 'circle',
-      paint: defaultPointPaintConfiguration
+      paint: defaultPointPaintConfiguration,
     },
     {
       id: mapLayerNames.siteLocationsPolygonsLayer,
       friendlyName: 'SiteLocations',
       source: mapSourceNames.detailsMapGeoJson,
       layout: {
-        visibility: 'visible'
+        visibility: 'visible',
       },
       type: 'fill',
       paint: {
         'fill-opacity': 0.5,
-        'fill-color': siteLocationPolygonFillColor
+        'fill-color': siteLocationPolygonFillColor,
       },
       filter: [
         'in',
         ['geometry-type'],
-        ['literal', ['Polygon', 'MultiPolygon']]
-      ]
+        ['literal', ['Polygon', 'MultiPolygon']],
+      ],
     },
     {
       id: mapLayerNames.siteLocationsPointsLayer,
@@ -172,16 +172,16 @@ const mapsJson = {
         'icon-image': siteLocationPointsIconImage,
         'icon-anchor': 'bottom',
         'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 15, 1],
-        'icon-allow-overlap': true
+        'icon-allow-overlap': true,
       },
       type: 'symbol',
-      filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]]
+      filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
     },
     {
       id: mapLayerNames.nldiFlowlinesLayer,
       source: mapSourceNames.nldiGeoJson,
       layout: {
-        visibility: 'visible'
+        visibility: 'visible',
       },
       type: 'line',
       paint: {
@@ -189,23 +189,23 @@ const mapsJson = {
           'case',
           ['==', ['get', 'westdaat_channeltype'], 'Main'],
           nldi.colors.mainstem,
-          nldi.colors.tributaries
+          nldi.colors.tributaries,
         ],
         'line-opacity': 1,
         'line-width': [
           'case',
           ['==', ['get', 'westdaat_channeltype'], 'Main'],
           2,
-          1
-        ]
+          1,
+        ],
       },
-      filter: ['==', ['get', 'westdaat_featuredatatype'], 'Flowline']
+      filter: ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'],
     },
     {
       id: mapLayerNames.nldiUsgsPointsLayer,
       source: mapSourceNames.nldiGeoJson,
       layout: {
-        visibility: 'visible'
+        visibility: 'visible',
       },
       type: 'circle',
       paint: {
@@ -218,14 +218,14 @@ const mapsJson = {
           nldi.colors.epa,
           ['==', ['get', 'westdaat_pointdatasource'], 'Wade'],
           nldi.colors.wade,
-          nldi.colors.unknown
-        ]
+          nldi.colors.unknown,
+        ],
       },
       filter: [
         'all',
         ['==', ['get', 'westdaat_featuredatatype'], 'Point'],
-        ['!=', ['get', 'westdaat_pointdatasource'], 'Location']
-      ]
+        ['!=', ['get', 'westdaat_pointdatasource'], 'Location'],
+      ],
     },
     {
       id: mapLayerNames.nldiUsgsLocationLayer,
@@ -234,10 +234,10 @@ const mapsJson = {
         visibility: 'visible',
         'icon-image': `mapMarker${nldi.colors.mapMarker}`,
         'icon-anchor': 'bottom',
-        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 15, 1]
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 15, 1],
       },
       type: 'symbol',
-      filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location']
+      filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
   ],
 };

@@ -9,7 +9,7 @@ import { useFiltersUrlParameters } from './useFiltersUrlParameters';
 import { Optional } from '../../../../../HelperTypes';
 import {
   BeneficialUseListItem,
-  ConsumptionCategoryTyp,
+  ConsumptionCategoryType,
 } from '../../../../../data-contracts/BeneficialUseListItem';
 import { DataPoints, Directions } from '../../../../../data-contracts/nldi';
 
@@ -56,17 +56,17 @@ const geoJsonDataNew: GeoJSON.Feature<GeoJSON.Geometry> = {
   type: 'Feature',
   geometry: {
     type: 'Point',
-    coordinates: [,
+    coordinates: [],
   },
-  properties: {}
+  properties: {},
 };
 const geoJsonDataOld: GeoJSON.Feature<GeoJSON.Geometry> = {
   type: 'Feature',
   geometry: {
     type: 'Polygon',
-    coordinates: []
+    coordinates: [],
   },
-  properties: {}
+  properties: {},
 };
 
 beforeEach(() => {
@@ -80,11 +80,11 @@ beforeEach(() => {
     .spyOn(urlParameters, 'useUrlParameters')
     .mockReturnValueOnce({
       getParameter: mockGetParameterWaterRights,
-      setParameter: mockSetParameterWaterRights
+      setParameter: mockSetParameterWaterRights,
     })
     .mockReturnValueOnce({
       getParameter: mockGetIsNldiParameterActive,
-      setParameter: mockSetIsNldiParameterActive
+      setParameter: mockSetIsNldiParameterActive,
     });
 });
 
@@ -100,8 +100,8 @@ describe('setParameter', () => {
   test('undefined', () => {
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(undefined);
@@ -120,19 +120,19 @@ describe('setParameter', () => {
   ])('allocationOwner %j', (initial, expected) => {
     const filters = {
       ...filtersWithDefinedNldiActive,
-      allocationOwner: initial
+      allocationOwner: initial,
     };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(mockSetParameterWaterRights.mock.calls[0][0].allocationOwner).toBe(
-      expected
+      expected,
     );
   });
 
@@ -143,19 +143,19 @@ describe('setParameter', () => {
   ])('beneficialUseNames %j', (initial, expected) => {
     const filters = {
       ...filtersWithDefinedNldiActive,
-      beneficialUseNames: initial
+      beneficialUseNames: initial,
     };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(
-      mockSetParameterWaterRights.mock.calls[0][0].beneficialUseNames
+      mockSetParameterWaterRights.mock.calls[0][0].beneficialUseNames,
     ).toEqual(expected);
   });
 
@@ -170,22 +170,22 @@ describe('setParameter', () => {
       const filters = {
         ...filtersWithDefinedNldiActive,
         isNldiFilterActive: initialIsNldiFilterActive,
-        nldiFilterData: initialNldiFilterData
+        nldiFilterData: initialNldiFilterData,
       };
       const {
         result: {
-          current: { setParameter }
-        }
+          current: { setParameter },
+        },
       } = renderHook(() => useFiltersUrlParameters());
 
       setParameter(filters);
 
       expect(mockSetParameterWaterRights).toBeCalledTimes(1);
       expect(
-        mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive
+        mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive,
       ).toEqual(initialIsNldiFilterActive);
       expect(
-        mockSetParameterWaterRights.mock.calls[0][0].nldiFilterData
+        mockSetParameterWaterRights.mock.calls[0][0].nldiFilterData,
       ).toEqual(expected);
     },
   );
@@ -197,19 +197,19 @@ describe('setParameter', () => {
   ])('ownerClassifications %j', (initial, expected) => {
     const filters = {
       ...filtersWithDefinedNldiActive,
-      ownerClassifications: initial
+      ownerClassifications: initial,
     };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(
-      mockSetParameterWaterRights.mock.calls[0][0].ownerClassifications
+      mockSetParameterWaterRights.mock.calls[0][0].ownerClassifications,
     ).toEqual(expected);
   });
 
@@ -221,15 +221,15 @@ describe('setParameter', () => {
     const filters = { ...filtersWithDefinedNldiActive, polylines: initial };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(mockSetParameterWaterRights.mock.calls[0][0].polylines).toEqual(
-      expected
+      expected,
     );
   });
 
@@ -240,19 +240,19 @@ describe('setParameter', () => {
   ])('riverBasinNames %j', (initial, expected) => {
     const filters = {
       ...filtersWithDefinedNldiActive,
-      riverBasinNames: initial
+      riverBasinNames: initial,
     };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(
-      mockSetParameterWaterRights.mock.calls[0][0].riverBasinNames
+      mockSetParameterWaterRights.mock.calls[0][0].riverBasinNames,
     ).toEqual(expected);
   });
 
@@ -264,15 +264,15 @@ describe('setParameter', () => {
     const filters = { ...filtersWithDefinedNldiActive, states: initial };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(mockSetParameterWaterRights.mock.calls[0][0].states).toEqual(
-      expected
+      expected,
     );
   });
 
@@ -283,19 +283,19 @@ describe('setParameter', () => {
   ])('states %j', (initial, expected) => {
     const filters = {
       ...filtersWithDefinedNldiActive,
-      waterSourceTypes: initial
+      waterSourceTypes: initial,
     };
     const {
       result: {
-        current: { setParameter }
-      }
+        current: { setParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     setParameter(filters);
 
     expect(mockSetParameterWaterRights).toBeCalledTimes(1);
     expect(
-      mockSetParameterWaterRights.mock.calls[0][0].waterSourceTypes
+      mockSetParameterWaterRights.mock.calls[0][0].waterSourceTypes,
     ).toEqual(expected);
   });
 });
@@ -306,8 +306,8 @@ describe('getParameter', () => {
 
     const {
       result: {
-        current: { getParameter }
-      }
+        current: { getParameter },
+      },
     } = renderHook(() => useFiltersUrlParameters());
 
     const paramResult = getParameter();
@@ -326,20 +326,20 @@ describe('getParameter', () => {
         [true, undefined],
         [false, true],
         [false, false],
-        [false, undefined]
+        [false, undefined],
       ])(
         'filter nldi state %s, nldi state: %s',
         (initialFilter: boolean, initialNldi: boolean | undefined) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithUndefinedNldiActive,
-            isNldiFilterActive: initialFilter
+            isNldiFilterActive: initialFilter,
           });
           mockGetIsNldiParameterActive.mockReturnValue(initialNldi);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -348,7 +348,7 @@ describe('getParameter', () => {
 
           expect(mockSetIsNldiParameterActive).toBeCalledWith(undefined);
           expect(mockSetParameterWaterRights).not.toBeCalled();
-        }
+        },
       );
 
       test.each([
@@ -359,53 +359,53 @@ describe('getParameter', () => {
             latitude: 40,
             longitude: -110,
             directions: Directions.Downsteam,
-            dataPoints: DataPoints.Usgs
-          }
-        ]
+            dataPoints: DataPoints.Usgs,
+          },
+        ],
       ])(
         'nldiFilterData null migration, %j',
         (initialNldiFilterData: NldiFilters | null | undefined) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithUndefinedNldiActive,
             nldiFilterData: initialNldiFilterData,
-            isNldiFilterActive: true
+            isNldiFilterActive: true,
           });
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
 
           expect(paramResult?.nldiFilterData).toBe(
-            initialNldiFilterData || undefined
+            initialNldiFilterData || undefined,
           );
 
           expect(mockSetIsNldiParameterActive).toBeCalledWith(undefined);
           expect(mockSetParameterWaterRights).toBeCalledTimes(
-            initialNldiFilterData === null ? 1 : 0
+            initialNldiFilterData === null ? 1 : 0,
           );
-        }
+        },
       );
 
       test.each([
         [true, true],
         [false, false],
-        [undefined, false]
+        [undefined, false],
       ])(
         'filter nldi state undefined, nldi state: %s',
         (initialNldi: boolean | undefined, expectedNldi: boolean) => {
           mockGetParameterWaterRights.mockReturnValue({
-            ...filtersWithUndefinedNldiActive
+            ...filtersWithUndefinedNldiActive,
           });
           mockGetIsNldiParameterActive.mockReturnValue(initialNldi);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -415,9 +415,9 @@ describe('getParameter', () => {
           expect(mockSetIsNldiParameterActive).toBeCalledWith(undefined);
           expect(mockSetParameterWaterRights).toBeCalledTimes(1);
           expect(
-            mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive
+            mockSetParameterWaterRights.mock.calls[0][0].isNldiFilterActive,
           ).toBe(expectedNldi);
-        }
+        },
       );
     });
 
@@ -429,10 +429,10 @@ describe('getParameter', () => {
           [
             {
               beneficialUseName: 'b',
-              consumptionCategory: ConsumptionCategoryType.NonConsumptive
-            }
+              consumptionCategory: ConsumptionCategoryType.NonConsumptive,
+            },
           ],
-          ['b']
+          ['b'],
         ],
         [[], [], undefined],
         [
@@ -440,10 +440,10 @@ describe('getParameter', () => {
           [
             {
               beneficialUseName: 'b',
-              consumptionCategory: ConsumptionCategoryType.NonConsumptive
-            }
+              consumptionCategory: ConsumptionCategoryType.NonConsumptive,
+            },
           ],
-          undefined
+          undefined,
         ],
         [['a'], [], ['a']],
         [
@@ -451,29 +451,29 @@ describe('getParameter', () => {
           [
             {
               beneficialUseName: 'b',
-              consumptionCategory: ConsumptionCategoryType.NonConsumptive
-            }
+              consumptionCategory: ConsumptionCategoryType.NonConsumptive,
+            },
           ],
-          ['a']
-        ]
+          ['a'],
+        ],
       ])(
         'Has Migration - names %j, uses: %j',
         (
           initialNames: string[] | undefined,
           initialUses: BeneficialUseListItem[] | undefined,
-          expectedNames: string[] | undefined
+          expectedNames: string[] | undefined,
         ) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithDefinedNldiActive,
             beneficialUseNames: initialNames,
-            beneficialUses: initialUses
+            beneficialUses: initialUses,
           });
           mockGetIsNldiParameterActive.mockReturnValue(undefined);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -482,35 +482,35 @@ describe('getParameter', () => {
 
           expect(mockSetParameterWaterRights).toBeCalledTimes(1);
           expect(
-            mockSetParameterWaterRights.mock.calls[0][0].beneficialUses
+            mockSetParameterWaterRights.mock.calls[0][0].beneficialUses,
           ).toBeUndefined();
           expect(
-            mockSetParameterWaterRights.mock.calls[0][0].beneficialUseNames
+            mockSetParameterWaterRights.mock.calls[0][0].beneficialUseNames,
           ).toEqual(expectedNames);
-        }
+        },
       );
 
       test.each([
         [undefined, undefined],
         [[], undefined],
-        [['a'], undefined]
+        [['a'], undefined],
       ])(
         'No Migration - names %j, uses: %j',
         (
           initialNames: string[] | undefined,
-          initialUses: BeneficialUseListItem[] | undefined
+          initialUses: BeneficialUseListItem[] | undefined,
         ) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithDefinedNldiActive,
             beneficialUseNames: initialNames,
-            beneficialUses: initialUses
+            beneficialUses: initialUses,
           });
           mockGetIsNldiParameterActive.mockReturnValue(undefined);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -518,7 +518,7 @@ describe('getParameter', () => {
           expect(paramResult?.beneficialUseNames).toEqual(initialNames);
 
           expect(mockSetParameterWaterRights).toBeCalledTimes(0);
-        }
+        },
       );
     });
 
@@ -528,7 +528,7 @@ describe('getParameter', () => {
         [
           undefined,
           [{ identifier: 'b', data: geoJsonDataOld }],
-          [geoJsonDataOld]
+          [geoJsonDataOld],
         ],
         [[], [{ identifier: 'b', data: geoJsonDataOld }], undefined],
         [[], [{ identifier: 'b', data: geoJsonDataOld }], undefined],
@@ -536,8 +536,8 @@ describe('getParameter', () => {
         [
           [geoJsonDataNew],
           [{ identifier: 'b', data: geoJsonDataOld }],
-          [geoJsonDataNew]
-        ]
+          [geoJsonDataNew],
+        ],
       ])(
         'Has Migration - new %j, old: %j',
         (
@@ -545,19 +545,19 @@ describe('getParameter', () => {
           initialOld:
             | { identifier: string; data: GeoJSON.Feature<GeoJSON.Geometry> }[]
             | undefined,
-          expectedNames: GeoJSON.Feature<GeoJSON.Geometry>[] | undefined
+          expectedNames: GeoJSON.Feature<GeoJSON.Geometry>[] | undefined,
         ) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithDefinedNldiActive,
             polylines: initialNew,
-            polyline: initialOld
+            polyline: initialOld,
           });
           mockGetIsNldiParameterActive.mockReturnValue(undefined);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -566,37 +566,37 @@ describe('getParameter', () => {
 
           expect(mockSetParameterWaterRights).toBeCalledTimes(1);
           expect(
-            mockSetParameterWaterRights.mock.calls[0][0].polyline
+            mockSetParameterWaterRights.mock.calls[0][0].polyline,
           ).toBeUndefined();
           expect(
-            mockSetParameterWaterRights.mock.calls[0][0].polylines
+            mockSetParameterWaterRights.mock.calls[0][0].polylines,
           ).toEqual(expectedNames);
-        }
+        },
       );
 
       test.each([
         [undefined, undefined],
         [[], undefined],
-        [[geoJsonDataNew], undefined]
+        [[geoJsonDataNew], undefined],
       ])(
         'No Migration - names %j, uses: %j',
         (
           initialNew: GeoJSON.Feature<GeoJSON.Geometry>[] | undefined,
           initialOld:
             | { identifier: string; data: GeoJSON.Feature<GeoJSON.Geometry> }[]
-            | undefined
+            | undefined,
         ) => {
           mockGetParameterWaterRights.mockReturnValue({
             ...filtersWithDefinedNldiActive,
             polylines: initialNew,
-            polyline: initialOld
+            polyline: initialOld,
           });
           mockGetIsNldiParameterActive.mockReturnValue(undefined);
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useFiltersUrlParameters());
 
           const paramResult = getParameter();
@@ -604,7 +604,7 @@ describe('getParameter', () => {
           expect(paramResult?.polylines).toEqual(initialNew);
 
           expect(mockSetParameterWaterRights).toBeCalledTimes(0);
-        }
+        },
       );
     });
   });

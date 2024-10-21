@@ -9,7 +9,7 @@ const urlParameterKeys = {
 
 //depricated: do not use these.  Only for migrating data.
 export const depricatedUrlParameterKeys = {
-  isWaterRightsNldiFilterActive: 'nldiActive,
+  isWaterRightsNldiFilterActive: 'nldiActive',
 };
 
 export default urlParameterKeys;

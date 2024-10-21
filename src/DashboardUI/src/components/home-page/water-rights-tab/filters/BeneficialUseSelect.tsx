@@ -31,7 +31,7 @@ const consumptiveOption: BeneficialUseChangeOption = {
       <CloseCircleOutline color="red" />
     </>
   ),
-  consumptiveFilter: tru,
+  consumptiveFilter: true,
 };
 
 const nonconsumptiveOption: BeneficialUseChangeOption = {
@@ -54,7 +54,7 @@ const unspecifiedOption: BeneficialUseChangeOption = {
       <span>Unspecified </span>
     </>
   ),
-  consumptiveFilter: tru,
+  consumptiveFilter: true,
 };
 
 function BeneficialUseSelect() {
@@ -72,9 +72,9 @@ function BeneficialUseSelect() {
       beneficialUseName: name,
       consumptionCategory:
         allBeneficialUses?.find((b) => b.beneficialUseName === name)
-          ?.consumptionCategory ?? ConsumptionCategoryType.Unspecifid,
+          ?.consumptionCategory ?? ConsumptionCategoryType.Unspecified,
     }),
-    [allBeneficialUse],
+    [allBeneficialUses],
   );
 
   const mapToBeneficialUseListItem = (
@@ -86,7 +86,7 @@ function BeneficialUseSelect() {
   };
 
   const mapToBeneficialUseOptions = (
-    beneficialUses: BeneficialUseListItem[] | undefine,
+    beneficialUses: BeneficialUseListItem[] | undefined,
   ) => {
     return beneficialUses
       ?.map((a) => {
@@ -151,9 +151,9 @@ function BeneficialUseSelect() {
       });
       setBeneficialUseNames([
         ...mapToBeneficialUseListItem(
-          currentSelectedOptions.filter((f) => f.consumptiveFilter !== tru),
+          currentSelectedOptions.filter((f) => f.consumptiveFilter !== true),
         ),
-        ...selectd,
+        ...selected,
       ]);
     } else {
       setBeneficialUseNames(mapToBeneficialUseListItem(currentSelectedOptions));

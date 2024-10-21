@@ -11,10 +11,10 @@ export function usePointSizeDisplayOption() {
     (pointSize: string) => {
       setDisplayOptions((s) => ({
         ...s,
-        pointSize: pointSize === 'f' ? 'f' : pointSize === 'v' ? 'v' : 'd,
+        pointSize: pointSize === 'f' ? 'f' : pointSize === 'v' ? 'v' : 'd',
       }));
     },
-    [setDisplayOptions,
+    [setDisplayOptions],
   );
 
   return { pointSize, setPointSize };

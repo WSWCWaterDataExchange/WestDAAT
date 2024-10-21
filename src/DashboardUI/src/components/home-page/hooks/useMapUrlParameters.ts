@@ -15,7 +15,7 @@ export function useMapUrlParameters() {
     mapStyle,
     setMapLocationSettings,
     setMapStyle,
-    setPolyline,
+    setPolylines,
   } = useMapContext();
   const {
     getParameter: getMapLocationParameter,
@@ -38,7 +38,7 @@ export function useMapUrlParameters() {
     setMapLocationSettings,
     setMapStyle,
     setPolylines,
-    getFiltersUrlParametr,
+    getFiltersUrlParameter,
   ]);
 
   useEffect(() => {

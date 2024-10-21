@@ -8,7 +8,7 @@ const minControlProps = {
 };
 
 const maxControlProps = {
-  'aria-label': 'Maximum Priority Date,
+  'aria-label': 'Maximum Priority Date',
 };
 export function PriorityDateRange() {
   const { minValue, maxValue, setMinValue, setMaxValue } =
@@ -19,7 +19,7 @@ export function PriorityDateRange() {
       setMinValue(min);
       setMaxValue(max);
     },
-    400
+    400,
   );
 
   return (

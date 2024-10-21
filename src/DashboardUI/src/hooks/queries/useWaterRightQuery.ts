@@ -12,12 +12,11 @@ import {
 import {
   WaterRightsSearchCriteria,
   WaterRightsSearchCriteriaWithFilterUrl,
-  WaterRightsSearchCriteriaWithPagin,
+  WaterRightsSearchCriteriaWithPaging,
 } from '../../data-contracts/WaterRightsSearchCriteria';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
-import { SiteInfoListItem } from '../../data-contracts/SiteInfoListItem';
-import { WaterSourceInfoListItem } from '../../data-contracts/WaterSourceInfoListItem';
+import { SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 
 export function useWaterRightDetails(allocationUuid: string | undefined) {
   return useQuery(
@@ -36,7 +35,7 @@ export function useGetAnalyticsSummaryInfo(
     ['waterRight.AnalyticsSummary', searchCriteria],
     async () => await getWaterRightAnalyticsSummaryInfo(searchCriteria!),
     {
-      enabled: searchCriteria !== nul,
+      enabled: searchCriteria !== null,
     },
   );
 }
@@ -52,7 +51,7 @@ export function useGetWaterRightDataEnvelope(
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled && searchCriteria !== nul,
+    enabled: options?.enabled && searchCriteria !== null,
   };
   return useQuery(
     ['waterRight.DataEnvelope', searchCriteria],
@@ -62,7 +61,7 @@ export function useGetWaterRightDataEnvelope(
 }
 
 export function useFindWaterRights(
-  searchCriteria: WaterRightsSearchCriteriaWithPaging | nul,
+  searchCriteria: WaterRightsSearchCriteriaWithPaging | null,
 ) {
   return useQuery(
     ['waterRight.Find', searchCriteria],
@@ -80,7 +79,7 @@ type WaterRightSiteInfoListOptionsType = UseQueryOptionsParameter<
 
 export function useWaterRightSiteInfoList(
   waterRightId: string | undefined,
-  options?: WaterRightSiteInfoListOptionsTyp,
+  options?: WaterRightSiteInfoListOptionsType,
 ) {
   const setOptions = {
     ...options,
@@ -89,7 +88,7 @@ export function useWaterRightSiteInfoList(
   return useQuery(
     ['waterRight.SiteInfoList', waterRightId],
     async () => await getWaterRightSiteInfoList(waterRightId!),
-    setOption,
+    setOptions,
   );
 }
 
@@ -104,7 +103,7 @@ export function useWaterRightSourceInfoList(
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled && !!allocationUui,
+    enabled: options?.enabled && !!allocationUuid,
   };
   return useQuery(
     ['waterRight.SourceInfoList', allocationUuid],
@@ -132,7 +131,7 @@ export function useWaterRightsDownload(
     {
       enabled: !!searchCriteria,
       retry: false,
-      cacheTime: ,
+      cacheTime: 0,
     },
   );
 }

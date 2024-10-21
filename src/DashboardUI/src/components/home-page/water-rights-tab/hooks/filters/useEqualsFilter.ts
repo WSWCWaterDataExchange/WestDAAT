@@ -4,7 +4,6 @@ import { waterRightsProperties } from '../../../../../config/constants';
 import { useEqualsFilter as useEqualsFilterBase } from '../../../../../hooks/filters/useEqualsFilter';
 
 type ValidEqualsFilters = 'podPou' | 'includeExempt';
-
 export function useEqualsFilter<
   K1 extends keyof Pick<WaterRightsFilters, ValidEqualsFilters>,
 >(field: K1, mapField: waterRightsProperties) {
@@ -19,10 +18,10 @@ export function useEqualsFilter<
     (val: typeof value) => {
       setFilters((s) => ({
         ...s,
-        [field]: va,
+        [field]: val,
       }));
     },
-    [field, setFilters,
+    [field, setFilters],
   );
 
   return { value, setValue, mapFilters };

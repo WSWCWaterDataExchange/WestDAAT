@@ -11,6 +11,6 @@ export function useStatesFilter() {
   return {
     states: values,
     setStates: setValues,
-    mapFilter,
+    mapFilters,
   };
 }

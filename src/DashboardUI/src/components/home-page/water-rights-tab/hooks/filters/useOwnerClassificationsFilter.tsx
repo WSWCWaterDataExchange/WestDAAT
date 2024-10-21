@@ -11,6 +11,6 @@ export function useOwnerClassificationsFilter() {
   return {
     ownerClassifications: values,
     setOwnerClassifications: setValues,
-    mapFilter,
+    mapFilters,
   };
 }

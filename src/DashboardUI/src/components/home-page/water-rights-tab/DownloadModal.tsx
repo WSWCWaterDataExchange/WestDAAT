@@ -82,7 +82,7 @@ function DownloadModal(props: DownloadModalProps) {
   const [isFetched, setIsFetched] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<JSX.Element | null>(null);
   const [modalTitle, setModalTitle] = useState<JSX.Element | null>(
-    <ModalTitleGeneric /,
+    <ModalTitleGeneric />,
   );
 
   const close = () => {

@@ -14,11 +14,11 @@ import { useColorMappings } from '../../../../hooks/useColorMappings';
 
 const defaultPolygonFillColors = {
   layer: mapLayerNames.siteLocationsPolygonsLayer,
-  fillColor: siteLocationPolygonFillColo,
+  fillColor: siteLocationPolygonFillColor,
 };
 const defaultMapMarkerIcons = {
   layer: mapLayerNames.siteLocationsPointsLayer,
-  iconImages: siteLocationPointsIconImag,
+  iconImages: siteLocationPointsIconImage,
 };
 export function useMapLegend() {
   const { setLegend, setLayerFillColors, setLayerIconImages } = useMapContext();

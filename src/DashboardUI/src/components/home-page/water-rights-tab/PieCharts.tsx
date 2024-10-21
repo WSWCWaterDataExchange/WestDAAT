@@ -29,7 +29,7 @@ const chartExporting = {
         dataLabels: {
           enabled: true,
           format:
-            '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%),
+            '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
         },
       },
     },
@@ -42,36 +42,36 @@ const chartCommonOptions = {
   },
   subtitle: {},
   series: [],
-  exporting: chartExporting
+  exporting: chartExporting,
 };
 
 const flowOptionsBase = {
   ...chartCommonOptions,
   title: {
-    text: 'Cumulative Flow (CSF) of Water Rights'
+    text: 'Cumulative Flow (CSF) of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.1f}</b>'
+    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.1f}</b>',
   },
 };
 
 const countOptionsBase = {
   ...chartCommonOptions,
   title: {
-    text: 'Count of Water Rights'
+    text: 'Count of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>'
+    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>',
   },
 };
 
 const volumeOptionsBase = {
   ...chartCommonOptions,
   title: {
-    text: 'Cumulative Volume (AF) of Water Rights'
+    text: 'Cumulative Volume (AF) of Water Rights',
   },
   tooltip: {
-    pointFormat: `<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.2f}</b>`
+    pointFormat: `<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.2f}</b>`,
   },
 };
 
@@ -95,15 +95,15 @@ function PieCharts() {
     const initData: ChartDataType[] = [
       {
         sum: 0,
-        data: []
+        data: [],
       },
       {
         sum: 0,
-        data: []
+        data: [],
       },
       {
         sum: 0,
-        data: []
+        data: [],
       },
     ];
     if (!pieChartSearchResults) return initData;
@@ -160,7 +160,7 @@ function PieCharts() {
       )}
       {isFetching && (
         <div>
-          <div className="d-flex justify-content-center">Loading...</div>
+          <div className="d-flex justify-content-center">Loading... </div>
           <ProgressBar animated now={100} />
         </div>
       )}
@@ -181,17 +181,17 @@ function ChartData(props: {
       case 'count':
         return [
           countOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Rights`
+          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Rights`,
         ];
       case 'flow':
         return [
           flowOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`
+          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`,
         ];
       case 'volume':
         return [
           volumeOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`
+          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`,
         ];
     }
   }, [name, data.sum]);
@@ -201,11 +201,11 @@ function ChartData(props: {
       ...chartOptionsBase,
       subtitle: {
         ...chartOptionsBase.subtitle,
-        text: subTitle
+        text: subTitle,
       },
       series: [
         {
-          data: data.data.sort((a, b) => b.y - a.y)
+          data: data.data.sort((a, b) => b.y - a.y),
         },
       ],
     };

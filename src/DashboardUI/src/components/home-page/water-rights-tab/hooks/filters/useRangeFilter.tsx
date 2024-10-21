@@ -18,7 +18,6 @@ type ValidRangeWaterRightsProperties =
   | waterRightsProperties.maxVolume
   | waterRightsProperties.minPriorityDate
   | waterRightsProperties.maxPriorityDate;
-
 export function useRangeFilter<
   K1 extends keyof Pick<WaterRightsFilters, ValidRangeFilterFields>,
 >(
@@ -36,7 +35,7 @@ export function useRangeFilter<
     minValue,
     maxValue,
     minMapField,
-    maxMapFied,
+    maxMapField,
   );
 
   const setMinValue = useCallback(
@@ -53,10 +52,10 @@ export function useRangeFilter<
     (value: typeof maxValue) => {
       setFilters((s) => ({
         ...s,
-        [maxField]: vale,
+        [maxField]: value,
       }));
     },
-    [maxField, setFilter],
+    [maxField, setFilters],
   );
 
   return { minValue, maxValue, setMinValue, setMaxValue, mapFilters };

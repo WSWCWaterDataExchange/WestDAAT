@@ -10,7 +10,7 @@ const minControlProps = {
 
 const maxControlProps = {
   placeholder: 'Max Flow',
-  'aria-label': 'Maximum Flow Rate,
+  'aria-label': 'Maximum Flow Rate',
 };
 export function FlowRange() {
   const { minValue, maxValue, setMinValue, setMaxValue } = useFlowFilters();
@@ -20,7 +20,7 @@ export function FlowRange() {
       setMinValue(min);
       setMaxValue(max);
     },
-    400
+    400,
   );
 
   return (

@@ -33,5 +33,4 @@ function useProgressIndicator(
     }
   }, [calculatedProgress, content]);
 }
-
 export default useProgressIndicator;

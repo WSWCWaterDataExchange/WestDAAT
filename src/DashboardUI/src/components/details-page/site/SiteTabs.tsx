@@ -15,7 +15,7 @@ function SiteTabs() {
 
   const getFormattedBeneficialUses = (beneficialUses: string[]) => {
     return beneficialUses.map((use) =>
-      use !== beneficialUses[beneficialUses.length - 1] ? `${use}, ` : ue,
+      use !== beneficialUses[beneficialUses.length - 1] ? `${use}, ` : use,
     );
   };
 

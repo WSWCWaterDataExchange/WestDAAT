@@ -91,7 +91,7 @@ export function useFilters() {
     setMapLayerFilters(
       allWaterRightsLayers.map((a) => {
         return { layer: a, filter: allMapFilters };
-      },
+      }),
     );
   }, [allMapFilters, setMapLayerFilters]);
 }

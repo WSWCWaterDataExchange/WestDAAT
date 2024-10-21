@@ -3,7 +3,6 @@ import { useWaterRightsContext, WaterRightsFilters } from '../../Provider';
 import { useGeoJsonFilter as useGeoJsonFilterBase } from '../../../../../hooks/filters/useGeoJsonFilter';
 
 type ValidGeoJsonFilters = 'polylines';
-
 export function useGeoJsonFilter<
   K1 extends keyof Pick<WaterRightsFilters, ValidGeoJsonFilters>,
 >(field: K1) {
@@ -18,10 +17,10 @@ export function useGeoJsonFilter<
     (val: typeof value) => {
       setFilters((s) => ({
         ...s,
-        [field]: va,
+        [field]: val,
       }));
     },
-    [field, setFilters,
+    [field, setFilters],
   );
 
   return { value, setValue, mapFilters };

@@ -16,7 +16,7 @@ export function useWaterRightsDigests(siteUuid: string) {
     ['site.waterRightsDigests', siteUuid],
     async () => await getWaterRightsDigests(siteUuid),
     {
-      enabled: !!siteUui,
+      enabled: !!siteUuid,
     },
   );
 }
@@ -45,14 +45,13 @@ type WaterSiteSourceInfoListOptionsType = UseQueryOptionsParameter<
   undefined,
   WaterSourceInfoListItem[]
 >;
-
 export function useWaterSiteSourceInfoList(
   siteUuid: string | undefined,
   options?: WaterSiteSourceInfoListOptionsType,
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled && !!siteUui,
+    enabled: options?.enabled && !!siteUuid,
   };
   return useQuery(
     ['site.SourceInfoList', siteUuid],
@@ -65,10 +64,9 @@ type WaterRightInfoListOptionsType = UseQueryOptionsParameter<
   undefined,
   WaterRightInfoListItem[]
 >;
-
 export function useWaterRightInfoList(
   siteUuid: string | undefined,
-  options?: WaterRightInfoListOptionsTyp,
+  options?: WaterRightInfoListOptionsType,
 ) {
   const setOptions = {
     ...options,
@@ -77,7 +75,7 @@ export function useWaterRightInfoList(
   return useQuery(
     ['site.WaterRightInfoList', siteUuid],
     async () => await getWaterRightInfoList(siteUuid!),
-    setOption,
+    setOptions,
   );
 }
 

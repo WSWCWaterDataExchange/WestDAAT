@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import deepEqual from 'fast-deep-equal/es6';
-import { MapBoundSettings } from '../data-contracts/MapBoundSettings';
+import { MapBoundSettings } from '@data-contracts';
 
 export enum MapTypes {
   WaterRights = 'waterRights',
@@ -132,7 +132,7 @@ interface MapContextState {
     key: string,
     display: boolean,
     element: JSX.Element,
-    priority: MapAlertPriorit,
+    priority: MapAlertPriority,
   ) => void;
   removeAlertDisplay: (key: string) => void;
   mapBoundSettings: MapBoundSettings | null;
@@ -233,11 +233,11 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setFilters,
+    [setFilters],
   );
 
   const [circleColors, setCircleColors] = useState<MapLayerCircleColorsType>(
-    {}
+    {},
   );
   const setLayerCircleColors = useCallback(
     (updatedFilters: setCircleColorsParamType): void => {
@@ -255,7 +255,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setCircleColors]
+    [setCircleColors],
   );
 
   const [circleRadii, setCircleRadii] = useState<MapLayerCircleRadiusType>({});
@@ -275,7 +275,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setCircleRadii]
+    [setCircleRadii],
   );
 
   const [circleSortKeys, setCircleSortKeys] =
@@ -296,7 +296,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setCircleSortKeys]
+    [setCircleSortKeys],
   );
 
   const [fillColors, setFillColors] = useState<MapLayerFillColorsType>({});
@@ -316,7 +316,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setFillColors]
+    [setFillColors],
   );
 
   const [iconImages, setIconImages] = useState<MapLayerIconImagesType>({});
@@ -336,7 +336,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setIconImages]
+    [setIconImages],
   );
 
   const [geoJsonData, setAllGeoJsonData] = useState<
@@ -354,7 +354,7 @@ const MapProvider: FC = ({ children }) => {
       data:
         | GeoJSON.Feature<GeoJSON.Geometry>
         | GeoJSON.FeatureCollection<GeoJSON.Geometry>
-        | string
+        | string,
     ) => {
       setAllGeoJsonData((s) => {
         const unchangedData = s.filter((a) => a.source !== source);
@@ -366,7 +366,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setAllGeoJsonData]
+    [setAllGeoJsonData],
   );
 
   const [vectorUrls, setAllVectorUrls] = useState<
@@ -384,7 +384,7 @@ const MapProvider: FC = ({ children }) => {
         return s;
       });
     },
-    [setAllVectorUrls]
+    [setAllVectorUrls],
   );
 
   const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
@@ -415,7 +415,7 @@ const MapProvider: FC = ({ children }) => {
       key: string,
       display: boolean,
       element: JSX.Element,
-      priority: MapAlertPriority
+      priority: MapAlertPriority,
     ) => {
       setMapAlerts((s) => {
         const unchangedData = s.filter((a) => a.key !== key);
@@ -425,12 +425,12 @@ const MapProvider: FC = ({ children }) => {
             key,
             display,
             element,
-            priority
-          }
+            priority,
+          },
         ];
       });
     },
-    [setMapAlerts]
+    [setMapAlerts],
   );
   const removeAlertDisplay = useCallback(
     (key: string) => {
@@ -438,7 +438,7 @@ const MapProvider: FC = ({ children }) => {
         return s.filter((a) => a.key !== key);
       });
     },
-    [setMapAlerts]
+    [setMapAlerts],
   );
 
   const [mapBoundSettings, setMapBoundSettings] =
@@ -496,7 +496,7 @@ const MapProvider: FC = ({ children }) => {
     mapLocationSettings,
     setMapLocationSettings,
     isMapRendering,
-    setIsMapRendering
+    setIsMapRendering,
   };
 
   return (

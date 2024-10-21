@@ -13,7 +13,6 @@ interface SearchCriteriaProps {
   filters: WaterRightsFilters;
   nldiIds: string[];
 }
-
 export function useWaterRightsSearchCriteriaWithoutContext({
   filters,
   nldiIds,
@@ -34,7 +33,7 @@ export function useWaterRightsSearchCriteriaWithoutContext({
     waterSourceTypes,
     riverBasinNames,
     allocationOwner,
-    state,
+    states,
   } = filters;
 
   const searchCriteria: WaterRightsSearchCriteria = useMemo(() => {

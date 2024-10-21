@@ -10,6 +10,6 @@ export function useIncludeExemptFilter() {
   return {
     includeExempt: value,
     setIncludeExempt: setValue,
-    mapFilter,
+    mapFilters,
   };
 }

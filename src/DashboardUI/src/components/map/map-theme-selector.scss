@@ -49,7 +49,6 @@
     &.active {
       outline-width: 0.25rem;
       outline-color: $primary-color;
-
       &:focus,
       &:focus:not(:focus-visible) {
         outline: 0.25rem solid $primary-color;

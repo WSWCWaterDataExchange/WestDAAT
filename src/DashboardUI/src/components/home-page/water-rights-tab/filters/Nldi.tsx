@@ -27,20 +27,20 @@ export function Nldi() {
     (e: ChangeEvent<HTMLInputElement>) => {
       setPointData((s) => ({
         ...s,
-        latitude: e.target.valu,
+        latitude: e.target.value,
       }));
     },
-    [setPointData,
+    [setPointData],
   );
 
   const handleLongitudeChanged = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setPointData((s) => ({
         ...s,
-        longitude: e.target.value
+        longitude: e.target.value,
       }));
     },
-    [setPointData]
+    [setPointData],
   );
 
   const setLatLongData = useCallback(
@@ -53,7 +53,7 @@ export function Nldi() {
         setPointData((s) => ({
           ...s,
           latitude: pointLat,
-          longitude: pointLong
+          longitude: pointLong,
         }));
         setLatLong(null, null);
         return;
@@ -74,10 +74,10 @@ export function Nldi() {
       setPointData((s) => ({
         ...s,
         latitude: lat.toFixed(nldi.latLongPrecision),
-        longitude: long.toFixed(nldi.latLongPrecision)
+        longitude: long.toFixed(nldi.latLongPrecision),
       }));
     },
-    [setLatLong]
+    [setLatLong],
   );
 
   const handleLatitudeBlurred = () => {
@@ -90,7 +90,7 @@ export function Nldi() {
 
   const handleDirectionsChanged = (
     e: ChangeEvent<HTMLInputElement>,
-    dir: Directions
+    dir: Directions,
   ) => {
     const val = e.target.checked
       ? nldiFilters.directions | dir
@@ -100,7 +100,7 @@ export function Nldi() {
 
   const handleDataPointsChanged = (
     e: ChangeEvent<HTMLInputElement>,
-    dataPoint: DataPoints
+    dataPoint: DataPoints,
   ) => {
     const val = e.target.checked
       ? nldiFilters.dataPoints | dataPoint
@@ -209,7 +209,7 @@ function NldiDragAndDropButton(props: {
       isDragging: monitor.isDragging(),
       dropResult: monitor.getDropResult<
         { latitude: number; longitude: number } | undefined
-      >()
+      >(),
     }),
   });
   const { setLatLong } = props;
@@ -217,7 +217,7 @@ function NldiDragAndDropButton(props: {
     if (dropResult) {
       setLatLong(
         dropResult.latitude.toString(),
-        dropResult.longitude.toString()
+        dropResult.longitude.toString(),
       );
     }
   }, [dropResult, setLatLong]);

@@ -16,7 +16,7 @@ const allWaterRightsLayers = [
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
-  mapLayerNames.nldiUsgsPointsLaye,
+  mapLayerNames.nldiUsgsPointsLayer,
 ];
 export function useDisplayOptions() {
   const {

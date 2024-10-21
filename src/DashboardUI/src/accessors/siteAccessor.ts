@@ -8,11 +8,11 @@ import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
 
 export const getWaterRightsDigests = async (
-  siteUuid: strin,
+  siteUuid: string,
 ): Promise<WaterRightDigest[]> => {
   const url = new URL(
     `Sites/${siteUuid}/WaterRightsDigest`,
-    process.env.REACT_APP_WEBAPI_UR,
+    process.env.REACT_APP_WEBAPI_URL,
   );
   const { data } = await axios.get<WaterRightDigest[]>(url.toString());
   return data;

@@ -32,7 +32,7 @@ function SideBar() {
     useState(false);
 
   const [activeKeys, setActiveKeys] = useState(
-    isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters',
+    isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
   );
 
   const toggleWaterRightFilters = useCallback(() => {
@@ -53,11 +53,11 @@ function SideBar() {
         setActiveKeys([keys]);
       }
     },
-    [setActiveKeys]
+    [setActiveKeys],
   );
   const openAccordionKeys = useMemo(() => {
     const keys = [...activeKeys].filter(
-      (a) => a !== 'nldi' && a !== 'siteSelectionFilters'
+      (a) => a !== 'nldi' && a !== 'siteSelectionFilters',
     );
     if (isNldiFilterActive) {
       keys.push('nldi');

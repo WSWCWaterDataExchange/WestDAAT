@@ -20,7 +20,6 @@ interface StyleButtonProps {
   style: MapStyle;
   friendlyName: string;
 }
-
 function StyleButton({ style, friendlyName }: StyleButtonProps) {
   const { mapStyle, setMapStyle } = useMapContext();
 

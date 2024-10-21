@@ -16,7 +16,7 @@ import { FeatureCollection } from 'geojson';
 
 export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid},
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}`,
   );
   return data;
 };
@@ -60,7 +60,7 @@ export const getWaterRightSiteInfoList = async (allocationUuid: string) => {
 
 export const getWaterRightSourceInfoList = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterSourceInfoListItem[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/Sources`
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/Sources`,
   );
   return data;
 };
@@ -69,13 +69,13 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
   const { data } = await axios.get<
     GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
   >(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/SiteLocations`
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/SiteLocations`,
   );
   return data;
 };
 
 export const downloadWaterRights = async (
-  searchCriteria: WaterRightsSearchCriteriaWithFilterUrl
+  searchCriteria: WaterRightsSearchCriteriaWithFilterUrl,
 ) => {
   // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests
   //https://stackoverflow.com/questions/70969837/how-to-download-zip-file-that-i-recieve-from-a-http-response-axios-put-request#:~:text=0,fetch%20over%20axios
@@ -84,7 +84,7 @@ export const downloadWaterRights = async (
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
     {
       method: 'POST',
-      body: JSON.stringify(searchCriteria)
+      body: JSON.stringify(searchCriteria),
     },
   );
 

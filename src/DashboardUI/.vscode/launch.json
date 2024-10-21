@@ -15,15 +15,9 @@
       "name": "Debug tests single run",
       "type": "node",
       "request": "launch",
-      "env": {
-        "CI": "true"
-      },
+      "env": { "CI": "true" },
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
-      "args": [
-        "test",
-        "--runInBand",
-        "--no-cache"
-      ],
+      "args": ["test", "--runInBand", "--no-cache"],
       "cwd": "${workspaceRoot}",
       "protocol": "inspector",
       "console": "integratedTerminal",

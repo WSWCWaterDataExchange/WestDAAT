@@ -114,7 +114,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
               </div>
             </div>
           </div>
-        ,
+        ),
       }}
     </MapPopupCard>
   );

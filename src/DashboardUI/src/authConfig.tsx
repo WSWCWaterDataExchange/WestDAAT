@@ -21,5 +21,5 @@ export const loginRequest = {
 
 // Add the endpoints here for Microsoft Graph API services you'd like to use.
 export const graphConfig = {
-  graphMeEndpoint: 'https://graph.microsoft.com,
+  graphMeEndpoint: 'https://graph.microsoft.com',
 };

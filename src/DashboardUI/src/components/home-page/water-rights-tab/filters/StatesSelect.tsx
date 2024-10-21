@@ -19,7 +19,7 @@ export function StatesSelect() {
       const result = values.map((option) => option.value);
       setStates(result.length > 0 ? result : undefined);
     },
-    [setState],
+    [setStates],
   );
 
   const options = useMemo(() => {

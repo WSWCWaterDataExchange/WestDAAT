@@ -12,12 +12,11 @@ const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   type: 'FeatureCollection',
   features: [],
 };
-
 export function useRiverBasinFilter() {
   const { setGeoJsonData } = useMapContext();
   const {
     filters: { riverBasinNames: rbn },
-    setFilter,
+    setFilters,
   } = useWaterRightsContext();
 
   const riverBasinNames = useMemo(() => {
@@ -60,6 +59,6 @@ export function useRiverBasinFilter() {
     riverBasinNames,
     mapFilters,
     riverBasinPolygonsQuery,
-    setRiverBasinNams,
+    setRiverBasinNames,
   };
 }

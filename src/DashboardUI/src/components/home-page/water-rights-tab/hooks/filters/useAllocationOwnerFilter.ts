@@ -9,6 +9,6 @@ export function useAllocationOwnerFilter() {
   return {
     allocationOwner: value,
     setAllocationOwner: setValue,
-    mapFilter,
+    mapFilters,
   };
 }

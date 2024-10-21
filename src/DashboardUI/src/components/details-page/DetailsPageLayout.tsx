@@ -81,7 +81,7 @@ Map.defaultProps = { __type: 'DetailsMap' };
 
 const Tabs = function DetailsTabs({
   children,
-}: PropsWithChildren<DetailsTyperops>) {
+}: PropsWithChildren<DetailsTypeProps>) {
   return <div className="flex-fill">{children}</div>;
 };
 Tabs.defaultProps = { __type: 'DetailsTabs' };

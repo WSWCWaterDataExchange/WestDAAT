@@ -50,13 +50,13 @@ export function DateRange(props: DateRangeProps) {
 
   useEffect(() => {
     setMinValueString(
-      initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : ',
+      initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : '',
     );
   }, [initialMin, setMinValueString]);
 
   useEffect(() => {
     setMaxValueString(
-      initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : ''
+      initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : '',
     );
   }, [initialMax, setMaxValueString]);
 
@@ -64,7 +64,7 @@ export function DateRange(props: DateRangeProps) {
     if (isValid) {
       onChange(
         minMoment.isValid() ? minMoment.unix() : undefined,
-        maxMoment.isValid() ? maxMoment.unix() : undefined
+        maxMoment.isValid() ? maxMoment.unix() : undefined,
       );
     }
   }, [minMoment, maxMoment, isValid, onChange]);

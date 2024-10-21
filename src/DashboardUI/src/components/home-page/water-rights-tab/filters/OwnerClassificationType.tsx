@@ -17,10 +17,10 @@ export function OwnerClassificationType() {
   const handleOwnerClassificationChange = useCallback(
     (selectedOptions: string[]) => {
       setOwnerClassifications(
-        selectedOptions.length > 0 ? selectedOptions : undefind,
+        selectedOptions.length > 0 ? selectedOptions : undefined,
       );
     },
-    [setOwnerClassification],
+    [setOwnerClassifications],
   );
 
   return (

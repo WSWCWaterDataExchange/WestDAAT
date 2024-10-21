@@ -53,7 +53,7 @@ export function useMapPointScaling() {
     }
     const values = renderedFeatures.map((a) => ({
       flow: a.properties?.[waterRightsProperties.maxFlowRate as string] ?? 0,
-      volume: a.properties?.[waterRightsProperties.maxVolume as string] ?? ,
+      volume: a.properties?.[waterRightsProperties.maxVolume as string] ?? 0,
     }));
     return values.reduce(
       (prev, curr) => ({
@@ -72,14 +72,14 @@ export function useMapPointScaling() {
         maxVolume:
           prev.maxVolume === undefined || curr.volume > prev.maxVolume
             ? curr.volume
-            : prev.maxVolum,
+            : prev.maxVolume,
       }),
       {
         minFlow: values[0].flow,
         maxFlow: values[0].flow,
         minVolume: values[0].volume,
-        maxVolume: values[0].volum,
-      ,
+        maxVolume: values[0].volume,
+      },
     );
   }, [renderedFeatures]);
 
@@ -116,7 +116,7 @@ export function useMapPointScaling() {
     lastKnownMinFlow,
     lastKnownMinVolume,
     filters.minFlow,
-    filters.minVolume
+    filters.minVolume,
   ]);
 
   const max = useMemo(() => {
@@ -128,7 +128,7 @@ export function useMapPointScaling() {
     filters.maxFlow,
     filters.maxVolume,
     lastKnownMaxFlow,
-    lastKnownMaxVolume
+    lastKnownMaxVolume,
   ]);
 
   const scaleProperty = useMemo(() => {
@@ -141,13 +141,13 @@ export function useMapPointScaling() {
     if (pointSize === 'd') {
       setLayerCircleRadii({
         layer: mapLayerNames.waterRightsPointsLayer,
-        circleRadius: defaultPointCircleRadius
+        circleRadius: defaultPointCircleRadius,
       });
     } else {
       if (min === max) {
         setLayerCircleRadii({
           layer: mapLayerNames.waterRightsPointsLayer,
-          circleRadius: defaultPointCircleRadius
+          circleRadius: defaultPointCircleRadius,
         });
       }
       const valueScaleFactorMinToMax = pointSizes.maxScaleFactorForSizedPoints; //the biggest point will be x times bigger than the smallest
@@ -164,9 +164,9 @@ export function useMapPointScaling() {
         [
           '+',
           ['*', ['/', ['-', scaleProperty, min], valueRange], sizeRange],
-          minSizeAtMinimumZoom
+          minSizeAtMinimumZoom,
         ],
-        maxSizeAtMinimumZoom
+        maxSizeAtMinimumZoom,
       ];
       //size at minimum * zoomScaleFactorMinToMax === this point's size at maximum zoom
       const maxZoomValue = ['*', minZoomValue, zoomScaleFactorMinToMax];
@@ -179,8 +179,8 @@ export function useMapPointScaling() {
           pointSizes.minPointSizeZoomLevel,
           minZoomValue,
           pointSizes.maxPointSizeZoomLevel,
-          maxZoomValue
-        ]
+          maxZoomValue,
+        ],
       });
     }
   }, [pointSize, scaleProperty, min, max, setLayerCircleRadii]);
@@ -189,17 +189,17 @@ export function useMapPointScaling() {
     if (pointSize === 'f') {
       setLayerCircleSortKeys({
         layer: mapLayerNames.waterRightsPointsLayer,
-        circleSortKey: flowPointCircleSortKey
+        circleSortKey: flowPointCircleSortKey,
       });
     } else if (pointSize === 'v') {
       setLayerCircleSortKeys({
         layer: mapLayerNames.waterRightsPointsLayer,
-        circleSortKey: volumePointCircleSortKey
+        circleSortKey: volumePointCircleSortKey,
       });
     } else {
       setLayerCircleSortKeys({
         layer: mapLayerNames.waterRightsPointsLayer,
-        circleSortKey: defaultPointCircleSortKey
+        circleSortKey: defaultPointCircleSortKey,
       });
     }
   }, [pointSize, setLayerCircleSortKeys]);

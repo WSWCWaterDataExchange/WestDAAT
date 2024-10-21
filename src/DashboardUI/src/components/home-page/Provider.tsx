@@ -28,7 +28,7 @@ export const HomePageProvider: FC = ({ children }) => {
     downloadModal,
     setDownloadModal,
     showDownloadModal,
-    setShowDownloadModa,
+    setShowDownloadModal,
   };
 
   return (

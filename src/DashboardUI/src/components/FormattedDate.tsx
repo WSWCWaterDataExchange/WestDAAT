@@ -5,7 +5,6 @@ export interface FormattedDateProps {
   children: MomentInput;
   noValueFallback?: string;
 }
-
 export function FormattedDate(props: FormattedDateProps) {
   const { children: dateValue, noValueFallback } = props;
   const fallback = noValueFallback ? <>noValueFallback</> : null;

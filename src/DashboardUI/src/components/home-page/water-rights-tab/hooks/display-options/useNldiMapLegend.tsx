@@ -14,9 +14,9 @@ export function useNldiMapLegend() {
     filters: {
       isNldiFilterActive,
       nldiFilterData: { dataPoints: nldiDataPoints } = {
-        dataPoints: DataPoints.Non,
-      ,
-    ,
+        dataPoints: DataPoints.None,
+      },
+    },
   } = useWaterRightsContext();
 
   const legendItems = useMemo(() => {

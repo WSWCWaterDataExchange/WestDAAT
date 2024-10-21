@@ -11,6 +11,6 @@ export function useWaterSourceTypesFilter() {
   return {
     waterSourceTypes: values,
     setWaterSourceTypes: setValues,
-    mapFilter,
+    mapFilters,
   };
 }

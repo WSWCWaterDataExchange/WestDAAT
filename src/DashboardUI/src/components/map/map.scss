@@ -13,7 +13,6 @@
   z-index: 2;
   padding: 6px;
   border-radius: 5px;
-
   .legend-item {
     display: flex;
     align-items: center;
@@ -47,7 +46,6 @@
   .mapboxgl-popup-close-button {
     display: none;
   }
-
   .map-popup-card {
     .map-popup-card-water-rights-link-icon {
       fill: #ff0000;
@@ -55,27 +53,22 @@
       height: 1em;
       width: 1em;
     }
-
     .map-popup-close-btn {
       margin-top: -7px;
       margin-right: -15px;
-
       svg {
         width: 14px;
         height: 14px;
       }
     }
-
     .map-popup-card-water-rights-body {
       .map-popup-card-water-rights-native-id-row {
         display: flex;
         align-items: center;
         line-height: normal;
-
         & > * {
           white-space: nowrap;
         }
-
         button {
           background: none;
           color: #000;
@@ -88,19 +81,15 @@
           outline: inherit;
           height: 18px;
           width: 18px;
-
           &:hover {
             opacity: 0.75;
           }
-
           &.nav-prev-water-right {
             margin-left: 3px;
           }
-
           &.nav-next-water-right {
             margin-right: 3px;
           }
-
           svg {
             height: 18px;
             width: 18px;
@@ -136,16 +125,13 @@
         width: 14px;
         margin-right: 17px;
       }
-
       .legend-flowline {
         display: inline-block;
         width: 100%;
         vertical-align: middle;
-
         &.legend-flowline-main {
           height: 4px;
         }
-
         &.legend-flowline-tributary {
           height: 2px;
         }
@@ -169,8 +155,10 @@
 body.dragging-nldi,
 .grabbable:hover {
   * {
-    cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' style='width: 32px; height: 32px;'%3e%3cpath d='M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z' style='fill: %23FF0000'%3e%3c/path%3e%3c/svg%3e") 16 16,
-    crosshair !important;
+    cursor:
+      url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' style='width: 32px; height: 32px;'%3e%3cpath d='M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z' style='fill: %23FF0000'%3e%3c/path%3e%3c/svg%3e")
+        16 16,
+      crosshair !important;
   }
 }
 
@@ -191,13 +179,13 @@ body.dragging-nldi,
   opacity: 0.85;
   padding: 2px 10px 2px 5px;
   clip-path: polygon(
-                  0% 0%,
-                  0% 100%,
-                  90% 100%,
-                  90% 35%,
-                  95% 50%,
-                  90% 65%,
-                  90% 0%
+    0% 0%,
+    0% 100%,
+    90% 100%,
+    90% 35%,
+    95% 50%,
+    90% 65%,
+    90% 0%
   );
 }
 

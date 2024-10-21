@@ -10,7 +10,7 @@ const minControlProps = {
 
 const maxControlProps = {
   placeholder: 'Max Volume',
-  'aria-label': 'Maximum Volume Rate,
+  'aria-label': 'Maximum Volume Rate',
 };
 export function VolumeRange() {
   const { minValue, maxValue, setMinValue, setMaxValue } = useVolumeFilters();
@@ -20,7 +20,7 @@ export function VolumeRange() {
       setMinValue(min);
       setMaxValue(max);
     },
-    400
+    400,
   );
 
   return (

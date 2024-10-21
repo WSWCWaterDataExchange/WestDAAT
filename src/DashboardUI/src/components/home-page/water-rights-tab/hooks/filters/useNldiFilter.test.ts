@@ -43,13 +43,13 @@ describe('setNldiMapActiveStatus', () => {
       false,
       WaterRightsProvider.defaultNldiFilters,
       false,
-      WaterRightsProvider.defaultNldiFilter,
+      WaterRightsProvider.defaultNldiFilters,
     ],
     [
       false,
       WaterRightsProvider.defaultNldiFilters,
       true,
-      WaterRightsProvider.defaultNldiFilter,
+      WaterRightsProvider.defaultNldiFilters,
     ],
     [false, differentNldiFilters, false, differentNldiFilters],
     [false, differentNldiFilters, true, differentNldiFilters],
@@ -117,7 +117,7 @@ describe('setLatLong', () => {
       {
         ...WaterRightsProvider.defaultNldiFilters,
         latitude: 20,
-        longitude: -0,
+        longitude: -80,
       },
     ],
     [
@@ -125,7 +125,7 @@ describe('setLatLong', () => {
       WaterRightsProvider.defaultNldiFilters,
       null,
       null,
-      WaterRightsProvider.defaultNldiFiltes,
+      WaterRightsProvider.defaultNldiFilters,
     ],
     [
       false,
@@ -149,7 +149,7 @@ describe('setLatLong', () => {
       {
         ...WaterRightsProvider.defaultNldiFilters,
         latitude: 20,
-        longitude: 80,
+        longitude: -80,
       },
     ],
     [
@@ -157,28 +157,28 @@ describe('setLatLong', () => {
       differentNldiFilters,
       null,
       null,
-      { ...differentNldiFilters, latitude: null, longitude: nul },
+      { ...differentNldiFilters, latitude: null, longitude: null },
     ],
     [
       false,
       differentNldiFilters,
       20,
       null,
-      { ...differentNldiFilters, latitude: 20, longitude: nul },
+      { ...differentNldiFilters, latitude: 20, longitude: null },
     ],
     [
       false,
       differentNldiFilters,
       null,
       -80,
-      { ...differentNldiFilters, latitude: null, longitude: -8 },
+      { ...differentNldiFilters, latitude: null, longitude: -80 },
     ],
     [
       false,
       differentNldiFilters,
       20,
       -80,
-      { ...differentNldiFilters, latitude: 20, longitude: -8 },
+      { ...differentNldiFilters, latitude: 20, longitude: -80 },
     ],
     [true, undefined, null, null, WaterRightsProvider.defaultNldiFilters],
     [
@@ -186,14 +186,14 @@ describe('setLatLong', () => {
       undefined,
       20,
       null,
-      { ...WaterRightsProvider.defaultNldiFilters, latitude: 20 ,
+      { ...WaterRightsProvider.defaultNldiFilters, latitude: 20 },
     ],
     [
       true,
       undefined,
       null,
       -80,
-      { ...WaterRightsProvider.defaultNldiFilters, longitude: -80 ,
+      { ...WaterRightsProvider.defaultNldiFilters, longitude: -80 },
     ],
     [
       true,
@@ -203,15 +203,15 @@ describe('setLatLong', () => {
       {
         ...WaterRightsProvider.defaultNldiFilters,
         latitude: 20,
-        longitude: -8,
-      ,
+        longitude: -80,
+      },
     ],
     [
       true,
       WaterRightsProvider.defaultNldiFilters,
       null,
       null,
-      WaterRightsProvider.defaultNldiFilter,
+      WaterRightsProvider.defaultNldiFilters,
     ],
     [
       true,
@@ -235,36 +235,36 @@ describe('setLatLong', () => {
       {
         ...WaterRightsProvider.defaultNldiFilters,
         latitude: 20,
-        longitude: -80
-      }
+        longitude: -80,
+      },
     ],
     [
       true,
       differentNldiFilters,
       null,
       null,
-      { ...differentNldiFilters, latitude: null, longitude: null }
+      { ...differentNldiFilters, latitude: null, longitude: null },
     ],
     [
       true,
       differentNldiFilters,
       20,
       null,
-      { ...differentNldiFilters, latitude: 20, longitude: null }
+      { ...differentNldiFilters, latitude: 20, longitude: null },
     ],
     [
       true,
       differentNldiFilters,
       null,
       -80,
-      { ...differentNldiFilters, latitude: null, longitude: -80 }
+      { ...differentNldiFilters, latitude: null, longitude: -80 },
     ],
     [
       true,
       differentNldiFilters,
       20,
       -80,
-      { ...differentNldiFilters, latitude: 20, longitude: -80 }
+      { ...differentNldiFilters, latitude: 20, longitude: -80 },
     ],
   ])(
     'set',
@@ -272,12 +272,12 @@ describe('setLatLong', () => {
       currFilters = {
         ...WaterRightsProvider.defaultFilters,
         isNldiFilterActive: initialIsActive,
-        nldiFilterData: initialNldiData
+        nldiFilterData: initialNldiData,
       };
       const {
         result: {
-          current: { setLatLong }
-        }
+          current: { setLatLong },
+        },
       } = renderHook(() => useNldiFilter());
 
       setLatLong(setLat, setLng);
@@ -286,7 +286,7 @@ describe('setLatLong', () => {
       expect(mockSetFilters.mock.calls[0][0](currFilters)).toEqual({
         ...WaterRightsProvider.defaultFilters,
         isNldiFilterActive: initialIsActive,
-        nldiFilterData: expectedNldiData
+        nldiFilterData: expectedNldiData,
       });
     },
   );

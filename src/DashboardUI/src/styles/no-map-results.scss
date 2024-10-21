@@ -9,14 +9,12 @@
   right: 0;
   top: 30%;
   width: 450px;
-
   .card {
     svg {
       height: 24px;
       cursor: pointer;
     }
   }
-
   .text-white {
     .btn-close {
       filter: invert(1) grayscale(100%) brightness(200%);

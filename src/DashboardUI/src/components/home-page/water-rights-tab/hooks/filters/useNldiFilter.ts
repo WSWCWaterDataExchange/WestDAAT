@@ -17,7 +17,7 @@ type DataPointType = DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa;
 const pointFeatureDataSourceNameKeys: DataPointType[] = [
   DataPoints.Wade,
   DataPoints.Usgs,
-  DataPoints.Ep,
+  DataPoints.Epa,
 ];
 const pointFeatureDataSourceNames: Record<DataPointType, string> = {
   [DataPoints.Wade]: 'Wade',
@@ -28,7 +28,7 @@ const pointFeatureDataSourceNames: Record<DataPointType, string> = {
 type DirectionsType = Directions.Upsteam | Directions.Downsteam;
 const directionNameKeys: DirectionsType[] = [
   Directions.Upsteam,
-  Directions.Downstea,
+  Directions.Downsteam,
 ];
 const directionNames: Record<DirectionsType, string> = {
   [Directions.Upsteam]: 'Upstream',
@@ -40,7 +40,7 @@ export function useNldiFilter() {
   const {
     filters: { nldiFilterData, isNldiFilterActive },
     setFilters,
-    setNldiId,
+    setNldiIds,
   } = useWaterRightsContext();
 
   const [debouncedLatitude, debouncedLongitude] = useDebounce(
@@ -87,7 +87,7 @@ export function useNldiFilter() {
       nldiFilterData.directions & Directions.Downsteam
     ) {
       arr = arr.filter(
-        (x) => x.properties?.westdaat_direction === 'Downstream,
+        (x) => x.properties?.westdaat_direction === 'Downstream',
       );
     } else if (
       !(nldiFilterData.directions & Directions.Upsteam) &&
@@ -99,7 +99,7 @@ export function useNldiFilter() {
       .filter(
         (x) =>
           x.properties?.identifier !== null &&
-          x.properties?.identifier !== undefined
+          x.properties?.identifier !== undefined,
       )
       .map((a) => a.properties?.identifier);
   }, [nldiGeoJsonData, nldiFilterData, isNldiFilterActive]);
@@ -121,7 +121,7 @@ export function useNldiFilter() {
           pointsTypeFilters.push([
             '==',
             ['get', 'westdaat_pointdatasource'],
-            pointFeatureDataSourceNames[key]
+            pointFeatureDataSourceNames[key],
           ]);
         }
       }
@@ -134,7 +134,7 @@ export function useNldiFilter() {
           directionFilters.push([
             '==',
             ['get', 'westdaat_direction'],
-            directionNames[key]
+            directionNames[key],
           ]);
         }
       }
@@ -148,22 +148,22 @@ export function useNldiFilter() {
           ['==', ['get', 'westdaat_featuredatatype'], 'Point'],
           ['!=', ['get', 'westdaat_pointdatasource'], 'Wade'],
           pointsTypeFilters,
-          directionFilters
-        ]
+          directionFilters,
+        ],
       },
       {
         layer: mapLayerNames.nldiFlowlinesLayer,
         filter: [
           'all',
           ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'],
-          directionFilters
-        ]
-      }
+          directionFilters,
+        ],
+      },
     ]);
   }, [
     nldiFilterData?.dataPoints,
     nldiFilterData?.directions,
-    setMapLayerFilters
+    setMapLayerFilters,
   ]);
 
   const mapFilters = useMemo((): any[] | undefined => {
@@ -171,7 +171,7 @@ export function useNldiFilter() {
       return [
         'in',
         ['get', waterRightsProperties.siteUuid],
-        ['literal', nldiWadeSiteIds]
+        ['literal', nldiWadeSiteIds],
       ];
     }
   }, [isNldiFilterActive, nldiWadeSiteIds]);
@@ -182,10 +182,10 @@ export function useNldiFilter() {
         ...s,
         isNldiFilterActive: isActive,
         nldiFilterData:
-          s.nldiFilterData ?? (isActive ? defaultNldiFilters : undefined)
+          s.nldiFilterData ?? (isActive ? defaultNldiFilters : undefined),
       }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   const setLatLong = useCallback(
@@ -195,11 +195,11 @@ export function useNldiFilter() {
         nldiFilterData: {
           ...(s.nldiFilterData ?? defaultNldiFilters),
           latitude,
-          longitude
-        }
+          longitude,
+        },
       }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   const setDataPoints = useCallback(
@@ -208,11 +208,11 @@ export function useNldiFilter() {
         ...s,
         nldiFilterData: {
           ...(s.nldiFilterData ?? defaultNldiFilters),
-          dataPoints
-        }
+          dataPoints,
+        },
       }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   const setDirections = useCallback(
@@ -221,11 +221,11 @@ export function useNldiFilter() {
         ...s,
         nldiFilterData: {
           ...(s.nldiFilterData ?? defaultNldiFilters),
-          directions
-        }
+          directions,
+        },
       }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   return {
@@ -236,6 +236,6 @@ export function useNldiFilter() {
     setLatLong,
     setDataPoints,
     setDirections,
-    mapFilters
+    mapFilters,
   };
 }

@@ -45,5 +45,4 @@ function useSiteDigestMapPopup() {
     }
   }, [result, updatePopup]);
 }
-
 export default useSiteDigestMapPopup;

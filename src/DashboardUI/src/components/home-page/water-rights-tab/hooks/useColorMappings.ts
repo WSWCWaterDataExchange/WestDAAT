@@ -28,7 +28,7 @@ export function useColorMappings() {
     return (
       allOwnerClassifications?.map((a) => ({
         key: a,
-        color: getColorByIndex(colorIndex++,
+        color: getColorByIndex(colorIndex++),
       })) ?? []
     );
   }, [allOwnerClassifications, getColorByIndex]);
@@ -38,7 +38,7 @@ export function useColorMappings() {
     return (
       allWaterSourceTypes?.map((a) => ({
         key: a,
-        color: getColorByIndex(colorIndex++)
+        color: getColorByIndex(colorIndex++),
       })) ?? []
     );
   }, [allWaterSourceTypes, getColorByIndex]);
@@ -50,18 +50,18 @@ export function useColorMappings() {
           ?.color ?? fallbackColor
       );
     },
-    [beneficialUseColors, fallbackColor]
+    [beneficialUseColors, fallbackColor],
   );
 
   const getOwnerClassificationColor = useCallback(
     (ownerClassification: string) => {
       return (
         ownerClassificationColors.find(
-          (item) => item.key === ownerClassification
+          (item) => item.key === ownerClassification,
         )?.color ?? fallbackColor
       );
     },
-    [ownerClassificationColors, fallbackColor]
+    [ownerClassificationColors, fallbackColor],
   );
 
   const getWaterSourceTypeColor = useCallback(
@@ -71,7 +71,7 @@ export function useColorMappings() {
           ?.color ?? fallbackColor
       );
     },
-    [waterSourceTypeColors, fallbackColor]
+    [waterSourceTypeColors, fallbackColor],
   );
 
   return {
@@ -81,6 +81,6 @@ export function useColorMappings() {
     getBeneficialUseColor,
     getOwnerClassificationColor,
     getWaterSourceTypeColor,
-    fallbackColor
+    fallbackColor,
   };
 }

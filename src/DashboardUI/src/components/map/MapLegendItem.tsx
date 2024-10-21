@@ -10,7 +10,6 @@ export function MapLegendItem({ children }: PropsWithChildren<{}>) {
 interface MapLegendCircleItemProps {
   color: string;
 }
-
 export function MapLegendCircleItem({
   color,
   children,
@@ -26,7 +25,6 @@ export function MapLegendCircleItem({
 interface MapLegendMapPointerItemProps {
   color: string;
 }
-
 export function MapLegendMarkerItem({
   color,
   children,

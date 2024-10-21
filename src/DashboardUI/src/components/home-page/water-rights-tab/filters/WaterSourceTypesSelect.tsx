@@ -19,7 +19,7 @@ export function WaterSourceTypesSelect() {
       const result = values.map((option) => option.value);
       setWaterSourceTypes(result.length > 0 ? result : undefined);
     },
-    [setWaterSourceType],
+    [setWaterSourceTypes],
   );
 
   const options = useMemo(() => {

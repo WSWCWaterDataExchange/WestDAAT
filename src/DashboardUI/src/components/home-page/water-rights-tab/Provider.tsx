@@ -7,12 +7,12 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { BeneficialUseListItem } from '../../../data-contracts/BeneficialUseListItem';
+import { BeneficialUseListItem } from '@data-contracts';
 import { DataPoints, Directions } from '../../../data-contracts/nldi';
 import { useDisplayOptionsUrlParameters } from './hooks/url-parameters/useDisplayOptionsUrlParameters';
 import { defaultDisplayOptions, DisplayOptions } from './DisplayOptions';
 import { useFiltersUrlParameters } from './hooks/url-parameters/useFiltersUrlParameters';
-import { useDashboardFilters } from '../../../hooks/queries/useSystemQuery';
+import { useDashboardFilters } from '../../../hooks/queries';
 import { UseQueryResult } from 'react-query';
 
 export interface WaterRightsFilters {
@@ -139,10 +139,10 @@ export const WaterRightsProvider: FC = ({ children }) => {
   } = useFiltersUrlParameters();
 
   const [filters, setFilters] = useState<WaterRightsFilters>(
-    getFiltersParameter() ?? defaultFiltes,
+    getFiltersParameter() ?? defaultFilters,
   );
   const [displayOptions, setDisplayOptions] = useState<DisplayOptions>(
-    getDisplayOptionsParameter() ?? defaultDisplayOptios,
+    getDisplayOptionsParameter() ?? defaultDisplayOptions,
   );
   const [nldiIds, setNldiIds] = useState<string[]>([]);
 

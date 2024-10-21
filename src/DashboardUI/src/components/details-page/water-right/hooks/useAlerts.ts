@@ -13,7 +13,7 @@ export function useAlerts() {
       },
       siteInfoListQuery: {
         isLoading: siteInfoListIsLoading,
-        isError: siteInfoListIsErro,
+        isError: siteInfoListIsError,
       },
       sourceInfoListQuery: {
         isLoading: sourceInfoListIsLoading,
@@ -33,7 +33,7 @@ export function useAlerts() {
     detailsIsError,
     siteLocationsIsError,
     siteInfoListIsError,
-    sourceInfoListIsErro,
+    sourceInfoListIsError,
   ]);
 
   useProgressIndicator(

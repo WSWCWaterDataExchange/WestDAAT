@@ -7,7 +7,7 @@ import {
 import mapboxgl from 'mapbox-gl';
 
 export function getLatsLongsFromFeatureCollection(
-  featureCollection: FeatureCollection<Geometry, GeoJsonProperties,
+  featureCollection: FeatureCollection<Geometry, GeoJsonProperties>,
 ) {
   let positions: Position[] = [];
 

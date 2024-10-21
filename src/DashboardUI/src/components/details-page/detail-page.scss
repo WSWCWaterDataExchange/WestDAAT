@@ -35,7 +35,6 @@
     font-size: 14px;
     margin-top: 18px;
     color: $text-color-grey;
-
     &:first-of-type {
       margin-top: 0;
     }
@@ -48,12 +47,10 @@
     display: flex; // For aligning correctly
     &:empty {
       color: $text-color-grey;
-
       &:before {
         content: 'Unknown';
       }
     }
-
     &.is-verbose {
       font-weight: normal;
     }

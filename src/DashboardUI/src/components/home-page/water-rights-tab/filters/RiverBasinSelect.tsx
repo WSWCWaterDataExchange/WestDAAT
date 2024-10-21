@@ -19,7 +19,7 @@ export function RiverBasinSelect() {
       const result = values.map((option) => option.value);
       setRiverBasinNames(result.length > 0 ? result : undefined);
     },
-    [setRiverBasinName],
+    [setRiverBasinNames],
   );
 
   const options = useMemo(() => {

@@ -32,11 +32,11 @@ const LineClampText: React.FC<LineClampTextProps> = ({ text }) => {
         const scrollHeight = clone.querySelector('p')?.scrollHeight || 0;
         paragraphRef.current.style.setProperty(
           '--truncated-height',
-          `${clientHeight}px,
+          `${clientHeight}px`,
         );
         paragraphRef.current.style.setProperty(
           '--expanded-height',
-          `${scrollHeight}px,
+          `${scrollHeight}px`,
         );
         setIsClamped(scrollHeight > clientHeight);
       }

@@ -54,8 +54,8 @@ describe('Initial Call', () => {
       ])('Key: %s, Default: %s', (key, defaultObject) => {
         const {
           result: {
-            current: { getParameter ,
-          ,
+            current: { getParameter },
+          },
         } = renderHook(() => useUrlParameters(key, defaultObject));
 
         expect(getParameter()).toBeUndefined();
@@ -73,7 +73,7 @@ describe('Initial Call', () => {
         ['test-key', undefined, sampleObject],
         [['test-key'], sampleObject, undefined],
         [['test-key'], diffObject, sampleObject],
-        [['test-key'], undefined, sampleObject]
+        [['test-key'], undefined, sampleObject],
       ])(
         'Key: %s, Default: %s',
         (key, defaultObject, expectedParameterValue) => {
@@ -81,18 +81,18 @@ describe('Initial Call', () => {
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useUrlParameters(key, defaultObject));
 
           expect(getParameter()).toStrictEqual(expectedParameterValue);
 
           expect(mockUrlParams['test-key']).toStrictEqual(
-            expectedParameterValue
+            expectedParameterValue,
           );
 
           expect(Object.keys(mockUrlParams)).toEqual(
-            expectedParameterValue ? ['test-key'] : []
+            expectedParameterValue ? ['test-key'] : [],
           );
         },
       );
@@ -108,8 +108,8 @@ describe('Initial Call', () => {
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useUrlParameters(params, defaultObject));
 
           expect(getParameter()).toBeUndefined();
@@ -167,8 +167,8 @@ describe('Initial Call', () => {
 
           const {
             result: {
-              current: { getParameter }
-            }
+              current: { getParameter },
+            },
           } = renderHook(() => useUrlParameters(params, defaultObject));
 
           expect(getParameter()).toStrictEqual(expectedParameterValue);
@@ -178,7 +178,7 @@ describe('Initial Call', () => {
           remaining.forEach((a) => expect(mockUrlParams[a]).toBeUndefined());
 
           expect(Object.keys(mockUrlParams)).toEqual(
-            expectedParameterValue ? [first] : []
+            expectedParameterValue ? [first] : [],
           );
         },
       );
@@ -229,7 +229,7 @@ describe('Sets Url Parameter', () => {
         mockSetUrlParam('test-key', initialObject);
 
         const { result } = renderHook(() =>
-          useUrlParameters(keys, defaultObject)
+          useUrlParameters(keys, defaultObject),
         );
 
         act(() => {
@@ -241,7 +241,7 @@ describe('Sets Url Parameter', () => {
         expect(mockUrlParams['test-key']).toStrictEqual(expectedObject);
 
         expect(Object.keys(mockUrlParams)).toEqual(
-          expectedObject ? ['test-key'] : []
+          expectedObject ? ['test-key'] : [],
         );
       },
     );
@@ -271,7 +271,7 @@ describe('Sets Url Parameter', () => {
         const keys = ['test-a', 'test-b', 'test-c'];
         mockSetUrlParam(keys[0], initialObject);
         const { result } = renderHook(() =>
-          useUrlParameters(keys, defaultObject)
+          useUrlParameters(keys, defaultObject),
         );
 
         act(() => {
@@ -283,7 +283,7 @@ describe('Sets Url Parameter', () => {
         expect(mockUrlParams[keys[0]]).toStrictEqual(expectedObject);
 
         expect(Object.keys(mockUrlParams)).toEqual(
-          expectedObject ? [keys[0]] : []
+          expectedObject ? [keys[0]] : [],
         );
       },
     );

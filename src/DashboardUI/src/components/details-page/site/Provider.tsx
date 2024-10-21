@@ -9,9 +9,11 @@ import {
   useWaterSiteSourceInfoList,
 } from '../../../hooks/queries';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { WaterSourceInfoListItem } from '../../../data-contracts/WaterSourceInfoListItem';
-import { SiteDetails } from '../../../data-contracts/SiteDetails';
-import { WaterRightInfoListItem } from '../../../data-contracts/WaterRightInfoListItem';
+import {
+  WaterSourceInfoListItem,
+  SiteDetails,
+  WaterRightInfoListItem,
+} from '@data-contracts';
 
 type Query<T> = Pick<
   UseQueryResult<T, unknown>,
@@ -28,6 +30,7 @@ export interface HostData {
 }
 
 type ActiveTabType = 'source' | 'right';
+
 interface SiteDetailsPageContextState {
   siteUuid: string | undefined;
   activeTab: ActiveTabType;
@@ -61,10 +64,10 @@ export const SiteDetailsProvider: FC = ({ children }) => {
   const detailsQuery = useSiteDetails(siteUuid);
   const locationsQuery = useWaterSiteLocation(siteUuid);
   const waterRightInfoListQuery = useWaterRightInfoList(siteUuid, {
-    enabled: activeTab === 'right,
+    enabled: activeTab === 'right',
   });
   const sourceInfoListQuery = useWaterSiteSourceInfoList(siteUuid, {
-    enabled: activeTab === 'source,
+    enabled: activeTab === 'source',
   });
 
   const filterContextProviderValue: SiteDetailsPageContextState = {
@@ -75,7 +78,7 @@ export const SiteDetailsProvider: FC = ({ children }) => {
       detailsQuery,
       locationsQuery,
       waterRightInfoListQuery,
-      sourceInfoListQuery
+      sourceInfoListQuery,
     },
   };
 

@@ -13,10 +13,10 @@ export function useMapGroupingDisplayOption() {
     (mapGrouping: MapGrouping | undefined) => {
       setDisplayOptions((s) => ({
         ...s,
-        mapGrouping: mapGrouping ?? defaultDisplayOptions.mapGroupin,
+        mapGrouping: mapGrouping ?? defaultDisplayOptions.mapGrouping,
       }));
     },
-    [setDisplayOptions,
+    [setDisplayOptions],
   );
 
   return { mapGrouping, setMapGrouping };
