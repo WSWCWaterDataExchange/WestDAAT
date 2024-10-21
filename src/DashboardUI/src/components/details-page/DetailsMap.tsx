@@ -1,11 +1,11 @@
 import React from 'react';
-import { useCallback, useEffect } from "react";
-import Map from "../map/Map";
-import { useMapContext } from "../../contexts/MapProvider";
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { mapLayerNames, mapSourceNames } from "../../config/maps";
-import { MapThemeSelector } from "../map/MapThemeSelector";
-import { getLatsLongsFromFeatureCollection } from "../../utilities/geometryHelpers";
+import { useCallback, useEffect } from 'react';
+import Map from '../map/Map';
+import { useMapContext } from '../../contexts/MapProvider';
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import { mapLayerNames, mapSourceNames } from '../../config/maps';
+import { MapThemeSelector } from '../map/MapThemeSelector';
+import { getLatsLongsFromFeatureCollection } from '../../utilities/geometryHelpers';
 
 interface detailsMapProps {
   mapData: FeatureCollection<Geometry, GeoJsonProperties>;
@@ -30,7 +30,7 @@ function DetailsMap(props: detailsMapProps) {
   }, [props.mapData, setGeoJsonData]);
 
   const handleMapFitChange = useCallback(() => {
-    if(props.mapData){
+    if (props.mapData) {
       setMapBounds({
         LngLatBounds: getLatsLongsFromFeatureCollection(props.mapData),
         maxZoom: 16,
