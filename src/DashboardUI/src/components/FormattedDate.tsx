@@ -1,3 +1,4 @@
+import React from 'react';
 import moment, { MomentInput } from "moment";
 
 export interface FormattedDateProps{

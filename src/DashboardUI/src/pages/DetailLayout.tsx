@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet } from "react-router-dom";
 import '../styles/detail-layout.scss';
 import SiteFooter from "../components/SiteFooter";

@@ -13,8 +13,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
     {
         private static JsonSerializerOptions JsonSerializerOptions => new()
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { new JsonStringEnumConverter() }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         protected static async Task<HttpResponseData> CreateOkResponse<T>(

@@ -48,7 +48,7 @@ export function useFiltersUrlParameters() {
         hasUpdate = true;
       }
       if(filters.beneficialUses){
-        let migratedBeneficialUseNames = 
+        const migratedBeneficialUseNames = 
           filters.beneficialUseNames || 
           (filters.beneficialUses.length > 0 ? filters.beneficialUses.map(a=> a.beneficialUseName) : undefined);
         filters = {
@@ -59,7 +59,7 @@ export function useFiltersUrlParameters() {
         hasUpdate = true;
       }
       if(filters.polyline){
-        let migratedPolylines = 
+        const migratedPolylines = 
           filters.polylines || 
           (filters.polyline.length > 0 ? filters.polyline.map(a=> a.data) : undefined);
         filters = {

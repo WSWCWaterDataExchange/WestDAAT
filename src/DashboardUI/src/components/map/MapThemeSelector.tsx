@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCallback, useMemo } from "react";
 import { useMapContext, MapStyle } from "../../contexts/MapProvider";
 

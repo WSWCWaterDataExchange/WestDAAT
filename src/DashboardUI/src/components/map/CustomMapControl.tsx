@@ -1,3 +1,4 @@
+import React from 'react';
 
 export class CustomMapControl {
   private _icon: string;

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useMemo } from "react";
 import { useMapContext } from "../../../../../contexts/MapProvider";
 import { useWaterRightsContext } from "../../Provider";

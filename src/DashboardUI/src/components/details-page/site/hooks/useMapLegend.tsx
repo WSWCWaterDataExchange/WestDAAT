@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from "react";
 import { useMapContext } from "../../../../contexts/MapProvider";
 import { nldi } from "../../../../config/constants";

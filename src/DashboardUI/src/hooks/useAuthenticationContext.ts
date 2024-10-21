@@ -25,7 +25,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
       setAuthContext({
         isAuthenticated,
         user: {
-          emailAddress: result?.account?.idTokenClaims?.emails?.find(_o => true) ?? null
+          emailAddress: result?.account?.idTokenClaims?.emails?.find(() => true) ?? null
         }
       });   
     }

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMemo } from "react";
 import MapPopupCard from "./MapPopupCard";
 import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';

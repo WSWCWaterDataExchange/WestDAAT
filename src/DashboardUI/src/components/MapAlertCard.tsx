@@ -1,3 +1,4 @@
+import React from 'react';
 import { ReactChild } from "react";
 import { Card, CardProps } from "react-bootstrap";
 import CardHeader from "react-bootstrap/esm/CardHeader";

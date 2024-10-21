@@ -1,3 +1,4 @@
+import React from 'react';
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { mdiFitToScreenOutline } from "@mdi/js";
 import { CustomMapControl } from "./CustomMapControl";
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import useSiteDigestMapPopup from "../../../hooks/map-popups/useSiteDigestMapPopup";
 import DetailsMap from "../DetailsMap";
 import { useWaterRightDetailsContext } from "./Provider";

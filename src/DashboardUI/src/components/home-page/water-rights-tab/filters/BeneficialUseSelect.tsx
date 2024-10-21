@@ -1,3 +1,4 @@
+import React from 'react';
 import Select from 'react-select';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
@@ -49,7 +50,7 @@ function BeneficialUseSelect() {
   const mapToBeneficialUseOptions = (beneficialUses: BeneficialUseListItem[] | undefined) => {
 
     return beneficialUses?.map(a => {
-      var label = <span>{a.beneficialUseName}</span>;
+      let label = <span>{a.beneficialUseName}</span>;
 
       if (a.consumptionCategory === ConsumptionCategoryType.Consumptive) {
         label = <><span>{a.beneficialUseName} </span><CloseCircleOutline color="red" /></>
@@ -74,10 +75,10 @@ function BeneficialUseSelect() {
   const handleChanges = (currentSelectedOptions: BeneficialUseChangeOption[]): void => {
     if (currentSelectedOptions.some(option => option.consumptiveFilter === true)) {
       // filter by category option selected
-      var selected: string[] = [];
+      const selected: string[] = [];
       currentSelectedOptions.forEach(option => {
         if (option.consumptiveFilter) {
-          var newSelected = allBeneficialUses?.filter(f => f.consumptionCategory === option.category) ?? [];
+          const newSelected = allBeneficialUses?.filter(f => f.consumptionCategory === option.category) ?? [];
           newSelected.forEach(beneficialUse => {
             if (!currentSelectedOptions.some(f => f.value === beneficialUse.beneficialUseName)) {
               selected.push(beneficialUse.beneficialUseName)
@@ -101,7 +102,7 @@ function BeneficialUseSelect() {
       return (selectedCountByCategory === totalCountByCategory);
     }
 
-    var consumptiveCategoryOptions = [];
+    const consumptiveCategoryOptions = [];
     if (!allSelected(ConsumptionCategoryType.Consumptive)) {
       consumptiveCategoryOptions.push(consumptiveOption);
     }

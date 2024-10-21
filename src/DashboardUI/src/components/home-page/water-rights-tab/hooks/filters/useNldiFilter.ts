@@ -72,7 +72,7 @@ export function useNldiFilter() {
   }, [nldiWadeSiteIds, setNldiIds]);
 
   useEffect(() => {
-    let pointsTypeFilters: any[] = ["any"];
+    const pointsTypeFilters: any[] = ["any"];
     if(nldiFilterData?.dataPoints){
       for (const key of pointFeatureDataSourceNameKeys) {
         if (nldiFilterData.dataPoints & key) {
@@ -81,7 +81,7 @@ export function useNldiFilter() {
       }
     }
     
-    let directionFilters: any[] = ["any"];
+    const directionFilters: any[] = ["any"];
     if(nldiFilterData?.directions){
       for (const key of directionNameKeys) {
         if (nldiFilterData.directions & key) {

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCallback, useEffect } from "react";
 import Map from "../map/Map";
 import { useMapContext } from "../../contexts/MapProvider";
