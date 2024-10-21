@@ -213,9 +213,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       mapInstance.resize();
       setMap(mapInstance);
     });
-  }, [
-    setMap,
-  ]); /* eslint-disable-line */ /* We don't want to run this when mapStyle updates */
+  }, [setMap]);
 
   useEffect(() => {
     setIsMapLoaded(!!map);
