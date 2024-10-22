@@ -1,6 +1,6 @@
 Pull Request Checklist
 
-- [ ] Did you latest and merge `develop` (or `master`) into your branch?
+- [ ] Did you pull latest and merge `develop` (or `master`) into your branch?
 - [ ] Did you perform a self-review before assigning reviewers?
 - [ ] Did you add tests?
 - [ ] Did you run the front-end tests (if applicable)?
