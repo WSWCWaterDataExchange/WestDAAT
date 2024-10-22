@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { useWaterRightsContext } from '../../Provider';
 import { useRiverBasinPolygons } from '../../../../../hooks/queries/useSystemQuery';

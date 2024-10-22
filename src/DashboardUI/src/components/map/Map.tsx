@@ -234,7 +234,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   }, []);
 
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
-    setRenderedFeatures((s) => {
+    setRenderedFeatures(() => {
       return map
         .queryRenderedFeatures()
         .filter((a) => sourceIds.some((b) => a.source === b));
