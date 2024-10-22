@@ -1,8 +1,12 @@
 import React from 'react';
-import { waterRightsProperties } from "../../../../../config/constants";
-import { useRangeFilter } from "./useRangeFilter";
-
+import { waterRightsProperties } from '../../../../../config/constants';
+import { useRangeFilter } from './useRangeFilter';
 
 export function usePriorityDateFilters() {
-  return useRangeFilter("minPriorityDate", "maxPriorityDate", waterRightsProperties.minPriorityDate, waterRightsProperties.maxPriorityDate);
+  return useRangeFilter(
+    'minPriorityDate',
+    'maxPriorityDate',
+    waterRightsProperties.minPriorityDate,
+    waterRightsProperties.maxPriorityDate,
+  );
 }

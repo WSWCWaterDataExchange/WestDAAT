@@ -15,9 +15,12 @@ const LineClampText: React.FC<LineClampTextProps> = ({ text }) => {
 
   useEffect(() => {
     let clone: HTMLDivElement | undefined = undefined;
-    if(paragraphRef?.current){
-      clone = paragraphRef.current.parentElement?.cloneNode(true) as HTMLDivElement || document.createElement('div');
-      clone.style.visibility='hidden';
+    if (paragraphRef?.current) {
+      clone =
+        (paragraphRef.current.parentElement?.cloneNode(
+          true,
+        ) as HTMLDivElement) || document.createElement('div');
+      clone.style.visibility = 'hidden';
       clone.style.position = 'fixed';
       clone.style.width = `${paragraphRef.current.parentElement?.clientWidth}px`;
       paragraphRef.current.parentElement?.parentElement?.appendChild(clone);
@@ -27,24 +30,33 @@ const LineClampText: React.FC<LineClampTextProps> = ({ text }) => {
         clone.style.width = `${paragraphRef.current.parentElement?.clientWidth}px`;
         const clientHeight = clone.querySelector('p')?.clientHeight || 0;
         const scrollHeight = clone.querySelector('p')?.scrollHeight || 0;
-        paragraphRef.current.style.setProperty('--truncated-height', `${clientHeight}px`)
-        paragraphRef.current.style.setProperty('--expanded-height', `${scrollHeight}px`)
-        setIsClamped(
-          scrollHeight > clientHeight
-        )
+        paragraphRef.current.style.setProperty(
+          '--truncated-height',
+          `${clientHeight}px`,
+        );
+        paragraphRef.current.style.setProperty(
+          '--expanded-height',
+          `${scrollHeight}px`,
+        );
+        setIsClamped(scrollHeight > clientHeight);
       }
     }
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
     handleResize();
-    return () => window.removeEventListener('resize', handleResize)
-  }, [paragraphRef, setIsClamped, setIsOpen])
+    return () => window.removeEventListener('resize', handleResize);
+  }, [paragraphRef, setIsClamped, setIsOpen]);
 
   return (
     <div>
-      <div className={`line-clamp${isOpen ? ' open' : ''}${isClamped ? ' truncated' : ''}`}>
+      <div
+        className={`line-clamp${isOpen ? ' open' : ''}${isClamped ? ' truncated' : ''}`}
+      >
         <p ref={paragraphRef}>{text}</p>
-        <button className='btn btn-link p-0 m-0' onClick={toggleShowFullText}></button>
+        <button
+          className="btn btn-link p-0 m-0"
+          onClick={toggleShowFullText}
+        ></button>
       </div>
     </div>
   );

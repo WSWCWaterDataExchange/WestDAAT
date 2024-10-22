@@ -1,4 +1,4 @@
-@import "_colors.scss";
+@import '_colors.scss';
 
 .footer {
   flex-shrink: 0;
@@ -10,17 +10,17 @@
 
   .navbar-nav {
     a:not(:last-child):after {
-      content: " |";
+      content: ' |';
       margin-right: 3px;
     }
   }
 
-  .btn-text-color{
+  .btn-text-color {
     color: rgba(255, 255, 255, 0.55);
   }
 }
 
 .navbar-nav .nav-link > .active {
-  background:none;
+  background: none;
   color: rgba(255, 255, 255, 0.55);
 }

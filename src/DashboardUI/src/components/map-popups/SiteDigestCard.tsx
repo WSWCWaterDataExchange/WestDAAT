@@ -1,40 +1,57 @@
 import React from 'react';
-import MapPopupCard from "./MapPopupCard";
+import MapPopupCard from './MapPopupCard';
 import { mdiOpenInNew } from '@mdi/js';
-import Icon from "@mdi/react";
-import SiteDigest from "../../data-contracts/SiteDigest";
+import Icon from '@mdi/react';
+import SiteDigest from '../../data-contracts/SiteDigest';
 
 interface SiteDigestMapPopupProps {
-  site: SiteDigest
+  site: SiteDigest;
   onClosePopup: () => void;
 }
 function SiteDigestCard(props: SiteDigestMapPopupProps) {
   const { onClosePopup } = props;
-  const {siteNativeId, siteName, siteType, siteUuid} = props.site;
+  const { siteNativeId, siteName, siteType, siteUuid } = props.site;
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
-        header: <div>Site ID: <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">{siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" /></a></div>,
-        body: <div className="map-popup-card-water-rights-body">
-          <div className="mb-2">
-            <div>
-              <strong>Native ID:</strong>
-            </div>
-            {siteNativeId}
+        header: (
+          <div>
+            Site ID:{' '}
+            <a
+              href={`/details/site/${siteUuid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {siteUuid}{' '}
+              <Icon
+                path={mdiOpenInNew}
+                className="map-popup-card-water-rights-link-icon"
+              />
+            </a>
           </div>
-          <div className="mb-2">
-            <div>
-              <strong>Name:</strong>
+        ),
+        body: (
+          <div className="map-popup-card-water-rights-body">
+            <div className="mb-2">
+              <div>
+                <strong>Native ID:</strong>
+              </div>
+              {siteNativeId}
             </div>
-            {siteName}
-          </div>
-          <div className="mb-0">
-            <div>
-              <strong>Type:</strong>
+            <div className="mb-2">
+              <div>
+                <strong>Name:</strong>
+              </div>
+              {siteName}
             </div>
-            {siteType}
+            <div className="mb-0">
+              <div>
+                <strong>Type:</strong>
+              </div>
+              {siteType}
+            </div>
           </div>
-        </div>
+        ),
       }}
     </MapPopupCard>
   );

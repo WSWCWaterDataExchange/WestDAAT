@@ -1,13 +1,18 @@
 import React from 'react';
 import DangerousIcon from 'mdi-react/DangerousIcon';
-import MapPopupCard from "./MapPopupCard";
+import MapPopupCard from './MapPopupCard';
 
-function ErrorCard(props: { errorText: string; onClosePopup: () => void; }) {
+function ErrorCard(props: { errorText: string; onClosePopup: () => void }) {
   return (
     <MapPopupCard onClosePopup={props.onClosePopup}>
       {{
-        header: "Error",
-        body: <div className="text-center text-danger"><DangerousIcon /><div>{props.errorText}</div></div>
+        header: 'Error',
+        body: (
+          <div className="text-center text-danger">
+            <DangerousIcon />
+            <div>{props.errorText}</div>
+          </div>
+        ),
       }}
     </MapPopupCard>
   );

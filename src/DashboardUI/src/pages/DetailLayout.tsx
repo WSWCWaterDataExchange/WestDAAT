@@ -1,10 +1,10 @@
 import React from 'react';
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 import '../styles/detail-layout.scss';
-import SiteFooter from "../components/SiteFooter";
-import {useState} from "react";
-import SiteNavbar from "../components/SiteNavbar";
-import FeedbackModal from "../components/FeedbackModal";
+import SiteFooter from '../components/SiteFooter';
+import { useState } from 'react';
+import SiteNavbar from '../components/SiteNavbar';
+import FeedbackModal from '../components/FeedbackModal';
 
 // TODO: Do we need logic to redirect if we don't have detail type or detail id in route?
 
@@ -13,7 +13,7 @@ function DetailLayout() {
 
   const shouldShowFeedbackModal = (show: boolean) => {
     setShowFeedbackModal(show);
-  }
+  };
 
   return (
     <>
@@ -28,7 +28,10 @@ function DetailLayout() {
         <Outlet />
         <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
       </div>
-      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
+      <FeedbackModal
+        show={showFeedbackModal}
+        setShow={shouldShowFeedbackModal}
+      />
     </>
   );
 }

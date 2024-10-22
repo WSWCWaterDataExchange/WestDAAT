@@ -19,7 +19,7 @@
     background-size: cover;
     background-origin: border-box;
     background-position: center;
-    
+
     &.light-v10 {
       background-image: url('../../../public/map-themes/light.png');
     }
@@ -45,11 +45,12 @@
       outline: 2px solid $bs-gray-200;
       box-shadow: none;
     }
-    
+
     &.active {
       outline-width: 0.25rem;
       outline-color: $primary-color;
-      &:focus, &:focus:not(:focus-visible) {
+      &:focus,
+      &:focus:not(:focus-visible) {
         outline: 0.25rem solid $primary-color;
         box-shadow: none;
       }

@@ -1,22 +1,21 @@
 import React from 'react';
-import { useEffect } from "react";
-import { useMapContext } from "../../../../../contexts/MapProvider";
-import { useWadeLegend as useWadeMapLegend } from "./useWadeMapLegend";
-import { useNldiMapLegend } from "./useNldiMapLegend";
+import { useEffect } from 'react';
+import { useMapContext } from '../../../../../contexts/MapProvider';
+import { useWadeLegend as useWadeMapLegend } from './useWadeMapLegend';
+import { useNldiMapLegend } from './useNldiMapLegend';
 
 export function useMapLegend() {
-    const {
-      setLegend,
-    } = useMapContext();
+  const { setLegend } = useMapContext();
 
-    const {legendItems: wadeLegendItems} = useWadeMapLegend();
-    const {legendItems: nldiLegendItems} = useNldiMapLegend();
+  const { legendItems: wadeLegendItems } = useWadeMapLegend();
+  const { legendItems: nldiLegendItems } = useNldiMapLegend();
 
-    useEffect(() => {
-      setLegend(<>
+  useEffect(() => {
+    setLegend(
+      <>
         {wadeLegendItems}
         {nldiLegendItems}
-      </>)
-    }, [setLegend, wadeLegendItems, nldiLegendItems])
-
+      </>,
+    );
+  }, [setLegend, wadeLegendItems, nldiLegendItems]);
 }

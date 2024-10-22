@@ -1,4 +1,4 @@
-@import "styles/colors";
+@import 'styles/colors';
 @import 'mapbox-gl/dist/mapbox-gl.css';
 @import './styles/custom.scss';
 
@@ -15,7 +15,7 @@ body {
   height: 100%;
 }
 
-input[type='date'][value='']{
+input[type='date'][value=''] {
   color: $input-placeholder-color;
 }
 
@@ -38,13 +38,13 @@ input[type='date'][value='']{
 
 .accordion {
   .accordion-body {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
   }
 
   .accordion-button,
   .accordion-button:not(.collapsed),
   .accordion-button:focus {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
     color: black;
     border: none;
     font-weight: bold;
@@ -57,12 +57,12 @@ input[type='date'][value='']{
   }
 }
 
-.zindexzero{
+.zindexzero {
   // stops radio buttons from showing in front of dropdowns
   z-index: 0 !important;
 }
 
-.line-clamp{
+.line-clamp {
   p {
     --line-clamp: 3;
     --expanded-height: auto;
@@ -74,14 +74,14 @@ input[type='date'][value='']{
     height: var(--truncated-height);
     transition: height 0.3s ease;
   }
-  &.truncated{
+  &.truncated {
     p {
       margin-bottom: 0;
     }
     button::after {
       content: 'Show More';
     }
-    &.open{
+    &.open {
       p {
         -webkit-line-clamp: unset;
         height: var(--expanded-height);
@@ -91,7 +91,7 @@ input[type='date'][value='']{
       }
     }
   }
-  &:not(.truncated){
+  &:not(.truncated) {
     p {
       height: auto;
     }

@@ -1,27 +1,27 @@
 import React from 'react';
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import DetailLayout from './pages/DetailLayout';
-import AppProvider from "./contexts/AppProvider";
-import { ToastContainer } from "react-toastify";
-import { DndProvider } from 'react-dnd'
-import { TouchBackend } from "react-dnd-touch-backend"; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
+import AppProvider from './contexts/AppProvider';
+import { ToastContainer } from 'react-toastify';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend'; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
 
 import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
-import { IPublicClientApplication } from "@azure/msal-browser";
-import { MsalProvider } from "@azure/msal-react";
-import { useEffect, useState } from "react";
+import { IPublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
+import { useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
-import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
-import SiteDetailsPage from "./pages/SiteDetailsPage";
-import { clarity } from 'clarity-js'
+import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
+import SiteDetailsPage from './pages/SiteDetailsPage';
+import { clarity } from 'clarity-js';
 
 export interface AppProps {
-  msalInstance: IPublicClientApplication
+  msalInstance: IPublicClientApplication;
 }
 
 function App({ msalInstance }: AppProps) {
@@ -32,11 +32,12 @@ function App({ msalInstance }: AppProps) {
       refetchOnMount: false,
       refetchOnReconnect: false,
       cacheTime: 8600000,
-      staleTime: Infinity
-    }
-  })
+      staleTime: Infinity,
+    },
+  });
 
-  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] = useState(false);
+  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] =
+    useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -49,26 +50,32 @@ function App({ msalInstance }: AppProps) {
 
   useEffect(() => {
     if (googleAnalyticsInitialized) {
-      ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
+      ReactGA.send({
+        hitType: 'pageview',
+        page: `${location.pathname}${location.search}`,
+      });
     }
-  }, [googleAnalyticsInitialized, location])
+  }, [googleAnalyticsInitialized, location]);
 
   useEffect(() => {
-    if((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0){
+    if ((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0) {
       clarity.start({
         projectId: process.env.REACT_APP_CLARITY_ID,
         upload: 'https://m.clarity.ms/collect',
         track: true,
-        content: true
-      })	
+        content: true,
+      });
     }
-  }, [])
+  }, []);
 
   return (
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <QueryClientProvider client={queryClient}>
-          <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+          <DndProvider
+            backend={TouchBackend}
+            options={{ enableMouseEvents: true }}
+          >
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />

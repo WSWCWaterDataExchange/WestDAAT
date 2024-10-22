@@ -1,26 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "ES2020", // Use ES6 or later
+    "module": "ESNext", // Use ESNext to support ES modules
+    "jsx": "react-jsx", // Modern JSX transform for React 17+
+    "esModuleInterop": true, // Enable interoperability between CommonJS and ES Modules
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "strict": true, // Enable all strict type-checking options
+    "skipLibCheck": true, // Skip type checking of dependencies
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node", // Use Node.js resolution strategy
+    "isolatedModules": true, // Helps with modern tooling like Vite
+    "allowJs": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmit": true,
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
     "paths": {
-      "@data-contracts": ["./src/data-contracts/index.ts"],
+      "@data-contracts": [
+        "./src/data-contracts/index.ts"
+      ],
     }
   },
   "include": [

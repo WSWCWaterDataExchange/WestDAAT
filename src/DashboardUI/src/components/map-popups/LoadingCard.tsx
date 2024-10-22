@@ -1,13 +1,18 @@
 import React from 'react';
-import { Spinner } from "react-bootstrap";
-import MapPopupCard from "./MapPopupCard";
+import { Spinner } from 'react-bootstrap';
+import MapPopupCard from './MapPopupCard';
 
-function LoadingCard(props: { loadingText: string; onClosePopup: () => void; }) {
+function LoadingCard(props: { loadingText: string; onClosePopup: () => void }) {
   return (
     <MapPopupCard onClosePopup={props.onClosePopup}>
       {{
-        header: "Loading",
-        body: <div className="text-center"><div>{props.loadingText}</div><Spinner animation="border" /></div>
+        header: 'Loading',
+        body: (
+          <div className="text-center">
+            <div>{props.loadingText}</div>
+            <Spinner animation="border" />
+          </div>
+        ),
       }}
     </MapPopupCard>
   );

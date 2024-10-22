@@ -15,7 +15,6 @@ interface HomePageContextState {
   setUploadedGeoJSON: (data: geojson.FeatureCollection | null) => void;
 }
 
-
 const defaultState: HomePageContextState = {
   downloadModal: undefined,
   setDownloadModal: () => {},
@@ -57,4 +56,4 @@ export const HomePageProvider: FC = ({ children }) => {
       {children}
     </HomePageContext.Provider>
   );
-}
+};
