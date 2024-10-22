@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 // eslint-disable-next-line
 // @ts-expect-error
@@ -27,38 +27,46 @@ const readFile = (file: File, format: 'arraybuffer' | 'text'): Promise<ArrayBuff
 
 const processGeoJSON = async (
     fileContent: string,
-    setUploadedGeoJSON: (geojson: any) => void,
+    setUploadedGeoJSON: (geojson: geojson.FeatureCollection) => void,
     setErrorMessage: (message: string) => void,
-    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void
+    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void,
+    closeModal: () => void
 ) => {
     try {
         const parsedData = JSON.parse(fileContent);
-        if (!validateGeoJSONPolygon(parsedData)) {
-            throw new Error('The file does not contain valid Polygon or MultiPolygon data.');
+        if (validateGeoJSONPolygon(parsedData)) {
+            setUploadedGeoJSON(parsedData);
+            setUploadStatus('uploaded');
+            closeModal();
+        } else {
+            setErrorMessage('The file does not contain valid Polygon or MultiPolygon data.');
+            setUploadStatus('idle');
         }
-        setUploadedGeoJSON(parsedData);
-        setUploadStatus('uploaded');
-    } catch (error: any) {
-        setErrorMessage('The uploaded GeoJSON file is invalid.');
+    } catch {
+        setErrorMessage('Failed to parse JSON file.');
         setUploadStatus('idle');
     }
 };
 
-const processShapefile = async (
+const processShapefileZip = async (
     fileContent: ArrayBuffer,
-    setUploadedGeoJSON: (geojson: any) => void,
+    setUploadedGeoJSON: (geojson: geojson.FeatureCollection) => void,
     setErrorMessage: (message: string) => void,
-    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void
+    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void,
+    closeModal: () => void
 ) => {
     try {
         const geojsonData = await shp(fileContent);
-        if (!geojsonData || geojsonData.features.length === 0 || !validateGeoJSONPolygon(geojsonData)) {
-            throw new Error('The uploaded shapefile does not contain valid Polygon or MultiPolygon geometries.');
+        if (geojsonData && geojsonData.features.length > 0 && validateGeoJSONPolygon(geojsonData)) {
+            setUploadedGeoJSON(geojsonData);
+            setUploadStatus('uploaded');
+            closeModal();
+        } else {
+            setErrorMessage('The uploaded shapefile does not contain valid Polygon or MultiPolygon geometries.');
+            setUploadStatus('idle');
         }
-        setUploadedGeoJSON(geojsonData);
-        setUploadStatus('uploaded');
-    } catch (error: any) {
-        setErrorMessage('The uploaded shapefile is invalid.');
+    } catch {
+        setErrorMessage('Failed to process the uploaded shapefile.');
         setUploadStatus('idle');
     }
 };
@@ -88,29 +96,53 @@ const UploadModal = () => {
         setUploadStatus('uploading');
 
         try {
-            if (fileName.endsWith('.json') || fileName.endsWith('.geojson')) {
-                const fileContent = await readFile(file, 'text') as string;
-                await processGeoJSON(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus);
-            } else if (fileName.endsWith('.zip')) {
-                const fileContent = await readFile(file, 'arraybuffer') as ArrayBuffer;
-                await processShapefile(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus);
-            } else {
-                throw new Error('Unsupported file type. Please upload a .json, .geojson, or .zip file containing shapefiles.');
+            switch (true) {
+                case fileName.endsWith('.json'):
+                case fileName.endsWith('.geojson'): {
+                    const fileContent = await readFile(file, 'text') as string;
+                    await processGeoJSON(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus, closeModal);
+                    break;
+                }
+                case fileName.endsWith('.zip'): {
+                    const fileContent = await readFile(file, 'arraybuffer') as ArrayBuffer;
+                    await processShapefileZip(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus, closeModal);
+                    break;
+                }
+                default: {
+                    setErrorMessage('Unsupported file type. Please upload a .json, .geojson, or .zip file containing shapefiles.');
+                    setUploadStatus('idle');
+                    break;
+                }
             }
-        } catch (error: any) {
-            setErrorMessage(error.message);
+        } catch {
+            setErrorMessage('Failed to read the uploaded file.');
             setUploadStatus('idle');
         }
     };
 
-    useEffect(() => {
-        if (uploadStatus === 'uploaded' && !errorMessage) {
-            const timer = setTimeout(() => {
-                closeModal();
-            }, 750);
-            return () => clearTimeout(timer);
+    const renderModalBodyContent = () => {
+        if (uploadStatus === 'idle') {
+            return (
+                <>
+                    <Form>
+                        <Form.Group controlId="formFile">
+                            <Form.Label>Select a .json, .geojson, or .zip file</Form.Label>
+                            <Form.Control
+                                type="file"
+                                accept=".json, .geojson, .zip"
+                                onChange={handleFileUpload}
+                            />
+                        </Form.Group>
+                    </Form>
+                    {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                </>
+            );
+        } else if (uploadStatus === 'uploading') {
+            return <p>Uploading your file, please wait...</p>;
         }
-    }, [uploadStatus, errorMessage]);
+
+        return null;
+    };
 
     return (
         <Modal show={showUploadModal} onHide={closeModal} centered>
@@ -118,22 +150,7 @@ const UploadModal = () => {
                 <Modal.Title>Upload GeoJSON, JSON, or Shapefile (.zip)</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {uploadStatus === 'idle' && (
-                    <>
-                        <Form>
-                            <Form.Group controlId="formFile">
-                                <Form.Label>Select a .json, .geojson, or .zip file</Form.Label>
-                                <Form.Control
-                                    type="file"
-                                    accept=".json, .geojson, .zip, .shp"
-                                    onChange={handleFileUpload} />
-                            </Form.Group>
-                        </Form>
-                        {errorMessage && <p className="text-danger">{errorMessage}</p>}
-                    </>
-                )}
-                {uploadStatus === 'uploading' && <p>Uploading your file, please wait...</p>}
-                {uploadStatus === 'uploaded' && !errorMessage && <p className="text-success mt-3">GeoJSON uploaded successfully!</p>}
+                {renderModalBodyContent()}
             </Modal.Body>
             <Modal.Footer style={{ justifyContent: 'end' }}>
                 {uploadStatus === 'idle' && <Button variant="secondary" onClick={closeModal}>Cancel</Button>}
