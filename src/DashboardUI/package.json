@@ -2,33 +2,6 @@
   "name": "dashboard-ui",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint src"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs"
-    },
-    "transformIgnorePatterns": [
-      "'node_modules/(?!d3)/'"
-    ]
-  },
   "dependencies": {
     "@azure/msal-browser": "^2.24.0",
     "@azure/msal-react": "^1.4.0",
@@ -64,6 +37,8 @@
     "react-select": "^5.2.2",
     "react-toastify": "^8.2.0",
     "sass": "^1.49.7",
+    "shpjs": "^6.1.0",
+    "usehooks-ts": "^2.9.1",
     "typescript": "^5.6.3",
     "uuid": "^10.0.0",
     "validator": "^13.7.0",

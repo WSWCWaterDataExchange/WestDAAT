@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import mapboxgl, {
   AnyLayer,
   AnySourceData,
   LngLat,
   NavigationControl,
 } from 'mapbox-gl';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
@@ -18,11 +19,17 @@ import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
-import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
+import { useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import {
+  FeatureCollection,
+  Feature,
+  Geometry,
+  GeoJsonProperties,
+} from 'geojson';
+import { useHomePageContext } from '../home-page/Provider';
 
 import './map.scss';
 
@@ -32,9 +39,11 @@ interface mapProps {
   ) => void;
   handleMapFitChange?: () => void;
 }
+
 // Fix transpile errors. Mapbox is working on a fix for this
 (mapboxgl as any).workerClass =
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
@@ -67,11 +76,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setMapClickedFeatures,
     setIsMapRendering,
   } = useMapContext();
+
+  const { uploadedGeoJSON } = useHomePageContext();
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
-  const [coords, setCoords] = useState(null as LngLat | null);
+  const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
   const [styleFlag, setStyleFlag] = useState(0);
+  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const geocoderControl = useRef(
@@ -88,12 +99,8 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     const canvas = new OffscreenCanvas(24, 24);
     const ctx = canvas.getContext('2d');
     if (ctx != null) {
-      // ctx and presets.offscreen() don't match the types in the Canvg library.
-      // ESLint is throwing an error here. Casting to any for now to get it to build.
       const v = await Canvg.from(ctx as any, svg, presets.offscreen() as any);
       await v.render();
-
-      // Build errors here without the any case. We need to update some packages.
       const blob = await (canvas as any).convertToBlob();
       const pngUrl = URL.createObjectURL(blob);
       map.loadImage(pngUrl, (_, result) => {
@@ -141,6 +148,30 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
     setDrawControl(dc);
   };
+
+  const uploadGeoJsonToMapbox = (
+    geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>,
+  ) => {
+    if (drawControl && geoJsonData.features) {
+      drawControl.deleteAll();
+      geoJsonData.features.forEach(
+        (feature: Feature<Geometry, GeoJsonProperties>) => {
+          drawControl.add(feature);
+        },
+      );
+
+      const features = drawControl.getAll().features;
+      if (features.length > 0) {
+        handleMapDrawnPolygonChange?.(features);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (map && uploadedGeoJSON) {
+      uploadGeoJsonToMapbox(uploadedGeoJSON);
+    }
+  }, [map, uploadedGeoJSON]);
 
   useEffect(() => {
     setIsMapRendering(true);
