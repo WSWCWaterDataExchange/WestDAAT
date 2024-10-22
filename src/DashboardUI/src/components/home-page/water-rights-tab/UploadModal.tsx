@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import JSZip from 'jszip';
 // eslint-disable-next-line
 // @ts-expect-error
 import shp from 'shpjs';
@@ -30,9 +29,10 @@ const handleShapefileUpload = async (
     fileContent: ArrayBuffer,
     setUploadedGeoJSON: (geojson: any) => void,
     setErrorMessage: (message: string) => void
-) => {
+    ) => {
     try {
         const geojson = await shp(fileContent);
+        console.log(geojson);
 
         if (!geojson || geojson.features.length === 0 || !validateGeoJSONPolygon(geojson)) {
             throw new Error('The uploaded shapefile does not contain valid Polygon or MultiPolygon geometries.');
@@ -40,7 +40,7 @@ const handleShapefileUpload = async (
 
         setUploadedGeoJSON(geojson);
     } catch (error: any) {
-        setErrorMessage(error.message || 'An error occurred while processing the shapefile.');
+        setErrorMessage('An error occurred while processing the shapefile.');
     }
 };
 
@@ -82,14 +82,14 @@ const UploadModal = () => {
                 throw new Error('Unsupported file type. Please upload a .json, .geojson, or .zip file containing shapefiles.');
             }
         } catch (error: any) {
-            setErrorMessage(error.message || 'Error processing the file. Please try again.');
+            setErrorMessage('Error processing the file. Please try again.');
             setUploadStatus('idle');
         }
     };
 
     useEffect(() => {
         if (uploadStatus === 'uploaded' && !errorMessage) {
-            const timer = setTimeout(() => closeModal(), 1000);
+            const timer = setTimeout(() => closeModal(), 750);
             return () => clearTimeout(timer);
         }
     }, [uploadStatus, errorMessage]);
@@ -107,9 +107,8 @@ const UploadModal = () => {
                                 <Form.Label>Select a .json, .geojson, or .zip file</Form.Label>
                                 <Form.Control
                                     type="file"
-                                    accept=".json, .geojson, .zip"
-                                    onChange={handleFileUpload}
-                                />
+                                    accept=".json, .geojson, .zip, .shp"
+                                    onChange={handleFileUpload} />
                             </Form.Group>
                         </Form>
                         {errorMessage && <p className="text-danger">{errorMessage}</p>}
