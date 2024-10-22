@@ -25,22 +25,41 @@ const readFile = (file: File, format: 'arraybuffer' | 'text'): Promise<ArrayBuff
     });
 };
 
-const handleShapefileUpload = async (
+const processGeoJSON = async (
+    fileContent: string,
+    setUploadedGeoJSON: (geojson: any) => void,
+    setErrorMessage: (message: string) => void,
+    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void
+) => {
+    try {
+        const parsedData = JSON.parse(fileContent);
+        if (!validateGeoJSONPolygon(parsedData)) {
+            throw new Error('The file does not contain valid Polygon or MultiPolygon data.');
+        }
+        setUploadedGeoJSON(parsedData);
+        setUploadStatus('uploaded');
+    } catch (error: any) {
+        setErrorMessage('The uploaded GeoJSON file is invalid.');
+        setUploadStatus('idle');
+    }
+};
+
+const processShapefile = async (
     fileContent: ArrayBuffer,
     setUploadedGeoJSON: (geojson: any) => void,
-    setErrorMessage: (message: string) => void
-    ) => {
+    setErrorMessage: (message: string) => void,
+    setUploadStatus: (status: 'idle' | 'uploading' | 'uploaded') => void
+) => {
     try {
-        const geojson = await shp(fileContent);
-        console.log(geojson);
-
-        if (!geojson || geojson.features.length === 0 || !validateGeoJSONPolygon(geojson)) {
+        const geojsonData = await shp(fileContent);
+        if (!geojsonData || geojsonData.features.length === 0 || !validateGeoJSONPolygon(geojsonData)) {
             throw new Error('The uploaded shapefile does not contain valid Polygon or MultiPolygon geometries.');
         }
-
-        setUploadedGeoJSON(geojson);
+        setUploadedGeoJSON(geojsonData);
+        setUploadStatus('uploaded');
     } catch (error: any) {
-        setErrorMessage('An error occurred while processing the shapefile.');
+        setErrorMessage('The uploaded shapefile is invalid.');
+        setUploadStatus('idle');
     }
 };
 
@@ -65,31 +84,30 @@ const UploadModal = () => {
 
         const file = files[0];
         const fileName = file.name.toLowerCase();
+        setErrorMessage(null);
         setUploadStatus('uploading');
 
         try {
             if (fileName.endsWith('.json') || fileName.endsWith('.geojson')) {
                 const fileContent = await readFile(file, 'text') as string;
-                const parsedData = JSON.parse(fileContent);
-                if (!validateGeoJSONPolygon(parsedData)) throw new Error('The file does not contain valid Polygon or MultiPolygon data.');
-                setUploadedGeoJSON(parsedData);
-                setUploadStatus('uploaded');
+                await processGeoJSON(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus);
             } else if (fileName.endsWith('.zip')) {
                 const fileContent = await readFile(file, 'arraybuffer') as ArrayBuffer;
-                await handleShapefileUpload(fileContent, setUploadedGeoJSON, setErrorMessage);
-                setUploadStatus('uploaded');
+                await processShapefile(fileContent, setUploadedGeoJSON, setErrorMessage, setUploadStatus);
             } else {
                 throw new Error('Unsupported file type. Please upload a .json, .geojson, or .zip file containing shapefiles.');
             }
         } catch (error: any) {
-            setErrorMessage('Error processing the file. Please try again.');
+            setErrorMessage(error.message);
             setUploadStatus('idle');
         }
     };
 
     useEffect(() => {
         if (uploadStatus === 'uploaded' && !errorMessage) {
-            const timer = setTimeout(() => closeModal(), 750);
+            const timer = setTimeout(() => {
+                closeModal();
+            }, 750);
             return () => clearTimeout(timer);
         }
     }, [uploadStatus, errorMessage]);
@@ -115,7 +133,7 @@ const UploadModal = () => {
                     </>
                 )}
                 {uploadStatus === 'uploading' && <p>Uploading your file, please wait...</p>}
-                {uploadStatus === 'uploaded' && <p className="text-success mt-3">GeoJSON uploaded successfully!</p>}
+                {uploadStatus === 'uploaded' && !errorMessage && <p className="text-success mt-3">GeoJSON uploaded successfully!</p>}
             </Modal.Body>
             <Modal.Footer style={{ justifyContent: 'end' }}>
                 {uploadStatus === 'idle' && <Button variant="secondary" onClick={closeModal}>Cancel</Button>}
