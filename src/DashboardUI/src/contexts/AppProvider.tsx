@@ -25,8 +25,8 @@ interface AppContextState {
 
 const defaultAppContextState = {
   authenticationContext: { isAuthenticated: false, user: null },
-  setUrlParam: (key: string, value: any) => {},
-  getUrlParam: <T,>(key: string): T | undefined => undefined,
+  setUrlParam: () => {},
+  getUrlParam: <T,>(): T | undefined => undefined,
 };
 
 const AppContext = createContext<AppContextState>(defaultAppContextState);

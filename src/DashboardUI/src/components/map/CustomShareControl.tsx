@@ -1,4 +1,3 @@
-import React from 'react';
 import { mdiLink } from '@mdi/js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

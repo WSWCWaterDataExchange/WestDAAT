@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCallback } from 'react';
 import { useWaterRightsContext, WaterRightsFilters } from '../../Provider';
 import { waterRightsProperties } from '../../../../../config/constants';
