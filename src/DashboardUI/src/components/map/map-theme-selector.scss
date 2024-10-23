@@ -1,4 +1,4 @@
-@import '../../styles/colors';
+@use '../../styles/colors';
 
 .map-themes {
   gap: 15px;
@@ -6,12 +6,12 @@
   justify-content: space-between;
   max-width: 375px;
 
-  > button {
+  >button {
     margin: 0;
     border-radius: 10px;
     height: 48px;
     width: 48px;
-    outline: 2px solid $bs-gray-200;
+    outline: 2px solid colors.$bs-gray-200;
     transition-property: outline-color, outline-width;
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
@@ -42,16 +42,17 @@
 
     //while they seem repetitive focus and focus-visible styles are necessary to win the war with reboot.scss
     &:focus:not(:focus-visible) {
-      outline: 2px solid $bs-gray-200;
+      outline: 2px solid colors.$bs-gray-200;
       box-shadow: none;
     }
 
     &.active {
       outline-width: 0.25rem;
-      outline-color: $primary-color;
+      outline-color: colors.$primary-color;
+
       &:focus,
       &:focus:not(:focus-visible) {
-        outline: 0.25rem solid $primary-color;
+        outline: 0.25rem solid colors.$primary-color;
         box-shadow: none;
       }
     }

@@ -1,4 +1,3 @@
-import React from 'react';
 import { waterRightsProperties } from '../../../../../config/constants';
 import { useInFilter } from './useInFilter';
 
