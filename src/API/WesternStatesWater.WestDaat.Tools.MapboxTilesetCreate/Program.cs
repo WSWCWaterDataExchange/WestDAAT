@@ -87,11 +87,9 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                     Console.WriteLine($"Fetching records {page * take} to {(page + 1) * take}");
                     var sites = await db.AllocationAmountsView
                         .AsNoTracking()
-                        // .Skip(page * take)
                         .OrderBy(s => s.SiteId)
                         .Where(s => s.SiteId > lastSiteId)
                         .Take(take)
-                        // .Where(s => s.SiteId == 33030553)
                         .ToArrayAsync();
 
                     Parallel.ForEach(sites, site =>
@@ -149,7 +147,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
                     page++;
                     end = sites.Length < take;
-                    lastSiteId = sites.Last().SiteId;
+                    lastSiteId = sites[^1].SiteId;
                 }
 
                 Console.WriteLine("Combining temp point files...");
@@ -176,7 +174,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine($"Error: {ex.Message} {ex.StackTrace}");
                 Console.ResetColor();
             }
             finally
@@ -225,6 +223,41 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             }
 
             await JsonSerializer.SerializeAsync(destStream, features, features.GetType());
+        }
+
+        private static async Task CombineFiles2(string[] files, string destFileName)
+        {
+            using (var outputStream = File.Create(destFileName))
+            {
+                using (var utf8Writer = new Utf8JsonWriter(outputStream, new JsonWriterOptions { Indented = true }))
+                {
+                    utf8Writer.WriteStartArray();
+
+                    foreach (var filePath in files)
+                    {
+                        using (var inputStream = File.OpenRead(filePath))
+                        {
+                            using (var jsonDoc = await JsonDocument.ParseAsync(inputStream))
+                            {
+                                if (jsonDoc.RootElement.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var element in jsonDoc.RootElement.EnumerateArray())
+                                    {
+                                        element.WriteTo(utf8Writer);
+                                    }
+                                }
+                                else
+                                {
+                                    throw new InvalidDataException($"File {filePath} does not contain a JSON array.");
+                                }
+                            }
+                        }
+                    }
+
+                    utf8Writer.WriteEndArray();
+                    await utf8Writer.FlushAsync();
+                }
+            }
         }
 
         private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
