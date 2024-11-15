@@ -20,4 +20,5 @@ public class AllocationAmountsView
     public Geometry Geometry { get; init; }
     public DateTime? MinPriorityDate { get; init; }
     public DateTime? MaxPriorityDate { get; init; }
+    public Geometry Point { get; init; }
 }

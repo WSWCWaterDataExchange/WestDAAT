@@ -76,7 +76,8 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
                 bool end = false;
                 int page = 0;
-                int take = 10000;
+                int take = 25000;
+                long lastSiteId = 0;
                 while (!end)
                 {
                     ConcurrentBag<Feature> pointFeatures = [];
@@ -86,7 +87,9 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                     Console.WriteLine($"Fetching records {page * take} to {(page + 1) * take}");
                     var sites = await db.AllocationAmountsView
                         .AsNoTracking()
-                        .Skip(page * take)
+                        // .Skip(page * take)
+                        .OrderBy(s => s.SiteId)
+                        .Where(s => s.SiteId > lastSiteId)
                         .Take(take)
                         // .Where(s => s.SiteId == 33030553)
                         .ToArrayAsync();
@@ -113,7 +116,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                             properties.Add("minPri", GetUnixTime(site.MinPriorityDate.Value)!.Value);
                         if (site.MaxPriorityDate.HasValue)
                             properties.Add("maxPri", GetUnixTime(site.MaxPriorityDate.Value)!.Value);
-                        var geometry = site.Geometry.AsGeoJsonGeometry();
+                        var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
 
                         var feature = new Feature(geometry, properties);
 
@@ -146,6 +149,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
                     page++;
                     end = sites.Length < take;
+                    lastSiteId = sites.Last().SiteId;
                 }
 
                 Console.WriteLine("Combining temp point files...");
