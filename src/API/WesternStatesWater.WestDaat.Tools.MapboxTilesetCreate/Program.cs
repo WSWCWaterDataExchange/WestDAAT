@@ -6,9 +6,10 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
@@ -35,7 +36,9 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services.AddScoped(_ => config.GetNldiConfiguration());
                 services.AddScoped(_ => config.GetBlobStorageConfiguration());
                 services.AddScoped(_ => config.GetPerformanceConfiguration());
-                services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
+                services
+                    .AddTransient<IDatabaseContextFactory,
+                        DatabaseContextFactory>();
                 services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
                 services.AddScoped<ISiteAccessor, SiteAccessor>();
@@ -52,114 +55,149 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services.BuildServiceProvider();
             }).Build();
 
-            var sw = Stopwatch.StartNew();
-
-            var waterAllocationAccessor = services.Services.GetService<IWaterAllocationAccessor>();
-            var siteAccessor = services.Services.GetService<ISiteAccessor>();
-
-            Console.WriteLine("Fetching allocations...");
-            var allocations = await waterAllocationAccessor!.GetAllWaterAllocations();
-
-            Console.WriteLine("Fetching sites...");
-            var sitesTask = siteAccessor!.GetSites();
-
-            Console.WriteLine("Building site allocations...");
-            var allSiteAllocations = new ConcurrentDictionary<long, ConcurrentBag<AllocationAmount>>();
-            Parallel.ForEach(allocations, allocation =>
-            {
-                if (allocation != null)
-                {
-                    foreach (var siteId in allocation.SiteIds)
-                    {
-                        allSiteAllocations.GetOrAdd(siteId, new ConcurrentBag<AllocationAmount>())
-                            .Add(allocation);
-                    }
-                }
-            });
-            Console.WriteLine("Built site allocations.");
-
-            var sites = await sitesTask;
-            Console.WriteLine("Fetched sites.");
-
-            Console.WriteLine("Mapping to GeoJsonFeature...");
-            var pointFeatures = new ConcurrentBag<Feature>();
-            var polygonFeatures = new ConcurrentBag<Feature>();
-            var unknownFeatures = new ConcurrentBag<Feature>();
-            Parallel.ForEach(sites, site =>
-            {
-                var hasAllocations = allSiteAllocations.TryGetValue(site.SiteId, out var siteAllocations);
-                if (!hasAllocations || siteAllocations == null || siteAllocations.Count == 0)
-                {
-                    return;
-                }
-
-                var properties = new Dictionary<string, object>
-                    {
-                        {"o", string.Join(" ", siteAllocations.Select(a => a.AllocationOwner).Distinct())},
-                        {"oClass", siteAllocations.Select(a => a.OwnerClassification).Distinct()},
-                        {"bu", siteAllocations.SelectMany(a => a.BeneficialUses).Distinct().ToList()},
-                        {"uuid", site.SiteUuid},
-                        {"podPou", site.PodPou},
-                        {"wsType", site.WaterSourceTypes},
-                        {"st", siteAllocations.Select(a => a.OrganizationState).Distinct() },
-                        {"xmpt", siteAllocations.Any(a=>a.ExemptOfVolumeFlowPriority ?? false) }
-                    };
-
-                var minFlow = siteAllocations.Select(a => a.AllocationFlowCfs).Min();
-                if (minFlow != null) properties.Add("minFlow", minFlow.Value);
-
-                var maxFlow = siteAllocations.Select(a => a.AllocationFlowCfs).Max();
-                if (maxFlow != null) properties.Add("maxFlow", maxFlow.Value);
-
-                var minVolume = siteAllocations.Select(a => a.AllocationVolumeAf).Min();
-                if (minVolume != null) properties.Add("minVol", minVolume.Value);
-
-                var maxVolume = siteAllocations.Select(a => a.AllocationVolumeAf).Max();
-                if (maxVolume != null) properties.Add("maxVol", maxVolume.Value);
-
-                var minPriorityDate = siteAllocations.Select(a => GetUnixTime(a.AllocationPriorityDate)).Min();
-                if (minPriorityDate != null) properties.Add("minPri", minPriorityDate.Value);
-
-                var maxPriorityDate = siteAllocations.Select(a => GetUnixTime(a.AllocationPriorityDate)).Max();
-                if (maxPriorityDate != null) properties.Add("maxPri", maxPriorityDate.Value);
-
-                var geometry = site.Geometry.AsGeoJsonGeometry();
-
-                var feature = new Feature(geometry, properties);
-
-                switch (geometry.Type)
-                {
-                    case GeoJSON.Text.GeoJSONObjectType.Point:
-                    case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
-                        pointFeatures.Add(feature);
-                        break;
-                    case GeoJSON.Text.GeoJSONObjectType.Polygon:
-                    case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
-                        polygonFeatures.Add(feature);
-                        break;
-                    default:
-                        unknownFeatures.Add(feature);
-                        break;
-                }
-            });
-
-
             var dir = Path.GetFullPath("geojson");
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
-            Console.WriteLine($"Writing to geojson files to {dir}...");
 
-            var pointsTask = WriteFeatures(pointFeatures, Path.Combine(dir, $"Allocations.Points.geojson"));
-            var polygonsTask = WriteFeatures(polygonFeatures, Path.Combine(dir, $"Allocations.Polygons.geojson"));
-            var unknownTask = WriteFeatures(unknownFeatures, Path.Combine(dir, $"Allocations.Unknown.geojson"));
+            var tempPointsDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Points"));
+            var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Polygons"));
+            var tempUnknownDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Unknown"));
 
-            await pointsTask;
-            await polygonsTask;
-            await unknownTask;
+            var sw = Stopwatch.StartNew();
+            Console.WriteLine("Starting...");
+            try
+            {
+                var databaseContextFactory = services.Services.GetRequiredService<IDatabaseContextFactory>();
+                await using var db = databaseContextFactory.Create();
+                db.Database.SetCommandTimeout(int.MaxValue);
 
-            Console.WriteLine($"Done. Took {(int)sw.Elapsed.TotalMinutes} minutes");
+
+                bool end = false;
+                int page = 0;
+                int take = 10000;
+                while (!end)
+                {
+                    ConcurrentBag<Feature> pointFeatures = [];
+                    ConcurrentBag<Feature> polygonFeatures = [];
+                    ConcurrentBag<Feature> unknownFeatures = [];
+
+                    Console.WriteLine($"Fetching records {page * take} to {(page + 1) * take}");
+                    var sites = await db.AllocationAmountsView
+                        .AsNoTracking()
+                        .Skip(page * take)
+                        .Take(take)
+                        // .Where(s => s.SiteId == 33030553)
+                        .ToArrayAsync();
+
+                    Parallel.ForEach(sites, site =>
+                    {
+                        var properties = new Dictionary<string, object>
+                        {
+                            { "o", PipeDelimterToString(site.Owners) },
+                            { "oClass", PipeDelimiterToDistinctList(site.OwnerClassifications) },
+                            { "bu", PipeDelimiterToDistinctList(site.BeneficalUses) },
+                            { "uuid", site.SiteUuid },
+                            { "podPou", site.PodPou },
+                            { "wsType", PipeDelimiterToDistinctList(site.WaterSources) },
+                            { "st", PipeDelimiterToDistinctList(site.States) },
+                            { "xmpt", site.ExemptOfVolumeFlowPriority }
+                        };
+
+                        if (site.MinCfsFlow.HasValue) properties.Add("minFlow", site.MinCfsFlow.Value);
+                        if (site.MaxCfsFlow.HasValue) properties.Add("maxFlow", site.MaxCfsFlow.Value);
+                        if (site.MinAfVolume.HasValue) properties.Add("minVol", site.MinAfVolume.Value);
+                        if (site.MaxAfVolume.HasValue) properties.Add("maxVol", site.MaxAfVolume.Value);
+                        if (site.MinPriorityDate.HasValue)
+                            properties.Add("minPri", GetUnixTime(site.MinPriorityDate.Value)!.Value);
+                        if (site.MaxPriorityDate.HasValue)
+                            properties.Add("maxPri", GetUnixTime(site.MaxPriorityDate.Value)!.Value);
+                        var geometry = site.Geometry.AsGeoJsonGeometry();
+
+                        var feature = new Feature(geometry, properties);
+
+                        switch (geometry.Type)
+                        {
+                            case GeoJSON.Text.GeoJSONObjectType.Point:
+                            case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
+                                pointFeatures.Add(feature);
+                                break;
+                            case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                            case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                                polygonFeatures.Add(feature);
+                                break;
+                            default:
+                                unknownFeatures.Add(feature);
+                                break;
+                        }
+                    });
+
+                    var pointsTask = WriteFeatures(pointFeatures,
+                        Path.Combine(dir, "Allocations", "Points", Path.GetRandomFileName()));
+                    var polygonsTask = WriteFeatures(polygonFeatures,
+                        Path.Combine(dir, "Allocations", "Polygons", Path.GetRandomFileName()));
+                    var unknownTask = WriteFeatures(unknownFeatures,
+                        Path.Combine(dir, "Allocations", "Unknown", Path.GetRandomFileName()));
+
+                    await pointsTask;
+                    await polygonsTask;
+                    await unknownTask;
+
+                    page++;
+                    end = sites.Length < take;
+                }
+
+                Console.WriteLine("Combining temp point files...");
+                string[] pointFiles = tempPointsDir.GetFiles()
+                    .Where(f => !f.Name.Contains("DS_Store"))
+                    .Select(f => f.FullName).ToArray();
+
+                await CombineFiles(pointFiles, Path.Combine(dir, "Allocations.Points.geojson"));
+
+                Console.WriteLine("Combining temp polygons files...");
+                string[] polygonsFiles = tempPolygonsDir.GetFiles()
+                    .Where(f => !f.Name.Contains("DS_Store"))
+                    .Select(f => f.FullName).ToArray();
+
+                await CombineFiles(polygonsFiles, Path.Combine(dir, "Allocations.Polygons.geojson"));
+
+                Console.WriteLine("Combining temp unknown files...");
+                string[] unknownFiles = tempUnknownDir.GetFiles()
+                    .Where(f => !f.Name.Contains("DS_Store"))
+                    .Select(f => f.FullName).ToArray();
+
+                await CombineFiles(unknownFiles, Path.Combine(dir, "Allocations.Unknown.geojson"));
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: " + ex.Message);
+                Console.ResetColor();
+            }
+            finally
+            {
+                sw.Stop();
+                Console.WriteLine("Cleaning up temp files...");
+                Directory.Delete(tempPointsDir.FullName, true);
+                Directory.Delete(tempPolygonsDir.FullName, true);
+                Directory.Delete(tempUnknownDir.FullName, true);
+            }
+
+
+            Console.WriteLine($"Done. Took {(int) sw.Elapsed.TotalMinutes} minutes");
+        }
+
+        private static string PipeDelimterToString(string? value)
+        {
+            if (value == null) return string.Empty;
+            var distinctList = PipeDelimiterToDistinctList(value);
+            return string.Join(" ", distinctList);
+        }
+
+        private static string[] PipeDelimiterToDistinctList(string? value)
+        {
+            return value == null ? [] : value.Split("||").Distinct().ToArray();
         }
 
         private static long? GetUnixTime(DateTime? value)
@@ -168,17 +206,29 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             {
                 return null;
             }
+
             return new DateTimeOffset(value.Value).ToUnixTimeSeconds();
+        }
+
+        private static async Task CombineFiles(string[] files, string destFileName)
+        {
+            List<Feature> features = [];
+            await using Stream destStream = File.OpenWrite(destFileName);
+            foreach (var file in files)
+            {
+                var json = await File.ReadAllTextAsync(file);
+                features.AddRange(JsonSerializer.Deserialize<List<Feature>>(json) ?? []);
+            }
+
+            await JsonSerializer.SerializeAsync(destStream, features, features.GetType());
         }
 
         private static async Task WriteFeatures(ConcurrentBag<Feature> features, string path)
         {
             if (features.Any())
             {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await JsonSerializer.SerializeAsync(stream, features, features.GetType());
-                }
+                await using var stream = new FileStream(path, FileMode.Create);
+                await JsonSerializer.SerializeAsync(stream, features, features.GetType());
             }
             else if (File.Exists(path))
             {
