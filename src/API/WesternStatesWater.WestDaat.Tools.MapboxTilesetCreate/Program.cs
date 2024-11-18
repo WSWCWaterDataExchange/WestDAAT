@@ -71,8 +71,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
             {
                 var databaseContextFactory = services.Services.GetRequiredService<IDatabaseContextFactory>();
                 await using var db = databaseContextFactory.Create();
-                db.Database.SetCommandTimeout(int.MaxValue);
-
 
                 bool end = false;
                 int page = 0;
@@ -155,21 +153,30 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                     .Where(f => !f.Name.Contains("DS_Store"))
                     .Select(f => f.FullName).ToArray();
 
-                await CombineFiles(pointFiles, Path.Combine(dir, "Allocations.Points.geojson"));
+                if (pointFiles.Length > 0)
+                {
+                    await CombineFiles(pointFiles, Path.Combine(dir, "Allocations.Points.geojson"));
+                }
 
                 Console.WriteLine("Combining temp polygons files...");
                 string[] polygonsFiles = tempPolygonsDir.GetFiles()
                     .Where(f => !f.Name.Contains("DS_Store"))
                     .Select(f => f.FullName).ToArray();
 
-                await CombineFiles(polygonsFiles, Path.Combine(dir, "Allocations.Polygons.geojson"));
+                if (polygonsFiles.Length > 0)
+                {
+                    await CombineFiles(polygonsFiles, Path.Combine(dir, "Allocations.Polygons.geojson"));
+                }
 
                 Console.WriteLine("Combining temp unknown files...");
                 string[] unknownFiles = tempUnknownDir.GetFiles()
                     .Where(f => !f.Name.Contains("DS_Store"))
                     .Select(f => f.FullName).ToArray();
 
-                await CombineFiles(unknownFiles, Path.Combine(dir, "Allocations.Unknown.geojson"));
+                if (unknownFiles.Length > 0)
+                {
+                    await CombineFiles(unknownFiles, Path.Combine(dir, "Allocations.Unknown.geojson"));
+                }
             }
             catch (Exception ex)
             {
@@ -214,22 +221,9 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
         private static async Task CombineFiles(string[] files, string destFileName)
         {
-            List<Feature> features = [];
-            await using Stream destStream = File.OpenWrite(destFileName);
-            foreach (var file in files)
-            {
-                var json = await File.ReadAllTextAsync(file);
-                features.AddRange(JsonSerializer.Deserialize<List<Feature>>(json) ?? []);
-            }
-
-            await JsonSerializer.SerializeAsync(destStream, features, features.GetType());
-        }
-
-        private static async Task CombineFiles2(string[] files, string destFileName)
-        {
             using (var outputStream = File.Create(destFileName))
             {
-                using (var utf8Writer = new Utf8JsonWriter(outputStream, new JsonWriterOptions { Indented = true }))
+                using (var utf8Writer = new Utf8JsonWriter(outputStream))
                 {
                     utf8Writer.WriteStartArray();
 
@@ -252,10 +246,11 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                                 }
                             }
                         }
+
+                        await utf8Writer.FlushAsync();
                     }
 
                     utf8Writer.WriteEndArray();
-                    await utf8Writer.FlushAsync();
                 }
             }
         }
