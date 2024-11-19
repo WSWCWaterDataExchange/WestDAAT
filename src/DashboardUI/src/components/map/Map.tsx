@@ -154,11 +154,15 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     });
 
     mapInstance.on("styleimagemissing", e => {
-      const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups;
-      if (groups?.color) {
-        addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color));
+      const id = e.id as string;
+      if (id.startsWith("mapMarker")) {
+        const color = id.substring("mapMarker".length);
+        if (color) {
+          addSvgImage(mapInstance, e.id, createMapMarkerIcon(color));
+        }
       }
     });
+
 
     mapInstance.once("load", () => {
       const mapSettings: MapSettings = defaultMapLocationData;
