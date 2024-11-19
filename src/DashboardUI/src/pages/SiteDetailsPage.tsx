@@ -7,7 +7,7 @@ function SiteDetailsPage() {
     <SiteDetailsProvider>
       <Layout />
     </SiteDetailsProvider>
-  )
+  );
 }
 
 export default SiteDetailsPage;

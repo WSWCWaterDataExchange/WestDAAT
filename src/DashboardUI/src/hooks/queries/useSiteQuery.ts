@@ -5,7 +5,7 @@ import {
   getWaterSiteLocation,
   getWaterSiteSourceInfoList,
   getWaterRightInfoList,
-  getSiteDigest
+  getSiteDigest,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
@@ -16,8 +16,8 @@ export function useWaterRightsDigests(siteUuid: string) {
     ['site.waterRightsDigests', siteUuid],
     async () => await getWaterRightsDigests(siteUuid),
     {
-      enabled: !!siteUuid
-    }
+      enabled: !!siteUuid,
+    },
   );
 }
 
@@ -26,8 +26,8 @@ export function useSiteDigest(siteUuid: string) {
     ['site.siteDigest', siteUuid],
     async () => await getSiteDigest(siteUuid),
     {
-      enabled: !!siteUuid
-    }
+      enabled: !!siteUuid,
+    },
   );
 }
 
@@ -37,33 +37,45 @@ export function useWaterSiteLocation(siteUuid: string | undefined) {
     async () => await getWaterSiteLocation(siteUuid!),
     {
       enabled: !!siteUuid,
-    }
+    },
   );
 }
 
-type WaterSiteSourceInfoListOptionsType = UseQueryOptionsParameter<undefined, WaterSourceInfoListItem[]>
-export function useWaterSiteSourceInfoList(siteUuid: string | undefined, options?: WaterSiteSourceInfoListOptionsType) {
+type WaterSiteSourceInfoListOptionsType = UseQueryOptionsParameter<
+  undefined,
+  WaterSourceInfoListItem[]
+>;
+export function useWaterSiteSourceInfoList(
+  siteUuid: string | undefined,
+  options?: WaterSiteSourceInfoListOptionsType,
+) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled && !!siteUuid
-  }
+    enabled: options?.enabled && !!siteUuid,
+  };
   return useQuery(
     ['site.SourceInfoList', siteUuid],
     async () => await getWaterSiteSourceInfoList(siteUuid!),
-    setOptions
+    setOptions,
   );
 }
 
-type WaterRightInfoListOptionsType = UseQueryOptionsParameter<undefined, WaterRightInfoListItem[]>
-export function useWaterRightInfoList(siteUuid: string | undefined, options?: WaterRightInfoListOptionsType) {
+type WaterRightInfoListOptionsType = UseQueryOptionsParameter<
+  undefined,
+  WaterRightInfoListItem[]
+>;
+export function useWaterRightInfoList(
+  siteUuid: string | undefined,
+  options?: WaterRightInfoListOptionsType,
+) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled && !!siteUuid
-  }
+    enabled: options?.enabled && !!siteUuid,
+  };
   return useQuery(
     ['site.WaterRightInfoList', siteUuid],
     async () => await getWaterRightInfoList(siteUuid!),
-    setOptions
+    setOptions,
   );
 }
 
@@ -73,6 +85,6 @@ export function useSiteDetails(siteUuid: string | undefined) {
     async () => await getSiteDetails(siteUuid!),
     {
       enabled: !!siteUuid,
-    }
+    },
   );
 }

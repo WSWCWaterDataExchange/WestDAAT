@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { waterRightsProperties } from "../../config/constants";
-import useMapPopupOnClick from "./useMapPopupOnClick";
+import { useMemo } from 'react';
+import { waterRightsProperties } from '../../config/constants';
+import useMapPopupOnClick from './useMapPopupOnClick';
 
 function useSiteClickedOnMap() {
   const { updatePopup, clickedFeatures } = useMapPopupOnClick();
@@ -9,7 +9,10 @@ function useSiteClickedOnMap() {
       return undefined;
     }
 
-    const siteFeature = clickedFeatures.find(a => a.properties && a.properties[waterRightsProperties.siteUuid as string]);
+    const siteFeature = clickedFeatures.find(
+      (a) =>
+        a.properties && a.properties[waterRightsProperties.siteUuid as string],
+    );
     if (!siteFeature || !siteFeature.properties) {
       return undefined;
     }

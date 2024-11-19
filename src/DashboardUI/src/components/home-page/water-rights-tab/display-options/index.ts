@@ -1,3 +1,3 @@
-export * from "./MapTheme";
-export * from "./MapGrouping";
-export * from "./PointSize";
+export * from './MapTheme';
+export * from './MapGrouping';
+export * from './PointSize';

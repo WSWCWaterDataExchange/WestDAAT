@@ -7,7 +7,7 @@ import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
 import { useHomePageContext } from './Provider';
 import { HomePageTab } from '../../pages/HomePage';
 
-import './home-page.scss'
+import './home-page.scss';
 
 export function Layout() {
   const { downloadModal, setShowDownloadModal, uploadModal, setShowUploadModal } = useHomePageContext();
@@ -38,8 +38,7 @@ export function Layout() {
         {currentTabElement}
       </div>
 
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal} />
+      <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
       {downloadModal}{uploadModal}

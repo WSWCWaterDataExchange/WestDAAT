@@ -1,5 +1,5 @@
 import React from 'react';
-import { createContext, FC, useContext, useState } from "react";
+import { createContext, FC, useContext, useState } from 'react';
 import * as geojson from 'geojson';
 
 interface HomePageContextState {
@@ -30,7 +30,7 @@ const defaultState: HomePageContextState = {
 }
 
 const HomePageContext = createContext<HomePageContextState>(defaultState);
-export const useHomePageContext = () => useContext(HomePageContext)
+export const useHomePageContext = () => useContext(HomePageContext);
 
 export const HomePageProvider: FC = ({ children }) => {
   const [ downloadModal, setDownloadModal ] = useState<JSX.Element | undefined>(undefined);
@@ -57,4 +57,4 @@ export const HomePageProvider: FC = ({ children }) => {
       {children}
     </HomePageContext.Provider>
   );
-}
+};

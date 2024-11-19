@@ -1,13 +1,14 @@
-import React from 'react';
-import { waterRightsProperties } from "../../../../../config/constants";
-import { useEqualsFilter } from "./useEqualsFilter";
-
+import { waterRightsProperties } from '../../../../../config/constants';
+import { useEqualsFilter } from './useEqualsFilter';
 
 export function usePodPouFilter() {
-  const { value, setValue, mapFilters } = useEqualsFilter("podPou", waterRightsProperties.sitePodOrPou);
+  const { value, setValue, mapFilters } = useEqualsFilter(
+    'podPou',
+    waterRightsProperties.sitePodOrPou,
+  );
   return {
     podPou: value,
     setPodPou: setValue,
-    mapFilters
+    mapFilters,
   };
 }

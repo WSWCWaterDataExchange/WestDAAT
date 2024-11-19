@@ -30,12 +30,6 @@ export default [
       // Remove this to get a handle of the "any" violations
       '@typescript-eslint/no-explicit-any': 'off',
 
-      // Remove this to get a handle of using empty object violations
-      '@typescript-eslint/no-empty-object-type': 'off',
-
-      // Remove this to get a handle of unused variables
-      '@typescript-eslint/no-unused-vars': 'off',
-
       // Remove this to get a handle of the missing "key" prop violations
       'react/jsx-key': 'off',
 
