@@ -12,7 +12,7 @@ import {
   defaultMapLocationData,
   useMapContext,
   MapSettings,
-  MapStyle,
+  MapStyle, RenderedFeatureType,
 } from '../../contexts/MapProvider';
 import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
@@ -75,7 +75,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   const geocoderControl = useRef(
       new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
       }),
   );
 
@@ -235,10 +234,16 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(() => {
       return map
-        .queryRenderedFeatures()
-        .filter((a) => sourceIds.some((b) => a.source === b));
+          .queryRenderedFeatures()
+          .filter((feature) => sourceIds.includes(feature.source as string))
+          .map((feature) => ({
+            layer: { id: feature.layer?.id ?? '' }, // Ensure `layer.id` exists
+            source: feature.source ?? '',           // Ensure `source` exists
+            ...feature,                             // Spread other properties
+          })) as RenderedFeatureType[];
     });
   }, 500);
+
 
   const setIsMapRenderingDebounce = useDebounceCallback(
     setIsMapRendering,
@@ -318,8 +323,18 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
       await new Promise((resolve) => {
-        const currLayers = map.getStyle().layers;
-        const currSources = map.getStyle().sources;
+        const style = map.getStyle();
+
+        let currLayers: mapboxgl.Layer[] | undefined;
+        let currSources: { [key: string]: mapboxgl.AnySourceData } | undefined;
+
+        if (style && style.layers && style.sources) {
+          currLayers = style.layers;
+          currSources = style.sources;
+        } else {
+          console.warn("Map style, layers, or sources are not available.");
+        }
+
         map.once('styledata', () => {
           sourceIds?.forEach((sourceId) => {
             if (!map.getSource(sourceId)) {
@@ -340,7 +355,16 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
-      const prevStyle = map.getStyle().metadata['mapbox:origin'];
+      const style = map.getStyle();
+
+      if (!style || !style.metadata) {
+        console.warn("Map style or metadata is not available.");
+        return;
+      }
+
+      const metadata = style.metadata as { [key: string]: any };
+      const prevStyle = metadata['mapbox:origin'];
+
       if (mapStyle !== prevStyle) {
         await setStyleData(map, mapStyle);
       }
@@ -389,20 +413,27 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     vectorUrls.forEach((a) => {
       const source = map.getSource(a.source);
-      if (source.type === 'vector') {
-        if (source.url !== a.url) {
-          source.setUrl(a.url);
+      if (source && source.type === 'vector') { // Check if source is defined
+        if ((source as mapboxgl.VectorTileSource).url !== a.url) {
+          (source as mapboxgl.VectorTileSource).setUrl(a.url); // Type assertion to VectorSource
         }
       }
     });
   }, [map, vectorUrls]);
 
+
   useEffect(() => {
     if (!map) return;
     for (const key in filters) {
-      map.setFilter(key, filters[key]);
+      const filter = filters[key];
+      if (filter) { // Ensure filter is defined and valid
+        map.setFilter(key, filter as mapboxgl.FilterSpecification);
+      } else {
+        map.setFilter(key, null); // Fallback to null if the filter is invalid
+      }
     }
   }, [map, filters]);
+
 
   useEffect(() => {
     if (!map) return;
