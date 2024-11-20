@@ -32,9 +32,7 @@ interface mapProps {
   ) => void;
   handleMapFitChange?: () => void;
 }
-// Fix transpile errors. Mapbox is working on a fix for this
-(mapboxgl as any).workerClass =
-  require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
@@ -75,9 +73,10 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const geocoderControl = useRef(
-    new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-    }),
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+      }),
   );
 
   const addSvgImage = async (
