@@ -237,9 +237,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
           .queryRenderedFeatures()
           .filter((feature) => sourceIds.includes(feature.source as string))
           .map((feature) => ({
-            layer: { id: feature.layer?.id ?? '' }, // Ensure `layer.id` exists
-            source: feature.source ?? '',           // Ensure `source` exists
-            ...feature,                             // Spread other properties
+            layer: { id: feature.layer?.id ?? '' },
+            source: feature.source ?? '',
+            ...feature,
           })) as RenderedFeatureType[];
     });
   }, 500);
@@ -413,9 +413,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     vectorUrls.forEach((a) => {
       const source = map.getSource(a.source);
-      if (source && source.type === 'vector') { // Check if source is defined
+      if (source && source.type === 'vector') {
         if ((source as mapboxgl.VectorTileSource).url !== a.url) {
-          (source as mapboxgl.VectorTileSource).setUrl(a.url); // Type assertion to VectorSource
+          (source as mapboxgl.VectorTileSource).setUrl(a.url);
         }
       }
     });
@@ -426,10 +426,10 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     for (const key in filters) {
       const filter = filters[key];
-      if (filter) { // Ensure filter is defined and valid
+      if (filter) {
         map.setFilter(key, filter as mapboxgl.FilterSpecification);
       } else {
-        map.setFilter(key, null); // Fallback to null if the filter is invalid
+        map.setFilter(key, null);
       }
     }
   }, [map, filters]);
