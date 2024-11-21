@@ -1,60 +1,17 @@
 using System.Collections.Concurrent;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text.Json;
 using GeoJSON.Text.Feature;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using WesternStatesWater.WestDaat.Accessors;
+using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Engines;
-using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
 
 public static class MapboxTileset
 {
-    public static async Task CreateTilesetFiles()
+    public static async Task CreateTilesetFiles(DatabaseContext db)
     {
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Environment.CurrentDirectory)
-            .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
-            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-            .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
-            .Build();
-
-        var hostBuilder = Host.CreateDefaultBuilder();
-        var services = hostBuilder.ConfigureServices((_, services) =>
-        {
-            services.AddScoped(_ => config.GetDatabaseConfiguration());
-            services.AddScoped(_ => config.GetNldiConfiguration());
-            services.AddScoped(_ => config.GetBlobStorageConfiguration());
-            services.AddScoped(_ => config.GetPerformanceConfiguration());
-            services
-                .AddTransient<IDatabaseContextFactory,
-                    DatabaseContextFactory>();
-            services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
-            services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
-            services.AddScoped<ISiteAccessor, SiteAccessor>();
-            services.AddScoped<INldiAccessor, NldiAccessor>();
-            services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
-            services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
-            services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
-            services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
-            services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
-            services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
-            {
-                a.BaseAddress = new Uri(config.GetUsgsNldiServiceConfiguration().BaseAddress);
-            });
-            services.BuildServiceProvider();
-        }).Build();
-
         var dir = Path.GetFullPath("geojson");
         if (!Directory.Exists(dir))
         {
@@ -69,9 +26,6 @@ public static class MapboxTileset
         Console.WriteLine("Starting...");
         try
         {
-            var databaseContextFactory = services.Services.GetRequiredService<IDatabaseContextFactory>();
-            await using var db = databaseContextFactory.Create();
-
             bool end = false;
             int page = 0;
             int take = 25000;
@@ -191,6 +145,8 @@ public static class MapboxTileset
             Directory.Delete(Path.Combine(dir, "Allocations"), true);
             Console.WriteLine($"Done. Took {(int) sw.Elapsed.TotalMinutes} minutes");
         }
+
+        return;
     }
 
     private static string PipeDelimiterToString(string? value)
