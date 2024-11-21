@@ -198,7 +198,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
             // Load pattern image for the polygon fill
             mapInstance.loadImage(
-                'http://localhost:3000/map.png', // Replace with your custom pattern URL
+                'http://localhost:3000/map.jpg', // Replace with your custom pattern URL has to be in public
                 (err, image) => {
                     if (err) {
                         console.error('Error loading pattern image:', err);
@@ -209,11 +209,11 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
                     mapInstance.addImage('stripe-pattern', image!);
 
                     // Add a new layer or update an existing layer to use the pattern
-                    mapInstance.addLayer({
-                        id: 'pattern-layer', // Unique ID for the new layer
+                    mapInstance.addLayer({ //There should be a way to move this to the maps.ts
+                        id: 'pattern-layer',
                         type: 'fill',
                         source: mapSourceNames.waterRightsVectorTiles, // Update with the appropriate source ID
-                        'source-layer': 'polygons', // Update with the correct source-layer name
+                        'source-layer': 'polygons',
                         layout: {
                             visibility: 'visible',
                         },
@@ -224,8 +224,9 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
                                 ['linear'],
                                 ['zoom'],
                                 5, 0.0,
-                                10, 0.75,
-                                15, 1,
+                                9, 0.0,
+                                10, .05,
+                                15, .05, //Zoom config
                             ],
                         },
                     });
