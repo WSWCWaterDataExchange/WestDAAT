@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@mapbox/mapbox-gl-draw": "^1.4.3",
-    "@mapbox/mapbox-gl-geocoder": "^5.0.0",
-    "mapbox-gl": "^3.8.0"
-  }
-}
