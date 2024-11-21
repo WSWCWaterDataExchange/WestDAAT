@@ -143,28 +143,20 @@ const mapsJson = {
       layout: {
         visibility: 'visible',
       },
-      type: 'line',
+      type: 'fill', // Use 'fill' type instead of 'line'
       paint: {
-        'line-color': '#000000',
-        'line-opacity': [
+        'fill-pattern': 'stripe-pattern', // Use a pattern name
+        'fill-opacity': [
           'interpolate',
           ['linear'],
           ['zoom'],
-          5, 0.0,  // No opacity at zoom level 5
+          5, 0.5,  // No opacity at zoom level 5
           10, 0.5, // Higher opacity at zoom level 10
           15, 1    // Full opacity at zoom level 15
         ],
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          5, 0,   // Thin line at zoom level 5
-          10, 2,  // Moderate thickness at zoom level 10
-          15, 3   // Thicker line at zoom level 15
-        ],
-        'line-dasharray': [2, 4],
       },
     },
+
 
     {
       id: mapLayerNames.waterRightsPointsLayer,

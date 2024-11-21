@@ -10,7 +10,7 @@ import {
     RenderedFeatureType,
     useMapContext,
 } from '../../contexts/MapProvider';
-import mapConfig from '../../config/maps';
+import mapConfig, {mapSourceNames} from '../../config/maps';
 import {mdiMapMarker} from '@mdi/js';
 import {Canvg, presets} from 'canvg';
 import {useDrop} from 'react-dnd';
@@ -160,7 +160,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
             );
             mapInstance.zoomTo(mapSettings.zoomLevel);
 
-            mapInstance.addControl(new NavigationControl({showCompass: false}));
+            mapInstance.addControl(new NavigationControl({ showCompass: false }));
 
             if (handleMapFitChange)
                 mapInstance.addControl(new CustomFitControl(handleMapFitChange));
@@ -196,14 +196,51 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
                 setCoords(e.lngLat.wrap());
             });
 
+            // Load pattern image for the polygon fill
+            mapInstance.loadImage(
+                'http://localhost:3000/map.png', // Replace with your custom pattern URL
+                (err, image) => {
+                    if (err) {
+                        console.error('Error loading pattern image:', err);
+                        return;
+                    }
+
+                    // Add the pattern image to the map style
+                    mapInstance.addImage('stripe-pattern', image!);
+
+                    // Add a new layer or update an existing layer to use the pattern
+                    mapInstance.addLayer({
+                        id: 'pattern-layer', // Unique ID for the new layer
+                        type: 'fill',
+                        source: mapSourceNames.waterRightsVectorTiles, // Update with the appropriate source ID
+                        'source-layer': 'polygons', // Update with the correct source-layer name
+                        layout: {
+                            visibility: 'visible',
+                        },
+                        paint: {
+                            'fill-pattern': 'stripe-pattern', // Use the registered pattern name
+                            'fill-opacity': [
+                                'interpolate',
+                                ['linear'],
+                                ['zoom'],
+                                5, 0.0,
+                                10, 0.75,
+                                15, 1,
+                            ],
+                        },
+                    });
+                }
+            );
+
             mapConfig.sources.forEach((a) => {
-                const {id, ...src} = a;
+                const { id, ...src } = a;
                 mapInstance.addSource(id, src as AnySourceData);
             });
 
             mapConfig.layers.forEach((a: any) => {
                 mapInstance.addLayer(a);
             });
+
             mapInstance.resize();
             setMap(mapInstance);
         });
