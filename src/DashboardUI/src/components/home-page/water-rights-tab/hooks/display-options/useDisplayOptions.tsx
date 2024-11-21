@@ -11,6 +11,7 @@ import { useAlerts } from '../useAlerts';
 const allWaterRightsLayers = [
   mapLayerNames.waterRightsPointsLayer,
   mapLayerNames.waterRightsPolygonsLayer,
+    mapLayerNames.waterRightsPolygonsOutlineLayer //add this so outlines default to on
 ];
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
@@ -25,7 +26,7 @@ export function useDisplayOptions() {
   const { setVisibleLayers } = useMapContext();
 
   useEffect(() => {
-    const visible = [...allWaterRightsLayers];
+    const visible = [...allWaterRightsLayers, ]; //This is where default layers are set
     if ((riverBasinNames?.length ?? 0) > 0)
       visible.push(mapLayerNames.riverBasinsLayer);
     if (isNldiFilterActive) visible.push(...nldiLayers);

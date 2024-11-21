@@ -22,8 +22,14 @@ function DetailsMap(props: detailsMapProps) {
     setVisibleLayers([
       mapLayerNames.siteLocationsPointsLayer,
       mapLayerNames.siteLocationsPolygonsLayer,
+      mapLayerNames.siteLocationsPolygonsOutlineLayer, // Directly reference the outline layer
+      mapLayerNames.waterRightsPolygonsLayer,
+      mapLayerNames.waterRightsPolygonsOutlineLayer, // Directly reference the outline layer
     ]);
   }, [setVisibleLayers]);
+
+
+
 
   useEffect(() => {
     setGeoJsonData(mapSourceNames.detailsMapGeoJson, props.mapData);

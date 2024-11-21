@@ -3,13 +3,16 @@ import { nldi, pointSizes, waterRightsProperties } from './constants';
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
   waterRightsPolygonsLayer: 'waterRightsPolygons',
+  waterRightsPolygonsOutlineLayer: 'waterRightsPolygons-outline', // Added outline layer
   riverBasinsLayer: 'river-basins',
   siteLocationsPolygonsLayer: 'site-locations-polygons',
+  siteLocationsPolygonsOutlineLayer: 'site-locations-polygons-outline', // Added outline layer
   siteLocationsPointsLayer: 'site-locations-points',
   nldiFlowlinesLayer: 'nldi-flowlines',
   nldiUsgsPointsLayer: 'nldi-usgs-points',
   nldiUsgsLocationLayer: 'nldi-usgs-location',
 };
+
 
 export const mapSourceNames = {
   waterRightsVectorTiles: 'water-rights-vector-tiles',
@@ -133,6 +136,36 @@ const mapsJson = {
         'fill-opacity': 0.5,
       },
     },
+    {
+      id: mapLayerNames.waterRightsPolygonsOutlineLayer,
+      'source-layer': 'polygons',
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'line',
+      paint: {
+        'line-color': '#000000',
+        'line-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          5, 0.0,  // No opacity at zoom level 5
+          10, 0.5, // Higher opacity at zoom level 10
+          15, 1    // Full opacity at zoom level 15
+        ],
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          5, 0,   // Thin line at zoom level 5
+          10, 2,  // Moderate thickness at zoom level 10
+          15, 3   // Thicker line at zoom level 15
+        ],
+        'line-dasharray': [2, 4],
+      },
+    },
+
     {
       id: mapLayerNames.waterRightsPointsLayer,
       friendlyName: 'Water Rights Points',

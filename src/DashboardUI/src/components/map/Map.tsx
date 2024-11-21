@@ -300,14 +300,15 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
     useEffect(() => {
         if (!map) return;
-        (mapConfig as any).layers.forEach((a: AnyLayer) => {
-            map.setLayoutProperty(
-                a.id,
-                'visibility',
-                visibleLayers.some((b) => b === a.id) ? 'visible' : 'none',
-            );
+
+        mapConfig.layers.forEach((layer) => {
+            const visibility = visibleLayers.includes(layer.id) ? 'visible' : 'none';
+            console.log(`Setting layer visibility: ${layer.id} -> ${visibility}`);
+            map.setLayoutProperty(layer.id, 'visibility', visibility);
         });
-    }, [map, visibleLayers, setMapRenderedFeatures]);
+    }, [map, visibleLayers]);
+
+
 
     const [debouncedStyleFlag] = useDebounce(styleFlag, 100);
     useEffect(() => {
