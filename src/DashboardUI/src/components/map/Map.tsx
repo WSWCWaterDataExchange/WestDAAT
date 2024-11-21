@@ -198,7 +198,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
             // Load pattern image for the polygon fill
             mapInstance.loadImage(
-                'http://localhost:3000/map.jpg', // Replace with your custom pattern URL has to be in public
+                'http://localhost:3000/stripes.png', // Replace with your custom pattern URL has to be in public
                 (err, image) => {
                     if (err) {
                         console.error('Error loading pattern image:', err);
@@ -225,8 +225,8 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
                                 ['zoom'],
                                 5, 0.0,
                                 9, 0.0,
-                                10, .05,
-                                15, .05, //Zoom config
+                                10, .01,
+                                15, .01, //Zoom config
                             ],
                         },
                     });
