@@ -31,7 +31,8 @@ namespace WesternStatesWater.WestDaat.Accessors
                 RiverBasins = RiverBasinConstants.RiverBasinNames.ToArray(),
                 SiteTypes = await db.SiteType.GetControlledVocabularyNames(),
                 States = await db.State.GetControlledVocabularyNames(),
-                WaterSources = await db.WaterSourceType.GetControlledVocabularyNames()
+                WaterSources = await db.WaterSourceType.GetControlledVocabularyNames(),
+                Overlay = await db.RegulatoryOverlayType.GetControlledVocabularyNames()
             };
         }
 
