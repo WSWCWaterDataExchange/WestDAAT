@@ -12,6 +12,9 @@ public class AllocationAmountsView
     public string PodPou { get; init; }
     public string WaterSources { get; init; }
     public string States { get; init; }
+    public string LegalStatus { get; init; }
+    public string SiteType { get; init; }
+    public string AllocationType { get; init; }
     public bool ExemptOfVolumeFlowPriority { get; init; }
     public double? MinCfsFlow { get; init; }
     public double? MaxCfsFlow { get; init; }

@@ -572,6 +572,9 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.PodPou).HasColumnName("podPou");
                 entity.Property(e => e.WaterSources).HasColumnName("wsType");
                 entity.Property(e => e.States).HasColumnName("st");
+                entity.Property(e => e.LegalStatus).HasColumnName("ls");
+                entity.Property(e => e.SiteType).HasColumnName("sType");
+                entity.Property(e => e.AllocationType).HasColumnName("allocType");
                 entity.Property(e => e.ExemptOfVolumeFlowPriority).HasColumnName("xmpt");
                 entity.Property(e => e.MinCfsFlow).HasColumnName("minCfsFlow");
                 entity.Property(e => e.MaxCfsFlow).HasColumnName("maxCfsFlow");

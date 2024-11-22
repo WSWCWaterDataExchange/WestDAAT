@@ -92,6 +92,42 @@ public class AllocationPointTests
         _db.OwnerClassificationCv.AddRange(armyClassification);
         await _db.SaveChangesAsync();
         ////////////////////////////////////////////////
+        
+        var legalStatusPending = new LegalStatusCVFaker()
+            .RuleFor(r => r.Name, "Pending")
+            .RuleFor(r => r.WaDEName, "Pending")
+            .Generate();
+        var legalStatusClaimed = new LegalStatusCVFaker()
+            .RuleFor(r => r.Name, "Claimed")
+            .RuleFor(r => r.WaDEName, "Claimed")
+            .Generate();
+        _db.LegalStatus.AddRange(legalStatusPending, legalStatusClaimed);
+        await _db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
+
+        var siteTypeDitch = new SiteTypeFaker()
+            .RuleFor(r => r.Name, "Canal")
+            .RuleFor(r => r.WaDEName, "Canal / Ditch / Diversion")
+            .Generate();
+        var siteTypeCanal = new SiteTypeFaker()
+            .RuleFor(r => r.Name, "Ditch")
+            .RuleFor(r => r.WaDEName, "Canal / Ditch / Diversion")
+            .Generate();
+        _db.SiteType.AddRange(siteTypeDitch, siteTypeCanal);
+        await _db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
+        
+        var allocationTypeAllClaim = new WaterAllocationTypeCVFaker()
+            .RuleFor(r => r.Name, "All_Claim")
+            .RuleFor(r => r.WaDEName, "Claim")
+            .Generate();
+        var allocationTypeClaimAmmendment = new WaterAllocationTypeCVFaker()
+            .RuleFor(r => r.Name, "All_ClaimAmendment")
+            .RuleFor(r => r.WaDEName, "Claim")
+            .Generate();
+        _db.WaterAllocationType.AddRange(allocationTypeAllClaim, allocationTypeClaimAmmendment);
+        await _db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
 
         var utahDivisionOrganization = new OrganizationsDimFaker()
             .RuleFor(r => r.OrganizationName, "Utah Division of Water Rights")
@@ -109,6 +145,8 @@ public class AllocationPointTests
         var utahSitePouAllocation = new SitesDimFaker()
             .RuleFor(r => r.SiteUuid, "utah_site_one_allocation")
             .RuleFor(r => r.PODorPOUSite, "POU")
+            .RuleFor(r => r.SiteTypeCv, siteTypeDitch.Name)
+            .RuleFor(r => r.SiteTypeCvNavigation, siteTypeDitch)
             .RuleFor(r => r.Geometry, isPoint ? Point.Empty : Polygon.Empty)
             .Generate();
         _db.SitesDim.AddRange(utahSitePouAllocation);
@@ -128,6 +166,10 @@ public class AllocationPointTests
             .RuleFor(r => r.OwnerClassificationCV, armyClassification.Name)
             .RuleFor(r => r.OrganizationId, utahDivisionOrganization.OrganizationId)
             .RuleFor(r => r.Organization, utahDivisionOrganization)
+            .RuleFor(r => r.AllocationLegalStatusCv, legalStatusPending.Name)
+            .RuleFor(r => r.AllocationLegalStatusCvNavigation, legalStatusPending)
+            .RuleFor(r => r.AllocationTypeCv, allocationTypeAllClaim.Name)
+            .RuleFor(r => r.AllocationTypeCvNavigation, allocationTypeAllClaim)
             .RuleFor(r => r.ExemptOfVolumeFlowPriority, true)
             .RuleFor(r => r.AllocationFlow_CFS, 1)
             .RuleFor(r => r.AllocationVolume_AF, 10)
@@ -164,6 +206,9 @@ public class AllocationPointTests
         siteWithOneAllocation.properties.podPou.Should().Be("POU");
         siteWithOneAllocation.properties.wsType.Should().BeEquivalentTo("Groundwater");
         siteWithOneAllocation.properties.st.Should().BeEquivalentTo("UT");
+        siteWithOneAllocation.properties.ls.Should().BeEquivalentTo("Pending");
+        siteWithOneAllocation.properties.allocType.Should().BeEquivalentTo("Claim");
+        siteWithOneAllocation.properties.sType.Should().BeEquivalentTo("Canal / Ditch / Diversion");
         siteWithOneAllocation.properties.xmpt.Should().Be(true);
         siteWithOneAllocation.properties.minFlow.Should().Be(1);
         siteWithOneAllocation.properties.maxFlow.Should().Be(1);
@@ -476,6 +521,9 @@ public class AllocationPointTests
         public string podPou { get; set; }
         public string[] wsType { get; set; }
         public string[] st { get; set; }
+        public string[] ls { get; set; }
+        public string[] sType { get; set; }
+        public string[] allocType { get; set; }
         public bool xmpt { get; set; }
         public double? minFlow { get; set; }
         public double? maxFlow { get; set; }

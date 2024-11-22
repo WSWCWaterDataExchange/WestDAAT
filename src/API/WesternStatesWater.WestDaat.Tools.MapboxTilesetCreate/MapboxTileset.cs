@@ -55,7 +55,10 @@ public static class MapboxTileset
                         { "podPou", site.PodPou },
                         { "wsType", PipeDelimiterToDistinctList(site.WaterSources) },
                         { "st", PipeDelimiterToDistinctList(site.States) },
-                        { "xmpt", site.ExemptOfVolumeFlowPriority }
+                        { "xmpt", site.ExemptOfVolumeFlowPriority },
+                        { "ls", PipeDelimiterToDistinctList(site.LegalStatus) },
+                        { "sType", PipeDelimiterToDistinctList(site.SiteType) },
+                        { "allocType", PipeDelimiterToDistinctList(site.AllocationType) }
                     };
 
                     if (site.MinCfsFlow.HasValue) properties.Add("minFlow", site.MinCfsFlow.Value);
