@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import mapboxgl, { AnyLayer, AnySourceData, LngLat, NavigationControl } from 'mapbox-gl';
+import mapboxgl, { LayerSpecification, GeoJSONSourceSpecification, LngLat, NavigationControl } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
@@ -207,7 +207,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       mapConfig.sources.forEach((a) => {
         const { id, ...src } = a;
-        mapInstance.addSource(id, src as AnySourceData);
+        mapInstance.addSource(id, src as GeoJSONSourceSpecification);
       });
 
       mapConfig.layers.forEach((a: any) => {
@@ -301,7 +301,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   useEffect(() => {
     if (!map) return;
-    (mapConfig as any).layers.forEach((a: AnyLayer) => {
+    (mapConfig as any).layers.forEach((a: LayerSpecification) => {
       map.setLayoutProperty(a.id, 'visibility', visibleLayers.some((b) => b === a.id) ? 'visible' : 'none');
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
@@ -317,12 +317,12 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         map.once('styledata', () => {
           sourceIds?.forEach((sourceId) => {
             if (!map.getSource(sourceId)) {
-              map.addSource(sourceId, currSources?.[sourceId] as AnySourceData);
+              map.addSource(sourceId, currSources?.[sourceId] as GeoJSONSourceSpecification);
             }
           });
           layerIds?.forEach((layerId) => {
             if (!map.getLayer(layerId)) {
-              map.addLayer(currLayers?.find((a) => a.id === layerId) as AnyLayer);
+              map.addLayer(currLayers?.find((a) => a.id === layerId) as LayerSpecification);
             }
           });
 
