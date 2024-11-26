@@ -146,21 +146,15 @@ const mapsJson = {
       type: 'line',
       paint: {
         'line-color': '#000000',
-        'line-opacity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          5, 0.0,  // No opacity at zoom level 5
-          10, 0.5, // Higher opacity at zoom level 10
-          15, 1    // Full opacity at zoom level 15
-        ],
         'line-width': [
           'interpolate',
           ['linear'],
           ['zoom'],
-          5, 0,   // Thin line at zoom level 5
-          10, 2,  // Moderate thickness at zoom level 10
-          15, 3   // Thicker line at zoom level 15
+            3.9,0,
+            4,.5,
+          5, .5,
+          10, 2,
+          15, 3
         ],
         'line-dasharray': [2, 4],
       },
