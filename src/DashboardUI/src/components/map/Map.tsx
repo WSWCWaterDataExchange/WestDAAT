@@ -239,8 +239,10 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(() => {
       return map
-        .queryRenderedFeatures()
-        .filter((feature) => sourceIds.includes(feature.source)) as RenderedFeatureType[];
+          .queryRenderedFeatures()
+          .filter((feature) => {
+            return feature.source && sourceIds.includes(feature.source);
+          }) as RenderedFeatureType[];
     });
   }, 500);
 
