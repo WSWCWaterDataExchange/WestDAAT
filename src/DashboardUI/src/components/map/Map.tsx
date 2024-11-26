@@ -1,31 +1,36 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl, {
   AnyLayer,
   AnySourceData,
   LngLat,
   NavigationControl,
-} from 'mapbox-gl';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { useAppContext } from '../../contexts/AppProvider';
+} from "mapbox-gl";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { useAppContext } from "../../contexts/AppProvider";
 import {
   defaultMapLocationData,
   useMapContext,
   MapSettings,
   MapStyle,
-} from '../../contexts/MapProvider';
-import mapConfig from '../../config/maps';
-import { mdiMapMarker } from '@mdi/js';
+} from "../../contexts/MapProvider";
+import mapConfig from "../../config/maps";
+import { mdiMapMarker } from "@mdi/js";
 import { Canvg, presets } from "canvg";
 import { useDrop } from "react-dnd";
 import { useDebounce, useDebounceCallback } from "@react-hook/debounce";
 import { CustomShareControl } from "./CustomShareControl";
 import { CustomFitControl } from "./CustomFitControl";
 import ReactDOM from "react-dom";
-import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from "geojson";
+import {
+  FeatureCollection,
+  Feature,
+  GeoJsonProperties,
+  Geometry,
+} from "geojson";
 import { useHomePageContext } from "../home-page/Provider";
 
-import './map.scss';
+import "./map.scss";
 interface mapProps {
   handleMapDrawnPolygonChange?: (
     polygons: Feature<Geometry, GeoJsonProperties>[],
@@ -35,13 +40,15 @@ interface mapProps {
 
 // Fix transpile errors. Mapbox is working on a fix for this
 (mapboxgl as any).workerClass =
-  require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+  require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
 
-function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
-  const { authenticationContext: {isAuthenticated} } = useAppContext();
+function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
+  const {
+    authenticationContext: { isAuthenticated },
+  } = useAppContext();
   const {
     legend,
     mapStyle,
@@ -87,7 +94,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     svg: string,
   ): Promise<void> => {
     const canvas = new OffscreenCanvas(24, 24);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (ctx != null) {
       const v = await Canvg.from(ctx as any, svg, presets.offscreen() as any);
       await v.render();
@@ -134,19 +141,23 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
         handleMapDrawnPolygonChange(dc.getAll().features);
     };
 
-    mapInstance.on('draw.create', callback);
-    mapInstance.on('draw.update', callback);
-    mapInstance.on('draw.delete', callback);
+    mapInstance.on("draw.create", callback);
+    mapInstance.on("draw.update", callback);
+    mapInstance.on("draw.delete", callback);
 
     setDrawControl(dc);
   };
 
-  const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
+  const uploadGeoJsonToMapbox = (
+    geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>,
+  ) => {
     if (drawControl && geoJsonData.features) {
       drawControl.deleteAll();
-      geoJsonData.features.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
-        drawControl.add(feature);
-      });
+      geoJsonData.features.forEach(
+        (feature: Feature<Geometry, GeoJsonProperties>) => {
+          drawControl.add(feature);
+        },
+      );
 
       const features = drawControl.getAll().features;
       if (features.length > 0) {
@@ -154,7 +165,6 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       }
     }
   };
-
 
   useEffect(() => {
     if (map && uploadedGeoJSON) {
@@ -164,23 +174,22 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
   useEffect(() => {
     setIsMapRendering(true);
-    mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
+    mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || "";
     const mapInstance = new mapboxgl.Map({
-      container: 'map',
+      container: "map",
       style: `mapbox://styles/mapbox/${mapStyle}`,
       center: [-100, 40],
       zoom: 4,
     });
 
-    mapInstance.on("styleimagemissing", e => {
-      const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups
-      if(groups?.color){
-        addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color))
+    mapInstance.on("styleimagemissing", (e) => {
+      const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups;
+      if (groups?.color) {
+        addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color));
       }
     });
 
-
-    mapInstance.once('load', () => {
+    mapInstance.once("load", () => {
       const mapSettings: MapSettings = defaultMapLocationData;
       mapInstance.setCenter(
         new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude),
@@ -189,16 +198,17 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
       mapInstance.addControl(new NavigationControl({ showCompass: false }));
 
-      if (handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
+      if (handleMapFitChange)
+        mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
       mapboxDrawControl(mapInstance);
 
-      mapInstance.on('render', () => {
+      mapInstance.on("render", () => {
         setIsMapRenderingDebounce(true);
       });
-      mapInstance.on('idle', () => {
+      mapInstance.on("idle", () => {
         setMapRenderedFeatures(mapInstance);
         setIsMapRenderingDebounce(false);
       });
@@ -214,10 +224,10 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
         };
         setMapLocationSettings(mapSettings);
       };
-      mapInstance.on('dragend', locationChangedEvent);
-      mapInstance.on('zoomend', locationChangedEvent);
+      mapInstance.on("dragend", locationChangedEvent);
+      mapInstance.on("zoomend", locationChangedEvent);
 
-      mapInstance.on('mousemove', (e) => {
+      mapInstance.on("mousemove", (e) => {
         setCoords(e.lngLat.wrap());
       });
 
@@ -270,7 +280,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     if (!map) return;
     setMapRenderedFeatures(map);
     mapConfig.layers.forEach((a) => {
-      map.on('click', a.id, (e) => {
+      map.on("click", a.id, (e) => {
         if (e.features && e.features.length > 0) {
           setMapClickedFeatures({
             latitude: e.lngLat.lat,
@@ -281,14 +291,14 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
         }
       });
 
-      map.on('mouseenter', a.id, (e) => {
+      map.on("mouseenter", a.id, (e) => {
         if (e.features && e.features.length > 0) {
-          map.getCanvas().style.cursor = 'pointer';
+          map.getCanvas().style.cursor = "pointer";
         }
       });
 
-      map.on('mouseleave', a.id, () => {
-        map.getCanvas().style.cursor = '';
+      map.on("mouseleave", a.id, () => {
+        map.getCanvas().style.cursor = "";
       });
     });
   }, [map, setMapRenderedFeatures, setMapClickedFeatures]);
@@ -302,11 +312,14 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
         .setLngLat({
           lat: mapPopup.latitude,
-          lng: mapPopup.longitude
+          lng: mapPopup.longitude,
         })
         .setHTML("<div id='mapboxPopupId'></div>")
-        .once('open', () => {
-          ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
+        .once("open", () => {
+          ReactDOM.render(
+            mapPopup.element,
+            document.getElementById("mapboxPopupId"),
+          );
         })
         .addTo(map);
     } else {
@@ -324,8 +337,8 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     (mapConfig as any).layers.forEach((a: AnyLayer) => {
       map.setLayoutProperty(
         a.id,
-        'visibility',
-        visibleLayers.some((b) => b === a.id) ? 'visible' : 'none',
+        "visibility",
+        visibleLayers.some((b) => b === a.id) ? "visible" : "none",
       );
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
@@ -337,7 +350,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       await new Promise((resolve) => {
         const currLayers = map.getStyle().layers;
         const currSources = map.getStyle().sources;
-        map.once('styledata', () => {
+        map.once("styledata", () => {
           sourceIds?.forEach((sourceId) => {
             if (!map.getSource(sourceId)) {
               map.addSource(sourceId, currSources?.[sourceId] as AnySourceData);
@@ -357,7 +370,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
-      const prevStyle = map.getStyle().metadata['mapbox:origin'];
+      const prevStyle = map.getStyle().metadata["mapbox:origin"];
       if (mapStyle !== prevStyle) {
         await setStyleData(map, mapStyle);
       }
@@ -396,7 +409,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     if (!map) return;
     geoJsonData.forEach((a) => {
       const source = map.getSource(a.source);
-      if (source?.type === 'geojson') {
+      if (source?.type === "geojson") {
         source.setData(a.data);
       }
     });
@@ -406,7 +419,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
     if (!map) return;
     vectorUrls.forEach((a) => {
       const source = map.getSource(a.source);
-      if (source.type === 'vector') {
+      if (source.type === "vector") {
         if (source.url !== a.url) {
           source.setUrl(a.url);
         }
@@ -424,35 +437,35 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   useEffect(() => {
     if (!map) return;
     for (const key in circleColors) {
-      map.setPaintProperty(key, 'circle-color', circleColors[key]);
+      map.setPaintProperty(key, "circle-color", circleColors[key]);
     }
   }, [map, circleColors]);
 
   useEffect(() => {
     if (!map) return;
     for (const key in circleRadii) {
-      map.setPaintProperty(key, 'circle-radius', circleRadii[key]);
+      map.setPaintProperty(key, "circle-radius", circleRadii[key]);
     }
   }, [map, circleRadii]);
 
   useEffect(() => {
     if (!map) return;
     for (const key in circleSortKeys) {
-      map.setLayoutProperty(key, 'circle-sort-key', circleSortKeys[key]);
+      map.setLayoutProperty(key, "circle-sort-key", circleSortKeys[key]);
     }
   }, [map, circleSortKeys]);
 
   useEffect(() => {
     if (!map) return;
     for (const key in fillColors) {
-      map.setPaintProperty(key, 'fill-color', fillColors[key]);
+      map.setPaintProperty(key, "fill-color", fillColors[key]);
     }
   }, [map, fillColors]);
 
   useEffect(() => {
     if (!map) return;
     for (const key in iconImages) {
-      map.setLayoutProperty(key, 'icon-image', iconImages[key]);
+      map.setLayoutProperty(key, "icon-image", iconImages[key]);
     }
   }, [map, iconImages]);
 
@@ -484,7 +497,7 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
   }, [map, mapBoundSettings]);
 
   const [, dropRef] = useDrop({
-    accept: 'nldiMapPoint',
+    accept: "nldiMapPoint",
     drop: () =>
       coords ? { latitude: coords.lat, longitude: coords.lng } : undefined,
     collect: () => {},
@@ -492,11 +505,11 @@ function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
 
   const legendClass = useMemo(() => {
     return {
-      [MapStyle.Dark]: 'legend-dark',
-      [MapStyle.Light]: 'legend-light',
-      [MapStyle.Outdoor]: 'legend-light',
-      [MapStyle.Street]: 'legend-light',
-      [MapStyle.Satellite]: 'legend-light',
+      [MapStyle.Dark]: "legend-dark",
+      [MapStyle.Light]: "legend-light",
+      [MapStyle.Outdoor]: "legend-light",
+      [MapStyle.Street]: "legend-light",
+      [MapStyle.Satellite]: "legend-light",
     }[mapStyle];
   }, [mapStyle]);
 
