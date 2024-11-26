@@ -18,10 +18,10 @@ import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { useHomePageContext } from '../home-page/Provider';
 
 import './map.scss';
-
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
@@ -59,11 +59,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setMapClickedFeatures,
     setIsMapRendering,
   } = useMapContext();
+
+  const { uploadedGeoJSON } = useHomePageContext();
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
-  const [coords, setCoords] = useState(null as LngLat | null);
+  const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
   const [styleFlag, setStyleFlag] = useState(0);
+  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const geocoderControl = useRef(
@@ -76,8 +78,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     const canvas = new OffscreenCanvas(24, 24);
     const ctx = canvas.getContext('2d');
     if (ctx != null) {
-      // ctx and presets.offscreen() don't match the types in the Canvg library.
-      // ESLint is throwing an error here. Casting to any for now to get it to build.
       const v = await Canvg.from(ctx as any, svg, presets.offscreen() as any);
       await v.render();
 
@@ -129,6 +129,26 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setDrawControl(dc);
   };
 
+  const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
+    if (drawControl && geoJsonData.features) {
+      drawControl.deleteAll();
+      geoJsonData.features.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
+        drawControl.add(feature);
+      });
+
+      const features = drawControl.getAll().features;
+      if (features.length > 0) {
+        handleMapDrawnPolygonChange?.(features);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (map && uploadedGeoJSON) {
+      uploadGeoJsonToMapbox(uploadedGeoJSON);
+    }
+  }, [map, uploadedGeoJSON]);
+
   useEffect(() => {
     setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -155,7 +175,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       if (handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
-
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
       mapboxDrawControl(mapInstance);
@@ -221,7 +240,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setRenderedFeatures(() => {
       return map
         .queryRenderedFeatures()
-        .filter((feature) => sourceIds.includes(feature.source as string)) as RenderedFeatureType[];
+        .filter((feature) => sourceIds.includes(feature.source)) as RenderedFeatureType[];
     });
   }, 500);
 

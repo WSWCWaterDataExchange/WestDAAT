@@ -5,22 +5,15 @@ import SiteNavbar from '../SiteNavbar';
 import FeedbackModal from '../FeedbackModal';
 import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
 import { useHomePageContext } from './Provider';
-import { HomePageTab } from '../../pages/HomePage';
-
 import './home-page.scss';
 
 export function Layout() {
-  const { downloadModal, setShowDownloadModal } = useHomePageContext();
-  const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
+  const { downloadModal, setShowDownloadModal, uploadModal, setShowUploadModal } = useHomePageContext();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const shouldShowFeedbackModal = (show: boolean) => {
     setShowFeedbackModal(show);
   };
-
-  useEffect(() => {
-    document.title = `WestDAAT - ${currentTab}`;
-  }, [currentTab]);
 
   const currentTabElement = useMemo(() => {
     return <WaterRightsTab />;
@@ -29,10 +22,8 @@ export function Layout() {
   return (
     <div className="home-page d-flex flex-column">
       <SiteNavbar
-        onTabClick={setCurrentTab}
-        currentTab={currentTab}
         showDownloadModal={setShowDownloadModal}
-      />
+        showUploadModal={setShowUploadModal} />
 
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
         {currentTabElement}
@@ -40,11 +31,8 @@ export function Layout() {
 
       <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
-      <FeedbackModal
-        show={showFeedbackModal}
-        setShow={shouldShowFeedbackModal}
-      />
-      {downloadModal}
+      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
+      {downloadModal}{uploadModal}
     </div>
   );
 }
