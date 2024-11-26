@@ -33,7 +33,8 @@ export const defaultPointCircleRadius = [
 
 const defaultPointPaintConfiguration = {
   'circle-radius': defaultPointCircleRadius,
-  'circle-stroke-width': 1,
+  'circle-stroke-width': 2,
+  'circle-stroke-color': 'white',
   'circle-stroke-opacity': [
     'interpolate',
     ['linear'],
