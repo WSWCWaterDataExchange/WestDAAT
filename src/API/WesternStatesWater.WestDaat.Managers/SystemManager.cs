@@ -26,7 +26,6 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             var filters = await _systemAccessor.LoadFilters();
             return filters.Map<DashboardFilters>();
-          //  return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();
         }
 
         public List<string> GetRiverBasinNames()
