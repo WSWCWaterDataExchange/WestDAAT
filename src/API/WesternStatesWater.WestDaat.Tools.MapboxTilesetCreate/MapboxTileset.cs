@@ -49,7 +49,7 @@ public static class MapboxTileset
         {
             bool end = false;
             int page = 0;
-            int take = 25000;
+            int take = 10000;
             long lastSiteId = 0;
             while (!end)
             {
