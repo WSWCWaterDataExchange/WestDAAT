@@ -1,5 +1,5 @@
 {
   "Database": {
-    "ConnectionString": "Server=localhost;User Id=sa;password=DevP@ssw0rd!;Initial Catalog=WaDE2Test;TrustServerCertificate=True"
+    "ConnectionString": "Server=localhost;User Id=sa;password=DevP@ssw0rd!;Initial Catalog=WaDE2;TrustServerCertificate=True"
   }
 }
