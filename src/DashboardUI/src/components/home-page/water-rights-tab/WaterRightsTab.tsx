@@ -6,14 +6,15 @@ import TableView from '../TableView';
 import { useWaterRightsContext, WaterRightsProvider } from './Provider';
 import SideBar from './SideBar';
 import Map from '../../map/Map';
-import { useDisplayOptions } from './hooks/display-options/useDisplayOptions';
-import { useFilters } from './hooks/filters/useFilters';
-import { useMapUrlParameters } from '../hooks/useMapUrlParameters';
-import { usePolylinesFilter } from './hooks/filters/usePolylinesFilter';
-import DownloadModal from './DownloadModal';
-import { useEffect } from 'react';
-import { useHomePageContext } from '../Provider';
-import { useMapFitRequested } from './hooks/useMapFitRequested';
+import { useDisplayOptions } from "./hooks/display-options/useDisplayOptions";
+import { useFilters } from "./hooks/filters/useFilters";
+import { useMapUrlParameters } from "../hooks/useMapUrlParameters";
+import { usePolylinesFilter } from "./hooks/filters/usePolylinesFilter";
+import DownloadModal from "./DownloadModal";
+import UploadModal from "./UploadModal"
+import { useEffect } from "react";
+import { useHomePageContext } from "../Provider";
+import { useMapFitRequested } from "./hooks/useMapFitRequested";
 
 export function WaterRightsTab() {
   return (
@@ -30,8 +31,9 @@ function WaterRightsLayout() {
   useFilters();
   useMapUrlParameters();
   useDownloadModal();
-  const { polylinesOnMapUpdated } = usePolylinesFilter();
-  const { handleMapFitRequested } = useMapFitRequested();
+  useUploadModal();
+  const {polylinesOnMapUpdated} = usePolylinesFilter();
+  const {handleMapFitRequested} = useMapFitRequested();
   return (
     <>
       <SidePanel>
@@ -54,4 +56,11 @@ function useDownloadModal() {
   useEffect(() => {
     setDownloadModal(<DownloadModal filters={filters} nldiIds={nldiIds} />);
   }, [filters, nldiIds, setDownloadModal]);
+}
+
+function useUploadModal() {
+    const { setUploadModal } = useHomePageContext();
+    useEffect(() => {
+        setUploadModal(<UploadModal/>);
+    }, [setUploadModal]);
 }

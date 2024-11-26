@@ -16,22 +16,23 @@ import {
 } from '../../contexts/MapProvider';
 import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
-import { Canvg, presets } from 'canvg';
-import { useDrop } from 'react-dnd';
-import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
-import { CustomShareControl } from './CustomShareControl';
-import { CustomFitControl } from './CustomFitControl';
-import ReactDOM from 'react-dom';
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { Canvg, presets } from "canvg";
+import { useDrop } from "react-dnd";
+import { useDebounce, useDebounceCallback } from "@react-hook/debounce";
+import { CustomShareControl } from "./CustomShareControl";
+import { CustomFitControl } from "./CustomFitControl";
+import ReactDOM from "react-dom";
+import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from "geojson";
+import { useHomePageContext } from "../home-page/Provider";
 
 import './map.scss';
-
 interface mapProps {
   handleMapDrawnPolygonChange?: (
     polygons: Feature<Geometry, GeoJsonProperties>[],
   ) => void;
   handleMapFitChange?: () => void;
 }
+
 // Fix transpile errors. Mapbox is working on a fix for this
 (mapboxgl as any).workerClass =
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
@@ -39,10 +40,8 @@ const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
 
-function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
-  const {
-    authenticationContext: { isAuthenticated },
-  } = useAppContext();
+function Map({handleMapDrawnPolygonChange, handleMapFitChange}: mapProps) {
+  const { authenticationContext: {isAuthenticated} } = useAppContext();
   const {
     legend,
     mapStyle,
@@ -67,11 +66,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setMapClickedFeatures,
     setIsMapRendering,
   } = useMapContext();
+
+  const { uploadedGeoJSON } = useHomePageContext();
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
-  const [coords, setCoords] = useState(null as LngLat | null);
+  const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
   const [styleFlag, setStyleFlag] = useState(0);
+  const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const geocoderControl = useRef(
@@ -88,8 +89,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     const canvas = new OffscreenCanvas(24, 24);
     const ctx = canvas.getContext('2d');
     if (ctx != null) {
-      // ctx and presets.offscreen() don't match the types in the Canvg library.
-      // ESLint is throwing an error here. Casting to any for now to get it to build.
       const v = await Canvg.from(ctx as any, svg, presets.offscreen() as any);
       await v.render();
 
@@ -142,6 +141,27 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     setDrawControl(dc);
   };
 
+  const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
+    if (drawControl && geoJsonData.features) {
+      drawControl.deleteAll();
+      geoJsonData.features.forEach((feature: Feature<Geometry, GeoJsonProperties>) => {
+        drawControl.add(feature);
+      });
+
+      const features = drawControl.getAll().features;
+      if (features.length > 0) {
+        handleMapDrawnPolygonChange?.(features);
+      }
+    }
+  };
+
+
+  useEffect(() => {
+    if (map && uploadedGeoJSON) {
+      uploadGeoJsonToMapbox(uploadedGeoJSON);
+    }
+  }, [map, uploadedGeoJSON]);
+
   useEffect(() => {
     setIsMapRendering(true);
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESSTOKEN || '';
@@ -152,12 +172,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       zoom: 4,
     });
 
-    mapInstance.on('styleimagemissing', (e) => {
-      const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups;
-      if (groups?.color) {
-        addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color));
+    mapInstance.on("styleimagemissing", e => {
+      const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups
+      if(groups?.color){
+        addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color))
       }
     });
+
 
     mapInstance.once('load', () => {
       const mapSettings: MapSettings = defaultMapLocationData;
@@ -168,10 +189,8 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       mapInstance.addControl(new NavigationControl({ showCompass: false }));
 
-      if (handleMapFitChange)
-        mapInstance.addControl(new CustomFitControl(handleMapFitChange));
+      if (handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
-
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
       mapboxDrawControl(mapInstance);
@@ -283,14 +302,11 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       currentMapPopup.current = new mapboxgl.Popup({ closeOnClick: false })
         .setLngLat({
           lat: mapPopup.latitude,
-          lng: mapPopup.longitude,
+          lng: mapPopup.longitude
         })
         .setHTML("<div id='mapboxPopupId'></div>")
         .once('open', () => {
-          ReactDOM.render(
-            mapPopup.element,
-            document.getElementById('mapboxPopupId'),
-          );
+          ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'))
         })
         .addTo(map);
     } else {

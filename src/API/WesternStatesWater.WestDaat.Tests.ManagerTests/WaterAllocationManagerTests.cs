@@ -11,7 +11,7 @@ using WesternStatesWater.WestDaat.Utilities;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Constants.RiverBasins;
 using System.IO;
-using Ionic.Zip;
+using System.IO.Compression;
 using System.Globalization;
 using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 
@@ -447,24 +447,15 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             // throws exception when building the predicate, before this call
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Never);
         }
-
+        
         [TestMethod]
         public async Task WaterRightsAsZip_BuildsStream_Variables()
         {
             var variables = new List<CsvModels.Variables>
             {
-                new CsvModels.Variables
-                {
-                    VariableSpecificUuid = Guid.NewGuid().ToString()
-                },
-                new CsvModels.Variables
-                {
-                    VariableSpecificUuid = Guid.NewGuid().ToString()
-                },
-                new CsvModels.Variables
-                {
-                    VariableSpecificUuid = Guid.NewGuid().ToString()
-                }
+                new CsvModels.Variables { VariableSpecificUuid = Guid.NewGuid().ToString() },
+                new CsvModels.Variables { VariableSpecificUuid = Guid.NewGuid().ToString() },
+                new CsvModels.Variables { VariableSpecificUuid = Guid.NewGuid().ToString() }
             };
 
             var iEnumerableList = new List<(string, IEnumerable<dynamic>)>
@@ -495,12 +486,15 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            using (var zip = ZipFile.Read(memoryStream))
+            using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Read))
             {
-                zip.Count.Should().Be(2);
-                foreach (ZipEntry e in zip)
+                zipArchive.Entries.Count.Should().Be(2);
+                foreach (var entry in zipArchive.Entries)
                 {
-                    await CheckRecords(e, e.FileName, variables);
+                    using (var entryStream = entry.Open())
+                    {
+                        await CheckRecords(entryStream, entry.FullName, variables);
+                    }
                 }
             }
 
@@ -555,12 +549,16 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            using (var zip = ZipFile.Read(memoryStream))
+            using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Read))
             {
-                zip.Count.Should().Be(2);
-                foreach (ZipEntry e in zip)
+                zipArchive.Entries.Count.Should().Be(2);
+
+                foreach (var entry in zipArchive.Entries)
                 {
-                    await CheckRecords(e, e.FileName, organizations);
+                    using (var entryStream = entry.Open())
+                    {
+                        await CheckRecords(entryStream, entry.FullName, organizations);
+                    }
                 }
             }
         }
@@ -658,47 +656,50 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            using (var zip = ZipFile.Read(memoryStream))
+            using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Read))
             {
-                zip.Count.Should().Be(8);
+                zipArchive.Entries.Count.Should().Be(8);
 
-                foreach (var zipFile in zip)
+                foreach (var entry in zipArchive.Entries)
                 {
-                    if (zipFile.FileName != "citation.txt")
+                    if (entry.FullName != "citation.txt")
                     {
-                        switch (zipFile.FileName)
+                        using (var entryStream = entry.Open())
                         {
-                            case "Organizations.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, organizations);
-                                break;
-                            case "Methods.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, methods);
-                                break;
-                            case "Variables.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, variables);
-                                break;
-                            case "PodSiteToPouSiteRelationships.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, podtopu);
-                                break;
-                            case "Sites.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, sites);
-                                break;
-                            case "WaterSources.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, watersources);
-                                break;
-                            case "WaterAllocations.csv":
-                                await CheckRecords(zipFile, zipFile.FileName, allocations);
-                                break;
+                            switch (entry.FullName)
+                            {
+                                case "Organizations.csv":
+                                    await CheckRecords(entryStream, entry.FullName, organizations);
+                                    break;
+                                case "Methods.csv":
+                                    await CheckRecords(entryStream, entry.FullName, methods);
+                                    break;
+                                case "Variables.csv":
+                                    await CheckRecords(entryStream, entry.FullName, variables);
+                                    break;
+                                case "PodSiteToPouSiteRelationships.csv":
+                                    await CheckRecords(entryStream, entry.FullName, podtopu);
+                                    break;
+                                case "Sites.csv":
+                                    await CheckRecords(entryStream, entry.FullName, sites);
+                                    break;
+                                case "WaterSources.csv":
+                                    await CheckRecords(entryStream, entry.FullName, watersources);
+                                    break;
+                                case "WaterAllocations.csv":
+                                    await CheckRecords(entryStream, entry.FullName, allocations);
+                                    break;
+                            }
                         }
                     }
                 }
             }
         }
 
-        private async Task CheckRecords<T>(ZipEntry entry, string fileEnd, List<T> list)
+        private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {
             using var data = new MemoryStream();
-            entry.Extract(data);
+            await entryStream.CopyToAsync(data);
             data.Position = 0;
 
             using var reader = new StreamReader(data);
@@ -707,7 +708,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             if (fileEnd.EndsWith(".csv"))
             {
                 using var csvReader = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture);
-                csvReader.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(""); // this is for the csv reader to interpret the empty strings as nulls
+                csvReader.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("");
                 var records = csvReader.GetRecords<T>().ToList();
 
                 records.Count.Should().Be(list.Count());

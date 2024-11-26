@@ -13,7 +13,6 @@ import Nav from 'react-bootstrap/Nav';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import MenuIcon from 'mdi-react/MenuIcon';
 
-import { HomePageTab } from '../pages/HomePage';
 import { SignIn } from './SignIn';
 
 import '../styles/navbar.scss';
@@ -22,9 +21,8 @@ import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 
 interface SiteNavbarProps {
-  currentTab?: HomePageTab;
-  onTabClick?: (tab: HomePageTab) => void;
   showDownloadModal?: (show: boolean) => void;
+  showUploadModal?: (show: boolean) => void;
 }
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
@@ -34,11 +32,7 @@ function handleLogout(msalContext: IPublicClientApplication | null) {
   });
 }
 
-function SiteNavbar({
-  currentTab,
-  onTabClick,
-  showDownloadModal,
-}: SiteNavbarProps = {}) {
+function SiteNavbar({ showDownloadModal, showUploadModal}: SiteNavbarProps = {}) {
   const { instance: msalContext } = useMsal();
   const { user } = useAuthenticationContext();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -91,29 +85,27 @@ function SiteNavbar({
         </Container>
       </Navbar>
 
-      {onTabClick && showDownloadModal && currentTab && (
-        <Navbar bg="light" className="p-0 second-nav">
-          <Container fluid className="p-0">
-            <Nav>
-              {Object.values(HomePageTab).map((tab) => (
-                <Nav.Link
-                  onClick={() => onTabClick(tab)}
-                  className={`py-3 px-4 ${currentTab === tab ? 'active-tab' : ''}`}
-                  key={tab}
-                >
-                  {tab}
-                </Nav.Link>
-              ))}
-            </Nav>
+          <Navbar bg="light" className="p-0 second-nav">
+            <Container fluid className="p-0">
+              <Nav>
+              </Nav>
 
-            <div className="mx-2">
-              <Button className="ms-1" onClick={() => showDownloadModal(true)}>
-                Download Data
-              </Button>
-            </div>
-          </Container>
-        </Navbar>
-      )}
+              <div className="d-flex">
+                <div className="p-2">
+                  {showDownloadModal && (
+                      <Button className="ms-1" onClick={() => showDownloadModal(true)}>
+                        Download Data
+                      </Button> )}
+                </div>
+                <div className="p-2">
+                  {showUploadModal && (
+                      <Button className="ms-1" onClick={() => showUploadModal(true)}>
+                        Upload Data
+                      </Button> )}
+                </div>
+              </div>
+            </Container>
+          </Navbar>
 
       <Offcanvas
         show={showHamburgerMenu}
