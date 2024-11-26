@@ -24,7 +24,9 @@ namespace WesternStatesWater.WestDaat.Managers
         
         async Task<DashboardFilters> ISystemManager.LoadFilters()
         {
-            return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();
+            var filters = await _systemAccessor.LoadFilters();
+            return filters.Map<DashboardFilters>();
+          //  return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();
         }
 
         public List<string> GetRiverBasinNames()
