@@ -27,12 +27,12 @@ namespace WesternStatesWater.WestDaat.Accessors
                 AllocationTypes = await db.WaterAllocationType.GetControlledVocabularyNames(),
                 BeneficialUses = await GetBeneficialUseNames(db),
                 LegalStatuses = await db.LegalStatus.GetControlledVocabularyNames(),
+                Overlays = await db.RegulatoryOverlayType.GetControlledVocabularyNames(),
                 OwnerClassifications = await db.OwnerClassificationCv.GetControlledVocabularyNames(),
                 RiverBasins = RiverBasinConstants.RiverBasinNames.ToArray(),
                 SiteTypes = await db.SiteType.GetControlledVocabularyNames(),
                 States = await db.State.GetControlledVocabularyNames(),
                 WaterSources = await db.WaterSourceType.GetControlledVocabularyNames(),
-                Overlays = await db.RegulatoryOverlayType.GetControlledVocabularyNames()
             };
         }
 
