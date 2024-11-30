@@ -73,6 +73,8 @@ public class AllocationFeatureProperties
     public double? maxVol { get; set; }
     public long? minPri { get; set; }
     public long? maxPri { get; set; }
+    public long? minTs { get; set; }
+    public long? maxTs { get; set; }
 }
 
 public class OverlayFeatureProperties
