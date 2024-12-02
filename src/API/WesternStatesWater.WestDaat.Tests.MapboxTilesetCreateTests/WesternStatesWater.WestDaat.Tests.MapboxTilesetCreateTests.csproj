@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <UserSecretsId>94df02de-b042-44c4-bbc9-60745c55c77f</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+        <PackageReference Include="MSTest.TestAdapter" Version="3.1.1"/>
+        <PackageReference Include="MSTest.TestFramework" Version="3.1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj" />
+      <ProjectReference Include="..\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="local.settings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
