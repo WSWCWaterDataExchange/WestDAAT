@@ -1,9 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import mapboxgl, { AnyLayer, AnySourceData, LngLat, NavigationControl } from 'mapbox-gl';
+import mapboxgl, { LayerSpecification, GeoJSONSourceSpecification, LngLat, NavigationControl } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
-import { defaultMapLocationData, useMapContext, MapSettings, MapStyle } from '../../contexts/MapProvider';
+import {
+  defaultMapLocationData,
+  MapSettings,
+  MapStyle,
+  RenderedFeatureType,
+  useMapContext,
+} from '../../contexts/MapProvider';
 import mapConfig from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
@@ -21,8 +27,6 @@ interface mapProps {
   handleMapFitChange?: () => void;
 }
 
-// Fix transpile errors. Mapbox is working on a fix for this
-(mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
@@ -203,7 +207,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       mapConfig.sources.forEach((a) => {
         const { id, ...src } = a;
-        mapInstance.addSource(id, src as AnySourceData);
+        mapInstance.addSource(id, src as GeoJSONSourceSpecification);
       });
 
       mapConfig.layers.forEach((a: any) => {
@@ -234,7 +238,11 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(() => {
-      return map.queryRenderedFeatures().filter((a) => sourceIds.some((b) => a.source === b));
+      return map
+          .queryRenderedFeatures()
+          .filter((feature) => {
+            return feature.source && sourceIds.includes(feature.source);
+          }) as RenderedFeatureType[];
     });
   }, 500);
 
@@ -295,7 +303,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   useEffect(() => {
     if (!map) return;
-    (mapConfig as any).layers.forEach((a: AnyLayer) => {
+    (mapConfig as any).layers.forEach((a: LayerSpecification) => {
       map.setLayoutProperty(a.id, 'visibility', visibleLayers.some((b) => b === a.id) ? 'visible' : 'none');
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
@@ -305,17 +313,18 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
       await new Promise((resolve) => {
-        const currLayers = map.getStyle().layers;
-        const currSources = map.getStyle().sources;
+        const currLayers = map.getStyle()!.layers;
+        const currSources = map.getStyle()!.sources;
+
         map.once('styledata', () => {
           sourceIds?.forEach((sourceId) => {
             if (!map.getSource(sourceId)) {
-              map.addSource(sourceId, currSources?.[sourceId] as AnySourceData);
+              map.addSource(sourceId, currSources?.[sourceId] as GeoJSONSourceSpecification);
             }
           });
           layerIds?.forEach((layerId) => {
             if (!map.getLayer(layerId)) {
-              map.addLayer(currLayers?.find((a) => a.id === layerId) as AnyLayer);
+              map.addLayer(currLayers?.find((a) => a.id === layerId) as LayerSpecification);
             }
           });
 
@@ -325,7 +334,16 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
-      const prevStyle = map.getStyle().metadata['mapbox:origin'];
+      const style = map.getStyle();
+
+      if (!style || !style.metadata) {
+        console.warn('Map style or metadata is not available.');
+        return;
+      }
+
+      const metadata = style.metadata as { [key: string]: any };
+      const prevStyle = metadata['mapbox:origin'];
+
       if (mapStyle !== prevStyle) {
         await setStyleData(map, mapStyle);
       }
@@ -361,9 +379,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     if (!map) return;
     vectorUrls.forEach((a) => {
       const source = map.getSource(a.source);
-      if (source.type === 'vector') {
-        if (source.url !== a.url) {
-          source.setUrl(a.url);
+      if (source && source.type === 'vector') {
+        if ((source as mapboxgl.VectorTileSource).url !== a.url) {
+          (source as mapboxgl.VectorTileSource).setUrl(a.url);
         }
       }
     });
@@ -372,7 +390,12 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   useEffect(() => {
     if (!map) return;
     for (const key in filters) {
-      map.setFilter(key, filters[key]);
+      const filter = filters[key];
+      if (filter) {
+        map.setFilter(key, filter as mapboxgl.FilterSpecification);
+      } else {
+        map.setFilter(key, null);
+      }
     }
   }, [map, filters]);
 
