@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate", "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj", "{25C64908-689E-4D52-B814-A41021918B88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests", "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests\WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests.csproj", "{3BA6F160-1CE7-4328-B546-33274602BED5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{25C64908-689E-4D52-B814-A41021918B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +143,7 @@ Global
 		{AD76D1F4-188C-4923-A887-410B52FB1FA6} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 		{5E195A8E-3E0A-4D51-ADBF-F864668265BC} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
 		{25C64908-689E-4D52-B814-A41021918B88} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
+		{3BA6F160-1CE7-4328-B546-33274602BED5} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76EF2099-5BC9-4F48-8EBA-524560067EC3}
