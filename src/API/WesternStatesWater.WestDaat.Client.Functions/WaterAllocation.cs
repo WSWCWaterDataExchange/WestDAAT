@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices.JavaScript;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -165,7 +166,9 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             return await CreateOkResponse(request, result);
         }
-
+        
+        
+        
         [Function(nameof(GetWaterSiteRightsListByUuid))]
         public async Task<HttpResponseData> GetWaterSiteRightsListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights")] HttpRequestData request, string siteUuid)
         {
@@ -174,6 +177,13 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
 
+        [Function(nameof(GetOverlayDataByUuid))]
+        public async Task<HttpResponseData> GetOverlayDataByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/OverlayData/{siteUuid}")] HttpRequestData request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetOverlayDataByUuid(siteUuid);
+
+            return await CreateOkResponse(request, result);
+        } //TODO 
 
         [Function(nameof(DownloadWaterRights))]
         public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)

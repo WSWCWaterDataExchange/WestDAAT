@@ -33,6 +33,8 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<Feature> GetWaterSiteLocation(string siteUuid);
 
         Task<List<WaterSourceInfoListItem>> GetWaterSiteSourceInfoListByUuid(string siteUuid);
+        
+        Task<List<OverlayData>> GetOverlayDataByUuid(string siteUuid);
 
         Task<List<WaterRightInfoListItem>> GetWaterSiteRightsInfoListByUuid(string siteUuid);
 
