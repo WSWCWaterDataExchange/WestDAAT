@@ -17,6 +17,8 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<SiteLocation> GetWaterSiteLocationByUuid(string siteUuid);
 
         Task<List<WaterRightInfoListItem>> GetWaterRightInfoListByUuid(string siteUuid);
+        
+        Task<IEnumerable<SiteUsagePoint>> GetSiteUsageBySiteUuid(string siteUuid);
 
         IEnumerable<GeoConnex> GetJSONLDData();
     }

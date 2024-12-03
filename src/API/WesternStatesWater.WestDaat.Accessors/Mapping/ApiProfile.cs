@@ -88,6 +88,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.BeneficialUsesCV, BeneficialUseItem>()
                 .ForMember(dest => dest.BeneficialUseName, opt => opt.MapFrom(source => source.WaDEName.Length > 0 ? source.WaDEName : source.Name))
                 .ForMember(dest => dest.ConsumptionCategory, opt => opt.MapFrom(source => source.ConsumptionCategoryType == null ? Common.ConsumptionCategory.Unspecified : source.ConsumptionCategoryType));
+            
+            CreateMap<EF.SiteVariableAmountsFact, SiteUsagePoint>()
+                .ForMember(dest => dest.Amount, opt => opt.MapFrom(source => source.Amount))
+                .ForMember(dest => dest.TimeFrameStartDate, opt => opt.MapFrom(source => source.TimeframeStartNavigation.Date))
+                .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
+                ;
         }
     }
 }
