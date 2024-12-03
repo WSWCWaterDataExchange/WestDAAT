@@ -405,6 +405,44 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().HaveCount(1);
             result[0].WaterSourceTypes.Should().BeEquivalentTo(new[] { expectedName1, expectedName2, expectedName3 } );
         }
+        
+        
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetSiteUsageBySiteUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            
+            var dates = new DateDimFaker().Generate(31);
+            db.DateDim.AddRange(dates);
+            await db.SaveChangesAsync();
+
+
+            var siteDim = new SitesDimFaker().Generate();
+            db.SitesDim.Add(siteDim);
+            await db.SaveChangesAsync();
+            
+            var timeSeries = new SiteVariableAmountsFactFaker()
+                .RuleFor(r => r.SiteId, siteDim.SiteId)
+                .RuleFor(r => r.Site, siteDim)
+                .RuleFor(r => r.TimeframeStartID, dates[0].DateId)
+                .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                .Generate(10);
+            
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+            
+            db.SiteVariableAmountsFact.Should().HaveCount(10);
+            
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteUsageBySiteUuid(siteDim.SiteUuid);
+
+            result.Should().HaveCount(10);
+        }
+
 
         private ISiteAccessor CreateSiteAccessor()
         {
