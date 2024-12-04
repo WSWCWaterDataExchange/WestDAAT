@@ -3,6 +3,7 @@ import { BeneficialUseListItem } from './BeneficialUseListItem';
 export interface DashboardFilters {
   beneficialUses: BeneficialUseListItem[];
   waterSources: string[];
+  overlays: string[];
   ownerClassifications: string[];
   states: string[];
   allocationTypes: string[];

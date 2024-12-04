@@ -17,6 +17,7 @@ import { UseQueryResult } from 'react-query';
 
 export interface WaterRightsFilters {
   beneficialUseNames?: string[];
+  overlays?: string[];
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
   riverBasinNames?: string[];
@@ -55,6 +56,7 @@ const defaultQuery = { data: undefined, isError: false, isLoading: false };
 export interface HostData {
   beneficialUsesQuery: Query<BeneficialUseListItem[]>;
   waterSourcesQuery: Query<string[]>;
+  overlaysQuery: Query<string[]>;
   ownerClassificationsQuery: Query<string[]>;
   statesQuery: Query<string[]>;
   riverBasinsQuery: Query<string[]>;
@@ -76,6 +78,7 @@ export interface WaterRightsContextState {
 
 export const defaultFilters: WaterRightsFilters = {
   beneficialUseNames: undefined,
+  overlays: undefined,
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
@@ -116,6 +119,7 @@ export const defaultState: WaterRightsContextState = {
   hostData: {
     beneficialUsesQuery: defaultQuery,
     waterSourcesQuery: defaultQuery,
+    overlaysQuery: defaultQuery,
     ownerClassificationsQuery: defaultQuery,
     statesQuery: defaultQuery,
     riverBasinsQuery: defaultQuery,
@@ -181,6 +185,11 @@ export const WaterRightsProvider: FC = ({ children }) => {
       },
       waterSourcesQuery: {
         data: dashboardFiltersQuery.data?.waterSources,
+        isLoading,
+        isError,
+      },
+      overlaysQuery: {
+        data: dashboardFiltersQuery.data?.overlays,
         isLoading,
         isError,
       },

@@ -18,6 +18,7 @@ import {
   PodPou,
   VolumeRange,
   Nldi,
+  Overlays,
 } from './filters';
 import { MapTheme, MapGrouping, PointSize } from './display-options';
 import { useNldiFilter } from './hooks/filters/useNldiFilter';
@@ -30,6 +31,8 @@ function SideBar() {
   const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
   const [isWaterRightsFilterActive, setWaterRightsFilterActive] =
     useState(false);
+  const [isOverlayFilterActive, setOverlayFilterActive] = useState(false);
+
 
   const [activeKeys, setActiveKeys] = useState(
     isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
@@ -42,6 +45,10 @@ function SideBar() {
   const toggleNldiFilterStatus = useCallback(() => {
     setNldiMapActiveStatus(!isNldiFilterActive);
   }, [isNldiFilterActive, setNldiMapActiveStatus]);
+
+  const toggleOverlayFilter = useCallback(() => {
+    setOverlayFilterActive(!isOverlayFilterActive);
+  }, [isOverlayFilterActive, setOverlayFilterActive]);
 
   const setOpenAccordionKeys = useCallback(
     (keys: AccordionEventKey) => {
@@ -57,7 +64,7 @@ function SideBar() {
   );
   const openAccordionKeys = useMemo(() => {
     const keys = [...activeKeys].filter(
-      (a) => a !== 'nldi' && a !== 'siteSelectionFilters',
+      (a) => a !== 'nldi' && a !== 'siteSelectionFilters'&& a !== 'overlayFilters',
     );
     if (isNldiFilterActive) {
       keys.push('nldi');
@@ -65,8 +72,11 @@ function SideBar() {
     if (isWaterRightsFilterActive) {
       keys.push('siteSelectionFilters');
     }
+    if (isOverlayFilterActive) {
+      keys.push('overlayFilters');
+    }
     return keys;
-  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive]);
+  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive]);
 
   return (
     <>
@@ -95,6 +105,24 @@ function SideBar() {
               <MapTheme />
             </Accordion.Body>
           </Accordion.Item>
+          <Accordion.Item eventKey="overlayFilters">
+            <Accordion.Header onClick={toggleOverlayFilter}>
+              <label className="fw-bold">
+                OVERLAY FILTER {isOverlayFilterActive}
+              </label>
+              <div className="px-1">
+                <BootstrapSwitchButton
+                  checked={isOverlayFilterActive}
+                  onstyle="primary"
+                  offstyle="secondary"
+                />
+              </div>
+            </Accordion.Header>
+            <Accordion.Body>
+              <Overlays />
+            </Accordion.Body>
+          </Accordion.Item>
+
           <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header onClick={toggleWaterRightFilters}>
               <label className="fw-bold">
