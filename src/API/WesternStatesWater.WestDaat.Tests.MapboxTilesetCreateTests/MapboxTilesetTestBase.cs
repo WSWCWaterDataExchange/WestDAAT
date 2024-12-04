@@ -34,6 +34,7 @@ public class MapboxTilesetTestBase
         var config = new ConfigurationBuilder()
             .SetBasePath(Environment.CurrentDirectory)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
             .Build();
 
         var dbConfig = config.GetDatabaseConfiguration();
@@ -73,6 +74,8 @@ public class AllocationFeatureProperties
     public double? maxVol { get; set; }
     public long? minPri { get; set; }
     public long? maxPri { get; set; }
+    public long? minTs { get; set; }
+    public long? maxTs { get; set; }
 }
 
 public class OverlayFeatureProperties
