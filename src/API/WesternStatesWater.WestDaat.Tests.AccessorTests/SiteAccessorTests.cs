@@ -449,7 +449,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().HaveCount(10);
-            result.Should().BeInDescendingOrder<DateTime>(x => x.TimeFrameStartDate);
+            result.Should().BeInAscendingOrder(x => x.TimeFrameStartDate);
         }
 
 

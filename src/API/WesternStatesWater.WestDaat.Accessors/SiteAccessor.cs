@@ -85,7 +85,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.SiteVariableAmountsFact
                 .Where(x => x.Site.SiteUuid == siteUuid)
                 .ProjectTo<SiteUsagePoint>(DtoMapper.Configuration)
-                .OrderByDescending(x => x.TimeFrameStartDate)
+                .OrderBy(x => x.TimeFrameStartDate)
                 .ToListAsync();
         }
 
