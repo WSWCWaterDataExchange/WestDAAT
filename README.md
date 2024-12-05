@@ -49,7 +49,7 @@
 1. Run MapboxTilesetCreate console app located in /tools
 2. Optional - Add personal.settings.json for connection string settings
 3. Allocations.Points.geojson and Allocations.Polygons.geojson files will be generated in geojson dir
-4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson"` This will take about 5 minutes
+4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson" -L polygons:"Overlays.Polygons.geojson"` This will take about 5 minutes
 5. Upload to mapbox studio
 
 

@@ -12,23 +12,44 @@ public static class MapboxTileset
 {
     public static async Task CreateTilesetFiles(DatabaseContext db)
     {
+        Console.WriteLine("Starting...");
+
         var dir = Path.GetFullPath("geojson");
         if (!Directory.Exists(dir))
         {
             Directory.CreateDirectory(dir);
         }
 
-        var tempPointsDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Points"));
-        var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Polygons"));
-        var tempUnknownDir = Directory.CreateDirectory(Path.Combine(dir, "Allocations", "Unknown"));
-
         var sw = Stopwatch.StartNew();
-        Console.WriteLine("Starting...");
+        try
+        {
+            await CreateAllocations(db, dir);
+            await CreateOverlays(db, dir);
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error: {ex.Message} {ex.StackTrace}");
+            Console.ResetColor();
+        }
+        finally
+        {
+            sw.Stop();
+            Console.WriteLine($"Done. Took {(int) sw.Elapsed.TotalMinutes} minutes");
+        }
+    }
+
+    internal static async Task CreateAllocations(DatabaseContext db, string geoJsonDirectoryPath)
+    {
+        var tempPointsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Points"));
+        var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Polygons"));
+        var tempUnknownDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "Allocations", "Unknown"));
+
         try
         {
             bool end = false;
             int page = 0;
-            int take = 25000;
+            int take = 10000;
             long lastSiteId = 0;
             while (!end)
             {
@@ -36,7 +57,7 @@ public static class MapboxTileset
                 ConcurrentBag<Feature> polygonFeatures = [];
                 ConcurrentBag<Feature> unknownFeatures = [];
 
-                Console.WriteLine($"Fetching records {page * take} to {(page + 1) * take}");
+                Console.WriteLine($"Fetching allocation records {page * take} to {(page + 1) * take}");
                 var sites = await db.AllocationAmountsView
                     .AsNoTracking()
                     .OrderBy(s => s.SiteId)
@@ -69,6 +90,10 @@ public static class MapboxTileset
                         properties.Add("minPri", GetUnixTime(site.MinPriorityDate.Value)!.Value);
                     if (site.MaxPriorityDate.HasValue)
                         properties.Add("maxPri", GetUnixTime(site.MaxPriorityDate.Value)!.Value);
+                    if (site.StartDate.HasValue)
+                        properties.Add("minTs", GetUnixTime(site.StartDate.Value)!.Value);
+                    if (site.EndDate.HasValue)
+                        properties.Add("maxTs", GetUnixTime(site.EndDate.Value)!.Value);
                     var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
 
                     var feature = new Feature(geometry, properties);
@@ -90,11 +115,11 @@ public static class MapboxTileset
                 });
 
                 var pointsTask = WriteFeatures(pointFeatures,
-                    Path.Combine(dir, "Allocations", "Points", Path.GetRandomFileName()));
+                    Path.Combine(geoJsonDirectoryPath, "Allocations", "Points", Path.GetRandomFileName()));
                 var polygonsTask = WriteFeatures(polygonFeatures,
-                    Path.Combine(dir, "Allocations", "Polygons", Path.GetRandomFileName()));
+                    Path.Combine(geoJsonDirectoryPath, "Allocations", "Polygons", Path.GetRandomFileName()));
                 var unknownTask = WriteFeatures(unknownFeatures,
-                    Path.Combine(dir, "Allocations", "Unknown", Path.GetRandomFileName()));
+                    Path.Combine(geoJsonDirectoryPath, "Allocations", "Unknown", Path.GetRandomFileName()));
 
                 await pointsTask;
                 await polygonsTask;
@@ -105,51 +130,89 @@ public static class MapboxTileset
                 lastSiteId = sites[^1].SiteId;
             }
 
-            Console.WriteLine("Combining temp point files...");
             string[] pointFiles = tempPointsDir.GetFiles()
                 .Where(f => !f.Name.Contains("DS_Store"))
                 .Select(f => f.FullName).ToArray();
 
             if (pointFiles.Length > 0)
             {
-                await CombineFiles(pointFiles, Path.Combine(dir, "Allocations.Points.geojson"));
+                Console.WriteLine("Combining temp point files...");
+                await CombineFiles(pointFiles, Path.Combine(geoJsonDirectoryPath, "Allocations.Points.geojson"));
             }
 
-            Console.WriteLine("Combining temp polygon files...");
             string[] polygonsFiles = tempPolygonsDir.GetFiles()
                 .Where(f => !f.Name.Contains("DS_Store"))
                 .Select(f => f.FullName).ToArray();
 
             if (polygonsFiles.Length > 0)
             {
-                await CombineFiles(polygonsFiles, Path.Combine(dir, "Allocations.Polygons.geojson"));
+                Console.WriteLine("Combining temp polygon files...");
+                await CombineFiles(polygonsFiles, Path.Combine(geoJsonDirectoryPath, "Allocations.Polygons.geojson"));
             }
 
-            Console.WriteLine("Combining temp unknown files...");
             string[] unknownFiles = tempUnknownDir.GetFiles()
                 .Where(f => !f.Name.Contains("DS_Store"))
                 .Select(f => f.FullName).ToArray();
 
             if (unknownFiles.Length > 0)
             {
-                await CombineFiles(unknownFiles, Path.Combine(dir, "Allocations.Unknown.geojson"));
+                Console.WriteLine("Combining temp unknown files...");
+                await CombineFiles(unknownFiles, Path.Combine(geoJsonDirectoryPath, "Allocations.Unknown.geojson"));
             }
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error: {ex.Message} {ex.StackTrace}");
-            Console.ResetColor();
         }
         finally
         {
-            sw.Stop();
-            Console.WriteLine("Removing temp folers...");
-            Directory.Delete(Path.Combine(dir, "Allocations"), true);
-            Console.WriteLine($"Done. Took {(int) sw.Elapsed.TotalMinutes} minutes");
+            Directory.Delete(Path.Combine(geoJsonDirectoryPath, "Allocations"), true);
+        }
+    }
+
+    internal static async Task CreateOverlays(DatabaseContext db, string geoJsonDirectoryPath)
+    {
+        ConcurrentBag<Feature> polygonFeatures = [];
+        ConcurrentBag<Feature> unknownFeatures = [];
+
+        Console.WriteLine($"Fetching overlays...");
+        var overlays = await db.OverlaysViews
+            .AsNoTracking()
+            .ToArrayAsync();
+
+        Parallel.ForEach(overlays, overlay =>
+        {
+            var properties = new Dictionary<string, object>
+            {
+                { "uuid", overlay.ReportingUnitUUID },
+                { "oType", PipeDelimiterToDistinctList(overlay.RegulatoryOverlayTypeWaDEName) },
+            };
+
+            var geometry = overlay.Geometry.AsGeoJsonGeometry();
+
+            var feature = new Feature(geometry, properties);
+
+            switch (geometry.Type)
+            {
+                case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                    polygonFeatures.Add(feature);
+                    break;
+                default:
+                    unknownFeatures.Add(feature);
+                    break;
+            }
+        });
+
+
+        if (polygonFeatures.Count > 0)
+        {
+            Console.WriteLine("Creating overlays polygons file...");
+            await WriteFeatures(polygonFeatures, Path.Combine(geoJsonDirectoryPath, "Overlays.Polygons.geojson"));
         }
 
-        return;
+
+        if (unknownFeatures.Count > 0)
+        {
+            Console.WriteLine("Creating overlays unknown file...");
+            await WriteFeatures(unknownFeatures, Path.Combine(geoJsonDirectoryPath, "Overlays.Unknown.geojson"));
+        }
     }
 
     private static string PipeDelimiterToString(string? value)

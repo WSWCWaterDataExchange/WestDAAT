@@ -1,58 +1,16 @@
 using System.Text.Json;
-using System.Transactions;
 using FluentAssertions;
 using GeoJSON.Text.Feature;
-using Microsoft.Extensions.Configuration;
 using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
 
 namespace WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests;
 
 [TestClass]
-public class AllocationPointTests
+public class AllocationTests : MapboxTilesetTestBase
 {
-    private TransactionScope _transactionScopeFixture = null!;
-    private IServiceProvider _services = null!;
-    private DatabaseContext _db = null!;
-
-    [TestInitialize]
-    public void TestInitialize()
-    {
-        if (Directory.Exists("geojson"))
-        {
-            Directory.Delete("geojson", true);
-        }
-
-        var transactionOptions = new TransactionOptions
-        {
-            IsolationLevel = IsolationLevel.ReadCommitted,
-            Timeout = TransactionManager.MaximumTimeout
-        };
-        _transactionScopeFixture = new TransactionScope(
-            TransactionScopeOption.Required,
-            transactionOptions,
-            TransactionScopeAsyncFlowOption.Enabled);
-
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Environment.CurrentDirectory)
-            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables()
-            .Build();
-
-        var dbConfig = config.GetDatabaseConfiguration();
-        IDatabaseContextFactory dbFactory = new DatabaseContextFactory(dbConfig);
-        _db = dbFactory.Create();
-    }
-
-    [TestCleanup]
-    public void BaseTestCleanup()
-    {
-        _transactionScopeFixture.Dispose();
-    }
-
     [DataTestMethod]
     [DataRow(true)]
     [DataRow(false)]
@@ -64,16 +22,16 @@ public class AllocationPointTests
             .RuleFor(r => r.State, "All")
             .Generate();
 
-        _db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse);
-        await _db.SaveChangesAsync();
+        Db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
         var utahGroundWaterSourceType = new WaterSourceTypeFaker()
             .RuleFor(r => r.Name, "Ground")
             .RuleFor(r => r.WaDEName, "Groundwater")
             .Generate();
 
-        _db.WaterSourceType.AddRange(utahGroundWaterSourceType);
-        await _db.SaveChangesAsync();
+        Db.WaterSourceType.AddRange(utahGroundWaterSourceType);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahGroundWaterSource = new WaterSourceDimFaker()
@@ -81,8 +39,8 @@ public class AllocationPointTests
             .RuleFor(r => r.WaterSourceTypeCvNavigation, utahGroundWaterSourceType)
             .Generate();
 
-        _db.WaterSourcesDim.AddRange(utahGroundWaterSource);
-        await _db.SaveChangesAsync();
+        Db.WaterSourcesDim.AddRange(utahGroundWaterSource);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var armyClassification = new OwnerClassificationCvFaker()
@@ -90,10 +48,10 @@ public class AllocationPointTests
             .RuleFor(r => r.WaDEName, "Military")
             .Generate();
 
-        _db.OwnerClassificationCv.AddRange(armyClassification);
-        await _db.SaveChangesAsync();
+        Db.OwnerClassificationCv.AddRange(armyClassification);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
-        
+
         var legalStatusPending = new LegalStatusCVFaker()
             .RuleFor(r => r.Name, "Pending")
             .RuleFor(r => r.WaDEName, "Pending")
@@ -102,8 +60,8 @@ public class AllocationPointTests
             .RuleFor(r => r.Name, "Claimed")
             .RuleFor(r => r.WaDEName, "Claimed")
             .Generate();
-        _db.LegalStatus.AddRange(legalStatusPending, legalStatusClaimed);
-        await _db.SaveChangesAsync();
+        Db.LegalStatus.AddRange(legalStatusPending, legalStatusClaimed);
+        await Db.SaveChangesAsync();
         ///////////////////////////////////////////////////
 
         var siteTypeDitch = new SiteTypeFaker()
@@ -114,10 +72,10 @@ public class AllocationPointTests
             .RuleFor(r => r.Name, "Ditch")
             .RuleFor(r => r.WaDEName, "Canal / Ditch / Diversion")
             .Generate();
-        _db.SiteType.AddRange(siteTypeDitch, siteTypeCanal);
-        await _db.SaveChangesAsync();
+        Db.SiteType.AddRange(siteTypeDitch, siteTypeCanal);
+        await Db.SaveChangesAsync();
         ///////////////////////////////////////////////////
-        
+
         var allocationTypeAllClaim = new WaterAllocationTypeCVFaker()
             .RuleFor(r => r.Name, "All_Claim")
             .RuleFor(r => r.WaDEName, "Claim")
@@ -126,21 +84,21 @@ public class AllocationPointTests
             .RuleFor(r => r.Name, "All_ClaimAmendment")
             .RuleFor(r => r.WaDEName, "Claim")
             .Generate();
-        _db.WaterAllocationType.AddRange(allocationTypeAllClaim, allocationTypeClaimAmmendment);
-        await _db.SaveChangesAsync();
+        Db.WaterAllocationType.AddRange(allocationTypeAllClaim, allocationTypeClaimAmmendment);
+        await Db.SaveChangesAsync();
         ///////////////////////////////////////////////////
 
         var utahDivisionOrganization = new OrganizationsDimFaker()
             .RuleFor(r => r.OrganizationName, "Utah Division of Water Rights")
             .RuleFor(r => r.State, "UT")
             .Generate();
-        _db.OrganizationsDim.AddRange(utahDivisionOrganization);
-        await _db.SaveChangesAsync();
+        Db.OrganizationsDim.AddRange(utahDivisionOrganization);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var januraryDates = new DateDimFaker().Generate(1);
-        _db.DateDim.AddRange(januraryDates);
-        await _db.SaveChangesAsync();
+        Db.DateDim.AddRange(januraryDates);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSitePouAllocation = new SitesDimFaker()
@@ -150,16 +108,16 @@ public class AllocationPointTests
             .RuleFor(r => r.SiteTypeCvNavigation, siteTypeDitch)
             .RuleFor(r => r.Geometry, isPoint ? Point.Empty : Polygon.Empty)
             .Generate();
-        _db.SitesDim.AddRange(utahSitePouAllocation);
-        await _db.SaveChangesAsync();
+        Db.SitesDim.AddRange(utahSitePouAllocation);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahWaterSourceBridge = new WaterSourceBridgeSiteFactFaker()
             .WaterSourceBridgeSiteFactFakerWithIds(utahGroundWaterSource.WaterSourceId,
                 utahSitePouAllocation.SiteId)
             .Generate();
-        _db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge);
-        await _db.SaveChangesAsync();
+        Db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var allocationAmount = new AllocationAmountFactFaker()
@@ -178,23 +136,24 @@ public class AllocationPointTests
             .LinkBeneficialUses(tapWaterBeneficialUse)
             .Generate();
 
-        _db.AllocationAmountsFact.AddRange(allocationAmount);
-        await _db.SaveChangesAsync();
+        Db.AllocationAmountsFact.AddRange(allocationAmount);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSiteWithOneAllocationNoBenficialUses = new AllocationBridgeSiteFactFaker()
             .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId,
                 utahSitePouAllocation.SiteId)
             .Generate();
-        _db.AllocationBridgeSitesFact.AddRange(utahSiteWithOneAllocationNoBenficialUses);
-        await _db.SaveChangesAsync();
+        Db.AllocationBridgeSitesFact.AddRange(utahSiteWithOneAllocationNoBenficialUses);
+        await Db.SaveChangesAsync();
 
         // Act
-        await MapboxTileset.CreateTilesetFiles(_db);
+        await MapboxTileset.CreateAllocations(Db, GeoJsonDir);
 
         // Assert
-        var json = await File.ReadAllTextAsync(Path.Combine("geojson", $"Allocations.{(isPoint ? "Points" : "Polygons")}.geojson"));
-        var features = JsonSerializer.Deserialize<List<Maptiler>>(json);
+        var json = await File.ReadAllTextAsync(Path.Combine("geojson",
+            $"Allocations.{(isPoint ? "Points" : "Polygons")}.geojson"));
+        var features = JsonSerializer.Deserialize<List<Maptiler<AllocationFeatureProperties>>>(json);
 
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(1);
@@ -244,8 +203,8 @@ public class AllocationPointTests
             .RuleFor(r => r.State, "All")
             .Generate();
 
-        _db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse, utahBeneficialUseStockwater, utahBeneficialUseDairy);
-        await _db.SaveChangesAsync();
+        Db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse, utahBeneficialUseStockwater, utahBeneficialUseDairy);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
         var utahGroundWaterSourceType = new WaterSourceTypeFaker()
             .RuleFor(r => r.Name, "Ground")
@@ -261,9 +220,9 @@ public class AllocationPointTests
             .RuleFor(r => r.Name, "Canal/Ditch")
             .RuleFor(r => r.WaDEName, "Surface Water")
             .Generate();
-        _db.WaterSourceType.AddRange(utahGroundWaterSourceType, utahGroundwaterWaterSourceType,
+        Db.WaterSourceType.AddRange(utahGroundWaterSourceType, utahGroundwaterWaterSourceType,
             utahCanalSurfaceWaterWaterSourceType);
-        await _db.SaveChangesAsync();
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahGroundWaterSource = new WaterSourceDimFaker()
@@ -276,8 +235,8 @@ public class AllocationPointTests
             .RuleFor(r => r.WaterSourceTypeCvNavigation, utahCanalSurfaceWaterWaterSourceType)
             .Generate();
 
-        _db.WaterSourcesDim.AddRange(utahGroundWaterSource, utahSurfaceWaterSource);
-        await _db.SaveChangesAsync();
+        Db.WaterSourcesDim.AddRange(utahGroundWaterSource, utahSurfaceWaterSource);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var doDClassification = new OwnerClassificationCvFaker()
@@ -290,8 +249,8 @@ public class AllocationPointTests
             .RuleFor(r => r.WaDEName, "Private")
             .Generate();
 
-        _db.OwnerClassificationCv.AddRange(doDClassification, privateClassification);
-        await _db.SaveChangesAsync();
+        Db.OwnerClassificationCv.AddRange(doDClassification, privateClassification);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahDivisionOrganization = new OrganizationsDimFaker()
@@ -303,13 +262,13 @@ public class AllocationPointTests
             .RuleFor(r => r.OrganizationName, "Colorado Department of Natural Resources")
             .RuleFor(r => r.State, "CO")
             .Generate();
-        _db.OrganizationsDim.AddRange(utahDivisionOrganization, coloradoDrsOrganization);
-        await _db.SaveChangesAsync();
+        Db.OrganizationsDim.AddRange(utahDivisionOrganization, coloradoDrsOrganization);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var januraryDates = new DateDimFaker().Generate(31);
-        _db.DateDim.AddRange(januraryDates);
-        await _db.SaveChangesAsync();
+        Db.DateDim.AddRange(januraryDates);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSitePodWithManyAllocations = new SitesDimFaker()
@@ -317,8 +276,8 @@ public class AllocationPointTests
             .RuleFor(r => r.PODorPOUSite, "POD")
             .RuleFor(r => r.Geometry, Point.Empty)
             .Generate();
-        _db.SitesDim.AddRange(utahSitePodWithManyAllocations);
-        await _db.SaveChangesAsync();
+        Db.SitesDim.AddRange(utahSitePodWithManyAllocations);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahWaterSourceBridge = new WaterSourceBridgeSiteFactFaker()
@@ -328,8 +287,8 @@ public class AllocationPointTests
         var utahSurfaceWaterBridge = new WaterSourceBridgeSiteFactFaker()
             .WaterSourceBridgeSiteFactFakerWithIds(utahSurfaceWaterSource.WaterSourceId,
                 utahSitePodWithManyAllocations.SiteId);
-        _db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge, utahSurfaceWaterBridge);
-        await _db.SaveChangesAsync();
+        Db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge, utahSurfaceWaterBridge);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahAllocationWithManyBeneficialUses = new AllocationAmountFactFaker()
@@ -356,10 +315,10 @@ public class AllocationPointTests
             .LinkBeneficialUses(tapWaterBeneficialUse)
             .Generate();
 
-        _db.AllocationAmountsFact.AddRange(
+        Db.AllocationAmountsFact.AddRange(
             utahAllocationWithManyBeneficialUses,
             utahAllocationWithTapWaterBeneficialUse);
-        await _db.SaveChangesAsync();
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSiteAllocationBridge1 = new AllocationBridgeSiteFactFaker()
@@ -370,15 +329,15 @@ public class AllocationPointTests
             .AllocationBridgeSiteFactFakerWithIds(utahAllocationWithManyBeneficialUses.AllocationAmountId,
                 utahSitePodWithManyAllocations.SiteId);
 
-        _db.AllocationBridgeSitesFact.AddRange(utahSiteAllocationBridge1, utahSiteAllocationBridge2);
-        await _db.SaveChangesAsync();
+        Db.AllocationBridgeSitesFact.AddRange(utahSiteAllocationBridge1, utahSiteAllocationBridge2);
+        await Db.SaveChangesAsync();
 
         // Act
-        await MapboxTileset.CreateTilesetFiles(_db);
+        await MapboxTileset.CreateAllocations(Db, GeoJsonDir);
 
         // Assert
         var json = await File.ReadAllTextAsync(Path.Combine("geojson", "Allocations.Points.geojson"));
-        var features = JsonSerializer.Deserialize<List<Maptiler>>(json);
+        var features = JsonSerializer.Deserialize<List<Maptiler<AllocationFeatureProperties>>>(json);
 
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(1);
@@ -413,16 +372,16 @@ public class AllocationPointTests
             .RuleFor(r => r.State, "All")
             .Generate();
 
-        _db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse);
-        await _db.SaveChangesAsync();
+        Db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
         var utahGroundWaterSourceType = new WaterSourceTypeFaker()
             .RuleFor(r => r.Name, "Ground")
             .RuleFor(r => r.WaDEName, "Groundwater")
             .Generate();
 
-        _db.WaterSourceType.AddRange(utahGroundWaterSourceType);
-        await _db.SaveChangesAsync();
+        Db.WaterSourceType.AddRange(utahGroundWaterSourceType);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahGroundWaterSource = new WaterSourceDimFaker()
@@ -430,8 +389,8 @@ public class AllocationPointTests
             .RuleFor(r => r.WaterSourceTypeCvNavigation, utahGroundWaterSourceType)
             .Generate();
 
-        _db.WaterSourcesDim.AddRange(utahGroundWaterSource);
-        await _db.SaveChangesAsync();
+        Db.WaterSourcesDim.AddRange(utahGroundWaterSource);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var armyClassification = new OwnerClassificationCvFaker()
@@ -439,16 +398,16 @@ public class AllocationPointTests
             .RuleFor(r => r.WaDEName, "Military")
             .Generate();
 
-        _db.OwnerClassificationCv.AddRange(armyClassification);
-        await _db.SaveChangesAsync();
+        Db.OwnerClassificationCv.AddRange(armyClassification);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahDivisionOrganization = new OrganizationsDimFaker()
             .RuleFor(r => r.OrganizationName, "Utah Division of Water Rights")
             .RuleFor(r => r.State, "UT")
             .Generate();
-        _db.OrganizationsDim.AddRange(utahDivisionOrganization);
-        await _db.SaveChangesAsync();
+        Db.OrganizationsDim.AddRange(utahDivisionOrganization);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSitePouWithOneAllocation = new SitesDimFaker()
@@ -456,16 +415,16 @@ public class AllocationPointTests
             .RuleFor(r => r.PODorPOUSite, "POU")
             .RuleFor(r => r.Geometry, Point.Empty)
             .Generate();
-        _db.SitesDim.AddRange(utahSitePouWithOneAllocation);
-        await _db.SaveChangesAsync();
+        Db.SitesDim.AddRange(utahSitePouWithOneAllocation);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahWaterSourceBridge = new WaterSourceBridgeSiteFactFaker()
             .WaterSourceBridgeSiteFactFakerWithIds(utahGroundWaterSource.WaterSourceId,
                 utahSitePouWithOneAllocation.SiteId)
             .Generate();
-        _db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge);
-        await _db.SaveChangesAsync();
+        Db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var allocationAmount = new AllocationAmountFactFaker()
@@ -479,19 +438,19 @@ public class AllocationPointTests
             .LinkBeneficialUses(tapWaterBeneficialUse)
             .Generate();
 
-        _db.AllocationAmountsFact.AddRange(allocationAmount);
-        await _db.SaveChangesAsync();
+        Db.AllocationAmountsFact.AddRange(allocationAmount);
+        await Db.SaveChangesAsync();
         ////////////////////////////////////////////////
 
         var utahSiteWithOneAllocationNoBenficialUses = new AllocationBridgeSiteFactFaker()
             .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId,
                 utahSitePouWithOneAllocation.SiteId)
             .Generate();
-        _db.AllocationBridgeSitesFact.AddRange(utahSiteWithOneAllocationNoBenficialUses);
-        await _db.SaveChangesAsync();
+        Db.AllocationBridgeSitesFact.AddRange(utahSiteWithOneAllocationNoBenficialUses);
+        await Db.SaveChangesAsync();
 
         // Act
-        await MapboxTileset.CreateTilesetFiles(_db);
+        await MapboxTileset.CreateAllocations(Db, GeoJsonDir);
 
         // Assert
         var json = await File.ReadAllTextAsync(Path.Combine("geojson", "Allocations.Points.geojson"));
@@ -507,30 +466,210 @@ public class AllocationPointTests
         features[0].Properties.ContainsKey("maxPri").Should().BeFalse();
     }
 
-    public class Maptiler
+    [TestMethod]
+    public async Task SiteWithTimeSeries_HasPropertiesIncluded()
     {
-        public string type { get; set; }
-        public MaptilerProperties properties { get; set; }
-    }
+        var tapWaterBeneficialUse = new BeneficialUsesCVFaker()
+            .RuleFor(r => r.Name, "TapWater")
+            .RuleFor(r => r.WaDEName, "Tap Water")
+            .RuleFor(r => r.State, "All")
+            .Generate();
 
-    public class MaptilerProperties
-    {
-        public string uuid { get; set; }
-        public string o { get; set; }
-        public string[] oClass { get; set; }
-        public string[] bu { get; set; }
-        public string podPou { get; set; }
-        public string[] wsType { get; set; }
-        public string[] st { get; set; }
-        public string[] ls { get; set; }
-        public string[] sType { get; set; }
-        public string[] allocType { get; set; }
-        public bool xmpt { get; set; }
-        public double? minFlow { get; set; }
-        public double? maxFlow { get; set; }
-        public double? minVol { get; set; }
-        public double? maxVol { get; set; }
-        public long? minPri { get; set; }
-        public long? maxPri { get; set; }
+        Db.BeneficialUsesCV.AddRange(tapWaterBeneficialUse);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+        var utahGroundWaterSourceType = new WaterSourceTypeFaker()
+            .RuleFor(r => r.Name, "Ground")
+            .RuleFor(r => r.WaDEName, "Groundwater")
+            .Generate();
+
+        Db.WaterSourceType.AddRange(utahGroundWaterSourceType);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var utahGroundWaterSource = new WaterSourceDimFaker()
+            .RuleFor(r => r.WaterSourceTypeCv, utahGroundWaterSourceType.Name)
+            .RuleFor(r => r.WaterSourceTypeCvNavigation, utahGroundWaterSourceType)
+            .Generate();
+
+        Db.WaterSourcesDim.AddRange(utahGroundWaterSource);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var armyClassification = new OwnerClassificationCvFaker()
+            .RuleFor(r => r.Name, "Army")
+            .RuleFor(r => r.WaDEName, "Military")
+            .Generate();
+
+        Db.OwnerClassificationCv.AddRange(armyClassification);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var legalStatusPending = new LegalStatusCVFaker()
+            .RuleFor(r => r.Name, "Pending")
+            .RuleFor(r => r.WaDEName, "Pending")
+            .Generate();
+        var legalStatusClaimed = new LegalStatusCVFaker()
+            .RuleFor(r => r.Name, "Claimed")
+            .RuleFor(r => r.WaDEName, "Claimed")
+            .Generate();
+        Db.LegalStatus.AddRange(legalStatusPending, legalStatusClaimed);
+        await Db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
+
+        var siteTypeDitch = new SiteTypeFaker()
+            .RuleFor(r => r.Name, "Canal")
+            .RuleFor(r => r.WaDEName, "Canal / Ditch / Diversion")
+            .Generate();
+        var siteTypeCanal = new SiteTypeFaker()
+            .RuleFor(r => r.Name, "Ditch")
+            .RuleFor(r => r.WaDEName, "Canal / Ditch / Diversion")
+            .Generate();
+        Db.SiteType.AddRange(siteTypeDitch, siteTypeCanal);
+        await Db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
+
+        var allocationTypeAllClaim = new WaterAllocationTypeCVFaker()
+            .RuleFor(r => r.Name, "All_Claim")
+            .RuleFor(r => r.WaDEName, "Claim")
+            .Generate();
+        var allocationTypeClaimAmmendment = new WaterAllocationTypeCVFaker()
+            .RuleFor(r => r.Name, "All_ClaimAmendment")
+            .RuleFor(r => r.WaDEName, "Claim")
+            .Generate();
+        Db.WaterAllocationType.AddRange(allocationTypeAllClaim, allocationTypeClaimAmmendment);
+        await Db.SaveChangesAsync();
+        ///////////////////////////////////////////////////
+
+        var utahDivisionOrganization = new OrganizationsDimFaker()
+            .RuleFor(r => r.OrganizationName, "Utah Division of Water Rights")
+            .RuleFor(r => r.State, "UT")
+            .Generate();
+        Db.OrganizationsDim.AddRange(utahDivisionOrganization);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var januraryDates = new DateDimFaker().Generate(31);
+        Db.DateDim.AddRange(januraryDates);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var utahSiteHasTimeSeries = new SitesDimFaker()
+            .RuleFor(r => r.SiteUuid, "utah_site_has_time_series")
+            .RuleFor(r => r.PODorPOUSite, "POU")
+            .RuleFor(r => r.SiteTypeCv, siteTypeDitch.Name)
+            .RuleFor(r => r.SiteTypeCvNavigation, siteTypeDitch)
+            .RuleFor(r => r.Geometry, Polygon.Empty)
+            .Generate();
+
+        var utahSiteNoTimeSeries = new SitesDimFaker()
+            .RuleFor(r => r.SiteUuid, "utah_site_no_time_series")
+            .RuleFor(r => r.SiteTypeCv, siteTypeCanal.Name)
+            .RuleFor(r => r.SiteTypeCvNavigation, siteTypeCanal)
+            .RuleFor(r => r.Geometry, Polygon.Empty)
+            .Generate();
+        Db.SitesDim.AddRange(utahSiteHasTimeSeries, utahSiteNoTimeSeries);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var utahWaterSourceBridge = new WaterSourceBridgeSiteFactFaker()
+            .WaterSourceBridgeSiteFactFakerWithIds(utahGroundWaterSource.WaterSourceId,
+                utahSiteHasTimeSeries.SiteId)
+            .Generate();
+        var utahWaterSourceBridge2 = new WaterSourceBridgeSiteFactFaker()
+            .WaterSourceBridgeSiteFactFakerWithIds(utahGroundWaterSource.WaterSourceId,
+                utahSiteNoTimeSeries.SiteId);
+        Db.WaterSourceBridgeSitesFact.AddRange(utahWaterSourceBridge, utahWaterSourceBridge2);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var allocationAmount = new AllocationAmountFactFaker()
+            .RuleFor(r => r.AllocationOwner, f => "Tom TapWater")
+            .RuleFor(r => r.OwnerClassificationCV, armyClassification.Name)
+            .RuleFor(r => r.OrganizationId, utahDivisionOrganization.OrganizationId)
+            .RuleFor(r => r.Organization, utahDivisionOrganization)
+            .RuleFor(r => r.AllocationLegalStatusCv, legalStatusPending.Name)
+            .RuleFor(r => r.AllocationLegalStatusCvNavigation, legalStatusPending)
+            .RuleFor(r => r.AllocationTypeCv, allocationTypeAllClaim.Name)
+            .RuleFor(r => r.AllocationTypeCvNavigation, allocationTypeAllClaim)
+            .RuleFor(r => r.ExemptOfVolumeFlowPriority, true)
+            .RuleFor(r => r.AllocationFlow_CFS, 1)
+            .RuleFor(r => r.AllocationVolume_AF, 10)
+            .RuleFor(r => r.AllocationPriorityDateID, januraryDates[0].DateId)
+            .LinkBeneficialUses(tapWaterBeneficialUse)
+            .Generate();
+        
+        var allocationAmount2 = new AllocationAmountFactFaker()
+            .RuleFor(r => r.AllocationOwner, f => "Tom TapWater")
+            .RuleFor(r => r.OwnerClassificationCV, armyClassification.Name)
+            .RuleFor(r => r.OrganizationId, utahDivisionOrganization.OrganizationId)
+            .RuleFor(r => r.Organization, utahDivisionOrganization)
+            .RuleFor(r => r.AllocationLegalStatusCv, legalStatusPending.Name)
+            .RuleFor(r => r.AllocationLegalStatusCvNavigation, legalStatusPending)
+            .RuleFor(r => r.AllocationTypeCv, allocationTypeAllClaim.Name)
+            .RuleFor(r => r.AllocationTypeCvNavigation, allocationTypeAllClaim)
+            .RuleFor(r => r.ExemptOfVolumeFlowPriority, true)
+            .RuleFor(r => r.AllocationFlow_CFS, 1)
+            .RuleFor(r => r.AllocationVolume_AF, 10)
+            .RuleFor(r => r.AllocationPriorityDateID, januraryDates[0].DateId)
+            .LinkBeneficialUses(tapWaterBeneficialUse)
+            .Generate();
+        
+        Db.AllocationAmountsFact.AddRange(allocationAmount, allocationAmount2);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        var utahSiteWithTimeSeries = new AllocationBridgeSiteFactFaker()
+            .AllocationBridgeSiteFactFakerWithIds(allocationAmount.AllocationAmountId,
+                utahSiteHasTimeSeries.SiteId)
+            .Generate();
+        
+        var utahSiteWithNoTimeSeries = new AllocationBridgeSiteFactFaker()
+            .AllocationBridgeSiteFactFakerWithIds(allocationAmount2.AllocationAmountId,
+                utahSiteNoTimeSeries.SiteId)
+            .Generate();
+        Db.AllocationBridgeSitesFact.AddRange(utahSiteWithTimeSeries, utahSiteWithNoTimeSeries);
+        await Db.SaveChangesAsync();
+
+        ////////////////////////////////////////////////
+        var timeSeries = new SiteVariableAmountsFactFaker()
+            .RuleFor(r => r.SiteId, utahSiteHasTimeSeries.SiteId)
+            .RuleFor(r => r.Site, utahSiteHasTimeSeries)
+            .RuleFor(r => r.TimeframeStartID, januraryDates[0].DateId)
+            .RuleFor(r => r.TimeframeEndID, januraryDates[6].DateId)
+            .RuleFor(r => r.DataPublicationDateID, januraryDates[6].DateId)
+            .Generate();
+        var timeSeries2 = new SiteVariableAmountsFactFaker()
+            .RuleFor(r => r.SiteId, utahSiteHasTimeSeries.SiteId)
+            .RuleFor(r => r.Site, utahSiteHasTimeSeries)
+            .RuleFor(r => r.TimeframeStartID, januraryDates[5].DateId)
+            .RuleFor(r => r.TimeframeEndID, januraryDates[11].DateId)
+            .RuleFor(r => r.DataPublicationDateID, januraryDates[6].DateId)
+            .Generate();
+
+        Db.SiteVariableAmountsFact.AddRange(timeSeries, timeSeries2);
+        await Db.SaveChangesAsync();
+        ////////////////////////////////////////////////
+
+        // Act
+        await MapboxTileset.CreateAllocations(Db, GeoJsonDir);
+
+        // Assert
+        var json = await File.ReadAllTextAsync(Path.Combine("geojson", "Allocations.Polygons.geojson"));
+        var features = JsonSerializer.Deserialize<List<Maptiler<AllocationFeatureProperties>>>(json);
+
+        features.Should().NotBeNullOrEmpty();
+        features.Should().HaveCount(2);
+
+        // Verify properties...
+        var siteWithTimeSeries = features.First(f => f.properties.uuid == "utah_site_has_time_series");
+        siteWithTimeSeries.properties.minTs.Should()
+            .Be(new DateTimeOffset(januraryDates[0].Date).ToUnixTimeSeconds());
+        siteWithTimeSeries.properties.maxTs.Should()
+            .Be(new DateTimeOffset(januraryDates[11].Date).ToUnixTimeSeconds());
+
+        var siteWithNoTimeSeries = features.First(f => f.properties.uuid == "utah_site_no_time_series");
+        siteWithNoTimeSeries.properties.minTs.Should().BeNull();
+        siteWithNoTimeSeries.properties.maxTs.Should().BeNull();
     }
 }

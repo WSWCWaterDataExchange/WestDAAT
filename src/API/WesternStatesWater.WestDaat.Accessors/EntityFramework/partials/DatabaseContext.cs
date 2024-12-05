@@ -80,6 +80,7 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
         public virtual DbSet<NhdnetworkStatus> NhdnetworkStatus { get; set; }
         public virtual DbSet<Nhdproduct> Nhdproduct { get; set; }
         public virtual DbSet<OrganizationsDim> OrganizationsDim { get; set; }
+        public virtual DbSet<OverlaysView> OverlaysViews { get; set; }
         public virtual DbSet<OwnerClassificationCv> OwnerClassificationCv { get; set; }
         public virtual DbSet<PODSiteToPOUSiteFact> PODSiteToPOUSiteFact { get; set; }
         public virtual DbSet<PowerType> PowerType { get; set; }
@@ -582,6 +583,8 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.MaxAfVolume).HasColumnName("maxAfVolume");
                 entity.Property(e => e.MinPriorityDate).HasColumnName("minPriorityDate");
                 entity.Property(e => e.MaxPriorityDate).HasColumnName("maxPriorityDate");
+                entity.Property(e=> e.StartDate).HasColumnName("startDate");
+                entity.Property(e=> e.EndDate).HasColumnName("endDate");
                 entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
                 entity.Property(e => e.Point).HasColumnType("point").HasColumnName("point");
             });
@@ -1156,6 +1159,13 @@ namespace WesternStatesWater.WestDaat.Accessors.EntityFramework
                 entity.Property(e => e.OrganizationWebsite)
                     .IsRequired()
                     .HasMaxLength(250);
+            });
+
+            modelBuilder.Entity<OverlaysView>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("OverlaysView");
+                entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
             });
 
             modelBuilder.Entity<OwnerClassificationCv>(entity =>
