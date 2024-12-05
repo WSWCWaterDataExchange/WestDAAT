@@ -419,28 +419,37 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             await db.SaveChangesAsync();
 
 
-            var siteDim = new SitesDimFaker().Generate();
-            db.SitesDim.Add(siteDim);
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
             await db.SaveChangesAsync();
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
             
-            var timeSeries = new SiteVariableAmountsFactFaker()
-                .RuleFor(r => r.SiteId, siteDim.SiteId)
-                .RuleFor(r => r.Site, siteDim)
-                .RuleFor(r => r.TimeframeStartID, dates[0].DateId)
-                .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
-                .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
-                .Generate(10);
+            foreach (var siteDim in siteDims)
+            {
+                timeSeries.AddRange(
+                        new SiteVariableAmountsFactFaker()
+                            .RuleFor(r => r.SiteId, siteDim.SiteId)
+                            .RuleFor(r => r.Site, siteDim)
+                            .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                            .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                            .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                            .Generate(10)
+                );
+            }
             
             await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
             await db.SaveChangesAsync();
             
-            db.SiteVariableAmountsFact.Should().HaveCount(10);
+            db.SiteVariableAmountsFact.Should().HaveCount(20);
             
             // Act
             var accessor = CreateSiteAccessor();
-            var result = await accessor.GetSiteUsageBySiteUuid(siteDim.SiteUuid);
+            var result = await accessor.GetSiteUsageBySiteUuid(siteDims[0].SiteUuid);
 
+            // Assert
             result.Should().HaveCount(10);
+            result.Should().BeInDescendingOrder<DateTime>(x => x.TimeFrameStartDate);
         }
 
 
