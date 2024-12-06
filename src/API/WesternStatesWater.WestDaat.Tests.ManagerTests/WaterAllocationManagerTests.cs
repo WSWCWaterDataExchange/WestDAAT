@@ -696,6 +696,30 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             }
         }
 
+        [TestMethod]
+        public async Task GetSiteUsageBySiteUuid_Results_Returned()
+        {
+            //Arrange
+            _siteAccessorMock.Setup(x => x.GetSiteUsageBySiteUuid(It.IsAny<String>()))
+                .ReturnsAsync(new List<CommonContracts.SiteUsagePoint>()
+                {
+                    new CommonContracts.SiteUsagePoint()
+                    {
+                        Amount = 1.0,
+                        TimeFrameStartDate = DateTime.Now,
+                        VariableUuid = "test"
+                    }
+                }).Verifiable();
+            
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetSiteUsageBySiteUuid("test");
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+        
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {
             using var data = new MemoryStream();

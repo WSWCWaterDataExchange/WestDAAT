@@ -173,8 +173,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             return await CreateOkResponse(request, result);
         }
+        
+        [Function(nameof(GetSiteUsageByByUuid))]
+        public async Task<HttpResponseData> GetSiteUsageByByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteUsage")] HttpRequestData request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetSiteUsageBySiteUuid(siteUuid);
 
-
+            return await CreateOkResponse(request, result);
+        }
+        
         [Function(nameof(DownloadWaterRights))]
         public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {

@@ -405,6 +405,53 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().HaveCount(1);
             result[0].WaterSourceTypes.Should().BeEquivalentTo(new[] { expectedName1, expectedName2, expectedName3 } );
         }
+        
+        
+        [TestMethod]
+        [TestCategory("Accessor Tests")]
+        public async Task WaterAllocationAccessor_GetSiteUsageBySiteUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            
+            var dates = new DateDimFaker().Generate(31);
+            db.DateDim.AddRange(dates);
+            await db.SaveChangesAsync();
+
+
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
+            await db.SaveChangesAsync();
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
+            
+            foreach (var siteDim in siteDims)
+            {
+                timeSeries.AddRange(
+                        new SiteVariableAmountsFactFaker()
+                            .RuleFor(r => r.SiteId, siteDim.SiteId)
+                            .RuleFor(r => r.Site, siteDim)
+                            .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                            .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                            .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                            .Generate(10)
+                );
+            }
+            
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+            
+            db.SiteVariableAmountsFact.Should().HaveCount(20);
+            
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteUsageBySiteUuid(siteDims[0].SiteUuid);
+
+            // Assert
+            result.Should().HaveCount(10);
+            result.Should().BeInAscendingOrder(x => x.TimeFrameStartDate);
+        }
+
 
         private ISiteAccessor CreateSiteAccessor()
         {

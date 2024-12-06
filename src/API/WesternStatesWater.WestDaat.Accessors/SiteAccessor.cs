@@ -78,6 +78,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)
                 .ToListAsync();
         }
+        
+        public async Task<IEnumerable<SiteUsagePoint>> GetSiteUsageBySiteUuid(string siteUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            return await db.SiteVariableAmountsFact
+                .Where(x => x.Site.SiteUuid == siteUuid)
+                .ProjectTo<SiteUsagePoint>(DtoMapper.Configuration)
+                .OrderBy(x => x.TimeFrameStartDate)
+                .ToListAsync();
+        }
 
         public IEnumerable<GeoConnex> GetJSONLDData()
         {

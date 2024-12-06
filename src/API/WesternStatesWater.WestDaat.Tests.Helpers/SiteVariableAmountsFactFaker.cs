@@ -2,7 +2,7 @@ using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class SiteVariableAmountsFactFaker : Faker<SiteVariableAmountsFact>
+public sealed class SiteVariableAmountsFactFaker : Faker<SiteVariableAmountsFact>
 {
     public SiteVariableAmountsFactFaker()
     {
