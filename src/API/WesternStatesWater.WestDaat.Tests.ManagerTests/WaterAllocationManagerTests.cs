@@ -720,6 +720,106 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _waterAllocationAccessorMock.Verify();
         }
         
+        [TestMethod]
+        public async Task GetOverlayByUuid_ReturnsExpectedOverlay()
+        {
+            //Arrange
+            var overlay = new CommonContracts.Overlay
+            {
+                WaDEAreaReportingUuid = "test",
+                ReportingAreaNativeID = "test",
+                WaDEOverlayAreaType = new List<string> { "test" },
+                NativeReportingAreaType = "test",
+                ReportingAreaName = "test",
+                State = "test",
+                AreaLastUpdatedDate = DateTime.Now,
+                OrganizationName = "test",
+                OrganizationState = "test",
+                OrganizationWebsite = "test",
+                Geometry = new PolygonFaker().Generate()
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(It.IsAny<string>()))
+                .ReturnsAsync(overlay)
+                .Verifiable();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetOverlayByUuid("test");
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+        
+        [TestMethod]
+        public async Task GetOverlayByUuid_ThrowsException_WhenUuidIsNullOrEmpty()
+        {
+            // Arrange
+            var manager = CreateWaterAllocationManager();
+
+            // Act & Assert
+            await Assert.ThrowsExceptionAsync<WestDaatException>(
+                () => manager.GetOverlayByUuid(""),
+                "Overlay UUID cannot be null or empty.");
+
+            await Assert.ThrowsExceptionAsync<WestDaatException>(
+                () => manager.GetOverlayByUuid(null),
+                "Overlay UUID cannot be null or empty.");
+        }
+        
+        [TestMethod]
+        public async Task GetOverlayByUuid_ThrowsException_WhenOverlayNotFound()
+        {
+            // Arrange
+            var overlayUuid = "test";
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(overlayUuid))
+                .ReturnsAsync((CommonContracts.Overlay)null)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act & Assert
+            await Assert.ThrowsExceptionAsync<WestDaatException>(
+                () => manager.GetOverlayByUuid(overlayUuid),
+                $"No overlay found for UUID: {overlayUuid}");
+
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayByUuid_SetsAreaLastUpdatedDateToNull_WhenInvalidDate()
+        {
+            //Arrange
+            var overlay = new CommonContracts.Overlay
+            {
+                WaDEAreaReportingUuid = "test",
+                ReportingAreaNativeID = "test",
+                WaDEOverlayAreaType = new List<string> { "test" },
+                NativeReportingAreaType = "test",
+                ReportingAreaName = "test",
+                State = "test",
+                AreaLastUpdatedDate = DateTime.MinValue,
+                OrganizationName = "test",
+                OrganizationState = "test",
+                OrganizationWebsite = "test",
+                Geometry = new PolygonFaker().Generate()
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(It.IsAny<string>()))
+                .ReturnsAsync(overlay)
+                .Verifiable();
+
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetOverlayByUuid("test");
+
+            //Assert
+            result.Should().NotBeNull();
+            result.AreaLastUpdatedDate.Should().BeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+        
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {
             using var data = new MemoryStream();

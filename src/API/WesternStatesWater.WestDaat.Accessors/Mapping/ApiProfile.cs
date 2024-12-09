@@ -96,12 +96,13 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 ;
             
             CreateMap<EF.ReportingUnitsDim, Overlay>()
-                .ForMember(dest => dest.WaDEAreaReportingUUID, opt => opt.MapFrom(source => source.ReportingUnitUuid))
+                .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
-                .ForMember(dest => dest.WaDEReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
-                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv))
-                .ForMember(dest => dest.NativeReportingAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCvNavigation.Name))
-                .ForMember(dest => dest.ReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
+                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source =>
+                    source.RegulatoryReportingUnitsFact
+                        .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
+                        .Distinct().ToList()))
+                .ForMember(dest => dest.NativeReportingAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(source => source.StateCv))
                 .ForMember(dest => dest.AreaLastUpdatedDate, opt => opt.MapFrom(source => source.ReportingUnitUpdateDate))
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
@@ -111,6 +112,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
                     .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
+
         }
     }
 }

@@ -566,10 +566,10 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             var overlay = await db.ReportingUnitsDim
                 .Include(r => r.RegulatoryReportingUnitsFact)
-                .ThenInclude(rr => rr.Organization) // Ensure organization data is included
+                .ThenInclude(rr => rr.Organization)
                 .AsNoTracking()
                 .Where(r => r.ReportingUnitUuid == overlayUuid)
-                .ProjectTo<Overlay>(DtoMapper.Configuration) // Use the new mapping
+                .ProjectTo<Overlay>(DtoMapper.Configuration)
                 .SingleOrDefaultAsync();
 
             ts.Complete();
