@@ -193,9 +193,14 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
         
-        async Task<List<ClientContracts.SiteUsagePoint>> ClientContracts.IWaterAllocationManager.GetSiteUsageBySiteUuid(string siteUuid)
+        async Task<ClientContracts.SiteUsage> ClientContracts.IWaterAllocationManager.GetSiteUsageBySiteUuid(string siteUuid)
         {
-            return (await _siteAccessor.GetSiteUsageBySiteUuid(siteUuid)).Map<List<ClientContracts.SiteUsagePoint>>();
+            var siteUsagePoints = await _siteAccessor.GetSiteUsageBySiteUuid(siteUuid);
+            return new ClientContracts.SiteUsage
+            {
+                AmountUnit = siteUsagePoints.FirstOrDefault()?.AmountUnit,
+                SiteUsagePoints = siteUsagePoints.Map<List<ClientContracts.SiteUsagePoint>>()
+            };
         }
 
         public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteriaWithFilterUrl searchRequest)

@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
+import {SiteUsage} from "../data-contracts/SiteUsage";
 
 export const getWaterRightsDigests = async (
   siteUuid: string,
@@ -59,5 +60,17 @@ export const getWaterRightInfoList = async (siteUuid: string) => {
 export const getSiteDetails = async (siteUuid: string) => {
   const url = new URL(`Sites/${siteUuid}`, process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<SiteDetails>(url.toString());
+  return data;
+};
+
+export const getSiteUsage = async (siteUuid: string) => {
+  const { data } = await axios.get<SiteUsage>(`${process.env.REACT_APP_WEBAPI_URL}Sites/${siteUuid}/SiteUsage`);
+
+  data.siteUsagePoints = data.siteUsagePoints.map((d) => ({
+    variableUuid: d.variableUuid,
+    timeFrameStartDate: new Date(d.timeFrameStartDate),
+    amount: d.amount,
+  }));
+
   return data;
 };
