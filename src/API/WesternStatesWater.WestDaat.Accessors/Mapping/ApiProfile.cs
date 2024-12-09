@@ -94,6 +94,23 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.TimeFrameStartDate, opt => opt.MapFrom(source => source.TimeframeStartNavigation.Date))
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 ;
+            
+            CreateMap<EF.ReportingUnitsDim, Overlay>()
+                .ForMember(dest => dest.WaDEAreaReportingUUID, opt => opt.MapFrom(source => source.ReportingUnitUuid))
+                .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
+                .ForMember(dest => dest.WaDEReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
+                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv))
+                .ForMember(dest => dest.NativeReportingAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCvNavigation.Name)) // Assuming "Name" exists //TODO check this
+                .ForMember(dest => dest.ReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
+                .ForMember(dest => dest.State, opt => opt.MapFrom(source => source.StateCv))
+                .ForMember(dest => dest.AreaLastUpdatedDate, opt => opt.MapFrom(source => source.ReportingUnitUpdateDate))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.OrganizationName).FirstOrDefault()))
+                .ForMember(dest => dest.OrganizationState, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.State).FirstOrDefault()))
+                .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()));
+
         }
     }
 }
