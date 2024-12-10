@@ -156,11 +156,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException($"No overlay found for UUID: {overlayUuid}");
             }
 
-            if (!overlay.AreaLastUpdatedDate.HasValue || overlay.AreaLastUpdatedDate == DateTime.MinValue)
-            {
-                overlay.AreaLastUpdatedDate = null; 
-            }
-
+        
             return overlay.Map<ClientContracts.OverlayDetails>();
         }
 
