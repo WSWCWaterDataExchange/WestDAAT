@@ -4,6 +4,7 @@ import { createContext, FC, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
   useSiteDetails,
+  useSiteUsage,
   useWaterRightInfoList,
   useWaterSiteLocation,
   useWaterSiteSourceInfoList,
@@ -14,6 +15,7 @@ import {
   SiteDetails,
   WaterRightInfoListItem,
 } from '@data-contracts';
+import {SiteUsage} from "../../../data-contracts/SiteUsage";
 
 type Query<T> = Pick<
   UseQueryResult<T, unknown>,
@@ -27,6 +29,7 @@ export interface HostData {
   locationsQuery: Query<Feature<Geometry, GeoJsonProperties>>;
   waterRightInfoListQuery: Query<WaterRightInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
+  siteUsageQuery: Query<SiteUsage>;
 }
 
 type ActiveTabType = 'source' | 'right';
@@ -47,6 +50,7 @@ const defaultState: SiteDetailsPageContextState = {
     locationsQuery: defaultQuery,
     waterRightInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
+    siteUsageQuery: defaultQuery,
   },
 };
 
@@ -69,6 +73,7 @@ export const SiteDetailsProvider: FC = ({ children }) => {
   const sourceInfoListQuery = useWaterSiteSourceInfoList(siteUuid, {
     enabled: activeTab === 'source',
   });
+  const siteUsageQuery = useSiteUsage(siteUuid);
 
   const filterContextProviderValue: SiteDetailsPageContextState = {
     siteUuid,
@@ -79,6 +84,7 @@ export const SiteDetailsProvider: FC = ({ children }) => {
       locationsQuery,
       waterRightInfoListQuery,
       sourceInfoListQuery,
+      siteUsageQuery,
     },
   };
 

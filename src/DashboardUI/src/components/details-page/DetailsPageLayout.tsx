@@ -9,13 +9,11 @@ type DetailsPageFunctionType = {
   Properties: typeof Properties;
   Map: typeof Map;
   Tabs: typeof Tabs;
+  LineChart: typeof LineChart;
 };
 
-type DetailsPageComponent = React.FunctionComponent<EmptyPropsWithChildren> &
-  DetailsPageFunctionType;
-const DetailsPage: DetailsPageComponent = function DetailsPage({
-  children,
-}: EmptyPropsWithChildren) {
+type DetailsPageComponent = React.FunctionComponent<EmptyPropsWithChildren> & DetailsPageFunctionType;
+const DetailsPage: DetailsPageComponent = function DetailsPage({ children }: EmptyPropsWithChildren) {
   const { findChild: findHeader } = useChildrenByTypes('DetailsHeader');
   const header = useMemo(() => {
     return findHeader(children);
@@ -36,6 +34,11 @@ const DetailsPage: DetailsPageComponent = function DetailsPage({
     return findTabs(children);
   }, [children, findTabs]);
 
+  const { findChild: findLineChart } = useChildrenByTypes('DetailsLineChart');
+  const lineGraph = useMemo(() => {
+    return findLineChart(children);
+  }, [children, findLineChart]);
+
   return (
     <div className="detail-page d-flex flex-column flex-grow-1">
       <div className="row">
@@ -48,6 +51,9 @@ const DetailsPage: DetailsPageComponent = function DetailsPage({
       <div className="row mt-3">
         <div className="col">{tabs}</div>
       </div>
+      <div className="row mt-3">
+        <div className="col">{lineGraph}</div>
+      </div>
     </div>
   );
 };
@@ -55,9 +61,7 @@ const DetailsPage: DetailsPageComponent = function DetailsPage({
 type DetailsTypeProps = {
   __type: 'DetailsHeader' | 'DetailsProperties' | 'DetailsMap' | 'DetailsTabs';
 };
-const Header = function DetailsHeader({
-  children,
-}: PropsWithChildren<DetailsTypeProps>) {
+const Header = function DetailsHeader({ children }: PropsWithChildren<DetailsTypeProps>) {
   return (
     <div className="d-flex flex-row align-items-center justify-content-center title-header">
       <h3 className="d-flex fw-bold">{children}</h3>
@@ -66,30 +70,30 @@ const Header = function DetailsHeader({
 };
 Header.defaultProps = { __type: 'DetailsHeader' };
 
-const Properties = function DetailsProperties({
-  children,
-}: PropsWithChildren<DetailsTypeProps>) {
+const Properties = function DetailsProperties({ children }: PropsWithChildren<DetailsTypeProps>) {
   return <>{children}</>;
 };
 Properties.defaultProps = { __type: 'DetailsProperties' };
 
-const Map = function DetailsMap({
-  children,
-}: PropsWithChildren<DetailsTypeProps>) {
+const Map = function DetailsMap({ children }: PropsWithChildren<DetailsTypeProps>) {
   return <>{children}</>;
 };
 Map.defaultProps = { __type: 'DetailsMap' };
 
-const Tabs = function DetailsTabs({
-  children,
-}: PropsWithChildren<DetailsTypeProps>) {
+const Tabs = function DetailsTabs({ children }: PropsWithChildren<DetailsTypeProps>) {
   return <div className="flex-fill">{children}</div>;
 };
 Tabs.defaultProps = { __type: 'DetailsTabs' };
+
+const LineChart = function DetailsLineChart({ children }: PropsWithChildren<DetailsTypeProps>) {
+  return <div className="flex-fill">{children}</div>;
+};
+LineChart.defaultProps = { __type: 'DetailsLineChart' };
 
 DetailsPage.Header = Header;
 DetailsPage.Properties = Properties;
 DetailsPage.Map = Map;
 DetailsPage.Tabs = Tabs;
+DetailsPage.LineChart = LineChart;
 
 export { DetailsPage };
