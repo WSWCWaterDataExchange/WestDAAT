@@ -8,7 +8,6 @@ public class Overlay
     public string ReportingAreaNativeID { get; set; }
     public List<string> WaDEOverlayAreaType { get; set; }
     public string NativeReportingAreaType { get; set; }
-    public string ReportingAreaName { get; set; }
     public string State { get; set; }
     public DateTime? AreaLastUpdatedDate { get; set; }
     public string OrganizationName { get; set; }
