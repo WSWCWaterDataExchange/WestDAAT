@@ -94,6 +94,18 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.TimeFrameStartDate, opt => opt.MapFrom(source => source.TimeframeStartNavigation.Date))
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 ;
+
+            CreateMap<EF.VariablesDim, VariableInfoListItem>()
+                .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(source => source.VariableSpecificUuid))
+                .ForMember(dest => dest.Variable, opt => opt.MapFrom(source => source.VariableCv))
+                .ForMember(dest => dest.VariableSpecificType, opt => opt.MapFrom(source => source.VariableSpecificCv))
+                .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.AmountUnitCv))
+                .ForMember(dest => dest.AggregationStatistic, opt => opt.MapFrom(source => source.AggregationStatisticCv))
+                .ForMember(dest => dest.AggregationInterval, opt => opt.MapFrom(source => source.AggregationInterval))
+                .ForMember(dest => dest.AggregationIntervalUnit, opt => opt.MapFrom(source => source.AggregationIntervalUnitCv))
+                .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.ReportYearStartMonth))
+                .ForMember(dest => dest.ReportYearType, opt => opt.MapFrom(source => source.ReportYearTypeCv))
+                ;
         }
     }
 }
