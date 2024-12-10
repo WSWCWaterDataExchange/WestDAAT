@@ -559,9 +559,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         
         public async Task<Overlay> GetOverlayByUuid(string overlayUuid)
         {
-            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
             await using var db = _databaseContextFactory.Create();
-
             await db.Database.OpenConnectionAsync();
 
             var overlay = await db.ReportingUnitsDim
@@ -571,8 +569,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Where(r => r.ReportingUnitUuid == overlayUuid)
                 .ProjectTo<Overlay>(DtoMapper.Configuration)
                 .SingleOrDefaultAsync();
-
-            ts.Complete();
 
             return overlay;
         }
