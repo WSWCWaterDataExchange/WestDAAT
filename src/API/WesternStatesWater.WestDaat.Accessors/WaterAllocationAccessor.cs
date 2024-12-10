@@ -557,7 +557,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return allRegulatoryUuids;
         }
         
-        public async Task<Overlay> GetOverlayByUuid(string overlayUuid)
+        public async Task<OverlayDetails> GetOverlayDetails(string overlayUuid)
         {
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
@@ -567,7 +567,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ThenInclude(rr => rr.Organization)
                 .AsNoTracking()
                 .Where(r => r.ReportingUnitUuid == overlayUuid)
-                .ProjectTo<Overlay>(DtoMapper.Configuration)
+                .ProjectTo<OverlayDetails>(DtoMapper.Configuration)
                 .SingleOrDefaultAsync();
 
             return overlay;

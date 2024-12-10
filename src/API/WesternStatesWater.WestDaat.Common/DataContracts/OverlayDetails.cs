@@ -1,7 +1,8 @@
+using NetTopologySuite.Geometries;
 
-namespace WesternStatesWater.WestDaat.Contracts.Client;
+namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class Overlay
+public class OverlayDetails
 {
     public string WaDEAreaReportingUuid { get; set; }
     public string ReportingAreaNativeID { get; set; }
@@ -12,5 +13,5 @@ public class Overlay
     public string OrganizationName { get; set; }
     public string OrganizationState { get; set; }
     public string OrganizationWebsite { get; set; }
-    public string Geometry { get; set; }
+    public Geometry Geometry { get; set; }
 }

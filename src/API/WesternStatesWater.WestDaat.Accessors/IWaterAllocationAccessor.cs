@@ -30,6 +30,6 @@ namespace WesternStatesWater.WestDaat.Accessors
         int GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
 
         IEnumerable<(string Name, IEnumerable<object> Data)> GetWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
-        Task<Overlay> GetOverlayByUuid(string overlayUuid);
+        Task<OverlayDetails> GetOverlayDetails(string overlayUuid);
     }
 }

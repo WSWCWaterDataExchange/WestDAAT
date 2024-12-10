@@ -721,10 +721,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
         
         [TestMethod]
-        public async Task GetOverlayByUuid_ReturnsExpectedOverlay()
+        public async Task GetOverlayDetails_ReturnsExpectedOverlay()
         {
             //Arrange
-            var overlay = new CommonContracts.Overlay
+            var overlay = new CommonContracts.OverlayDetails
             {
                 WaDEAreaReportingUuid = "test",
                 ReportingAreaNativeID = "test",
@@ -738,13 +738,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Geometry = new PolygonFaker().Generate()
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(It.IsAny<string>()))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayDetails(It.IsAny<string>()))
                 .ReturnsAsync(overlay)
                 .Verifiable();
 
             //Act
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetOverlayByUuid("test");
+            var result = await manager.GetOverlayDetails("test");
 
             //Assert
             result.Should().NotBeNull();
@@ -752,45 +752,45 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
         
         [TestMethod]
-        public async Task GetOverlayByUuid_ThrowsException_WhenUuidIsNullOrEmpty()
+        public async Task GetOverlayDetails_ThrowsException_WhenUuidIsNullOrEmpty()
         {
             // Arrange
             var manager = CreateWaterAllocationManager();
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<WestDaatException>(
-                () => manager.GetOverlayByUuid(""),
-                "Overlay UUID cannot be null or empty.");
+                () => manager.GetOverlayDetails(""),
+                "OverlayDetails UUID cannot be null or empty.");
 
             await Assert.ThrowsExceptionAsync<WestDaatException>(
-                () => manager.GetOverlayByUuid(null),
-                "Overlay UUID cannot be null or empty.");
+                () => manager.GetOverlayDetails(null),
+                "OverlayDetails UUID cannot be null or empty.");
         }
         
         [TestMethod]
-        public async Task GetOverlayByUuid_ThrowsException_WhenOverlayNotFound()
+        public async Task GetOverlayDetails_ThrowsException_WhenOverlayNotFound()
         {
             // Arrange
             var overlayUuid = "test";
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(overlayUuid))
-                .ReturnsAsync((CommonContracts.Overlay)null)
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayDetails(overlayUuid))
+                .ReturnsAsync((CommonContracts.OverlayDetails)null)
                 .Verifiable();
 
             var manager = CreateWaterAllocationManager();
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<WestDaatException>(
-                () => manager.GetOverlayByUuid(overlayUuid),
+                () => manager.GetOverlayDetails(overlayUuid),
                 $"No overlay found for UUID: {overlayUuid}");
 
             _waterAllocationAccessorMock.Verify();
         }
 
         [TestMethod]
-        public async Task GetOverlayByUuid_SetsAreaLastUpdatedDateToNull_WhenInvalidDate()
+        public async Task GetOverlayDetails_SetsAreaLastUpdatedDateToNull_WhenInvalidDate()
         {
             //Arrange
-            var overlay = new CommonContracts.Overlay
+            var overlay = new CommonContracts.OverlayDetails
             {
                 WaDEAreaReportingUuid = "test",
                 ReportingAreaNativeID = "test",
@@ -804,13 +804,13 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Geometry = new PolygonFaker().Generate()
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayByUuid(It.IsAny<string>()))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayDetails(It.IsAny<string>()))
                 .ReturnsAsync(overlay)
                 .Verifiable();
 
             //Act
             var manager = CreateWaterAllocationManager();
-            var result = await manager.GetOverlayByUuid("test");
+            var result = await manager.GetOverlayDetails("test");
 
             //Assert
             result.Should().NotBeNull();

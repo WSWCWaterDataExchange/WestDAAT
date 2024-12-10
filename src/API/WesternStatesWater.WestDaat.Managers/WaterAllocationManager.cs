@@ -142,14 +142,14 @@ namespace WesternStatesWater.WestDaat.Managers
             return new FeatureCollection(features);
         }
         
-        public async Task<ClientContracts.Overlay> GetOverlayByUuid(string overlayUuid)
+        public async Task<ClientContracts.OverlayDetails> GetOverlayDetails(string overlayUuid)
         {
             if (string.IsNullOrWhiteSpace(overlayUuid))
             {
-                throw new WestDaatException("Overlay UUID cannot be null or empty.");
+                throw new WestDaatException("OverlayDetails UUID cannot be null or empty.");
             }
 
-            var overlay = await _waterAllocationAccessor.GetOverlayByUuid(overlayUuid);
+            var overlay = await _waterAllocationAccessor.GetOverlayDetails(overlayUuid);
 
             if (overlay == null)
             {
@@ -161,7 +161,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 overlay.AreaLastUpdatedDate = null; 
             }
 
-            return overlay.Map<ClientContracts.Overlay>();
+            return overlay.Map<ClientContracts.OverlayDetails>();
         }
 
 

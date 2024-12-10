@@ -95,7 +95,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 ;
             
-            CreateMap<EF.ReportingUnitsDim, Overlay>()
+            CreateMap<EF.ReportingUnitsDim, OverlayDetails>()
                 .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
                 .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source =>
