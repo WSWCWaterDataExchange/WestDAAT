@@ -573,7 +573,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return overlay;
         }
         
-        public async Task<OverlayTable> GetOverlayTableDetails(string reportingUnitUuid)
+        public async Task<OverlayTable> GetOverlayInfoById(string reportingUnitUuid)
         {
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
@@ -587,7 +587,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return new OverlayTable
             {
-                Entries = entries //is this too business logic for accessor? 
+                Entries = entries //is this too business logic for accessor? just retrun list of lists
             };
         }
 

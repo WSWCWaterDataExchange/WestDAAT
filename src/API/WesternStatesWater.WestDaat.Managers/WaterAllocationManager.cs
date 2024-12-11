@@ -159,14 +159,14 @@ namespace WesternStatesWater.WestDaat.Managers
         
             return overlay.Map<ClientContracts.OverlayDetails>();
         }
-        public async Task<ClientContracts.OverlayTable> GetOverlayTableDetails(string reportingUnitUuid)
+        public async Task<ClientContracts.OverlayTable> GetOverlayInfoById(string reportingUnitUuid)
         {
             if (string.IsNullOrWhiteSpace(reportingUnitUuid))
             {
                 throw new WestDaatException("Reporting Unit UUID cannot be null or empty.");
             }
 
-            var overlayTable = await _waterAllocationAccessor.GetOverlayTableDetails(reportingUnitUuid);
+            var overlayTable = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
 
             if (overlayTable == null || overlayTable.Entries == null || !overlayTable.Entries.Any())
             {
