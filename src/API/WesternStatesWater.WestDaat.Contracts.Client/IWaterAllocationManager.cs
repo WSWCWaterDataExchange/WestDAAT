@@ -41,5 +41,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<SiteUsage> GetSiteUsageBySiteUuid(string siteUuid);
 
         Task<List<VariableInfoListItem>> GetSiteVariableInfoListByUuid(string siteUuid);
+        
+        Task<List<MethodInfoListItem>> GetSiteMethodInfoListByUuid(string siteUuid);
     }
 }
