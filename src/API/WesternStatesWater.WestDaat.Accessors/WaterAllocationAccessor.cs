@@ -556,6 +556,22 @@ namespace WesternStatesWater.WestDaat.Accessors
             });
             return allRegulatoryUuids;
         }
+        
+        public async Task<OverlayDetails> GetOverlayDetails(string overlayUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var overlay = await db.ReportingUnitsDim
+                .Include(r => r.RegulatoryReportingUnitsFact)
+                .ThenInclude(rr => rr.Organization)
+                .AsNoTracking()
+                .Where(r => r.ReportingUnitUuid == overlayUuid)
+                .ProjectTo<OverlayDetails>(DtoMapper.Configuration)
+                .SingleOrDefaultAsync();
+
+            return overlay;
+        }
 
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
         {
