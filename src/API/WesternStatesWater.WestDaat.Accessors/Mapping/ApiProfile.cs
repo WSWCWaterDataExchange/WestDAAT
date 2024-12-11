@@ -112,7 +112,19 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
                     .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
-
+            
+            CreateMap<RegulatoryOverlayDim, OverlayTableEntry>()
+                .ForMember(dest => dest.WaDEOverlayUUID, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
+                .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
+                .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
+                .ForMember(dest => dest.OverlayType, opt => opt.MapFrom(source => source.RegulatoryOverlayTypeCV))
+                .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCV))
+                .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.RegulatoryStatusCv))
+                .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.RegulatoryStatute))
+                .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.RegulatoryStatuteLink))
+                .ForMember(dest => dest.StatutoryEffectiveDate, opt => opt.MapFrom(source => source.StatutoryEffectiveDate))
+                .ForMember(dest => dest.StatutoryEndDate, opt => opt.MapFrom(source => source.StatutoryEndDate))
+                .ForMember(dest => dest.OverlayStatusDesc, opt => opt.MapFrom(source => source.RegulatoryDescription));
         }
     }
 }

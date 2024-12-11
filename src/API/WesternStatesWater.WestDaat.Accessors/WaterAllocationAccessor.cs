@@ -572,6 +572,24 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return overlay;
         }
+        
+        public async Task<OverlayTable> GetOverlayTableDetails(string reportingUnitUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var entries = await db.RegulatoryOverlayDim
+                .AsNoTracking()
+                .Where(ro => ro.RegulatoryReportingUnitsFact
+                    .Any(rr => rr.ReportingUnit.ReportingUnitUuid == reportingUnitUuid))
+                .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
+                .ToListAsync();
+
+            return new OverlayTable
+            {
+                Entries = entries //is this too business logic for accessor? 
+            };
+        }
 
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
         {
