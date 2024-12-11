@@ -797,7 +797,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 WaDEOverlayAreaType = new List<string> { "test" },
                 NativeReportingAreaType = "test",
                 State = "test",
-                AreaLastUpdatedDate = DateTime.MinValue,
+                AreaLastUpdatedDate = null,
                 OrganizationName = "test",
                 OrganizationState = "test",
                 OrganizationWebsite = "test",
