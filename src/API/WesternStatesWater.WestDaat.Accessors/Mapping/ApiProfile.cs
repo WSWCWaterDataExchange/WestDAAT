@@ -95,6 +95,18 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.VariableSpecific.AmountUnitCv))
                 ;
+
+            CreateMap<EF.VariablesDim, VariableInfoListItem>()
+                .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(source => source.VariableSpecificUuid))
+                .ForMember(dest => dest.Variable, opt => opt.MapFrom(source => source.VariableCvNavigation.WaDEName.Length > 0 ? source.VariableCvNavigation.WaDEName : source.VariableCv))
+                .ForMember(dest => dest.VariableSpecificType, opt => opt.MapFrom(source => source.VariableSpecificCvNavigation.WaDEName.Length > 0 ? source.VariableSpecificCvNavigation.Term : source.VariableSpecificCv))
+                .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.AmountUnitCvNavigation.WaDEName.Length > 0 ? source.AmountUnitCvNavigation.WaDEName : source.AmountUnitCv))
+                .ForMember(dest => dest.AggregationStatistic, opt => opt.MapFrom(source => source.AggregationStatisticCvNavigation.WaDEName.Length > 0 ? source.AggregationStatisticCvNavigation.WaDEName : source.AggregationStatisticCv))
+                .ForMember(dest => dest.AggregationInterval, opt => opt.MapFrom(source => source.AggregationInterval))
+                .ForMember(dest => dest.AggregationIntervalUnit, opt => opt.MapFrom(source => source.AggregationIntervalUnitCvNavigation.WaDEName.Length > 0 ? source.AggregationIntervalUnitCvNavigation.WaDEName : source.AggregationIntervalUnitCv))
+                .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.ReportYearStartMonth))
+                .ForMember(dest => dest.ReportYearType, opt => opt.MapFrom(source => source.ReportYearTypeCvNavigation.WaDEName.Length > 0 ? source.ReportYearTypeCvNavigation.WaDEName : source.ReportYearTypeCv))
+                ;
         }
     }
 }

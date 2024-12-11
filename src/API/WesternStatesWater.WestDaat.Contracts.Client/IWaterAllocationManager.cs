@@ -39,5 +39,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteriaWithFilterUrl searchRequest);
 
         Task<SiteUsage> GetSiteUsageBySiteUuid(string siteUuid);
+
+        Task<List<VariableInfoListItem>> GetSiteVariableInfoListByUuid(string siteUuid);
     }
 }

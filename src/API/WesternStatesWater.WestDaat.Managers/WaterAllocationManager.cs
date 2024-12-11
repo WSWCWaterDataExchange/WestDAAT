@@ -203,6 +203,11 @@ namespace WesternStatesWater.WestDaat.Managers
             };
         }
 
+        async Task<List<ClientContracts.VariableInfoListItem>> ClientContracts.IWaterAllocationManager.GetSiteVariableInfoListByUuid(string siteUuid)
+        {
+            return (await _siteAccessor.GetVariableInfoListByUuid(siteUuid)).Map<List<ClientContracts.VariableInfoListItem>>();
+        }
+        
         public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteriaWithFilterUrl searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
