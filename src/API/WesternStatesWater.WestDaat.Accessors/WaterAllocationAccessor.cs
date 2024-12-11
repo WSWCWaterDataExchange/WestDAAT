@@ -572,8 +572,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return overlay;
         }
-        
-        public async Task<OverlayTable> GetOverlayInfoById(string reportingUnitUuid)
+
+        public async Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
         {
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
@@ -585,10 +585,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
                 .ToListAsync();
 
-            return new OverlayTable
-            {
-                Entries = entries //is this too business logic for accessor? just retrun list of lists
-            };
+            return entries;
         }
 
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)

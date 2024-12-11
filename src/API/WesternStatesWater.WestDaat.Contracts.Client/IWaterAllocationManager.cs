@@ -41,6 +41,6 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<SiteUsagePoint>> GetSiteUsageBySiteUuid(string siteUuid);
         
         Task<OverlayDetails> GetOverlayDetails(string overlayUuid);
-        Task<OverlayTable> GetOverlayInfoById(string reportingUnitUuid);
+        Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid);
     }
 }
