@@ -8,11 +8,13 @@ import {
   getSiteDigest,
   getSiteUsage,
   getSiteVariableInfoList,
+  getSiteMethodInfoList,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
 import { WaterSourceInfoListItem } from '../../data-contracts/WaterSourceInfoListItem';
 import { VariableInfoListItem } from '../../data-contracts/VariableInfoListItem';
+import { MethodInfoListItem } from '../../data-contracts/MethodInfoListItem';
 
 export function useWaterRightsDigests(siteUuid: string) {
   return useQuery(['site.waterRightsDigests', siteUuid], async () => await getWaterRightsDigests(siteUuid), {
@@ -84,4 +86,14 @@ export function useSiteVariableInfoList(siteUuid: string | undefined, options?: 
     async () => await getSiteVariableInfoList(siteUuid!),
     setOptions,
   );
+}
+
+type MethodInfoListOptionsType = UseQueryOptionsParameter<undefined, MethodInfoListItem[]>;
+
+export function useSiteMethodInfoList(siteUuid: string | undefined, options?: MethodInfoListOptionsType) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!siteUuid,
+  };
+  return useQuery(['site.VariableInfoList', siteUuid], async () => await getSiteMethodInfoList(siteUuid!), setOptions);
 }
