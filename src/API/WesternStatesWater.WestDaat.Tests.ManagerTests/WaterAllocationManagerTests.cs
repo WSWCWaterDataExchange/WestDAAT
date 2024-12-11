@@ -797,7 +797,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 WaDEOverlayAreaType = new List<string> { "test" },
                 NativeReportingAreaType = "test",
                 State = "test",
-                AreaLastUpdatedDate = DateTime.MinValue,
+                AreaLastUpdatedDate = null,
                 OrganizationName = "test",
                 OrganizationState = "test",
                 OrganizationWebsite = "test",
@@ -817,6 +817,54 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.AreaLastUpdatedDate.Should().BeNull();
             _waterAllocationAccessorMock.Verify();
         }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_ThrowsException_WhenNoOverlayEntriesFound()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+                .ReturnsAsync((List<CommonContracts.OverlayTableEntry>)null)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act & Assert
+            await Assert.ThrowsExceptionAsync<WestDaatException>(
+                () => manager.GetOverlayInfoById(reportingUnitUuid),
+                $"No overlay table entries found for Reporting Unit UUID: {reportingUnitUuid}");
+
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_ReturnsOverlayEntries()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            var overlayEntries = new List<CommonContracts.OverlayTableEntry>
+            {
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUUID = "overlay_1"},
+                new CommonContracts.OverlayTableEntry {WaDEOverlayUUID = "overlay_2" }
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+                .ReturnsAsync(overlayEntries)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act
+            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(2);
+            result.Select(x => x.WaDEOverlayUUID).Should().BeEquivalentTo(new[] { "overlay_1", "overlay_2" });
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        
         
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {
