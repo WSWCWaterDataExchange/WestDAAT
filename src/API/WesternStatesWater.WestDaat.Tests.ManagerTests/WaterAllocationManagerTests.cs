@@ -721,6 +721,28 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
         
         [TestMethod]
+        public async Task GetSiteVariableInfoListBySiteUuid_Results_Returned()
+        {
+            //Arrange
+            _siteAccessorMock.Setup(x => x.GetVariableInfoListByUuid(It.IsAny<String>()))
+                .ReturnsAsync(new List<CommonContracts.VariableInfoListItem>()
+                {
+                    new CommonContracts.VariableInfoListItem()
+                    {
+                        WaDEVariableUuid = "test"
+                    }
+                }).Verifiable();
+            
+            //Act
+            var manager = CreateWaterAllocationManager();
+            var result = await manager.GetSiteVariableInfoListByUuid("test");
+
+            //Assert
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+        
+        [TestMethod]
         public async Task GetOverlayDetails_ReturnsExpectedOverlay()
         {
             //Arrange

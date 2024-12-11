@@ -6,6 +6,7 @@ import {
   getWaterSiteSourceInfoList,
   getWaterRightInfoList,
   getSiteDigest,
+  getSiteUsage
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
@@ -83,6 +84,15 @@ export function useSiteDetails(siteUuid: string | undefined) {
   return useQuery(
     ['site', siteUuid],
     async () => await getSiteDetails(siteUuid!),
+    {
+      enabled: !!siteUuid,
+    },
+  );
+}
+export function useSiteUsage(siteUuid: string | undefined) {
+  return useQuery(
+    ['site.UsagePointList', siteUuid],
+    async () => await getSiteUsage(siteUuid!),
     {
       enabled: !!siteUuid,
     },
