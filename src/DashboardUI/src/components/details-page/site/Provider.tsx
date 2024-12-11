@@ -1,24 +1,21 @@
-import React from 'react';
+import React, { createContext, FC, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { createContext, FC, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
   useSiteDetails,
+  useSiteUsage,
+  useSiteVariableInfoList,
   useWaterRightInfoList,
   useWaterSiteLocation,
   useWaterSiteSourceInfoList,
 } from '../../../hooks/queries';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import {
-  WaterSourceInfoListItem,
-  SiteDetails,
-  WaterRightInfoListItem,
-} from '@data-contracts';
+import { SiteDetails, WaterRightInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
+import { SiteUsage } from '../../../data-contracts/SiteUsage';
+import { VariableInfoListItem } from '../../../data-contracts/VariableInfoListItem';
+import { SiteActiveTabType } from './enums/SiteActiveTabType';
 
-type Query<T> = Pick<
-  UseQueryResult<T, unknown>,
-  'data' | 'isError' | 'isLoading'
->;
+type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
 const defaultQuery = { data: undefined, isError: false, isLoading: false };
 
@@ -27,47 +24,50 @@ export interface HostData {
   locationsQuery: Query<Feature<Geometry, GeoJsonProperties>>;
   waterRightInfoListQuery: Query<WaterRightInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
+  siteUsageQuery: Query<SiteUsage>;
+  variableInfoListQuery: Query<VariableInfoListItem[]>;
 }
-
-type ActiveTabType = 'source' | 'right';
 
 interface SiteDetailsPageContextState {
   siteUuid: string | undefined;
-  activeTab: ActiveTabType;
-  setActiveTab: (tab: ActiveTabType) => void;
+  activeTab: SiteActiveTabType;
+  setActiveTab: (tab: SiteActiveTabType) => void;
   hostData: HostData;
 }
 
 const defaultState: SiteDetailsPageContextState = {
   siteUuid: undefined,
-  activeTab: 'source',
+  activeTab: SiteActiveTabType.source,
   setActiveTab: () => {},
   hostData: {
     detailsQuery: defaultQuery,
     locationsQuery: defaultQuery,
     waterRightInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
+    siteUsageQuery: defaultQuery,
+    variableInfoListQuery: defaultQuery,
   },
 };
 
-const SiteDetailsContext =
-  createContext<SiteDetailsPageContextState>(defaultState);
+const SiteDetailsContext = createContext<SiteDetailsPageContextState>(defaultState);
 export const useSiteDetailsContext = () => useContext(SiteDetailsContext);
 
 export const SiteDetailsProvider: FC = ({ children }) => {
   const { id: siteUuid } = useParams();
 
-  const [activeTab, setActiveTab] = useState<ActiveTabType>(
-    defaultState.activeTab,
-  );
+  const [activeTab, setActiveTab] = useState<SiteActiveTabType>(defaultState.activeTab);
 
   const detailsQuery = useSiteDetails(siteUuid);
   const locationsQuery = useWaterSiteLocation(siteUuid);
+  const siteUsageQuery = useSiteUsage(siteUuid);
   const waterRightInfoListQuery = useWaterRightInfoList(siteUuid, {
-    enabled: activeTab === 'right',
+    enabled: activeTab === SiteActiveTabType.right,
   });
   const sourceInfoListQuery = useWaterSiteSourceInfoList(siteUuid, {
-    enabled: activeTab === 'source',
+    enabled: activeTab === SiteActiveTabType.source,
+  });
+  const variableInfoListQuery = useSiteVariableInfoList(siteUuid, {
+    enabled: activeTab === SiteActiveTabType.variable,
   });
 
   const filterContextProviderValue: SiteDetailsPageContextState = {
@@ -79,12 +79,10 @@ export const SiteDetailsProvider: FC = ({ children }) => {
       locationsQuery,
       waterRightInfoListQuery,
       sourceInfoListQuery,
+      siteUsageQuery,
+      variableInfoListQuery,
     },
   };
 
-  return (
-    <SiteDetailsContext.Provider value={filterContextProviderValue}>
-      {children}
-    </SiteDetailsContext.Provider>
-  );
+  return <SiteDetailsContext.Provider value={filterContextProviderValue}>{children}</SiteDetailsContext.Provider>;
 };

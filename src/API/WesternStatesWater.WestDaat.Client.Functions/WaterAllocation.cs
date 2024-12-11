@@ -182,6 +182,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
         
+        [Function(nameof(GetSiteVariableInfoListByUuid))]
+        public async Task<HttpResponseData> GetSiteVariableInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Variables")] HttpRequestData request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetSiteVariableInfoListByUuid(siteUuid);
+
+            return await CreateOkResponse(request, result);
+        }
+        
         [Function(nameof(GetOverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {

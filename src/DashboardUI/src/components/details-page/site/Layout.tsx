@@ -3,6 +3,7 @@ import { DetailsPage } from '../DetailsPageLayout';
 import SiteMap from './SiteMap';
 import SiteProperties from './SiteProperties';
 import SiteTabs from './SiteTabs';
+import DetailsLineChart from "./DetailsLineChart";
 import { useAlerts } from './hooks/useAlerts';
 
 import './site.scss';
@@ -21,6 +22,9 @@ export function Layout() {
       <DetailsPage.Tabs>
         <SiteTabs />
       </DetailsPage.Tabs>
+      <DetailsPage.LineChart>
+        <DetailsLineChart />
+      </DetailsPage.LineChart>
     </DetailsPage>
   );
 }
