@@ -6,7 +6,7 @@ using WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;
 namespace WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests;
 
 [TestClass]
-public class OverlayDetailsTests : MapboxTilesetTestBase
+public class OverlayTests : MapboxTilesetTestBase
 {
     [TestMethod]
     public async Task CreateOverlay()
