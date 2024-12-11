@@ -107,6 +107,25 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.ReportYearStartMonth))
                 .ForMember(dest => dest.ReportYearType, opt => opt.MapFrom(source => source.ReportYearTypeCvNavigation.WaDEName.Length > 0 ? source.ReportYearTypeCvNavigation.WaDEName : source.ReportYearTypeCv))
                 ;
+            
+            CreateMap<EF.ReportingUnitsDim, OverlayDetails>()
+                .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
+                .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
+                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source =>
+                    source.RegulatoryReportingUnitsFact
+                        .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
+                        .Distinct().ToList()))
+                .ForMember(dest => dest.NativeReportingAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv))
+                .ForMember(dest => dest.State, opt => opt.MapFrom(source => source.StateCv))
+                .ForMember(dest => dest.AreaLastUpdatedDate, opt => opt.MapFrom(source => source.ReportingUnitUpdateDate))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.OrganizationName).FirstOrDefault()))
+                .ForMember(dest => dest.OrganizationState, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.State).FirstOrDefault()))
+                .ForMember(dest => dest.OrganizationWebsite, opt => opt.MapFrom(source => source.RegulatoryReportingUnitsFact
+                    .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
+                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
+
 
             CreateMap<EF.MethodsDim, MethodInfoListItem>()
                 .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(source => source.MethodUuid))
