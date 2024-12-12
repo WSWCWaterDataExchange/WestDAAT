@@ -126,6 +126,15 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
 
+
+            CreateMap<EF.MethodsDim, MethodInfoListItem>()
+                .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(source => source.MethodUuid))
+                .ForMember(dest => dest.ApplicationResourceType, opt => opt.MapFrom(source => source.ApplicableResourceTypeCvNavigation.WaDEName.Length > 0 ? source.ApplicableResourceTypeCvNavigation.WaDEName : source.ApplicableResourceTypeCv))
+                .ForMember(dest => dest.MethodType, opt => opt.MapFrom(source => source.MethodTypeCvNavigation.WaDEName.Length > 0 ? source.MethodTypeCvNavigation.WaDEName : source.MethodTypeCv))
+                .ForMember(dest => dest.MethodUrl, opt => opt.MapFrom(source => source.MethodNemilink))
+                .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
+                .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription))
+                ;
         }
     }
 }

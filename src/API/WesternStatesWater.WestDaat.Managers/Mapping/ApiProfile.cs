@@ -25,6 +25,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.SiteUsagePoint, ClientContracts.SiteUsagePoint>();
             CreateMap<CommonContracts.OverlayDetails, ClientContracts.OverlayDetails>();
             CreateMap<CommonContracts.VariableInfoListItem, ClientContracts.VariableInfoListItem>();
+            CreateMap<CommonContracts.MethodInfoListItem, ClientContracts.MethodInfoListItem>();
         }
     }
 }

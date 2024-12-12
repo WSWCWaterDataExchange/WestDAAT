@@ -200,6 +200,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             
         }
         
+        [Function(nameof(GetSiteMethodInfoListByUuid))]
+        public async Task<HttpResponseData> GetSiteMethodInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Methods")] HttpRequestData request, string siteUuid)
+        {
+            var result = await _waterAllocationManager.GetSiteMethodInfoListByUuid(siteUuid);
+
+            return await CreateOkResponse(request, result);
+        }
+        
         [Function(nameof(DownloadWaterRights))]
         public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {

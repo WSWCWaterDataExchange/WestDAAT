@@ -22,6 +22,8 @@ namespace WesternStatesWater.WestDaat.Accessors
         
         Task<IEnumerable<VariableInfoListItem>> GetVariableInfoListByUuid(string siteUuid);
 
+        Task<IEnumerable<MethodInfoListItem>> GetMethodInfoListByUuid(string siteUuid);
+        
         IEnumerable<GeoConnex> GetJSONLDData();
     }
 }
