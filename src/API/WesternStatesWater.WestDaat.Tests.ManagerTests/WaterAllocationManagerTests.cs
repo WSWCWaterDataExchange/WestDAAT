@@ -873,10 +873,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var manager = CreateWaterAllocationManager();
 
-            // Act & Assert
-            await Assert.ThrowsExceptionAsync<WestDaatException>(
-                () => manager.GetOverlayInfoById(reportingUnitUuid),
-                $"No overlay table entries found for Reporting Unit UUID: {reportingUnitUuid}");
+            // Act
+            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+
+            // Assert
+            result.Should().BeEmpty($"No overlay table entries found for Reporting Unit UUID: {reportingUnitUuid}");
 
             _waterAllocationAccessorMock.Verify();
         }
