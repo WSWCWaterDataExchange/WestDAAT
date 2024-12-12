@@ -137,7 +137,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
             
             CreateMap<RegulatoryOverlayDim, OverlayTableEntry>()
-                .ForMember(dest => dest.WaDEOverlayUUID, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
+                .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
                 .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
                 .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
                 .ForMember(dest => dest.OverlayType, opt => opt.MapFrom(source => source.RegulatoryOverlayType.WaDEName.Length > 0 ? source.RegulatoryOverlayType.WaDEName : source.RegulatoryOverlayTypeCV))
