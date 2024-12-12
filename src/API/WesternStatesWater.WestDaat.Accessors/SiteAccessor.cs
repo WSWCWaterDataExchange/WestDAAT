@@ -98,6 +98,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync()
                 ;
         }
+        
+        public async Task<IEnumerable<MethodInfoListItem>> GetMethodInfoListByUuid(string siteUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            return await db.MethodsDim.Where(x => x.SiteVariableAmountsFact.Any(y => y.Site.SiteUuid == siteUuid))
+                .ProjectTo<MethodInfoListItem>(DtoMapper.Configuration)
+                .OrderBy(x => x.WaDEMethodUuid)
+                .ToListAsync()
+                ;
+        }
 
         public IEnumerable<GeoConnex> GetJSONLDData()
         {
