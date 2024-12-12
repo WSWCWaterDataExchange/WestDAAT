@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { UseQueryResult } from 'react-query';
 import {
   useSiteDetails,
+  useSiteMethodInfoList,
   useSiteUsage,
   useSiteVariableInfoList,
   useWaterRightInfoList,
@@ -14,6 +15,7 @@ import { SiteDetails, WaterRightInfoListItem, WaterSourceInfoListItem } from '@d
 import { SiteUsage } from '../../../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../../../data-contracts/VariableInfoListItem';
 import { SiteActiveTabType } from './enums/SiteActiveTabType';
+import { MethodInfoListItem } from '../../../data-contracts/MethodInfoListItem';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -26,6 +28,7 @@ export interface HostData {
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
   siteUsageQuery: Query<SiteUsage>;
   variableInfoListQuery: Query<VariableInfoListItem[]>;
+  methodInfoListQuery: Query<MethodInfoListItem[]>;
 }
 
 interface SiteDetailsPageContextState {
@@ -46,6 +49,7 @@ const defaultState: SiteDetailsPageContextState = {
     sourceInfoListQuery: defaultQuery,
     siteUsageQuery: defaultQuery,
     variableInfoListQuery: defaultQuery,
+    methodInfoListQuery: defaultQuery,
   },
 };
 
@@ -69,6 +73,9 @@ export const SiteDetailsProvider: FC = ({ children }) => {
   const variableInfoListQuery = useSiteVariableInfoList(siteUuid, {
     enabled: activeTab === SiteActiveTabType.variable,
   });
+  const methodInfoListQuery = useSiteMethodInfoList(siteUuid, {
+    enabled: activeTab === SiteActiveTabType.method,
+  });
 
   const filterContextProviderValue: SiteDetailsPageContextState = {
     siteUuid,
@@ -81,6 +88,7 @@ export const SiteDetailsProvider: FC = ({ children }) => {
       sourceInfoListQuery,
       siteUsageQuery,
       variableInfoListQuery,
+      methodInfoListQuery,
     },
   };
 

@@ -12,6 +12,7 @@ function SiteTabs() {
       sourceInfoListQuery: { data: sourceInfoList },
       waterRightInfoListQuery: { data: waterRightInfoList },
       variableInfoListQuery: { data: variableInfoList },
+      methodInfoListQuery: { data: methodInfoList },
     },
   } = useSiteDetailsContext();
 
@@ -85,6 +86,44 @@ function SiteTabs() {
                   <td>{right.flow}</td>
                   <td>{right.volume}</td>
                   <td>{getFormattedBeneficialUses(right.beneficialUses)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Tab>
+        <Tab eventKey={SiteActiveTabType.method} title="Method Information">
+          <Table hover>
+            <thead>
+              <tr>
+                <th>WaDE Method UUID</th>
+                <th>Application Resource Type</th>
+                <th>Method Type</th>
+                <th>Method Link</th>
+                <th>WaDE Data Mapping Process</th>
+                <th>Method Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {methodInfoList?.map((method) => (
+                <tr key={method.waDEMethodUuid}>
+                  <td>{method.waDEMethodUuid}</td>
+                  <td>{method.applicationResourceType}</td>
+                  <td>{method.methodType}</td>
+                  <td>
+                    {method.methodUrl ? (
+                      <a href={method.methodUrl} target="_blank" rel="noopener noreferrer">
+                        Link
+                      </a>
+                    ) : null}
+                  </td>
+                  <td>
+                    {method.waDEDataMappingProcessUrl ? (
+                      <a href={method.waDEDataMappingProcessUrl} target="_blank" rel="noopener noreferrer">
+                        Link
+                      </a>
+                    ) : null}
+                  </td>
+                  <td>{method.methodDescription}</td>
                 </tr>
               ))}
             </tbody>

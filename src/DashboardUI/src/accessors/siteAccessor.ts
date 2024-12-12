@@ -4,6 +4,7 @@ import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
 import { SiteUsage } from '../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../data-contracts/VariableInfoListItem';
+import { MethodInfoListItem } from '../data-contracts/MethodInfoListItem';
 
 export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {
   const url = new URL(`Sites/${siteUuid}/WaterRightsDigest`, process.env.REACT_APP_WEBAPI_URL);
@@ -56,5 +57,11 @@ export const getSiteUsage = async (siteUuid: string) => {
 export const getSiteVariableInfoList = async (siteUuid: string) => {
   const url = new URL(`Sites/${siteUuid}/Variables`, process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<VariableInfoListItem[]>(url.toString());
+  return data;
+};
+
+export const getSiteMethodInfoList = async (siteUuid: string) => {
+  const url = new URL(`Sites/${siteUuid}/Methods`, process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<MethodInfoListItem[]>(url.toString());
   return data;
 };
