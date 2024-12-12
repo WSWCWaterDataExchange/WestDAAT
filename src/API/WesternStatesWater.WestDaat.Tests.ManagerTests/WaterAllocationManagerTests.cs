@@ -861,6 +861,55 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.AreaLastUpdatedDate.Should().BeNull();
             _waterAllocationAccessorMock.Verify();
         }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_ThrowsException_WhenNoOverlayEntriesFound()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+                .ReturnsAsync((List<CommonContracts.OverlayTableEntry>)null)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act
+            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+
+            // Assert
+            result.Should().BeEmpty();
+
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_ReturnsOverlayEntries()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            var overlayEntries = new List<CommonContracts.OverlayTableEntry>
+            {
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1"},
+                new CommonContracts.OverlayTableEntry {WaDEOverlayUuid = "overlay_2" }
+            };
+
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+                .ReturnsAsync(overlayEntries)
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act
+            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(2);
+            result.Select(x => x.WaDEOverlayUuid).Should().BeEquivalentTo(new[] { "overlay_1", "overlay_2" });
+            _waterAllocationAccessorMock.Verify();
+        }
+
+        
         
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {

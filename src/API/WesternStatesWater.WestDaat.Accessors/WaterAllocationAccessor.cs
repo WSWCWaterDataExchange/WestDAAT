@@ -573,6 +573,21 @@ namespace WesternStatesWater.WestDaat.Accessors
             return overlay;
         }
 
+        public async Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var entries = await db.RegulatoryOverlayDim
+                .AsNoTracking()
+                .Where(ro => ro.RegulatoryReportingUnitsFact
+                    .Any(rr => rr.ReportingUnit.ReportingUnitUuid == reportingUnitUuid))
+                .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
+                .ToListAsync();
+
+            return entries;
+        }
+
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, sites) = GetFilteredSites(searchCriteria);

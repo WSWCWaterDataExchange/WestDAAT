@@ -159,8 +159,18 @@ namespace WesternStatesWater.WestDaat.Managers
         
             return overlay.Map<ClientContracts.OverlayDetails>();
         }
+        public async Task<List<ClientContracts.OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
+        {
+            if (string.IsNullOrWhiteSpace(reportingUnitUuid))
+            {
+                throw new WestDaatException("Reporting Unit UUID cannot be null or empty.");
+            }
 
-
+            var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
+            
+            return overlayEntries.Map<List<ClientContracts.OverlayTableEntry>>();
+        }
+        
         async Task<string> ClientContracts.IWaterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
             var site = await _siteAccessor.GetSiteByUuid(siteUuid);
