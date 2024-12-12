@@ -7,7 +7,7 @@ public class OverlayTableEntry
     public string OverlayName { get; set; }
     public string OverlayType { get; set; }
     public string WaterSourceType { get; set; }
-    public string OverlayStatus { get; set; } //this need to be nullable? 
+    public string OverlayStatus { get; set; }
     public string OverlayStatute { get; set; }
     public string StatuteLink { get; set; }
     public DateTime? StatutoryEffectiveDate { get; set; }
