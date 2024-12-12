@@ -10,6 +10,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 {
     internal class ApiProfile : Profile
     {
+#pragma warning disable CA1502
         public ApiProfile()
         {
             CreateMap<EF.AllocationAmountsFact, AllocationAmount>()
@@ -133,15 +134,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodType, opt => opt.MapFrom(source => source.MethodTypeCvNavigation.WaDEName.Length > 0 ? source.MethodTypeCvNavigation.WaDEName : source.MethodTypeCv))
                 .ForMember(dest => dest.MethodUrl, opt => opt.MapFrom(source => source.MethodNemilink))
                 .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
-                .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription))
-                ;
+                .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
             
             CreateMap<RegulatoryOverlayDim, OverlayTableEntry>()
-                .ForMember(dest => dest.WaDEOverlayUUID, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
+                .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
                 .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
                 .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
-                .ForMember(dest => dest.OverlayType, opt => opt.MapFrom(source => source.RegulatoryOverlayTypeCV))
-                .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCV))
+                .ForMember(dest => dest.OverlayType, opt => opt.MapFrom(source => source.RegulatoryOverlayType.WaDEName.Length > 0 ? source.RegulatoryOverlayType.WaDEName : source.RegulatoryOverlayTypeCV))
+                .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceType.WaDEName.Length > 0 ? source.WaterSourceType.WaDEName : source.WaterSourceTypeCV))
                 .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.RegulatoryStatusCv))
                 .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.RegulatoryStatute))
                 .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.RegulatoryStatuteLink))

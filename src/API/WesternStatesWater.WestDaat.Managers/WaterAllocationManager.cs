@@ -167,12 +167,7 @@ namespace WesternStatesWater.WestDaat.Managers
             }
 
             var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
-
-            if (overlayEntries == null || !overlayEntries.Any())
-            {
-                throw new WestDaatException($"No overlay table entries found for Reporting Unit UUID: {reportingUnitUuid}");
-            }
-
+            
             return overlayEntries.Map<List<ClientContracts.OverlayTableEntry>>();
         }
         

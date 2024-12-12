@@ -873,10 +873,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var manager = CreateWaterAllocationManager();
 
-            // Act & Assert
-            await Assert.ThrowsExceptionAsync<WestDaatException>(
-                () => manager.GetOverlayInfoById(reportingUnitUuid),
-                $"No overlay table entries found for Reporting Unit UUID: {reportingUnitUuid}");
+            // Act
+            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+
+            // Assert
+            result.Should().BeEmpty();
 
             _waterAllocationAccessorMock.Verify();
         }
@@ -888,8 +889,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var reportingUnitUuid = "test_uuid";
             var overlayEntries = new List<CommonContracts.OverlayTableEntry>
             {
-                new CommonContracts.OverlayTableEntry { WaDEOverlayUUID = "overlay_1"},
-                new CommonContracts.OverlayTableEntry {WaDEOverlayUUID = "overlay_2" }
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1"},
+                new CommonContracts.OverlayTableEntry {WaDEOverlayUuid = "overlay_2" }
             };
 
             _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
@@ -904,7 +905,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             // Assert
             result.Should().NotBeNull();
             result.Count.Should().Be(2);
-            result.Select(x => x.WaDEOverlayUUID).Should().BeEquivalentTo(new[] { "overlay_1", "overlay_2" });
+            result.Select(x => x.WaDEOverlayUuid).Should().BeEquivalentTo(new[] { "overlay_1", "overlay_2" });
             _waterAllocationAccessorMock.Verify();
         }
 

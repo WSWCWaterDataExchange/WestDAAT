@@ -2,7 +2,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 
 public class OverlayTableEntry
 {
-    public string WaDEOverlayUUID { get; set; }
+    public string WaDEOverlayUuid { get; set; }
     public string OverlayNativeID { get; set; }
     public string OverlayName { get; set; }
     public string OverlayType { get; set; }
