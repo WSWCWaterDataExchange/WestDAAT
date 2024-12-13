@@ -1001,8 +1001,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             _siteAccessorMock.Verify();
         }
-
-                
         
         [TestMethod]
         public async Task GetWaterRightsInfoListByReportingUnitUuid_ThrowsException_WhenUuidIsNullOrEmpty()
