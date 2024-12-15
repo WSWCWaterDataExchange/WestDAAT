@@ -37,10 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DataTransferObjects\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Scripts\Scripts.Designer.cs">
