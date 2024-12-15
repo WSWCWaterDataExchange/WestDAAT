@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {

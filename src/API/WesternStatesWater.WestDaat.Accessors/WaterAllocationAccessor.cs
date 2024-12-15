@@ -8,11 +8,11 @@ using System.Collections.Concurrent;
 using System.Transactions;
 using NetTopologySuite.Geometries.Utilities;
 using WesternStatesWater.WestDaat.Accessors.CsvModels;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Database.EntityFramework.partials;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Accessors
@@ -21,13 +21,13 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         private readonly PerformanceConfiguration _performanceConfiguration;
 
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
         public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
         {
@@ -117,9 +117,9 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>();
 
             predicate.And(BuildBeneficialUsesPredicate(searchCriteria));
 
@@ -138,117 +138,117 @@ namespace WesternStatesWater.WestDaat.Accessors
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.WadeSitesUuids != null && searchCriteria.WadeSitesUuids.Any())
             {
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempUuidTable);
 
-                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new TempUuid { Uuid = a }).ToList());
+                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new EF.TempUuid { Uuid = a }).ToList());
 
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempIdTable);
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.FindSiteIdsFromUuids);
 
-                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(db));
+                predicate = predicate.And(EF.AllocationAmountsFact.HasSitesUuids(db));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
             {
-                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
+                predicate = predicate.And(EF.AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
             {
-                predicate.And(AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
+                predicate.And(EF.AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
             {
-                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
+                predicate.And(EF.AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
             }
 
             if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
             {
-                predicate.And(AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
+                predicate.And(EF.AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
             }
 
             if (searchCriteria?.MinimumVolume != null || searchCriteria?.MaximumVolume != null)
             {
-                predicate.And(AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
+                predicate.And(EF.AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
             {
-                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
             }
 
             if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
             {
-                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+                predicate.And(EF.AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
             {
-                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
             }
 
             if (searchCriteria?.States != null && searchCriteria.States.Any())
             {
-                predicate.And(AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
             }
 
             if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))
             {
-                predicate.And(AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
+                predicate.And(EF.AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.FilterGeometry != null)
             {
-                predicate.And(AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
+                predicate.And(EF.AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
             }
 
             return predicate;
@@ -470,7 +470,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private (DatabaseContext DB, IQueryable<AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
+        private (DatabaseContext DB, IQueryable<EF.AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
         {
             var db = _databaseContextFactory.Create();
 
@@ -486,7 +486,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return (db, waterRightDetails);
         }
 
-        private (DatabaseContext DB, IQueryable<SitesDim> FilteredSites) GetFilteredSites(WaterRightsSearchCriteria searchCriteria)
+        private (DatabaseContext DB, IQueryable<EF.SitesDim> FilteredSites) GetFilteredSites(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 

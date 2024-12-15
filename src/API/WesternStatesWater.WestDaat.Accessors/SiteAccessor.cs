@@ -8,12 +8,12 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class SiteAccessor : AccessorBase, ISiteAccessor
     {
-        public SiteAccessor(ILogger<SiteAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        public SiteAccessor(ILogger<SiteAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
         async Task<Site> ISiteAccessor.GetSiteByUuid(string siteUuid)
         {

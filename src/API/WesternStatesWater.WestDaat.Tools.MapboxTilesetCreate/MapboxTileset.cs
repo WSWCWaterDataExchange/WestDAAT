@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using GeoJSON.Text.Feature;
 using Microsoft.EntityFrameworkCore;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Database.EntityFramework.partials;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate;

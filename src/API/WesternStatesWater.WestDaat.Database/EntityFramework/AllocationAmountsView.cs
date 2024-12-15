@@ -1,3 +1,5 @@
+using NetTopologySuite.Geometries;
+
 namespace WesternStatesWater.WestDaat.Database.EntityFramework;
 
 public class AllocationAmountsView

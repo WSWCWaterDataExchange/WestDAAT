@@ -7,6 +7,7 @@ using System.Text.Json;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
@@ -30,7 +31,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     services.AddScoped(_ => config.GetDatabaseConfiguration());
                     services.AddScoped(_ => config.GetBlobStorageConfiguration());
                     services.AddScoped(_ => config.GetPerformanceConfiguration());
-                    services.AddTransient<Accessors.EntityFramework.IDatabaseContextFactory, Accessors.EntityFramework.DatabaseContextFactory>();
+                    services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
                     services.AddScoped<ISiteAccessor, SiteAccessor>();
                     services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
                     services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();

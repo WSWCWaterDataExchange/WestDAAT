@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using LinqKit;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using WesternStatesWater.WestDaat.Database.EntityFramework.partials;
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework

@@ -1,4 +1,6 @@
-﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework
+﻿using NetTopologySuite.Geometries;
+
+namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
     public partial class WaterSourcesDim
     {
