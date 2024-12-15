@@ -5,6 +5,7 @@ using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -81,8 +82,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MaxRecordsDownload = 100000,
             };
         }
-
-        protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)
         {
