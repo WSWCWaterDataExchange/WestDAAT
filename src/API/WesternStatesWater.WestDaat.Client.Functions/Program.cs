@@ -75,6 +75,8 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
+        
+        services.AddScoped<IContextUtility, ContextUtility>();
     })
     .Build();
 

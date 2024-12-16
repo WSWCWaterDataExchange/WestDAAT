@@ -1,6 +1,6 @@
-﻿namespace WesternStatesWater.WestDaat.Common
+﻿namespace WesternStatesWater.WestDaat.Common.Context
 {
-    public class AmbientContext
+    public abstract class ContextBase
     {
         public string AuthToken { get; set; }
 
