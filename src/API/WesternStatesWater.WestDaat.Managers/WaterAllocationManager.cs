@@ -222,6 +222,12 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
         
+        async Task<List<ClientContracts.WaterRightInfoListItem>> ClientContracts.IWaterAllocationManager.GetWaterRightsInfoListByReportingUnitUuid(string reportingUnitUuid)
+        {
+            return (await _siteAccessor.GetWaterRightInfoListByReportingUnitUuid(reportingUnitUuid))
+                .Map<List<ClientContracts.WaterRightInfoListItem>>();
+        }
+        
         async Task<ClientContracts.SiteUsage> ClientContracts.IWaterAllocationManager.GetSiteUsageBySiteUuid(string siteUuid)
         {
             var siteUsagePoints = await _siteAccessor.GetSiteUsageBySiteUuid(siteUuid);
