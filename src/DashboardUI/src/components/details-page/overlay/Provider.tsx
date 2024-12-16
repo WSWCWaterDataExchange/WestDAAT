@@ -4,7 +4,7 @@ import { useOverlayDetails } from '../../../hooks/queries';
 import { OverlayDetails } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import wellknown from 'wellknown';
+import wellknown from 'wellknown'; //Remove this import after fixing the backend
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -15,7 +15,7 @@ export interface HostData {
   geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null;
 }
 
-type ActiveTabType = 'details';
+type ActiveTabType = 'admin' | 'water-right';
 
 interface OverlayDetailsPageContextState {
   overlayUuid: string | undefined;
@@ -26,7 +26,7 @@ interface OverlayDetailsPageContextState {
 
 const defaultState: OverlayDetailsPageContextState = {
   overlayUuid: undefined,
-  activeTab: 'details',
+  activeTab: 'admin',
   setActiveTab: () => {},
   hostData: {
     detailsQuery: defaultQuery,
