@@ -2,6 +2,7 @@ import {
   SiteInfoListItem,
   WaterRightDetails,
   WaterSourceInfoListItem,
+  OverlayDetails
 } from '@data-contracts';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
@@ -20,6 +21,13 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
   );
   return data;
 };
+
+export const getOverlayDetails = async (overlayUuid: string) => {
+  const { data } = await axios.get<OverlayDetails>(
+    `${process.env.REACT_APP_WEBAPI_URL}Overlays/${overlayUuid}`,
+  );
+  return data;
+}
 
 export const getWaterRightAnalyticsSummaryInfo = async (
   searchCriteria: WaterRightsSearchCriteria,

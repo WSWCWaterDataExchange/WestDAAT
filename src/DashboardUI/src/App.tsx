@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 import SiteDetailsPage from './pages/SiteDetailsPage';
+import OverlayDetailsPage from "./pages/OverlayDetailsPage";
 import { clarity } from 'clarity-js';
 
 export interface AppProps {
@@ -82,6 +83,7 @@ function App({ msalInstance }: AppProps) {
                 <Route path="details" element={<DetailLayout />}>
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
+                  <Route path="overlay/:id" element={<OverlayDetailsPage />} />
                 </Route>
               </Route>
             </Routes>

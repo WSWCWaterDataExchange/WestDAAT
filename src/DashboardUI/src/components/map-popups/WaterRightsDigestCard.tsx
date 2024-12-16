@@ -85,7 +85,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
               </div>
               <div>
                 <a
-                  href={`/details/right/${currWaterRight.allocationUuid}`}
+                  href={`/details/overlay/${currWaterRight.allocationUuid}`} ////TODO This I changed to make it work for Overlays it will need to be changed back to /right
                   target="_blank"
                   rel="noopener noreferrer"
                 >
