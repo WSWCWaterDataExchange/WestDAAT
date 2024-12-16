@@ -60,8 +60,6 @@ export const OverlayDetailsProvider: React.FC = ({ children }) => {
     }
     : null;
 
-  console.log("Geometry Feature Collection: ", geometryFeatureCollection);
-
   const contextValue: OverlayDetailsPageContextState = {
     overlayUuid,
     activeTab,

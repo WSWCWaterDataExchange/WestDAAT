@@ -15,8 +15,6 @@ function Layout() {
   const {
     hostData: { geometryFeatureCollection, detailsQuery },
   } = useOverlayDetailsContext();
-  console.log("Overlay Geometry Feature Collection: ", geometryFeatureCollection);
-
 
   if (detailsQuery.isLoading || !geometryFeatureCollection) return null;
 
