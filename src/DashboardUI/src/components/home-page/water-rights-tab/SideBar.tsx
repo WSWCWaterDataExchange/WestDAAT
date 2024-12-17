@@ -1,9 +1,8 @@
 import React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import { Accordion } from 'react-bootstrap';
+import { Accordion, Form } from 'react-bootstrap';
 import BeneficialUseSelect from './filters/BeneficialUseSelect';
-import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 import { useWaterRightsContext } from './Provider';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
 import {
@@ -29,10 +28,8 @@ import { SiteTypeSelect } from './filters/SiteTypeSelect';
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
   const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
-  const [isWaterRightsFilterActive, setWaterRightsFilterActive] =
-    useState(false);
+  const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
   const [isOverlayFilterActive, setOverlayFilterActive] = useState(false);
-
 
   const [activeKeys, setActiveKeys] = useState(
     isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
@@ -63,9 +60,7 @@ function SideBar() {
     [setActiveKeys],
   );
   const openAccordionKeys = useMemo(() => {
-    const keys = [...activeKeys].filter(
-      (a) => a !== 'nldi' && a !== 'siteSelectionFilters'&& a !== 'overlayFilters',
-    );
+    const keys = [...activeKeys].filter((a) => a !== 'nldi' && a !== 'siteSelectionFilters' && a !== 'overlayFilters');
     if (isNldiFilterActive) {
       keys.push('nldi');
     }
@@ -81,21 +76,12 @@ function SideBar() {
   return (
     <>
       <div className="m-3">
-        <Button
-          variant="outline-danger"
-          className="w-100"
-          onClick={resetUserOptions}
-        >
+        <Button variant="outline-danger" className="w-100" onClick={resetUserOptions}>
           Reset All Filters
         </Button>
       </div>
       <div className="position-relative flex-grow-1 panel-content">
-        <Accordion
-          flush
-          activeKey={openAccordionKeys}
-          alwaysOpen
-          onSelect={setOpenAccordionKeys}
-        >
+        <Accordion flush activeKey={openAccordionKeys} alwaysOpen onSelect={setOpenAccordionKeys}>
           <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
@@ -107,16 +93,14 @@ function SideBar() {
           </Accordion.Item>
           <Accordion.Item eventKey="overlayFilters">
             <Accordion.Header onClick={toggleOverlayFilter}>
-              <label className="fw-bold">
-                OVERLAY FILTER {isOverlayFilterActive}
-              </label>
-              <div className="px-1">
-                <BootstrapSwitchButton
-                  checked={isOverlayFilterActive}
-                  onstyle="primary"
-                  offstyle="secondary"
-                />
-              </div>
+              <Form.Check
+                type="switch"
+                id="overlayFilters"
+                label=""
+                checked={isOverlayFilterActive}
+                onChange={toggleOverlayFilter}
+              />
+              <label className="fw-bold">OVERLAY FILTER {isOverlayFilterActive}</label>
             </Accordion.Header>
             <Accordion.Body>
               <Overlays />
@@ -125,16 +109,14 @@ function SideBar() {
 
           <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header onClick={toggleWaterRightFilters}>
-              <label className="fw-bold">
-                WATER RIGHT SELECTION {isWaterRightsFilterActive}
-              </label>
-              <div className="px-1">
-                <BootstrapSwitchButton
-                  checked={isWaterRightsFilterActive}
-                  onstyle="primary"
-                  offstyle="secondary"
-                />
-              </div>
+              <Form.Check
+                type="switch"
+                id="waterRightSelection"
+                label=""
+                checked={isWaterRightsFilterActive}
+                onChange={toggleWaterRightFilters}
+              />
+              <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive}</label>
             </Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -163,16 +145,14 @@ function SideBar() {
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={toggleNldiFilterStatus}>
-              <label className="fw-bold">
-                NLDI FILTER {isNldiFilterActive}
-              </label>
-              <div className="px-5">
-                <BootstrapSwitchButton
-                  checked={isNldiFilterActive}
-                  onstyle="primary"
-                  offstyle="secondary"
-                />
-              </div>
+              <Form.Check
+                type="switch"
+                id="nldi"
+                label=""
+                checked={isNldiFilterActive}
+                onChange={toggleNldiFilterStatus}
+              />
+              <label className="fw-bold">NLDI FILTER {isNldiFilterActive}</label>
             </Accordion.Header>
             <div className="px-4" style={{ background: 'ghostwhite' }}>
               <a
@@ -185,8 +165,8 @@ function SideBar() {
               </a>
               <label className="h6">
                 <i>
-                  Search along the stream network using the Hydro Network-Linked
-                  Data Index (NLDI) and Geoconnex Frameworks
+                  Search along the stream network using the Hydro Network-Linked Data Index (NLDI) and Geoconnex
+                  Frameworks
                 </i>
               </label>
             </div>
