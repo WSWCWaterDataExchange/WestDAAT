@@ -3,8 +3,6 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CustomMapControl } from './CustomMapControl';
 
-toast.configure();
-
 export class CustomShareControl extends CustomMapControl {
   constructor() {
     super(
@@ -13,7 +11,7 @@ export class CustomShareControl extends CustomMapControl {
       () => {
         navigator.clipboard.writeText(window.location.href);
         toast.info('link copied successfully', {
-          position: toast.POSITION.BOTTOM_RIGHT,
+          position:'bottom-right',
           autoClose: 500,
           theme: 'colored',
         });

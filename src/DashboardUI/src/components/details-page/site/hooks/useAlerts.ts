@@ -49,7 +49,7 @@ export function useAlerts() {
   useEffect(() => {
     if (isError) {
       toast.error('Error loading site data.  Please try again.', {
-        position: toast.POSITION.TOP_CENTER,
+        position: 'top-center',
         theme: 'colored',
         autoClose: false,
       });
