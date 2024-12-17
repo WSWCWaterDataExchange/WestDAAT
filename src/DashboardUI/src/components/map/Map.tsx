@@ -22,6 +22,7 @@ import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson
 import { useHomePageContext } from '../home-page/Provider';
 
 import './map.scss';
+import { createRoot } from 'react-dom/client';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
@@ -238,11 +239,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   const setMapRenderedFeatures = useDebounceCallback((map: mapboxgl.Map) => {
     setRenderedFeatures(() => {
-      return map
-          .queryRenderedFeatures()
-          .filter((feature) => {
-            return feature.source && sourceIds.includes(feature.source);
-          }) as RenderedFeatureType[];
+      return map.queryRenderedFeatures().filter((feature) => {
+        return feature.source && sourceIds.includes(feature.source);
+      }) as RenderedFeatureType[];
     });
   }, 500);
 
@@ -288,7 +287,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         })
         .setHTML("<div id='mapboxPopupId'></div>")
         .once('open', () => {
-          ReactDOM.render(mapPopup.element, document.getElementById('mapboxPopupId'));
+          const popupContainer = document.getElementById('mapboxPopupId');
+          const root = createRoot(popupContainer!);
+          root.render(mapPopup.element);
         })
         .addTo(map);
     } else {
