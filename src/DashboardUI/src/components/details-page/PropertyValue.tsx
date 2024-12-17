@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { JSX, useMemo } from 'react';
 import { FormattedDate } from '../FormattedDate';
 import moment from 'moment';
 import { formatNumber } from '../../utilities/valueFormatters';

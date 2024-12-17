@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { createContext, FC, useContext, useState } from 'react';
 import * as geojson from 'geojson';
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import './side-panel.scss';
 
 function SidePanel(props: { children: JSX.Element }) {

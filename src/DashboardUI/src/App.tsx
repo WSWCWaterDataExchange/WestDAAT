@@ -92,6 +92,7 @@ function App({ msalInstance }: AppProps) {
       </AppProvider>
     </MsalProvider>
   );
+
 }
 
 export default App;
