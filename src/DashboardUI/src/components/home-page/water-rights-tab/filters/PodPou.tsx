@@ -13,11 +13,7 @@ export function PodPou() {
 
   const handlePodPouChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setPodPou(
-        e.target.value === 'POD' || e.target.value === 'POU'
-          ? e.target.value
-          : undefined,
-      );
+      setPodPou(e.target.value === 'POD' || e.target.value === 'POU' ? e.target.value : undefined);
     },
     [setPodPou],
   );

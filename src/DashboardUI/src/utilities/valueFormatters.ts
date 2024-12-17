@@ -1,11 +1,5 @@
-type NumberFormatOptions = Pick<
-  Intl.NumberFormatOptions,
-  'maximumFractionDigits' | 'minimumFractionDigits'
->;
-export function formatNumber(
-  value: number | null | undefined,
-  decimals?: number | NumberFormatOptions,
-) {
+type NumberFormatOptions = Pick<Intl.NumberFormatOptions, 'maximumFractionDigits' | 'minimumFractionDigits'>;
+export function formatNumber(value: number | null | undefined, decimals?: number | NumberFormatOptions) {
   if (value === null || value === undefined) {
     return '';
   }

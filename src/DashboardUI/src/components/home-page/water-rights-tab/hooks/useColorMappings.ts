@@ -45,31 +45,21 @@ export function useColorMappings() {
 
   const getBeneficialUseColor = useCallback(
     (beneficialUseName: string) => {
-      return (
-        beneficialUseColors.find((item) => item.key === beneficialUseName)
-          ?.color ?? fallbackColor
-      );
+      return beneficialUseColors.find((item) => item.key === beneficialUseName)?.color ?? fallbackColor;
     },
     [beneficialUseColors, fallbackColor],
   );
 
   const getOwnerClassificationColor = useCallback(
     (ownerClassification: string) => {
-      return (
-        ownerClassificationColors.find(
-          (item) => item.key === ownerClassification,
-        )?.color ?? fallbackColor
-      );
+      return ownerClassificationColors.find((item) => item.key === ownerClassification)?.color ?? fallbackColor;
     },
     [ownerClassificationColors, fallbackColor],
   );
 
   const getWaterSourceTypeColor = useCallback(
     (waterSourceType: string) => {
-      return (
-        waterSourceTypeColors.find((item) => item.key === waterSourceType)
-          ?.color ?? fallbackColor
-      );
+      return waterSourceTypeColors.find((item) => item.key === waterSourceType)?.color ?? fallbackColor;
     },
     [waterSourceTypeColors, fallbackColor],
   );

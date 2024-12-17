@@ -42,11 +42,7 @@ function WaterRightTabs() {
               {siteInfoList?.map((site) => (
                 <tr key={site.siteUuid}>
                   <td>
-                    <a
-                      href={`/details/site/${site.siteUuid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={`/details/site/${site.siteUuid}`} target="_blank" rel="noopener noreferrer">
                       {site.siteUuid}
                     </a>
                   </td>

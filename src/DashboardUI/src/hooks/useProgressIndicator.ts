@@ -1,10 +1,7 @@
 import { ReactText, useEffect, useMemo, useRef } from 'react';
 import { toast, ToastContent } from 'react-toastify';
 
-function useProgressIndicator(
-  progress: number | boolean[],
-  content: ToastContent,
-) {
+function useProgressIndicator(progress: number | boolean[], content: ToastContent) {
   const loadingFilterDataToast = useRef<ReactText | null>(null);
   const calculatedProgress = useMemo(() => {
     if (Array.isArray(progress)) {
@@ -20,10 +17,7 @@ function useProgressIndicator(
         type: 'info',
         theme: 'colored',
       });
-    } else if (
-      loadingFilterDataToast.current != null &&
-      calculatedProgress < 1
-    ) {
+    } else if (loadingFilterDataToast.current != null && calculatedProgress < 1) {
       toast.update(loadingFilterDataToast.current, {
         progress: calculatedProgress,
       });

@@ -28,8 +28,7 @@ const chartExporting = {
       pie: {
         dataLabels: {
           enabled: true,
-          format:
-            '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
+          format: '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
         },
       },
     },
@@ -87,8 +86,7 @@ type ChartDataType = {
 function PieCharts() {
   const { searchCriteria } = useWaterRightsSearchCriteria();
 
-  const { data: pieChartSearchResults, isFetching } =
-    useGetAnalyticsSummaryInfo(searchCriteria);
+  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
   const { getBeneficialUseColor } = useColorMappings();
 
   const [flowData, volumeData, pointData] = useMemo(() => {
@@ -131,11 +129,7 @@ function PieCharts() {
   return (
     <div>
       <div className="my-3 d-flex justify-content-center">
-        <a
-          href="https://westernstateswater.org/wade/westdaat-analytics"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank" rel="noopener noreferrer">
           Learn about WestDAAT analytics
         </a>
       </div>
@@ -170,29 +164,17 @@ function PieCharts() {
 
 export default PieCharts;
 
-function ChartData(props: {
-  name: 'volume' | 'flow' | 'count';
-  data: ChartDataType;
-}) {
+function ChartData(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
   const { name, data } = props;
 
   const [chartOptionsBase, subTitle] = useMemo(() => {
     switch (name) {
       case 'count':
-        return [
-          countOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Rights`,
-        ];
+        return [countOptionsBase, `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} Rights`];
       case 'flow':
-        return [
-          flowOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`,
-        ];
+        return [flowOptionsBase, `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (CFS)`];
       case 'volume':
-        return [
-          volumeOptionsBase,
-          `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`,
-        ];
+        return [volumeOptionsBase, `${data.sum.toLocaleString(undefined, { maximumFractionDigits: 2 })} (AF)`];
     }
   }, [name, data.sum]);
 
@@ -214,8 +196,6 @@ function ChartData(props: {
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
   ) : (
-    <div className="d-flex justify-content-center align-items-center h-100">
-      No {props.name} data found
-    </div>
+    <div className="d-flex justify-content-center align-items-center h-100">No {props.name} data found</div>
   );
 }

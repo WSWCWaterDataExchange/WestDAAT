@@ -7,10 +7,7 @@ import { getLatsLongsFromFeatureCollection } from '../../../../utilities/geometr
 export function useMapFitRequested() {
   const [fitRequested, setFitRequested] = useState(false);
   const { searchCriteria } = useWaterRightsSearchCriteria();
-  const { data, isLoading, isError } = useGetWaterRightDataEnvelope(
-    searchCriteria,
-    { enabled: fitRequested },
-  );
+  const { data, isLoading, isError } = useGetWaterRightDataEnvelope(searchCriteria, { enabled: fitRequested });
   const { setMapBoundSettings } = useMapContext();
 
   const handleMapFitRequested = useCallback(() => {
