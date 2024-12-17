@@ -1,10 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IPublicClientApplication } from '@azure/msal-browser';
-import {
-  AuthenticatedTemplate,
-  UnauthenticatedTemplate,
-  useMsal,
-} from '@azure/msal-react';
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
 
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
@@ -19,6 +15,7 @@ import '../styles/navbar.scss';
 import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
+import { toast } from 'react-toastify';
 
 interface SiteNavbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -32,13 +29,19 @@ function handleLogout(msalContext: IPublicClientApplication | null) {
   });
 }
 
-function SiteNavbar({ showDownloadModal, showUploadModal}: SiteNavbarProps = {}) {
+function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}) {
   const { instance: msalContext } = useMsal();
   const { user } = useAuthenticationContext();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
+
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    toast.info('Heyo ' + counter);
+  }, [counter]);
 
   return (
     <div>
@@ -76,50 +79,44 @@ function SiteNavbar({ showDownloadModal, showUploadModal}: SiteNavbarProps = {})
             </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
-                <NavDropdown.Item onClick={() => handleLogout(msalContext)}>
-                  Logout
-                </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>
               </NavDropdown>
             </AuthenticatedTemplate>
           </Nav>
         </Container>
       </Navbar>
 
-          <Navbar bg="light" className="p-0 second-nav">
-            <Container fluid className="p-0">
-              <Nav>
-              </Nav>
+      <Navbar bg="light" className="p-0 second-nav">
+        <Container fluid className="p-0">
+          <Nav></Nav>
 
-              <div className="d-flex">
-                <div className="p-2">
-                  {showDownloadModal && (
-                      <Button className="ms-1" onClick={() => showDownloadModal(true)}>
-                        Download Data
-                      </Button> )}
-                </div>
-                <div className="p-2">
-                  {showUploadModal && (
-                      <Button className="ms-1" onClick={() => showUploadModal(true)}>
-                        Upload Data
-                      </Button> )}
-                </div>
-              </div>
-            </Container>
-          </Navbar>
+          <div className="d-flex">
+            <div className="p-2">
+              <Button className="ms-1" onClick={() => setCounter(counter + 1)}>
+                Hello
+              </Button>
+              {showDownloadModal && (
+                <Button className="ms-1" onClick={() => showDownloadModal(true)}>
+                  Download Data
+                </Button>
+              )}
+            </div>
+            <div className="p-2">
+              {showUploadModal && (
+                <Button className="ms-1" onClick={() => showUploadModal(true)}>
+                  Upload Data
+                </Button>
+              )}
+            </div>
+          </div>
+        </Container>
+      </Navbar>
 
-      <Offcanvas
-        show={showHamburgerMenu}
-        onHide={handleClose}
-        className="ham-menu"
-      >
+      <Offcanvas show={showHamburgerMenu} onHide={handleClose} className="ham-menu">
         <Offcanvas.Header closeButton></Offcanvas.Header>
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
-            <Nav.Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://westernstateswater.org/wade/about "
-            >
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">
               About
             </Nav.Link>
             <Nav.Link
@@ -129,11 +126,7 @@ function SiteNavbar({ showDownloadModal, showUploadModal}: SiteNavbarProps = {})
             >
               Water Rights Data
             </Nav.Link>
-            <Nav.Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://westernstateswater.org/wade/contact-us"
-            >
+            <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/contact-us">
               Contact Us
             </Nav.Link>
             <Nav.Link

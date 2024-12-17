@@ -23,6 +23,7 @@ import { useHomePageContext } from '../home-page/Provider';
 
 import './map.scss';
 import { createRoot } from 'react-dom/client';
+import { ToastContainer } from 'react-toastify';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
@@ -490,6 +491,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
           dropRef(el);
         }}
       ></div>
+       <ToastContainer />
     </div>
   );
 }
