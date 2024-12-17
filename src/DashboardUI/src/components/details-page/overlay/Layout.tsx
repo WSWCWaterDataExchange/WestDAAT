@@ -6,6 +6,8 @@ import OverlayAgency from './OverlayAgency';
 
 import { useAlerts } from './hooks/useAlerts';
 import './overlay.scss';
+import WaterRightTabs from "../water-right/WaterRightTabs";
+//import OverlayTabs from "./OverlayTabs";
 
 export function Layout() {
   useAlerts();
@@ -25,6 +27,8 @@ export function Layout() {
         <OverlayMap/>
       </DetailsPage.Map>
 
+        <DetailsPage.Tabs>
+        </DetailsPage.Tabs>
     </DetailsPage>
   );
 }

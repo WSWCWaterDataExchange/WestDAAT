@@ -47,18 +47,18 @@ export const OverlayDetailsProvider: React.FC = ({ children }) => {
   const detailsQuery = useOverlayDetails(overlayUuid);
 
   const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null = detailsQuery.data?.geometry
-    ? {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry, //fix this, uninstall wellknown and wellknown/types
-          // this casting above is a temp fix until fixing the backend
-          properties: {},
-        },
-      ],
-    }
-    : null;
+      ? {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry, //fix this, uninstall wellknown and wellknown/types
+            // this casting above is a temp fix until fixing the backend
+            properties: {},
+          },
+        ],
+      }
+      : null;
 
   const contextValue: OverlayDetailsPageContextState = {
     overlayUuid,
@@ -71,8 +71,8 @@ export const OverlayDetailsProvider: React.FC = ({ children }) => {
   };
 
   return (
-    <OverlayDetailsContext.Provider value={contextValue}>
-      {children}
-    </OverlayDetailsContext.Provider>
+      <OverlayDetailsContext.Provider value={contextValue}>
+        {children}
+      </OverlayDetailsContext.Provider>
   );
 };
