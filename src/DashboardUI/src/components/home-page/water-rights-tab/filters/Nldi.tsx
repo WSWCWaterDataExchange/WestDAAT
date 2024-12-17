@@ -234,7 +234,7 @@ function NldiDragAndDropButton(props: {
     <div className="d-inline-flex flex-row align-items-center">
       <Button
         type="button"
-        ref={dragRef}
+        ref={el => {dragRef(el)}}
         variant="no-outline"
         className="grabbable me-2"
       >

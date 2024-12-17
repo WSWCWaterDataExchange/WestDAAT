@@ -483,7 +483,13 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       )}
       {legend && map && <div className={`legend ${legendClass}`}>{legend}</div>}
       {map && mapAlert}
-      <div id="map" className="map h-100" ref={dropRef}></div>
+      <div
+        id="map"
+        className="map h-100"
+        ref={(el) => {
+          dropRef(el);
+        }}
+      ></div>
     </div>
   );
 }
