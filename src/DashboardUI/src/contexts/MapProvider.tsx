@@ -208,7 +208,10 @@ const defaultState: MapContextState = {
 const MapContext = createContext<MapContextState>(defaultState);
 export const useMapContext = () => useContext(MapContext);
 
-const MapProvider: FC = ({ children }) => {
+interface MapProviderProps {
+  children: React.ReactNode;
+}
+const MapProvider = ({ children }: MapProviderProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapStyle, setMapStyle] = useState(defaultMapStyle);
 

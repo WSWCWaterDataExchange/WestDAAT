@@ -3,7 +3,7 @@ import { colorList } from '../config/constants';
 
 const fallbackColor = '#000000';
 export function useColorMappings() {
-  const getColorByIndex = useCallback((i) => {
+  const getColorByIndex = useCallback((i: number) => {
     return colorList[i % colorList.length];
   }, []);
 

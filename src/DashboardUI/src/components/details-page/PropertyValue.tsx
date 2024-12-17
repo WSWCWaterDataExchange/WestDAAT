@@ -33,7 +33,7 @@ export function PropertyValue({
     if (typeof value === 'number') {
       return formatNumber(value, decimalPositions);
     }
-    if (typeof value === 'string' && moment(value, true).isValid()) {
+    if (value instanceof Date || (typeof value === 'string' && moment(value, true).isValid())) {
       return <FormattedDate>{value}</FormattedDate>;
     }
     return value;

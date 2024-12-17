@@ -55,7 +55,10 @@ const WaterRightDetailsContext =
 export const useWaterRightDetailsContext = () =>
   useContext(WaterRightDetailsContext);
 
-export const WaterRightDetailsProvider: FC = ({ children }) => {
+interface WaterRightDetailsProviderProps {
+  children: React.ReactNode;
+}
+export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProviderProps) => {
   const { id: allocationUuid } = useParams();
 
   const [activeTab, setActiveTab] = useState<ActiveTabType>(

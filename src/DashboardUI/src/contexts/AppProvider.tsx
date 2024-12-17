@@ -32,7 +32,11 @@ const defaultAppContextState = {
 const AppContext = createContext<AppContextState>(defaultAppContextState);
 export const useAppContext = () => useContext(AppContext);
 
-const AppProvider: FC = ({ children }) => {
+interface AppProviderProps {
+  children: React.ReactNode;
+}
+
+const AppProvider = ({ children }: AppProviderProps) => {
   const [urlParams, setUrlParams] = useSearchParams();
   const authenticationContext = useAuthenticationContext();
 
