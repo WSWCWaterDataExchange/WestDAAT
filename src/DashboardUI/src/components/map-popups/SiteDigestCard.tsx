@@ -17,16 +17,8 @@ function SiteDigestCard(props: SiteDigestMapPopupProps) {
         header: (
           <div>
             Site ID:{' '}
-            <a
-              href={`/details/site/${siteUuid}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteUuid}{' '}
-              <Icon
-                path={mdiOpenInNew}
-                className="map-popup-card-water-rights-link-icon"
-              />
+            <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
+              {siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
             </a>
           </div>
         ),

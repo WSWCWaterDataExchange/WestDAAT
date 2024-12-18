@@ -15,13 +15,10 @@ const maxControlProps = {
 export function FlowRange() {
   const { minValue, maxValue, setMinValue, setMaxValue } = useFlowFilters();
 
-  const handleFlowChange = useDebounceCallback(
-    (min: number | undefined, max: number | undefined) => {
-      setMinValue(min);
-      setMaxValue(max);
-    },
-    400,
-  );
+  const handleFlowChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
+    setMinValue(min);
+    setMaxValue(max);
+  }, 400);
 
   return (
     <div className="mb-3">

@@ -7,11 +7,7 @@ export function useRangeFilter<T>(
   maxMapField: string,
 ) {
   const mapFilters = useMemo((): any[] | undefined => {
-    const buildRangeFilter = (
-      field: string,
-      value: T,
-      isMin: boolean,
-    ): any[] => {
+    const buildRangeFilter = (field: string, value: T, isMin: boolean): any[] => {
       const fieldStr = field as string;
       const operator = isMin ? '<=' : '>=';
 

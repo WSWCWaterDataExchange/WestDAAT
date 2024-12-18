@@ -7,17 +7,13 @@ toast.configure();
 
 export class CustomShareControl extends CustomMapControl {
   constructor() {
-    super(
-      mdiLink,
-      'Get a link for the current map view to bookmark or share',
-      () => {
-        navigator.clipboard.writeText(window.location.href);
-        toast.info('link copied successfully', {
-          position: toast.POSITION.BOTTOM_RIGHT,
-          autoClose: 500,
-          theme: 'colored',
-        });
-      },
-    );
+    super(mdiLink, 'Get a link for the current map view to bookmark or share', () => {
+      navigator.clipboard.writeText(window.location.href);
+      toast.info('link copied successfully', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 500,
+        theme: 'colored',
+      });
+    });
   }
 }

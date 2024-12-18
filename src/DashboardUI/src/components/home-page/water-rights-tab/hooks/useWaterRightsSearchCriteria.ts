@@ -13,10 +13,7 @@ interface SearchCriteriaProps {
   filters: WaterRightsFilters;
   nldiIds: string[];
 }
-export function useWaterRightsSearchCriteriaWithoutContext({
-  filters,
-  nldiIds,
-}: SearchCriteriaProps) {
+export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }: SearchCriteriaProps) {
   //pulling only the fields we need out of the filters to avoid more updates than we need to do to the search criteria
   const {
     beneficialUseNames,
@@ -46,12 +43,8 @@ export function useWaterRightsSearchCriteriaWithoutContext({
       minimumVolume: minVolume,
       maximumVolume: maxVolume,
       podOrPou: podPou,
-      minimumPriorityDate: minPriorityDate
-        ? moment.unix(minPriorityDate).toDate()
-        : undefined,
-      maximumPriorityDate: maxPriorityDate
-        ? moment.unix(maxPriorityDate).toDate()
-        : undefined,
+      minimumPriorityDate: minPriorityDate ? moment.unix(minPriorityDate).toDate() : undefined,
+      maximumPriorityDate: maxPriorityDate ? moment.unix(maxPriorityDate).toDate() : undefined,
       ownerClassifications: ownerClassifications,
       waterSourceTypes: waterSourceTypes,
       riverBasinNames: riverBasinNames,

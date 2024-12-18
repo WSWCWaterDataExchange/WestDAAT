@@ -44,21 +44,9 @@ const defaultPointPaintConfiguration = {
   'circle-opacity': 0.75,
 };
 
-export const defaultPointCircleSortKey = [
-  '-',
-  0,
-  ['get', waterRightsProperties.minPriorityDate],
-];
-export const flowPointCircleSortKey = [
-  '-',
-  0,
-  ['get', waterRightsProperties.maxFlowRate],
-];
-export const volumePointCircleSortKey = [
-  '-',
-  0,
-  ['get', waterRightsProperties.maxVolume],
-];
+export const defaultPointCircleSortKey = ['-', 0, ['get', waterRightsProperties.minPriorityDate]];
+export const flowPointCircleSortKey = ['-', 0, ['get', waterRightsProperties.maxFlowRate]];
+export const volumePointCircleSortKey = ['-', 0, ['get', waterRightsProperties.maxVolume]];
 export const siteLocationPolygonFillColor = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
@@ -157,11 +145,7 @@ const mapsJson = {
         'fill-opacity': 0.5,
         'fill-color': siteLocationPolygonFillColor,
       },
-      filter: [
-        'in',
-        ['geometry-type'],
-        ['literal', ['Polygon', 'MultiPolygon']],
-      ],
+      filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
     },
     {
       id: mapLayerNames.siteLocationsPointsLayer,
@@ -192,12 +176,7 @@ const mapsJson = {
           nldi.colors.tributaries,
         ],
         'line-opacity': 1,
-        'line-width': [
-          'case',
-          ['==', ['get', 'westdaat_channeltype'], 'Main'],
-          2,
-          1,
-        ],
+        'line-width': ['case', ['==', ['get', 'westdaat_channeltype'], 'Main'], 2, 1],
       },
       filter: ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'],
     },

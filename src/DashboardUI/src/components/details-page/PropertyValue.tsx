@@ -39,18 +39,12 @@ export function PropertyValue({
     return value;
   }, [value, isUrl, decimalPositions]);
 
-  const content = isVerbose ? (
-    <LineClampText text={String(formattedValue)} />
-  ) : (
-    formattedValue
-  );
+  const content = isVerbose ? <LineClampText text={String(formattedValue)} /> : formattedValue;
 
   return (
     <>
       <div className="property-name">{label}</div>
-      <div className={`property-value${isVerbose ? ' is-verbose' : ''}`}>
-        {content}
-      </div>
+      <div className={`property-value${isVerbose ? ' is-verbose' : ''}`}>{content}</div>
     </>
   );
 }

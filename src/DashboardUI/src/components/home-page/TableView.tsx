@@ -23,9 +23,7 @@ function TableView() {
         <span>ANALYTICS &amp; TABLE</span>
         <Icon path={show ? mdiChevronDown : mdiChevronUp} />
       </Button>
-      <div
-        className={`analytics-and-table-content ${show ? 'toggle-on' : 'toggle-off'}`}
-      >
+      <div className={`analytics-and-table-content ${show ? 'toggle-on' : 'toggle-off'}`}>
         <Tab.Container
           activeKey={activeTab}
           onSelect={(tab) => setActiveTab(tab || 'pieChart')}
@@ -40,13 +38,9 @@ function TableView() {
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="pieChart">
-              {activeTab === 'pieChart' && show && <PieCharts></PieCharts>}
-            </Tab.Pane>
+            <Tab.Pane eventKey="pieChart">{activeTab === 'pieChart' && show && <PieCharts></PieCharts>}</Tab.Pane>
             <Tab.Pane eventKey="dataTable">
-              {activeTab === 'dataTable' && show && (
-                <AnalyticsDataTable></AnalyticsDataTable>
-              )}
+              {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}
             </Tab.Pane>
           </Tab.Content>
         </Tab.Container>

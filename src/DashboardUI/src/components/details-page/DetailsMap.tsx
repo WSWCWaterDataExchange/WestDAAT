@@ -12,17 +12,10 @@ interface detailsMapProps {
 }
 
 function DetailsMap(props: detailsMapProps) {
-  const {
-    setVisibleLayers,
-    setGeoJsonData,
-    setMapBoundSettings: setMapBounds,
-  } = useMapContext();
+  const { setVisibleLayers, setGeoJsonData, setMapBoundSettings: setMapBounds } = useMapContext();
 
   useEffect(() => {
-    setVisibleLayers([
-      mapLayerNames.siteLocationsPointsLayer,
-      mapLayerNames.siteLocationsPolygonsLayer,
-    ]);
+    setVisibleLayers([mapLayerNames.siteLocationsPointsLayer, mapLayerNames.siteLocationsPolygonsLayer]);
   }, [setVisibleLayers]);
 
   useEffect(() => {

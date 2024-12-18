@@ -34,25 +34,25 @@ export function Overlays() {
   }
 
   return (
-      <div className="position-relative flex-grow-1">
-        <h5 className="fw-bold">OVERLAY INFO</h5>
-        <div className="mb-3">
-          <label className="form-label fw-bolder">Overlay Type</label>
-          {overlaysData &&
-              overlaysData.map((overlay) => (
-                  <Form.Group className="mb-3" key={overlay}>
-                    <Form.Check
-                        className="toggle"
-                        type="switch"
-                        id={`overlay${overlay}`}
-                        checked={overlayFilters[overlay] || false}
-                        onChange={(e) => handleToggleChange(e, overlay)}
-                        label={overlay}
-                    />
-                  </Form.Group>
-              ))}
-        </div>
+    <div className="position-relative flex-grow-1">
+      <h5 className="fw-bold">OVERLAY INFO</h5>
+      <div className="mb-3">
+        <label className="form-label fw-bolder">Overlay Type</label>
+        {overlaysData &&
+          overlaysData.map((overlay) => (
+            <Form.Group className="mb-3" key={overlay}>
+              <Form.Check
+                className="toggle"
+                type="switch"
+                id={`overlay${overlay}`}
+                checked={overlayFilters[overlay] || false}
+                onChange={(e) => handleToggleChange(e, overlay)}
+                label={overlay}
+              />
+            </Form.Group>
+          ))}
       </div>
+    </div>
   );
 }
 

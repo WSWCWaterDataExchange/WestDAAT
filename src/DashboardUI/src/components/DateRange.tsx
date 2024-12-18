@@ -3,10 +3,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Form, FormControlProps, InputGroup } from 'react-bootstrap';
 import moment from 'moment';
 
-type ControlProps = Omit<
-  FormControlProps,
-  'onChange' | 'type' | 'value' | 'max'
->;
+type ControlProps = Omit<FormControlProps, 'onChange' | 'type' | 'value' | 'max'>;
 export interface DateRangeProps {
   initialMin: number | undefined;
   initialMax: number | undefined;
@@ -16,15 +13,10 @@ export interface DateRangeProps {
 }
 
 export function DateRange(props: DateRangeProps) {
-  const { initialMin, initialMax, onChange, minControlProps, maxControlProps } =
-    props;
+  const { initialMin, initialMax, onChange, minControlProps, maxControlProps } = props;
 
-  const [minValueString, setMinValueString] = useState(
-    initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : '',
-  );
-  const [maxValueString, setMaxValueString] = useState(
-    initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : '',
-  );
+  const [minValueString, setMinValueString] = useState(initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : '');
+  const [maxValueString, setMaxValueString] = useState(initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : '');
 
   const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMinValueString(e.target.value);
@@ -49,23 +41,16 @@ export function DateRange(props: DateRangeProps) {
   }, [minValueString, minMoment, maxValueString, maxMoment]);
 
   useEffect(() => {
-    setMinValueString(
-      initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : '',
-    );
+    setMinValueString(initialMin ? moment.unix(initialMin).format('YYYY-MM-DD') : '');
   }, [initialMin, setMinValueString]);
 
   useEffect(() => {
-    setMaxValueString(
-      initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : '',
-    );
+    setMaxValueString(initialMax ? moment.unix(initialMax).format('YYYY-MM-DD') : '');
   }, [initialMax, setMaxValueString]);
 
   useEffect(() => {
     if (isValid) {
-      onChange(
-        minMoment.isValid() ? minMoment.unix() : undefined,
-        maxMoment.isValid() ? maxMoment.unix() : undefined,
-      );
+      onChange(minMoment.isValid() ? minMoment.unix() : undefined, maxMoment.isValid() ? maxMoment.unix() : undefined);
     }
   }, [minMoment, maxMoment, isValid, onChange]);
 

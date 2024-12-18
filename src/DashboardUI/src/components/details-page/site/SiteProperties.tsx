@@ -24,26 +24,11 @@ function SiteProperties() {
               </Card.Header>
               <Card.Body>
                 <div className="d-flex p-2 flex-column">
-                  <PropertyValue
-                    label="WaDE Site ID"
-                    value={siteDetails.siteUuid}
-                  />
-                  <PropertyValue
-                    label="Site Native ID"
-                    value={siteDetails.siteNativeId}
-                  />
-                  <PropertyValue
-                    label="Site Name"
-                    value={siteDetails.siteName}
-                  />
-                  <PropertyValue
-                    label="Site Type"
-                    value={siteDetails.siteType}
-                  />
-                  <PropertyValue
-                    label="POD or POU"
-                    value={siteDetails.podOrPou}
-                  />
+                  <PropertyValue label="WaDE Site ID" value={siteDetails.siteUuid} />
+                  <PropertyValue label="Site Native ID" value={siteDetails.siteNativeId} />
+                  <PropertyValue label="Site Name" value={siteDetails.siteName} />
+                  <PropertyValue label="Site Type" value={siteDetails.siteType} />
+                  <PropertyValue label="POD or POU" value={siteDetails.podOrPou} />
                 </div>
               </Card.Body>
             </Card>
@@ -56,25 +41,11 @@ function SiteProperties() {
               </Card.Header>
               <Card.Body>
                 <div className="d-flex p-2 flex-column">
-                  <PropertyValue
-                    label="Longitude"
-                    value={siteDetails.longitude}
-                    decimalPositions={6}
-                  />
-                  <PropertyValue
-                    label="Latitude"
-                    value={siteDetails.latitude}
-                    decimalPositions={6}
-                  />
+                  <PropertyValue label="Longitude" value={siteDetails.longitude} decimalPositions={6} />
+                  <PropertyValue label="Latitude" value={siteDetails.latitude} decimalPositions={6} />
                   <PropertyValue label="County" value={siteDetails.county} />
-                  <PropertyValue
-                    label="Coordinate Method"
-                    value={siteDetails.coordinateMethodCv}
-                  />
-                  <PropertyValue
-                    label="Coordinate Accuracy"
-                    value={siteDetails.coordinateAccuracy}
-                  />
+                  <PropertyValue label="Coordinate Method" value={siteDetails.coordinateMethodCv} />
+                  <PropertyValue label="Coordinate Accuracy" value={siteDetails.coordinateAccuracy} />
                 </div>
               </Card.Body>
             </Card>

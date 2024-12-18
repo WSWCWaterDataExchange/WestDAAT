@@ -1,14 +1,7 @@
-import {
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  Position,
-} from 'geojson';
+import { FeatureCollection, GeoJsonProperties, Geometry, Position } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 
-export function getLatsLongsFromFeatureCollection(
-  featureCollection: FeatureCollection<Geometry, GeoJsonProperties>,
-) {
+export function getLatsLongsFromFeatureCollection(featureCollection: FeatureCollection<Geometry, GeoJsonProperties>) {
   let positions: Position[] = [];
 
   featureCollection.features.forEach((x) => {

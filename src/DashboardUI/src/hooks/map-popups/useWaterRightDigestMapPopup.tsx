@@ -10,10 +10,7 @@ function useWaterRightDigestMapPopup() {
   //Because of how we are rendering the water rights to the UI, we cannot manage state inside of the components like WaterRightsDigestCard.  State has to be managed here.
   const { updatePopup, siteUuid } = useSiteClickedOnMap();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const handleClosePopup = useCallback(
-    () => updatePopup(undefined),
-    [updatePopup],
-  );
+  const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 
   const { data: siteData, isFetching } = useWaterRightsDigests(siteUuid);
 
@@ -27,18 +24,12 @@ function useWaterRightDigestMapPopup() {
     }
     if (isFetching) {
       return (
-        <LoadingCard
-          onClosePopup={handleClosePopup}
-          loadingText={`Retrieving water right data for ${siteUuid}`}
-        />
+        <LoadingCard onClosePopup={handleClosePopup} loadingText={`Retrieving water right data for ${siteUuid}`} />
       );
     }
     if (!siteData || siteData.length === 0) {
       return (
-        <ErrorCard
-          onClosePopup={handleClosePopup}
-          errorText={`Unable to find water right data for ${siteUuid}`}
-        />
+        <ErrorCard onClosePopup={handleClosePopup} errorText={`Unable to find water right data for ${siteUuid}`} />
       );
     }
     return (
@@ -50,14 +41,7 @@ function useWaterRightDigestMapPopup() {
         onClosePopup={handleClosePopup}
       />
     );
-  }, [
-    isFetching,
-    siteUuid,
-    siteData,
-    currentIndex,
-    handleClosePopup,
-    setCurrentIndex,
-  ]);
+  }, [isFetching, siteUuid, siteData, currentIndex, handleClosePopup, setCurrentIndex]);
 
   useEffect(() => {
     if (result) {

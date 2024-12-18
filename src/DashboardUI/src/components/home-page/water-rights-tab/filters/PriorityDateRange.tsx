@@ -11,16 +11,12 @@ const maxControlProps = {
   'aria-label': 'Maximum Priority Date',
 };
 export function PriorityDateRange() {
-  const { minValue, maxValue, setMinValue, setMaxValue } =
-    usePriorityDateFilters();
+  const { minValue, maxValue, setMinValue, setMaxValue } = usePriorityDateFilters();
 
-  const handlePriorityDateChange = useDebounceCallback(
-    (min: number | undefined, max: number | undefined) => {
-      setMinValue(min);
-      setMaxValue(max);
-    },
-    400,
-  );
+  const handlePriorityDateChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
+    setMinValue(min);
+    setMaxValue(max);
+  }, 400);
 
   return (
     <div className="mb-3">

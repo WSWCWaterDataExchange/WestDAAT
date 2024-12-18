@@ -17,12 +17,10 @@ export interface WaterRightsSearchCriteria {
   maximumPriorityDate?: Date;
 }
 
-export interface WaterRightsSearchCriteriaWithPaging
-  extends WaterRightsSearchCriteria {
+export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCriteria {
   pageNumber: number;
 }
 
-export interface WaterRightsSearchCriteriaWithFilterUrl
-  extends WaterRightsSearchCriteria {
+export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearchCriteria {
   filterUrl: string;
 }

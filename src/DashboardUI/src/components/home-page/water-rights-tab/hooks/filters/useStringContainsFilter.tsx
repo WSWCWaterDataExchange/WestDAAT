@@ -4,9 +4,10 @@ import { waterRightsProperties } from '../../../../../config/constants';
 import { useStringContainsFilter as useStringContainsFilterBase } from '../../../../../hooks/filters/useStringContainsFilter';
 
 type ValidStringContainsFilters = 'allocationOwner';
-export function useStringContainsFilter<
-  K1 extends keyof Pick<WaterRightsFilters, ValidStringContainsFilters>,
->(field: K1, mapField: waterRightsProperties) {
+export function useStringContainsFilter<K1 extends keyof Pick<WaterRightsFilters, ValidStringContainsFilters>>(
+  field: K1,
+  mapField: waterRightsProperties,
+) {
   const {
     filters: { [field]: value },
     setFilters,
