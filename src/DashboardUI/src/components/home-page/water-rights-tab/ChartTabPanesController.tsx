@@ -54,7 +54,7 @@ function ChartTabPanesController(props: ChartTabPanesControllerProps) {
         )}
       </>
     ),
-    [isFetching],
+    [isFetching, dropdownOptions, dropdownDefaultValue],
   );
 
   return (
