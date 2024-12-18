@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HC_Data from 'highcharts/modules/export-data';
@@ -6,14 +6,8 @@ import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
-import Select from 'react-select';
 import { useColorMappings } from './hooks/useColorMappings';
 import { AnalyticsSummaryInformationResponse } from '../../../data-contracts/AnalyticsSummaryInformationResponse';
-
-interface DropdownOption {
-  value: string;
-  label: string;
-}
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -92,6 +86,7 @@ type ChartDataType = {
 interface PieChartsProps {
   pieChartSearchResults: AnalyticsSummaryInformationResponse | undefined;
   isFetching: boolean;
+  dropdownElement: JSX.Element;
 }
 function PieCharts(props: PieChartsProps) {
   const { pieChartSearchResults, isFetching } = props;
@@ -135,23 +130,6 @@ function PieCharts(props: PieChartsProps) {
     }, initData);
   }, [pieChartSearchResults, getBeneficialUseColor]);
 
-  const dropdownOptions: DropdownOption[] = useMemo(() => {
-    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
-      return [];
-    }
-    return pieChartSearchResults.dropdownOptions.map((option) => ({
-      value: option.value.toString(),
-      label: option.label,
-    }));
-  }, [pieChartSearchResults]);
-
-  const dropdownDefaultValue: DropdownOption | null = useMemo(() => {
-    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
-      return null;
-    }
-    return dropdownOptions.find((option) => option.value === pieChartSearchResults.selectedValue.toString()) ?? null;
-  }, [pieChartSearchResults]);
-
   return (
     <div>
       <div className="my-3 d-flex justify-content-center">
@@ -160,19 +138,7 @@ function PieCharts(props: PieChartsProps) {
         </a>
       </div>
 
-      {!isFetching && (
-        // `Select` must only be rendered when data is available, otherwise the `defaultValue` will not be set properly
-        <div className="mb-3 col-4">
-          <label htmlFor="grouping-dropdown">Select Grouping</label>
-          <Select<DropdownOption>
-            id="grouping-dropdown"
-            placeholder="Select Grouping"
-            isLoading={isFetching}
-            options={dropdownOptions}
-            defaultValue={dropdownDefaultValue}
-          />
-        </div>
-      )}
+      {props.dropdownElement}
 
       {pieChartSearchResults?.analyticsSummaryInformation &&
         pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
