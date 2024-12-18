@@ -86,7 +86,7 @@ function App({ msalInstance }: AppProps) {
               </Route>
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} />
-            <ToastContainer />
+            <ToastContainer containerId="app-toast-container" />
           </DndProvider>
         </QueryClientProvider>
       </AppProvider>

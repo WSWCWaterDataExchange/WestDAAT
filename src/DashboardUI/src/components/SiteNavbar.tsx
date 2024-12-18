@@ -15,7 +15,6 @@ import '../styles/navbar.scss';
 import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
-import { toast } from 'react-toastify';
 
 interface SiteNavbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -36,12 +35,6 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
 
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
-
-  const [counter, setCounter] = useState(0);
-
-  useEffect(() => {
-    toast.info('Heyo ' + counter);
-  }, [counter]);
 
   return (
     <div>
@@ -92,9 +85,6 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
 
           <div className="d-flex">
             <div className="p-2">
-              <Button className="ms-1" onClick={() => setCounter(counter + 1)}>
-                Hello
-              </Button>
               {showDownloadModal && (
                 <Button className="ms-1" onClick={() => showDownloadModal(true)}>
                   Download Data
