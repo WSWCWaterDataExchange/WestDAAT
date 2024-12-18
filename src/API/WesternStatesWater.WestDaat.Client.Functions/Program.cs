@@ -45,7 +45,9 @@ var host = new HostBuilder()
         services.AddScoped(a => configuration.GetBlobStorageConfiguration());
         services.AddScoped(a => configuration.GetPerformanceConfiguration());
 
+        services.AddScoped<IApplicationManager, ConservationManager>();
         services.AddScoped<INotificationManager, NotificationManager>();
+        services.AddScoped<IUserManager, AdminManager>();
         services.AddTransient<ISystemManager, SystemManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
