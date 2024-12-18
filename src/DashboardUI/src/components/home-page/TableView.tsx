@@ -5,7 +5,7 @@ import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
 import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
-import ChartsController from './water-rights-tab/ChartsController';
+import ChartTabPanesController from './water-rights-tab/ChartTabPanesController';
 
 function TableView() {
   const [show, setshow] = useState(false);
@@ -38,7 +38,7 @@ function TableView() {
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            {show && <ChartsController activeTab={activeTab} />}
+            {show && <ChartTabPanesController activeTab={activeTab} />}
 
             <Tab.Pane eventKey="dataTable">
               {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}

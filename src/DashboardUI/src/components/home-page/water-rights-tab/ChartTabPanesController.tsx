@@ -10,11 +10,11 @@ interface DropdownOption {
   label: string;
 }
 
-interface ChartsControllerProps {
+interface ChartTabPanesControllerProps {
   activeTab: string;
 }
 
-function ChartsController(props: ChartsControllerProps) {
+function ChartTabPanesController(props: ChartTabPanesControllerProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
 
@@ -74,4 +74,4 @@ function ChartsController(props: ChartsControllerProps) {
   }
 }
 
-export default ChartsController;
+export default ChartTabPanesController;
