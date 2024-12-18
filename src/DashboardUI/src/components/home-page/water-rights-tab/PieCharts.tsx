@@ -11,6 +11,11 @@ import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 
+interface DropdownOption {
+  value: string;
+  label: string;
+}
+
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
   HC_Data(Highcharts);
@@ -127,6 +132,23 @@ function PieCharts() {
     }, initData);
   }, [pieChartSearchResults, getBeneficialUseColor]);
 
+  const dropdownOptions: DropdownOption[] = useMemo(() => {
+    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
+      return [];
+    }
+    return pieChartSearchResults.dropdownOptions.map((option) => ({
+      value: option.value.toString(),
+      label: option.label,
+    }));
+  }, [pieChartSearchResults]);
+
+  const dropdownDefaultValue: DropdownOption | null = useMemo(() => {
+    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
+      return null;
+    }
+    return dropdownOptions.find((option) => option.value === pieChartSearchResults.selectedValue.toString()) ?? null;
+  }, [pieChartSearchResults]);
+
   return (
     <div>
       <div className="my-3 d-flex justify-content-center">
@@ -135,10 +157,19 @@ function PieCharts() {
         </a>
       </div>
 
-      <div className="mb-3 col-4">
-        <label htmlFor="grouping-dropdown">Select Grouping</label>
-        <Select id="grouping-dropdown" placeholder="Select Grouping"></Select>
-      </div>
+      {!isFetching && (
+        // `Select` must only be rendered when data is available, otherwise the `defaultValue` will not be set properly
+        <div className="mb-3 col-4">
+          <label htmlFor="grouping-dropdown">Select Grouping</label>
+          <Select<DropdownOption>
+            id="grouping-dropdown"
+            placeholder="Select Grouping"
+            isLoading={isFetching}
+            options={dropdownOptions}
+            defaultValue={dropdownDefaultValue}
+          />
+        </div>
+      )}
 
       {pieChartSearchResults?.analyticsSummaryInformation &&
         pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
