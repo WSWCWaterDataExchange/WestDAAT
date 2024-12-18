@@ -115,7 +115,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             //Assert
             result.Should().NotBeNull();
-            result.AnalyticsSummaryInformations.Should().NotBeNull();
+            result.AnalyticsSummaryInformation.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
         }
 
