@@ -4,8 +4,8 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import PieCharts from './water-rights-tab/PieCharts';
 import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
+import ChartsController from './water-rights-tab/ChartsController';
 
 function TableView() {
   const [show, setshow] = useState(false);
@@ -38,7 +38,7 @@ function TableView() {
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="pieChart">{activeTab === 'pieChart' && show && <PieCharts></PieCharts>}</Tab.Pane>
+            <ChartsController activeTab={activeTab} show={show} />
             <Tab.Pane eventKey="dataTable">
               {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}
             </Tab.Pane>
