@@ -16,13 +16,13 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class WaterAllocation : FunctionBase
     {
-        public WaterAllocation(IWaterAllocationManager waterAllocationManager, ILogger<WaterAllocation> logger)
+        public WaterAllocation(IWaterResourceManager waterResourceManager, ILogger<WaterAllocation> logger)
         {
-            _waterAllocationManager = waterAllocationManager;
+            _waterResourceManager = waterResourceManager;
             _logger = logger;
         }
 
-        private readonly IWaterAllocationManager _waterAllocationManager;
+        private readonly IWaterResourceManager _waterResourceManager;
         private readonly ILogger _logger;
 
         [Function(nameof(NldiFeatures))]
@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var directions = Enum.Parse<NldiDirections>(req.Query["dir"]);
             var dataPoints = Enum.Parse<NldiDataPoints>(req.Query["points"]);
 
-            var results = await _waterAllocationManager.GetNldiFeatures(latitude, longitude, directions, dataPoints);
+            var results = await _waterResourceManager.GetNldiFeatures(latitude, longitude, directions, dataPoints);
 
             return await CreateOkResponse(req, results);
         }
@@ -50,7 +50,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithPaging>(requestBody);
 
-            var result = await _waterAllocationManager.FindWaterRights(searchRequest);
+            var result = await _waterResourceManager.FindWaterRights(searchRequest);
 
             return await CreateOkResponse(request, result);
         }
@@ -58,7 +58,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightDetails))]
         public async Task<HttpResponseData> GetWaterRightDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}")] HttpRequestData request, string allocationUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightDetails(allocationUuid);
+            var result = await _waterResourceManager.GetWaterRightDetails(allocationUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -66,7 +66,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightSiteInfoList))]
         public async Task<HttpResponseData> GetWaterRightSiteInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Sites")] HttpRequestData request, string allocationUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightSiteInfoList(allocationUuid);
+            var result = await _waterResourceManager.GetWaterRightSiteInfoList(allocationUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -74,7 +74,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightSourceInfoList))]
         public async Task<HttpResponseData> GetWaterRightSourceInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Sources")] HttpRequestData request, string allocationUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightSourceInfoList(allocationUuid);
+            var result = await _waterResourceManager.GetWaterRightSourceInfoList(allocationUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -82,7 +82,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightSiteLocations))]
         public async Task<HttpResponseData> GetWaterRightSiteLocations([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/SiteLocations")] HttpRequestData request, string allocationUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightSiteLocations(allocationUuid);
+            var result = await _waterResourceManager.GetWaterRightSiteLocations(allocationUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -97,7 +97,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             }
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
-            var result = await _waterAllocationManager.GetAnalyticsSummaryInformation(searchRequest);
+            var result = await _waterResourceManager.GetAnalyticsSummaryInformation(searchRequest);
 
             return await CreateOkResponse(request, result);
         }
@@ -112,7 +112,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             }
             var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
 
-            var result = await _waterAllocationManager.GetWaterRightsEnvelope(searchRequest);
+            var result = await _waterResourceManager.GetWaterRightsEnvelope(searchRequest);
 
             return await CreateOkResponse(request, result);
         }
@@ -121,7 +121,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterAllocationSiteDetails))]
         public async Task<HttpResponseData> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
+            var result = await _waterResourceManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -129,7 +129,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetSiteDetails))]
         public async Task<HttpResponseData> GetSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetSiteDetails(siteUuid);
+            var result = await _waterResourceManager.GetSiteDetails(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -137,7 +137,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightSiteDigest))]
         public async Task<HttpResponseData> GetWaterRightSiteDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/WaterRightsDigest")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightsDigestsBySite(siteUuid);
+            var result = await _waterResourceManager.GetWaterRightsDigestsBySite(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -145,7 +145,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetSiteDigest))]
         public async Task<HttpResponseData> GetSiteDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Digest")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetSiteDigest(siteUuid);
+            var result = await _waterResourceManager.GetSiteDigest(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -153,7 +153,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetSiteLocation))]
         public async Task<HttpResponseData> GetSiteLocation([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteLocation")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterSiteLocation(siteUuid);
+            var result = await _waterResourceManager.GetWaterSiteLocation(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -161,7 +161,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterSiteSourceListByUuid))]
         public async Task<HttpResponseData> GetWaterSiteSourceListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Sources")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterSiteSourceInfoListByUuid(siteUuid);
+            var result = await _waterResourceManager.GetWaterSiteSourceInfoListByUuid(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -169,7 +169,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterSiteRightsListByUuid))]
         public async Task<HttpResponseData> GetWaterSiteRightsListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
+            var result = await _waterResourceManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -179,14 +179,14 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{reportingUnitUuid}/Rights")] HttpRequestData request,
             string reportingUnitUuid)
         {
-            var result = await _waterAllocationManager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
+            var result = await _waterResourceManager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
             return await CreateOkResponse(request, result);
         }
         
         [Function(nameof(GetSiteUsageByByUuid))]
         public async Task<HttpResponseData> GetSiteUsageByByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteUsage")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetSiteUsageBySiteUuid(siteUuid);
+            var result = await _waterResourceManager.GetSiteUsageBySiteUuid(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -194,7 +194,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetSiteVariableInfoListByUuid))]
         public async Task<HttpResponseData> GetSiteVariableInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Variables")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetSiteVariableInfoListByUuid(siteUuid);
+            var result = await _waterResourceManager.GetSiteVariableInfoListByUuid(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -202,7 +202,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetOverlayTableDetails))]
         public async Task<HttpResponseData> GetOverlayTableDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] HttpRequestData request, string overlayUuid)
         {
-            var overlayTable = await _waterAllocationManager.GetOverlayInfoById(overlayUuid);
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(overlayUuid);
             return await CreateOkResponse(request, overlayTable);
         }
         
@@ -210,7 +210,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
             
-            var overlay = await _waterAllocationManager.GetOverlayDetails(overlayUuid);
+            var overlay = await _waterResourceManager.GetOverlayDetails(overlayUuid);
             
             return await CreateOkResponse(request, overlay);
             
@@ -219,7 +219,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetSiteMethodInfoListByUuid))]
         public async Task<HttpResponseData> GetSiteMethodInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Methods")] HttpRequestData request, string siteUuid)
         {
-            var result = await _waterAllocationManager.GetSiteMethodInfoListByUuid(siteUuid);
+            var result = await _waterResourceManager.GetSiteMethodInfoListByUuid(siteUuid);
 
             return await CreateOkResponse(request, result);
         }
@@ -237,7 +237,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var ms = new MemoryStream();
             try
             {
-                await _waterAllocationManager.WaterRightsAsZip(ms, searchRequest);
+                await _waterResourceManager.WaterRightsAsZip(ms, searchRequest);
             }
             catch (WestDaatException wex)
             {

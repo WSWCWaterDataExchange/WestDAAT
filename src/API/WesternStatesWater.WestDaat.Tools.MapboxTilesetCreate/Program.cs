@@ -34,12 +34,12 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services
                     .AddTransient<IDatabaseContextFactory,
                         DatabaseContextFactory>();
-                services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
+                services.AddScoped<IWaterResourceManager, WaterResourceManager>();
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
                 services.AddScoped<ISiteAccessor, SiteAccessor>();
                 services.AddScoped<INldiAccessor, NldiAccessor>();
                 services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
-                services.AddScoped<IWaterAllocationManager, WaterAllocationManager>();
+                services.AddScoped<IWaterResourceManager, WaterResourceManager>();
                 services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
                 services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();
                 services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();

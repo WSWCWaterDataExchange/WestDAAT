@@ -50,7 +50,7 @@ var host = new HostBuilder()
         services.AddScoped<IUserManager, AdminManager>();
         services.AddTransient<ISystemManager, SystemManager>();
         services.AddTransient<ITestManager, TestManager>();
-        services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
+        services.AddTransient<IWaterResourceManager, WaterResourceManager>();
 
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();

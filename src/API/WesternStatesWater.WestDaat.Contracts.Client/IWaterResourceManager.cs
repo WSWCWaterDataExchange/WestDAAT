@@ -4,7 +4,7 @@ using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
-    public interface IWaterAllocationManager : IServiceContractBase
+    public interface IWaterResourceManager : IServiceContractBase
     {
         Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
 
@@ -47,6 +47,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid);
         
         Task<List<MethodInfoListItem>> GetSiteMethodInfoListByUuid(string siteUuid);
+        
         Task<List<WaterRightInfoListItem>> GetWaterRightsInfoListByReportingUnitUuid(string reportingUnitUuid);
     }
 }
