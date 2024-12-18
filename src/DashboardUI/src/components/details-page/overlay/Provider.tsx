@@ -1,4 +1,5 @@
 import React, { createContext, FC, useContext, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useOverlayDetails, useOverlayInfoById, useWaterRightsInfoListByReportingUnitUuid } from '../../../hooks/queries';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
@@ -42,7 +43,7 @@ const OverlayDetailsContext = createContext<OverlayDetailsPageContextState>(defa
 export const useOverlayDetailsContext = () => useContext(OverlayDetailsContext);
 
 export const OverlayDetailsProvider: FC = ({ children }) => {
-  const overlayUuid = 'UTre_RUut_99'; // Hardcoded for now, can use useParams later
+  const { id: overlayUuid } = useParams();
   const [activeTab, setActiveTab] = useState<ActiveTabType>('admin');
 
   const detailsQuery = useOverlayDetails(overlayUuid);
