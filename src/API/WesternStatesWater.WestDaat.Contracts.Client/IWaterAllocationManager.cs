@@ -6,7 +6,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
 {
     public interface IWaterAllocationManager : IServiceContractBase
     {
-        Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
+        Task<AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
 
         Task<FeatureCollection> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchRequest);
 

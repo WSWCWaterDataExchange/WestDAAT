@@ -6,8 +6,10 @@ using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
@@ -49,11 +51,39 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        public async Task<ClientContracts.AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            return (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+            var data = (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+
+            var dropdownOptions = BuildDropdownOptionsForEnum<AnalyticsInformationGrouping>();
+
+            return new ClientContracts.AnalyticsSummaryInformationResponse
+            {
+                AnalyticsSummaryInformations = data,
+                DropdownOptions = dropdownOptions,
+                SelectedValue = (int)AnalyticsInformationGrouping.BeneficialUse
+            };
+        }
+
+        private ClientContracts.DropdownOption[] BuildDropdownOptionsForEnum<T>() where T : Enum
+        {
+            var enumValues = typeof(T).GetEnumValues() as T[];
+            var enumValuesAndDisplayAttributes = enumValues
+                .Select(enumValue => new 
+                {
+                    Value = (int)(object)enumValue,
+                    DisplayAttribute = enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()
+                }).ToArray();
+
+            return enumValuesAndDisplayAttributes
+                .Where(obj => obj.DisplayAttribute is not null)
+                .Select(obj => new ClientContracts.DropdownOption
+                {
+                    Value = obj.Value,
+                    Label = obj.DisplayAttribute.Name
+                }).ToArray();
         }
 
         public async Task<FeatureCollection> GetWaterRightsEnvelope(ClientContracts.WaterRightsSearchCriteria searchRequest)
