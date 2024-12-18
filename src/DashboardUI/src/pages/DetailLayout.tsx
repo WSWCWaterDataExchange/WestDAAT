@@ -28,10 +28,7 @@ function DetailLayout() {
         <Outlet />
         <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
       </div>
-      <FeedbackModal
-        show={showFeedbackModal}
-        setShow={shouldShowFeedbackModal}
-      />
+      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
     </>
   );
 }

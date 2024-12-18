@@ -18,17 +18,12 @@ function DownloadWaterRights(props: {
   setIsFetching: (isFetching: boolean) => void;
   setIsFetched: (isFetched: boolean) => void;
 }) {
-  const { isFetching, isError, isFetched, error } = useWaterRightsDownload(
-    props.searchCriteria,
-  );
+  const { isFetching, isError, isFetched, error } = useWaterRightsDownload(props.searchCriteria);
   const { setTitle, setError, setIsFetching, setIsFetched } = props;
 
   useEffect(() => {
     if (isError) {
-      if (
-        error instanceof Error &&
-        error.message === 'Download limit exceeded.'
-      ) {
+      if (error instanceof Error && error.message === 'Download limit exceeded.') {
         setError(<ErrorMessageTooMuchData />);
       } else {
         setError(<ErrorMessageGeneric />);
@@ -39,11 +34,7 @@ function DownloadWaterRights(props: {
   }, [isError, error, setError]);
 
   useEffect(() => {
-    if (
-      isError &&
-      error instanceof Error &&
-      error.message === 'Download limit exceeded.'
-    ) {
+    if (isError && error instanceof Error && error.message === 'Download limit exceeded.') {
       setTitle(<ModalTitleDownloadLimit />);
     }
   }, [isError, error, setTitle]);
@@ -81,9 +72,7 @@ function DownloadModal(props: DownloadModalProps) {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isFetched, setIsFetched] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<JSX.Element | null>(null);
-  const [modalTitle, setModalTitle] = useState<JSX.Element | null>(
-    <ModalTitleGeneric />,
-  );
+  const [modalTitle, setModalTitle] = useState<JSX.Element | null>(<ModalTitleGeneric />);
 
   const close = () => {
     setShowDownloadModal(false);
@@ -112,11 +101,7 @@ function DownloadModal(props: DownloadModalProps) {
   }, [searchCriteria]);
 
   return (
-    <Modal
-      show={showDownloadModal}
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
+    <Modal show={showDownloadModal} aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton onClick={close}>
         <Modal.Title id="contained-modal-title-vcenter">
           {!isAuthenticated && <label>Login for Download Access</label>}
@@ -126,17 +111,13 @@ function DownloadModal(props: DownloadModalProps) {
       <Modal.Body>
         {!isAuthenticated && (
           <p>
-            Sign up <strong>completely free</strong> or login for download
-            access of up to 100,000 water rights points.
+            Sign up <strong>completely free</strong> or login for download access of up to 100,000 water rights points.
           </p>
         )}
         {downloadError}
         {/* display donwload message to continue with download if user is authenticated */}
         {isAuthenticated && !isFetching && !downloadError && (
-          <p>
-            Download access limited up to a maximum of 100,000 water rights
-            points. Click Download to continue
-          </p>
+          <p>Download access limited up to a maximum of 100,000 water rights points. Click Download to continue</p>
         )}
         {/* display modal with is fetching info and progress bar with it */}
         {isAuthenticated && isFetching && !downloadError && (
@@ -160,9 +141,7 @@ function DownloadModal(props: DownloadModalProps) {
             <SignIn />
           </Button>
         )}
-        {isAuthenticated && !isFetching && !downloadError && (
-          <Button onClick={download}>Download</Button>
-        )}
+        {isAuthenticated && !isFetching && !downloadError && <Button onClick={download}>Download</Button>}
         {downloadError && (
           <Button className="btn btn-secondary" onClick={close}>
             Okay
@@ -184,8 +163,8 @@ function ModalTitleDownloadLimit() {
 function ErrorMessageGeneric() {
   return (
     <p>
-      An error occurred while attempting to download the data. Please adjust
-      your filters to reduce the data-set and try again.
+      An error occurred while attempting to download the data. Please adjust your filters to reduce the data-set and try
+      again.
     </p>
   );
 }
@@ -193,16 +172,15 @@ function ErrorMessageGeneric() {
 function ErrorMessageTooMuchData() {
   return (
     <p>
-      You tried downloading a water rights dataset containing more than the
-      supported limit for software efficiency reasons.
+      You tried downloading a water rights dataset containing more than the supported limit for software efficiency
+      reasons.
       <br />
       <br />
-      Please adjust your filters to reduce the dataset size to less than 100,000
-      water rights and try the download again.
+      Please adjust your filters to reduce the dataset size to less than 100,000 water rights and try the download
+      again.
       <br />
       <br />
-      If not, don't hesitate to get in touch with the WaDE Team for a larger
-      dataset request.
+      If not, don't hesitate to get in touch with the WaDE Team for a larger dataset request.
     </p>
   );
 }

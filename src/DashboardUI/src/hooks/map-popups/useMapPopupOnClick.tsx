@@ -5,11 +5,7 @@ function useMapPopupOnClick() {
   const { mapClickedFeatures, setMapPopup } = useMapContext();
   const updatePopup = useCallback(
     (element: ReactElement | undefined) => {
-      if (
-        element &&
-        mapClickedFeatures?.latitude &&
-        mapClickedFeatures?.longitude
-      ) {
+      if (element && mapClickedFeatures?.latitude && mapClickedFeatures?.longitude) {
         setMapPopup({
           latitude: mapClickedFeatures.latitude,
           longitude: mapClickedFeatures.longitude,

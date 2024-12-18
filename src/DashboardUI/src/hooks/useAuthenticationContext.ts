@@ -1,10 +1,5 @@
 import { InteractionStatus, InteractionType } from '@azure/msal-browser';
-import {
-  useAccount,
-  useIsAuthenticated,
-  useMsal,
-  useMsalAuthentication,
-} from '@azure/msal-react';
+import { useAccount, useIsAuthenticated, useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { useEffect, useState } from 'react';
 import { loginRequest } from '../authConfig';
 
@@ -26,18 +21,14 @@ export function useAuthenticationContext(): IAuthenticationContext {
   const activeAccount = useAccount() ?? undefined;
   const isAuthenticated = useIsAuthenticated(activeAccount);
 
-  const { result } = useMsalAuthentication(
-    InteractionType.Silent,
-    loginRequest,
-  );
+  const { result } = useMsalAuthentication(InteractionType.Silent, loginRequest);
 
   useEffect(() => {
     if (isAuthenticated && inProgress !== InteractionStatus.Startup) {
       setAuthContext({
         isAuthenticated,
         user: {
-          emailAddress:
-            result?.account?.idTokenClaims?.emails?.find(() => true) ?? null,
+          emailAddress: result?.account?.idTokenClaims?.emails?.find(() => true) ?? null,
         },
       });
     } else {

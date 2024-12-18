@@ -2,10 +2,7 @@ import { useQuery } from 'react-query';
 import { getNldiFeatures } from '../../accessors/nldiAccessor';
 import { DataPoints, Directions } from '../../data-contracts/nldi';
 
-export function useNldiFeatures(
-  latitude: number | null,
-  longitude: number | null,
-) {
+export function useNldiFeatures(latitude: number | null, longitude: number | null) {
   return useQuery(
     ['nldi.features', latitude, longitude],
     () =>

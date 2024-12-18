@@ -36,8 +36,7 @@ function App({ msalInstance }: AppProps) {
     },
   });
 
-  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] =
-    useState(false);
+  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -72,10 +71,7 @@ function App({ msalInstance }: AppProps) {
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <QueryClientProvider client={queryClient}>
-          <DndProvider
-            backend={TouchBackend}
-            options={{ enableMouseEvents: true }}
-          >
+          <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />

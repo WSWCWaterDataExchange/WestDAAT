@@ -1,9 +1,6 @@
 import React, { JSX } from 'react';
 import Select from 'react-select';
-import {
-  BeneficialUseListItem,
-  ConsumptionCategoryType,
-} from '../../../../data-contracts/BeneficialUseListItem';
+import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../data-contracts/BeneficialUseListItem';
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
 import { useCallback, useEffect, useState } from 'react';
@@ -58,8 +55,7 @@ const unspecifiedOption: BeneficialUseChangeOption = {
 };
 
 function BeneficialUseSelect() {
-  const { beneficialUseNames, setBeneficialUseNames } =
-    useBeneficialUsesFilter();
+  const { beneficialUseNames, setBeneficialUseNames } = useBeneficialUsesFilter();
 
   const {
     hostData: {
@@ -71,23 +67,17 @@ function BeneficialUseSelect() {
     (name: string) => ({
       beneficialUseName: name,
       consumptionCategory:
-        allBeneficialUses?.find((b) => b.beneficialUseName === name)
-          ?.consumptionCategory ?? ConsumptionCategoryType.Unspecified,
+        allBeneficialUses?.find((b) => b.beneficialUseName === name)?.consumptionCategory ??
+        ConsumptionCategoryType.Unspecified,
     }),
     [allBeneficialUses],
   );
 
-  const mapToBeneficialUseListItem = (
-    selectedOptions: BeneficialUseChangeOption[],
-  ) => {
-    return selectedOptions
-      ?.map((a) => a.value)
-      .filter((a) => a !== undefined) as string[];
+  const mapToBeneficialUseListItem = (selectedOptions: BeneficialUseChangeOption[]) => {
+    return selectedOptions?.map((a) => a.value).filter((a) => a !== undefined) as string[];
   };
 
-  const mapToBeneficialUseOptions = (
-    beneficialUses: BeneficialUseListItem[] | undefined,
-  ) => {
+  const mapToBeneficialUseOptions = (beneficialUses: BeneficialUseListItem[] | undefined) => {
     return beneficialUses
       ?.map((a) => {
         let label = <span>{a.beneficialUseName}</span>;
@@ -99,9 +89,7 @@ function BeneficialUseSelect() {
               <CloseCircleOutline color="red" />
             </>
           );
-        } else if (
-          a.consumptionCategory === ConsumptionCategoryType.NonConsumptive
-        ) {
+        } else if (a.consumptionCategory === ConsumptionCategoryType.NonConsumptive) {
           label = (
             <>
               <span>{a.beneficialUseName} </span>
@@ -124,35 +112,22 @@ function BeneficialUseSelect() {
     </div>
   );
 
-  const handleChanges = (
-    currentSelectedOptions: BeneficialUseChangeOption[],
-  ): void => {
-    if (
-      currentSelectedOptions.some((option) => option.consumptiveFilter === true)
-    ) {
+  const handleChanges = (currentSelectedOptions: BeneficialUseChangeOption[]): void => {
+    if (currentSelectedOptions.some((option) => option.consumptiveFilter === true)) {
       // filter by category option selected
       const selected: string[] = [];
       currentSelectedOptions.forEach((option) => {
         if (option.consumptiveFilter) {
-          const newSelected =
-            allBeneficialUses?.filter(
-              (f) => f.consumptionCategory === option.category,
-            ) ?? [];
+          const newSelected = allBeneficialUses?.filter((f) => f.consumptionCategory === option.category) ?? [];
           newSelected.forEach((beneficialUse) => {
-            if (
-              !currentSelectedOptions.some(
-                (f) => f.value === beneficialUse.beneficialUseName,
-              )
-            ) {
+            if (!currentSelectedOptions.some((f) => f.value === beneficialUse.beneficialUseName)) {
               selected.push(beneficialUse.beneficialUseName);
             }
           });
         }
       });
       setBeneficialUseNames([
-        ...mapToBeneficialUseListItem(
-          currentSelectedOptions.filter((f) => f.consumptiveFilter !== true),
-        ),
+        ...mapToBeneficialUseListItem(currentSelectedOptions.filter((f) => f.consumptiveFilter !== true)),
         ...selected,
       ]);
     } else {
@@ -194,15 +169,9 @@ function BeneficialUseSelect() {
       },
     ];
     setAvailableDropDownOptions(groupedOptions);
-  }, [
-    beneficialUseNames,
-    allBeneficialUses,
-    mapBeneficialUseToBeneficialUseListItem,
-  ]);
+  }, [beneficialUseNames, allBeneficialUses, mapBeneficialUseToBeneficialUseListItem]);
 
-  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<
-    GroupedOption[]
-  >([]);
+  const [availableDropdownOptions, setAvailableDropDownOptions] = useState<GroupedOption[]>([]);
 
   return (
     <div className="mb-3">
@@ -216,9 +185,7 @@ function BeneficialUseSelect() {
         closeMenuOnSelect={false}
         placeholder="Select Beneficial Use(s)"
         name="beneficialUse"
-        value={mapToBeneficialUseOptions(
-          beneficialUseNames?.map(mapBeneficialUseToBeneficialUseListItem),
-        )}
+        value={mapToBeneficialUseOptions(beneficialUseNames?.map(mapBeneficialUseToBeneficialUseListItem))}
       />
     </div>
   );

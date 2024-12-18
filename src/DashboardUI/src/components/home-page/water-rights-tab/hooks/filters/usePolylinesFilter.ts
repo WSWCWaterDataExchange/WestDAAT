@@ -4,11 +4,7 @@ import { useMapContext } from '../../../../../contexts/MapProvider';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 export function usePolylinesFilter() {
-  const {
-    value: filterPolylines,
-    mapFilters,
-    setValue: setFilterPolylines,
-  } = useGeoJsonFilter('polylines');
+  const { value: filterPolylines, mapFilters, setValue: setFilterPolylines } = useGeoJsonFilter('polylines');
   const { setPolylines: setMapPolylines } = useMapContext();
 
   useEffect(() => {
