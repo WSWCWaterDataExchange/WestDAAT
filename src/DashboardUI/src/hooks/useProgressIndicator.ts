@@ -29,17 +29,14 @@ function useProgressIndicator(
         type: 'info',
         theme: 'colored',
       });
-      console.log('info', loadingFilterDataToast.current);
     } else if (
       loadingFilterDataToast.current != null &&
       calculatedProgress < 1
     ) {
-      console.log('update');
       toast.update(loadingFilterDataToast.current!, {
         progress: calculatedProgress,
       });
     } else if (loadingFilterDataToast.current != null) {
-      console.log('dismiss', loadingFilterDataToast.current!);
       toast.dismiss(loadingFilterDataToast.current!);
       loadingFilterDataToast.current = null;
     }
