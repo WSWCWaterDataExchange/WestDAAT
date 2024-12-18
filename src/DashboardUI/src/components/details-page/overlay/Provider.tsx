@@ -47,10 +47,10 @@ export const OverlayDetailsProvider: FC = ({ children }) => {
 
   const detailsQuery = useOverlayDetails(overlayUuid);
   const overlayInfoListQuery = useOverlayInfoById(overlayUuid, {
-    enabled: activeTab === 'admin',
+    enabled: activeTab === 'water-right',
   });
   const waterRightsInfoListQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid, {
-    enabled: activeTab === 'water-right',
+    enabled: activeTab === 'admin',
   });
 
   const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null =

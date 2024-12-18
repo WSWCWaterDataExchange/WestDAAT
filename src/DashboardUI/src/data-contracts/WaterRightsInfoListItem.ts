@@ -9,4 +9,5 @@ export interface WaterRightsInfoListItem {
   statuteLink: string;
   statutoryEffectiveDate: string;
   statutoryEndDate?: string | null;
+  overlayStatusDesc: string;
 }
