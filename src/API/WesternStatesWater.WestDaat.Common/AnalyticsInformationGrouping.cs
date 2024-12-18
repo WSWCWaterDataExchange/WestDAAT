@@ -4,6 +4,8 @@ namespace WesternStatesWater.WestDaat.Common
 {
     public enum AnalyticsInformationGrouping
     {
+        None = 0, // project doesn't build without this value
+
         [Display(Name = "Beneficial Use")]
         BeneficialUse = 1,
 
