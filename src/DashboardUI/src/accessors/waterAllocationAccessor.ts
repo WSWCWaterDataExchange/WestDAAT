@@ -24,29 +24,6 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
   return data;
 };
 
-export const getOverlayDetails = async (overlayUuid: string) => {
-  const { data } = await axios.get<OverlayDetails>(
-    `${process.env.REACT_APP_WEBAPI_URL}Overlays/${overlayUuid}`,
-  );
-  return data;
-}
-
-export const getOverlayInfoById = async (overlayUuid: string) => {
-  const { data } = await axios.get<OverlayTableEntry[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}Overlays/${overlayUuid}/Rights`,
-  );
-  return data;
-};
-
-export const getWaterRightsInfoListByReportingUnitUuid = async (
-  reportingUnitUuid: string,
-) => {
-  const { data } = await axios.get<WaterRightsInfoListItem[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}Overlays/${reportingUnitUuid}/Legal`,
-  );
-  return data;
-};
-
 export const getWaterRightAnalyticsSummaryInfo = async (
   searchCriteria: WaterRightsSearchCriteria,
 ) => {

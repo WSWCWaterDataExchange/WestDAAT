@@ -2,8 +2,8 @@ import { useQuery } from 'react-query';
 import {
   getOverlayDetails,
   getOverlayInfoById,
-  getWaterRightsInfoListByReportingUnitUuid,
-} from '../../accessors/waterAllocationAccessor';
+  getWaterRightsInfoListByReportingUnitUuid
+} from "../../accessors/overlaysAccessor";
 import {
   OverlayDetails,
   OverlayTableEntry,
