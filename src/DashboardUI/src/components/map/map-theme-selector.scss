@@ -1,4 +1,4 @@
-@use "../../styles/colors";
+@use '../../styles/colors';
 
 .map-themes {
   gap: 15px;
@@ -21,23 +21,23 @@
     background-position: center;
 
     &.light-v10 {
-      background-image: url("../../../public/map-themes/light.png");
+      background-image: url('../../../public/map-themes/light.png');
     }
 
     &.dark-v10 {
-      background-image: url("../../../public/map-themes/dark.png");
+      background-image: url('../../../public/map-themes/dark.png');
     }
 
     &.streets-v11 {
-      background-image: url("../../../public/map-themes/streets.png");
+      background-image: url('../../../public/map-themes/streets.png');
     }
 
     &.outdoors-v11 {
-      background-image: url("../../../public/map-themes/outdoor.png");
+      background-image: url('../../../public/map-themes/outdoor.png');
     }
 
     &.satellite-v9 {
-      background-image: url("../../../public/map-themes/satelite.png");
+      background-image: url('../../../public/map-themes/satelite.png');
     }
 
     //while they seem repetitive focus and focus-visible styles are necessary to win the war with reboot.scss
