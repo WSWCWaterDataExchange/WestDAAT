@@ -1,13 +1,4 @@
-import React, {
-  createContext,
-  FC,
-  JSX,
-  ReactElement,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, FC, JSX, ReactElement, useCallback, useContext, useMemo, useState } from 'react';
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '@data-contracts';
 
@@ -60,21 +51,11 @@ export type MapPopupType = {
 type setFiltersParamType =
   | { layer: string; filter: MapLayerFilterType }
   | { layer: string; filter: MapLayerFilterType }[];
-type setCircleColorsParamType =
-  | { layer: string; circleColor: any }
-  | { layer: string; circleColor: any }[];
-type setCircleRadiusParamType =
-  | { layer: string; circleRadius: any }
-  | { layer: string; circleRadius: any }[];
-type setCircleSortKeyParamType =
-  | { layer: string; circleSortKey: any }
-  | { layer: string; circleSortKey: any }[];
-type setFillColorsParamType =
-  | { layer: string; fillColor: any }
-  | { layer: string; fillColor: any }[];
-type setIconImagesParamType =
-  | { layer: string; iconImages: any }
-  | { layer: string; iconImages: any }[];
+type setCircleColorsParamType = { layer: string; circleColor: any } | { layer: string; circleColor: any }[];
+type setCircleRadiusParamType = { layer: string; circleRadius: any } | { layer: string; circleRadius: any }[];
+type setCircleSortKeyParamType = { layer: string; circleSortKey: any } | { layer: string; circleSortKey: any }[];
+type setFillColorsParamType = { layer: string; fillColor: any } | { layer: string; fillColor: any }[];
+type setIconImagesParamType = { layer: string; iconImages: any } | { layer: string; iconImages: any }[];
 export type RenderedFeatureType = GeoJSON.Feature<GeoJSON.Geometry> & {
   layer: { id: string };
   source: string;
@@ -108,40 +89,25 @@ interface MapContextState {
   setLayerIconImages: (iconImages: setIconImagesParamType) => void;
   geoJsonData: {
     source: string;
-    data:
-      | GeoJSON.Feature<GeoJSON.Geometry>
-      | GeoJSON.FeatureCollection<GeoJSON.Geometry>
-      | string;
+    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string;
   }[];
   setGeoJsonData: (
     source: string,
-    data:
-      | GeoJSON.Feature<GeoJSON.Geometry>
-      | GeoJSON.FeatureCollection<GeoJSON.Geometry>
-      | string,
+    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string,
   ) => void;
   vectorUrls: { source: string; url: string }[];
   setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[];
   setVisibleLayers: (layers: string[]) => void;
   renderedFeatures: RenderedFeatureType[];
-  setRenderedFeatures: React.Dispatch<
-    React.SetStateAction<RenderedFeatureType[]>
-  >;
+  setRenderedFeatures: React.Dispatch<React.SetStateAction<RenderedFeatureType[]>>;
   mapAlert: JSX.Element | null;
-  changeAlertDisplay: (
-    key: string,
-    display: boolean,
-    element: JSX.Element,
-    priority: MapAlertPriority,
-  ) => void;
+  changeAlertDisplay: (key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => void;
   removeAlertDisplay: (key: string) => void;
   mapBoundSettings: MapBoundSettings | null;
   setMapBoundSettings: (settings: MapBoundSettings) => void;
   mapClickedFeatures: MapClickType | null;
-  setMapClickedFeatures: React.Dispatch<
-    React.SetStateAction<MapClickType | null>
-  >;
+  setMapClickedFeatures: React.Dispatch<React.SetStateAction<MapClickType | null>>;
   mapPopup: MapPopupType | null;
   setMapPopup: React.Dispatch<React.SetStateAction<MapPopupType | null>>;
   polylines: GeoJSON.Feature<GeoJSON.Geometry>[];
@@ -216,17 +182,13 @@ const MapProvider = ({ children }: MapProviderProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapStyle, setMapStyle] = useState(defaultMapStyle);
 
-  const [mapLocationSettings, setMapLocationSettings] = useState(
-    defaultMapLocationData,
-  );
+  const [mapLocationSettings, setMapLocationSettings] = useState(defaultMapLocationData);
 
   const [filters, setFilters] = useState<MapLayerFiltersType>({});
   const setLayerFilters = useCallback(
     (updatedFilters: setFiltersParamType): void => {
       setFilters((s) => {
-        const filterArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const filterArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedFilterSet = { ...s };
         filterArray.forEach((value) => {
           updatedFilterSet[value.layer] = value.filter;
@@ -240,15 +202,11 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setFilters],
   );
 
-  const [circleColors, setCircleColors] = useState<MapLayerCircleColorsType>(
-    {},
-  );
+  const [circleColors, setCircleColors] = useState<MapLayerCircleColorsType>({});
   const setLayerCircleColors = useCallback(
     (updatedFilters: setCircleColorsParamType): void => {
       setCircleColors((s) => {
-        const circleColorArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const circleColorArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedCircleColorSet = { ...s };
         circleColorArray.forEach((value) => {
           updatedCircleColorSet[value.layer] = value.circleColor;
@@ -266,9 +224,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
   const setLayerCircleRadii = useCallback(
     (updatedFilters: setCircleRadiusParamType): void => {
       setCircleRadii((s) => {
-        const circleRadiusArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const circleRadiusArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedCircleRadiusSet = { ...s };
         circleRadiusArray.forEach((value) => {
           updatedCircleRadiusSet[value.layer] = value.circleRadius;
@@ -282,14 +238,11 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setCircleRadii],
   );
 
-  const [circleSortKeys, setCircleSortKeys] =
-    useState<MapLayerCircleSortKeyType>({});
+  const [circleSortKeys, setCircleSortKeys] = useState<MapLayerCircleSortKeyType>({});
   const setLayerCircleSortKeys = useCallback(
     (updatedFilters: setCircleSortKeyParamType): void => {
       setCircleSortKeys((s) => {
-        const circleSortKeyArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const circleSortKeyArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedCircleSortKeySet = { ...s };
         circleSortKeyArray.forEach((value) => {
           updatedCircleSortKeySet[value.layer] = value.circleSortKey;
@@ -307,9 +260,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
   const setLayerFillColors = useCallback(
     (updatedFilters: setFillColorsParamType): void => {
       setFillColors((s) => {
-        const fillColorArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const fillColorArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedFillColorSet = { ...s };
         fillColorArray.forEach((value) => {
           updatedFillColorSet[value.layer] = value.fillColor;
@@ -327,9 +278,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
   const setLayerIconImages = useCallback(
     (updatedFilters: setIconImagesParamType): void => {
       setIconImages((s) => {
-        const iconImageArray = Array.isArray(updatedFilters)
-          ? updatedFilters
-          : [updatedFilters];
+        const iconImageArray = Array.isArray(updatedFilters) ? updatedFilters : [updatedFilters];
         const updatedIconImageSet = { ...s };
         iconImageArray.forEach((value) => {
           updatedIconImageSet[value.layer] = value.iconImages;
@@ -346,19 +295,13 @@ const MapProvider = ({ children }: MapProviderProps) => {
   const [geoJsonData, setAllGeoJsonData] = useState<
     {
       source: string;
-      data:
-        | GeoJSON.Feature<GeoJSON.Geometry>
-        | GeoJSON.FeatureCollection<GeoJSON.Geometry>
-        | string;
+      data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string;
     }[]
   >([]);
   const setGeoJsonData = useCallback(
     (
       source: string,
-      data:
-        | GeoJSON.Feature<GeoJSON.Geometry>
-        | GeoJSON.FeatureCollection<GeoJSON.Geometry>
-        | string,
+      data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string,
     ) => {
       setAllGeoJsonData((s) => {
         const unchangedData = s.filter((a) => a.source !== source);
@@ -373,9 +316,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setAllGeoJsonData],
   );
 
-  const [vectorUrls, setAllVectorUrls] = useState<
-    { source: string; url: string }[]
-  >([]);
+  const [vectorUrls, setAllVectorUrls] = useState<{ source: string; url: string }[]>([]);
   const setVectorUrl = useCallback(
     (source: string, url: string) => {
       setAllVectorUrls((s) => {
@@ -395,9 +336,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
 
   const [legend, setLegend] = useState<JSX.Element | null>(null);
 
-  const [renderedFeatures, setRenderedFeatures] = useState<
-    RenderedFeatureType[]
-  >([]);
+  const [renderedFeatures, setRenderedFeatures] = useState<RenderedFeatureType[]>([]);
 
   const [mapAlerts, setMapAlerts] = useState<
     {
@@ -409,18 +348,12 @@ const MapProvider = ({ children }: MapProviderProps) => {
   >([]);
   const mapAlert = useMemo(() => {
     return (
-      [...mapAlerts]
-        .sort((a, b) => ((a.priority as number) - b.priority) as number)
-        .find((a) => a.display)?.element ?? null
+      [...mapAlerts].sort((a, b) => ((a.priority as number) - b.priority) as number).find((a) => a.display)?.element ??
+      null
     );
   }, [mapAlerts]);
   const changeAlertDisplay = useCallback(
-    (
-      key: string,
-      display: boolean,
-      element: JSX.Element,
-      priority: MapAlertPriority,
-    ) => {
+    (key: string, display: boolean, element: JSX.Element, priority: MapAlertPriority) => {
       setMapAlerts((s) => {
         const unchangedData = s.filter((a) => a.key !== key);
         return [
@@ -445,17 +378,13 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setMapAlerts],
   );
 
-  const [mapBoundSettings, setMapBoundSettings] =
-    useState<MapBoundSettings | null>(null);
+  const [mapBoundSettings, setMapBoundSettings] = useState<MapBoundSettings | null>(null);
 
-  const [mapClickedFeatures, setMapClickedFeatures] =
-    useState<MapClickType | null>(null);
+  const [mapClickedFeatures, setMapClickedFeatures] = useState<MapClickType | null>(null);
 
   const [mapPopup, setMapPopup] = useState<MapPopupType | null>(null);
 
-  const [polylines, setPolylines] = useState<
-    GeoJSON.Feature<GeoJSON.Geometry>[]
-  >([]);
+  const [polylines, setPolylines] = useState<GeoJSON.Feature<GeoJSON.Geometry>[]>([]);
 
   const [isMapRendering, setIsMapRendering] = useState<boolean>(false);
 
@@ -503,11 +432,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
     setIsMapRendering,
   };
 
-  return (
-    <MapContext.Provider value={mapContextProviderValue}>
-      {children}
-    </MapContext.Provider>
-  );
+  return <MapContext.Provider value={mapContextProviderValue}>{children}</MapContext.Provider>;
 };
 
 export default MapProvider;

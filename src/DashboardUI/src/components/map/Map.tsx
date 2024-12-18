@@ -491,7 +491,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
           dropRef(el);
         }}
       ></div>
-       <ToastContainer />
+      <ToastContainer />
     </div>
   );
 }

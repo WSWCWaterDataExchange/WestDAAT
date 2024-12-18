@@ -1,20 +1,17 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { toast, ToastContent } from 'react-toastify';
 
-function useProgressIndicator(
-  progress: number | boolean[],
-  content: ToastContent,
-) {
+function useProgressIndicator(progress: number | boolean[], content: ToastContent) {
   const toastContainer = document.querySelector('#app-toast-container');
   const loadingFilterDataToast = useRef<string | number | null>(null);
-  
+
   const calculatedProgress = useMemo(() => {
     if (Array.isArray(progress)) {
       return progress.filter((a) => a).length / progress.length;
     }
     return progress;
   }, [progress]);
-  
+
   useEffect(() => {
     // Wait for the toast container to be available in the dom.
     // If you don't, then toast messages on initial page load will not show.
@@ -29,10 +26,7 @@ function useProgressIndicator(
         type: 'info',
         theme: 'colored',
       });
-    } else if (
-      loadingFilterDataToast.current != null &&
-      calculatedProgress < 1
-    ) {
+    } else if (loadingFilterDataToast.current != null && calculatedProgress < 1) {
       toast.update(loadingFilterDataToast.current!, {
         progress: calculatedProgress,
       });
