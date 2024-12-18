@@ -121,7 +121,10 @@ export const defaultState: WaterRightsContextState = {
 const WaterRightsContext = createContext<WaterRightsContextState>(defaultState);
 export const useWaterRightsContext = () => useContext(WaterRightsContext);
 
-export const WaterRightsProvider: FC = ({ children }) => {
+interface WaterRightsProviderProps {
+  children: React.ReactNode;
+}
+export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
   const { getParameter: getDisplayOptionsParameter, setParameter: setDisplayOptionsParameter } =
     useDisplayOptionsUrlParameters();
   const { getParameter: getFiltersParameter, setParameter: setFiltersParameter } = useFiltersUrlParameters();
