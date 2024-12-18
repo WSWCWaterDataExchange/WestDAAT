@@ -4,15 +4,9 @@ namespace WesternStatesWater.WestDaat.Managers;
 
 public partial class ConservationManager : ManagerBase
 {
-    private readonly IApplicationAccessor _applicationAccessor;
-    private readonly IUserAccessor _userAccessor;
-
     public ConservationManager(
-        ILogger<ConservationManager> logger,
-        IApplicationAccessor applicationAccessor,
-        IUserAccessor userAccessor
+        ILogger<ConservationManager> logger
     ) : base(logger)
     {
-        _applicationAccessor = applicationAccessor;
     }
 }

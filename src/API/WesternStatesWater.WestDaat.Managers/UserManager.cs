@@ -2,7 +2,7 @@ using WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Managers;
 
-public partial class AdminManager : IUserManager
+public sealed partial class AdminManager : IUserManager
 {
     Task<ResponseBase> IUserManager.Load(RequestBase request)
     {
