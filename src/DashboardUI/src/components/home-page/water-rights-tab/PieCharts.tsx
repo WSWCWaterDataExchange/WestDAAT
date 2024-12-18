@@ -6,6 +6,7 @@ import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
+import Select from 'react-select';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
@@ -132,6 +133,11 @@ function PieCharts() {
         <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank" rel="noopener noreferrer">
           Learn about WestDAAT analytics
         </a>
+      </div>
+
+      <div className="mb-3 col-4">
+        <label htmlFor="grouping-dropdown">Select Grouping</label>
+        <Select id="grouping-dropdown" placeholder="Select Grouping"></Select>
       </div>
 
       {pieChartSearchResults && pieChartSearchResults?.length > 0 && (
