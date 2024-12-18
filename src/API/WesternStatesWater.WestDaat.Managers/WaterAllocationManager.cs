@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
             var data = (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
 
-            var dropdownOptions = BuildDropdownOptionsForEnum<AnalyticsInformationGrouping>();
+            var dropdownOptions = BuildEnumGroupItems<AnalyticsInformationGrouping>();
 
             return new ClientContracts.AnalyticsSummaryInformationResponse
             {
@@ -67,7 +67,7 @@ namespace WesternStatesWater.WestDaat.Managers
             };
         }
 
-        private ClientContracts.DropdownOption[] BuildDropdownOptionsForEnum<T>() where T : Enum
+        private ClientContracts.GroupItem[] BuildEnumGroupItems<T>() where T : Enum
         {
             var enumValues = typeof(T).GetEnumValues() as T[];
             var enumValuesAndDisplayAttributes = enumValues
@@ -79,7 +79,7 @@ namespace WesternStatesWater.WestDaat.Managers
 
             return enumValuesAndDisplayAttributes
                 .Where(obj => obj.DisplayAttribute is not null)
-                .Select(obj => new ClientContracts.DropdownOption
+                .Select(obj => new ClientContracts.GroupItem
                 {
                     Value = obj.Value,
                     Label = obj.DisplayAttribute.Name
