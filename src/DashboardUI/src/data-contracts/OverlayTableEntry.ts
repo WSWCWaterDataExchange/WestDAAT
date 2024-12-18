@@ -1,13 +1,11 @@
 export interface OverlayTableEntry {
-  WaDEOverlayUuid: string;
-  OverlayNativeID: string;
-  OverlayName: string;
-  OverlayType: string;
-  WaterSourceType: string;
-  OverlayStatus: string;
-  OverlayStatute: string;
-  StatuteLink: string;
-  StatutoryEffectiveDate?: Date;
-  StatutoryEndDate?: Date;
-  OverlayStatusDesc: string;
+  allocationUuid: string;
+  waterRightNativeId: string;
+  owner: string;
+  priorityDate: string;
+  expirationDate?: string | null;
+  legalStatus: string;
+  flow: number;
+  volume: number;
+  beneficialUses: string[];
 }

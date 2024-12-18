@@ -7,6 +7,7 @@ import OverlayAgency from './OverlayAgency';
 import { useAlerts } from './hooks/useAlerts';
 import './overlay.scss';
 import WaterRightTabs from "../water-right/WaterRightTabs";
+import OverlayTabs from "./OverlayTabs";
 //import OverlayTabs from "./OverlayTabs";
 
 export function Layout() {
@@ -28,6 +29,7 @@ export function Layout() {
       </DetailsPage.Map>
 
         <DetailsPage.Tabs>
+            <OverlayTabs/>
         </DetailsPage.Tabs>
     </DetailsPage>
   );

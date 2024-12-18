@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
-// import { useParams } from 'react-router-dom'; // Uncomment for dynamic ID
-import { useOverlayDetails } from '../../../hooks/queries';
-import { OverlayDetails } from '@data-contracts';
+import React, { createContext, FC, useContext, useState } from 'react';
+import { useOverlayDetails, useOverlayInfoById, useWaterRightsInfoListByReportingUnitUuid } from '../../../hooks/queries';
+import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import wellknown from 'wellknown'; //Remove this import after fixing the backend
+import wellknown from 'wellknown'; // Temporary fix until backend is updated
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -12,6 +11,8 @@ const defaultQuery = { data: undefined, isError: false, isLoading: false };
 
 export interface HostData {
   detailsQuery: Query<OverlayDetails>;
+  overlayInfoListQuery: Query<OverlayTableEntry[]>;
+  waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
   geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null;
 }
 
@@ -30,6 +31,8 @@ const defaultState: OverlayDetailsPageContextState = {
   setActiveTab: () => {},
   hostData: {
     detailsQuery: defaultQuery,
+    overlayInfoListQuery: defaultQuery,
+    waterRightsInfoListQuery: defaultQuery,
     geometryFeatureCollection: null,
   },
 };
@@ -38,36 +41,44 @@ const OverlayDetailsContext = createContext<OverlayDetailsPageContextState>(defa
 
 export const useOverlayDetailsContext = () => useContext(OverlayDetailsContext);
 
-export const OverlayDetailsProvider: React.FC = ({ children }) => {
-  // const { id: overlayUuid } = useParams(); // Uncomment for dynamic ID
-  const overlayUuid = 'UTre_RUut_99'; // Hardcoded for testing
-
-  const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
+export const OverlayDetailsProvider: FC = ({ children }) => {
+  const overlayUuid = 'UTre_RUut_99'; // Hardcoded for now, can use useParams later
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('admin');
 
   const detailsQuery = useOverlayDetails(overlayUuid);
+  const overlayInfoListQuery = useOverlayInfoById(overlayUuid, {
+    enabled: activeTab === 'admin',
+  });
+  const waterRightsInfoListQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid, {
+    enabled: activeTab === 'water-right',
+  });
 
-  const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null = detailsQuery.data?.geometry
-      ? {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry, //fix this, uninstall wellknown and wellknown/types
-            // this casting above is a temp fix until fixing the backend
-            properties: {},
-          },
-        ],
-      }
-      : null;
+  const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null =
+      detailsQuery.data?.geometry
+          ? {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry,
+                properties: {},
+              },
+            ],
+          }
+          : null;
+
+  const hostData: HostData = {
+    detailsQuery,
+    overlayInfoListQuery,
+    waterRightsInfoListQuery,
+    geometryFeatureCollection,
+  };
 
   const contextValue: OverlayDetailsPageContextState = {
     overlayUuid,
     activeTab,
     setActiveTab,
-    hostData: {
-      detailsQuery,
-      geometryFeatureCollection,
-    },
+    hostData,
   };
 
   return (
