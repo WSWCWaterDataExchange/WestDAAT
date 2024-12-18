@@ -58,7 +58,7 @@ function ChartTabPanesController(props: ChartTabPanesControllerProps) {
   );
 
   return (
-    <Tab.Pane eventKey={props.activeTab}>
+    <Tab.Pane eventKey="pieChart">
       {props.activeTab === 'pieChart' && props.show && (
         <PieCharts
           pieChartSearchResults={pieChartSearchResults}
