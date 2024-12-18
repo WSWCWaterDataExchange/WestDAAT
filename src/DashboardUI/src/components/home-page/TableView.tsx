@@ -38,7 +38,7 @@ function TableView() {
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            {show && <ChartTabPanesController activeTab={activeTab} />}
+            <ChartTabPanesController activeTab={activeTab} show={show} />
 
             <Tab.Pane eventKey="dataTable">
               {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}

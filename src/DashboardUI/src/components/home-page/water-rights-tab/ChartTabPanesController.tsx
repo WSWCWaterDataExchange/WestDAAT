@@ -12,6 +12,7 @@ interface DropdownOption {
 
 interface ChartTabPanesControllerProps {
   activeTab: string;
+  show: boolean;
 }
 
 function ChartTabPanesController(props: ChartTabPanesControllerProps) {
@@ -56,22 +57,17 @@ function ChartTabPanesController(props: ChartTabPanesControllerProps) {
     [isFetching],
   );
 
-  switch (props.activeTab) {
-    case 'pieChart': {
-      return (
-        <Tab.Pane eventKey="pieChart">
-          <PieCharts
-            pieChartSearchResults={pieChartSearchResults}
-            isFetching={isFetching}
-            dropdownElement={selectElement}
-          />
-        </Tab.Pane>
-      );
-    }
-    default: {
-      throw new Error('Invalid active tab ' + props.activeTab);
-    }
-  }
+  return (
+    <Tab.Pane eventKey={props.activeTab}>
+      {props.activeTab === 'pieChart' && props.show && (
+        <PieCharts
+          pieChartSearchResults={pieChartSearchResults}
+          isFetching={isFetching}
+          dropdownElement={selectElement}
+        />
+      )}
+    </Tab.Pane>
+  );
 }
 
 export default ChartTabPanesController;
