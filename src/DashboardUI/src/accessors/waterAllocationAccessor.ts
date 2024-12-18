@@ -1,7 +1,6 @@
 import { SiteInfoListItem, WaterRightDetails, WaterSourceInfoListItem } from '@data-contracts';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
-import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
 import {
   WaterRightsSearchCriteria,
   WaterRightsSearchCriteriaWithFilterUrl,
@@ -9,6 +8,7 @@ import {
 } from '../data-contracts/WaterRightsSearchCriteria';
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
 import { FeatureCollection } from 'geojson';
+import { AnalyticsSummaryInformationResponse } from '../data-contracts/AnalyticsSummaryInformationResponse';
 
 export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
@@ -18,7 +18,7 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
 };
 
 export const getWaterRightAnalyticsSummaryInfo = async (searchCriteria: WaterRightsSearchCriteria) => {
-  const { data } = await axios.post<AnalyticsSummaryInformation[]>(
+  const { data } = await axios.post<AnalyticsSummaryInformationResponse>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/AnalyticsSummaryInformation`,
     searchCriteria,
   );
