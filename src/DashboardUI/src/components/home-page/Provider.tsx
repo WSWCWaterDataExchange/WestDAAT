@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { createContext, FC, useContext, useState } from 'react';
 import * as geojson from 'geojson';
 
@@ -31,7 +31,10 @@ const defaultState: HomePageContextState = {
 const HomePageContext = createContext<HomePageContextState>(defaultState);
 export const useHomePageContext = () => useContext(HomePageContext);
 
-export const HomePageProvider: FC = ({ children }) => {
+interface HomePageProviderProps {
+  children: React.ReactNode;
+}
+export const HomePageProvider = ({ children }: HomePageProviderProps) => {
   const [downloadModal, setDownloadModal] = useState<JSX.Element | undefined>(undefined);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [uploadModal, setUploadModal] = useState<JSX.Element | undefined>(undefined);

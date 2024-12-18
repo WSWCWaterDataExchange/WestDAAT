@@ -214,7 +214,14 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
 
   return (
     <div className="d-inline-flex flex-row align-items-center">
-      <Button type="button" ref={dragRef} variant="no-outline" className="grabbable me-2">
+      <Button
+        type="button"
+        ref={(el) => {
+          dragRef(el);
+        }}
+        variant="no-outline"
+        className="grabbable me-2"
+      >
         <Icon path={mdiMapMarker} color={nldi.colors.mapMarker} size="48px" />
       </Button>
       <span>Drag and drop the "Pin Icon" on the map to select your search location</span>

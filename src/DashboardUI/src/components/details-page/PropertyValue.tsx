@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { JSX, useMemo } from 'react';
 import { FormattedDate } from '../FormattedDate';
 import moment from 'moment';
 import { formatNumber } from '../../utilities/valueFormatters';
@@ -33,7 +33,7 @@ export function PropertyValue({
     if (typeof value === 'number') {
       return formatNumber(value, decimalPositions);
     }
-    if (typeof value === 'string' && moment(value, true).isValid()) {
+    if (value instanceof Date || (typeof value === 'string' && moment(value, true).isValid())) {
       return <FormattedDate>{value}</FormattedDate>;
     }
     return value;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactChild, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { MapAlertPriority, useMapContext } from '../contexts/MapProvider';
 import { MapAlertCard } from '../components/MapAlertCard';
 import { CardProps } from 'react-bootstrap';
@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function useMapAlert(
   isActive: boolean,
-  header?: ReactChild,
-  body?: ReactChild,
+  header?: ReactNode,
+  body?: ReactNode,
   cardProps?: CardProps,
   priority: MapAlertPriority = MapAlertPriority.Information,
 ) {

@@ -89,7 +89,7 @@ export function useAlerts() {
   useEffect(() => {
     if (isError) {
       toast.error('Error loading water rights data.  Please try again.', {
-        position: toast.POSITION.TOP_CENTER,
+        position: 'top-center',
         theme: 'colored',
         autoClose: false,
       });
@@ -98,7 +98,7 @@ export function useAlerts() {
   useEffect(() => {
     if (isFilterEnvelopeError) {
       toast.error('Unable to find water right locations', {
-        position: toast.POSITION.TOP_CENTER,
+        position: 'top-center',
         theme: 'colored',
         autoClose: 3000,
       });

@@ -56,7 +56,10 @@ const defaultState: SiteDetailsPageContextState = {
 const SiteDetailsContext = createContext<SiteDetailsPageContextState>(defaultState);
 export const useSiteDetailsContext = () => useContext(SiteDetailsContext);
 
-export const SiteDetailsProvider: FC = ({ children }) => {
+interface SiteDetailsProviderProps {
+  children: React.ReactNode;
+}
+export const SiteDetailsProvider = ({ children }: SiteDetailsProviderProps) => {
   const { id: siteUuid } = useParams();
 
   const [activeTab, setActiveTab] = useState<SiteActiveTabType>(defaultState.activeTab);
