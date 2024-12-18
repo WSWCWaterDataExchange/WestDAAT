@@ -1,6 +1,8 @@
 import React from 'react';
 import PieCharts from './PieCharts';
 import Tab from 'react-bootstrap/esm/Tab';
+import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
+import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 
 interface ChartsControllerProps {
   activeTab: string;
@@ -8,6 +10,9 @@ interface ChartsControllerProps {
 }
 
 function ChartsController(props: ChartsControllerProps) {
+  const { searchCriteria } = useWaterRightsSearchCriteria();
+  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
+
   if (!props.show) {
     return null;
   }
@@ -16,7 +21,7 @@ function ChartsController(props: ChartsControllerProps) {
     case 'pieChart': {
       return (
         <Tab.Pane eventKey="pieChart">
-          <PieCharts />
+          <PieCharts pieChartSearchResults={pieChartSearchResults} isFetching={isFetching} />
         </Tab.Pane>
       );
     }

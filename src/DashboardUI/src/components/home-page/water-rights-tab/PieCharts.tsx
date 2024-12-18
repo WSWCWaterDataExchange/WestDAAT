@@ -7,9 +7,8 @@ import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
 import Select from 'react-select';
-import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
-import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
+import { AnalyticsSummaryInformationResponse } from '../../../data-contracts/AnalyticsSummaryInformationResponse';
 
 interface DropdownOption {
   value: string;
@@ -89,10 +88,14 @@ type ChartDataType = {
   sum: number;
   data: ChartSeriesDataType[];
 };
-function PieCharts() {
-  const { searchCriteria } = useWaterRightsSearchCriteria();
 
-  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
+interface PieChartsProps {
+  pieChartSearchResults: AnalyticsSummaryInformationResponse | undefined;
+  isFetching: boolean;
+}
+function PieCharts(props: PieChartsProps) {
+  const { pieChartSearchResults, isFetching } = props;
+
   const { getBeneficialUseColor } = useColorMappings();
 
   const [flowData, volumeData, pointData] = useMemo(() => {
