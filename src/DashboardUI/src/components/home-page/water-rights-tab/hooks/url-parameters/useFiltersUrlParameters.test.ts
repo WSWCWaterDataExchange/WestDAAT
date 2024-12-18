@@ -1,5 +1,5 @@
+import { renderHook } from '@testing-library/react';
 import * as urlParameters from '../../../../../hooks/url-parameters/useUrlParameters';
-import { renderHook } from '@testing-library/react-hooks';
 import {
   NldiFilters,
   WaterRightsFilters,

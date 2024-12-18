@@ -1,5 +1,5 @@
+import { act, renderHook } from '@testing-library/react';
 import { useUrlParameters } from './useUrlParameters';
-import { act, renderHook } from '@testing-library/react-hooks';
 
 let mockUrlParams: Record<string, any> = {};
 const mockSetUrlParam = jest.fn();

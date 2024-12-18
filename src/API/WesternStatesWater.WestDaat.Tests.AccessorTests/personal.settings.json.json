@@ -1,0 +1,19 @@
+{
+  "Logging": {
+    "Console": {
+      "LogLevel": {
+        "Default": "Information",
+        "WesternStatesWater": "Debug"
+      },
+      "FormatterName": "simple",
+      "FormatterOptions": {
+        "SingleLine": true,
+        "TimestampFormat": "HH:mm:ss ",
+        "UseUtcTimestamp": true
+      }
+    },
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
+}
