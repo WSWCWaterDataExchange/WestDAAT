@@ -7,14 +7,14 @@ function useProgressIndicator(
 ) {
   const toastContainer = document.querySelector('#app-toast-container');
   const loadingFilterDataToast = useRef<string | number | null>(null);
-
+  
   const calculatedProgress = useMemo(() => {
     if (Array.isArray(progress)) {
       return progress.filter((a) => a).length / progress.length;
     }
     return progress;
   }, [progress]);
-
+  
   useEffect(() => {
     // Wait for the toast container to be available in the dom.
     // If you don't, then toast messages on initial page load will not show.
