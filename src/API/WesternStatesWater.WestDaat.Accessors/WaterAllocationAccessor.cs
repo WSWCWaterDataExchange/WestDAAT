@@ -46,21 +46,19 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             var summaryQueryGroupBy = BuildGetAnalyticsSummaryInformationGroupByQuery(analyticsSummaryQuery, groupValue.Value);
 
-            var analyticsSummary = await summaryQueryGroupBy
-                .ToArrayAsync();
+            var analyticsSummary = await summaryQueryGroupBy;
 
             ts.Complete();
 
             return analyticsSummary;
         }
 
-        private IQueryable<AnalyticsSummaryInformation> BuildGetAnalyticsSummaryInformationGroupByQuery(IQueryable<AllocationAmountsFact> query, Common.AnalyticsInformationGrouping groupBy)
+        private async Task<AnalyticsSummaryInformation[]> BuildGetAnalyticsSummaryInformationGroupByQuery(IQueryable<AllocationAmountsFact> query, Common.AnalyticsInformationGrouping groupBy)
         {
-            IQueryable<AnalyticsSummaryInformation> result = null;
             switch (groupBy)
             {
                 case Common.AnalyticsInformationGrouping.BeneficialUse:
-                    result = query
+                    return await query
                         .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
                         .Distinct()
                         .GroupBy(a => a.PrimaryBeneficialUseCategory)
@@ -70,10 +68,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                             PrimaryUseCategoryName = a.Key,
                             Points = a.Count(),
                             Volume = a.Sum(c => c.AllocationVolume_AF),
-                        });
-                    break;
+                        })
+                        .ToArrayAsync();
                 case Common.AnalyticsInformationGrouping.OwnerType:
-                    result = query
+                    return await query
                         .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.OwnerClassificationCV, a.AllocationAmountId })
                         .Distinct()
                         .GroupBy(a => a.OwnerClassificationCV)
@@ -83,10 +81,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                             PrimaryUseCategoryName = a.Key,
                             Points = a.Count(),
                             Volume = a.Sum(c => c.AllocationVolume_AF),
-                        });
-                    break;
+                        })
+                        .ToArrayAsync();
                 case Common.AnalyticsInformationGrouping.AllocationType:
-                    result = query
+                    return await query
                         .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationTypeCv, a.AllocationAmountId })
                         .Distinct()
                         .GroupBy(a => a.AllocationTypeCv)
@@ -96,10 +94,10 @@ namespace WesternStatesWater.WestDaat.Accessors
                             PrimaryUseCategoryName = a.Key,
                             Points = a.Count(),
                             Volume = a.Sum(c => c.AllocationVolume_AF),
-                        });
-                    break;
+                        })
+                        .ToArrayAsync();
                 case Common.AnalyticsInformationGrouping.LegalStatus:
-                    result = query
+                    return await query
                         .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationLegalStatusCv, a.AllocationAmountId })
                         .Distinct()
                         .GroupBy(a => a.AllocationLegalStatusCv)
@@ -109,29 +107,39 @@ namespace WesternStatesWater.WestDaat.Accessors
                             PrimaryUseCategoryName = a.Key,
                             Points = a.Count(),
                             Volume = a.Sum(c => c.AllocationVolume_AF),
-                        });
-                    break;
+                        })
+                        .ToArrayAsync();
                 case Common.AnalyticsInformationGrouping.SiteType:
-                    result = query
+                    var summaryWithSiteData = query
                         .Select(a => new
                         {
                             a.AllocationFlow_CFS,
                             a.AllocationVolume_AF,
                             a.AllocationAmountId,
-                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv)
-                        })
-                        .GroupBy(a => a.SiteTypes)
-                        .Select(a => new AnalyticsSummaryInformation
-                        {
-                            Flow = a.Sum(c => c.AllocationFlow_CFS),
-                            PrimaryUseCategoryName = string.Join(",", a.Key),
-                            Points = a.Count(),
-                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).ToArray()
                         });
-                    break;
+
+                    var allSiteTypes = await summaryWithSiteData
+                        .SelectMany(a => a.SiteTypes)
+                        .Distinct()
+                        .ToArrayAsync();
+
+                    return allSiteTypes
+                        .Select(siteType =>
+                        {
+                            var matchingGroups = summaryWithSiteData.Where(a => a.SiteTypes.Contains(siteType));
+                            return new AnalyticsSummaryInformation
+                            {
+                                Flow = matchingGroups.Sum(c => c.AllocationFlow_CFS),
+                                Volume = matchingGroups.Sum(c => c.AllocationVolume_AF),
+                                Points = matchingGroups.Count(),
+                                PrimaryUseCategoryName = siteType
+                            };
+                        })
+                        .ToArray();
             }
 
-            return result;
+            throw new NotImplementedException($"Support for grouping by value {groupBy} is not implemented");
         }
 
         public async Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchCriteria)
