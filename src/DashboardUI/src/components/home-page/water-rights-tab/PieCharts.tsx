@@ -10,6 +10,7 @@ import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
+import { DropdownOption } from '../../../data-contracts/DropdownOption';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -85,7 +86,10 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-function PieCharts() {
+function PieCharts(props: {
+  selectedDropdownOption: DropdownOption | null;
+  setSelectedDropdownOption: (option: DropdownOption) => void;
+}) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
 
@@ -136,7 +140,12 @@ function PieCharts() {
         </a>
       </div>
 
-      <AnalyticsInfoGroupingDropdown isFetching={isFetching} pieChartSearchResults={pieChartSearchResults} />
+      <AnalyticsInfoGroupingDropdown
+        isFetching={isFetching}
+        pieChartSearchResults={pieChartSearchResults}
+        selectedDropdownOption={props.selectedDropdownOption}
+        setSelectedDropdownOption={props.setSelectedDropdownOption}
+      />
 
       {pieChartSearchResults?.analyticsSummaryInformation &&
         pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (

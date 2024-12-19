@@ -6,10 +6,12 @@ import './tableView.scss';
 import Icon from '@mdi/react';
 import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import PieCharts from './water-rights-tab/PieCharts';
+import { DropdownOption } from '../../data-contracts/DropdownOption';
 
 function TableView() {
   const [show, setshow] = useState(false);
   const [activeTab, setActiveTab] = useState('pieChart');
+  const [selectedDropdownValue, setSelectedDropdownValue] = useState<DropdownOption | null>(null);
 
   const toggleShow = () => setshow(!show);
 
@@ -38,7 +40,14 @@ function TableView() {
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="pieChart">{activeTab === 'pieChart' && show && <PieCharts />}</Tab.Pane>
+            <Tab.Pane eventKey="pieChart">
+              {activeTab === 'pieChart' && show && (
+                <PieCharts
+                  selectedDropdownOption={selectedDropdownValue}
+                  setSelectedDropdownOption={setSelectedDropdownValue}
+                />
+              )}
+            </Tab.Pane>
 
             <Tab.Pane eventKey="dataTable">
               {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}
