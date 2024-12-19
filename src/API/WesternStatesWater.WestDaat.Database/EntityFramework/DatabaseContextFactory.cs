@@ -1,5 +1,4 @@
 ﻿using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Database.EntityFramework.partials;
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {

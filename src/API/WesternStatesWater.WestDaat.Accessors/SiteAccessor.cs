@@ -116,8 +116,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.MethodsDim.Where(x => x.SiteVariableAmountsFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<MethodInfoListItem>(DtoMapper.Configuration)
                 .OrderBy(x => x.WaDEMethodUuid)
-                .ToListAsync()
-                ;
+                .ToListAsync();
         }
 
         public IEnumerable<GeoConnex> GetJSONLDData()
