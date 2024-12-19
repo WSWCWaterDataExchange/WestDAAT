@@ -9,14 +9,11 @@ public class ApplicationManagerTests : ManagerTestBase
 {
     private IApplicationManager _applicationManager = null!;
     
-    private Mock<IApplicationAccessor> _applicationAccessorMock = new(MockBehavior.Strict);
-
     [TestInitialize]
     public void TestInitialize()
     {
         _applicationManager = new ConservationManager(
-            CreateLogger<ConservationManager>(),
-            _applicationAccessorMock.Object
+            CreateLogger<ConservationManager>()
         );
     }
 

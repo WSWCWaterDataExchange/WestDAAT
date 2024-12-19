@@ -1,6 +1,4 @@
-using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Managers;
-using WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -13,8 +11,7 @@ public class UserIntegrationTests : IntegrationTestBase
     public void TestInitialize()
     {
         _userManager = new AdminManager(
-            CreateLogger<AdminManager>(),
-            Services.GetService<IUserAccessor>()
+            CreateLogger<AdminManager>()
         );
     }
 

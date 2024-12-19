@@ -9,14 +9,11 @@ public class UserManagerTests : ManagerTestBase
 {
     private IUserManager _userManager = null!;
 
-    private Mock<IUserAccessor> _userAccessorMock = new(MockBehavior.Strict);
-
     [TestInitialize]
     public void TestInitialize()
     {
         _userManager = new AdminManager(
-            CreateLogger<AdminManager>(),
-            _userAccessorMock.Object
+            CreateLogger<AdminManager>()
         );
     }
 

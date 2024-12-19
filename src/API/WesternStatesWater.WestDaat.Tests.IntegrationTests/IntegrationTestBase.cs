@@ -11,8 +11,6 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private ILoggerFactory _loggerFactory;
 
         private TransactionScope _transactionScopeFixture;
-        
-        protected IServiceProvider Services = null!;
 
         [TestInitialize]
         public void BaseTestInitialize()
@@ -26,11 +24,11 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 TransactionScopeOption.Required,
                 transactionOptions);
 
-            Services = new ServiceCollection()
+            var services = new ServiceCollection()
                 .AddLogging(config => config.AddConsole())
                 .BuildServiceProvider();
 
-            _loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+            _loggerFactory = services.GetRequiredService<ILoggerFactory>();
         }
 
         [TestCleanup]
