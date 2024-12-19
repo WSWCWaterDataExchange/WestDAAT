@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             groupValue ??= Common.AnalyticsInformationGrouping.BeneficialUse;
 
-            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
+            using var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
             await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
@@ -44,9 +44,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsNoTracking()
                 .Where(predicate);
 
-            var summaryQueryGroupBy = BuildGetAnalyticsSummaryInformationGroupByQuery(analyticsSummaryQuery, groupValue.Value);
-
-            var analyticsSummary = await summaryQueryGroupBy;
+            var analyticsSummary = await BuildGetAnalyticsSummaryInformationGroupByQuery(analyticsSummaryQuery, groupValue.Value);
 
             ts.Complete();
 
