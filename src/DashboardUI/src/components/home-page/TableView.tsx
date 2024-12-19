@@ -4,8 +4,8 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import PieCharts from './water-rights-tab/PieCharts';
+import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import { DropdownOption } from '../../data-contracts/DropdownOption';
 
 function TableView() {

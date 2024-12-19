@@ -6,9 +6,9 @@ import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
+import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
-import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
 import { DropdownOption } from '../../../data-contracts/DropdownOption';
 
@@ -86,10 +86,12 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-function PieCharts(props: {
+interface PieChartsProps {
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
-}) {
+}
+
+function PieCharts(props: PieChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
 
@@ -142,7 +144,7 @@ function PieCharts(props: {
 
       <AnalyticsInfoGroupingDropdown
         isFetching={isFetching}
-        pieChartSearchResults={pieChartSearchResults}
+        analyticsSummaryInformationResponse={pieChartSearchResults}
         selectedDropdownOption={props.selectedDropdownOption}
         setSelectedDropdownOption={props.setSelectedDropdownOption}
       />

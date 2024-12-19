@@ -5,30 +5,30 @@ import { AnalyticsSummaryInformationResponse } from '../../../data-contracts/Ana
 
 interface AnalyticsInfoGroupingDropdownProps {
   isFetching: boolean;
-  pieChartSearchResults: AnalyticsSummaryInformationResponse | undefined;
+  analyticsSummaryInformationResponse: AnalyticsSummaryInformationResponse | undefined;
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
 }
 
 function AnalyticsInfoGroupingDropdown(props: AnalyticsInfoGroupingDropdownProps) {
-  const pieChartSearchResults = props.pieChartSearchResults;
+  const response = props.analyticsSummaryInformationResponse;
 
   const dropdownOptions: DropdownOption[] = useMemo(() => {
-    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
+    if (!response || !response.dropdownOptions) {
       return [];
     }
-    return pieChartSearchResults.dropdownOptions.map((option) => ({
+    return response.dropdownOptions.map((option) => ({
       value: option.value.toString(),
       label: option.label,
     }));
-  }, [pieChartSearchResults]);
+  }, [response]);
 
   const dropdownDefaultValue: DropdownOption | null = useMemo(() => {
-    if (!pieChartSearchResults || !pieChartSearchResults.dropdownOptions) {
+    if (!response || !response.dropdownOptions) {
       return null;
     }
-    return dropdownOptions.find((option) => option.value === pieChartSearchResults.selectedValue.toString()) ?? null;
-  }, [pieChartSearchResults]);
+    return dropdownOptions.find((option) => option.value === response.selectedValue.toString()) ?? null;
+  }, [response]);
 
   return (
     !props.isFetching && (
