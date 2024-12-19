@@ -9,16 +9,9 @@ import {
   useWaterRightSourceInfoList,
 } from '../../../hooks/queries';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import {
-  WaterRightDetails,
-  SiteInfoListItem,
-  WaterSourceInfoListItem,
-} from '@data-contracts';
+import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 
-type Query<T> = Pick<
-  UseQueryResult<T, unknown>,
-  'data' | 'isError' | 'isLoading'
->;
+type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
 const defaultQuery = { data: undefined, isError: false, isLoading: false };
 
@@ -50,17 +43,13 @@ const defaultState: WaterRightDetailsPageContextState = {
   },
 };
 
-const WaterRightDetailsContext =
-  createContext<WaterRightDetailsPageContextState>(defaultState);
-export const useWaterRightDetailsContext = () =>
-  useContext(WaterRightDetailsContext);
+const WaterRightDetailsContext = createContext<WaterRightDetailsPageContextState>(defaultState);
+export const useWaterRightDetailsContext = () => useContext(WaterRightDetailsContext);
 
 export const WaterRightDetailsProvider: FC = ({ children }) => {
   const { id: allocationUuid } = useParams();
 
-  const [activeTab, setActiveTab] = useState<ActiveTabType>(
-    defaultState.activeTab,
-  );
+  const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
 
   const detailsQuery = useWaterRightDetails(allocationUuid);
   const siteLocationsQuery = useWaterRightSiteLocations(allocationUuid);
@@ -84,8 +73,6 @@ export const WaterRightDetailsProvider: FC = ({ children }) => {
   };
 
   return (
-    <WaterRightDetailsContext.Provider value={filterContextProviderValue}>
-      {children}
-    </WaterRightDetailsContext.Provider>
+    <WaterRightDetailsContext.Provider value={filterContextProviderValue}>{children}</WaterRightDetailsContext.Provider>
   );
 };

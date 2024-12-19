@@ -1,4 +1,4 @@
-import {Feature, GeoJsonProperties, Geometry} from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 export interface OverlayDetails {
   waDEAreaReportingUuid: string;

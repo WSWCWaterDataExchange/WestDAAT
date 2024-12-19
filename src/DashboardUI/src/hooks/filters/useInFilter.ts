@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
 
-export function useInFilter<T>(
-  vals: T[] | undefined,
-  allValuesCount: number | undefined,
-  mapField: string,
-) {
+export function useInFilter<T>(vals: T[] | undefined, allValuesCount: number | undefined, mapField: string) {
   const values = useMemo(() => {
     return [...new Set(vals)].sort() ?? [];
   }, [vals]);

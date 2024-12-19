@@ -8,8 +8,7 @@ import { useColorMappings } from '../useColorMappings';
 import { MapLegendCircleItem } from '../../../../map/MapLegendItem';
 
 export function useWadeLegend() {
-  const { renderedFeatures, setLayerCircleColors, setLayerFillColors } =
-    useMapContext();
+  const { renderedFeatures, setLayerCircleColors, setLayerFillColors } = useMapContext();
 
   const {
     filters: {
@@ -20,12 +19,7 @@ export function useWadeLegend() {
     displayOptions: { mapGrouping: mapGroupingOption },
   } = useWaterRightsContext();
 
-  const {
-    beneficialUseColors,
-    ownerClassificationColors,
-    waterSourceTypeColors,
-    fallbackColor,
-  } = useColorMappings();
+  const { beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, fallbackColor } = useColorMappings();
 
   const mapGroupingColors = useMemo(() => {
     switch (mapGroupingOption) {
@@ -36,12 +30,7 @@ export function useWadeLegend() {
       case MapGrouping.WaterSourceType:
         return waterSourceTypeColors;
     }
-  }, [
-    mapGroupingOption,
-    beneficialUseColors,
-    ownerClassificationColors,
-    waterSourceTypeColors,
-  ]);
+  }, [mapGroupingOption, beneficialUseColors, ownerClassificationColors, waterSourceTypeColors]);
 
   const renderedMapGroupingsColors = useMemo(() => {
     const tryParseJsonArray = (value: any) => {
@@ -58,35 +47,25 @@ export function useWadeLegend() {
       beneficialUseFilters &&
       beneficialUseFilters?.length > 0
     ) {
-      colorMappings = colorMappings.filter((a) =>
-        beneficialUseFilters?.some((b) => b === a.key),
-      );
+      colorMappings = colorMappings.filter((a) => beneficialUseFilters?.some((b) => b === a.key));
     }
     if (
       mapGroupingOption === (MapGrouping.WaterSourceType as string) &&
       waterSourceTypeFilters &&
       waterSourceTypeFilters.length > 0
     ) {
-      colorMappings = colorMappings.filter((a) =>
-        waterSourceTypeFilters?.some((b) => b === a.key),
-      );
+      colorMappings = colorMappings.filter((a) => waterSourceTypeFilters?.some((b) => b === a.key));
     }
     if (
       mapGroupingOption === (MapGrouping.OwnerClassification as string) &&
       ownerClassificationsFilters &&
       ownerClassificationsFilters.length > 0
     ) {
-      colorMappings = colorMappings.filter((a) =>
-        ownerClassificationsFilters?.some((b) => b === a.key),
-      );
+      colorMappings = colorMappings.filter((a) => ownerClassificationsFilters?.some((b) => b === a.key));
     }
     colorMappings = colorMappings.filter((a) =>
       renderedFeatures.some(
-        (b) =>
-          b.properties &&
-          tryParseJsonArray(b.properties[mapGroupingOption]).some(
-            (c: string) => c === a.key,
-          ),
+        (b) => b.properties && tryParseJsonArray(b.properties[mapGroupingOption]).some((c: string) => c === a.key),
       ),
     );
 

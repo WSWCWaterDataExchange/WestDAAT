@@ -21,18 +21,15 @@ export function Layout() {
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar
-        showDownloadModal={setShowDownloadModal}
-        showUploadModal={setShowUploadModal} />
+      <SiteNavbar showDownloadModal={setShowDownloadModal} showUploadModal={setShowUploadModal} />
 
-      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
-        {currentTabElement}
-      </div>
+      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">{currentTabElement}</div>
 
       <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
 
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
-      {downloadModal}{uploadModal}
+      {downloadModal}
+      {uploadModal}
     </div>
   );
 }

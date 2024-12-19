@@ -18,8 +18,7 @@ function AnalyticsDataTable() {
   );
 
   const [hasMoreResults, setHasMoreResults] = useState(false);
-  const [waterRightsSearchResults, setWaterRightsSearchResults] =
-    useState<WaterRightsSearchResults>(_defaultResults);
+  const [waterRightsSearchResults, setWaterRightsSearchResults] = useState<WaterRightsSearchResults>(_defaultResults);
   const [pageNumber, setPageNumber] = useState(0);
 
   const { searchCriteria } = useWaterRightsSearchCriteria();
@@ -40,24 +39,17 @@ function AnalyticsDataTable() {
     };
   }, [pageNumber, searchCriteria]);
 
-  const { data: latestSearchResults, isFetching: isFetchingTableData } =
-    useFindWaterRights(searchCriteriaWithPaging);
+  const { data: latestSearchResults, isFetching: isFetchingTableData } = useFindWaterRights(searchCriteriaWithPaging);
 
   useEffect(() => {
     if (!latestSearchResults) return;
 
-    setHasMoreResults(
-      latestSearchResults.waterRightsDetails.length > 0 &&
-        latestSearchResults.hasMoreResults,
-    );
+    setHasMoreResults(latestSearchResults.waterRightsDetails.length > 0 && latestSearchResults.hasMoreResults);
 
     setWaterRightsSearchResults((previousState) => ({
       currentPageNumber: latestSearchResults.currentPageNumber,
       hasMoreResults: latestSearchResults.hasMoreResults,
-      waterRightsDetails: [
-        ...previousState.waterRightsDetails,
-        ...latestSearchResults.waterRightsDetails,
-      ],
+      waterRightsDetails: [...previousState.waterRightsDetails, ...latestSearchResults.waterRightsDetails],
     }));
   }, [latestSearchResults]);
 
@@ -77,42 +69,37 @@ function AnalyticsDataTable() {
       </thead>
       <tbody>
         {waterRightsSearchResults.waterRightsDetails?.length > 0 &&
-          waterRightsSearchResults?.waterRightsDetails.map(
-            (waterRightDetail) => {
-              return (
-                <tr key={waterRightDetail.allocationUuid}>
-                  <td>
-                    <a
-                      href={`/details/right/${waterRightDetail.allocationUuid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {waterRightDetail.allocationUuid}
-                    </a>
-                  </td>
-                  <td>
-                    <FormattedDate>
-                      {waterRightDetail.allocationPriorityDate}
-                    </FormattedDate>
-                  </td>
-                  <td>{waterRightDetail.ownerClassification}</td>
-                  <td>{waterRightDetail.allocationOwner}</td>
-                  <td>{waterRightDetail.allocationLegalStatus}</td>
-                  <td>{formatNumber(waterRightDetail.allocationFlowCfs)}</td>
-                  <td>{formatNumber(waterRightDetail.allocationVolumeAf)}</td>
-                  <td>{waterRightDetail.beneficialUses.join(', ')}</td>
-                </tr>
-              );
-            },
-          )}
-        {waterRightsSearchResults.waterRightsDetails?.length === 0 &&
-          !isFetchingTableData && (
-            <tr key="noResults">
-              <td colSpan={8} align="center">
-                No results found
-              </td>
-            </tr>
-          )}
+          waterRightsSearchResults?.waterRightsDetails.map((waterRightDetail) => {
+            return (
+              <tr key={waterRightDetail.allocationUuid}>
+                <td>
+                  <a
+                    href={`/details/right/${waterRightDetail.allocationUuid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {waterRightDetail.allocationUuid}
+                  </a>
+                </td>
+                <td>
+                  <FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate>
+                </td>
+                <td>{waterRightDetail.ownerClassification}</td>
+                <td>{waterRightDetail.allocationOwner}</td>
+                <td>{waterRightDetail.allocationLegalStatus}</td>
+                <td>{formatNumber(waterRightDetail.allocationFlowCfs)}</td>
+                <td>{formatNumber(waterRightDetail.allocationVolumeAf)}</td>
+                <td>{waterRightDetail.beneficialUses.join(', ')}</td>
+              </tr>
+            );
+          })}
+        {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetchingTableData && (
+          <tr key="noResults">
+            <td colSpan={8} align="center">
+              No results found
+            </td>
+          </tr>
+        )}
         {hasMoreResults && !isFetchingTableData && (
           <tr>
             <td colSpan={8} align="center">

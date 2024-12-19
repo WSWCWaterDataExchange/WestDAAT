@@ -6,15 +6,15 @@ import TableView from '../TableView';
 import { useWaterRightsContext, WaterRightsProvider } from './Provider';
 import SideBar from './SideBar';
 import Map from '../../map/Map';
-import { useDisplayOptions } from "./hooks/display-options/useDisplayOptions";
-import { useFilters } from "./hooks/filters/useFilters";
-import { useMapUrlParameters } from "../hooks/useMapUrlParameters";
-import { usePolylinesFilter } from "./hooks/filters/usePolylinesFilter";
-import DownloadModal from "./DownloadModal";
-import UploadModal from "./UploadModal"
-import { useEffect } from "react";
-import { useHomePageContext } from "../Provider";
-import { useMapFitRequested } from "./hooks/useMapFitRequested";
+import { useDisplayOptions } from './hooks/display-options/useDisplayOptions';
+import { useFilters } from './hooks/filters/useFilters';
+import { useMapUrlParameters } from '../hooks/useMapUrlParameters';
+import { usePolylinesFilter } from './hooks/filters/usePolylinesFilter';
+import DownloadModal from './DownloadModal';
+import UploadModal from './UploadModal';
+import { useEffect } from 'react';
+import { useHomePageContext } from '../Provider';
+import { useMapFitRequested } from './hooks/useMapFitRequested';
 
 export function WaterRightsTab() {
   return (
@@ -32,18 +32,15 @@ function WaterRightsLayout() {
   useMapUrlParameters();
   useDownloadModal();
   useUploadModal();
-  const {polylinesOnMapUpdated} = usePolylinesFilter();
-  const {handleMapFitRequested} = useMapFitRequested();
+  const { polylinesOnMapUpdated } = usePolylinesFilter();
+  const { handleMapFitRequested } = useMapFitRequested();
   return (
     <>
       <SidePanel>
         <SideBar />
       </SidePanel>
       <MainPanel>
-        <Map
-          handleMapDrawnPolygonChange={polylinesOnMapUpdated}
-          handleMapFitChange={handleMapFitRequested}
-        />
+        <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
         <TableView />
       </MainPanel>
     </>
@@ -59,8 +56,8 @@ function useDownloadModal() {
 }
 
 function useUploadModal() {
-    const { setUploadModal } = useHomePageContext();
-    useEffect(() => {
-        setUploadModal(<UploadModal/>);
-    }, [setUploadModal]);
+  const { setUploadModal } = useHomePageContext();
+  useEffect(() => {
+    setUploadModal(<UploadModal />);
+  }, [setUploadModal]);
 }

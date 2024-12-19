@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import MapMarkerIcon from 'mdi-react/MapMarkerIcon';
 import { PropertyValue } from '../PropertyValue';
-import { useOverlayDetailsContext} from "./Provider";
+import { useOverlayDetailsContext } from './Provider';
 
 function OverlayProperties() {
   const {
@@ -23,27 +23,12 @@ function OverlayProperties() {
           </Card.Header>
           <Card.Body>
             <div className="d-flex p-2 flex-column">
-              <PropertyValue
-                label="WaDE Area Reporting UUID"
-                value={details.waDEAreaReportingUuid}
-              />
-              <PropertyValue
-                label="Reporting Area Native ID"
-                value={details.reportingAreaNativeID}
-              />
-              <PropertyValue
-                label="WaDE Overlay Area Type"
-                value={details.waDEOverlayAreaType?.join(', ')}
-              />
-              <PropertyValue
-                label="Native Reporting Area Type"
-                value={details.nativeReportingAreaType}
-              />
+              <PropertyValue label="WaDE Area Reporting UUID" value={details.waDEAreaReportingUuid} />
+              <PropertyValue label="Reporting Area Native ID" value={details.reportingAreaNativeID} />
+              <PropertyValue label="WaDE Overlay Area Type" value={details.waDEOverlayAreaType?.join(', ')} />
+              <PropertyValue label="Native Reporting Area Type" value={details.nativeReportingAreaType} />
               <PropertyValue label="State" value={details.state} />
-              <PropertyValue
-                label="Area Last Updated Date"
-                value={details.areaLastUpdatedDate}
-              />
+              <PropertyValue label="Area Last Updated Date" value={details.areaLastUpdatedDate} />
             </div>
           </Card.Body>
         </Card>

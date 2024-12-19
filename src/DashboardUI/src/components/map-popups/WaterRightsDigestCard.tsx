@@ -16,19 +16,13 @@ function WaterRightsMapPopupToggle(props: WaterRightsMapPopupToggleProps) {
   if (count <= 1) return null;
   return (
     <>
-      <button
-        onClick={() => setCurrentIndex((currentIndex - 1 + count) % count)}
-        className="nav-prev-water-right"
-      >
+      <button onClick={() => setCurrentIndex((currentIndex - 1 + count) % count)} className="nav-prev-water-right">
         <Icon path={mdiChevronLeftBox} />
       </button>
       <span>
         {currentIndex + 1} of {count}
       </span>
-      <button
-        onClick={() => setCurrentIndex((currentIndex + 1) % count)}
-        className="nav-next-water-right"
-      >
+      <button onClick={() => setCurrentIndex((currentIndex + 1) % count)} className="nav-next-water-right">
         <Icon path={mdiChevronRightBox} />
       </button>
     </>
@@ -43,13 +37,7 @@ interface WaterRightsMapPopupProps {
   onClosePopup: () => void;
 }
 function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
-  const {
-    waterRights,
-    siteUuid,
-    currentIndex,
-    onSelectedIndexChanged,
-    onClosePopup,
-  } = props;
+  const { waterRights, siteUuid, currentIndex, onSelectedIndexChanged, onClosePopup } = props;
   const currWaterRight = useMemo(() => {
     return waterRights[currentIndex];
   }, [waterRights, currentIndex]);
@@ -59,16 +47,8 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
         header: (
           <div>
             Site ID:{' '}
-            <a
-              href={`/details/site/${siteUuid}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteUuid}{' '}
-              <Icon
-                path={mdiOpenInNew}
-                className="map-popup-card-water-rights-link-icon"
-              />
+            <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
+              {siteUuid} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
             </a>
           </div>
         ),
@@ -86,7 +66,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
               <div>
                 <a href={`/details/right/${currWaterRight.allocationUuid}`} target="_blank" rel="noopener noreferrer">
                   {currWaterRight.nativeId}{' '}
-                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon"/>
+                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
                 </a>
               </div>
             </div>

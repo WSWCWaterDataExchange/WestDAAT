@@ -1,9 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useWaterRightsContext } from '../../Provider';
-import {
-  pointSizes,
-  waterRightsProperties,
-} from '../../../../../config/constants';
+import { pointSizes, waterRightsProperties } from '../../../../../config/constants';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import useLastKnownValue from '../../../../../hooks/useLastKnownValue';
 import {
@@ -14,23 +11,14 @@ import {
   volumePointCircleSortKey,
 } from '../../../../../config/maps';
 
-const flowPointCircleRadiusFlow = [
-  'coalesce',
-  ['get', waterRightsProperties.maxFlowRate as string],
-  0,
-];
-const volumePointCircleRadiusFlow = [
-  'coalesce',
-  ['get', waterRightsProperties.maxVolume as string],
-  0,
-];
+const flowPointCircleRadiusFlow = ['coalesce', ['get', waterRightsProperties.maxFlowRate as string], 0];
+const volumePointCircleRadiusFlow = ['coalesce', ['get', waterRightsProperties.maxVolume as string], 0];
 export function useMapPointScaling() {
   const [minVolume, lastKnownMinVolume, setMinVolume] = useLastKnownValue(0);
   const [maxVolume, lastKnownMaxVolume, setMaxVolume] = useLastKnownValue(100);
   const [minFlow, lastKnownMinFlow, setMinFlow] = useLastKnownValue(0);
   const [maxFlow, lastKnownMaxFlow, setMaxFlow] = useLastKnownValue(100);
-  const { renderedFeatures, setLayerCircleRadii, setLayerCircleSortKeys } =
-    useMapContext();
+  const { renderedFeatures, setLayerCircleRadii, setLayerCircleSortKeys } = useMapContext();
   const {
     filters,
     displayOptions: { pointSize },
@@ -56,22 +44,10 @@ export function useMapPointScaling() {
     }));
     return values.reduce(
       (prev, curr) => ({
-        minFlow:
-          prev.minFlow === undefined || curr.flow < prev.minFlow
-            ? curr.flow
-            : prev.minFlow,
-        maxFlow:
-          prev.maxFlow === undefined || curr.flow > prev.maxFlow
-            ? curr.flow
-            : prev.maxFlow,
-        minVolume:
-          prev.minVolume === undefined || curr.volume < prev.minVolume
-            ? curr.volume
-            : prev.minVolume,
-        maxVolume:
-          prev.maxVolume === undefined || curr.volume > prev.maxVolume
-            ? curr.volume
-            : prev.maxVolume,
+        minFlow: prev.minFlow === undefined || curr.flow < prev.minFlow ? curr.flow : prev.minFlow,
+        maxFlow: prev.maxFlow === undefined || curr.flow > prev.maxFlow ? curr.flow : prev.maxFlow,
+        minVolume: prev.minVolume === undefined || curr.volume < prev.minVolume ? curr.volume : prev.minVolume,
+        maxVolume: prev.maxVolume === undefined || curr.volume > prev.maxVolume ? curr.volume : prev.maxVolume,
       }),
       {
         minFlow: values[0].flow,
@@ -107,33 +83,15 @@ export function useMapPointScaling() {
   }, [maxVolume, flowVolumeMinMax.maxVolume, setMaxVolume]);
 
   const min = useMemo(() => {
-    return pointSize === 'f'
-      ? (filters.minFlow ?? lastKnownMinFlow)
-      : (filters.minVolume ?? lastKnownMinVolume);
-  }, [
-    pointSize,
-    lastKnownMinFlow,
-    lastKnownMinVolume,
-    filters.minFlow,
-    filters.minVolume,
-  ]);
+    return pointSize === 'f' ? (filters.minFlow ?? lastKnownMinFlow) : (filters.minVolume ?? lastKnownMinVolume);
+  }, [pointSize, lastKnownMinFlow, lastKnownMinVolume, filters.minFlow, filters.minVolume]);
 
   const max = useMemo(() => {
-    return pointSize === 'f'
-      ? (filters.maxFlow ?? lastKnownMaxFlow)
-      : (filters.maxVolume ?? lastKnownMaxVolume);
-  }, [
-    pointSize,
-    filters.maxFlow,
-    filters.maxVolume,
-    lastKnownMaxFlow,
-    lastKnownMaxVolume,
-  ]);
+    return pointSize === 'f' ? (filters.maxFlow ?? lastKnownMaxFlow) : (filters.maxVolume ?? lastKnownMaxVolume);
+  }, [pointSize, filters.maxFlow, filters.maxVolume, lastKnownMaxFlow, lastKnownMaxVolume]);
 
   const scaleProperty = useMemo(() => {
-    return pointSize === 'f'
-      ? flowPointCircleRadiusFlow
-      : volumePointCircleRadiusFlow;
+    return pointSize === 'f' ? flowPointCircleRadiusFlow : volumePointCircleRadiusFlow;
   }, [pointSize]);
 
   useEffect(() => {
@@ -150,21 +108,15 @@ export function useMapPointScaling() {
         });
       }
       const valueScaleFactorMinToMax = pointSizes.maxScaleFactorForSizedPoints; //the biggest point will be x times bigger than the smallest
-      const zoomScaleFactorMinToMax =
-        pointSizes.maxPointSize / pointSizes.minPointSize;
+      const zoomScaleFactorMinToMax = pointSizes.maxPointSize / pointSizes.minPointSize;
       const valueRange = max - min;
       const minSizeAtMinimumZoom = pointSizes.minPointSize;
-      const maxSizeAtMinimumZoom =
-        pointSizes.minPointSize * valueScaleFactorMinToMax;
+      const maxSizeAtMinimumZoom = pointSizes.minPointSize * valueScaleFactorMinToMax;
       const sizeRange = maxSizeAtMinimumZoom - minSizeAtMinimumZoom;
       //(((vol-min)/(max-min))*(maxPointSize-minPointSize))+minPointSize === this point's size at minimum zoom
       const minZoomValue = [
         'min',
-        [
-          '+',
-          ['*', ['/', ['-', scaleProperty, min], valueRange], sizeRange],
-          minSizeAtMinimumZoom,
-        ],
+        ['+', ['*', ['/', ['-', scaleProperty, min], valueRange], sizeRange], minSizeAtMinimumZoom],
         maxSizeAtMinimumZoom,
       ];
       //size at minimum * zoomScaleFactorMinToMax === this point's size at maximum zoom

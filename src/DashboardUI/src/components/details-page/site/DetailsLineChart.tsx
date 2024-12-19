@@ -4,9 +4,8 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import HC_Data from 'highcharts/modules/export-data';
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
-import {useSiteDetailsContext} from "./Provider";
-import {SiteUsagePoint} from "../../../data-contracts/SiteUsagePoint";
-
+import { useSiteDetailsContext } from './Provider';
+import { SiteUsagePoint } from '../../../data-contracts/SiteUsagePoint';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -22,16 +21,15 @@ if (typeof Highcharts === 'object') {
 
 function formatData(siteUsagePoints: SiteUsagePoint[]) {
   const series: unknown[] = [];
-  const groups = Object.groupBy(siteUsagePoints, ({variableUuid}) => variableUuid);
+  const groups = Object.groupBy(siteUsagePoints, ({ variableUuid }) => variableUuid);
   for (const group in groups) {
     const grouping = groups[group] ?? [];
 
-    const data = grouping.map((point) => ([point.timeFrameStartDate.getTime(), point.amount]));
-    series.push(
-      {
-        name: group,
-        data,
-      });
+    const data = grouping.map((point) => [point.timeFrameStartDate.getTime(), point.amount]);
+    series.push({
+      name: group,
+      data,
+    });
   }
   return series;
 }
@@ -39,7 +37,7 @@ function formatData(siteUsagePoints: SiteUsagePoint[]) {
 function DetailsLineChart() {
   const {
     hostData: {
-      siteUsageQuery: {data: siteUsage}
+      siteUsageQuery: { data: siteUsage },
     },
   } = useSiteDetailsContext();
   return (
@@ -57,8 +55,8 @@ function DetailsLineChart() {
                 itemMarginTop: 10,
                 itemMarginBottom: 10,
                 title: {
-                  text: "WaDE Variable UUID"
-                }
+                  text: 'WaDE Variable UUID',
+                },
               },
               exporting: {
                 enabled: false,
@@ -85,9 +83,7 @@ function DetailsLineChart() {
         </div>
       )}
 
-      {siteUsage?.siteUsagePoints.length === 0 && (
-        <div className="d-flex justify-content-center">No results found</div>
-      )}
+      {siteUsage?.siteUsagePoints.length === 0 && <div className="d-flex justify-content-center">No results found</div>}
     </div>
   );
 }

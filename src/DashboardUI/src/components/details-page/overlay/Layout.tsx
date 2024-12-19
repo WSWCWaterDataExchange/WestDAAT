@@ -16,15 +16,14 @@ export function Layout() {
 
       <DetailsPage.Properties>
         <div>
-          <OverlayProperties/>
-          <OverlayAgency/>
+          <OverlayProperties />
+          <OverlayAgency />
         </div>
       </DetailsPage.Properties>
 
       <DetailsPage.Map>
-        <OverlayMap/>
+        <OverlayMap />
       </DetailsPage.Map>
-
     </DetailsPage>
   );
 }

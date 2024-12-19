@@ -20,9 +20,7 @@ function Layout() {
     hostData: { locationsQuery },
   } = useSiteDetailsContext();
 
-  const featureCollection = useMemo<
-    FeatureCollection<Geometry, GeoJsonProperties> | undefined
-  >(() => {
+  const featureCollection = useMemo<FeatureCollection<Geometry, GeoJsonProperties> | undefined>(() => {
     if (!locationsQuery.data) return undefined;
     return {
       features: [locationsQuery.data],

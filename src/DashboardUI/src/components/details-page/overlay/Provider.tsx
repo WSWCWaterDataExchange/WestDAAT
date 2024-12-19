@@ -54,9 +54,5 @@ export const OverlayDetailsProvider: React.FC = ({ children }) => {
     },
   };
 
-  return (
-    <OverlayDetailsContext.Provider value={contextValue}>
-      {children}
-    </OverlayDetailsContext.Provider>
-  );
+  return <OverlayDetailsContext.Provider value={contextValue}>{children}</OverlayDetailsContext.Provider>;
 };

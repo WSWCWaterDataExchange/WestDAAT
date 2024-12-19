@@ -5,10 +5,7 @@ import NldiSiteCard from '../../components/map-popups/NldiSiteCard';
 
 function useNldiMapPopup() {
   const { updatePopup, nldiData } = useNldiClickedOnMap();
-  const handleClosePopup = useCallback(
-    () => updatePopup(undefined),
-    [updatePopup],
-  );
+  const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 
   const result = useMemo(() => {
     if (!nldiData) {

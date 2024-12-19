@@ -15,13 +15,10 @@ const maxControlProps = {
 export function VolumeRange() {
   const { minValue, maxValue, setMinValue, setMaxValue } = useVolumeFilters();
 
-  const handleVolumeChange = useDebounceCallback(
-    (min: number | undefined, max: number | undefined) => {
-      setMinValue(min);
-      setMaxValue(max);
-    },
-    400,
-  );
+  const handleVolumeChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
+    setMinValue(min);
+    setMaxValue(max);
+  }, 400);
 
   return (
     <div className="mb-3">

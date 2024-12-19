@@ -3,12 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {
-  AuthenticationResult,
-  EventMessage,
-  EventType,
-  PublicClientApplication,
-} from '@azure/msal-browser';
+import { AuthenticationResult, EventMessage, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from './authConfig';
 
 const msalInstance = new PublicClientApplication(msalConfig);
