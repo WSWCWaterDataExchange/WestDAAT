@@ -64,7 +64,7 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 AnalyticsSummaryInformation = clientResult,
                 GroupItems = dropdownOptions,
-                GroupValue = (int)AnalyticsInformationGrouping.BeneficialUse
+                GroupValue = (int)(searchRequest.GroupValue ?? AnalyticsInformationGrouping.BeneficialUse)
             };
         }
 
