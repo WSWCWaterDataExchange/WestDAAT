@@ -60,7 +60,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 case Common.AnalyticsInformationGrouping.BeneficialUse:
                     result = query
                         .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
-                        // Distinct forces proper grouping by beneficialUse query
                         .Distinct()
                         .GroupBy(a => a.PrimaryBeneficialUseCategory)
                         .Select(a => new AnalyticsSummaryInformation
@@ -71,6 +70,20 @@ namespace WesternStatesWater.WestDaat.Accessors
                             Volume = a.Sum(c => c.AllocationVolume_AF),
                         });
                     break;
+                case Common.AnalyticsInformationGrouping.AllocationType:
+                    result = query
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationTypeCv, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.AllocationTypeCv)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        });
+                    break;
+
             }
 
             return result;
