@@ -28,5 +28,5 @@ public class UserIntegrationTests : IntegrationTestBase
     
     private class FakeLoadRequest : CLI.UserLoadRequestBase
     {
-    } 
+    }
 }
