@@ -26,5 +26,5 @@ export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearc
 }
 
 export interface WaterRightsSearchCriteriaWithGrouping extends WaterRightsSearchCriteria {
-  groupValue: number;
+  groupValue?: number;
 }

@@ -11,6 +11,7 @@ import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
 import { DropdownOption } from '../../../data-contracts/DropdownOption';
+import { WaterRightsSearchCriteriaWithGrouping } from '../../../data-contracts/WaterRightsSearchCriteria';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -93,7 +94,11 @@ interface PieChartsProps {
 
 function PieCharts(props: PieChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
-  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
+  const request: WaterRightsSearchCriteriaWithGrouping = {
+    ...searchCriteria,
+    groupValue: Number(props.selectedDropdownOption?.value),
+  };
+  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
 
   const { getBeneficialUseColor } = useColorMappings();
 
