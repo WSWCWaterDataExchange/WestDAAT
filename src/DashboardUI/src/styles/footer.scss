@@ -1,4 +1,4 @@
-@import "_colors.scss";
+@import '_colors.scss';
 
 .footer {
   flex-shrink: 0;
@@ -10,7 +10,7 @@
 
   .navbar-nav {
     a:not(:last-child):after {
-      content: " |";
+      content: ' |';
       margin-right: 3px;
     }
   }

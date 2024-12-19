@@ -1,6 +1,6 @@
-@import "styles/colors";
-@import "mapbox-gl/dist/mapbox-gl.css";
-@import "./styles/custom.scss";
+@import 'styles/colors';
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import './styles/custom.scss';
 
 body {
   position: absolute;
@@ -15,7 +15,7 @@ body {
   height: 100%;
 }
 
-input[type="date"][value=""] {
+input[type='date'][value=''] {
   color: $input-placeholder-color;
 }
 
@@ -79,7 +79,7 @@ input[type="date"][value=""] {
       margin-bottom: 0;
     }
     button::after {
-      content: "Show More";
+      content: 'Show More';
     }
     &.open {
       p {
@@ -87,7 +87,7 @@ input[type="date"][value=""] {
         height: var(--expanded-height);
       }
       button::after {
-        content: "Show Less";
+        content: 'Show Less';
       }
     }
   }

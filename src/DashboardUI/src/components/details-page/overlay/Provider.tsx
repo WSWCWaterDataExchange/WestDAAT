@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {useOverlayDetails, useOverlayInfoById, useWaterRightsInfoListByReportingUnitUuid} from '../../../hooks/queries';
-import {OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem} from '@data-contracts';
+import {
+  useOverlayDetails,
+  useOverlayInfoById,
+  useWaterRightsInfoListByReportingUnitUuid,
+} from '../../../hooks/queries';
+import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
-import {Feature, Geometry, GeoJsonProperties, FeatureCollection} from 'geojson';
+import { Feature, Geometry, GeoJsonProperties, FeatureCollection } from 'geojson';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -44,7 +48,7 @@ interface OverlayDetailsProviderProps {
   children: React.ReactNode;
 }
 
-export const OverlayDetailsProvider = ({children}: OverlayDetailsProviderProps) => {
+export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps) => {
   const { id: overlayUuid } = useParams();
   const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
   const detailsQuery = useOverlayDetails(overlayUuid);
