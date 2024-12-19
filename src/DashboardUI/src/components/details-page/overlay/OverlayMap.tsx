@@ -2,6 +2,7 @@ import React from 'react';
 import DetailsMap from '../DetailsMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { useOverlayDetailsContext } from './Provider';
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 
 function OverlayMap() {
   return (
@@ -13,12 +14,17 @@ function OverlayMap() {
 
 function Layout() {
   const {
-    hostData: { geometryFeatureCollection, detailsQuery },
+    hostData: { geometryFeature, detailsQuery },
   } = useOverlayDetailsContext();
 
-  if (detailsQuery.isLoading || !geometryFeatureCollection) return null;
+  if (detailsQuery.isLoading || !geometryFeature) return null;
 
-  return <DetailsMap mapData={geometryFeatureCollection} />;
+  const featureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
+    type: 'FeatureCollection',
+    features: [geometryFeature],
+  };
+
+  return <DetailsMap mapData={featureCollection} />;
 }
 
 export default OverlayMap;
