@@ -137,6 +137,38 @@ namespace WesternStatesWater.WestDaat.Accessors
                             };
                         })
                         .ToArray();
+                case Common.AnalyticsInformationGrouping.WaterSourceType:
+                    var summaryWithWaterData = query
+                        .Select(a => new
+                        {
+                            a.AllocationFlow_CFS,
+                            a.AllocationVolume_AF,
+                            a.AllocationAmountId,
+                            WaterSourceTypeWaDENames = a.AllocationBridgeSitesFact
+                                .SelectMany(absf => absf.Site.WaterSourceBridgeSitesFact
+                                    .Select(wsbsf => wsbsf.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
+                                )
+                                .ToArray()
+                        });
+
+                    var allWaterSourceTypes = await summaryWithWaterData
+                        .SelectMany(a => a.WaterSourceTypeWaDENames)
+                        .Distinct()
+                        .ToArrayAsync();
+
+                    return allWaterSourceTypes
+                        .Select(waterSourceType =>
+                        {
+                            var matchingGroups = summaryWithWaterData.Where(a => a.WaterSourceTypeWaDENames.Contains(waterSourceType));
+                            return new AnalyticsSummaryInformation
+                            {
+                                Flow = matchingGroups.Sum(c => c.AllocationFlow_CFS),
+                                Volume = matchingGroups.Sum(c => c.AllocationVolume_AF),
+                                Points = matchingGroups.Count(),
+                                PrimaryUseCategoryName = waterSourceType
+                            };
+                        })
+                        .ToArray();
             }
 
             throw new NotImplementedException($"Support for grouping by value {groupBy} is not implemented");
