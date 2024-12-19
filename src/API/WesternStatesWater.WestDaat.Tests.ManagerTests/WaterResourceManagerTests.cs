@@ -103,11 +103,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Volume = 0
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), null))
                 .ReturnsAsync([slice, slice, slice])
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteriaWithGrouping();
 
             //Act
             var manager = CreateWaterResourceManager();
@@ -123,11 +123,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         public async Task GetAnalyticsSummaryInformation_ShouldBuildEnumData()
         {
             //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), null))
                 .ReturnsAsync([])
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteriaWithGrouping();
 
             //Act
             var manager = CreateWaterResourceManager();

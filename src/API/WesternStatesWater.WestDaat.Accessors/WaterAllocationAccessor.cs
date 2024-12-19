@@ -29,7 +29,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
-        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping? groupValue)
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping? groupValue = null)
         {
             groupValue ??= Common.AnalyticsInformationGrouping.BeneficialUse;
 
