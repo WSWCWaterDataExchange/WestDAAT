@@ -39,7 +39,7 @@ public class ApplicationManagerTests : ManagerTestBase
     private class FakeLoadRequest : ApplicationLoadRequestBase
     {
     }
-    
+
     private class FakeStoreRequest : ApplicationStoreRequestBase
     {
     }

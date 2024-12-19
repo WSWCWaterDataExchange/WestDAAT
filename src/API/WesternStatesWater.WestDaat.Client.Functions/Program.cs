@@ -56,10 +56,12 @@ var host = new HostBuilder()
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
 
+        services.AddTransient<IApplicationAccessor, ApplicationAccessor>();
         services.AddTransient<INldiAccessor, NldiAccessor>();
         services.AddTransient<ISiteAccessor, SiteAccessor>();
         services.AddTransient<ISystemAccessor, SystemAccessor>();
         services.AddTransient<ITestAccessor, TestAccessor>();
+        services.AddTransient<IUserAccessor, UserAccessor>();
         services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
