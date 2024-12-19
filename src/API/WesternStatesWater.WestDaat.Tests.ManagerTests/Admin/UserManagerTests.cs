@@ -25,8 +25,8 @@ public class UserManagerTests : ManagerTestBase
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
     }
-}
 
-internal class FakeRequest : RequestBase
-{
+    private class FakeRequest : RequestBase
+    {
+    }
 }

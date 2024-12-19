@@ -25,7 +25,7 @@ public class ApplicationManagerTests : ManagerTestBase
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _applicationManager.Load(request));
     }
-    
+
     [TestMethod]
     public async Task Store_FakeRequest_ShouldThrow()
     {
@@ -35,8 +35,8 @@ public class ApplicationManagerTests : ManagerTestBase
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _applicationManager.Store(request));
     }
-}
 
-internal class FakeRequest : RequestBase
-{
+    private class FakeRequest : RequestBase
+    {
+    }
 }
