@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import ReactGA from 'react-ga4';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 import SiteDetailsPage from './pages/SiteDetailsPage';
-import OverlayDetailsPage from "./pages/OverlayDetailsPage";
+import OverlayDetailsPage from './pages/OverlayDetailsPage';
 import { clarity } from 'clarity-js';
 
 export interface AppProps {
@@ -37,8 +37,7 @@ function App({ msalInstance }: AppProps) {
     },
   });
 
-  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] =
-    useState(false);
+  const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -73,10 +72,7 @@ function App({ msalInstance }: AppProps) {
     <MsalProvider instance={msalInstance}>
       <AppProvider>
         <QueryClientProvider client={queryClient}>
-          <DndProvider
-            backend={TouchBackend}
-            options={{ enableMouseEvents: true }}
-          >
+          <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />

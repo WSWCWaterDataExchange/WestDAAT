@@ -1,4 +1,4 @@
-import {SiteUsagePoint} from "./SiteUsagePoint";
+import { SiteUsagePoint } from './SiteUsagePoint';
 
 export interface SiteUsage {
   amountUnit: string;

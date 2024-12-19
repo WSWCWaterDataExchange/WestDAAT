@@ -7,8 +7,7 @@ export function useChildrenByTypes(type: string | string[]) {
   }, [type]);
 
   const typeOfComponent = (component: any) => {
-    const result =
-      component?.props?.__type || component?.type?.name || undefined;
+    const result = component?.props?.__type || component?.type?.name || undefined;
     return result;
   };
 
@@ -16,9 +15,7 @@ export function useChildrenByTypes(type: string | string[]) {
   type ResultType = ReturnType<typeof React.Children.toArray>;
   const findChildren = useCallback(
     (children: ChildrenType): ResultType => {
-      return React.Children.toArray(children).filter(
-        (child) => types.indexOf(typeOfComponent(child)) >= 0,
-      );
+      return React.Children.toArray(children).filter((child) => types.indexOf(typeOfComponent(child)) >= 0);
     },
     [types],
   );

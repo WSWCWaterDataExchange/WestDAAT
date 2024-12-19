@@ -10,8 +10,7 @@ function useSiteClickedOnMap() {
     }
 
     const siteFeature = clickedFeatures.find(
-      (a) =>
-        a.properties && a.properties[waterRightsProperties.siteUuid as string],
+      (a) => a.properties && a.properties[waterRightsProperties.siteUuid as string],
     );
     if (!siteFeature || !siteFeature.properties) {
       return undefined;

@@ -8,10 +8,7 @@ import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
 import { useAlerts } from '../useAlerts';
 
-const allWaterRightsLayers = [
-  mapLayerNames.waterRightsPointsLayer,
-  mapLayerNames.waterRightsPolygonsLayer,
-];
+const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
@@ -26,8 +23,7 @@ export function useDisplayOptions() {
 
   useEffect(() => {
     const visible = [...allWaterRightsLayers];
-    if ((riverBasinNames?.length ?? 0) > 0)
-      visible.push(mapLayerNames.riverBasinsLayer);
+    if ((riverBasinNames?.length ?? 0) > 0) visible.push(mapLayerNames.riverBasinsLayer);
     if (isNldiFilterActive) visible.push(...nldiLayers);
 
     setVisibleLayers(visible);

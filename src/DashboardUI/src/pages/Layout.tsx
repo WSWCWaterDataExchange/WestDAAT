@@ -4,9 +4,7 @@ import { Outlet } from 'react-router-dom';
 import DisclaimerModal from '../components/DisclaimerModal';
 
 function Layout() {
-  const [showDisclaimerModal, setShowDisclaimerModal] = useState(
-    !localStorage.getItem('disclaimer'),
-  );
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(!localStorage.getItem('disclaimer'));
 
   const acceptDisclaimer = (today: Date) => {
     localStorage.setItem('disclaimer', today.toUTCString());
@@ -15,10 +13,7 @@ function Layout() {
 
   return (
     <>
-      <DisclaimerModal
-        show={showDisclaimerModal}
-        acceptDisclaimer={acceptDisclaimer}
-      />
+      <DisclaimerModal show={showDisclaimerModal} acceptDisclaimer={acceptDisclaimer} />
 
       {/* A "layout route" is a good place to put markup you want to
           share across all the pages on your site, like navigation. */}

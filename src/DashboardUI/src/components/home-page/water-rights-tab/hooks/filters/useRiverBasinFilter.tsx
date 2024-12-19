@@ -27,9 +27,7 @@ export function useRiverBasinFilter() {
   }, [riverBasinNames.length]);
 
   const [debouncedRiverBasinNames] = useDebounce(riverBasinNames, 500);
-  const riverBasinPolygonsQuery = useRiverBasinPolygons(
-    debouncedRiverBasinNames,
-  );
+  const riverBasinPolygonsQuery = useRiverBasinPolygons(debouncedRiverBasinNames);
   const riverBasinPolygons = useMemo(() => {
     if (!hasRiverBasinNames) return emptyGeoJsonData;
     return riverBasinPolygonsQuery.data ?? emptyGeoJsonData;
@@ -46,9 +44,7 @@ export function useRiverBasinFilter() {
       setFilters((s) => ({
         ...s,
         riverBasinNames:
-          riverBasinNames === undefined || riverBasinNames.length === 0
-            ? undefined
-            : [...new Set(riverBasinNames)],
+          riverBasinNames === undefined || riverBasinNames.length === 0 ? undefined : [...new Set(riverBasinNames)],
       }));
     },
     [setFilters],

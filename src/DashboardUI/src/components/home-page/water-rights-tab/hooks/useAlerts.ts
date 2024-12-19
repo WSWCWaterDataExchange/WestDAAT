@@ -1,8 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import {
-  useNldiPinDropAlert,
-  useNoMapResults,
-} from '../../../../hooks/useMapAlert';
+import { useNldiPinDropAlert, useNoMapResults } from '../../../../hooks/useMapAlert';
 import { useWaterRightsContext } from '../Provider';
 import useProgressIndicator from '../../../../hooks/useProgressIndicator';
 import { useNldiFilter } from './filters/useNldiFilter';
@@ -13,42 +10,23 @@ import { useMapFitRequested } from './useMapFitRequested';
 export function useAlerts() {
   const {
     hostData: {
-      beneficialUsesQuery: {
-        isLoading: beneficialUseIsLoading,
-        isError: beneficialUseIsError,
-      },
-      waterSourcesQuery: {
-        isLoading: waterSourcesIsLoading,
-        isError: waterSourcesIsError,
-      },
-      ownerClassificationsQuery: {
-        isLoading: ownerClassificationsIsLoading,
-        isError: ownerClassificationsIsError,
-      },
-      riverBasinsQuery: {
-        isLoading: riverBasinsIsLoading,
-        isError: riverBasinsIsError,
-      },
+      beneficialUsesQuery: { isLoading: beneficialUseIsLoading, isError: beneficialUseIsError },
+      waterSourcesQuery: { isLoading: waterSourcesIsLoading, isError: waterSourcesIsError },
+      ownerClassificationsQuery: { isLoading: ownerClassificationsIsLoading, isError: ownerClassificationsIsError },
+      riverBasinsQuery: { isLoading: riverBasinsIsLoading, isError: riverBasinsIsError },
       statesQuery: { isLoading: statesIsLoading, isError: statesIsError },
     },
   } = useWaterRightsContext();
 
   const {
     isNldiFilterActive,
-    nldiFeaturesQuery: {
-      isLoading: isNldiDataLoading,
-      isError: isNldiDataError,
-    },
+    nldiFeaturesQuery: { isLoading: isNldiDataLoading, isError: isNldiDataError },
     nldiFilterData: { latitude, longitude } = {},
   } = useNldiFilter();
   const {
-    riverBasinPolygonsQuery: {
-      isLoading: isRiverBasinPolygonLoading,
-      isError: isRiverBasinPolygonError,
-    },
+    riverBasinPolygonsQuery: { isLoading: isRiverBasinPolygonLoading, isError: isRiverBasinPolygonError },
   } = useRiverBasinFilter();
-  const { isLoading: isFilterEnvelopeLoading, isError: isFilterEnvelopeError } =
-    useMapFitRequested();
+  const { isLoading: isFilterEnvelopeLoading, isError: isFilterEnvelopeError } = useMapFitRequested();
 
   const isLoaded = useMemo(() => {
     return !(
@@ -104,14 +82,8 @@ export function useAlerts() {
   );
 
   useProgressIndicator([!isNldiDataLoading], 'Loading NLDI Data');
-  useProgressIndicator(
-    [!isRiverBasinPolygonLoading],
-    'Loading River Basin Data',
-  );
-  useProgressIndicator(
-    [!isFilterEnvelopeLoading],
-    'Finding Water Right Locations',
-  );
+  useProgressIndicator([!isRiverBasinPolygonLoading], 'Loading River Basin Data');
+  useProgressIndicator([!isFilterEnvelopeLoading], 'Finding Water Right Locations');
 
   useNldiPinDropAlert(needsToSetNldiLocation);
   useEffect(() => {

@@ -6,8 +6,8 @@ import OverlayAgency from './OverlayAgency';
 
 import { useAlerts } from './hooks/useAlerts';
 import './overlay.scss';
-import WaterRightTabs from "../water-right/WaterRightTabs";
-import OverlayTabs from "./OverlayTabs";
+import WaterRightTabs from '../water-right/WaterRightTabs';
+import OverlayTabs from './OverlayTabs';
 //import OverlayTabs from "./OverlayTabs";
 
 export function Layout() {
@@ -19,18 +19,18 @@ export function Layout() {
 
       <DetailsPage.Properties>
         <div>
-          <OverlayProperties/>
-          <OverlayAgency/>
+          <OverlayProperties />
+          <OverlayAgency />
         </div>
       </DetailsPage.Properties>
 
       <DetailsPage.Map>
-        <OverlayMap/>
+        <OverlayMap />
       </DetailsPage.Map>
 
-        <DetailsPage.Tabs>
-            <OverlayTabs/>
-        </DetailsPage.Tabs>
+      <DetailsPage.Tabs>
+        <OverlayTabs />
+      </DetailsPage.Tabs>
     </DetailsPage>
   );
 }

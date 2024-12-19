@@ -3,11 +3,7 @@ import { useEffect } from 'react';
 import { useMapContext } from '../../../../contexts/MapProvider';
 import { nldi } from '../../../../config/constants';
 import { MapLegendMarkerItem } from '../../../map/MapLegendItem';
-import {
-  mapLayerNames,
-  siteLocationPointsIconImage,
-  siteLocationPolygonFillColor,
-} from '../../../../config/maps';
+import { mapLayerNames, siteLocationPointsIconImage, siteLocationPolygonFillColor } from '../../../../config/maps';
 
 const defaultPolygonFillColors = {
   layer: mapLayerNames.siteLocationsPolygonsLayer,
@@ -23,12 +19,8 @@ export function useMapLegend() {
   useEffect(() => {
     setLegend(
       <>
-        <MapLegendMarkerItem color={nldi.colors.sitePOD}>
-          Point of Diversion (POD)
-        </MapLegendMarkerItem>
-        <MapLegendMarkerItem color={nldi.colors.sitePOU}>
-          Place of Use (POU)
-        </MapLegendMarkerItem>
+        <MapLegendMarkerItem color={nldi.colors.sitePOD}>Point of Diversion (POD)</MapLegendMarkerItem>
+        <MapLegendMarkerItem color={nldi.colors.sitePOU}>Place of Use (POU)</MapLegendMarkerItem>
       </>,
     );
     setLayerFillColors(defaultPolygonFillColors);

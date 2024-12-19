@@ -11,9 +11,7 @@ export function AllocationOwnerSearch() {
 
   return (
     <div className="mb-3">
-      <label htmlFor="wr-allocation-owner-search">
-        Search Allocation Owner
-      </label>
+      <label htmlFor="wr-allocation-owner-search">Search Allocation Owner</label>
       <input
         id="wr-allocation-owner-search"
         type="text"

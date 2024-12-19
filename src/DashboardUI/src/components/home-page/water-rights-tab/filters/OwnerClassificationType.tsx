@@ -5,8 +5,7 @@ import { useCallback } from 'react';
 import { useWaterRightsContext } from '../Provider';
 
 export function OwnerClassificationType() {
-  const { ownerClassifications, setOwnerClassifications } =
-    useOwnerClassificationsFilter();
+  const { ownerClassifications, setOwnerClassifications } = useOwnerClassificationsFilter();
 
   const {
     hostData: {
@@ -16,27 +15,21 @@ export function OwnerClassificationType() {
 
   const handleOwnerClassificationChange = useCallback(
     (selectedOptions: string[]) => {
-      setOwnerClassifications(
-        selectedOptions.length > 0 ? selectedOptions : undefined,
-      );
+      setOwnerClassifications(selectedOptions.length > 0 ? selectedOptions : undefined);
     },
     [setOwnerClassifications],
   );
 
   return (
     <div className="mb-3">
-      <label htmlFor="wr-owner-classification-type-filter">
-        Owner Classification Type
-      </label>
+      <label htmlFor="wr-owner-classification-type-filter">Owner Classification Type</label>
       <Select
         id="wr-owner-classification-type-filter"
         isMulti
         options={allOwnerClassifications?.map((ownerClassification) => ({
           value: ownerClassification,
         }))}
-        onChange={(a) =>
-          handleOwnerClassificationChange(a.map((option) => option.value))
-        }
+        onChange={(a) => handleOwnerClassificationChange(a.map((option) => option.value))}
         closeMenuOnSelect={false}
         placeholder="Select Owner Classification(s)"
         name="ownerClassification"

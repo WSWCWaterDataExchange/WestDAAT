@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import DomainIcon from 'mdi-react/DomainIcon';
 import { PropertyValue } from '../PropertyValue';
-import { useOverlayDetailsContext } from "./Provider";
+import { useOverlayDetailsContext } from './Provider';
 
 function OverlayAgency() {
   const {
@@ -23,19 +23,9 @@ function OverlayAgency() {
           </Card.Header>
           <Card.Body>
             <div className="d-flex p-2 flex-column">
-              <PropertyValue
-                label="Organization Name"
-                value={details.organizationName}
-              />
-              <PropertyValue
-                label="State"
-                value={details.organizationState}
-              />
-              <PropertyValue
-                label="Website"
-                value={details.organizationWebsite}
-                isUrl={true}
-              />
+              <PropertyValue label="Organization Name" value={details.organizationName} />
+              <PropertyValue label="State" value={details.organizationState} />
+              <PropertyValue label="Website" value={details.organizationWebsite} isUrl={true} />
             </div>
           </Card.Body>
         </Card>

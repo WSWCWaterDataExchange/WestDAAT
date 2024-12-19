@@ -1,6 +1,10 @@
 import React, { createContext, FC, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useOverlayDetails, useOverlayInfoById, useWaterRightsInfoListByReportingUnitUuid } from '../../../hooks/queries';
+import {
+  useOverlayDetails,
+  useOverlayInfoById,
+  useWaterRightsInfoListByReportingUnitUuid,
+} from '../../../hooks/queries';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
@@ -54,19 +58,18 @@ export const OverlayDetailsProvider: FC = ({ children }) => {
     enabled: activeTab === 'admin',
   });
 
-  const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null =
-      detailsQuery.data?.geometry
-          ? {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry,
-                properties: {},
-              },
-            ],
-          }
-          : null;
+  const geometryFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> | null = detailsQuery.data?.geometry
+    ? {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: wellknown.parse(detailsQuery.data.geometry as unknown as string) as Geometry,
+            properties: {},
+          },
+        ],
+      }
+    : null;
 
   const hostData: HostData = {
     detailsQuery,
@@ -82,9 +85,5 @@ export const OverlayDetailsProvider: FC = ({ children }) => {
     hostData,
   };
 
-  return (
-      <OverlayDetailsContext.Provider value={contextValue}>
-        {children}
-      </OverlayDetailsContext.Provider>
-  );
+  return <OverlayDetailsContext.Provider value={contextValue}>{children}</OverlayDetailsContext.Provider>;
 };

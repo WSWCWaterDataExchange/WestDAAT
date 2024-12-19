@@ -14,11 +14,7 @@ const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   features: [],
 };
 type DataPointType = DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa;
-const pointFeatureDataSourceNameKeys: DataPointType[] = [
-  DataPoints.Wade,
-  DataPoints.Usgs,
-  DataPoints.Epa,
-];
+const pointFeatureDataSourceNameKeys: DataPointType[] = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa];
 const pointFeatureDataSourceNames: Record<DataPointType, string> = {
   [DataPoints.Wade]: 'Wade',
   [DataPoints.Usgs]: 'UsgsSurfaceWaterSite',
@@ -26,17 +22,13 @@ const pointFeatureDataSourceNames: Record<DataPointType, string> = {
 };
 
 type DirectionsType = Directions.Upsteam | Directions.Downsteam;
-const directionNameKeys: DirectionsType[] = [
-  Directions.Upsteam,
-  Directions.Downsteam,
-];
+const directionNameKeys: DirectionsType[] = [Directions.Upsteam, Directions.Downsteam];
 const directionNames: Record<DirectionsType, string> = {
   [Directions.Upsteam]: 'Upstream',
   [Directions.Downsteam]: 'Downstream',
 };
 export function useNldiFilter() {
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } =
-    useMapContext();
+  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useMapContext();
   const {
     filters: { nldiFilterData, isNldiFilterActive },
     setFilters,
@@ -47,10 +39,7 @@ export function useNldiFilter() {
     [nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null],
     400,
   );
-  const nldiFeaturesQuery = useNldiFeatures(
-    debouncedLatitude,
-    debouncedLongitude,
-  );
+  const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);
   const { data: nldiGeoJsonData } = nldiFeaturesQuery;
 
   useEffect(() => {
@@ -62,12 +51,7 @@ export function useNldiFilter() {
   }, [nldiGeoJsonData, setGeoJsonData]);
 
   const nldiWadeSiteIds = useMemo(() => {
-    if (
-      !isNldiFilterActive ||
-      !nldiGeoJsonData ||
-      !nldiFilterData ||
-      !(nldiFilterData.dataPoints & DataPoints.Wade)
-    ) {
+    if (!isNldiFilterActive || !nldiGeoJsonData || !nldiFilterData || !(nldiFilterData.dataPoints & DataPoints.Wade)) {
       return [];
     }
 
@@ -77,18 +61,10 @@ export function useNldiFilter() {
         x.properties?.source?.toLowerCase() === 'wade',
     );
 
-    if (
-      nldiFilterData.directions & Directions.Upsteam &&
-      !(nldiFilterData.directions & Directions.Downsteam)
-    ) {
+    if (nldiFilterData.directions & Directions.Upsteam && !(nldiFilterData.directions & Directions.Downsteam)) {
       arr = arr.filter((x) => x.properties?.westdaat_direction === 'Upstream');
-    } else if (
-      !(nldiFilterData.directions & Directions.Upsteam) &&
-      nldiFilterData.directions & Directions.Downsteam
-    ) {
-      arr = arr.filter(
-        (x) => x.properties?.westdaat_direction === 'Downstream',
-      );
+    } else if (!(nldiFilterData.directions & Directions.Upsteam) && nldiFilterData.directions & Directions.Downsteam) {
+      arr = arr.filter((x) => x.properties?.westdaat_direction === 'Downstream');
     } else if (
       !(nldiFilterData.directions & Directions.Upsteam) &&
       !(nldiFilterData.directions & Directions.Downsteam)
@@ -96,11 +72,7 @@ export function useNldiFilter() {
       return [];
     }
     return arr
-      .filter(
-        (x) =>
-          x.properties?.identifier !== null &&
-          x.properties?.identifier !== undefined,
-      )
+      .filter((x) => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
       .map((a) => a.properties?.identifier);
   }, [nldiGeoJsonData, nldiFilterData, isNldiFilterActive]);
 
@@ -118,11 +90,7 @@ export function useNldiFilter() {
     if (nldiFilterData?.dataPoints) {
       for (const key of pointFeatureDataSourceNameKeys) {
         if (nldiFilterData.dataPoints & key) {
-          pointsTypeFilters.push([
-            '==',
-            ['get', 'westdaat_pointdatasource'],
-            pointFeatureDataSourceNames[key],
-          ]);
+          pointsTypeFilters.push(['==', ['get', 'westdaat_pointdatasource'], pointFeatureDataSourceNames[key]]);
         }
       }
     }
@@ -131,11 +99,7 @@ export function useNldiFilter() {
     if (nldiFilterData?.directions) {
       for (const key of directionNameKeys) {
         if (nldiFilterData.directions & key) {
-          directionFilters.push([
-            '==',
-            ['get', 'westdaat_direction'],
-            directionNames[key],
-          ]);
+          directionFilters.push(['==', ['get', 'westdaat_direction'], directionNames[key]]);
         }
       }
     }
@@ -153,26 +117,14 @@ export function useNldiFilter() {
       },
       {
         layer: mapLayerNames.nldiFlowlinesLayer,
-        filter: [
-          'all',
-          ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'],
-          directionFilters,
-        ],
+        filter: ['all', ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'], directionFilters],
       },
     ]);
-  }, [
-    nldiFilterData?.dataPoints,
-    nldiFilterData?.directions,
-    setMapLayerFilters,
-  ]);
+  }, [nldiFilterData?.dataPoints, nldiFilterData?.directions, setMapLayerFilters]);
 
   const mapFilters = useMemo((): any[] | undefined => {
     if (isNldiFilterActive && nldiWadeSiteIds !== undefined) {
-      return [
-        'in',
-        ['get', waterRightsProperties.siteUuid],
-        ['literal', nldiWadeSiteIds],
-      ];
+      return ['in', ['get', waterRightsProperties.siteUuid], ['literal', nldiWadeSiteIds]];
     }
   }, [isNldiFilterActive, nldiWadeSiteIds]);
 
@@ -181,8 +133,7 @@ export function useNldiFilter() {
       setFilters((s) => ({
         ...s,
         isNldiFilterActive: isActive,
-        nldiFilterData:
-          s.nldiFilterData ?? (isActive ? defaultNldiFilters : undefined),
+        nldiFilterData: s.nldiFilterData ?? (isActive ? defaultNldiFilters : undefined),
       }));
     },
     [setFilters],

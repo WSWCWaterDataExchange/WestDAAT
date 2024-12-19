@@ -1,8 +1,5 @@
 import { useQuery } from 'react-query';
-import {
-  getFilters,
-  getRiverBasinPolygonsByName,
-} from '../../accessors/systemAccessor';
+import { getFilters, getRiverBasinPolygonsByName } from '../../accessors/systemAccessor';
 
 export function useDashboardFilters() {
   return useQuery(['system.filters'], getFilters);

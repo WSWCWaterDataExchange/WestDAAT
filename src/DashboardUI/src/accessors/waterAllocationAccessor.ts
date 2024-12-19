@@ -4,7 +4,7 @@ import {
   WaterSourceInfoListItem,
   OverlayDetails,
   WaterRightsInfoListItem,
-  OverlayTableEntry
+  OverlayTableEntry,
 } from '@data-contracts';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
@@ -24,9 +24,7 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
   return data;
 };
 
-export const getWaterRightAnalyticsSummaryInfo = async (
-  searchCriteria: WaterRightsSearchCriteria,
-) => {
+export const getWaterRightAnalyticsSummaryInfo = async (searchCriteria: WaterRightsSearchCriteria) => {
   const { data } = await axios.post<AnalyticsSummaryInformation[]>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/AnalyticsSummaryInformation`,
     searchCriteria,
@@ -34,9 +32,7 @@ export const getWaterRightAnalyticsSummaryInfo = async (
   return data;
 };
 
-export const getWaterRightDataEnvelope = async (
-  searchCriteria: WaterRightsSearchCriteria,
-) => {
+export const getWaterRightDataEnvelope = async (searchCriteria: WaterRightsSearchCriteria) => {
   const { data } = await axios.post<FeatureCollection>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/DataEnvelope`,
     searchCriteria,
@@ -44,9 +40,7 @@ export const getWaterRightDataEnvelope = async (
   return data;
 };
 
-export const findWaterRight = async (
-  searchCriteria: WaterRightsSearchCriteriaWithPaging,
-) => {
+export const findWaterRight = async (searchCriteria: WaterRightsSearchCriteriaWithPaging) => {
   const { data } = await axios.post<WaterRightsSearchResults>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/find`,
     searchCriteria,
@@ -69,27 +63,20 @@ export const getWaterRightSourceInfoList = async (allocationUuid: string) => {
 };
 
 export const getWaterRightSiteLocations = async (allocationUuid: string) => {
-  const { data } = await axios.get<
-    GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>
-  >(
+  const { data } = await axios.get<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/SiteLocations`,
   );
   return data;
 };
 
-export const downloadWaterRights = async (
-  searchCriteria: WaterRightsSearchCriteriaWithFilterUrl,
-) => {
+export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCriteriaWithFilterUrl) => {
   // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests
   //https://stackoverflow.com/questions/70969837/how-to-download-zip-file-that-i-recieve-from-a-http-response-axios-put-request#:~:text=0,fetch%20over%20axios
 
-  const response = await fetch(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`,
-    {
-      method: 'POST',
-      body: JSON.stringify(searchCriteria),
-    },
-  );
+  const response = await fetch(`${process.env.REACT_APP_WEBAPI_URL}WaterRights/download`, {
+    method: 'POST',
+    body: JSON.stringify(searchCriteria),
+  });
 
   if (response.ok) {
     const blob = await response.blob();
@@ -99,10 +86,7 @@ export const downloadWaterRights = async (
       throw Error('Something went wrong, please try again later');
     }
   } else {
-    const errorMessage =
-      response.status === 413
-        ? 'Download limit exceeded.'
-        : 'Something went wrong';
+    const errorMessage = response.status === 413 ? 'Download limit exceeded.' : 'Something went wrong';
     throw Error(errorMessage);
   }
 };

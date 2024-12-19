@@ -2,13 +2,9 @@ import { useQuery } from 'react-query';
 import {
   getOverlayDetails,
   getOverlayInfoById,
-  getWaterRightsInfoListByReportingUnitUuid
-} from "../../accessors/overlaysAccessor";
-import {
-  OverlayDetails,
-  OverlayTableEntry,
-  WaterRightsInfoListItem,
-} from '@data-contracts';
+  getWaterRightsInfoListByReportingUnitUuid,
+} from '../../accessors/overlaysAccessor';
+import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 
 export function useOverlayDetails(
@@ -20,11 +16,7 @@ export function useOverlayDetails(
     enabled: options?.enabled !== false && !!overlayUuid,
   };
 
-  return useQuery(
-    ['overlay.Details', overlayUuid],
-    async () => await getOverlayDetails(overlayUuid!),
-    setOptions,
-  );
+  return useQuery(['overlay.Details', overlayUuid], async () => await getOverlayDetails(overlayUuid!), setOptions);
 }
 
 export function useOverlayInfoById(
@@ -36,11 +28,7 @@ export function useOverlayInfoById(
     enabled: options?.enabled !== false && !!overlayUuid,
   };
 
-  return useQuery(
-    ['overlay.Rights', overlayUuid],
-    async () => await getOverlayInfoById(overlayUuid!),
-    setOptions,
-  );
+  return useQuery(['overlay.Rights', overlayUuid], async () => await getOverlayInfoById(overlayUuid!), setOptions);
 }
 
 export function useWaterRightsInfoListByReportingUnitUuid(

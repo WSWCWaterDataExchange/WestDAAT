@@ -7,42 +7,18 @@ export function useAlerts() {
   const {
     hostData: {
       detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
-      siteLocationsQuery: {
-        isLoading: siteLocationsIsLoading,
-        isError: siteLocationsIsError,
-      },
-      siteInfoListQuery: {
-        isLoading: siteInfoListIsLoading,
-        isError: siteInfoListIsError,
-      },
-      sourceInfoListQuery: {
-        isLoading: sourceInfoListIsLoading,
-        isError: sourceInfoListIsError,
-      },
+      siteLocationsQuery: { isLoading: siteLocationsIsLoading, isError: siteLocationsIsError },
+      siteInfoListQuery: { isLoading: siteInfoListIsLoading, isError: siteInfoListIsError },
+      sourceInfoListQuery: { isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError },
     },
   } = useWaterRightDetailsContext();
 
   const isError = useMemo(() => {
-    return (
-      detailsIsError ||
-      siteLocationsIsError ||
-      siteInfoListIsError ||
-      sourceInfoListIsError
-    );
-  }, [
-    detailsIsError,
-    siteLocationsIsError,
-    siteInfoListIsError,
-    sourceInfoListIsError,
-  ]);
+    return detailsIsError || siteLocationsIsError || siteInfoListIsError || sourceInfoListIsError;
+  }, [detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError]);
 
   useProgressIndicator(
-    [
-      !detailsIsLoading,
-      !siteLocationsIsLoading,
-      !siteInfoListIsLoading,
-      !sourceInfoListIsLoading,
-    ],
+    [!detailsIsLoading, !siteLocationsIsLoading, !siteInfoListIsLoading, !sourceInfoListIsLoading],
     'Loading Water Right Data',
   );
 
