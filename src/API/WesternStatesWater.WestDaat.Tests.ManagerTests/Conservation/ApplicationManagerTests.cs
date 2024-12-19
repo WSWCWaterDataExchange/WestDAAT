@@ -7,7 +7,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Conservation;
 public class ApplicationManagerTests : ManagerTestBase
 {
     private IApplicationManager _applicationManager = null!;
-    
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -39,7 +39,7 @@ public class ApplicationManagerTests : ManagerTestBase
     private class FakeLoadRequest : ApplicationLoadRequestBase
     {
     }
-    
+
     private class FakeStoreRequest : ApplicationStoreRequestBase
     {
     }
