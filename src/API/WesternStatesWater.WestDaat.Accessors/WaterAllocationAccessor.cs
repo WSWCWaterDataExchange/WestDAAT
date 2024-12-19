@@ -38,25 +38,42 @@ namespace WesternStatesWater.WestDaat.Accessors
             await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
-            var analyticsSummary = await db.AllocationAmountsFact
+            var analyticsSummaryQuery = db.AllocationAmountsFact
                 .AsNoTracking()
-                .Where(predicate)
-                // Distinct forces proper grouping by beneficialUse query
-                .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
-                .Distinct()
-                .GroupBy(a => a.PrimaryBeneficialUseCategory)
-                .Select(a => new AnalyticsSummaryInformation
-                {
-                    Flow = a.Sum(c => c.AllocationFlow_CFS),
-                    PrimaryUseCategoryName = a.Key,
-                    Points = a.Count(),
-                    Volume = a.Sum(c => c.AllocationVolume_AF),
-                })
+                .Where(predicate);
+
+            var summaryQueryGroupBy = BuildGetAnalyticsSummaryInformationGroupByQuery(analyticsSummaryQuery, Common.AnalyticsInformationGrouping.BeneficialUse);
+
+            var analyticsSummary = await summaryQueryGroupBy
                 .ToArrayAsync();
 
             ts.Complete();
 
             return analyticsSummary;
+        }
+
+        private IQueryable<AnalyticsSummaryInformation> BuildGetAnalyticsSummaryInformationGroupByQuery(IQueryable<AllocationAmountsFact> query, Common.AnalyticsInformationGrouping groupBy)
+        {
+            IQueryable<AnalyticsSummaryInformation> result = null;
+            switch (groupBy)
+            {
+                case Common.AnalyticsInformationGrouping.BeneficialUse:
+                    result = query
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
+                        // Distinct forces proper grouping by beneficialUse query
+                        .Distinct()
+                        .GroupBy(a => a.PrimaryBeneficialUseCategory)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        });
+                    break;
+            }
+
+            return result;
         }
 
         public async Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchCriteria)
