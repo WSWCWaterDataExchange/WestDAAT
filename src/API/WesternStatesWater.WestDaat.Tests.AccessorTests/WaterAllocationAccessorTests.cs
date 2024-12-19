@@ -140,6 +140,39 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             results.Should().BeEquivalentTo(expected);
         }
 
+        [DataTestMethod]
+        [DataRow(Common.AnalyticsInformationGrouping.BeneficialUse)]
+        [DataRow(Common.AnalyticsInformationGrouping.WaterSourceType)]
+        [DataRow(Common.AnalyticsInformationGrouping.OwnerType)]
+        [DataRow(Common.AnalyticsInformationGrouping.AllocationType)]
+        [DataRow(Common.AnalyticsInformationGrouping.LegalStatus)]
+        [DataRow(Common.AnalyticsInformationGrouping.SiteType)]
+        public async Task GetAnalyticsSummaryInformation_ShouldSucceedForEachGroupValue(Common.AnalyticsInformationGrouping groupValue)
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker()
+                .RuleFor(aaf => aaf.PrimaryBeneficialUseCategory, f => f.Name.FirstName())
+                .IncludeOwnerClassification()
+                .IncludeLegalStatus()
+                .LinkSites(
+                    new SitesDimFaker().Generate(3).ToArray()
+                )
+                .Generate(3);
+            
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), groupValue);
+
+            // Assert
+            result.Should().NotBeNull();
+        }
+
         [TestMethod]
         [DataRow(1, 1)]
         [DataRow(3, 1)]

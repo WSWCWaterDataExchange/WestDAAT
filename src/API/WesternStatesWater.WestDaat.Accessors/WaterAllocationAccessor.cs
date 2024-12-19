@@ -120,7 +120,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                             a.AllocationAmountId,
                             SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv)
                         })
-                        .Distinct()
                         .GroupBy(a => a.SiteTypes)
                         .Select(a => new AnalyticsSummaryInformation
                         {
