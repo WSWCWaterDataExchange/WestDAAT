@@ -109,7 +109,25 @@ namespace WesternStatesWater.WestDaat.Accessors
                             Volume = a.Sum(c => c.AllocationVolume_AF),
                         });
                     break;
-
+                case Common.AnalyticsInformationGrouping.SiteType:
+                    result = query
+                        .Select(a => new
+                        {
+                            a.AllocationFlow_CFS,
+                            a.AllocationVolume_AF,
+                            a.AllocationAmountId,
+                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv)
+                        })
+                        .Distinct()
+                        .GroupBy(a => a.SiteTypes)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = string.Join(",", a.Key),
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        });
+                    break;
             }
 
             return result;
