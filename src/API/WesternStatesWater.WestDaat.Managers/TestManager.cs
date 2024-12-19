@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
@@ -8,7 +9,8 @@ namespace WesternStatesWater.WestDaat.Managers
     {
         private readonly ITestEngine _testEngine;
 
-        public TestManager(ITestEngine testEngine, ILogger<TestManager> logger) : base(logger)
+        public TestManager(ITestEngine testEngine, IManagerRequestHandlerResolver resolver, ILogger<TestManager> logger)
+            : base(resolver, logger)
         {
             _testEngine = testEngine;
         }

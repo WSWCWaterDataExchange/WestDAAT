@@ -1,13 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
+using WesternStatesWater.Shared.DataContracts;
+using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.Shared.Extensions;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 
 namespace WesternStatesWater.WestDaat.Managers
 {
     public abstract class ManagerBase : ServiceContractBase
     {
-        protected ManagerBase(ILogger logger)
+        private readonly IManagerRequestHandlerResolver _requestHandlerResolver;
+
+        protected ManagerBase(IManagerRequestHandlerResolver resolver, ILogger logger)
         {
+            _requestHandlerResolver = resolver;
             base.Logger = logger;
         }
 
@@ -43,6 +50,55 @@ namespace WesternStatesWater.WestDaat.Managers
             };
 
             return System.Text.Json.JsonSerializer.Serialize(result);
+        }
+
+        protected async Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest request)
+            where TRequest : RequestBase
+            where TResponse : ResponseBase
+        {
+            try
+            {
+                var validationResult = await request.ValidateAsync();
+
+                if (!validationResult.IsValid)
+                {
+                    return CreateErrorResponse<TResponse>(new ValidationError(validationResult.ToDictionary()));
+                }
+
+                var response = await _requestHandlerResolver
+                    .Resolve<TRequest, TResponse>()
+                    .Handle(request);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "An error occurred while processing the request");
+
+                return CreateErrorResponse<TResponse>(new InternalError());
+            }
+        }
+
+        private TResponse CreateErrorResponse<TResponse>(ErrorBase error) where TResponse : ResponseBase
+        {
+            try
+            {
+                var response = (TResponse)Activator.CreateInstance(typeof(TResponse))!;
+                response.Error = error;
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(
+                    ex,
+                    "Failed to create error response for type {ResponseTypeName} with error type {ErrorTypeName}",
+                    typeof(TResponse).FullName,
+                    error.GetType().FullName
+                );
+
+                return (TResponse)new ResponseBase { Error = new InternalError() };
+            }
         }
     }
 }
