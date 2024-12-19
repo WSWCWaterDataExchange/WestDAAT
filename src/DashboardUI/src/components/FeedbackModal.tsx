@@ -37,19 +37,14 @@ const defaultFeedbackRequest = new FeedbackRequest();
 
 function FeedbackModal(props: FeedBackModalProps) {
   const [showThankYouModal, setShowThankYouModal] = useState<boolean>(false);
-  const [feedbackRequest, setFeedbackRequest] = useState(
-    defaultFeedbackRequest,
-  );
+  const [feedbackRequest, setFeedbackRequest] = useState(defaultFeedbackRequest);
 
   const handleDataCheckChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       return [...feedbackRequest.dataUsage, event.target.value];
     } else {
       const dataArray = [...feedbackRequest.dataUsage];
-      dataArray.splice(
-        feedbackRequest.dataUsage.indexOf(event.target.value),
-        1,
-      );
+      dataArray.splice(feedbackRequest.dataUsage.indexOf(event.target.value), 1);
       return dataArray;
     }
   };
@@ -59,15 +54,11 @@ function FeedbackModal(props: FeedBackModalProps) {
   }, [feedbackRequest.dataUsage]);
 
   const otherDataText = useMemo(() => {
-    return otherDataIndex >= 0
-      ? feedbackRequest.dataUsage[otherDataIndex].replace(/Other\s-\s/, '')
-      : '';
+    return otherDataIndex >= 0 ? feedbackRequest.dataUsage[otherDataIndex].replace(/Other\s-\s/, '') : '';
   }, [feedbackRequest.dataUsage, otherDataIndex]);
 
   const handleOtherDataChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value?.trim()
-      ? [`Other - ${event.target.value}`]
-      : [];
+    const newValue = event.target.value?.trim() ? [`Other - ${event.target.value}`] : [];
     if (otherDataIndex < 0) {
       return [...feedbackRequest.dataUsage, ...newValue];
     }
@@ -90,7 +81,7 @@ function FeedbackModal(props: FeedBackModalProps) {
     });
     if (result === false) {
       toast.error('Something went wrong sending the feedback', {
-        position: toast.POSITION.TOP_CENTER,
+        position: 'top-center',
         theme: 'colored',
         autoClose: false,
       });
@@ -106,49 +97,28 @@ function FeedbackModal(props: FeedBackModalProps) {
   const isFormValid = useMemo(() => {
     return (
       isEmailValid &&
-      ((feedbackRequest.comments !== null &&
-        feedbackRequest.comments.trim() !== '') ||
-        (feedbackRequest.email !== null &&
-          feedbackRequest.email.trim() !== '') ||
-        (feedbackRequest.firstName !== null &&
-          feedbackRequest.firstName.trim() !== '') ||
-        (feedbackRequest.lastName !== null &&
-          feedbackRequest.lastName.trim() !== '') ||
-        (feedbackRequest.organization !== null &&
-          feedbackRequest.organization.trim() !== '') ||
+      ((feedbackRequest.comments !== null && feedbackRequest.comments.trim() !== '') ||
+        (feedbackRequest.email !== null && feedbackRequest.email.trim() !== '') ||
+        (feedbackRequest.firstName !== null && feedbackRequest.firstName.trim() !== '') ||
+        (feedbackRequest.lastName !== null && feedbackRequest.lastName.trim() !== '') ||
+        (feedbackRequest.organization !== null && feedbackRequest.organization.trim() !== '') ||
         (feedbackRequest.role !== null && feedbackRequest.role.trim() !== '') ||
-        (feedbackRequest.satisfactionLevel !== null &&
-          feedbackRequest.satisfactionLevel.trim() !== '') ||
+        (feedbackRequest.satisfactionLevel !== null && feedbackRequest.satisfactionLevel.trim() !== '') ||
         feedbackRequest.dataUsage?.length !== 0)
     );
   }, [feedbackRequest, isEmailValid]);
 
   return (
     <>
-      <Modal
-        show={props.show}
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-        size="xl"
-        onHide={close}
-      >
+      <Modal show={props.show} aria-labelledby="contained-modal-title-vcenter" centered size="xl" onHide={close}>
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Send Feedback
-          </Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">Send Feedback</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>
-            Please let us know your feedback about the Water Data Exchange Data
-            (WaDE) Tool.
-          </p>
+          <p>Please let us know your feedback about the Water Data Exchange Data (WaDE) Tool.</p>
           <p>
             Contact us:{' '}
-            <a
-              href="https://westernstateswater.org/wade/contact-us/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://westernstateswater.org/wade/contact-us/" target="_blank" rel="noopener noreferrer">
               https://westernstateswater.org/wade/contact-us/
             </a>
           </p>
@@ -197,18 +167,13 @@ function FeedbackModal(props: FeedBackModalProps) {
                 }
                 value={feedbackRequest.email}
               />
-              {!isEmailValid && (
-                <label className="text-danger">
-                  Please use a valid email address
-                </label>
-              )}
+              {!isEmailValid && <label className="text-danger">Please use a valid email address</label>}
             </div>
           </div>
 
           <div className="row mb-3">
             <div className="col">
-              <label className="fw-bolder">Professional Organization</label>{' '}
-              <br />
+              <label className="fw-bolder">Professional Organization</label> <br />
               <input
                 className="form-control"
                 onChange={(e) =>
@@ -280,11 +245,7 @@ function FeedbackModal(props: FeedBackModalProps) {
               })}
               <div className="col-8">
                 <div className="input-group input-group-sm">
-                  <label
-                    className="input-group-text"
-                    id="other-usage-label"
-                    htmlFor="data-usage-other"
-                  >
+                  <label className="input-group-text" id="other-usage-label" htmlFor="data-usage-other">
                     Other
                   </label>
                   <input
@@ -306,10 +267,7 @@ function FeedbackModal(props: FeedBackModalProps) {
             </div>
           </div>
           <div className="mb-3" id="dashboardSatisfactionLevel">
-            <label className="fw-bolder">
-              How satisfied are you with the Water Data Exchange Data (WaDE)
-              Tool?
-            </label>
+            <label className="fw-bolder">How satisfied are you with the Water Data Exchange Data (WaDE) Tool?</label>
             <ButtonGroup className="w-100">
               {dashboardSatisfactionOptions.map((element) => (
                 <ToggleButton
@@ -335,26 +293,15 @@ function FeedbackModal(props: FeedBackModalProps) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          {!isFormValid && (
-            <label className="text-danger">
-              Please fill at least one field before submitting
-            </label>
-          )}
+          {!isFormValid && <label className="text-danger">Please fill at least one field before submitting</label>}
           <Button onClick={submit} disabled={!isFormValid}>
             Submit
           </Button>
         </Modal.Footer>
       </Modal>
-      <Modal
-        show={showThankYouModal}
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-        onHide={close}
-      >
+      <Modal show={showThankYouModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={close}>
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Thank You
-          </Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">Thank You</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>Your feedback has been submitted!</p>

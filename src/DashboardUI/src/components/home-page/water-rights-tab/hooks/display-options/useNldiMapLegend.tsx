@@ -3,11 +3,7 @@ import { useMemo } from 'react';
 import { nldi } from '../../../../../config/constants';
 import { useWaterRightsContext } from '../../Provider';
 import { DataPoints } from '../../../../../data-contracts/nldi';
-import {
-  MapLegendCircleItem,
-  MapLegendItem,
-  MapLegendMarkerItem,
-} from '../../../../map/MapLegendItem';
+import { MapLegendCircleItem, MapLegendItem, MapLegendMarkerItem } from '../../../../map/MapLegendItem';
 
 export function useNldiMapLegend() {
   const {
@@ -25,15 +21,10 @@ export function useNldiMapLegend() {
     }
     return (
       <div className="legend-nldi">
-        <MapLegendMarkerItem color={nldi.colors.mapMarker}>
-          Starting Point of Interest
-        </MapLegendMarkerItem>
+        <MapLegendMarkerItem color={nldi.colors.mapMarker}>Starting Point of Interest</MapLegendMarkerItem>
         <MapLegendItem>
           <span className="legend-flowline">
-            <span
-              className="legend-flowline legend-flowline-main"
-              style={{ backgroundColor: nldi.colors.mainstem }}
-            />
+            <span className="legend-flowline legend-flowline-main" style={{ backgroundColor: nldi.colors.mainstem }} />
           </span>
           Mainstem
         </MapLegendItem>
@@ -47,9 +38,7 @@ export function useNldiMapLegend() {
           Tributaries
         </MapLegendItem>
         {!!((nldiDataPoints ?? DataPoints.None) & DataPoints.Usgs) && (
-          <MapLegendCircleItem color={nldi.colors.usgs}>
-            USGS NWIS Sites
-          </MapLegendCircleItem>
+          <MapLegendCircleItem color={nldi.colors.usgs}>USGS NWIS Sites</MapLegendCircleItem>
         )}
         {!!((nldiDataPoints ?? DataPoints.None) & DataPoints.Epa) && (
           <MapLegendCircleItem color={nldi.colors.epa}>

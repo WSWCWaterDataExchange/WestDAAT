@@ -17,10 +17,7 @@ import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
 
-const allWaterRightsLayers = [
-  mapLayerNames.waterRightsPointsLayer,
-  mapLayerNames.waterRightsPolygonsLayer,
-];
+const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
 
 export function useFilters() {
   const { setLayerFilters: setMapLayerFilters } = useMapContext();
@@ -28,10 +25,8 @@ export function useFilters() {
   const { mapFilters: podPouMapFilters } = usePodPouFilter();
   const { mapFilters: includeExemptMapFilters } = useIncludeExemptFilter();
   const { mapFilters: beneficialUsesMapFilters } = useBeneficialUsesFilter();
-  const { mapFilters: ownerClassificationsMapFilters } =
-    useOwnerClassificationsFilter();
-  const { mapFilters: waterSourceTypesMapFilters } =
-    useWaterSourceTypesFilter();
+  const { mapFilters: ownerClassificationsMapFilters } = useOwnerClassificationsFilter();
+  const { mapFilters: waterSourceTypesMapFilters } = useWaterSourceTypesFilter();
   const { mapFilters: riverBasinMapFilters } = useRiverBasinFilter();
   const { mapFilters: statesMapFilters } = useStatesFilter();
   const { mapFilters: allocationOwnerMapFilters } = useAllocationOwnerFilter();

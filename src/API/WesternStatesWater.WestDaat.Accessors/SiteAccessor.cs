@@ -78,6 +78,18 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
         
+        public async Task<List<WaterRightInfoListItem>> GetWaterRightInfoListByReportingUnitUuid(string reportingUnitUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            return await db.AllocationAmountsFact
+                .Where(aaf => aaf.AllocationBridgeSitesFact.Any(absf =>
+                    absf.Site.RegulatoryOverlayBridgeSitesFact.Any(robsf =>
+                        robsf.RegulatoryOverlay.RegulatoryReportingUnitsFact.Any(rruf =>
+                            rruf.ReportingUnit.ReportingUnitUuid == reportingUnitUuid))))
+                .ProjectTo<WaterRightInfoListItem>(DtoMapper.Configuration)
+                .ToListAsync();
+        }
+        
         public async Task<IEnumerable<SiteUsagePoint>> GetSiteUsageBySiteUuid(string siteUuid)
         {
             await using var db = _databaseContextFactory.Create();

@@ -2,10 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useAppContext } from '../../contexts/AppProvider';
 import deepEqual from 'fast-deep-equal/es6';
 
-export function useUrlParameters<T>(
-  parameterKey: string | string[],
-  defaultValue: T,
-) {
+export function useUrlParameters<T>(parameterKey: string | string[], defaultValue: T) {
   const { setUrlParam, getUrlParam } = useAppContext();
 
   const keys = useMemo(() => {
@@ -29,9 +26,7 @@ export function useUrlParameters<T>(
 
   const setParameter = useCallback(
     (parameterValue?: T) => {
-      const value = deepEqual(parameterValue, defaultValue)
-        ? undefined
-        : parameterValue;
+      const value = deepEqual(parameterValue, defaultValue) ? undefined : parameterValue;
       setUrlParam(primaryKey, value);
     },
     [primaryKey, defaultValue, setUrlParam],
@@ -51,13 +46,7 @@ export function useUrlParameters<T>(
       }
       setUrlParam(a.key, undefined);
     });
-  }, [
-    defaultValue,
-    allParameterValues,
-    setParameter,
-    getUrlParam,
-    setUrlParam,
-  ]);
+  }, [defaultValue, allParameterValues, setParameter, getUrlParam, setUrlParam]);
 
   return { getParameter, setParameter };
 }

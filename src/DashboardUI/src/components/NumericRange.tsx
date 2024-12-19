@@ -2,10 +2,7 @@ import React from 'react';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Form, FormControlProps, InputGroup } from 'react-bootstrap';
 
-type ControlProps = Omit<
-  FormControlProps,
-  'onChange' | 'type' | 'value' | 'max' | 'step'
->;
+type ControlProps = Omit<FormControlProps, 'onChange' | 'type' | 'value' | 'max' | 'step'>;
 export interface NumericRangeProps {
   initialMin: number | undefined;
   initialMax: number | undefined;
@@ -16,15 +13,7 @@ export interface NumericRangeProps {
   maxControlProps?: ControlProps;
 }
 function NumericRange(props: NumericRangeProps) {
-  const {
-    initialMin,
-    initialMax,
-    units,
-    precision,
-    onChange,
-    minControlProps,
-    maxControlProps,
-  } = props;
+  const { initialMin, initialMax, units, precision, onChange, minControlProps, maxControlProps } = props;
 
   const [minValue, setMinValue] = useState(initialMin);
   const [maxValue, setMaxValue] = useState(initialMax);

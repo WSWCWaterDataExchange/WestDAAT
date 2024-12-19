@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { JSX, useMemo } from 'react';
 import { FormattedDate } from '../FormattedDate';
 import moment from 'moment';
 import { formatNumber } from '../../utilities/valueFormatters';
@@ -33,24 +33,18 @@ export function PropertyValue({
     if (typeof value === 'number') {
       return formatNumber(value, decimalPositions);
     }
-    if (typeof value === 'string' && moment(value, true).isValid()) {
+    if (value instanceof Date || (typeof value === 'string' && moment(value, true).isValid())) {
       return <FormattedDate>{value}</FormattedDate>;
     }
     return value;
   }, [value, isUrl, decimalPositions]);
 
-  const content = isVerbose ? (
-    <LineClampText text={String(formattedValue)} />
-  ) : (
-    formattedValue
-  );
+  const content = isVerbose ? <LineClampText text={String(formattedValue)} /> : formattedValue;
 
   return (
     <>
       <div className="property-name">{label}</div>
-      <div className={`property-value${isVerbose ? ' is-verbose' : ''}`}>
-        {content}
-      </div>
+      <div className={`property-value${isVerbose ? ' is-verbose' : ''}`}>{content}</div>
     </>
   );
 }

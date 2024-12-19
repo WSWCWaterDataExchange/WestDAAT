@@ -2,7 +2,6 @@
 @import '_sizes.scss';
 
 // Override default variables before the import
-$body-bg: #e4e4e4;
 $navbar-light-color: $primary-color;
 $nav-link-font-weight: $semi-bold;
 
@@ -16,8 +15,8 @@ $form-check-min-height: 20px;
 
 $offcanvas-vertical-height: 55vh;
 
-$font-family-base: -apple-system, BlinkMacSystemFont, 'Lato', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Lato', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+  'Droid Sans', 'Helvetica Neue', sans-serif;
 
 // Import Bootstrap and its default variables
 @import '~bootstrap/scss/bootstrap.scss';

@@ -19,18 +19,12 @@ import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 
 export function useWaterRightDetails(allocationUuid: string | undefined) {
-  return useQuery(
-    ['waterRight.Details', allocationUuid],
-    async () => await getWaterRightDetails(allocationUuid!),
-    {
-      enabled: !!allocationUuid,
-    },
-  );
+  return useQuery(['waterRight.Details', allocationUuid], async () => await getWaterRightDetails(allocationUuid!), {
+    enabled: !!allocationUuid,
+  });
 }
 
-export function useGetAnalyticsSummaryInfo(
-  searchCriteria: WaterRightsSearchCriteria | null,
-) {
+export function useGetAnalyticsSummaryInfo(searchCriteria: WaterRightsSearchCriteria | null) {
   return useQuery(
     ['waterRight.AnalyticsSummary', searchCriteria],
     async () => await getWaterRightAnalyticsSummaryInfo(searchCriteria!),
@@ -60,22 +54,13 @@ export function useGetWaterRightDataEnvelope(
   );
 }
 
-export function useFindWaterRights(
-  searchCriteria: WaterRightsSearchCriteriaWithPaging | null,
-) {
-  return useQuery(
-    ['waterRight.Find', searchCriteria],
-    async () => await findWaterRight(searchCriteria!),
-    {
-      enabled: searchCriteria !== null,
-    },
-  );
+export function useFindWaterRights(searchCriteria: WaterRightsSearchCriteriaWithPaging | null) {
+  return useQuery(['waterRight.Find', searchCriteria], async () => await findWaterRight(searchCriteria!), {
+    enabled: searchCriteria !== null,
+  });
 }
 
-type WaterRightSiteInfoListOptionsType = UseQueryOptionsParameter<
-  undefined,
-  SiteInfoListItem[]
->;
+type WaterRightSiteInfoListOptionsType = UseQueryOptionsParameter<undefined, SiteInfoListItem[]>;
 
 export function useWaterRightSiteInfoList(
   waterRightId: string | undefined,
@@ -92,10 +77,7 @@ export function useWaterRightSiteInfoList(
   );
 }
 
-type WaterRightSourceInfoListOptionsType = UseQueryOptionsParameter<
-  undefined,
-  WaterSourceInfoListItem[]
->;
+type WaterRightSourceInfoListOptionsType = UseQueryOptionsParameter<undefined, WaterSourceInfoListItem[]>;
 
 export function useWaterRightSourceInfoList(
   allocationUuid: string | undefined,
@@ -122,16 +104,10 @@ export function useWaterRightSiteLocations(allocationUuid: string | undefined) {
   );
 }
 
-export function useWaterRightsDownload(
-  searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null,
-) {
-  return useQuery(
-    ['waterRight.Download', searchCriteria],
-    async () => await downloadWaterRights(searchCriteria!),
-    {
-      enabled: !!searchCriteria,
-      retry: false,
-      cacheTime: 0,
-    },
-  );
+export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null) {
+  return useQuery(['waterRight.Download', searchCriteria], async () => await downloadWaterRights(searchCriteria!), {
+    enabled: !!searchCriteria,
+    retry: false,
+    cacheTime: 0,
+  });
 }

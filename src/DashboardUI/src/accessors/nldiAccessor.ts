@@ -8,10 +8,7 @@ export const getNldiFeatures = async (
   directions: Directions,
   dataPoints: DataPoints,
 ): Promise<geojson.FeatureCollection> => {
-  const url = new URL(
-    `NldiFeatures/@${latitude},${longitude}`,
-    process.env.REACT_APP_WEBAPI_URL,
-  );
+  const url = new URL(`NldiFeatures/@${latitude},${longitude}`, process.env.REACT_APP_WEBAPI_URL);
   url.searchParams.append('dir', directions.toString());
   url.searchParams.append('points', dataPoints.toString());
   const { data } = await axios.get<geojson.FeatureCollection>(url.toString());

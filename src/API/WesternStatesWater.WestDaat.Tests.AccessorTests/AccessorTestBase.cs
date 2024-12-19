@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
-using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 
@@ -81,8 +80,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MaxRecordsDownload = 100000,
             };
         }
-
-        protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)
         {

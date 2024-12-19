@@ -908,8 +908,120 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.Select(x => x.WaDEOverlayUuid).Should().BeEquivalentTo(new[] { "overlay_1", "overlay_2" });
             _waterAllocationAccessorMock.Verify();
         }
-
         
+        [TestMethod]
+        public async Task GetWaterRightsInfoListByReportingUnitUuid_Results_Returned()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            _siteAccessorMock.Setup(x => x.GetWaterRightInfoListByReportingUnitUuid(reportingUnitUuid))
+                .ReturnsAsync(new List<CommonContracts.WaterRightInfoListItem>
+                {
+                    new CommonContracts.WaterRightInfoListItem { WaterRightNativeId = "test_water_right_uuid" }
+                })
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act
+            var result = await manager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(1);
+            result[0].WaterRightNativeId.Should().Be("test_water_right_uuid");
+            _siteAccessorMock.Verify();
+        }
+
+         [TestMethod]
+        public async Task GetWaterRightsInfoListByReportingUnitUuid_MultipleResults_Returned()
+        {
+            // Arrange
+            var reportingUnitUuid = "test_uuid";
+            _siteAccessorMock.Setup(x => x.GetWaterRightInfoListByReportingUnitUuid(reportingUnitUuid))
+                .ReturnsAsync(new List<CommonContracts.WaterRightInfoListItem>
+                {
+                    new CommonContracts.WaterRightInfoListItem
+                    {
+                        WaterRightNativeId = "water_right_1",
+                        AllocationUuid = "alloc_1",
+                        Owner = "Owner1",
+                        PriorityDate = DateTime.Parse("2000-01-01"),
+                        ExpirationDate = DateTime.Parse("2025-01-01"),
+                        LegalStatus = "Valid",
+                        Flow = 10.5,
+                        Volume = 20.0,
+                        BeneficialUses = new List<string> { "Irrigation", "Recreation" }
+                    },
+                    new CommonContracts.WaterRightInfoListItem
+                    {
+                        WaterRightNativeId = "water_right_2",
+                        AllocationUuid = "alloc_2",
+                        Owner = "Owner2",
+                        PriorityDate = DateTime.Parse("2010-05-15"),
+                        ExpirationDate = null,
+                        LegalStatus = "Pending",
+                        Flow = 5.0,
+                        Volume = 10.0,
+                        BeneficialUses = new List<string> { "Municipal" }
+                    }
+                })
+                .Verifiable();
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act
+            var result = await manager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Count.Should().Be(2);
+
+            // Validate the first item
+            result[0].WaterRightNativeId.Should().Be("water_right_1");
+            result[0].AllocationUuid.Should().Be("alloc_1");
+            result[0].Owner.Should().Be("Owner1");
+            result[0].PriorityDate.Should().Be(DateTime.Parse("2000-01-01"));
+            result[0].ExpirationDate.Should().Be(DateTime.Parse("2025-01-01"));
+            result[0].LegalStatus.Should().Be("Valid");
+            result[0].Flow.Should().Be(10.5);
+            result[0].Volume.Should().Be(20.0);
+            result[0].BeneficialUses.Should().BeEquivalentTo(new List<string> { "Irrigation", "Recreation" });
+
+            // Validate the second item
+            result[1].WaterRightNativeId.Should().Be("water_right_2");
+            result[1].AllocationUuid.Should().Be("alloc_2");
+            result[1].Owner.Should().Be("Owner2");
+            result[1].PriorityDate.Should().Be(DateTime.Parse("2010-05-15"));
+            result[1].ExpirationDate.Should().BeNull();
+            result[1].LegalStatus.Should().Be("Pending");
+            result[1].Flow.Should().Be(5.0);
+            result[1].Volume.Should().Be(10.0);
+            result[1].BeneficialUses.Should().BeEquivalentTo(new List<string> { "Municipal" });
+
+            _siteAccessorMock.Verify();
+        }
+        
+        [TestMethod]
+        public async Task GetWaterRightsInfoListByReportingUnitUuid_ThrowsException_WhenUuidIsNullOrEmpty()
+        {
+            // Arrange
+            _siteAccessorMock.Setup(x => x.GetWaterRightInfoListByReportingUnitUuid(null))
+                .ThrowsAsync(new ArgumentException("ReportingUnitUuid cannot be null or empty."));
+            _siteAccessorMock.Setup(x => x.GetWaterRightInfoListByReportingUnitUuid(""))
+                .ThrowsAsync(new ArgumentException("ReportingUnitUuid cannot be null or empty."));
+
+            var manager = CreateWaterAllocationManager();
+
+            // Act & Assert
+            await Assert.ThrowsExceptionAsync<ArgumentException>(
+                () => manager.GetWaterRightsInfoListByReportingUnitUuid(null),
+                "ReportingUnitUuid cannot be null or empty.");
+
+            await Assert.ThrowsExceptionAsync<ArgumentException>(
+                () => manager.GetWaterRightsInfoListByReportingUnitUuid(""),
+                "ReportingUnitUuid cannot be null or empty.");
+        }
         
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {

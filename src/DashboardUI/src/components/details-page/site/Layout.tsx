@@ -3,7 +3,7 @@ import { DetailsPage } from '../DetailsPageLayout';
 import SiteMap from './SiteMap';
 import SiteProperties from './SiteProperties';
 import SiteTabs from './SiteTabs';
-import DetailsLineChart from "./DetailsLineChart";
+import DetailsLineChart from './DetailsLineChart';
 import { useAlerts } from './hooks/useAlerts';
 
 import './site.scss';

@@ -11,8 +11,7 @@ import { defaultNldiFilters } from '../Provider';
 import { useNldiFilter } from '../hooks/filters/useNldiFilter';
 
 export function Nldi() {
-  const { nldiFilterData, setDataPoints, setDirections, setLatLong } =
-    useNldiFilter();
+  const { nldiFilterData, setDataPoints, setDirections, setLatLong } = useNldiFilter();
 
   const nldiFilters = useMemo(() => {
     return nldiFilterData ?? defaultNldiFilters;
@@ -88,23 +87,13 @@ export function Nldi() {
     setLatLongData(pointData.latitude, pointData.longitude);
   };
 
-  const handleDirectionsChanged = (
-    e: ChangeEvent<HTMLInputElement>,
-    dir: Directions,
-  ) => {
-    const val = e.target.checked
-      ? nldiFilters.directions | dir
-      : nldiFilters.directions & ~dir;
+  const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
+    const val = e.target.checked ? nldiFilters.directions | dir : nldiFilters.directions & ~dir;
     setDirections(val);
   };
 
-  const handleDataPointsChanged = (
-    e: ChangeEvent<HTMLInputElement>,
-    dataPoint: DataPoints,
-  ) => {
-    const val = e.target.checked
-      ? nldiFilters.dataPoints | dataPoint
-      : nldiFilters.dataPoints & ~dataPoint;
+  const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
+    const val = e.target.checked ? nldiFilters.dataPoints | dataPoint : nldiFilters.dataPoints & ~dataPoint;
     setDataPoints(val);
   };
 
@@ -199,26 +188,19 @@ export function Nldi() {
   );
 }
 
-function NldiDragAndDropButton(props: {
-  setLatLong: (lat: string, long: string) => void;
-}) {
+function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
   const [{ dropResult, isDragging }, dragRef] = useDrag({
     type: 'nldiMapPoint',
     item: {},
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
-      dropResult: monitor.getDropResult<
-        { latitude: number; longitude: number } | undefined
-      >(),
+      dropResult: monitor.getDropResult<{ latitude: number; longitude: number } | undefined>(),
     }),
   });
   const { setLatLong } = props;
   useEffect(() => {
     if (dropResult) {
-      setLatLong(
-        dropResult.latitude.toString(),
-        dropResult.longitude.toString(),
-      );
+      setLatLong(dropResult.latitude.toString(), dropResult.longitude.toString());
     }
   }, [dropResult, setLatLong]);
 
@@ -234,15 +216,15 @@ function NldiDragAndDropButton(props: {
     <div className="d-inline-flex flex-row align-items-center">
       <Button
         type="button"
-        ref={dragRef}
+        ref={(el) => {
+          dragRef(el);
+        }}
         variant="no-outline"
         className="grabbable me-2"
       >
         <Icon path={mdiMapMarker} color={nldi.colors.mapMarker} size="48px" />
       </Button>
-      <span>
-        Drag and drop the "Pin Icon" on the map to select your search location
-      </span>
+      <span>Drag and drop the "Pin Icon" on the map to select your search location</span>
     </div>
   );
 }

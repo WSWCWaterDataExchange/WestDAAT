@@ -16,9 +16,8 @@ const exemptRadios = [
 ];
 const tooltip = (
   <>
-    <em>Unavailable</em> indicates they dont have a priority date or flow/volume
-    amounts. Either the state does not have them available in machine-readable
-    formats, or the water right does not require or specify them due to distinct
+    <em>Unavailable</em> indicates they dont have a priority date or flow/volume amounts. Either the state does not have
+    them available in machine-readable formats, or the water right does not require or specify them due to distinct
     legal reasons.
   </>
 );

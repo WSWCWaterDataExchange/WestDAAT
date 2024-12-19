@@ -1,15 +1,11 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useMapContext } from '../../../../contexts/MapProvider';
 import { useWaterRightDetailsContext } from '../Provider';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { colorList, nldi } from '../../../../config/constants';
 import { MapLegendMarkerItem } from '../../../map/MapLegendItem';
-import {
-  mapLayerNames,
-  siteLocationPointsIconImage,
-  siteLocationPolygonFillColor,
-} from '../../../../config/maps';
+import { mapLayerNames, siteLocationPointsIconImage, siteLocationPolygonFillColor } from '../../../../config/maps';
 import { useColorMappings } from '../../../../hooks/useColorMappings';
 
 const defaultPolygonFillColors = {
@@ -57,12 +53,8 @@ export function useMapLegend() {
     if (sites.length > colorList.length) {
       setLegend(
         <>
-          <MapLegendMarkerItem color={nldi.colors.sitePOD}>
-            Point of Diversion (POD)
-          </MapLegendMarkerItem>
-          <MapLegendMarkerItem color={nldi.colors.sitePOU}>
-            Place of Use (POU)
-          </MapLegendMarkerItem>
+          <MapLegendMarkerItem color={nldi.colors.sitePOD}>Point of Diversion (POD)</MapLegendMarkerItem>
+          <MapLegendMarkerItem color={nldi.colors.sitePOU}>Place of Use (POU)</MapLegendMarkerItem>
         </>,
       );
       setLayerFillColors(defaultPolygonFillColors);
@@ -105,12 +97,5 @@ export function useMapLegend() {
       layer: defaultMapMarkerIcons.layer,
       iconImages: markerIcons,
     });
-  }, [
-    sites,
-    fallbackColor,
-    setLegend,
-    setLayerFillColors,
-    getColorByIndex,
-    setLayerIconImages,
-  ]);
+  }, [sites, fallbackColor, setLegend, setLayerFillColors, getColorByIndex, setLayerIconImages]);
 }

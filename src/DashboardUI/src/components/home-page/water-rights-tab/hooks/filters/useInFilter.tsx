@@ -1,9 +1,5 @@
 import { useCallback } from 'react';
-import {
-  HostData,
-  useWaterRightsContext,
-  WaterRightsFilters,
-} from '../../Provider';
+import { HostData, useWaterRightsContext, WaterRightsFilters } from '../../Provider';
 import { waterRightsProperties } from '../../../../../config/constants';
 import { useInFilter as useInFilterBase } from '../../../../../hooks/filters/useInFilter';
 
@@ -15,10 +11,11 @@ type ValidInFilters =
   | 'allocationTypes'
   | 'legalStatuses'
   | 'siteTypes';
-export function useInFilter<
-  K1 extends keyof Pick<WaterRightsFilters, ValidInFilters>,
-  K2 extends keyof HostData,
->(field: K1, hostData: K2, mapField: waterRightsProperties) {
+export function useInFilter<K1 extends keyof Pick<WaterRightsFilters, ValidInFilters>, K2 extends keyof HostData>(
+  field: K1,
+  hostData: K2,
+  mapField: waterRightsProperties,
+) {
   const {
     filters: { [field]: val },
     setFilters,
@@ -27,11 +24,7 @@ export function useInFilter<
     },
   } = useWaterRightsContext();
 
-  const { values, mapFilters } = useInFilterBase(
-    val,
-    allValues?.length,
-    mapField,
-  );
+  const { values, mapFilters } = useInFilterBase(val, allValues?.length, mapField);
 
   const setValues = useCallback(
     (values: typeof val) => {

@@ -13,7 +13,5 @@ namespace WesternStatesWater.WestDaat.Common
         }
 
         protected ILogger Logger { get; set; }
-
-        public AmbientContext Context { get; set; }
     }
 }

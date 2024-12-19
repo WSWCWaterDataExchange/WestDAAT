@@ -10,8 +10,7 @@ function useNldiClickedOnMap() {
     }
 
     const nldiFeature = clickedFeatures.find(
-      (a) =>
-        a.properties && a.properties[nldiSiteProperties.sourceName as string],
+      (a) => a.properties && a.properties[nldiSiteProperties.sourceName as string],
     );
     if (!nldiFeature || !nldiFeature.properties) {
       return undefined;
