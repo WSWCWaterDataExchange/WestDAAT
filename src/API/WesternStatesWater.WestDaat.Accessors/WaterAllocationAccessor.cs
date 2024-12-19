@@ -116,7 +116,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                             a.AllocationFlow_CFS,
                             a.AllocationVolume_AF,
                             a.AllocationAmountId,
-                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).ToArray()
+                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).Distinct().ToArray()
                         });
 
                     var allSiteTypes = await summaryWithSiteData
@@ -147,7 +147,9 @@ namespace WesternStatesWater.WestDaat.Accessors
                             WaterSourceTypeWaDENames = a.AllocationBridgeSitesFact
                                 .SelectMany(absf => absf.Site.WaterSourceBridgeSitesFact
                                     .Select(wsbsf => wsbsf.WaterSource.WaterSourceTypeCvNavigation.WaDEName)
+                                    .Distinct()
                                 )
+                                .Distinct()
                                 .ToArray()
                         });
 
