@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using System.Runtime.CompilerServices;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 [assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
 
@@ -136,7 +134,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
             
-            CreateMap<RegulatoryOverlayDim, OverlayTableEntry>()
+            CreateMap<EF.RegulatoryOverlayDim, OverlayTableEntry>()
                 .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
                 .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
                 .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
