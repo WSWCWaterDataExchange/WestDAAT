@@ -156,16 +156,17 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException($"No overlay found for UUID: {overlayUuid}");
             }
 
-            string geoJson = null;
-            if (overlayCommon.Geometry != null)
+            var geoJsonGeometry = overlayCommon.Geometry?.AsGeoJsonGeometry();
+
+            Feature geometryFeature = null;
+            if (geoJsonGeometry != null)
             {
-                var geoJsonWriter = new NetTopologySuite.IO.GeoJsonWriter();
-                geoJson = geoJsonWriter.Write(overlayCommon.Geometry);
+                geometryFeature = new Feature(geoJsonGeometry);
             }
 
             var overlayClient = overlayCommon.Map<ClientContracts.OverlayDetails>();
 
-            overlayClient.Geometry = geoJson;
+            overlayClient.Geometry = geometryFeature;
 
             return overlayClient;
         }
