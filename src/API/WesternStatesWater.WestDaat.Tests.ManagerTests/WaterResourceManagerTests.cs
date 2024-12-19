@@ -130,7 +130,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var searchCriteria = new WaterRightsSearchCriteria();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetAnalyticsSummaryInformation(searchCriteria);
 
             //Assert
