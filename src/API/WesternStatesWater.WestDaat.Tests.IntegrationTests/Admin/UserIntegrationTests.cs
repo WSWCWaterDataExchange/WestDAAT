@@ -20,13 +20,13 @@ public class UserIntegrationTests : IntegrationTestBase
     public async Task Load_FakeRequest_ShouldThrow()
     {
         // Arrange
-        var request = new FakeRequest();
+        var request = new FakeLoadRequest();
 
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
     }
     
-    private class FakeRequest : CLI.RequestBase
+    private class FakeLoadRequest : CLI.UserLoadRequestBase
     {
     }
 }

@@ -7,5 +7,5 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 /// </summary>
 public interface IUserManager : IServiceContractBase
 {
-    Task<ResponseBase> Load(RequestBase request);
+    Task<UserLoadResponseBase> Load(UserLoadRequestBase request);
 }

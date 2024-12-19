@@ -20,7 +20,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Load_FakeRequest_ShouldThrow()
     {
         // Arrange
-        var request = new FakeRequest();
+        var request = new FakeLoadRequest();
 
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _applicationManager.Load(request));
@@ -30,13 +30,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_FakeRequest_ShouldThrow()
     {
         // Arrange
-        var request = new FakeRequest();
+        var request = new FakeStoreRequest();
 
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _applicationManager.Store(request));
     }
     
-    private class FakeRequest : CLI.RequestBase
+    private class FakeLoadRequest : ApplicationLoadRequestBase
+    {
+    }
+    
+    private class FakeStoreRequest : ApplicationStoreRequestBase
     {
     }
 }

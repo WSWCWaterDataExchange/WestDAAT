@@ -8,7 +8,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 /// </summary>
 public interface IApplicationManager : IServiceContractBase
 {
-    Task<ResponseBase> Load(RequestBase request);
+    Task<ApplicationLoadResponseBase> Load(ApplicationLoadRequestBase request);
     
-    Task<ResponseBase> Store(RequestBase request);
+    Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request);
 }
