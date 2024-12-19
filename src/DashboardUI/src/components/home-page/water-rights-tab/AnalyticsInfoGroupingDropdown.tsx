@@ -31,22 +31,19 @@ function AnalyticsInfoGroupingDropdown(props: AnalyticsInfoGroupingDropdownProps
   }, [response]);
 
   return (
-    !props.isFetching && (
-      // `Select` must only be rendered when data is available, otherwise the default value will not be set properly
-      <div className="mb-3 col-4">
-        <label htmlFor="grouping-dropdown">Select Grouping</label>
-        <Select<DropdownOption>
-          id="grouping-dropdown"
-          placeholder="Select Grouping"
-          isLoading={props.isFetching}
-          options={dropdownOptions}
-          onChange={(newValue: SingleValue<DropdownOption>) =>
-            props.setSelectedDropdownOption(newValue as DropdownOption)
-          }
-          value={props.selectedDropdownOption ?? dropdownDefaultValue}
-        />
-      </div>
-    )
+    <div className="mb-3 col-4">
+      <label htmlFor="grouping-dropdown">Select Grouping</label>
+      <Select<DropdownOption>
+        id="grouping-dropdown"
+        placeholder="Select Grouping"
+        isLoading={props.isFetching}
+        options={dropdownOptions}
+        onChange={(newValue: SingleValue<DropdownOption>) =>
+          props.setSelectedDropdownOption(newValue as DropdownOption)
+        }
+        value={props.selectedDropdownOption ?? dropdownDefaultValue}
+      />
+    </div>
   );
 }
 
