@@ -1,12 +1,11 @@
-import React from 'react';
-import { ReactChild } from 'react';
+import { ReactNode } from 'react';
 import { Card } from 'react-bootstrap';
 import CardHeader from 'react-bootstrap/esm/CardHeader';
 
 interface MapPopupCardProps {
   children: {
-    header?: ReactChild;
-    body?: ReactChild;
+    header?: ReactNode;
+    body?: ReactNode;
   };
   onClosePopup: () => void;
 }

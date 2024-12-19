@@ -81,7 +81,7 @@ function FeedbackModal(props: FeedBackModalProps) {
     });
     if (result === false) {
       toast.error('Something went wrong sending the feedback', {
-        position: toast.POSITION.TOP_CENTER,
+        position: 'top-center',
         theme: 'colored',
         autoClose: false,
       });

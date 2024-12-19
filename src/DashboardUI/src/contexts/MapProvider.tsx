@@ -1,4 +1,4 @@
-import React, { createContext, FC, ReactElement, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, FC, JSX, ReactElement, useCallback, useContext, useMemo, useState } from 'react';
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '@data-contracts';
 
@@ -175,7 +175,10 @@ const defaultState: MapContextState = {
 const MapContext = createContext<MapContextState>(defaultState);
 export const useMapContext = () => useContext(MapContext);
 
-const MapProvider: FC = ({ children }) => {
+interface MapProviderProps {
+  children: React.ReactNode;
+}
+const MapProvider = ({ children }: MapProviderProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapStyle, setMapStyle] = useState(defaultMapStyle);
 
