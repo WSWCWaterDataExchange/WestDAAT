@@ -119,10 +119,10 @@ function PieCharts(props: PieChartsProps) {
     ];
     if (!pieChartSearchResults || !pieChartSearchResults.analyticsSummaryInformation) return initData;
 
-    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr) => {
+    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
       const [flow, vol, point] = prev;
       const name = curr.primaryUseCategoryName ?? 'Unspecified';
-      const color = getBeneficialUseColor(name);
+      const color = getBeneficialUseColor(name, index);
       if (curr.flow && curr.flow > 0) {
         flow.sum += curr.flow;
         flow.data.push({ name, y: curr.flow, color });
