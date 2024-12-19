@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HC_Data from 'highcharts/modules/export-data';
@@ -7,7 +7,9 @@ import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
 import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
 import { useColorMappings } from './hooks/useColorMappings';
-import { AnalyticsSummaryInformationResponse } from '../../../data-contracts/AnalyticsSummaryInformationResponse';
+import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
+import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
+import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -83,13 +85,9 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-interface PieChartsProps {
-  pieChartSearchResults: AnalyticsSummaryInformationResponse | undefined;
-  isFetching: boolean;
-  dropdownElement: JSX.Element;
-}
-function PieCharts(props: PieChartsProps) {
-  const { pieChartSearchResults, isFetching } = props;
+function PieCharts() {
+  const { searchCriteria } = useWaterRightsSearchCriteria();
+  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
 
   const { getBeneficialUseColor } = useColorMappings();
 
@@ -138,7 +136,7 @@ function PieCharts(props: PieChartsProps) {
         </a>
       </div>
 
-      {props.dropdownElement}
+      <AnalyticsInfoGroupingDropdown isFetching={isFetching} pieChartSearchResults={pieChartSearchResults} />
 
       {pieChartSearchResults?.analyticsSummaryInformation &&
         pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
