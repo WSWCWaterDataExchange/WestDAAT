@@ -70,7 +70,7 @@ public class MessageBusUtility : IMessageBusUtility, IAsyncDisposable
     {
         if (_environmentConfiguration.IsLocalEnvironment)
         {
-            queueName = $"{queueName}-{_environmentConfiguration.Username}";
+            queueName = $"{queueName}-{_environmentConfiguration.Username.ToLower()}";
         }
 
         return queueName;
