@@ -10,5 +10,5 @@ export interface OverlayDetails {
   organizationName: string;
   organizationState: string;
   organizationWebsite: string;
-  geometry: Geometry;
+  geometry: string;
 }
