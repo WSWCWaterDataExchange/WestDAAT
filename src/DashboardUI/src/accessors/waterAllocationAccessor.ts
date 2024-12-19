@@ -1,4 +1,11 @@
-import { SiteInfoListItem, WaterRightDetails, WaterSourceInfoListItem, OverlayDetails } from '@data-contracts';
+import {
+  SiteInfoListItem,
+  WaterRightDetails,
+  WaterSourceInfoListItem,
+  OverlayDetails,
+  WaterRightsInfoListItem,
+  OverlayTableEntry,
+} from '@data-contracts';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { AnalyticsSummaryInformation } from '../data-contracts/AnalyticsSummaryInformation';
@@ -14,11 +21,6 @@ export const getWaterRightDetails = async (allocationUuid: string) => {
   const { data } = await axios.get<WaterRightDetails>(
     `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}`,
   );
-  return data;
-};
-
-export const getOverlayDetails = async (overlayUuid: string) => {
-  const { data } = await axios.get<OverlayDetails>(`${process.env.REACT_APP_WEBAPI_URL}Overlays/${overlayUuid}`);
   return data;
 };
 
