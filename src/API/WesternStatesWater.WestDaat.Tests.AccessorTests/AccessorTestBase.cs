@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {

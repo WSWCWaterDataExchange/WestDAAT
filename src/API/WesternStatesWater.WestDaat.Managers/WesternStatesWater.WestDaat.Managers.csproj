@@ -23,4 +23,12 @@
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Engines\WesternStatesWater.WestDaat.Engines.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ApplicationManager.cs">
+      <DependentUpon>ConservationManager.cs</DependentUpon>
+    </Compile>
+    <Compile Update="UserManager.cs">
+      <DependentUpon>AdminManager.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
