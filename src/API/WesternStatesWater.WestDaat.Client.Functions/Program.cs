@@ -39,11 +39,12 @@ var host = new HostBuilder()
 
         services.AddHttpContextAccessor();
 
-        services.AddScoped(a => configuration.GetDatabaseConfiguration());
-        services.AddScoped(a => configuration.GetNldiConfiguration());
-        services.AddScoped(a => configuration.GetSmtpConfiguration());
         services.AddScoped(a => configuration.GetBlobStorageConfiguration());
+        services.AddScoped(a => configuration.GetDatabaseConfiguration());
+        services.AddScoped(a => configuration.GetMessageBusConfiguration());
+        services.AddScoped(a => configuration.GetNldiConfiguration());
         services.AddScoped(a => configuration.GetPerformanceConfiguration());
+        services.AddScoped(a => configuration.GetSmtpConfiguration());
 
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
@@ -70,6 +71,7 @@ var host = new HostBuilder()
         services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<IMessageBusUtility, MessageBusUtility>();
 
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
