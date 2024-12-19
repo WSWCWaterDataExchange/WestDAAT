@@ -150,14 +150,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         public async Task GetAnalyticsSummaryInformation_ShouldSucceedForEachGroupValue(Common.AnalyticsInformationGrouping groupValue)
         {
             //Arrange
-            var allocationAmountFacts = new AllocationAmountFactFaker()
-                .RuleFor(aaf => aaf.PrimaryBeneficialUseCategory, f => f.Name.FirstName())
-                .IncludeOwnerClassification()
-                .IncludeLegalStatus()
-                .LinkSites(
-                    new SitesDimFaker().Generate(3).ToArray()
-                )
-                .Generate(3);
+            var allocationAmountFacts = new AllocationAmountFactFaker().Generate(3);
             
             using (var db = CreateDatabaseContextFactory().Create())
             {
