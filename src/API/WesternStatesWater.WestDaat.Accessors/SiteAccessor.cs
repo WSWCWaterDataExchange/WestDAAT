@@ -1,7 +1,6 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -9,12 +8,12 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class SiteAccessor : AccessorBase, ISiteAccessor
     {
-        public SiteAccessor(ILogger<SiteAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        public SiteAccessor(ILogger<SiteAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
         async Task<Site> ISiteAccessor.GetSiteByUuid(string siteUuid)
         {
@@ -117,8 +116,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return await db.MethodsDim.Where(x => x.SiteVariableAmountsFact.Any(y => y.Site.SiteUuid == siteUuid))
                 .ProjectTo<MethodInfoListItem>(DtoMapper.Configuration)
                 .OrderBy(x => x.WaDEMethodUuid)
-                .ToListAsync()
-                ;
+                .ToListAsync();
         }
 
         public IEnumerable<GeoConnex> GetJSONLDData()

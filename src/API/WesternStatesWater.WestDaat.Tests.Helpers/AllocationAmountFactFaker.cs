@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {

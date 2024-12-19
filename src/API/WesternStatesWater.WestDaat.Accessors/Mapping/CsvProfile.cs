@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using System.Runtime.CompilerServices;
 using WesternStatesWater.WestDaat.Accessors.CsvModels;
-using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 [assembly: InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.AccessorTests")]
 
