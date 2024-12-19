@@ -18,7 +18,7 @@ using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
     [TestClass]
-    public class WaterAllocationManagerTests : ManagerTestBase
+    public class WaterResourceManagerTests : ManagerTestBase
     {
         private readonly Mock<INldiAccessor> _nldiAccessorMock = new(MockBehavior.Strict);
         private readonly Mock<IGeoConnexEngine> _geoConnexEngineMock = new Mock<IGeoConnexEngine>(MockBehavior.Strict);
@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             });
             _waterAllocationAccessorMock.Setup(x => x.GetWaterAllocationAmountOrganizationById(It.IsAny<long>())).Returns(new CommonContracts.Organization());
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // ACT 
             var response = await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
@@ -62,7 +62,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 AllocationIds = new List<long> { /* Empty */ }
             });
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // ACT 
             Func<Task> call = async () => await manager.GetWaterAllocationSiteGeoconnexIntegrationData("test");
@@ -84,7 +84,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                              .ReturnsAsync(resultFeatureCollection)
                              .Verifiable();
 
-            var sut = CreateWaterAllocationManager();
+            var sut = CreateWaterResourceManager();
             var result = await sut.GetNldiFeatures(latitude, longitude, directions, dataPoints);
 
             result.Should().Be(resultFeatureCollection);
@@ -112,7 +112,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var searchCriteria = new WaterRightsSearchCriteria();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetAnalyticsSummaryInformation(searchCriteria);
 
             //Assert
@@ -133,7 +133,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var searchCriteria = new WaterRightsSearchCriteria();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightsEnvelope(searchCriteria);
 
             //Assert
@@ -166,7 +166,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.FindWaterRights(searchCriteria);
 
             //Assert
@@ -211,7 +211,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             expectedFilterGeometryParam.All(x => x != null).Should().BeTrue();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.FindWaterRights(searchCriteria);
 
             //Assert
@@ -256,7 +256,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             };
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.FindWaterRights(searchCriteria);
 
             //Assert
@@ -269,11 +269,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetSiteDetails()
+        public async Task WaterResourceManager_GetSiteDetails()
         {
             _siteAccessorMock.Setup(x => x.GetSiteDetailsByUuid("TESTME")).ReturnsAsync(new CommonContracts.SiteDetails()).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetSiteDetails("TESTME");
 
             result.Should().NotBeNull();
@@ -281,7 +281,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterSiteLocation()
+        public async Task WaterResourceManager_GetWaterSiteLocation()
         {
             var location = new CommonContracts.SiteLocation
             {
@@ -293,7 +293,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             _siteAccessorMock.Setup(x => x.GetWaterSiteLocationByUuid("TEST_PODorPOU")).ReturnsAsync(location).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterSiteLocation("TEST_PODorPOU");
 
             result.Should().NotBeNull();
@@ -303,11 +303,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightDetails()
+        public async Task WaterResourceManager_GetWaterRightDetails()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById("99")).ReturnsAsync(new CommonContracts.WaterRightDetails()).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightDetails("99");
 
             result.Should().NotBeNull();
@@ -315,11 +315,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightDetails_Null()
+        public async Task WaterResourceManager_GetWaterRightDetails_Null()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightDetailsById("99")).ReturnsAsync((CommonContracts.WaterRightDetails)null).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightDetails("99");
 
             result.Should().BeNull();
@@ -327,11 +327,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightSiteInfoList()
+        public async Task WaterResourceManager_GetWaterRightSiteInfoList()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteInfoById("99")).ReturnsAsync(new List<CommonContracts.SiteInfoListItem> { }).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightSiteInfoList("99");
 
             result.Should().NotBeNull();
@@ -339,11 +339,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightSourceInfoList()
+        public async Task WaterResourceManager_GetWaterRightSourceInfoList()
         {
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSourceInfoById("99")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem> { }).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightSourceInfoList("99");
 
             result.Should().NotBeNull();
@@ -351,12 +351,12 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightsDigestsBySite()
+        public async Task WaterResourceManager_GetWaterRightsDigestsBySite()
         {
             var siteUuid = new Faker().Random.String(11, 'A', 'z');
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsDigestsBySite(siteUuid)).ReturnsAsync(new List<CommonContracts.WaterRightsDigest> { }).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightsDigestsBySite(siteUuid);
 
             result.Should().NotBeNull();
@@ -364,7 +364,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterRightSiteLocations()
+        public async Task WaterResourceManager_GetWaterRightSiteLocations()
         {
             var location = new CommonContracts.SiteLocation
             {
@@ -376,7 +376,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightSiteLocationsById("99")).ReturnsAsync(new List<CommonContracts.SiteLocation> { location }).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterRightSiteLocations("99");
 
             result.Should().NotBeNull();
@@ -387,11 +387,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task WaterAllocationManager_GetWaterSiteSourceInfoList()
+        public async Task WaterResourceManager_GetWaterSiteSourceInfoList()
         {
             _siteAccessorMock.Setup(x => x.GetWaterSiteSourceInfoListByUuid("siteuuid")).ReturnsAsync(new List<CommonContracts.WaterSourceInfoListItem> { }).Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetWaterSiteSourceInfoListByUuid("siteuuid");
 
             result.Should().NotBeNull();
@@ -429,7 +429,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Returns(returnAmount)
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             await Assert.ThrowsExceptionAsync<WestDaatException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), managerSearchRequest));
 
             _waterAllocationAccessorMock.Verify(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()), Times.Once);
@@ -441,7 +441,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _waterAllocationAccessorMock.Setup(x => x.GetWaterRightsCount(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await manager.WaterRightsAsZip(new MemoryStream(), It.IsAny<WaterRightsSearchCriteriaWithFilterUrl>()));
 
             // throws exception when building the predicate, before this call
@@ -481,7 +481,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var memoryStream = new MemoryStream();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
@@ -544,7 +544,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var memoryStream = new MemoryStream();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
@@ -651,7 +651,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             var memoryStream = new MemoryStream();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             await manager.WaterRightsAsZip(memoryStream, managerSearchRequest);
 
             memoryStream.Seek(0, SeekOrigin.Begin);
@@ -712,7 +712,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }).Verifiable();
             
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetSiteUsageBySiteUuid("test");
 
             //Assert
@@ -734,7 +734,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }).Verifiable();
             
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetSiteVariableInfoListByUuid("test");
 
             //Assert
@@ -756,7 +756,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }).Verifiable();
             
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetSiteMethodInfoListByUuid("test-site-uuid");
 
             //Assert
@@ -787,7 +787,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Verifiable();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetOverlayDetails("test");
 
             //Assert
@@ -799,7 +799,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         public async Task GetOverlayDetails_ThrowsException_WhenUuidIsNullOrEmpty()
         {
             // Arrange
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<WestDaatException>(
@@ -820,7 +820,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .ReturnsAsync((CommonContracts.OverlayDetails)null)
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<WestDaatException>(
@@ -853,7 +853,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .Verifiable();
 
             //Act
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
             var result = await manager.GetOverlayDetails("test");
 
             //Assert
@@ -871,7 +871,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .ReturnsAsync((List<CommonContracts.OverlayTableEntry>)null)
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act
             var result = await manager.GetOverlayInfoById(reportingUnitUuid);
@@ -897,7 +897,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 .ReturnsAsync(overlayEntries)
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act
             var result = await manager.GetOverlayInfoById(reportingUnitUuid);
@@ -921,7 +921,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act
             var result = await manager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
@@ -968,7 +968,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 })
                 .Verifiable();
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act
             var result = await manager.GetWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid);
@@ -1011,7 +1011,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _siteAccessorMock.Setup(x => x.GetWaterRightInfoListByReportingUnitUuid(""))
                 .ThrowsAsync(new ArgumentException("ReportingUnitUuid cannot be null or empty."));
 
-            var manager = CreateWaterAllocationManager();
+            var manager = CreateWaterResourceManager();
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentException>(
@@ -1048,9 +1048,9 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             }
         }
 
-        private IWaterAllocationManager CreateWaterAllocationManager()
+        private IWaterResourceManager CreateWaterResourceManager()
         {
-            return new WaterAllocationManager(
+            return new WaterResourceManager(
                 _nldiAccessorMock.Object,
                 _siteAccessorMock.Object,
                 _waterAllocationAccessorMock.Object,
@@ -1058,7 +1058,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _locationEngineMock.Object,
                 _templateResourceSdk.Object,
                 CreatePerformanceConfiguration(),
-                CreateLogger<WaterAllocationManager>()
+                CreateLogger<WaterResourceManager>()
             );
         }
     }

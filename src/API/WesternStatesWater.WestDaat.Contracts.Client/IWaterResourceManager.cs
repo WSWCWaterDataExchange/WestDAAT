@@ -4,7 +4,12 @@ using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client
 {
-    public interface IWaterAllocationManager : IServiceContractBase
+    /// <summary>
+    /// Defines operations for searching, viewing, and analyzing water rights, sites, allocations, 
+    /// and overlay data. Implementations of this interface are intended to support comprehensive 
+    /// data queries and provide insights into water resource management.
+    /// </summary>
+    public interface IWaterResourceManager : IServiceContractBase
     {
         Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
 
@@ -47,6 +52,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client
         Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid);
         
         Task<List<MethodInfoListItem>> GetSiteMethodInfoListByUuid(string siteUuid);
+        
         Task<List<WaterRightInfoListItem>> GetWaterRightsInfoListByReportingUnitUuid(string reportingUnitUuid);
     }
 }
