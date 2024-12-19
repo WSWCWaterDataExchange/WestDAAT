@@ -40,8 +40,11 @@ const defaultState: OverlayDetailsPageContextState = {
 const OverlayDetailsContext = createContext<OverlayDetailsPageContextState>(defaultState);
 
 export const useOverlayDetailsContext = () => useContext(OverlayDetailsContext);
+interface OverlayDetailsProviderProps {
+  children: React.ReactNode;
+}
 
-export const OverlayDetailsProvider: React.FC = ({ children }) => {
+export const OverlayDetailsProvider = ({children}: OverlayDetailsProviderProps) => {
   const { id: overlayUuid } = useParams();
   const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
   const detailsQuery = useOverlayDetails(overlayUuid);
