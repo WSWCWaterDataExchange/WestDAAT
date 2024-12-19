@@ -1,5 +1,5 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests

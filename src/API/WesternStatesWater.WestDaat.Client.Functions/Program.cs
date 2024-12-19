@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Client.Functions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -45,10 +45,12 @@ var host = new HostBuilder()
         services.AddScoped(a => configuration.GetBlobStorageConfiguration());
         services.AddScoped(a => configuration.GetPerformanceConfiguration());
 
-        services.AddScoped<INotificationManager, NotificationManager>();
+        services.AddTransient<IApplicationManager, ConservationManager>();
+        services.AddTransient<INotificationManager, NotificationManager>();
         services.AddTransient<ISystemManager, SystemManager>();
         services.AddTransient<ITestManager, TestManager>();
-        services.AddTransient<IWaterAllocationManager, WaterAllocationManager>();
+        services.AddTransient<IUserManager, AdminManager>();
+        services.AddTransient<IWaterResourceManager, WaterResourceManager>();
 
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
@@ -60,9 +62,10 @@ var host = new HostBuilder()
         services.AddTransient<ITestAccessor, TestAccessor>();
         services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
+        services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
+        
         services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
         services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
-        services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
 
