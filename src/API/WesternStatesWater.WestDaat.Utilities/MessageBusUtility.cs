@@ -61,14 +61,6 @@ public class MessageBusUtility : IMessageBusUtility, IAsyncDisposable
         return queueNames.Contains(queueName);
     }
 
-    private ServiceBusReceiver GetServiceBusReceiver(string queueOrTopicName)
-    {
-        queueOrTopicName = LocalizeQueueName(queueOrTopicName);
-
-        return _serviceBusClient.CreateReceiver(queueOrTopicName,
-            new ServiceBusReceiverOptions { ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
-    }
-
     private ServiceBusSender GetServiceBusSender(string queueOrTopicName)
     {
         return _messageBusSenderCache.GetOrAdd(queueOrTopicName, a => _serviceBusClient.CreateSender(a));
