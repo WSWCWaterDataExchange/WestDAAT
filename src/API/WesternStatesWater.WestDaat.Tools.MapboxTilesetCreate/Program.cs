@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Utilities;
@@ -31,10 +31,10 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services.AddScoped(_ => config.GetNldiConfiguration());
                 services.AddScoped(_ => config.GetBlobStorageConfiguration());
                 services.AddScoped(_ => config.GetPerformanceConfiguration());
-                services
-                    .AddTransient<IDatabaseContextFactory,
-                        DatabaseContextFactory>();
+                services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
                 services.AddScoped<IWaterResourceManager, WaterResourceManager>();
+                services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
+                
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
                 services.AddScoped<ISiteAccessor, SiteAccessor>();
                 services.AddScoped<INldiAccessor, NldiAccessor>();

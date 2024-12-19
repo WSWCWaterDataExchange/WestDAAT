@@ -4,7 +4,7 @@ namespace WesternStatesWater.WestDaat.Managers;
 
 public sealed partial class AdminManager : IUserManager
 {
-    Task<ResponseBase> IUserManager.Load(RequestBase request)
+    Task<UserLoadResponseBase> IUserManager.Load(UserLoadRequestBase request)
     {
         return request switch
         {

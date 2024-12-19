@@ -4,7 +4,7 @@ namespace WesternStatesWater.WestDaat.Managers;
 
 public sealed partial class ConservationManager : IApplicationManager
 {
-    Task<ResponseBase> IApplicationManager.Load(RequestBase request)
+    Task<ApplicationLoadResponseBase> IApplicationManager.Load(ApplicationLoadRequestBase request)
     {
         return request switch
         {
@@ -12,7 +12,7 @@ public sealed partial class ConservationManager : IApplicationManager
         };
     }
 
-    Task<ResponseBase> IApplicationManager.Store(RequestBase request)
+    Task<ApplicationStoreResponseBase> IApplicationManager.Store(ApplicationStoreRequestBase request)
     {
         return request switch
         {
