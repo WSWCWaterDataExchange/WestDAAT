@@ -62,8 +62,8 @@ namespace WesternStatesWater.WestDaat.Managers
             return new ClientContracts.AnalyticsSummaryInformationResponse
             {
                 AnalyticsSummaryInformation = data,
-                DropdownOptions = dropdownOptions,
-                SelectedValue = (int)AnalyticsInformationGrouping.BeneficialUse
+                GroupItems = dropdownOptions,
+                GroupValue = (int)AnalyticsInformationGrouping.BeneficialUse
             };
         }
 

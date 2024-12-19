@@ -135,17 +135,17 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             //Assert
             result.Should().NotBeNull();
-            result.DropdownOptions.Should().NotBeNull();
+            result.GroupItems.Should().NotBeNull();
 
             var expectedEnumValues = Enum.GetValues(typeof(Common.AnalyticsInformationGrouping))
                 .Cast<Common.AnalyticsInformationGrouping>()
                 .Where(enumValue => enumValue != Common.AnalyticsInformationGrouping.None)
                 .ToArray();
 
-            result.DropdownOptions.Should().HaveCount(expectedEnumValues.Length);
+            result.GroupItems.Should().HaveCount(expectedEnumValues.Length);
             expectedEnumValues.All(enumValue =>
             {
-                return result.DropdownOptions.Any(option => option.Value == (int)enumValue);
+                return result.GroupItems.Any(option => option.Value == (int)enumValue);
             }).Should().BeTrue();
         }
 

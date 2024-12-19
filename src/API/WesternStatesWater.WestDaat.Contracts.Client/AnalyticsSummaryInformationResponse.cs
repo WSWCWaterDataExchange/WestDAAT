@@ -3,6 +3,6 @@
 public class AnalyticsSummaryInformationResponse
 {
     public AnalyticsSummaryInformation[] AnalyticsSummaryInformation { get; set; }
-    public GroupItem[] DropdownOptions { get; set; }
-    public int SelectedValue { get; set; }
+    public GroupItem[] GroupItems { get; set; }
+    public int GroupValue { get; set; }
 }

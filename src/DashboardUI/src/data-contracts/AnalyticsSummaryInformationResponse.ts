@@ -3,6 +3,6 @@ import { GroupItem } from './GroupItem';
 
 export interface AnalyticsSummaryInformationResponse {
   analyticsSummaryInformation: AnalyticsSummaryInformation[];
-  dropdownOptions: GroupItem[];
-  selectedValue: number;
+  groupItems: GroupItem[];
+  groupValue: number;
 }

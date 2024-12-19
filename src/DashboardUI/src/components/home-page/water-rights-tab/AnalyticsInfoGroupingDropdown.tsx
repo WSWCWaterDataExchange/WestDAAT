@@ -14,20 +14,20 @@ function AnalyticsInfoGroupingDropdown(props: AnalyticsInfoGroupingDropdownProps
   const response = props.analyticsSummaryInformationResponse;
 
   const dropdownOptions: DropdownOption[] = useMemo(() => {
-    if (!response || !response.dropdownOptions) {
+    if (!response || !response.groupItems) {
       return [];
     }
-    return response.dropdownOptions.map((option) => ({
+    return response.groupItems.map((option) => ({
       value: option.value.toString(),
       label: option.label,
     }));
   }, [response]);
 
   const dropdownDefaultValue: DropdownOption | null = useMemo(() => {
-    if (!response || !response.dropdownOptions) {
+    if (!response || !response.groupItems) {
       return null;
     }
-    return dropdownOptions.find((option) => option.value === response.selectedValue.toString()) ?? null;
+    return dropdownOptions.find((option) => option.value === response.groupValue.toString()) ?? null;
   }, [response]);
 
   return (
