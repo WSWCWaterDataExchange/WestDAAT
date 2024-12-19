@@ -1,3 +1,4 @@
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 
@@ -12,7 +13,8 @@ public class UserIntegrationTests : IntegrationTestBase
     public void TestInitialize()
     {
         _userManager = new AdminManager(
-            CreateLogger<AdminManager>()
+            CreateLogger<AdminManager>(),
+            Services.GetService<IUserAccessor>()
         );
     }
 
@@ -25,7 +27,7 @@ public class UserIntegrationTests : IntegrationTestBase
         // Act + Assert
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
     }
-    
+
     private class FakeLoadRequest : CLI.UserLoadRequestBase
     {
     }

@@ -1,3 +1,4 @@
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Managers;
 
@@ -8,11 +9,14 @@ public class UserManagerTests : ManagerTestBase
 {
     private IUserManager _userManager = null!;
 
+    private Mock<IUserAccessor> _userAccessorMock = new(MockBehavior.Strict);
+
     [TestInitialize]
     public void TestInitialize()
     {
         _userManager = new AdminManager(
-            CreateLogger<AdminManager>()
+            CreateLogger<AdminManager>(),
+            _userAccessorMock.Object
         );
     }
 
