@@ -7,7 +7,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 {
     public interface IWaterAllocationAccessor : IServiceContractBase
     {
-        Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria accessorRequest);
+        Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, AnalyticsInformationGrouping? groupValue);
 
         Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria accessorRequest);
 

@@ -51,17 +51,18 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            var data = (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+            var result = await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest, searchRequest.GroupValue);
+            var clientResult = result.Map<ClientContracts.AnalyticsSummaryInformation[]>();
 
             var dropdownOptions = BuildEnumGroupItems<AnalyticsInformationGrouping>();
 
             return new ClientContracts.AnalyticsSummaryInformationResponse
             {
-                AnalyticsSummaryInformation = data,
+                AnalyticsSummaryInformation = clientResult,
                 GroupItems = dropdownOptions,
                 GroupValue = (int)AnalyticsInformationGrouping.BeneficialUse
             };

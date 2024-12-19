@@ -2,5 +2,5 @@
 
 public class WaterRightsSearchCriteriaWithGrouping : WaterRightsSearchCriteria
 {
-    public Common.AnalyticsInformationGrouping GroupValue { get; set; }
+    public Common.AnalyticsInformationGrouping? GroupValue { get; set; }
 }
