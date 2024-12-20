@@ -20,7 +20,7 @@ export interface HostData {
   geometryFeature: Feature<Geometry, GeoJsonProperties> | null;
 }
 
-type ActiveTabType = 'admin' | 'water-right';
+type ActiveTabType = 'overlay' | 'right';
 
 interface OverlayDetailsPageContextState {
   overlayUuid: string | undefined;
