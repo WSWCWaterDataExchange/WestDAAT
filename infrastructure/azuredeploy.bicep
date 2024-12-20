@@ -380,3 +380,33 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
     hostNameType: 'Verified'
   }
 }
+
+
+var serviceBusName = 'sb-${toLower(product)}${resourceSuffix}'
+
+resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
+  name: serviceBusName
+  location: region[Environment]
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {
+    disableLocalAuth: false
+    zoneRedundant: false
+  }
+}
+
+// Will need to match the following locations:
+//   AzureNames.Queues list
+//   sb-emulator.config.json
+var queueNames = [
+  'conservation-application-submitted'
+]
+
+resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = [
+  for queueName in queueNames: {
+    parent: service_bus
+    name: queueName
+  }
+]

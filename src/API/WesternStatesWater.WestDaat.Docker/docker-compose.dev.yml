@@ -4,7 +4,18 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: mssql
     environment:
-      ACCEPT_EULA: 'Y'
+      ACCEPT_EULA: "Y"
       SA_PASSWORD: DevP@ssw0rd!
     ports:
       - 1433:1433
+  sb-emulator:
+    container_name: "servicebus-emulator"
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    volumes:
+      - "./sb-emulator.config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
+    ports:
+      - "5672:5672"
+    environment:
+      SQL_SERVER: mssql
+      MSSQL_SA_PASSWORD: DevP@ssw0rd!
+      ACCEPT_EULA: "Y"

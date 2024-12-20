@@ -58,11 +58,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             return config.GetSection(ConfigurationRootNames.MessageBus).Get<MessageBusConfiguration>() ?? new MessageBusConfiguration();
         }
         
-        public static EnvironmentConfiguration GetEnvironmentConfiguration(this IConfiguration config)
-        {
-            return config.GetSection(ConfigurationRootNames.Environment).Get<EnvironmentConfiguration>() ?? new EnvironmentConfiguration();
-        }
-
         public static TokenCredential TokenCredential => new ChainedTokenCredential(
             new AzureCliCredential(), // When Local
             new DefaultAzureCredential() // When Azure
