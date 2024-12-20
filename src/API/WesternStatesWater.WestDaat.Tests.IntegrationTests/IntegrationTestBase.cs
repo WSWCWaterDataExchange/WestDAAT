@@ -6,7 +6,6 @@ using MGR = WesternStatesWater.WestDaat.Managers;
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {
     [TestClass]
-    [TestCategory("Integration Tests")]
     public class IntegrationTestBase : IDisposable
     {
         private ILoggerFactory _loggerFactory;

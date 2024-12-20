@@ -8,5 +8,5 @@ global using System.Linq;
 global using System.Threading.Tasks;
 using System.Resources;
 
-[assembly: TestCategory("Manager Tests")]
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: TestCategory("Manager Tests")]
