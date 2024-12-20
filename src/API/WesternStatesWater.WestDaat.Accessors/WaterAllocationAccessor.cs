@@ -108,31 +108,25 @@ namespace WesternStatesWater.WestDaat.Accessors
                         })
                         .ToArrayAsync();
                 case Common.AnalyticsInformationGrouping.SiteType:
-                    var summaryWithSiteData = query
+                    var summaryWithSiteData = await query
                         .Select(a => new
                         {
                             a.AllocationFlow_CFS,
                             a.AllocationVolume_AF,
                             a.AllocationAmountId,
-                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).Distinct().ToArray()
-                        });
-
-                    var allSiteTypes = await summaryWithSiteData
-                        .SelectMany(a => a.SiteTypes)
-                        .Distinct()
+                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).ToArray()
+                        })
                         .ToArrayAsync();
 
-                    return allSiteTypes
-                        .Select(siteType =>
+                    return summaryWithSiteData
+                        .SelectMany(a => a.SiteTypes, (data, siteType) => new { data, siteType })
+                        .GroupBy(x => x.siteType)
+                        .Select(g => new AnalyticsSummaryInformation
                         {
-                            var matchingGroups = summaryWithSiteData.Where(a => a.SiteTypes.Contains(siteType));
-                            return new AnalyticsSummaryInformation
-                            {
-                                Flow = matchingGroups.Sum(c => c.AllocationFlow_CFS),
-                                Volume = matchingGroups.Sum(c => c.AllocationVolume_AF),
-                                Points = matchingGroups.Count(),
-                                PrimaryUseCategoryName = siteType
-                            };
+                            PrimaryUseCategoryName = g.Key,
+                            Flow = g.Sum(x => x.data.AllocationFlow_CFS),
+                            Volume = g.Sum(x => x.data.AllocationVolume_AF),
+                            Points = g.Count()
                         })
                         .ToArray();
                 case Common.AnalyticsInformationGrouping.WaterSourceType:
