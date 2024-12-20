@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using WesternStatesWater.WestDaat.Contracts.Client.User;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
@@ -10,9 +12,7 @@ public class UserIntegrationTests : IntegrationTestBase
     [TestInitialize]
     public void TestInitialize()
     {
-        _userManager = new AdminManager(
-            CreateLogger<AdminManager>()
-        );
+        _userManager = Services.GetRequiredService<CLI.IUserManager>();
     }
 
     [TestMethod]
@@ -25,7 +25,7 @@ public class UserIntegrationTests : IntegrationTestBase
         await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
     }
 
-    private class FakeLoadRequest : CLI.UserLoadRequestBase
+    private class FakeLoadRequest : UserLoadRequestBase
     {
     }
 }

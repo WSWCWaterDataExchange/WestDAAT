@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Azure.Core.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.Shared.Errors;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
