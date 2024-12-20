@@ -1058,6 +1058,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _locationEngineMock.Object,
                 _templateResourceSdk.Object,
                 CreatePerformanceConfiguration(),
+                ManagerRequestHandlerResolverMock.Object,
                 CreateLogger<WaterResourceManager>()
             );
         }

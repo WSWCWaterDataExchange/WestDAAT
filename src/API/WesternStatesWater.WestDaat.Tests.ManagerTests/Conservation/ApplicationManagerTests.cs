@@ -13,6 +13,7 @@ public class ApplicationManagerTests : ManagerTestBase
     public void TestInitialize()
     {
         _applicationManager = new ConservationManager(
+            ManagerRequestHandlerResolverMock.Object,
             CreateLogger<ConservationManager>()
         );
     }

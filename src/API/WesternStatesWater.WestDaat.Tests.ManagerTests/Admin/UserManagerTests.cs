@@ -13,6 +13,7 @@ public class UserManagerTests : ManagerTestBase
     public void TestInitialize()
     {
         _userManager = new AdminManager(
+            ManagerRequestHandlerResolverMock.Object,
             CreateLogger<AdminManager>()
         );
     }

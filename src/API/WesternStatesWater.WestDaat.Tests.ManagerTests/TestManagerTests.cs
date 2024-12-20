@@ -18,7 +18,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             // ARRANGE 
             _testEngineMock.Setup(x => x.TestMe(It.IsAny<string>())).Returns("hello");
-            var manager = new TestManager(_testEngineMock.Object, CreateLogger<TestManager>());
+            var manager = new TestManager(
+                _testEngineMock.Object,
+                ManagerRequestHandlerResolverMock.Object,
+                CreateLogger<TestManager>());
 
             // ACT 
             var response = manager.TestMe("test test");

@@ -72,6 +72,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             return new SystemManager(
                 _locationEngineMock.Object,
                 _systemAccessorMock.Object,
+                ManagerRequestHandlerResolverMock.Object,
                 CreateLogger<SystemManager>()
             );
         }
