@@ -427,6 +427,69 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForSiteType()
+        {
+            //Arrange
+            var siteTypes = new EF.SiteType[]
+            {
+                new SiteTypeFaker()
+                    .RuleFor(st => st.Name, () => "site name 1")
+                    .Generate(),
+                new SiteTypeFaker()
+                    .RuleFor(st => st.Name, () => "site name 2")
+                    .Generate(),
+            };
+
+            var allocationAmountsFacts = siteTypes.Select((siteType, idx) =>
+            {
+                return new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                    .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                    .RuleFor(a => a.AllocationBridgeSitesFact, () => new AllocationBridgeSiteFactFaker()
+                        .RuleFor(absf => absf.Site, () => new SitesDimFaker()
+                            .RuleFor(site => site.SiteTypeCvNavigation, () => siteType)
+                            .Generate())
+                        .Generate(1)
+                    )
+                    .Generate(idx + 1);
+            })
+            .SelectMany(array => array)
+            .ToArray();
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "site name 1",
+                    Flow = 1,
+                    Points = 1,
+                    Volume = 2,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "site name 2",
+                    Flow = 2,
+                    Points = 2,
+                    Volume = 4,
+                },
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountsFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.SiteType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
         [DataRow(1, 1)]
         [DataRow(3, 1)]
         [DataRow(1, 3)]
