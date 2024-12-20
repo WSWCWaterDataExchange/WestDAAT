@@ -167,6 +167,74 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForWaterSourceType()
+        {
+            //Arrange
+            var wadeNames = new string[] { "wadename1", "wadename2", "wadename3" };
+
+            var allocationAmountsFacts = wadeNames.Select((name, idx) =>
+            {
+                return new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                    .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                    .RuleFor(a => a.AllocationBridgeSitesFact, () => new AllocationBridgeSiteFactFaker()
+                        .RuleFor(absf => absf.Site, () => new SitesDimFaker()
+                            .RuleFor(site => site.WaterSourceBridgeSitesFact, () => new WaterSourceBridgeSiteFactFaker()
+                                .RuleFor(wsbsf => wsbsf.WaterSource, () => new WaterSourceDimFaker()
+                                    .RuleFor(ws => ws.WaterSourceTypeCvNavigation, () => new WaterSourceTypeFaker()
+                                        .RuleFor(wst => wst.WaDEName, () => name)
+                                        .Generate())
+                                    .Generate())
+                                .Generate(1))
+                            .Generate())
+                        .Generate(1)
+                    )
+                    .Generate(idx + 1);
+            })
+            .SelectMany(array => array)
+            .ToArray();
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename1",
+                    Flow = 1,
+                    Points = 1,
+                    Volume = 2,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename2",
+                    Flow = 2,
+                    Points = 2,
+                    Volume = 4,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename3",
+                    Flow = 3,
+                    Points = 3,
+                    Volume = 6,
+                },
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountsFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.WaterSourceType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
         [DataRow(1, 1)]
         [DataRow(3, 1)]
         [DataRow(1, 3)]
