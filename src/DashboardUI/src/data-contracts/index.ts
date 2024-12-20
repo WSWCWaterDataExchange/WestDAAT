@@ -7,3 +7,6 @@ export * from './BeneficialUseListItem';
 export * from './SiteDetails';
 export * from './WaterRightInfoListItem';
 export * from './WaterSourceInfoListItem';
+export * from './OverlayDetails';
+export * from './OverlayTableEntry';
+export * from './WaterRightsInfoListItem';
