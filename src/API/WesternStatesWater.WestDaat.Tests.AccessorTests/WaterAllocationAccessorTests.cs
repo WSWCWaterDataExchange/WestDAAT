@@ -153,8 +153,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
-                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
-                db.SaveChanges();
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
             }
 
             //Act
