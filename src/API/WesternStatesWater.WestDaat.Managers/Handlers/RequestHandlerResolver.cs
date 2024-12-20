@@ -11,7 +11,7 @@ public class RequestHandlerResolver(IServiceProvider serviceProvider)
         {
             throw new InvalidOperationException(
                 $"Type {requestType.FullName} is not a valid request type."
-                + " Request types must be in the WesternStatesWater.WaDE.Contracts.Client namespace."
+                + " Request types must be in the WesternStatesWater.WestDaat.Contracts.Client namespace."
             );
         }
 
@@ -19,7 +19,7 @@ public class RequestHandlerResolver(IServiceProvider serviceProvider)
         {
             throw new InvalidOperationException(
                 $"Type {responseType.FullName} is not a valid response type."
-                + " Response types must be in the WesternStatesWater.WaDE.Contracts.Client namespace."
+                + " Response types must be in the WesternStatesWater.WestDaat.Contracts.Client namespace."
             );
         }
     }
