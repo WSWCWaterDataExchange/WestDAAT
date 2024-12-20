@@ -1,0 +1,10 @@
+@import '../../../styles/colors';
+
+.detail-page {
+  .overlay-card {
+    .card-header {
+      background-color: $card-header-color-red;
+      color: white;
+    }
+  }
+}

@@ -20,4 +20,12 @@
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Contracts.Client\WesternStatesWater.WestDaat.Contracts.Client.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="NotificationFilteringEngine.cs">
+      <DependentUpon>FilteringEngine.cs</DependentUpon>
+    </Compile>
+    <Compile Update="NotificationFormattingEngine.cs">
+      <DependentUpon>FormattingEngine.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
