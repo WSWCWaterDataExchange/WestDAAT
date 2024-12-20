@@ -56,7 +56,11 @@ var host = new HostBuilder()
         services.AddTransient<IWaterResourceManager, WaterResourceManager>();
         
         // Manager handlers
-        services.AddScoped<MGR.Handlers.IManagerRequestHandlerResolver, MGR.Handlers.RequestHandlerResolver>();
+        services.AddScoped<
+            MGR.Handlers.IManagerRequestHandlerResolver,
+            MGR.Handlers.RequestHandlerResolver
+        >();
+        
         MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(services);
 
         // Engines

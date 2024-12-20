@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
+using MGR = WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {
@@ -12,6 +13,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private TransactionScope _transactionScopeFixture;
 
+        protected IServiceProvider Services { get; private set; }
+
         [TestInitialize]
         public void BaseTestInitialize()
         {
@@ -20,15 +23,36 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 IsolationLevel = IsolationLevel.ReadCommitted,
                 Timeout = TransactionManager.MaximumTimeout
             };
+
             _transactionScopeFixture = new TransactionScope(
                 TransactionScopeOption.Required,
                 transactionOptions);
 
-            var services = new ServiceCollection()
-                .AddLogging(config => config.AddConsole())
-                .BuildServiceProvider();
+            var serviceCollection = new ServiceCollection()
+                .AddLogging(config => config.AddConsole());
 
-            _loggerFactory = services.GetRequiredService<ILoggerFactory>();
+            RegisterManagerServices(serviceCollection);
+
+            Services = serviceCollection.BuildServiceProvider();
+
+            _loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+        }
+
+        private void RegisterManagerServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<CLI.IApplicationManager, MGR.ConservationManager>();
+            serviceCollection.AddTransient<CLI.INotificationManager, MGR.NotificationManager>();
+            serviceCollection.AddTransient<CLI.ISystemManager, MGR.SystemManager>();
+            serviceCollection.AddTransient<CLI.ITestManager, MGR.TestManager>();
+            serviceCollection.AddTransient<CLI.IUserManager, MGR.AdminManager>();
+            serviceCollection.AddTransient<CLI.IWaterResourceManager, MGR.WaterResourceManager>();
+
+            serviceCollection.AddScoped<
+                MGR.Handlers.IManagerRequestHandlerResolver,
+                MGR.Handlers.RequestHandlerResolver
+            >();
+
+            MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(serviceCollection);
         }
 
         [TestCleanup]

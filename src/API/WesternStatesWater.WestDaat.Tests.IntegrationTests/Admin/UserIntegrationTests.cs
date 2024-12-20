@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Contracts.Client.User;
 using WesternStatesWater.WestDaat.Managers;
 
@@ -11,9 +12,7 @@ public class UserIntegrationTests : IntegrationTestBase
     [TestInitialize]
     public void TestInitialize()
     {
-        _userManager = new AdminManager(
-            CreateLogger<AdminManager>()
-        );
+        _userManager = Services.GetRequiredService<CLI.IUserManager>();
     }
 
     [TestMethod]

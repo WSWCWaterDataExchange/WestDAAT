@@ -1,6 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Application;
-using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 
@@ -12,9 +12,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [TestInitialize]
     public void TestInitialize()
     {
-        _applicationManager = new ConservationManager(
-            CreateLogger<ConservationManager>()
-        );
+        _applicationManager = Services.GetRequiredService<IApplicationManager>();
     }
 
     [TestMethod]
