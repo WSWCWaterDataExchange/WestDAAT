@@ -9,6 +9,8 @@ import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
+import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
+import { DropdownOption } from '../../../data-contracts/DropdownOption';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -83,10 +85,16 @@ type ChartDataType = {
   sum: number;
   data: ChartSeriesDataType[];
 };
-function PieCharts() {
-  const { searchCriteria } = useWaterRightsSearchCriteria();
 
+interface PieChartsProps {
+  selectedDropdownOption: DropdownOption | null;
+  setSelectedDropdownOption: (option: DropdownOption) => void;
+}
+
+function PieCharts(props: PieChartsProps) {
+  const { searchCriteria } = useWaterRightsSearchCriteria();
   const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
+
   const { getBeneficialUseColor } = useColorMappings();
 
   const [flowData, volumeData, pointData] = useMemo(() => {
@@ -104,9 +112,9 @@ function PieCharts() {
         data: [],
       },
     ];
-    if (!pieChartSearchResults) return initData;
+    if (!pieChartSearchResults || !pieChartSearchResults.analyticsSummaryInformation) return initData;
 
-    return pieChartSearchResults.reduce((prev, curr) => {
+    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr) => {
       const [flow, vol, point] = prev;
       const name = curr.primaryUseCategoryName ?? 'Unspecified';
       const color = getBeneficialUseColor(name);
@@ -134,22 +142,30 @@ function PieCharts() {
         </a>
       </div>
 
-      {pieChartSearchResults && pieChartSearchResults?.length > 0 && (
-        <Container fluid={true}>
-          <Row>
-            <Col lg="4">
-              <ChartData name="count" data={pointData} />
-            </Col>
-            <Col lg="4">
-              <ChartData name="flow" data={flowData} />
-            </Col>
-            <Col lg="4">
-              <ChartData name="volume" data={volumeData} />
-            </Col>
-          </Row>
-        </Container>
-      )}
-      {pieChartSearchResults?.length === 0 && !isFetching && (
+      <AnalyticsInfoGroupingDropdown
+        isFetching={isFetching}
+        analyticsSummaryInformationResponse={pieChartSearchResults}
+        selectedDropdownOption={props.selectedDropdownOption}
+        setSelectedDropdownOption={props.setSelectedDropdownOption}
+      />
+
+      {pieChartSearchResults?.analyticsSummaryInformation &&
+        pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
+          <Container fluid={true}>
+            <Row>
+              <Col lg="4">
+                <ChartData name="count" data={pointData} />
+              </Col>
+              <Col lg="4">
+                <ChartData name="flow" data={flowData} />
+              </Col>
+              <Col lg="4">
+                <ChartData name="volume" data={volumeData} />
+              </Col>
+            </Row>
+          </Container>
+        )}
+      {pieChartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
         <div className="d-flex justify-content-center">No results found</div>
       )}
       {isFetching && (
