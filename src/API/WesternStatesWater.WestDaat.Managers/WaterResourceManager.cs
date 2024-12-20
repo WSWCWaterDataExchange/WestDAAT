@@ -149,16 +149,35 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException("OverlayDetails UUID cannot be null or empty.");
             }
 
-            var overlay = await _waterAllocationAccessor.GetOverlayDetails(overlayUuid);
+            var overlayCommon = await _waterAllocationAccessor.GetOverlayDetails(overlayUuid);
 
-            if (overlay == null)
+            if (overlayCommon == null)
             {
                 throw new WestDaatException($"No overlay found for UUID: {overlayUuid}");
             }
 
-        
-            return overlay.Map<ClientContracts.OverlayDetails>();
+            var geoJsonGeometry = overlayCommon.Geometry?.AsGeoJsonGeometry();
+
+            Feature geometryFeature = null;
+            if (geoJsonGeometry != null)
+            {
+                geometryFeature = new Feature(geoJsonGeometry);
+            }
+
+            var overlayClient = overlayCommon.Map<ClientContracts.OverlayDetails>();
+
+            var featureCollection = new FeatureCollection();
+            if (geometryFeature != null)
+            {
+                featureCollection.Features.Add(geometryFeature);
+            }
+
+            overlayClient.Geometry = featureCollection;
+
+            return overlayClient;
         }
+
+
         public async Task<List<ClientContracts.OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
         {
             if (string.IsNullOrWhiteSpace(reportingUnitUuid))
