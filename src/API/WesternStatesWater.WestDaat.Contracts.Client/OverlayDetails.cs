@@ -1,4 +1,3 @@
-
 using GeoJSON.Text.Feature;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client;
@@ -14,5 +13,5 @@ public class OverlayDetails
     public string OrganizationName { get; set; }
     public string OrganizationState { get; set; }
     public string OrganizationWebsite { get; set; }
-    public Feature Geometry { get; set; }
+    public FeatureCollection Geometry { get; set; }
 }

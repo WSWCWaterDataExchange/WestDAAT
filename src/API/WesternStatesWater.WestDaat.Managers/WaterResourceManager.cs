@@ -166,11 +166,18 @@ namespace WesternStatesWater.WestDaat.Managers
 
             var overlayClient = overlayCommon.Map<ClientContracts.OverlayDetails>();
 
-            overlayClient.Geometry = geometryFeature;
+            var featureCollection = new FeatureCollection();
+            if (geometryFeature != null)
+            {
+                featureCollection.Features.Add(geometryFeature);
+            }
+
+            overlayClient.Geometry = featureCollection;
 
             return overlayClient;
         }
-        
+
+
         public async Task<List<ClientContracts.OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
         {
             if (string.IsNullOrWhiteSpace(reportingUnitUuid))

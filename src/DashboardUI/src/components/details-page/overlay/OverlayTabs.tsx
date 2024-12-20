@@ -3,8 +3,8 @@ import { Tabs, Tab, Table } from 'react-bootstrap';
 import { useOverlayDetailsContext } from './Provider';
 
 export enum OverlayTab {
-  Admin = 'admin',
-  WaterRight = 'water-right',
+  Admin = 'overlay',
+  WaterRight = 'right',
 }
 
 function OverlayTabs() {
