@@ -114,7 +114,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                             a.AllocationFlow_CFS,
                             a.AllocationVolume_AF,
                             a.AllocationAmountId,
-                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).ToArray()
+                            SiteTypes = a.AllocationBridgeSitesFact.Select(absf => absf.Site.SiteTypeCv).Distinct().ToArray()
                         })
                         .ToArrayAsync();
 
