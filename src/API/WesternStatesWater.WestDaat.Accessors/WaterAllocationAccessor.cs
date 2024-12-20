@@ -130,7 +130,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                         })
                         .ToArray();
                 case Common.AnalyticsInformationGrouping.WaterSourceType:
-                    var summaryWithWaterData = query
+                    var summaryWithWaterData = await query
                         .Select(a => new
                         {
                             a.AllocationFlow_CFS,
@@ -143,24 +143,18 @@ namespace WesternStatesWater.WestDaat.Accessors
                                 )
                                 .Distinct()
                                 .ToArray()
-                        });
-
-                    var allWaterSourceTypes = await summaryWithWaterData
-                        .SelectMany(a => a.WaterSourceTypeWaDENames)
-                        .Distinct()
+                        })
                         .ToArrayAsync();
 
-                    return allWaterSourceTypes
-                        .Select(waterSourceType =>
+                    return summaryWithWaterData
+                        .SelectMany(a => a.WaterSourceTypeWaDENames, (data, wadeName) => new { data, wadeName })
+                        .GroupBy(x => x.wadeName)
+                        .Select(g => new AnalyticsSummaryInformation
                         {
-                            var matchingGroups = summaryWithWaterData.Where(a => a.WaterSourceTypeWaDENames.Contains(waterSourceType));
-                            return new AnalyticsSummaryInformation
-                            {
-                                Flow = matchingGroups.Sum(c => c.AllocationFlow_CFS),
-                                Volume = matchingGroups.Sum(c => c.AllocationVolume_AF),
-                                Points = matchingGroups.Count(),
-                                PrimaryUseCategoryName = waterSourceType
-                            };
+                            PrimaryUseCategoryName = g.Key,
+                            Flow = g.Sum(x => x.data.AllocationFlow_CFS),
+                            Volume = g.Sum(x => x.data.AllocationVolume_AF),
+                            Points = g.Count()
                         })
                         .ToArray();
             }
