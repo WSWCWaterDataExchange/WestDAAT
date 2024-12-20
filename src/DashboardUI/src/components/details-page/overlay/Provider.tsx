@@ -54,7 +54,7 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
   const detailsQuery = useOverlayDetails(overlayUuid);
   const overlayInfoListQuery = useOverlayInfoById(overlayUuid);
   const waterRightsInfoListQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid);
-console.log(waterRightsInfoListQuery)
+  console.log(waterRightsInfoListQuery);
   const geometryFeature: FeatureCollection | null = detailsQuery.data?.geometry || null;
 
   const contextValue: OverlayDetailsPageContextState = {

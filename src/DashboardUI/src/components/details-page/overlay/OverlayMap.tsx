@@ -1,7 +1,7 @@
 import React from 'react';
 import DetailsMap from '../DetailsMap';
 import MapProvider from '../../../contexts/MapProvider';
-import {useOverlayDetailsContext} from './Provider';
+import { useOverlayDetailsContext } from './Provider';
 
 function OverlayMap() {
   return (

@@ -218,6 +218,26 @@ const mapsJson = {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
+    {
+      id: 'customLayer',
+      friendlyName: 'Water Rights Polygons with OType',
+      'source-layer': 'polygons',
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'fill',
+      paint: {
+        'fill-color': '#1E88E5', // Blue color
+        'fill-opacity': 0.5,
+      },
+      filter: [
+        'all',
+        // Only Polygon or MultiPolygon geometries
+        ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+        // Only features that have an oType property
+      ],
+    },
   ],
 };
 
