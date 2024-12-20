@@ -44,14 +44,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsNoTracking()
                 .Where(predicate);
 
-            var analyticsSummary = await BuildGetAnalyticsSummaryInformationGroupByQuery(analyticsSummaryQuery, groupValue.Value);
+            var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(analyticsSummaryQuery, groupValue.Value);
 
             ts.Complete();
 
             return analyticsSummary;
         }
 
-        private async Task<AnalyticsSummaryInformation[]> BuildGetAnalyticsSummaryInformationGroupByQuery(IQueryable<AllocationAmountsFact> query, Common.AnalyticsInformationGrouping groupBy)
+        private async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformationWithGrouping(IQueryable<AllocationAmountsFact> query, Common.AnalyticsInformationGrouping groupBy)
         {
             switch (groupBy)
             {
