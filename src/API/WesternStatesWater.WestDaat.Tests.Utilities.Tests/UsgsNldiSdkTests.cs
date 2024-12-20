@@ -10,7 +10,6 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 {
     [TestClass]
-    [TestCategory("Utilities Tests")]
     public class UsgsNldiSdkTests : UtilitiesTestBase
     {
         [DataTestMethod]

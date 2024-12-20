@@ -11,7 +11,6 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class NldiAccessorTests : AccessorTestBase
     {
         private readonly Mock<IUsgsNldiSdk> _usgsNldiSdkMock = new Mock<IUsgsNldiSdk>(MockBehavior.Strict);

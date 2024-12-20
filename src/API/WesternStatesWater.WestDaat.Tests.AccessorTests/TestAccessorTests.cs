@@ -7,7 +7,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
     public class TestAccessorTests : AccessorTestBase
     {
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void TestAccessor_TestMe()
         {
             // Arrange

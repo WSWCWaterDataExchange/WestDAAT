@@ -6,7 +6,6 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class SiteAccessorTests : AccessorTestBase
     {
         [TestMethod]
@@ -408,7 +407,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         
         
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task SiteAccessor_GetSiteUsageBySiteUuid()
         {
             // Arrange
@@ -453,7 +451,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task SiteAccessor_GetMethodInfoListBySiteUuid()
         {
             // Arrange
@@ -500,7 +497,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
         
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetVariableInfoListBySiteUuid()
         {
             // Arrange

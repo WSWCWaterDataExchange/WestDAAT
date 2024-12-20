@@ -1,0 +1,1 @@
+[assembly: TestCategory("MapBoxTileset Tests")]
