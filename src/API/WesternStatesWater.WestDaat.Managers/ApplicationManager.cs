@@ -1,4 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Contracts.Client.Application;
 
 namespace WesternStatesWater.WestDaat.Managers;
 

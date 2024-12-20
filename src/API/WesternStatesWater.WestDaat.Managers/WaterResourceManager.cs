@@ -16,6 +16,7 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
@@ -40,7 +41,8 @@ namespace WesternStatesWater.WestDaat.Managers
             ILocationEngine locationEngine,
             ITemplateResourceSdk templateResourceSdk,
             PerformanceConfiguration performanceConfiguration,
-            ILogger<WaterResourceManager> logger) : base(logger)
+            IManagerRequestHandlerResolver resolver,
+            ILogger<WaterResourceManager> logger) : base(resolver, logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;

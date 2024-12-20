@@ -1,4 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Contracts.Client.Application;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Conservation;
@@ -12,6 +13,7 @@ public class ApplicationManagerTests : ManagerTestBase
     public void TestInitialize()
     {
         _applicationManager = new ConservationManager(
+            ManagerRequestHandlerResolverMock.Object,
             CreateLogger<ConservationManager>()
         );
     }

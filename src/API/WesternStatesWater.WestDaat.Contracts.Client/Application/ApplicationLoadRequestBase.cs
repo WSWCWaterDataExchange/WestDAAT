@@ -1,4 +1,6 @@
-namespace WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.Shared.DataContracts;
+
+namespace WesternStatesWater.WestDaat.Contracts.Client.Application;
 
 public class ApplicationLoadRequestBase : RequestBase
 {

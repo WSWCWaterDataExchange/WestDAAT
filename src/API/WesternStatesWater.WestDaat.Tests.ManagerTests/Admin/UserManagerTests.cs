@@ -1,4 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Contracts.Client.User;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Admin;
@@ -12,6 +13,7 @@ public class UserManagerTests : ManagerTestBase
     public void TestInitialize()
     {
         _userManager = new AdminManager(
+            ManagerRequestHandlerResolverMock.Object,
             CreateLogger<AdminManager>()
         );
     }
