@@ -119,17 +119,17 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
 
             var primaryUse1Values = new AllocationAmountFactFaker()
-               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 1")
-               .RuleFor(a => a.AllocationFlow_CFS, () => 1)
-               .RuleFor(a => a.AllocationVolume_AF, () => 2)
-               .Generate(5);
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 1")
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
             allocationAmountFacts.AddRange(primaryUse1Values);
 
             var primaryUse2Values = new AllocationAmountFactFaker()
-               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 2")
-               .RuleFor(a => a.AllocationFlow_CFS, () => 3)
-               .RuleFor(a => a.AllocationVolume_AF, () => 4)
-               .Generate(2);
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 2")
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
 
             allocationAmountFacts.AddRange(primaryUse2Values);
 
