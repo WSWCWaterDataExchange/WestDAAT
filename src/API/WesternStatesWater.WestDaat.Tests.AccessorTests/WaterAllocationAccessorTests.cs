@@ -235,6 +235,70 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForOwnerType()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var ownerClassificationCvs = new EF.OwnerClassificationCv[]
+            {
+                new OwnerClassificationCvFaker()
+                    .RuleFor(occ => occ.Name, () => "Owner Type 1")
+                    .Generate(),
+                new OwnerClassificationCvFaker()
+                    .RuleFor(occ => occ.Name, () => "Owner Type 2")
+                    .Generate()
+            };
+
+            var primaryUse1Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.OwnerClassification, () => ownerClassificationCvs[0])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
+            allocationAmountFacts.AddRange(primaryUse1Values);
+
+            var primaryUse2Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.OwnerClassification, () => ownerClassificationCvs[1])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
+
+            allocationAmountFacts.AddRange(primaryUse2Values);
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Owner Type 1",
+                    Flow = 5,
+                    Points = 5,
+                    Volume = 10,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Owner Type 2",
+                    Flow = 6,
+                    Volume = 8,
+                    Points = 2,
+                }
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.OwnerType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
         [DataRow(1, 1)]
         [DataRow(3, 1)]
         [DataRow(1, 3)]
