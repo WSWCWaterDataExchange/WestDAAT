@@ -434,9 +434,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 new SiteTypeFaker()
                     .RuleFor(st => st.Name, () => "site name 1")
+                    .RuleFor(st => st.WaDEName, () => "wadename1")
                     .Generate(),
                 new SiteTypeFaker()
                     .RuleFor(st => st.Name, () => "site name 2")
+                    .RuleFor(st => st.WaDEName, () => "wadename2")
                     .Generate(),
             };
 
@@ -458,23 +460,23 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             var expected = new AnalyticsSummaryInformation[]
             {
-                new AnalyticsSummaryInformation
+                new()
                 {
-                    PrimaryUseCategoryName = "site name 1",
+                    PrimaryUseCategoryName = "wadename1",
                     Flow = 1,
                     Points = 1,
                     Volume = 2,
                 },
-                new AnalyticsSummaryInformation
+                new()
                 {
-                    PrimaryUseCategoryName = "site name 2",
+                    PrimaryUseCategoryName = "wadename2",
                     Flow = 2,
                     Points = 2,
                     Volume = 4,
                 },
             };
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 await db.AllocationAmountsFact.AddRangeAsync(allocationAmountsFacts);
                 await db.SaveChangesAsync();
