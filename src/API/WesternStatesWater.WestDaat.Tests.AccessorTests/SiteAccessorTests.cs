@@ -552,7 +552,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().HaveCount(2);
-            result.Should().BeInAscendingOrder(x => x.WaDEVariableUuid);
+            result.Should().BeInAscendingOrder(x => x.WaDEVariableUuid, StringComparer.InvariantCulture);
         }
         
         private ISiteAccessor CreateSiteAccessor()
