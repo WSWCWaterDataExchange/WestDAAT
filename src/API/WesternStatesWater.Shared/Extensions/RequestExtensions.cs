@@ -20,6 +20,14 @@ public static class RequestExtensions
                 .GetMethod("ValidateAsync", [requestType, typeof(CancellationToken)])!
                 .Invoke(validator, [request, CancellationToken.None])!;
         }
+        catch (NullReferenceException ex)
+        {
+            throw new TypeLoadException(
+                $"Validator '{validatorFullName}' does not have a matching 'ValidateAsync' method. " +
+                $"Ensure that the validator extends 'AbstractValidator<{requestType.Name}>'.",
+                ex
+            );
+        }
         catch (TypeLoadException ex)
         {
             throw new TypeLoadException(
