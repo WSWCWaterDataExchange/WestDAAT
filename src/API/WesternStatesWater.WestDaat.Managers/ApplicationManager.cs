@@ -1,23 +1,16 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Contracts.Client.Application;
 
 namespace WesternStatesWater.WestDaat.Managers;
 
 public sealed partial class ConservationManager : IApplicationManager
 {
-    Task<ApplicationLoadResponseBase> IApplicationManager.Load(ApplicationLoadRequestBase request)
+    async Task<TResponse> IApplicationManager.Load<TRequest, TResponse>(TRequest request)
     {
-        return request switch
-        {
-            _ => throw new NotImplementedException()
-        };
+        return await ExecuteAsync<TRequest, TResponse>(request);
     }
 
-    Task<ApplicationStoreResponseBase> IApplicationManager.Store(ApplicationStoreRequestBase request)
+    async Task<TResponse> IApplicationManager.Store<TRequest, TResponse>(TRequest request)
     {
-        return request switch
-        {
-            _ => throw new NotImplementedException()
-        };
+        return await ExecuteAsync<TRequest, TResponse>(request);
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using WesternStatesWater.WestDaat.Contracts.Client.User;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;

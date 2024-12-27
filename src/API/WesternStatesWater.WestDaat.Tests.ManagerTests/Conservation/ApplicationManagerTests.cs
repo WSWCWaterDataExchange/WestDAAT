@@ -1,5 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Contracts.Client.Application;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Conservation;

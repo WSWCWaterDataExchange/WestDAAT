@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Contracts.Client.Application;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 

@@ -1,5 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Contracts.Client.User;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Admin;
