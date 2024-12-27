@@ -5,6 +5,15 @@ namespace WesternStatesWater.Shared.Extensions;
 
 public static class RequestExtensions
 {
+    /// <summary>
+    /// Asynchronously validates the specified request using its associated validator.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous validation operation. The result contains a <see cref="ValidationResult"/> with the details of the validation.</returns>
+    /// <exception cref="TypeLoadException">
+    /// Thrown when the corresponding validator for the request type cannot be found or does not implement the required <c>ValidateAsync</c> method.
+    /// Ensure that a validator class named '<c>{RequestType}Validator</c>' exists in the same assembly and namespace as the request type 
+    /// and extends <c>AbstractValidator&lt;TRequest&gt;</c>.
+    /// </exception>
     public static async Task<ValidationResult> ValidateAsync<TRequest>(this TRequest request)
         where TRequest : RequestBase
     {

@@ -4,6 +4,7 @@ using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.Shared.Extensions;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
+using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Handlers;
 
 namespace WesternStatesWater.WestDaat.Managers
@@ -12,10 +13,18 @@ namespace WesternStatesWater.WestDaat.Managers
     {
         private readonly IManagerRequestHandlerResolver _requestHandlerResolver;
 
-        protected ManagerBase(IManagerRequestHandlerResolver resolver, ILogger logger)
+        private readonly IValidationEngine _validationEngine;
+
+        protected ManagerBase(
+            IManagerRequestHandlerResolver resolver,
+            IValidationEngine validationEngine,
+            ILogger logger
+        )
         {
             _requestHandlerResolver = resolver;
-            base.Logger = logger;
+            _validationEngine = validationEngine;
+
+            Logger = logger;
         }
 
         public override string TestMe(string input)
@@ -52,17 +61,50 @@ namespace WesternStatesWater.WestDaat.Managers
             return System.Text.Json.JsonSerializer.Serialize(result);
         }
 
+        /// <summary>
+        /// Executes the request pipeline for the specified request type, performing validation, handling the request,
+        /// and returning the appropriate response.
+        /// </summary>
+        /// <typeparam name="TRequest">The type of the request being processed. Must inherit from <see cref="RequestBase"/>.</typeparam>
+        /// <typeparam name="TResponse">The type of the response to be returned. Must inherit from <see cref="ResponseBase"/>.</typeparam>
+        /// <param name="request">The request object to process.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The result is a <typeparamref name="TResponse"/> object
+        /// containing either a successful response or an error response if validation or processing fails.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Logs and catches any unhandled exception that occurs during request processing, returning an 
+        /// <see cref="InternalError"/> encapsulated in the response.
+        /// </exception>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// <list type="number">
+        ///     <item><description>Validates the input request using fast-fail validation rules (e.g., missing required fields).</description></item>
+        ///     <item><description>Performs business logic and access control validation using the validation engine.</description></item>
+        ///     <item><description>Resolves and invokes the appropriate request handler to process the request and generate a response.</description></item>
+        ///     <item><description>Handles any exceptions by logging them and returning an <see cref="InternalError"/> as the response.</description></item>
+        /// </list>
+        /// The method ensures that any errors encountered during validation or processing are captured and
+        /// appropriately transformed into an error response of type <typeparamref name="TResponse"/>.
+        /// </remarks>
         protected async Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest request)
             where TRequest : RequestBase
             where TResponse : ResponseBase
         {
             try
             {
-                var validationResult = await request.ValidateAsync();
+                var inputValidationResult = await request.ValidateAsync();
 
-                if (!validationResult.IsValid)
+                if (!inputValidationResult.IsValid)
                 {
-                    return CreateErrorResponse<TResponse>(new ValidationError(validationResult.ToDictionary()));
+                    return CreateErrorResponse<TResponse>(new ValidationError(inputValidationResult.ToDictionary()));
+                }
+
+                var businessValidationResult = await _validationEngine.Validate(request);
+
+                if (businessValidationResult is not null)
+                {
+                    return CreateErrorResponse<TResponse>(businessValidationResult);
                 }
 
                 var response = await _requestHandlerResolver
