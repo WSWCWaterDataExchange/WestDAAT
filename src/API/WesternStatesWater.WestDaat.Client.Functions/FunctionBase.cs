@@ -54,25 +54,5 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             return response;
         }
-
-        protected static async Task<T> Deserialize<T>(HttpRequestData request, ILogger logger) where T : class
-        {
-            T result = null;
-
-            try
-            {
-                // Workaround since every function currently calls deserialize regardless of http method type.
-                result = request.Method != "GET"
-                    ? await JsonSerializer.DeserializeAsync<T>(request.Body, JsonSerializerOptions)
-                    : null;
-            }
-            catch (JsonException ex)
-            {
-                logger.LogError(ex, "Failed to deserialize type '{TypeName}'", typeof(T).Name);
-            }
-
-            // For legacy reasons, return null instead of an error response. We should change this to return an error response.
-            return result;
-        }
     }
 }

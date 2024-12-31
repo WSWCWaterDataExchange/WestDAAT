@@ -5,6 +5,7 @@ using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Contracts.Clients;
+using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Managers.Handlers;
 
@@ -18,6 +19,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<IRequestHandler<TestRequest, TestResponse>>
             _requestHandlerMock = new(MockBehavior.Strict);
 
+        private readonly Mock<IValidationEngine> _validationEngineMock = new(MockBehavior.Strict);
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -30,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var resolver = serviceProvider.GetRequiredService<IManagerRequestHandlerResolver>();
             var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<TestManager>();
 
-            _manager = new TestManager(resolver, logger);
+            _manager = new TestManager(resolver, _validationEngineMock.Object, logger);
         }
 
         [TestMethod]
@@ -80,8 +83,12 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             error.Errors["Id"].Should().Contain("'Id' must be less than '43'.");
         }
 
-        private class TestManager(IManagerRequestHandlerResolver resolver, ILogger<TestManager> logger)
-            : ManagerBase(resolver, logger)
+        private class TestManager(
+            IManagerRequestHandlerResolver resolver,
+            IValidationEngine validationEngine,
+            ILogger<TestManager> logger
+        )
+            : ManagerBase(resolver, validationEngine, logger)
         {
             public new async Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest request)
                 where TRequest : TestRequestBase

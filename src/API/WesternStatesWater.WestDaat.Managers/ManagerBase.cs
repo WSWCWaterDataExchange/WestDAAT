@@ -97,14 +97,22 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 if (!inputValidationResult.IsValid)
                 {
-                    return CreateErrorResponse<TResponse>(new ValidationError(inputValidationResult.ToDictionary()));
+                    return CreateErrorResponse<TRequest, TResponse>(
+                        new ValidationError(inputValidationResult.ToDictionary())
+                    );
                 }
 
                 var businessValidationResult = await _validationEngine.Validate(request);
 
                 if (businessValidationResult is not null)
                 {
-                    return CreateErrorResponse<TResponse>(businessValidationResult);
+                    Logger.LogError(
+                        "Request type '{RequestTypeName}' failed validation: {LogMessage}",
+                        typeof(TRequest).FullName,
+                        businessValidationResult.LogMessage
+                    );
+
+                    return CreateErrorResponse<TRequest, TResponse>(businessValidationResult);
                 }
 
                 var response = await _requestHandlerResolver
@@ -117,11 +125,11 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 Logger.LogError(ex, "An error occurred while processing the request");
 
-                return CreateErrorResponse<TResponse>(new InternalError());
+                return CreateErrorResponse<TRequest, TResponse>(new InternalError());
             }
         }
 
-        private TResponse CreateErrorResponse<TResponse>(ErrorBase error) where TResponse : ResponseBase
+        private TResponse CreateErrorResponse<TRequest, TResponse>(ErrorBase error) where TResponse : ResponseBase
         {
             try
             {
@@ -134,7 +142,8 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 Logger.LogError(
                     ex,
-                    "Failed to create error response for type {ResponseTypeName} with error type {ErrorTypeName}",
+                    "Failed to create error response for request type '{RequestTypeName}', response type '{ResponseTypeName}', and error type {ErrorTypeName}",
+                    typeof(TRequest).FullName,
                     typeof(TResponse).FullName,
                     error.GetType().FullName
                 );
