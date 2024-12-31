@@ -23,7 +23,10 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
     {
         if (_context is not T context)
         {
-            throw new InvalidOperationException($"Request context is not of the type '{typeof(T).Name}'.");
+            throw new InvalidOperationException(
+                $"Context is of type '{_context.GetType().Name}', not of the " +
+                $"requested type '{typeof(T).Name}'."
+            );
         }
 
         return context;

@@ -18,18 +18,4 @@ public class UserManagerTests : ManagerTestBase
             CreateLogger<AdminManager>()
         );
     }
-
-    // [TestMethod]
-    // public async Task Load_FakeRequest_ShouldThrow()
-    // {
-    //     // Arrange
-    //     var request = new FakeLoadRequest();
-    //
-    //     // Act + Assert
-    //     await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
-    // }
-
-    // private class FakeLoadRequest : UserLoadRequestBase
-    // {
-    // }
 }
