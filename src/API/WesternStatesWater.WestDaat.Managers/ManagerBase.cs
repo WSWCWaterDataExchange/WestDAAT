@@ -102,17 +102,17 @@ namespace WesternStatesWater.WestDaat.Managers
                     );
                 }
 
-                var businessValidationResult = await _validationEngine.Validate(request);
+                var engineValidationResult = await _validationEngine.Validate(request);
 
-                if (businessValidationResult is not null)
+                if (engineValidationResult is not null)
                 {
                     Logger.LogError(
                         "Request type '{RequestTypeName}' failed validation: {LogMessage}",
                         typeof(TRequest).FullName,
-                        businessValidationResult.LogMessage
+                        engineValidationResult.LogMessage
                     );
 
-                    return CreateErrorResponse<TRequest, TResponse>(businessValidationResult);
+                    return CreateErrorResponse<TRequest, TResponse>(engineValidationResult);
                 }
 
                 var response = await _requestHandlerResolver

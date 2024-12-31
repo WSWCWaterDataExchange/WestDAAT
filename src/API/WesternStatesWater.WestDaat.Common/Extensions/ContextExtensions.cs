@@ -4,7 +4,9 @@ namespace WesternStatesWater.WestDaat.Common.Extensions;
 
 public static class ContextExtensions
 {
-    // TODO test
+    /// <summary>
+    /// Converts the specified <see cref="ContextBase"/> instance into a log-friendly string representation.
+    /// </summary>
     public static string ToLogString(this ContextBase context)
     {
         return context switch

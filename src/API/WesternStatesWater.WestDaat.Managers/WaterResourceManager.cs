@@ -1,6 +1,4 @@
-using AutoMapper.Features;
 using CsvHelper;
-using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
@@ -39,10 +37,11 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            IValidationEngine validationEngine,
             ITemplateResourceSdk templateResourceSdk,
             PerformanceConfiguration performanceConfiguration,
             IManagerRequestHandlerResolver resolver,
-            ILogger<WaterResourceManager> logger) : base(resolver, logger)
+            ILogger<WaterResourceManager> logger) : base(resolver, validationEngine, logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;

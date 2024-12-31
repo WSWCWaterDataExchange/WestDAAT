@@ -9,8 +9,13 @@ namespace WesternStatesWater.WestDaat.Managers
     {
         private readonly ITestEngine _testEngine;
 
-        public TestManager(ITestEngine testEngine, IManagerRequestHandlerResolver resolver, ILogger<TestManager> logger)
-            : base(resolver, logger)
+        public TestManager(
+            ITestEngine testEngine,
+            IManagerRequestHandlerResolver resolver,
+            IValidationEngine validationEngine,
+            ILogger<TestManager> logger
+        )
+            : base(resolver, validationEngine, logger)
         {
             _testEngine = testEngine;
         }
