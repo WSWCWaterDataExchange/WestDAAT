@@ -21,6 +21,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = new TestManager(
                 _testEngineMock.Object,
                 ManagerRequestHandlerResolverMock.Object,
+                ValidationEngineMock.Object,
                 CreateLogger<TestManager>());
 
             // ACT 

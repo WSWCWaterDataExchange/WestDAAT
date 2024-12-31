@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Handlers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
@@ -14,6 +15,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
         public Mock<IManagerRequestHandlerResolver> ManagerRequestHandlerResolverMock { get; } =
             new(MockBehavior.Strict);
+        
+        public Mock<IValidationEngine> ValidationEngineMock { get; } = new(MockBehavior.Strict);
 
         static ManagerTestBase()
         {

@@ -14,6 +14,7 @@ public class UserManagerTests : ManagerTestBase
     {
         _userManager = new AdminManager(
             ManagerRequestHandlerResolverMock.Object,
+            ValidationEngineMock.Object,
             CreateLogger<AdminManager>()
         );
     }

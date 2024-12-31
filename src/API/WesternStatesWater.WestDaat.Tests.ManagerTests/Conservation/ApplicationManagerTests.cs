@@ -14,6 +14,7 @@ public class ApplicationManagerTests : ManagerTestBase
     {
         _applicationManager = new ConservationManager(
             ManagerRequestHandlerResolverMock.Object,
+            ValidationEngineMock.Object,
             CreateLogger<ConservationManager>()
         );
     }
