@@ -34,7 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Handlers\Admin\" />
-    <Folder Include="Handlers\Conservations\" />
+    <Folder Include="Handlers\Conservation\" />
     <Folder Include="Handlers\WaterResource\" />
   </ItemGroup>
 </Project>
