@@ -31,7 +31,9 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationStoreRequestBase req => ValidateUserLoadRequest(req, context, permissions),
 
-            _ => throw new NotImplementedException($"Validation for {request.GetType().Name} is not implemented.")
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
         };
     }
 

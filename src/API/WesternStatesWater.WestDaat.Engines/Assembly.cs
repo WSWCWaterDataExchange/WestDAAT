@@ -7,3 +7,4 @@ global using DTO = WesternStatesWater.WestDaat.Common.DataContracts;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.EngineTests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.IntegrationTests")]

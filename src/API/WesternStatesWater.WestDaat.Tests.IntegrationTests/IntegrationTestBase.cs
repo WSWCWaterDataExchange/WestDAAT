@@ -31,6 +31,9 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .AddLogging(config => config.AddConsole());
 
             RegisterManagerServices(serviceCollection);
+            RegisterEngineServices(serviceCollection);
+            RegisterAccessorServices(serviceCollection);
+            RegisterUtilityServices(serviceCollection);
 
             Services = serviceCollection.BuildServiceProvider();
 
@@ -53,17 +56,37 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(serviceCollection);
         }
+        
+        private void RegisterEngineServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<Engines.IGeoConnexEngine, Engines.GeoConnexEngine>();
+            serviceCollection.AddTransient<Engines.ILocationEngine, Engines.LocationEngine>();
+            serviceCollection.AddTransient<Engines.ITestEngine, Engines.TestEngine>();
+            serviceCollection.AddTransient<Engines.IValidationEngine, Engines.ValidationEngine>();
+        }
+        
+        private void RegisterAccessorServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<Accessors.IApplicationAccessor, Accessors.ApplicationAccessor>();
+            serviceCollection.AddTransient<Accessors.INldiAccessor, Accessors.NldiAccessor>();
+            serviceCollection.AddTransient<Accessors.ISiteAccessor, Accessors.SiteAccessor>();
+            serviceCollection.AddTransient<Accessors.ISystemAccessor, Accessors.SystemAccessor>();
+            serviceCollection.AddTransient<Accessors.ITestAccessor, Accessors.TestAccessor>();
+            serviceCollection.AddTransient<Accessors.IUserAccessor, Accessors.UserAccessor>();
+            serviceCollection.AddTransient<Accessors.IWaterAllocationAccessor, Accessors.WaterAllocationAccessor>();
+        }
+        
+        private void RegisterUtilityServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<Utilities.IContextUtility, Utilities.ContextUtility>();
+            serviceCollection.AddTransient<Utilities.ISecurityUtility, Utilities.SecurityUtility>();
+        }
 
         [TestCleanup]
         public void BaseTestCleanup()
         {
             _transactionScopeFixture.Dispose();
             _loggerFactory.Dispose();
-        }
-
-        public ILogger<T> CreateLogger<T>()
-        {
-            return _loggerFactory.CreateLogger<T>();
         }
 
         protected virtual void Dispose(bool disposing)

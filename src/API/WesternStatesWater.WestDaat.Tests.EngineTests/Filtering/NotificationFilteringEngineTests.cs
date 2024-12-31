@@ -3,12 +3,12 @@ using WesternStatesWater.WestDaat.Engines;
 namespace WesternStatesWater.WestDaat.Tests.EngineTests.Filtering;
 
 [TestClass]
-public class NotificationFilteringTests : EngineTestBase
+public class NotificationFilteringEngineTests : EngineTestBase
 {
     private INotificationFilteringEngine _notificationFilteringEngine;
 
     [TestInitialize]
-    public override void TestInitialize()
+    public void TestInitialize()
     {
         _notificationFilteringEngine = new FilteringEngine(
             CreateLogger<FilteringEngine>()

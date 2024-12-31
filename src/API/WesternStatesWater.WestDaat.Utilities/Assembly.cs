@@ -6,3 +6,4 @@ using System.Resources;
 
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Tests.IntegrationTests")]
