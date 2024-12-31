@@ -37,15 +37,59 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task ExecuteAsync_ShouldReturnHandlerResult()
+        public async Task ExecuteAsync_InputValidationFails_ShouldReturnValidationError()
+        {
+            var request = new TestRequest { Id = 43 };
+            var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(request);
+
+            response.Should().NotBeNull();
+            response.Should().BeOfType<TestResponse>();
+            response.Error.Should().NotBeNull();
+            response.Error.Should().BeOfType<ValidationError>();
+
+            var error = (ValidationError)response.Error!;
+            error.Errors.Keys.Count.Should().Be(1);
+            error.Errors["Id"].Should().Contain("'Id' must be less than '43'.");
+        }
+
+        [TestMethod]
+        public async Task ExecuteAsync_EngineValidationFails_ShouldHaltAndReturnError()
         {
             var request = new TestRequest { Id = 42 };
+
+            _validationEngineMock
+                .Setup(engine => engine.Validate(request))
+                .ReturnsAsync(new NotFoundError());
+
+            _requestHandlerMock
+                .Setup(handler => handler.Handle(request))
+                .ReturnsAsync(new TestResponse { Message = "Success" })
+                .Verifiable();
+
+            var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(request);
+
+            _requestHandlerMock.Verify(handler => handler.Handle(request), Times.Never);
+
+            response.Error.Should().BeOfType<NotFoundError>();
+        }
+
+        [TestMethod]
+        public async Task ExecuteAsync_ValidationSucceeds_ShouldReturnHandlerResult()
+        {
+            var request = new TestRequest { Id = 42 };
+
+            _validationEngineMock
+                .Setup(engine => engine.Validate(request))
+                .ReturnsAsync(default(ErrorBase))
+                .Verifiable();
 
             _requestHandlerMock
                 .Setup(handler => handler.Handle(request))
                 .ReturnsAsync(new TestResponse { Message = "Success" });
 
             var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(request);
+
+            _validationEngineMock.Verify();
 
             response.Message.Should().Be("Success");
         }
@@ -65,22 +109,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             response.Should().BeOfType<TestResponse>();
             response.Error.Should().NotBeNull();
             response.Error.Should().BeOfType<InternalError>();
-        }
-
-        [TestMethod]
-        public async Task ExecuteAsync_InputValidationFails_ShouldReturnValidationError()
-        {
-            var request = new TestRequest { Id = 43 };
-            var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(request);
-
-            response.Should().NotBeNull();
-            response.Should().BeOfType<TestResponse>();
-            response.Error.Should().NotBeNull();
-            response.Error.Should().BeOfType<ValidationError>();
-
-            var error = (ValidationError)response.Error!;
-            error.Errors.Keys.Count.Should().Be(1);
-            error.Errors["Id"].Should().Contain("'Id' must be less than '43'.");
         }
 
         private class TestManager(
