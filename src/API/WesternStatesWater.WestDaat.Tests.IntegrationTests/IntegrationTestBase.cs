@@ -2,6 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
 using MGR = WesternStatesWater.WestDaat.Managers;
+using ENG = WesternStatesWater.WestDaat.Engines;
+using ACC = WesternStatesWater.WestDaat.Accessors;
+using UTIL = WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {
@@ -13,6 +16,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private TransactionScope _transactionScopeFixture;
 
         protected IServiceProvider Services { get; private set; }
+
+        protected Mock<UTIL.IContextUtility> ContextUtilityMock { get; private set; }
 
         [TestInitialize]
         public void BaseTestInitialize()
@@ -56,30 +61,31 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(serviceCollection);
         }
-        
+
         private void RegisterEngineServices(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<Engines.IGeoConnexEngine, Engines.GeoConnexEngine>();
-            serviceCollection.AddTransient<Engines.ILocationEngine, Engines.LocationEngine>();
-            serviceCollection.AddTransient<Engines.ITestEngine, Engines.TestEngine>();
-            serviceCollection.AddTransient<Engines.IValidationEngine, Engines.ValidationEngine>();
+            serviceCollection.AddTransient<ENG.IGeoConnexEngine, ENG.GeoConnexEngine>();
+            serviceCollection.AddTransient<ENG.ILocationEngine, ENG.LocationEngine>();
+            serviceCollection.AddTransient<ENG.ITestEngine, ENG.TestEngine>();
+            serviceCollection.AddTransient<ENG.IValidationEngine, ENG.ValidationEngine>();
         }
-        
+
         private void RegisterAccessorServices(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<Accessors.IApplicationAccessor, Accessors.ApplicationAccessor>();
-            serviceCollection.AddTransient<Accessors.INldiAccessor, Accessors.NldiAccessor>();
-            serviceCollection.AddTransient<Accessors.ISiteAccessor, Accessors.SiteAccessor>();
-            serviceCollection.AddTransient<Accessors.ISystemAccessor, Accessors.SystemAccessor>();
-            serviceCollection.AddTransient<Accessors.ITestAccessor, Accessors.TestAccessor>();
-            serviceCollection.AddTransient<Accessors.IUserAccessor, Accessors.UserAccessor>();
-            serviceCollection.AddTransient<Accessors.IWaterAllocationAccessor, Accessors.WaterAllocationAccessor>();
+            serviceCollection.AddTransient<ACC.IApplicationAccessor, ACC.ApplicationAccessor>();
+            serviceCollection.AddTransient<ACC.INldiAccessor, ACC.NldiAccessor>();
+            serviceCollection.AddTransient<ACC.ISiteAccessor, ACC.SiteAccessor>();
+            serviceCollection.AddTransient<ACC.ISystemAccessor, ACC.SystemAccessor>();
+            serviceCollection.AddTransient<ACC.ITestAccessor, ACC.TestAccessor>();
+            serviceCollection.AddTransient<ACC.IUserAccessor, ACC.UserAccessor>();
+            serviceCollection.AddTransient<ACC.IWaterAllocationAccessor, ACC.WaterAllocationAccessor>();
         }
-        
+
         private void RegisterUtilityServices(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<Utilities.IContextUtility, Utilities.ContextUtility>();
-            serviceCollection.AddTransient<Utilities.ISecurityUtility, Utilities.SecurityUtility>();
+            ContextUtilityMock = new Mock<UTIL.IContextUtility>();
+            serviceCollection.AddScoped(_ => ContextUtilityMock.Object);
+            serviceCollection.AddTransient<UTIL.ISecurityUtility, UTIL.SecurityUtility>();
         }
 
         [TestCleanup]
