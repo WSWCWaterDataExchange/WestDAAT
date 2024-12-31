@@ -9,7 +9,7 @@ using WesternStatesWater.Shared.Errors;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class FunctionBase
+    public abstract class FunctionBase
     {
         private static JsonSerializerOptions JsonSerializerOptions => new()
         {

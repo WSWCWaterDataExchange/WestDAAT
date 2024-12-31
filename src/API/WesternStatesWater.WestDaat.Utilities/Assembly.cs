@@ -5,3 +5,4 @@ global using System.Threading.Tasks;
 using System.Resources;
 
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WesternStatesWater.WestDaat.Client.Functions")]

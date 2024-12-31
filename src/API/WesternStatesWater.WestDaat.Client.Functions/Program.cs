@@ -82,10 +82,12 @@ var host = new HostBuilder()
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         
         // Utilities / SDKs
+        services.AddScoped<IContextUtility, ContextUtility>();
         services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
         services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<ISecurityUtility, SecurityUtility>();
 
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
@@ -97,7 +99,6 @@ var host = new HostBuilder()
             logging.AddConsole();
         });
         
-        services.AddScoped<IContextUtility, ContextUtility>();
     })
     .Build();
 
