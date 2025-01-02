@@ -10,7 +10,7 @@ import {
   RenderedFeatureType,
   useMapContext,
 } from '../../contexts/MapProvider';
-import mapConfig from '../../config/maps';
+import mapConfig, {mapSourceNames} from '../../config/maps';
 import { mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
@@ -165,6 +165,22 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       const groups = (e.id as string).match(/^mapMarker(?<color>.+)$/)?.groups;
       if (groups?.color) {
         addSvgImage(mapInstance, e.id, createMapMarkerIcon(groups.color));
+      }
+    });
+
+    mapInstance.on('idle', () => {
+      const features = mapInstance.querySourceFeatures('water-rights-vector-tiles', {
+        sourceLayer: 'polygons'
+      });
+
+      if (features && features.length > 0) {
+        features.forEach(feature => {
+          if (feature.properties && feature.properties.oType) {
+            console.log(`Feature ID: ${feature.id}, oType: ${feature.properties.oType}, Properties:`, feature.properties);
+          }
+        });
+      } else {
+        console.log('No features found');
       }
     });
 
