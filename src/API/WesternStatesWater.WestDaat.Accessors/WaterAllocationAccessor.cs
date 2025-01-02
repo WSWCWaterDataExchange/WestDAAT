@@ -606,5 +606,5 @@ namespace WesternStatesWater.WestDaat.Accessors
             });
             return allRegulatoryUuids;
         }
-    } 
+    }
 }
