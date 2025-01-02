@@ -41,11 +41,12 @@ var host = new HostBuilder()
         services.AddHttpContextAccessor();
 
         // Config
-        services.AddScoped(_ => configuration.GetDatabaseConfiguration());
-        services.AddScoped(_ => configuration.GetNldiConfiguration());
-        services.AddScoped(_ => configuration.GetSmtpConfiguration());
         services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
+        services.AddScoped(_ => configuration.GetDatabaseConfiguration());
+        services.AddScoped(_ => configuration.GetMessageBusConfiguration());
+        services.AddScoped(_ => configuration.GetNldiConfiguration());
         services.AddScoped(_ => configuration.GetPerformanceConfiguration());
+        services.AddScoped(_ => configuration.GetSmtpConfiguration());
 
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
@@ -83,11 +84,12 @@ var host = new HostBuilder()
         
         // Utilities / SDKs
         services.AddScoped<IContextUtility, ContextUtility>();
-        services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
-        services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
-        services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
+        services.AddTransient<IMessageBusUtility, MessageBusUtility>();
         services.AddTransient<ISecurityUtility, SecurityUtility>();
+        services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
 
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
