@@ -13,15 +13,14 @@ param Product string = 'WestDAAT'
 ])
 param Environment string
 
-
 var resource_name_dashes_var = '${toLower(Product)}-${toLower(Environment)}'
 var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
 var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
-
-var wadedbserver = ((Environment == 'prod')) ? 'wade-production-server.database.windows.net' : 'wade-qa-server.database.windows.net'
+var wadedbserver = ((Environment == 'prod'))
+  ? 'wade-production-server.database.windows.net'
+  : 'wade-qa-server.database.windows.net'
 var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA_Server'
-
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
@@ -254,6 +253,10 @@ siteConfig: {
           name: 'Database:ConnectionString'
           value: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
+        {
+          name: 'MessageBus:ServiceBusUrl'
+          value: '${service_bus.name}.servicebus.windows.net'
+        }
       ]
     }
     scmSiteAlsoStopped: false
@@ -376,17 +379,13 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
   name: '${resource_name_dashes_var}.azurewebsites.net'
   location: location
   properties: {
-    siteName: 'wade-westdaat-qa-fn'
     hostNameType: 'Verified'
   }
 }
 
-
-var serviceBusName = 'sb-${toLower(product)}${resourceSuffix}'
-
 resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
-  name: serviceBusName
-  location: region[Environment]
+  name: resource_name_dashes_var
+  location: location
   sku: {
     name: 'Standard'
     tier: 'Standard'
