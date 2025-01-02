@@ -7,10 +7,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
     {
         private ILoggerFactory _loggerFactory;
 
-        public virtual void TestInitialize()
-        {
-        }
-
         [TestInitialize]
         public virtual void BaseTestInitialize()
         {

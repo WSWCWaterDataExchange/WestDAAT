@@ -7,13 +7,6 @@ public record ValidationError : ErrorBase
     public ValidationError(IDictionary<string, string[]> errors)
     {
         Errors = errors;
-    }
-
-    public ValidationError(string key, string[] values)
-    {
-        Errors = new Dictionary<string, string[]>
-        {
-            [key] = values
-        };
+        LogMessage = $"Validation failed on the fields {string.Join(", ", errors.Keys)}";
     }
 }

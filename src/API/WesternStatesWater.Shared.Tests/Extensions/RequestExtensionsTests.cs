@@ -43,11 +43,25 @@ public class RequestExtensionsTests
             "('WesternStatesWater.Shared.Tests.Extensions')."
         );
     }
+
+    [TestMethod]
+    public async Task ValidateAsync_ValidatorHasWrongType_ShouldThrow()
+    {
+        var request = new ClassWithWrongValidatorType { Id = 42 };
+
+        var message = await Assert.ThrowsExceptionAsync<TypeLoadException>(() => request.ValidateAsync());
+
+        message.Message.Should().Be(
+            "Validator 'WesternStatesWater.Shared.Tests.Extensions.ClassWithWrongValidatorTypeValidator' " +
+            "does not have a matching 'ValidateAsync' method. " +
+            "Ensure that the validator extends 'AbstractValidator<ClassWithWrongValidatorType>'."
+        );
+    }
 }
 
 public class ClassWithValidator : RequestBase
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
 }
 
 public class ClassWithValidatorValidator : AbstractValidator<ClassWithValidator>
@@ -58,7 +72,14 @@ public class ClassWithValidatorValidator : AbstractValidator<ClassWithValidator>
     }
 }
 
+public class ClassWithWrongValidatorType : RequestBase
+{
+    public int Id { get; init; }
+}
+
+public class ClassWithWrongValidatorTypeValidator : AbstractValidator<ClassWithValidator>;
+
 public class ClassWithoutValidator : RequestBase
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
 }

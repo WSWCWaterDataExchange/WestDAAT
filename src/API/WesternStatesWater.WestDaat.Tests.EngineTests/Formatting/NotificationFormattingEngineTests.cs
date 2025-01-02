@@ -4,12 +4,12 @@ using WesternStatesWater.WestDaat.Engines;
 namespace WesternStatesWater.WestDaat.Tests.EngineTests.Formatting;
 
 [TestClass]
-public class NotificationFormattingTests : EngineTestBase
+public class NotificationFormattingEngineTests : EngineTestBase
 {
     private INotificationFormattingEngine _notificationFormattingEngine;
 
     [TestInitialize]
-    public override void TestInitialize()
+    public void TestInitialize()
     {
         _notificationFormattingEngine = new FormattingEngine(
             CreateLogger<FormattingEngine>()

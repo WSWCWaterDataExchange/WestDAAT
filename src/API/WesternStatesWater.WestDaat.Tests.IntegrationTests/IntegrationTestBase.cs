@@ -1,7 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
-using MGR = WesternStatesWater.WestDaat.Managers;
+using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers;
+using WesternStatesWater.WestDaat.Managers.Handlers;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 {
@@ -13,6 +17,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private TransactionScope _transactionScopeFixture;
 
         protected IServiceProvider Services { get; private set; }
+
+        protected Mock<IContextUtility> ContextUtilityMock { get; private set; }
 
         [TestInitialize]
         public void BaseTestInitialize()
@@ -31,6 +37,9 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .AddLogging(config => config.AddConsole());
 
             RegisterManagerServices(serviceCollection);
+            RegisterEngineServices(serviceCollection);
+            RegisterAccessorServices(serviceCollection);
+            RegisterUtilityServices(serviceCollection);
 
             Services = serviceCollection.BuildServiceProvider();
 
@@ -39,19 +48,45 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<CLI.IApplicationManager, MGR.ConservationManager>();
-            serviceCollection.AddTransient<CLI.INotificationManager, MGR.NotificationManager>();
-            serviceCollection.AddTransient<CLI.ISystemManager, MGR.SystemManager>();
-            serviceCollection.AddTransient<CLI.ITestManager, MGR.TestManager>();
-            serviceCollection.AddTransient<CLI.IUserManager, MGR.AdminManager>();
-            serviceCollection.AddTransient<CLI.IWaterResourceManager, MGR.WaterResourceManager>();
+            serviceCollection.AddTransient<CLI.IApplicationManager, ConservationManager>();
+            serviceCollection.AddTransient<CLI.INotificationManager, NotificationManager>();
+            serviceCollection.AddTransient<CLI.ISystemManager, SystemManager>();
+            serviceCollection.AddTransient<CLI.ITestManager, TestManager>();
+            serviceCollection.AddTransient<CLI.IUserManager, AdminManager>();
+            serviceCollection.AddTransient<CLI.IWaterResourceManager, WaterResourceManager>();
 
             serviceCollection.AddScoped<
-                MGR.Handlers.IManagerRequestHandlerResolver,
-                MGR.Handlers.RequestHandlerResolver
+                IManagerRequestHandlerResolver,
+                RequestHandlerResolver
             >();
 
-            MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(serviceCollection);
+            Managers.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(serviceCollection);
+        }
+
+        private void RegisterEngineServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
+            serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
+            serviceCollection.AddTransient<ITestEngine, TestEngine>();
+            serviceCollection.AddTransient<IValidationEngine, ValidationEngine>();
+        }
+
+        private void RegisterAccessorServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IApplicationAccessor, ApplicationAccessor>();
+            serviceCollection.AddTransient<INldiAccessor, NldiAccessor>();
+            serviceCollection.AddTransient<ISiteAccessor, SiteAccessor>();
+            serviceCollection.AddTransient<ISystemAccessor, SystemAccessor>();
+            serviceCollection.AddTransient<ITestAccessor, TestAccessor>();
+            serviceCollection.AddTransient<IUserAccessor, UserAccessor>();
+            serviceCollection.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
+        }
+
+        private void RegisterUtilityServices(IServiceCollection serviceCollection)
+        {
+            ContextUtilityMock = new Mock<IContextUtility>();
+            serviceCollection.AddScoped(_ => ContextUtilityMock.Object);
+            serviceCollection.AddTransient<ISecurityUtility, SecurityUtility>();
         }
 
         [TestCleanup]
@@ -59,11 +94,6 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         {
             _transactionScopeFixture.Dispose();
             _loggerFactory.Dispose();
-        }
-
-        public ILogger<T> CreateLogger<T>()
-        {
-            return _loggerFactory.CreateLogger<T>();
         }
 
         protected virtual void Dispose(bool disposing)

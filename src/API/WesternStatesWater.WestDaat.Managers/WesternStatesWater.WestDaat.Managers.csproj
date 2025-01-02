@@ -32,4 +32,9 @@
       <DependentUpon>AdminManager.cs</DependentUpon>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Handlers\Admin\" />
+    <Folder Include="Handlers\Conservation\" />
+    <Folder Include="Handlers\WaterResource\" />
+  </ItemGroup>
 </Project>

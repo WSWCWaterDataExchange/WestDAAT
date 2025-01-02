@@ -41,11 +41,11 @@ var host = new HostBuilder()
         services.AddHttpContextAccessor();
 
         // Config
-        services.AddScoped(a => configuration.GetDatabaseConfiguration());
-        services.AddScoped(a => configuration.GetNldiConfiguration());
-        services.AddScoped(a => configuration.GetSmtpConfiguration());
-        services.AddScoped(a => configuration.GetBlobStorageConfiguration());
-        services.AddScoped(a => configuration.GetPerformanceConfiguration());
+        services.AddScoped(_ => configuration.GetDatabaseConfiguration());
+        services.AddScoped(_ => configuration.GetNldiConfiguration());
+        services.AddScoped(_ => configuration.GetSmtpConfiguration());
+        services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
+        services.AddScoped(_ => configuration.GetPerformanceConfiguration());
 
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
@@ -67,6 +67,7 @@ var host = new HostBuilder()
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
+        services.AddTransient<IValidationEngine, ValidationEngine>();
 
         // Accessors
         services.AddTransient<IApplicationAccessor, ApplicationAccessor>();
@@ -81,10 +82,12 @@ var host = new HostBuilder()
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         
         // Utilities / SDKs
+        services.AddScoped<IContextUtility, ContextUtility>();
         services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
         services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<ISecurityUtility, SecurityUtility>();
 
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
@@ -96,7 +99,6 @@ var host = new HostBuilder()
             logging.AddConsole();
         });
         
-        services.AddScoped<IContextUtility, ContextUtility>();
     })
     .Build();
 

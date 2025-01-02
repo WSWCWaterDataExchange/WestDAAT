@@ -1,5 +1,5 @@
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Contracts.Client.User;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests.Admin;
@@ -14,21 +14,8 @@ public class UserManagerTests : ManagerTestBase
     {
         _userManager = new AdminManager(
             ManagerRequestHandlerResolverMock.Object,
+            ValidationEngineMock.Object,
             CreateLogger<AdminManager>()
         );
-    }
-
-    [TestMethod]
-    public async Task Load_FakeRequest_ShouldThrow()
-    {
-        // Arrange
-        var request = new FakeLoadRequest();
-
-        // Act + Assert
-        await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
-    }
-
-    private class FakeLoadRequest : UserLoadRequestBase
-    {
     }
 }

@@ -1085,6 +1085,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
                 _locationEngineMock.Object,
+                ValidationEngineMock.Object,
                 _templateResourceSdk.Object,
                 CreatePerformanceConfiguration(),
                 ManagerRequestHandlerResolverMock.Object,

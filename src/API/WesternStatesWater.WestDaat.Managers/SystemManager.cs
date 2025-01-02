@@ -18,12 +18,14 @@ namespace WesternStatesWater.WestDaat.Managers
             ILocationEngine locationEngine,
             ISystemAccessor systemAccessor,
             IManagerRequestHandlerResolver resolver,
-            ILogger<SystemManager> logger) : base(resolver, logger)
+            IValidationEngine validationEngine,
+            ILogger<SystemManager> logger
+        ) : base(resolver, validationEngine, logger)
         {
             _locationEngine = locationEngine;
             _systemAccessor = systemAccessor;
         }
-        
+
         async Task<DashboardFilters> ISystemManager.LoadFilters()
         {
             return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();

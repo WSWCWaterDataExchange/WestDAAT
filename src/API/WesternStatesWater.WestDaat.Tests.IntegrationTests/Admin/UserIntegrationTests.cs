@@ -1,6 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using WesternStatesWater.WestDaat.Contracts.Client.User;
-using WesternStatesWater.WestDaat.Managers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -14,18 +12,7 @@ public class UserIntegrationTests : IntegrationTestBase
     {
         _userManager = Services.GetRequiredService<CLI.IUserManager>();
     }
-
+    
     [TestMethod]
-    public async Task Load_FakeRequest_ShouldThrow()
-    {
-        // Arrange
-        var request = new FakeLoadRequest();
-
-        // Act + Assert
-        await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
-    }
-
-    private class FakeLoadRequest : UserLoadRequestBase
-    {
-    }
+    public void SmokeTest() => _userManager.Should().NotBeNull();
 }
