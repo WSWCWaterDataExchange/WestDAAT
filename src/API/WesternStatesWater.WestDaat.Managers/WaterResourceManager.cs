@@ -1,19 +1,20 @@
-using AutoMapper.Features;
 using CsvHelper;
-using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
@@ -36,9 +37,11 @@ namespace WesternStatesWater.WestDaat.Managers
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            IValidationEngine validationEngine,
             ITemplateResourceSdk templateResourceSdk,
             PerformanceConfiguration performanceConfiguration,
-            ILogger<WaterResourceManager> logger) : base(logger)
+            IManagerRequestHandlerResolver resolver,
+            ILogger<WaterResourceManager> logger) : base(resolver, validationEngine, logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;
@@ -49,11 +52,39 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        public async Task<ClientContracts.AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            return (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+            var data = (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+
+            var dropdownOptions = BuildEnumGroupItems<AnalyticsInformationGrouping>();
+
+            return new ClientContracts.AnalyticsSummaryInformationResponse
+            {
+                AnalyticsSummaryInformation = data,
+                GroupItems = dropdownOptions,
+                GroupValue = (int)AnalyticsInformationGrouping.BeneficialUse
+            };
+        }
+
+        private ClientContracts.GroupItem[] BuildEnumGroupItems<T>() where T : Enum
+        {
+            var enumValues = typeof(T).GetEnumValues() as T[];
+            var enumValuesAndDisplayAttributes = enumValues
+                .Select(enumValue => new 
+                {
+                    Value = (int)(object)enumValue,
+                    DisplayAttribute = enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()
+                }).ToArray();
+
+            return enumValuesAndDisplayAttributes
+                .Where(obj => obj.DisplayAttribute is not null)
+                .Select(obj => new ClientContracts.GroupItem
+                {
+                    Value = obj.Value,
+                    Label = obj.DisplayAttribute.Name
+                }).ToArray();
         }
 
         public async Task<FeatureCollection> GetWaterRightsEnvelope(ClientContracts.WaterRightsSearchCriteria searchRequest)
@@ -149,16 +180,35 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException("OverlayDetails UUID cannot be null or empty.");
             }
 
-            var overlay = await _waterAllocationAccessor.GetOverlayDetails(overlayUuid);
+            var overlayCommon = await _waterAllocationAccessor.GetOverlayDetails(overlayUuid);
 
-            if (overlay == null)
+            if (overlayCommon == null)
             {
                 throw new WestDaatException($"No overlay found for UUID: {overlayUuid}");
             }
 
-        
-            return overlay.Map<ClientContracts.OverlayDetails>();
+            var geoJsonGeometry = overlayCommon.Geometry?.AsGeoJsonGeometry();
+
+            Feature geometryFeature = null;
+            if (geoJsonGeometry != null)
+            {
+                geometryFeature = new Feature(geoJsonGeometry);
+            }
+
+            var overlayClient = overlayCommon.Map<ClientContracts.OverlayDetails>();
+
+            var featureCollection = new FeatureCollection();
+            if (geometryFeature != null)
+            {
+                featureCollection.Features.Add(geometryFeature);
+            }
+
+            overlayClient.Geometry = featureCollection;
+
+            return overlayClient;
         }
+
+
         public async Task<List<ClientContracts.OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
         {
             if (string.IsNullOrWhiteSpace(reportingUnitUuid))

@@ -1,4 +1,6 @@
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client;
 
@@ -7,5 +9,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 /// </summary>
 public interface IUserManager : IServiceContractBase
 {
-    Task<UserLoadResponseBase> Load(UserLoadRequestBase request);
+    Task<TResponse> Load<TRequest, TResponse>(TRequest request)
+        where TRequest : UserLoadRequestBase
+        where TResponse : UserLoadResponseBase;
 }

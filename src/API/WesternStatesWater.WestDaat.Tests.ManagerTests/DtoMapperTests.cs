@@ -6,7 +6,6 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     public class DtoMapperTests
     {
         [TestMethod]
-        [TestCategory("Manager Tests")]
         public void DtoMapper_IsDtoMApperConfigValid()
         {
             DtoMapper.Configuration.AssertConfigurationIsValid();

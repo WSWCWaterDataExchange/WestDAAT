@@ -94,6 +94,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         [TestMethod]
         public async Task GetAnalyticsSummaryInformation_ResultsReturned()
         {
+            //Arrange
             var slice = new CommonContracts.AnalyticsSummaryInformation()
             {
                 Flow = 0,
@@ -101,12 +102,9 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Points = 0,
                 Volume = 0
             };
-            //Arrange
+
             _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
-                .ReturnsAsync(new CommonContracts.AnalyticsSummaryInformation[]
-                {
-                    slice, slice, slice
-                })
+                .ReturnsAsync([slice, slice, slice])
                 .Verifiable();
 
             var searchCriteria = new WaterRightsSearchCriteria();
@@ -117,7 +115,38 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             //Assert
             result.Should().NotBeNull();
+            result.AnalyticsSummaryInformation.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummaryInformation_ShouldBuildEnumData()
+        {
+            //Arrange
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+                .ReturnsAsync([])
+                .Verifiable();
+
+            var searchCriteria = new WaterRightsSearchCriteria();
+
+            //Act
+            var manager = CreateWaterResourceManager();
+            var result = await manager.GetAnalyticsSummaryInformation(searchCriteria);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.GroupItems.Should().NotBeNull();
+
+            var expectedEnumValues = Enum.GetValues(typeof(Common.AnalyticsInformationGrouping))
+                .Cast<Common.AnalyticsInformationGrouping>()
+                .Where(enumValue => enumValue != Common.AnalyticsInformationGrouping.None)
+                .ToArray();
+
+            result.GroupItems.Should().HaveCount(expectedEnumValues.Length);
+            expectedEnumValues.All(enumValue =>
+            {
+                return result.GroupItems.Any(option => option.Value == (int)enumValue);
+            }).Should().BeTrue();
         }
 
         [TestMethod]
@@ -1056,8 +1085,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
                 _locationEngineMock.Object,
+                ValidationEngineMock.Object,
                 _templateResourceSdk.Object,
                 CreatePerformanceConfiguration(),
+                ManagerRequestHandlerResolverMock.Object,
                 CreateLogger<WaterResourceManager>()
             );
         }

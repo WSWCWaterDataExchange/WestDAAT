@@ -69,6 +69,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             return new NotificationManager(
                 Configuration.GetSmtpConfiguration(),
                 _emailNotificationSDK.Object,
+                ManagerRequestHandlerResolverMock.Object,
+                ValidationEngineMock.Object,
                 CreateLogger<NotificationManager>()
             );
         }

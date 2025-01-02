@@ -1,9 +1,8 @@
-using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
-// TODO Summary
 public interface ISecurityUtility
 {
-    Task<bool> IsAuthorized(RequestBase request);
+    Task<object> GetPermissions(ContextBase context);
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers
@@ -16,12 +17,15 @@ namespace WesternStatesWater.WestDaat.Managers
         public SystemManager(
             ILocationEngine locationEngine,
             ISystemAccessor systemAccessor,
-            ILogger<SystemManager> logger) : base(logger)
+            IManagerRequestHandlerResolver resolver,
+            IValidationEngine validationEngine,
+            ILogger<SystemManager> logger
+        ) : base(resolver, validationEngine, logger)
         {
             _locationEngine = locationEngine;
             _systemAccessor = systemAccessor;
         }
-        
+
         async Task<DashboardFilters> ISystemManager.LoadFilters()
         {
             return (await _systemAccessor.LoadFilters()).Map<DashboardFilters>();

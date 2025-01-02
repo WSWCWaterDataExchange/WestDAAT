@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 using WesternStatesWater.WestDaat.Utilities;
 using CommonDTO = WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -13,7 +15,13 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly IEmailNotificationSdk _emailSDK;
         private readonly EmailServiceConfiguration _emailConfig;
 
-        public NotificationManager(EmailServiceConfiguration emailService, IEmailNotificationSdk emailSDK, ILogger<NotificationManager> logger) : base(logger)
+        public NotificationManager(
+            EmailServiceConfiguration emailService,
+            IEmailNotificationSdk emailSDK,
+            IManagerRequestHandlerResolver resolver,
+            IValidationEngine validationEngine,
+            ILogger<NotificationManager> logger
+        ) : base(resolver, validationEngine, logger)
         {
             _emailConfig = emailService;
             _emailSDK = emailSDK;

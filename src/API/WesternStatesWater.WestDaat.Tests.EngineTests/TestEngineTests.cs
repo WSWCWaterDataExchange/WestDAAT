@@ -8,11 +8,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
     {
         private readonly Mock<ITestAccessor> _testAccessorMock = new Mock<ITestAccessor>(MockBehavior.Strict);
 
-        [TestInitialize]
-        public override void TestInitialize()
-        {
-        }
-
         [TestMethod]
         public void TestMe_Success()
         {

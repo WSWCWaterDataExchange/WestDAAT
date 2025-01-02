@@ -1,4 +1,6 @@
 ﻿using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client;
 
@@ -8,7 +10,11 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 /// </summary>
 public interface IApplicationManager : IServiceContractBase
 {
-    Task<ApplicationLoadResponseBase> Load(ApplicationLoadRequestBase request);
-    
-    Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request);
+    Task<TResponse> Load<TRequest, TResponse>(TRequest request)
+        where TRequest : ApplicationLoadRequestBase
+        where TResponse : ApplicationLoadResponseBase;
+
+    Task<TResponse> Store<TRequest, TResponse>(TRequest request)
+        where TRequest : ApplicationStoreRequestBase
+        where TResponse : ApplicationStoreResponseBase;
 }

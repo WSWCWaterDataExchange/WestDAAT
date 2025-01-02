@@ -1,4 +1,4 @@
-using WesternStatesWater.WestDaat.Managers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -10,22 +10,9 @@ public class UserIntegrationTests : IntegrationTestBase
     [TestInitialize]
     public void TestInitialize()
     {
-        _userManager = new AdminManager(
-            CreateLogger<AdminManager>()
-        );
+        _userManager = Services.GetRequiredService<CLI.IUserManager>();
     }
-
+    
     [TestMethod]
-    public async Task Load_FakeRequest_ShouldThrow()
-    {
-        // Arrange
-        var request = new FakeLoadRequest();
-
-        // Act + Assert
-        await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _userManager.Load(request));
-    }
-
-    private class FakeLoadRequest : CLI.UserLoadRequestBase
-    {
-    }
+    public void SmokeTest() => _userManager.Should().NotBeNull();
 }

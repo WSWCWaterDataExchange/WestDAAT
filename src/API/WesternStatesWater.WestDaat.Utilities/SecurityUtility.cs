@@ -1,18 +1,11 @@
-using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
-public class SecurityUtility : ISecurityUtility
+internal class SecurityUtility : ISecurityUtility
 {
-    private readonly IContextUtility _contextUtility;
-
-    public SecurityUtility(IContextUtility contextUtility)
+    public Task<object> GetPermissions(ContextBase context)
     {
-        _contextUtility = contextUtility;
-    }
-
-    public async Task<bool> IsAuthorized(RequestBase request)
-    {
-        return await Task.FromResult(true);
+        return Task.FromResult((object)42);
     }
 }

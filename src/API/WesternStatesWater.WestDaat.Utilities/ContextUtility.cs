@@ -17,11 +17,16 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
         return new AnonymousContext();
     }
 
-    public T Resolve<T>() where T : ContextBase
+    public ContextBase GetContext() => _context;
+
+    public T GetRequiredContext<T>() where T : ContextBase
     {
         if (_context is not T context)
         {
-            throw new InvalidOperationException($"Request context is not of the type '{typeof(T).Name}'.");
+            throw new InvalidOperationException(
+                $"Context is of type '{_context.GetType().Name}', not of the " +
+                $"requested type '{typeof(T).Name}'."
+            );
         }
 
         return context;
