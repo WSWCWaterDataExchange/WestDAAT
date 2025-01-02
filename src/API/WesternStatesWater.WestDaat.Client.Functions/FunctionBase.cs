@@ -78,7 +78,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var details = new ProblemDetails
             {
                 Status = (int)HttpStatusCode.InternalServerError,
-                Title = "An unexpected error has occurred.",
+                Title = "An unexpected error has occurred",
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
             };
 
@@ -90,7 +90,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var details = new ProblemDetails
             {
                 Status = (int)HttpStatusCode.NotFound,
-                Title = "Resource not found.",
+                Title = "Resource not found",
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
                 Detail = err.PublicMessage
             };
@@ -103,7 +103,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var details = new HttpValidationProblemDetails(error.Errors)
             {
                 Status = (int)HttpStatusCode.BadRequest,
-                Title = "One or more validation errors occurred.",
+                Title = "One or more validation errors occurred",
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
             };
 

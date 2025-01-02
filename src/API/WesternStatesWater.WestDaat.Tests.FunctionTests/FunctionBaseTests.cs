@@ -46,7 +46,7 @@ public class FunctionBaseTests
 
         body.Should().Be("{\"" +
                          "type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"" +
-                         "title\":\"One or more validation errors occurred.\",\"" +
+                         "title\":\"One or more validation errors occurred\",\"" +
                          "status\":400,\"" +
                          "errors\":{\"Message\":[\"Message is required.\",\"I don\\u0027t like your attitude\"]}" +
                          "}");
@@ -84,7 +84,7 @@ public class FunctionBaseTests
 
         body.Should().Be("{\"" +
                          "type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.4\",\"" +
-                         "title\":\"Resource not found.\",\"" +
+                         "title\":\"Resource not found\",\"" +
                          "status\":404" +
                          "}");
     }
@@ -102,7 +102,7 @@ public class FunctionBaseTests
 
         body.Should().Be("{\"" +
                          "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.1\",\"" +
-                         "title\":\"An unexpected error has occurred.\",\"" +
+                         "title\":\"An unexpected error has occurred\",\"" +
                          "status\":500" +
                          "}");
     }
@@ -120,7 +120,7 @@ public class FunctionBaseTests
 
         body.Should().Be("{\"" +
                          "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.1\",\"" +
-                         "title\":\"An unexpected error has occurred.\",\"" +
+                         "title\":\"An unexpected error has occurred\",\"" +
                          "status\":500" +
                          "}");
     }

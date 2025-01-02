@@ -72,10 +72,6 @@ namespace WesternStatesWater.WestDaat.Managers
         /// A task that represents the asynchronous operation. The result is a <typeparamref name="TResponse"/> object
         /// containing either a successful response or an error response if validation or processing fails.
         /// </returns>
-        /// <exception cref="Exception">
-        /// Logs and catches any unhandled exception that occurs during request processing, returning an 
-        /// <see cref="InternalError"/> encapsulated in the response.
-        /// </exception>
         /// <remarks>
         /// This method performs the following steps:
         /// <list type="number">

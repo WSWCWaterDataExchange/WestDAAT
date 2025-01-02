@@ -22,14 +22,14 @@ internal class ValidationEngine : IValidationEngine
         _securityUtility = securityUtility;
     }
 
-    public async Task<ErrorBase> Validate<TRequest>(TRequest request) where TRequest : RequestBase
+    public async Task<ErrorBase> Validate(RequestBase request)
     {
         var context = _contextUtility.GetContext();
         var permissions = await _securityUtility.GetPermissions(context);
 
         return request switch
         {
-            ApplicationStoreRequestBase req => ValidateUserLoadRequest(req, context, permissions),
+            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context, permissions),
 
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -37,7 +37,7 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private ErrorBase ValidateUserLoadRequest(ApplicationStoreRequestBase request, ContextBase context,
+    private ErrorBase ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context,
         object permissions)
     {
         // If context cannot make a request of this type.

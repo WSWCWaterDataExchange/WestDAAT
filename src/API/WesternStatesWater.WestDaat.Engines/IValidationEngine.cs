@@ -9,7 +9,6 @@ public interface IValidationEngine
     /// Validates the specified request against business rules, role-based access control (RBAC), 
     /// relationship-based access control (ReBAC), and other domain-specific logic.
     /// </summary>
-    /// <typeparam name="TRequest">The type of the request to validate.</typeparam>
     /// <param name="request">The request object to be validated.</param>
     /// <returns>
     /// A task that represents the asynchronous validation operation. 
@@ -20,5 +19,5 @@ public interface IValidationEngine
     /// This method is intended for advanced validation scenarios that go beyond structural checks, 
     /// focusing on access control and business-specific constraints.
     /// </remarks>
-    Task<ErrorBase> Validate<TRequest>(TRequest request) where TRequest : RequestBase;
+    Task<ErrorBase> Validate(RequestBase request);
 }
