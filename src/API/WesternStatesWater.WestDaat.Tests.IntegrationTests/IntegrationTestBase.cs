@@ -50,7 +50,6 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         {
             serviceCollection.AddTransient<CLI.IApplicationManager, ConservationManager>();
             serviceCollection.AddTransient<CLI.INotificationManager, NotificationManager>();
-            serviceCollection.AddTransient<CLI.ISystemManager, SystemManager>();
             serviceCollection.AddTransient<CLI.ITestManager, TestManager>();
             serviceCollection.AddTransient<CLI.IUserManager, AdminManager>();
             serviceCollection.AddTransient<CLI.IWaterResourceManager, WaterResourceManager>();

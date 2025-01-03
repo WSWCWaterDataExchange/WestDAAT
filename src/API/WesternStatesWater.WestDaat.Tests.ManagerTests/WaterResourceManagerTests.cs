@@ -24,6 +24,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private readonly Mock<IGeoConnexEngine> _geoConnexEngineMock = new Mock<IGeoConnexEngine>(MockBehavior.Strict);
         private readonly Mock<ILocationEngine> _locationEngineMock = new Mock<ILocationEngine>(MockBehavior.Strict);
         private readonly Mock<ISiteAccessor> _siteAccessorMock = new Mock<ISiteAccessor>(MockBehavior.Strict);
+        private readonly Mock<ISystemAccessor> _systemAccessorMock = new(MockBehavior.Strict);
         private readonly Mock<IWaterAllocationAccessor> _waterAllocationAccessorMock = new Mock<IWaterAllocationAccessor>(MockBehavior.Strict);
         private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new Mock<ITemplateResourceSdk>(MockBehavior.Strict);
 
@@ -1052,6 +1053,61 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 "ReportingUnitUuid cannot be null or empty.");
         }
         
+        
+        [TestMethod]
+        public async Task SystemManager_LoadFilters_ShouldBeEquivalent()
+        {
+            var faker = new Faker();
+
+            var beneficialUse1 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = faker.Random.AlphaNumeric(10),
+                ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
+            };
+            var beneficialUse2 = new Common.DataContracts.BeneficialUseItem
+            {
+                BeneficialUseName = faker.Random.AlphaNumeric(10),
+                ConsumptionCategory = Common.ConsumptionCategory.Consumptive,
+            };
+
+            var ownerClassification1 = faker.Random.AlphaNumeric(10);
+            var ownerClassification2 = faker.Random.AlphaNumeric(10);
+            
+            var waterSourceType1 = faker.Random.AlphaNumeric(10);
+            var waterSourceType2 = faker.Random.AlphaNumeric(10);
+            
+            var state1 = faker.Address.StateAbbr();
+            var state2 = faker.Address.StateAbbr();
+
+            _systemAccessorMock.Setup(a => a.LoadFilters())
+                .ReturnsAsync(new CommonContracts.DashboardFilters
+                {
+                    AllocationTypes = null,
+                    BeneficialUses = [beneficialUse1, beneficialUse2],
+                    LegalStatuses = null,
+                    OwnerClassifications = [ownerClassification1, ownerClassification2],
+                    RiverBasins = null,
+                    SiteTypes = null,
+                    States = [state1, state2],
+                    WaterSources = [waterSourceType1, waterSourceType2]
+                })
+                .Verifiable();
+
+            var waterResourceManager = CreateWaterResourceManager();
+            var result = await waterResourceManager.LoadFilters();
+
+            result.BeneficialUses.Should().NotBeNull().And
+                .BeEquivalentTo([beneficialUse2, beneficialUse1]);
+            result.OwnerClassifications.Should().NotBeNull().And
+                .BeEquivalentTo(ownerClassification2, ownerClassification1);
+            result.States.Should().NotBeNull().And
+                .BeEquivalentTo(state2, state1);
+            result.WaterSources.Should().NotBeNull().And
+                .BeEquivalentTo(waterSourceType2, waterSourceType1);
+
+            _systemAccessorMock.VerifyAll();
+        }
+        
         private async Task CheckRecords<T>(Stream entryStream, string fileEnd, List<T> list)
         {
             using var data = new MemoryStream();
@@ -1082,6 +1138,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             return new WaterResourceManager(
                 _nldiAccessorMock.Object,
                 _siteAccessorMock.Object,
+                _systemAccessorMock.Object,
                 _waterAllocationAccessorMock.Object,
                 _geoConnexEngineMock.Object,
                 _locationEngineMock.Object,

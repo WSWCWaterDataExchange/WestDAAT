@@ -51,7 +51,6 @@ var host = new HostBuilder()
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
-        services.AddTransient<ISystemManager, SystemManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
         services.AddTransient<IWaterResourceManager, WaterResourceManager>();
