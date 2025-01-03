@@ -12,19 +12,19 @@ namespace WesternStatesWater.WestDaat.Managers
 {
     public sealed class NotificationManager : ManagerBase, INotificationManager
     {
-        private readonly IEmailNotificationSdk _emailSDK;
+        private readonly IEmailNotificationSdk _emailSdk;
         private readonly EmailServiceConfiguration _emailConfig;
 
         public NotificationManager(
             EmailServiceConfiguration emailService,
-            IEmailNotificationSdk emailSDK,
+            IEmailNotificationSdk emailSdk,
             IManagerRequestHandlerResolver resolver,
             IValidationEngine validationEngine,
             ILogger<NotificationManager> logger
         ) : base(resolver, validationEngine, logger)
         {
             _emailConfig = emailService;
-            _emailSDK = emailSDK;
+            _emailSdk = emailSdk;
         }
 
         async Task INotificationManager.SendFeedback(FeedbackRequest request)
@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 To = _emailConfig.FeedbackTo,
             };
 
-            await _emailSDK.SendEmail(msg);
+            await _emailSdk.SendEmail(msg);
         }
 
         private string FeedbackTextContent(FeedbackRequest request)

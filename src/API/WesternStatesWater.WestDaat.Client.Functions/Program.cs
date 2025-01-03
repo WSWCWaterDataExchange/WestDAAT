@@ -81,11 +81,12 @@ var host = new HostBuilder()
         // Database
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         
-        // Utilities / SDKs
+        // Utilities / Sdks
         services.AddScoped<IContextUtility, ContextUtility>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
         services.AddTransient<IMessageBusUtility, MessageBusUtility>();
+        services.AddTransient<IOpenEtSdk, OpenEtSdk>();
         services.AddTransient<ISecurityUtility, SecurityUtility>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
         services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
