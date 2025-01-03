@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests.Context;
@@ -16,35 +18,37 @@ public class ContextUtilityTests
         StringValues headerValue = default;
 
         _httpContextAccessorMock
-            .Setup(x => x.HttpContext.Request.Headers.TryGetValue("x-test-header", out headerValue))
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(false);
 
         var utility = new ContextUtility(_httpContextAccessorMock.Object);
 
         utility.GetContext().Should().BeOfType<AnonymousContext>();
     }
-
+    
     [TestMethod]
     public void BuildContext_UserContext_ShouldSetContext()
     {
-        StringValues headerValue = "abc123";
+        var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid());
+        StringValues headerValue = jwt;
 
         _httpContextAccessorMock
-            .Setup(x => x.HttpContext.Request.Headers.TryGetValue("x-test-header", out headerValue))
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
         var utility = new ContextUtility(_httpContextAccessorMock.Object);
 
         utility.GetContext().Should().BeOfType<UserContext>();
     }
-
+    
     [TestMethod]
     public void GetRequiredContext_ContextMatchesRequestedType_ShouldReturnContext()
     {
-        StringValues headerValue = "abc123";
+        var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid());
+        StringValues headerValue = jwt;
 
         _httpContextAccessorMock
-            .Setup(x => x.HttpContext.Request.Headers.TryGetValue("x-test-header", out headerValue))
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
         var utility = new ContextUtility(_httpContextAccessorMock.Object);
@@ -58,7 +62,7 @@ public class ContextUtilityTests
         StringValues headerValue = default;
 
         _httpContextAccessorMock
-            .Setup(x => x.HttpContext.Request.Headers.TryGetValue("x-test-header", out headerValue))
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(false);
 
         var utility = new ContextUtility(_httpContextAccessorMock.Object);
