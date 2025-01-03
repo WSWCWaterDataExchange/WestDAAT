@@ -47,12 +47,13 @@ export function useColorMappings() {
   const overlayTypeColors = useMemo(() => {
     let colorIndex = 0;
     return (
-      allOverlays?.map((a) => ({
-        key: a,
-        color: getColorByIndex(colorIndex++),
+      allOverlays?.map((oType) => ({
+        key: oType,
+        color: getColorByIndex(colorIndex++),  // picks next color from the colorList
       })) ?? []
     );
   }, [allOverlays, getColorByIndex]);
+
 
   const getBeneficialUseColor = useCallback(
     (beneficialUseName: string) => {

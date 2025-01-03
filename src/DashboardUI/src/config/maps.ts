@@ -3,6 +3,7 @@ import { nldi, pointSizes, waterRightsProperties } from './constants';
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
   waterRightsPolygonsLayer: 'waterRightsPolygons',
+  overlayTypesPolygonsLayer: 'overlayTypesPolygons',
   riverBasinsLayer: 'river-basins',
   siteLocationsPolygonsLayer: 'site-locations-polygons',
   siteLocationsPointsLayer: 'site-locations-points',
@@ -123,8 +124,8 @@ const mapsJson = {
       filter: ['has', 'podPou']
     },
     {
-      id:'foobars',
-      friendlyName: 'Foobars',
+      id: mapLayerNames.overlayTypesPolygonsLayer,
+      friendlyName: 'Overlay Types Polygons',
       'source-layer': 'polygons',
       source: mapSourceNames.waterRightsVectorTiles,
       layout: {
@@ -132,7 +133,7 @@ const mapsJson = {
       },
       type:'fill',
       paint: {
-      "fill-color": "#0000ff",
+      "fill-color": "#FF0000",
       "fill-opacity": 0.5
       },
       filter: ['has', 'oType']
