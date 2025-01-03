@@ -25,11 +25,15 @@ internal class ValidationEngine : IValidationEngine
     public async Task<ErrorBase> Validate(RequestBase request)
     {
         var context = _contextUtility.GetContext();
-        var permissions = await _securityUtility.GetPermissions(context);
+        var isAuthorized = await _securityUtility.IsAuthorized(context, request);
+        if (!isAuthorized)
+        {
+            return CreateForbiddenError(request, context);
+        }
 
         return request switch
         {
-            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context, permissions),
+            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context),
 
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -37,33 +41,26 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private ErrorBase ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context,
-        object permissions)
+    private ErrorBase ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context)
     {
-        // If context cannot make a request of this type.
-        if (permissions is 1)
+        // If there is additional business logic validation that the request doesn't pass.
+        if (request is null)
         {
-            return CreateForbiddenError(request, context);
+            return new ValidationError(new Dictionary<string, string[]>
+            {
+                { "Notes", ["You must cross the T's and dot the lowercase J's."] }
+            });
         }
 
-        // If the resources required to fulfill the request are not accessible to the user, or they
-        // do not exist.
-        if (permissions is 2)
+        // If the resources required to fulfill the request
+        // are not accessible to the user, or they do not exist.
+        if (request.ToString() is null)
         {
             return CreateNotFoundError(
                 context,
                 "Conservation Application",
                 Guid.NewGuid()
             );
-        }
-
-        // If there is additional business logic validation that the request doesn't pass.
-        if (permissions is 3)
-        {
-            return new ValidationError(new Dictionary<string, string[]>
-            {
-                { "Notes", ["You must cross the T's and dot the lowercase J's."] }
-            });
         }
 
         return null;
