@@ -40,6 +40,7 @@ export enum waterRightsProperties {
   allocationTypes = 'allocType',
   legalStatuses = 'ls',
   siteTypes = 'sType',
+  overlayTypes = 'oType',
 }
 
 export enum nldiSiteProperties {
@@ -48,6 +49,7 @@ export enum nldiSiteProperties {
   uri = 'uri',
   name = 'name',
 }
+
 
 export const colorList = [
   '#006400',

@@ -53,6 +53,18 @@ export const siteLocationPolygonFillColor = [
   nldi.colors.sitePOD,
   nldi.colors.sitePOU,
 ];
+export const waterRightsPolygonFillColor = [
+  'match',
+  ['get', 'oType'],
+  '["Administrative"]', '#1f78b4',
+  '["Regulatory"]',    '#33a02c',
+  '["Tribal"]',        '#e31a1c',
+  '["Federal"]',       '#ff7f00',
+  '#6a3d9a'
+];
+
+
+
 export const siteLocationPointsIconImage = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
@@ -108,8 +120,8 @@ const mapsJson = {
       },
     },
     {
-      id: `${mapLayerNames.waterRightsPolygonsLayer}`,
-      friendlyName: 'Water Rights Polygons - Administrative',
+      id: mapLayerNames.waterRightsPolygonsLayer,
+      friendlyName: 'Water Rights Polygons',
       'source-layer': 'polygons',
       source: mapSourceNames.waterRightsVectorTiles,
       layout: {
@@ -117,70 +129,9 @@ const mapsJson = {
       },
       type: 'fill',
       paint: {
-        'fill-color': '#1f78b4', // Blue for Administrative
+        'fill-color': waterRightsPolygonFillColor,
         'fill-opacity': 0.5,
       },
-      filter: ['==', ['get', 'oType'], 'Administrative'],
-    },
-    {
-      id: `${mapLayerNames.waterRightsPolygonsLayer}`,
-      friendlyName: 'Water Rights Polygons - Regulatory',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type: 'fill',
-      paint: {
-        'fill-color': '#33a02c', // Green for Regulatory
-        'fill-opacity': 0.5,
-      },
-      filter: ['==', ['get', 'oType'], 'Regulatory'],
-    },
-    {
-      id: `${mapLayerNames.waterRightsPolygonsLayer}`,
-      friendlyName: 'Water Rights Polygons - Tribal',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type: 'fill',
-      paint: {
-        'fill-color': '#e31a1c', // Red for Tribal
-        'fill-opacity': 0.5,
-      },
-      filter: ['==', ['get', 'oType'], 'Tribal'],
-    },
-    {
-      id: `${mapLayerNames.waterRightsPolygonsLayer}`,
-      friendlyName: 'Water Rights Polygons - Federal',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type: 'fill',
-      paint: {
-        'fill-color': '#ff7f00', // Orange for Federal
-        'fill-opacity': 0.5,
-      },
-      filter: ['==', ['get', 'oType'], 'Federal'],
-    },
-    {
-      id: `${mapLayerNames.waterRightsPolygonsLayer}`,
-      friendlyName: 'Water Rights Polygons - Default',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type: 'fill',
-      paint: {
-        'fill-color': '#6a3d9a', // Purple for Default
-        'fill-opacity': 0.5,
-      },
-      filter: ['!', ['in', ['get', 'oType'], ['Administrative', 'Regulatory', 'Tribal', 'Federal']]],
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,
