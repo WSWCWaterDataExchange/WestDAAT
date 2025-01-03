@@ -8,6 +8,7 @@ export function useColorMappings() {
       beneficialUsesQuery: { data: allBeneficialUses },
       ownerClassificationsQuery: { data: allOwnerClassifications },
       waterSourcesQuery: { data: allWaterSourceTypes },
+      overlaysQuery: { data: allOverlays },
     },
   } = useWaterRightsContext();
 
@@ -43,6 +44,16 @@ export function useColorMappings() {
     );
   }, [allWaterSourceTypes, getColorByIndex]);
 
+  const overlayTypeColors = useMemo(() => {
+    let colorIndex = 0;
+    return (
+      allOverlays?.map((a) => ({
+        key: a,
+        color: getColorByIndex(colorIndex++),
+      })) ?? []
+    );
+  }, [allOverlays, getColorByIndex]);
+
   const getBeneficialUseColor = useCallback(
     (beneficialUseName: string) => {
       return beneficialUseColors.find((item) => item.key === beneficialUseName)?.color ?? fallbackColor;
@@ -64,13 +75,22 @@ export function useColorMappings() {
     [waterSourceTypeColors, fallbackColor],
   );
 
+  const getOverlayColor = useCallback(
+    (overlayType: string) => {
+      return overlayTypeColors.find((item) => item.key === overlayType)?.color ?? fallbackColor;
+    },
+    [overlayTypeColors, fallbackColor],
+  );
+
   return {
     beneficialUseColors,
     ownerClassificationColors,
     waterSourceTypeColors,
+    overlayTypeColors,
     getBeneficialUseColor,
     getOwnerClassificationColor,
     getWaterSourceTypeColor,
+    getOverlayColor,
     fallbackColor,
   };
 }

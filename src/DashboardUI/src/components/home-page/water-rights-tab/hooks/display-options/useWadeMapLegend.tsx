@@ -19,7 +19,7 @@ export function useWadeLegend() {
     displayOptions: { mapGrouping: mapGroupingOption },
   } = useWaterRightsContext();
 
-  const { beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, fallbackColor } = useColorMappings();
+  const { beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, overlayTypeColors, fallbackColor } = useColorMappings();
 
   const mapGroupingColors = useMemo(() => {
     switch (mapGroupingOption) {

@@ -40,7 +40,7 @@ const defaultPointPaintConfiguration = {
     pointSizes.maxPointSizeZoomLevel,
     0.3,
   ],
-  'circle-color': '#ff0000',
+  'circle-color': '#FE2346',
   'circle-opacity': 0.75,
 };
 
@@ -120,6 +120,22 @@ const mapsJson = {
         'fill-color': '#ff0000',
         'fill-opacity': 0.5,
       },
+      filter: ['has', 'podPou']
+    },
+    {
+      id:'foobars',
+      friendlyName: 'Foobars',
+      'source-layer': 'polygons',
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type:'fill',
+      paint: {
+      "fill-color": "#0000ff",
+      "fill-opacity": 0.5
+      },
+      filter: ['has', 'oType']
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,

@@ -13,6 +13,8 @@ export function useMapLegend() {
   useEffect(() => {
     setLegend(
       <>
+        <h1>OVERLAY INFO</h1>
+        <h1>BENEFICIAL USE</h1>
         {wadeLegendItems}
         {nldiLegendItems}
       </>,
