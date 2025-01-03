@@ -108,7 +108,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
             .Select(claimValue => new
             {
                 OrganizationId = new Guid(claimValue[0].Replace("org_", "")),
-                RoleName = claimValue[0].Replace("rol_", "")
+                RoleName = claimValue[1].Replace("rol_", "")
             }).ToArray();
 
         // Group the organization roles together
