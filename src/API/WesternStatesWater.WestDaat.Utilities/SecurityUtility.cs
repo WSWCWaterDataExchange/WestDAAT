@@ -10,20 +10,41 @@ internal class SecurityUtility : ISecurityUtility
     {
         return request.Context switch
         {
-            AnonymousContext => AnonymousContextPermissions,
-            UserContext => GetPermissions(request),
+            AnonymousContext => [],
+            UserContext => GetUserContextPermissions(request),
             _ => throw new InvalidOperationException($"Context type '{request.Context.GetType().Name}' is not supported.")
         };
     }
 
-    private static string[] GetPermissions(PermissionsGetRequestBase request)
+    private static string[] GetUserContextPermissions(PermissionsGetRequestBase request)
     {
+        // If global admin return all permissions.
+        if (((UserContext)request.Context).Roles.Contains(Roles.GlobalAdmin))
+        {
+            return Permissions.AllPermissions();
+        }
+
         return request switch
         {
             PermissionsGetRequest req => GetPermissions(req),
             OrganizationPermissionsGetRequest req => GetOrganizationPermissions(req),
             _ => throw new InvalidOperationException($"Request type '{request.GetType().Name}' is not supported.")
         };
+    }
+
+    private static string[] GetPermissions(PermissionsGetRequest request)
+    {
+        var userContext = (UserContext)request.Context;
+        var uniquePermissions = new HashSet<string>();
+        foreach (var role in userContext.Roles)
+        {
+            if (RolePermissions.TryGetValue(role, out var permissions))
+            {
+                uniquePermissions.UnionWith(permissions);
+            }
+        }
+
+        return uniquePermissions.ToArray();
     }
 
 
@@ -59,11 +80,6 @@ internal class SecurityUtility : ISecurityUtility
         return uniquePermissions.ToArray();
     }
 
-    private static readonly string[] AnonymousContextPermissions =
-    [
-        Permissions.UserLoad
-    ];
-
     private static readonly Dictionary<string, string[]> RolePermissions = new()
     {
         {
@@ -83,7 +99,10 @@ internal class SecurityUtility : ISecurityUtility
             [
                 Permissions.UserLoad
             ]
+        },
+        {
+            Roles.GlobalAdmin,
+            Permissions.AllPermissions()
         }
-        // GlobalAdmin has all permissions.
     };
 }
