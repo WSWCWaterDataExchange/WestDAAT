@@ -27,14 +27,25 @@ if (typeof Highcharts === 'object') {
 
 type SupportedSeriesChartTypes = 'pieChart' | 'barChart';
 
-const chartExporting = {
+const chartExporting: Highcharts.ExportingOptions = {
   chartOptions: {
     plotOptions: {
       pie: {
         dataLabels: {
           enabled: true,
-
-          format: '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
+          formatter: function () {
+            let result = '<b>';
+            if (this.point.name) {
+              result += `${this.point.name}</b>:<br>`;
+            }
+            if (this.point.y) {
+              result += `${this.point.y.toFixed(0)} `;
+            }
+            if (this.point.percentage) {
+              result += `(${this.point.percentage.toFixed(1)}%)`;
+            }
+            return result;
+          },
         },
       },
     },
