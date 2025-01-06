@@ -1,29 +1,53 @@
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
 internal class SecurityUtility : ISecurityUtility
 {
-    public string[] GetPermissions(ContextBase context, Guid organizationId)
+    public string[] Get(PermissionsGetRequestBase request)
     {
-        return context switch
+        return request.Context switch
         {
-            UserContext userContext => GetPermissions(userContext, organizationId),
-            AnonymousContext => [],
-            _ => throw new NotImplementedException($"Permissions for context type '{context.GetType().Name}' are not implemented.")
+            AnonymousContext => AnonymousContextPermissions,
+            UserContext => GetPermissions(request),
+            _ => throw new InvalidOperationException($"Context type '{request.Context.GetType().Name}' is not supported.")
         };
     }
 
-    private static string[] GetPermissions(UserContext context, Guid organizationId)
+    private static string[] GetPermissions(PermissionsGetRequestBase request)
     {
-        var organizationRoles = context.OrganizationRoles.FirstOrDefault(or => or.OrganizationId == organizationId);
+        return request switch
+        {
+            PermissionsGetRequest req => GetPermissions(req),
+            OrganizationPermissionsGetRequest req => GetOrganizationPermissions(req),
+            _ => throw new InvalidOperationException($"Request type '{request.GetType().Name}' is not supported.")
+        };
+    }
+
+
+    private static string[] GetOrganizationPermissions(OrganizationPermissionsGetRequest request)
+    {
+        var userContext = (UserContext)request.Context;
+        var organizationRoles = userContext.OrganizationRoles.FirstOrDefault(or =>
+            or.OrganizationId == request.OrganizationId
+        );
+
         if (organizationRoles is null)
         {
-            throw new InvalidOperationException($"User does not have roles for organization '{organizationId}'.");
+            throw new InvalidOperationException($"User does not have roles for organization '{request.OrganizationId}'.");
         }
 
         var uniquePermissions = new HashSet<string>();
+        foreach (var role in userContext.Roles)
+        {
+            if (RolePermissions.TryGetValue(role, out var permissions))
+            {
+                uniquePermissions.UnionWith(permissions);
+            }
+        }
+
         foreach (var role in organizationRoles.RoleNames)
         {
             if (RolePermissions.TryGetValue(role, out var permissions))
@@ -34,6 +58,11 @@ internal class SecurityUtility : ISecurityUtility
 
         return uniquePermissions.ToArray();
     }
+
+    private static readonly string[] AnonymousContextPermissions =
+    [
+        Permissions.UserLoad
+    ];
 
     private static readonly Dictionary<string, string[]> RolePermissions = new()
     {

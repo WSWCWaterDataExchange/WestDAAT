@@ -1,5 +1,6 @@
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -31,8 +32,8 @@ public class ValidationEngineTests : EngineTestBase
             .Returns(new UserContext());
         
         _securityUtilityMock
-            .Setup(util => util.GetPermissions(It.IsAny<UserContext>()))
-            .ReturnsAsync(42);
+            .Setup(util => util.Get(It.IsAny<PermissionsGetRequestBase>()))
+            .Returns(["Permission_1"]);
 
         var request = new TestType();
         var call = () => _validationEngine.Validate(request);

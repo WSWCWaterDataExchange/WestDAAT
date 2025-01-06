@@ -143,7 +143,7 @@ public class ContextUtilityTests
     public void BuildContext_UserContext_GlobalAdminRole_ShouldSetContext()
     {
         // Arrange
-        var roles = new string[] { "GlobalAdmin", "FutureRole" };
+        var roles = new[] { "GlobalAdmin" };
         var orgRoles = new List<KeyValuePair<Guid, string>> { };
 
         var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid(), orgRoles, roles);
@@ -161,10 +161,9 @@ public class ContextUtilityTests
         // Assert
         context.Should().BeOfType<UserContext>();
         var userContext = (UserContext)context;
-        userContext.OrganizationRoles.Length.Should().Be(1);
-
-        var orgRole1 = userContext.OrganizationRoles.Single(x => x.OrganizationId == org1);
-        orgRole1.RoleNames.Single().Should().Be("GlobalAdmin");
+        
+        userContext.Roles.Length.Should().Be(1);
+        userContext.Roles.Single().Should().Be("GlobalAdmin");
     }
 
     [TestMethod]

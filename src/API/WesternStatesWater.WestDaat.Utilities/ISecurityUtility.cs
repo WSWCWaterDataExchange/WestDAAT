@@ -1,8 +1,8 @@
-using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
 public interface ISecurityUtility
 {
-    string[] GetPermissions(ContextBase context, Guid organizationId);
+    string[] Get(PermissionsGetRequestBase request);
 }

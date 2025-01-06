@@ -32,7 +32,7 @@ public static class JwtFaker
             claims.AddRange(roles.Select(role =>
                 new Claim(
                     "extension_westdaat/roles",
-                    $"org_{role}"
+                    $"rol_{role}"
                 )));
         }
 
