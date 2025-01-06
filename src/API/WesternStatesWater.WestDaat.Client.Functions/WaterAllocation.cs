@@ -95,7 +95,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithGrouping>(requestBody);
 
             var result = await _waterResourceManager.GetAnalyticsSummaryInformation(searchRequest);
 

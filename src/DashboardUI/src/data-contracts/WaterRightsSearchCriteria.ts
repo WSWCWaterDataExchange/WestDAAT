@@ -24,3 +24,7 @@ export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCr
 export interface WaterRightsSearchCriteriaWithFilterUrl extends WaterRightsSearchCriteria {
   filterUrl: string;
 }
+
+export interface WaterRightsSearchCriteriaWithGrouping extends WaterRightsSearchCriteria {
+  groupValue?: number;
+}
