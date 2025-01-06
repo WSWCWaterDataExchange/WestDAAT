@@ -3,6 +3,7 @@ interface WaterRightDigest {
   nativeId: string;
   priorityDate: Date;
   beneficialUses: string[];
+  hasTimeSeriesData: boolean;
 }
 
 export default WaterRightDigest;
