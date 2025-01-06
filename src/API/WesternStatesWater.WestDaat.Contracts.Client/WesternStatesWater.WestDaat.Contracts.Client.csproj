@@ -20,7 +20,6 @@
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Requests\WaterResources\" />
     <Folder Include="Responses\WaterResources\" />
   </ItemGroup>
 </Project>

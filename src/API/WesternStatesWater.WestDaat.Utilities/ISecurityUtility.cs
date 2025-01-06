@@ -4,5 +4,5 @@ namespace WesternStatesWater.WestDaat.Utilities;
 
 public interface ISecurityUtility
 {
-    Task<object> GetPermissions(ContextBase context);
+    string[] GetPermissions(ContextBase context, Guid organizationId);
 }
