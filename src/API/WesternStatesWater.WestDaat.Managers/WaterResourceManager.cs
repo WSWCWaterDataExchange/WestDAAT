@@ -70,7 +70,7 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 AnalyticsSummaryInformation = clientResult,
                 GroupItems = dropdownOptions,
-                GroupValue = (int)(searchRequest.GroupValue ?? AnalyticsInformationGrouping.BeneficialUse)
+                GroupValue = (int)groupValue
             };
         }
 
