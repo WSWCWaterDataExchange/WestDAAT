@@ -55,7 +55,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> ClientContracts.IWaterResourceManager.GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
+        async Task<ClientContracts.AnalyticsSummaryInformationResponse> ClientContracts.IWaterResourceManager.GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 

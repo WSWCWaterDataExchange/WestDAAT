@@ -13,8 +13,6 @@ public interface IWaterResourceManager : IServiceContractBase
 {
     Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteriaWithPaging searchRequest);
 
-    Task<AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchRequest);
-
     Task<AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(WaterRightsSearchCriteriaWithGrouping searchRequest);
 
     Task<FeatureCollection> GetNldiFeatures(double latitude, double longitude, NldiDirections directions, NldiDataPoints dataPoints);
