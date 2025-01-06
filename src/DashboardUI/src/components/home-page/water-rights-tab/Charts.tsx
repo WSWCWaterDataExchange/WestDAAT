@@ -221,7 +221,7 @@ function SeriesChart(props: {
     }
   }, [name, data.sum]);
 
-  const highChartsChartType: string = useMemo(() => {
+  const highchartsChartType: Highcharts.SeriesOptionsType['type'] = useMemo(() => {
     switch (chartType) {
       case 'pieChart':
         return 'pie';
@@ -230,11 +230,11 @@ function SeriesChart(props: {
     }
   }, [chartType]);
 
-  const chartOptions = useMemo(() => {
+  const chartOptions: Highcharts.Options = useMemo(() => {
     return {
       ...chartOptionsBase,
       chart: {
-        type: highChartsChartType,
+        type: highchartsChartType,
       },
       subtitle: {
         ...chartOptionsBase.subtitle,
@@ -243,10 +243,11 @@ function SeriesChart(props: {
       series: [
         {
           data: data.data.sort((a, b) => b.y - a.y),
+          type: highchartsChartType,
         },
       ],
     };
-  }, [chartOptionsBase, subTitle, highChartsChartType, data.data]);
+  }, [chartOptionsBase, subTitle, highchartsChartType, data.data]);
 
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
