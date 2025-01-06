@@ -40,13 +40,13 @@ const chartExporting = {
   },
 };
 
-const chartCommonOptions = {
+const chartCommonOptions: Highcharts.Options = {
   subtitle: {},
   series: [],
   exporting: chartExporting,
 };
 
-const flowOptionsBase = {
+const flowOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Cumulative Flow (CSF) of Water Rights',
@@ -56,7 +56,7 @@ const flowOptionsBase = {
   },
 };
 
-const countOptionsBase = {
+const countOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Count of Water Rights',
@@ -66,7 +66,7 @@ const countOptionsBase = {
   },
 };
 
-const volumeOptionsBase = {
+const volumeOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Cumulative Volume (AF) of Water Rights',
@@ -248,6 +248,8 @@ function SeriesChart(props: {
       ],
     };
   }, [chartOptionsBase, subTitle, highchartsChartType, data.data]);
+
+  console.log('data', chartOptions.series![0]);
 
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
