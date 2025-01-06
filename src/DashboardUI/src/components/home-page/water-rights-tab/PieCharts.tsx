@@ -11,6 +11,7 @@ import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
 import AnalyticsInfoGroupingDropdown from './AnalyticsInfoGroupingDropdown';
 import { DropdownOption } from '../../../data-contracts/DropdownOption';
+import { WaterRightsSearchCriteriaWithGrouping } from '../../../data-contracts/WaterRightsSearchCriteria';
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts);
@@ -93,7 +94,11 @@ interface PieChartsProps {
 
 function PieCharts(props: PieChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
-  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(searchCriteria);
+  const request: WaterRightsSearchCriteriaWithGrouping = {
+    ...searchCriteria,
+    groupValue: Number(props.selectedDropdownOption?.value),
+  };
+  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
 
   const { getBeneficialUseColor } = useColorMappings();
 
@@ -114,10 +119,10 @@ function PieCharts(props: PieChartsProps) {
     ];
     if (!pieChartSearchResults || !pieChartSearchResults.analyticsSummaryInformation) return initData;
 
-    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr) => {
+    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
       const [flow, vol, point] = prev;
       const name = curr.primaryUseCategoryName ?? 'Unspecified';
-      const color = getBeneficialUseColor(name);
+      const color = getBeneficialUseColor(name, index);
       if (curr.flow && curr.flow > 0) {
         flow.sum += curr.flow;
         flow.data.push({ name, y: curr.flow, color });

@@ -55,19 +55,22 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        async Task<ClientContracts.AnalyticsSummaryInformationResponse> ClientContracts.IWaterResourceManager.GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        async Task<ClientContracts.AnalyticsSummaryInformationResponse> ClientContracts.IWaterResourceManager.GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            var data = (await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest)).Map<ClientContracts.AnalyticsSummaryInformation[]>();
+            var groupValue = searchRequest.GroupValue ?? AnalyticsInformationGrouping.BeneficialUse;
+
+            var result = await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest, groupValue);
+            var clientResult = result.Map<ClientContracts.AnalyticsSummaryInformation[]>();
 
             var dropdownOptions = BuildEnumGroupItems<AnalyticsInformationGrouping>();
 
             return new ClientContracts.AnalyticsSummaryInformationResponse
             {
-                AnalyticsSummaryInformation = data,
+                AnalyticsSummaryInformation = clientResult,
                 GroupItems = dropdownOptions,
-                GroupValue = (int)AnalyticsInformationGrouping.BeneficialUse
+                GroupValue = (int)groupValue
             };
         }
 
@@ -378,7 +381,7 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return (await _systemAccessor.LoadFilters()).Map<ClientContracts.DashboardFilters>();
         }
-        
+
         FeatureCollection ClientContracts.IWaterResourceManager.GetRiverBasinPolygonsByName(string[] basinNames)
         {
             return _locationEngine.GetRiverBasinPolygonsByName(basinNames);
