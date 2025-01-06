@@ -1,6 +1,4 @@
-using AutoMapper.Features;
 using CsvHelper;
-using CsvHelper.Configuration;
 using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
 using ICSharpCode.SharpZipLib.Core;
@@ -16,6 +14,7 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
@@ -27,6 +26,7 @@ namespace WesternStatesWater.WestDaat.Managers
         private readonly IGeoConnexEngine _geoConnexEngine;
         private readonly ILocationEngine _locationEngine;
         private readonly ISiteAccessor _siteAccessor;
+        private readonly ISystemAccessor _systemAccessor;
         private readonly IWaterAllocationAccessor _waterAllocationAccessor;
         private readonly INldiAccessor _nldiAccessor;
         private readonly ITemplateResourceSdk _templateResourceSdk;
@@ -35,15 +35,19 @@ namespace WesternStatesWater.WestDaat.Managers
         public WaterResourceManager(
             INldiAccessor nldiAccessor,
             ISiteAccessor siteAccessor,
+            ISystemAccessor systemAccessor,
             IWaterAllocationAccessor waterAllocationAccessor,
             IGeoConnexEngine geoConnexEngine,
             ILocationEngine locationEngine,
+            IValidationEngine validationEngine,
             ITemplateResourceSdk templateResourceSdk,
             PerformanceConfiguration performanceConfiguration,
-            ILogger<WaterResourceManager> logger) : base(logger)
+            IManagerRequestHandlerResolver resolver,
+            ILogger<WaterResourceManager> logger) : base(resolver, validationEngine, logger)
         {
             _nldiAccessor = nldiAccessor;
             _siteAccessor = siteAccessor;
+            _systemAccessor = systemAccessor;
             _waterAllocationAccessor = waterAllocationAccessor;
             _geoConnexEngine = geoConnexEngine;
             _locationEngine = locationEngine;
@@ -51,7 +55,7 @@ namespace WesternStatesWater.WestDaat.Managers
             _performanceConfiguration = performanceConfiguration;
         }
 
-        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
+        public async Task<ClientContracts.AnalyticsSummaryInformationResponse> ClientContracts.IWaterResourceManager.GetAnalyticsSummaryInformation(ClientContracts.WaterRightsSearchCriteriaWithGrouping searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
@@ -72,7 +76,7 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             var enumValues = typeof(T).GetEnumValues() as T[];
             var enumValuesAndDisplayAttributes = enumValues
-                .Select(enumValue => new 
+                .Select(enumValue => new
                 {
                     Value = (int)(object)enumValue,
                     DisplayAttribute = enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()
@@ -87,7 +91,7 @@ namespace WesternStatesWater.WestDaat.Managers
                 }).ToArray();
         }
 
-        public async Task<FeatureCollection> GetWaterRightsEnvelope(ClientContracts.WaterRightsSearchCriteria searchRequest)
+        async Task<FeatureCollection> ClientContracts.IWaterResourceManager.GetWaterRightsEnvelope(ClientContracts.WaterRightsSearchCriteria searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
@@ -101,7 +105,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return new FeatureCollection(features);
         }
 
-        public async Task<ClientContracts.WaterRightsSearchResults> FindWaterRights(ClientContracts.WaterRightsSearchCriteriaWithPaging searchRequest)
+        async Task<ClientContracts.WaterRightsSearchResults> ClientContracts.IWaterResourceManager.FindWaterRights(ClientContracts.WaterRightsSearchCriteriaWithPaging searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
@@ -154,7 +158,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _waterAllocationAccessor.GetWaterRightSourceInfoById(allocationUuid)).Map<List<ClientContracts.WaterSourceInfoListItem>>();
         }
 
-        public async Task<FeatureCollection> GetWaterRightSiteLocations(string allocationUuid)
+        async Task<FeatureCollection> ClientContracts.IWaterResourceManager.GetWaterRightSiteLocations(string allocationUuid)
         {
             var siteLocations = await _waterAllocationAccessor.GetWaterRightSiteLocationsById(allocationUuid);
 
@@ -166,14 +170,14 @@ namespace WesternStatesWater.WestDaat.Managers
                     new Feature(
                         siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
                         new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
-                        )
-                    );
+                    )
+                );
             }
 
             return new FeatureCollection(features);
         }
-        
-        public async Task<ClientContracts.OverlayDetails> GetOverlayDetails(string overlayUuid)
+
+        async Task<ClientContracts.OverlayDetails> ClientContracts.IWaterResourceManager.GetOverlayDetails(string overlayUuid)
         {
             if (string.IsNullOrWhiteSpace(overlayUuid))
             {
@@ -208,8 +212,7 @@ namespace WesternStatesWater.WestDaat.Managers
             return overlayClient;
         }
 
-
-        public async Task<List<ClientContracts.OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
+        async Task<List<ClientContracts.OverlayTableEntry>> ClientContracts.IWaterResourceManager.GetOverlayInfoById(string reportingUnitUuid)
         {
             if (string.IsNullOrWhiteSpace(reportingUnitUuid))
             {
@@ -217,10 +220,10 @@ namespace WesternStatesWater.WestDaat.Managers
             }
 
             var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
-            
+
             return overlayEntries.Map<List<ClientContracts.OverlayTableEntry>>();
         }
-        
+
         async Task<string> ClientContracts.IWaterResourceManager.GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid)
         {
             var site = await _siteAccessor.GetSiteByUuid(siteUuid);
@@ -250,14 +253,14 @@ namespace WesternStatesWater.WestDaat.Managers
             return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
         }
 
-        public async Task<Feature> GetWaterSiteLocation(string siteUuid)
+        async Task<Feature> ClientContracts.IWaterResourceManager.GetWaterSiteLocation(string siteUuid)
         {
             var siteLocation = await _siteAccessor.GetWaterSiteLocationByUuid(siteUuid);
 
             Feature feature = new Feature(
-                        siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
-                        new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
-                        );
+                siteLocation.Geometry?.AsGeoJsonGeometry() ?? new Point(new Position(siteLocation.Latitude.Value, siteLocation.Longitude.Value)),
+                new Dictionary<string, object> { { "uuid", siteLocation.SiteUuid }, { "podOrPou", siteLocation.PODorPOUSite } }
+            );
 
             return feature;
         }
@@ -271,13 +274,13 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return (await _siteAccessor.GetWaterRightInfoListByUuid(siteUuid)).Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
-        
+
         async Task<List<ClientContracts.WaterRightInfoListItem>> ClientContracts.IWaterResourceManager.GetWaterRightsInfoListByReportingUnitUuid(string reportingUnitUuid)
         {
             return (await _siteAccessor.GetWaterRightInfoListByReportingUnitUuid(reportingUnitUuid))
                 .Map<List<ClientContracts.WaterRightInfoListItem>>();
         }
-        
+
         async Task<ClientContracts.SiteUsage> ClientContracts.IWaterResourceManager.GetSiteUsageBySiteUuid(string siteUuid)
         {
             var siteUsagePoints = await _siteAccessor.GetSiteUsageBySiteUuid(siteUuid);
@@ -292,13 +295,13 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return (await _siteAccessor.GetVariableInfoListByUuid(siteUuid)).Map<List<ClientContracts.VariableInfoListItem>>();
         }
-        
+
         async Task<List<ClientContracts.MethodInfoListItem>> ClientContracts.IWaterResourceManager.GetSiteMethodInfoListByUuid(string siteUuid)
         {
             return (await _siteAccessor.GetMethodInfoListByUuid(siteUuid)).Map<List<ClientContracts.MethodInfoListItem>>();
         }
-        
-        public async Task WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteriaWithFilterUrl searchRequest)
+
+        async Task ClientContracts.IWaterResourceManager.WaterRightsAsZip(Stream responseStream, ClientContracts.WaterRightsSearchCriteriaWithFilterUrl searchRequest)
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
@@ -370,6 +373,16 @@ namespace WesternStatesWater.WestDaat.Managers
 
                 await Task.CompletedTask;
             }
+        }
+
+        async Task<ClientContracts.DashboardFilters> ClientContracts.IWaterResourceManager.LoadFilters()
+        {
+            return (await _systemAccessor.LoadFilters()).Map<ClientContracts.DashboardFilters>();
+        }
+
+        FeatureCollection ClientContracts.IWaterResourceManager.GetRiverBasinPolygonsByName(string[] basinNames)
+        {
+            return _locationEngine.GetRiverBasinPolygonsByName(basinNames);
         }
     }
 }

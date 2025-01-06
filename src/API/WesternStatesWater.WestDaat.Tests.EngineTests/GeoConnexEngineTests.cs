@@ -17,11 +17,6 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
         private readonly Mock<ITemplateResourceSdk> _templateResourceSdk = new(MockBehavior.Strict);
         private readonly string _geoConnexJsonTemplate = GeoConnexJsonLDResource.GeoConnexJsonLDTemplate;
 
-        [TestInitialize]
-        public override void TestInitialize()
-        {
-        }
-
         [TestMethod]
         public void GeoConnexEngineTests_BuildGeoConnexJson_ShouldFormatJson()
         {

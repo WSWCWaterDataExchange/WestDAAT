@@ -11,6 +11,7 @@ using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Utilities;
+using MGR = WesternStatesWater.WestDaat.Managers;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication(builder =>
@@ -39,23 +40,36 @@ var host = new HostBuilder()
 
         services.AddHttpContextAccessor();
 
-        services.AddScoped(a => configuration.GetDatabaseConfiguration());
-        services.AddScoped(a => configuration.GetNldiConfiguration());
-        services.AddScoped(a => configuration.GetSmtpConfiguration());
-        services.AddScoped(a => configuration.GetBlobStorageConfiguration());
-        services.AddScoped(a => configuration.GetPerformanceConfiguration());
+        // Config
+        services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
+        services.AddScoped(_ => configuration.GetDatabaseConfiguration());
+        services.AddScoped(_ => configuration.GetMessageBusConfiguration());
+        services.AddScoped(_ => configuration.GetNldiConfiguration());
+        services.AddScoped(_ => configuration.GetPerformanceConfiguration());
+        services.AddScoped(_ => configuration.GetSmtpConfiguration());
 
+        // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
-        services.AddTransient<ISystemManager, SystemManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
         services.AddTransient<IWaterResourceManager, WaterResourceManager>();
+        
+        // Manager handlers
+        services.AddScoped<
+            MGR.Handlers.IManagerRequestHandlerResolver,
+            MGR.Handlers.RequestHandlerResolver
+        >();
+        
+        MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(services);
 
+        // Engines
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
+        services.AddTransient<IValidationEngine, ValidationEngine>();
 
+        // Accessors
         services.AddTransient<IApplicationAccessor, ApplicationAccessor>();
         services.AddTransient<INldiAccessor, NldiAccessor>();
         services.AddTransient<ISiteAccessor, SiteAccessor>();
@@ -64,12 +78,18 @@ var host = new HostBuilder()
         services.AddTransient<IUserAccessor, UserAccessor>();
         services.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
 
+        // Database
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         
-        services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
-        services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
+        // Utilities / Sdks
+        services.AddScoped<IContextUtility, ContextUtility>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
+        services.AddTransient<IEmailNotificationSdk, EmailNotificationSdk>();
+        services.AddTransient<IMessageBusUtility, MessageBusUtility>();
+        services.AddTransient<IOpenEtSdk, OpenEtSdk>();
+        services.AddTransient<ISecurityUtility, SecurityUtility>();
         services.AddTransient<ITemplateResourceSdk, TemplateResourceSdk>();
+        services.AddTransient<IUsgsNldiSdk, UsgsNldiSdk>();
 
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
@@ -81,7 +101,6 @@ var host = new HostBuilder()
             logging.AddConsole();
         });
         
-        services.AddScoped<IContextUtility, ContextUtility>();
     })
     .Build();
 

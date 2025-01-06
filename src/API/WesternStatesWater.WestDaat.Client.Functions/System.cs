@@ -12,15 +12,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class System : FunctionBase
     {
-        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<System> logger)
+        public System(IWaterResourceManager waterResourceManager, INotificationManager notificationManager, ILogger<System> logger)
         {
-            _systemManager = systemManager;
+            _waterResourceManager = waterResourceManager;
             _notificationManager = notificationManager;
             _logger = logger;
         }
 
         private readonly INotificationManager _notificationManager;
-        private readonly ISystemManager _systemManager;
+        private readonly IWaterResourceManager _waterResourceManager;
         private readonly ILogger _logger;
 
         [Function(nameof(GetDashboardFilters))]
@@ -29,7 +29,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             HttpRequestData req)
         {
             _logger.LogInformation("Loading filters");
-            var results = await _systemManager.LoadFilters();
+            var results = await _waterResourceManager.LoadFilters();
             return await CreateOkResponse(req, results);
         }
 
@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
 
             _logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
-            var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
+            var result = _waterResourceManager.GetRiverBasinPolygonsByName(basinNames);
 
             return await CreateOkResponse(request, result);
         }

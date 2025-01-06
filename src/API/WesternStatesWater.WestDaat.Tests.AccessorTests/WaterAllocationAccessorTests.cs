@@ -10,7 +10,6 @@ using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
@@ -2740,7 +2739,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetWaterRightSiteLocationsById()
         {
             // Arrange
@@ -2773,7 +2771,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetWaterRightSiteLocationsById_SkipNulls()
         {
             // Arrange
@@ -2980,7 +2977,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount()
         {
             // Arrange
@@ -3004,7 +3000,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount_Multiple()
         {
             // Arrange
@@ -3028,7 +3023,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount_FilterByExemptUse()
         {
             // Arrange

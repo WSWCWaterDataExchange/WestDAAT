@@ -22,7 +22,8 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
-
+            { $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.UseDevelopmentEmulator)}", "true" },
+            { $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.ServiceBusUrl)}", "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;" },
         };
 
         private ILoggerFactory? _loggerFactory;

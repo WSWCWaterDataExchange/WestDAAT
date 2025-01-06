@@ -9,7 +9,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
     [TestClass]
     public class NotificationManagerTests : ManagerTestBase
     {
-        private readonly Mock<IEmailNotificationSdk> _emailNotificationSDK = new(MockBehavior.Strict);
+        private readonly Mock<IEmailNotificationSdk> _emailNotificationSdk = new(MockBehavior.Strict);
         private INotificationManager Manager { get; set; }
         private EmailServiceConfiguration EmailConfig { get; set; }
 
@@ -39,7 +39,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 
             CommonDTO.EmailRequest emailRequest = null;
 
-            _emailNotificationSDK.Setup(a => a.SendEmail(It.IsAny<CommonDTO.EmailRequest>()))
+            _emailNotificationSdk.Setup(a => a.SendEmail(It.IsAny<CommonDTO.EmailRequest>()))
                              .Callback<CommonDTO.EmailRequest>((request) => { emailRequest = request; });
 
             Manager.SendFeedback(feedbackRequest);
@@ -68,7 +68,9 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             return new NotificationManager(
                 Configuration.GetSmtpConfiguration(),
-                _emailNotificationSDK.Object,
+                _emailNotificationSdk.Object,
+                ManagerRequestHandlerResolverMock.Object,
+                ValidationEngineMock.Object,
                 CreateLogger<NotificationManager>()
             );
         }

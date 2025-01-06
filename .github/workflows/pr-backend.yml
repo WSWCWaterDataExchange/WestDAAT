@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Create Database Container
+    - name: Start Docker Containers
       run: docker compose -f ci-compose.yml up -d
       working-directory: .github
     - name: Setup .NET

@@ -5,7 +5,6 @@ using WesternStatesWater.WestDaat.Tests.Helpers;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class SystemAccessorTests : AccessorTestBase
     {
         [TestMethod]
