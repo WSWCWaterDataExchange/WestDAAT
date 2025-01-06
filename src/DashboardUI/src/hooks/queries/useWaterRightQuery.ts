@@ -12,6 +12,7 @@ import {
 import {
   WaterRightsSearchCriteria,
   WaterRightsSearchCriteriaWithFilterUrl,
+  WaterRightsSearchCriteriaWithGrouping,
   WaterRightsSearchCriteriaWithPaging,
 } from '../../data-contracts/WaterRightsSearchCriteria';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
@@ -24,7 +25,7 @@ export function useWaterRightDetails(allocationUuid: string | undefined) {
   });
 }
 
-export function useGetAnalyticsSummaryInfo(searchCriteria: WaterRightsSearchCriteria | null) {
+export function useGetAnalyticsSummaryInfo(searchCriteria: WaterRightsSearchCriteriaWithGrouping | null) {
   return useQuery(
     ['waterRight.AnalyticsSummary', searchCriteria],
     async () => await getWaterRightAnalyticsSummaryInfo(searchCriteria!),

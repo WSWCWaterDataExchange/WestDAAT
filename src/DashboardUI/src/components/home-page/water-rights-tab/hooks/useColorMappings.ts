@@ -44,8 +44,8 @@ export function useColorMappings() {
   }, [allWaterSourceTypes, getColorByIndex]);
 
   const getBeneficialUseColor = useCallback(
-    (beneficialUseName: string) => {
-      return beneficialUseColors.find((item) => item.key === beneficialUseName)?.color ?? fallbackColor;
+    (beneficialUseName: string, index: number) => {
+      return beneficialUseColors.find((item) => item.key === beneficialUseName)?.color ?? getColorByIndex(index);
     },
     [beneficialUseColors, fallbackColor],
   );
