@@ -87,18 +87,18 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-interface PieChartsProps {
+interface ChartsProps {
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
 }
 
-function PieCharts(props: PieChartsProps) {
+function Charts(props: ChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
   const request: WaterRightsSearchCriteriaWithGrouping = {
     ...searchCriteria,
     groupValue: Number(props.selectedDropdownOption?.value),
   };
-  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
+  const { data: chartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
 
   const { getBeneficialUseColor } = useColorMappings();
 
@@ -117,9 +117,9 @@ function PieCharts(props: PieChartsProps) {
         data: [],
       },
     ];
-    if (!pieChartSearchResults || !pieChartSearchResults.analyticsSummaryInformation) return initData;
+    if (!chartSearchResults || !chartSearchResults.analyticsSummaryInformation) return initData;
 
-    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
+    return chartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
       const [flow, vol, point] = prev;
       const name = curr.primaryUseCategoryName ?? 'Unspecified';
       const color = getBeneficialUseColor(name, index);
@@ -137,7 +137,7 @@ function PieCharts(props: PieChartsProps) {
       }
       return [flow, vol, point];
     }, initData);
-  }, [pieChartSearchResults, getBeneficialUseColor]);
+  }, [chartSearchResults, getBeneficialUseColor]);
 
   return (
     <div>
@@ -149,13 +149,13 @@ function PieCharts(props: PieChartsProps) {
 
       <AnalyticsInfoGroupingDropdown
         isFetching={isFetching}
-        analyticsSummaryInformationResponse={pieChartSearchResults}
+        analyticsSummaryInformationResponse={chartSearchResults}
         selectedDropdownOption={props.selectedDropdownOption}
         setSelectedDropdownOption={props.setSelectedDropdownOption}
       />
 
-      {pieChartSearchResults?.analyticsSummaryInformation &&
-        pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
+      {chartSearchResults?.analyticsSummaryInformation &&
+        chartSearchResults?.analyticsSummaryInformation?.length > 0 && (
           <Container fluid={true}>
             <Row>
               <Col lg="4">
@@ -170,7 +170,7 @@ function PieCharts(props: PieChartsProps) {
             </Row>
           </Container>
         )}
-      {pieChartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
+      {chartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
         <div className="d-flex justify-content-center">No results found</div>
       )}
       {isFetching && (
@@ -183,7 +183,7 @@ function PieCharts(props: PieChartsProps) {
   );
 }
 
-export default PieCharts;
+export default Charts;
 
 function ChartData(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
   const { name, data } = props;

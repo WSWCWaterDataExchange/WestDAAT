@@ -4,7 +4,7 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import PieCharts from './water-rights-tab/PieCharts';
+import Charts from './water-rights-tab/Charts';
 import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import { DropdownOption } from '../../data-contracts/DropdownOption';
 
@@ -42,7 +42,7 @@ function TableView() {
           <Tab.Content>
             <Tab.Pane eventKey="pieChart">
               {activeTab === 'pieChart' && show && (
-                <PieCharts
+                <Charts
                   selectedDropdownOption={selectedDropdownValue}
                   setSelectedDropdownOption={setSelectedDropdownValue}
                 />
