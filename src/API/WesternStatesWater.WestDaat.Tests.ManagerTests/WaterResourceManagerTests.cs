@@ -104,7 +104,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Volume = 0
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), null))
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<Common.AnalyticsInformationGrouping>()))
                 .ReturnsAsync([slice, slice, slice])
                 .Verifiable();
 

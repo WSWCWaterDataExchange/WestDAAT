@@ -37,7 +37,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { }, Common.AnalyticsInformationGrouping.BeneficialUse);
 
             //Assert
             results.Length.Should().Be(uniquePrimaryUseCount);
@@ -79,7 +79,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { }, Common.AnalyticsInformationGrouping.BeneficialUse);
 
             //Assert
             results.First().Should().BeEquivalentTo(expected);
