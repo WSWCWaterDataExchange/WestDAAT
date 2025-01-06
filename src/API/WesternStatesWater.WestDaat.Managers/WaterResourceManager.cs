@@ -59,7 +59,9 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             var accessorSearchRequest = MapSearchRequest(searchRequest);
 
-            var result = await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest, searchRequest.GroupValue);
+            var groupValue = searchRequest.GroupValue ?? AnalyticsInformationGrouping.BeneficialUse;
+
+            var result = await _waterAllocationAccessor.GetAnalyticsSummaryInformation(accessorSearchRequest, groupValue);
             var clientResult = result.Map<ClientContracts.AnalyticsSummaryInformation[]>();
 
             var dropdownOptions = BuildEnumGroupItems<AnalyticsInformationGrouping>();

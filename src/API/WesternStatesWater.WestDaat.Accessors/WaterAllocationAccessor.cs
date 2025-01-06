@@ -29,10 +29,8 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
-        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping? groupValue = null)
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping groupValue)
         {
-            groupValue ??= Common.AnalyticsInformationGrouping.BeneficialUse;
-
             using var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
             await using var db = _databaseContextFactory.Create();
 
@@ -40,7 +38,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
             
-            var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(db, predicate, groupValue.Value);
+            var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(db, predicate, groupValue);
 
             ts.Complete();
 
