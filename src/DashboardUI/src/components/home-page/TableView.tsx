@@ -41,7 +41,6 @@ function TableView() {
                 <Charts
                   selectedDropdownOption={selectedDropdownValue}
                   setSelectedDropdownOption={setSelectedDropdownValue}
-                  chartType="pieChart"
                 />
               )}
             </Tab.Pane>

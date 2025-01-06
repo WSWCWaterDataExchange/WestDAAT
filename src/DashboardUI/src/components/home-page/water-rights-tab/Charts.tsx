@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HC_Data from 'highcharts/modules/export-data';
@@ -89,7 +89,6 @@ type ChartDataType = {
 interface ChartsProps {
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
-  chartType: SupportedSeriesChartTypes;
 }
 
 function Charts(props: ChartsProps) {
@@ -99,6 +98,7 @@ function Charts(props: ChartsProps) {
     groupValue: Number(props.selectedDropdownOption?.value),
   };
   const { data: chartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
+  const [chartType, setChartType] = useState<SupportedSeriesChartTypes>('pieChart');
 
   const { getBeneficialUseColor } = useColorMappings();
 
@@ -159,13 +159,13 @@ function Charts(props: ChartsProps) {
           <Container fluid={true}>
             <Row>
               <Col lg="4">
-                <SeriesChart name="count" data={pointData} chartType={props.chartType} />
+                <SeriesChart name="count" data={pointData} chartType={chartType} />
               </Col>
               <Col lg="4">
-                <SeriesChart name="flow" data={flowData} chartType={props.chartType} />
+                <SeriesChart name="flow" data={flowData} chartType={chartType} />
               </Col>
               <Col lg="4">
-                <SeriesChart name="volume" data={volumeData} chartType={props.chartType} />
+                <SeriesChart name="volume" data={volumeData} chartType={chartType} />
               </Col>
             </Row>
           </Container>
