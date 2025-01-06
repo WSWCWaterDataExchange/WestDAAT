@@ -33,6 +33,7 @@ const chartExporting = {
       pie: {
         dataLabels: {
           enabled: true,
+
           format: '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
         },
       },
@@ -52,7 +53,18 @@ const flowOptionsBase: Highcharts.Options = {
     text: 'Cumulative Flow (CSF) of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.1f}</b>',
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(1)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
@@ -62,7 +74,18 @@ const countOptionsBase: Highcharts.Options = {
     text: 'Count of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>',
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(0)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
@@ -72,7 +95,18 @@ const volumeOptionsBase: Highcharts.Options = {
     text: 'Cumulative Volume (AF) of Water Rights',
   },
   tooltip: {
-    pointFormat: `<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.2f}</b>`,
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(2)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
