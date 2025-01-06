@@ -159,13 +159,13 @@ function Charts(props: ChartsProps) {
           <Container fluid={true}>
             <Row>
               <Col lg="4">
-                <ChartData name="count" data={pointData} />
+                <SeriesChart name="count" data={pointData} />
               </Col>
               <Col lg="4">
-                <ChartData name="flow" data={flowData} />
+                <SeriesChart name="flow" data={flowData} />
               </Col>
               <Col lg="4">
-                <ChartData name="volume" data={volumeData} />
+                <SeriesChart name="volume" data={volumeData} />
               </Col>
             </Row>
           </Container>
@@ -185,7 +185,7 @@ function Charts(props: ChartsProps) {
 
 export default Charts;
 
-function ChartData(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
+function SeriesChart(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
   const { name, data } = props;
 
   const [chartOptionsBase, subTitle] = useMemo(() => {
