@@ -10,7 +10,7 @@ import { DropdownOption } from '../../data-contracts/DropdownOption';
 
 function TableView() {
   const [show, setshow] = useState(false);
-  const [activeTab, setActiveTab] = useState('pieChart');
+  const [activeTab, setActiveTab] = useState('charts');
   const [selectedDropdownValue, setSelectedDropdownValue] = useState<DropdownOption | null>(null);
 
   const toggleShow = () => setshow(!show);
@@ -26,36 +26,22 @@ function TableView() {
         <Icon path={show ? mdiChevronDown : mdiChevronUp} />
       </Button>
       <div className={`analytics-and-table-content ${show ? 'toggle-on' : 'toggle-off'}`}>
-        <Tab.Container
-          activeKey={activeTab}
-          onSelect={(tab) => setActiveTab(tab || 'pieChart')}
-          id="analytics-and-table"
-        >
-          <Nav variant="tabs" defaultActiveKey="pieChart">
+        <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'charts')} id="analytics-and-table">
+          <Nav variant="tabs" defaultActiveKey="charts">
             <Nav.Item>
-              <Nav.Link eventKey="pieChart">Chart Summary</Nav.Link>
+              <Nav.Link eventKey="charts">Chart Summary</Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="dataTable">Data Table</Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="pieChart">
-              {activeTab === 'pieChart' && show && (
+            <Tab.Pane eventKey="charts">
+              {activeTab === 'charts' && show && (
                 <Charts
                   selectedDropdownOption={selectedDropdownValue}
                   setSelectedDropdownOption={setSelectedDropdownValue}
                   chartType="pieChart"
-                />
-              )}
-            </Tab.Pane>
-
-            <Tab.Pane eventKey="barChart">
-              {activeTab === 'barChart' && show && (
-                <Charts
-                  selectedDropdownOption={selectedDropdownValue}
-                  setSelectedDropdownOption={setSelectedDropdownValue}
-                  chartType="barChart"
                 />
               )}
             </Tab.Pane>
