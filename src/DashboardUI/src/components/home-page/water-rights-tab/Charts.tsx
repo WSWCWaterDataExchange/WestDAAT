@@ -199,7 +199,7 @@ function Charts(props: ChartsProps) {
               <span>Chart Type</span>
             </div>
             <Tab.Container activeKey={chartType} onSelect={(tab) => setChartType(tab as SupportedSeriesChartTypes)}>
-              <Nav variant="pills" defaultActiveKey="pieChart" className="input-group">
+              <Nav variant="pills" defaultActiveKey="pieChart">
                 <Nav.Item>
                   <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
                 </Nav.Item>
