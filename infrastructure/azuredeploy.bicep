@@ -253,8 +253,8 @@ var fnAppSettings = {
   'Nldi:MaxDownstreamMainDistance': '500'
   'Nldi:MaxUpstreamMainDistance': '500'
   'Nldi:MaxUpstreamTributaryDistance': '500'
-  'Smtp:FeedbackFrom': 'adelabdallah@wswc.utah.gov'
-  'Smtp:FeedbackTo:0': 'adelabdallah@wswc.utah.gov'
+  'Smtp:FeedbackFrom': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackTo:0': 'WaDE_WSWC@hotmail.com'
   'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
   APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
   AzureWebJobsSecretStorageType: 'files'
