@@ -297,8 +297,6 @@ function SeriesChart(props: {
     };
   }, [chartOptionsBase, subTitle, highchartsChartType, data.data]);
 
-  console.log('data', chartOptions.series![0]);
-
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
   ) : (
