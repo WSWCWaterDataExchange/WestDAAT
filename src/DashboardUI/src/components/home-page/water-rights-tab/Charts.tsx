@@ -5,7 +5,7 @@ import HC_Data from 'highcharts/modules/export-data';
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
-import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
+import { Col, Container, Nav, ProgressBar, Row, Tab } from 'react-bootstrap';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
@@ -147,12 +147,30 @@ function Charts(props: ChartsProps) {
         </a>
       </div>
 
-      <AnalyticsInfoGroupingDropdown
-        isFetching={isFetching}
-        analyticsSummaryInformationResponse={chartSearchResults}
-        selectedDropdownOption={props.selectedDropdownOption}
-        setSelectedDropdownOption={props.setSelectedDropdownOption}
-      />
+      <Container fluid={true}>
+        <Row>
+          <Col lg="3">
+            <Tab.Container activeKey={chartType} onSelect={(tab) => setChartType(tab as SupportedSeriesChartTypes)}>
+              <Nav variant="pills" defaultActiveKey="pieChart" className="input-group">
+                <Nav.Item>
+                  <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="barChart">Bar Graph</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Tab.Container>
+          </Col>
+          <Col lg="9">
+            <AnalyticsInfoGroupingDropdown
+              isFetching={isFetching}
+              analyticsSummaryInformationResponse={chartSearchResults}
+              selectedDropdownOption={props.selectedDropdownOption}
+              setSelectedDropdownOption={props.setSelectedDropdownOption}
+            />
+          </Col>
+        </Row>
+      </Container>
 
       {chartSearchResults?.analyticsSummaryInformation &&
         chartSearchResults?.analyticsSummaryInformation?.length > 0 && (
