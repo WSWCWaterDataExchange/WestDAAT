@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
