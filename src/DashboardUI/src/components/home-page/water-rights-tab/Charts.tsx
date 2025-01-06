@@ -25,6 +25,8 @@ if (typeof Highcharts === 'object') {
   });
 }
 
+type SupportedSeriesChartTypes = 'pieChart' | 'barChart';
+
 const chartExporting = {
   chartOptions: {
     plotOptions: {
@@ -39,9 +41,6 @@ const chartExporting = {
 };
 
 const chartCommonOptions = {
-  chart: {
-    type: 'pie',
-  },
   subtitle: {},
   series: [],
   exporting: chartExporting,
@@ -90,6 +89,7 @@ type ChartDataType = {
 interface ChartsProps {
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
+  chartType: SupportedSeriesChartTypes;
 }
 
 function Charts(props: ChartsProps) {
@@ -159,13 +159,13 @@ function Charts(props: ChartsProps) {
           <Container fluid={true}>
             <Row>
               <Col lg="4">
-                <SeriesChart name="count" data={pointData} />
+                <SeriesChart name="count" data={pointData} chartType={props.chartType} />
               </Col>
               <Col lg="4">
-                <SeriesChart name="flow" data={flowData} />
+                <SeriesChart name="flow" data={flowData} chartType={props.chartType} />
               </Col>
               <Col lg="4">
-                <SeriesChart name="volume" data={volumeData} />
+                <SeriesChart name="volume" data={volumeData} chartType={props.chartType} />
               </Col>
             </Row>
           </Container>
@@ -185,8 +185,12 @@ function Charts(props: ChartsProps) {
 
 export default Charts;
 
-function SeriesChart(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
-  const { name, data } = props;
+function SeriesChart(props: {
+  name: 'volume' | 'flow' | 'count';
+  data: ChartDataType;
+  chartType: SupportedSeriesChartTypes;
+}) {
+  const { name, data, chartType } = props;
 
   const [chartOptionsBase, subTitle] = useMemo(() => {
     switch (name) {
@@ -199,9 +203,21 @@ function SeriesChart(props: { name: 'volume' | 'flow' | 'count'; data: ChartData
     }
   }, [name, data.sum]);
 
+  const highChartsChartType: string = useMemo(() => {
+    switch (chartType) {
+      case 'pieChart':
+        return 'pie';
+      case 'barChart':
+        return 'column';
+    }
+  }, [chartType]);
+
   const chartOptions = useMemo(() => {
     return {
       ...chartOptionsBase,
+      chart: {
+        type: highChartsChartType,
+      },
       subtitle: {
         ...chartOptionsBase.subtitle,
         text: subTitle,
@@ -212,7 +228,7 @@ function SeriesChart(props: { name: 'volume' | 'flow' | 'count'; data: ChartData
         },
       ],
     };
-  }, [chartOptionsBase, subTitle, data.data]);
+  }, [chartOptionsBase, subTitle, highChartsChartType, data.data]);
 
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
