@@ -49,6 +49,15 @@ function TableView() {
               )}
             </Tab.Pane>
 
+            <Tab.Pane eventKey="barChart">
+              {activeTab === 'barChart' && show && (
+                <Charts
+                  selectedDropdownOption={selectedDropdownValue}
+                  setSelectedDropdownOption={setSelectedDropdownValue}
+                />
+              )}
+            </Tab.Pane>
+
             <Tab.Pane eventKey="dataTable">
               {activeTab === 'dataTable' && show && <AnalyticsDataTable></AnalyticsDataTable>}
             </Tab.Pane>
