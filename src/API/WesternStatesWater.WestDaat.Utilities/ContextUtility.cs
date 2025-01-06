@@ -40,7 +40,8 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static UserContext BuildUserContext(string authHeader)
     {
-        // Example claims:
+        // Example jwt claims:
+        // Note - azure b2c requires the namespace to be prefixed with "extension_"
         //  {
         //   "extension_westdaat/userId": "<guid>",
         //   "extension_westdaat/organizationRoles": [
@@ -65,11 +66,6 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static JwtSecurityToken GetJwt(string authHeaderValue)
     {
-        if (authHeaderValue is null)
-        {
-            throw new InvalidOperationException("Authorization header was not found.");
-        }
-
         var bearerToken = authHeaderValue.Replace("Bearer ", string.Empty);
         var tokenHandler = new JwtSecurityTokenHandler();
 

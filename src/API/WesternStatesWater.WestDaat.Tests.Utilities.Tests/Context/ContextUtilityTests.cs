@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using SendGrid.Helpers.Errors.Model;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
@@ -109,6 +110,33 @@ public class ContextUtilityTests
         // Assert
         action.Should().Throw<InvalidOperationException>()
             .WithMessage("Authorization header did not contain a valid JWT.");
+    }
+    
+    [TestMethod]
+    public void BuildContext_UserContext_MalformedRoleClaim_ShouldThrow()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var externalAuthId = Guid.NewGuid();
+
+        var orgRoles = new List<KeyValuePair<Guid, string>>
+        {
+            new(Guid.NewGuid(), "invalid/claim/format/should/throw"),
+        };
+
+        var jwt = JwtFaker.Generate(userId, externalAuthId, orgRoles);
+        StringValues headerValue = jwt;
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        // Act
+        Action action = () => new ContextUtility(_httpContextAccessorMock.Object);
+
+        // Assert
+        action.Should().Throw<UnauthorizedException>()
+            .WithMessage("Organization roles were improperly formatted.");
     }
 
     [TestMethod]
