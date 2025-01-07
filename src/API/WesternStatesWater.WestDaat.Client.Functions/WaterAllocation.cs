@@ -200,16 +200,23 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetOverlayTableDetails))]
-        public async Task<HttpResponseData> GetOverlayTableDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] HttpRequestData request, string overlayUuid)
+        public async Task<HttpResponseData> GetOverlayTableDetails(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Overlays/Legal")] HttpRequestData request)
         {
-            var overlayTable = await _waterResourceManager.GetOverlayInfoById(overlayUuid);
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(request.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+            var searchCriteria = JsonConvert.DeserializeObject<OverlayDetailsSearchCriteria>(requestBody);
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
             return await CreateOkResponse(request, overlayTable);
         }
         
         [Function(nameof(GetOverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
-            
             var overlay = await _waterResourceManager.GetOverlayDetails(overlayUuid);
             
             return await CreateOkResponse(request, overlay);
