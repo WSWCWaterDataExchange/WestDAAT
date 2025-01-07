@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
+import { OverlayDetailsSearchCriteria } from '../data-contracts/OverlayDetailsSearchCriteria';
 
 export const getOverlayDetails = async (overlayUuid: string): Promise<OverlayDetails> => {
   const { data } = await axios.get<OverlayDetails>(`${process.env.REACT_APP_WEBAPI_URL}Overlays/${overlayUuid}`);
@@ -16,8 +17,14 @@ export const getOverlayInfoById = async (overlayUuid: string): Promise<OverlayTa
 export const getWaterRightsInfoListByReportingUnitUuid = async (
   reportingUnitUuid: string,
 ): Promise<WaterRightsInfoListItem[]> => {
-  const { data } = await axios.get<WaterRightsInfoListItem[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}Overlays/${reportingUnitUuid}/Legal`,
+  const request: OverlayDetailsSearchCriteria = {
+    reportingUnitUUID: reportingUnitUuid,
+    allocationUUID: null,
+  };
+
+  const { data } = await axios.post<WaterRightsInfoListItem[]>(
+    `${process.env.REACT_APP_WEBAPI_URL}Overlays/Legal`,
+    request,
   );
   return data;
 };
