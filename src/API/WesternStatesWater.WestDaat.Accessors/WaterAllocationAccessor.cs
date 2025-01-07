@@ -440,6 +440,20 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
                 .ToListAsync();
         }
+        
+        public async Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var overlayDigests = await db.ReportingUnitsDim
+                .AsNoTracking()
+                .Where(r => r.ReportingUnitUuid == overlayUuid)
+                .ProjectTo<OverlayDigest>(DtoMapper.Configuration)
+                .ToListAsync();
+
+            return overlayDigests;
+        }
 
         public int GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
         {
