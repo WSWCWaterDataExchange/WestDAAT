@@ -104,11 +104,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 Volume = 0
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), It.IsAny<Common.AnalyticsInformationGrouping>()))
                 .ReturnsAsync([slice, slice, slice])
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteriaWithGrouping();
 
             //Act
             var manager = CreateWaterResourceManager();
@@ -121,14 +121,23 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task GetAnalyticsSummaryInformation_ShouldBuildEnumData()
+        public async Task GetAnalyticsSummaryInformation_ShouldBuildEnumDataAndReturnGroupValue()
         {
             //Arrange
-            _waterAllocationAccessorMock.Setup(x => x.GetAnalyticsSummaryInformation(It.IsAny<CommonContracts.WaterRightsSearchCriteria>()))
+            _waterAllocationAccessorMock
+                .Setup(x => 
+                    x.GetAnalyticsSummaryInformation(
+                        It.IsAny<CommonContracts.WaterRightsSearchCriteria>(), 
+                        Common.AnalyticsInformationGrouping.WaterSourceType
+                    )
+                )
                 .ReturnsAsync([])
                 .Verifiable();
 
-            var searchCriteria = new WaterRightsSearchCriteria();
+            var searchCriteria = new WaterRightsSearchCriteriaWithGrouping()
+            {
+                GroupValue = Common.AnalyticsInformationGrouping.WaterSourceType
+            };
 
             //Act
             var manager = CreateWaterResourceManager();
@@ -148,6 +157,8 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             {
                 return result.GroupItems.Any(option => option.Value == (int)enumValue);
             }).Should().BeTrue();
+
+            result.GroupValue.Should().Be((int)Common.AnalyticsInformationGrouping.WaterSourceType);
         }
 
         [TestMethod]
