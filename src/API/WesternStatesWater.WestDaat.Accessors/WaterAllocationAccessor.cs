@@ -444,8 +444,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                     PriorityDate = x.AllocationPriorityDateNavigation.Date,
                     BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList(),
                     HasTimeSeriesData = x.AllocationBridgeSitesFact
-                        .Any(bridge => db.SiteVariableAmountsFact
-                            .Any(variable => variable.SiteId == bridge.Site.SiteId))
+                        .Any(bridge => bridge.Site.SiteVariableAmountsFact.Count != 0)
                 })
                 .ToListAsync();
         }
