@@ -221,7 +221,11 @@ namespace WesternStatesWater.WestDaat.Managers
                 throw new WestDaatException("Reporting Unit UUID cannot be null or empty.");
             }
 
-            var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
+            var request = new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = reportingUnitUuid
+            };
+            var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(request);
 
             return overlayEntries.Map<List<ClientContracts.OverlayTableEntry>>();
         }

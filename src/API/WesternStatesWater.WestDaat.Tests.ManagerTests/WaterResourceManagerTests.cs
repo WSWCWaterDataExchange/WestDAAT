@@ -908,7 +908,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             // Arrange
             var reportingUnitUuid = "test_uuid";
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(It.Is<CommonContracts.OverlayDetailsSearchCriteria>(searchCriteria => searchCriteria.ReportingUnitUUID == reportingUnitUuid)))
                 .ReturnsAsync((List<CommonContracts.OverlayTableEntry>)null)
                 .Verifiable();
 
@@ -930,11 +930,11 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var reportingUnitUuid = "test_uuid";
             var overlayEntries = new List<CommonContracts.OverlayTableEntry>
             {
-                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1"},
-                new CommonContracts.OverlayTableEntry {WaDEOverlayUuid = "overlay_2" }
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1" },
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_2" }
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(It.Is<CommonContracts.OverlayDetailsSearchCriteria>(searchCriteria => searchCriteria.ReportingUnitUUID == reportingUnitUuid)))
                 .ReturnsAsync(overlayEntries)
                 .Verifiable();
 
