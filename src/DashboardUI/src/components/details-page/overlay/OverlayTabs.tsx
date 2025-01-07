@@ -13,7 +13,7 @@ function OverlayTabs() {
     setActiveTab,
     hostData: {
       overlayInfoListQuery: { data: overlayInfoList },
-      waterRightsInfoListQuery: { data: waterRightsInfoList },
+      waterRightsInfoListByReportingUnitQuery: { data: waterRightsInfoListByReportingUnit },
     },
   } = useOverlayDetailsContext();
 
@@ -41,7 +41,7 @@ function OverlayTabs() {
             </tr>
           </thead>
           <tbody>
-            {waterRightsInfoList?.map((entry) => (
+            {waterRightsInfoListByReportingUnit?.map((entry) => (
               <tr key={entry.waDEOverlayUuid}>
                 <td>{entry.waDEOverlayUuid}</td>
                 <td>{entry.overlayNativeID}</td>
