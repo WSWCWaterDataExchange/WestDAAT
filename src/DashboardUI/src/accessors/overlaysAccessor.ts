@@ -28,3 +28,18 @@ export const getWaterRightsInfoListByReportingUnitUuid = async (
   );
   return data;
 };
+
+export const getWaterRightsInfoListByAllocationUuid = async (
+  allocationUuid: string,
+): Promise<WaterRightsInfoListItem[]> => {
+  const request: OverlayDetailsSearchCriteria = {
+    reportingUnitUUID: null,
+    allocationUUID: allocationUuid,
+  };
+
+  const { data } = await axios.post<WaterRightsInfoListItem[]>(
+    `${process.env.REACT_APP_WEBAPI_URL}Overlays/Legal`,
+    request,
+  );
+  return data;
+};
