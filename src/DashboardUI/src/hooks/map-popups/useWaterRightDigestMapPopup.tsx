@@ -7,7 +7,7 @@ import { useWaterRightsDigests } from '../queries';
 
 function useWaterRightDigestMapPopup() {
   //Because of how we are rendering the water rights to the UI, we cannot manage state inside of the components like WaterRightsDigestCard.  State has to be managed here.
-  const { updatePopup, siteUuid } = useSiteClickedOnMap();
+  const { updatePopup, siteUuid, oType } = useSiteClickedOnMap();
   const [currentIndex, setCurrentIndex] = useState(0);
   const handleClosePopup = useCallback(() => updatePopup(undefined), [updatePopup]);
 
