@@ -53,12 +53,14 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
         var jwt = GetJwt(authHeader);
         var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}/userId");
+        var roles = GetRoles(jwt.Claims);
         var orgRoles = GetOrganizationRoles(jwt.Claims);
         var externalAuthId = GetClaimValue(jwt.Claims, "sub");
 
         return new UserContext
         {
             UserId = new Guid(id),
+            Roles = roles,
             OrganizationRoles = orgRoles,
             ExternalAuthId = externalAuthId,
         };
@@ -86,6 +88,16 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
         return !string.IsNullOrWhiteSpace(claimValue)
             ? claimValue
             : throw new InvalidOperationException($"'{type}' was not found on JWT.");
+    }
+
+    private static string[] GetRoles(IEnumerable<Claim> claims)
+    {
+        var roles = claims
+            .Where(claim => claim.Type == $"{ClaimNamespace}/roles")
+            .Select(claim => claim.Value.Replace("rol_", ""))
+            .ToArray();
+
+        return roles;
     }
 
     private static OrganizationRole[] GetOrganizationRoles(IEnumerable<Claim> claims)

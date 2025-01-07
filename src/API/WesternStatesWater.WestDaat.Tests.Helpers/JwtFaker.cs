@@ -6,7 +6,11 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
 public static class JwtFaker
 {
-    public static string Generate(Guid userId, Guid externalAuthId, List<KeyValuePair<Guid, string>> orgRoles = null)
+    public static string Generate(
+        Guid userId,
+        Guid externalAuthId,
+        List<KeyValuePair<Guid, string>> orgRoles = null,
+        string[] roles = null)
     {
         var claims = new List<Claim>
         {
@@ -20,6 +24,15 @@ public static class JwtFaker
                 new Claim(
                     "extension_westdaat/organizationRoles",
                     $"org_{orgId.Key}/rol_{orgId.Value}"
+                )));
+        }
+
+        if (roles is not null)
+        {
+            claims.AddRange(roles.Select(role =>
+                new Claim(
+                    "extension_westdaat/roles",
+                    $"rol_{role}"
                 )));
         }
 
