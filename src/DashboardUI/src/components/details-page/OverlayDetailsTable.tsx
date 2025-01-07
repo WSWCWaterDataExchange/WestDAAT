@@ -26,6 +26,13 @@ function OverlayDetailsTable(props: OverlayDetailsTableProps) {
         </tr>
       </thead>
       <tbody>
+        {(waterRightsInfoList?.length ?? 0) === 0 && (
+          <tr>
+            <td colSpan={10} className="text-center">
+              No data available
+            </td>
+          </tr>
+        )}
         {waterRightsInfoList?.map((entry) => (
           <tr key={entry.waDEOverlayUuid}>
             <td>{entry.waDEOverlayUuid}</td>
