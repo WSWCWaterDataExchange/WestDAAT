@@ -437,7 +437,15 @@ namespace WesternStatesWater.WestDaat.Accessors
             db.Database.SetCommandTimeout(int.MaxValue);
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
-                .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
+                .Select(x => new WaterRightsDigest
+                {
+                    AllocationUuid = x.AllocationUuid,
+                    NativeId = x.AllocationNativeId,
+                    PriorityDate = x.AllocationPriorityDateNavigation.Date,
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList(),
+                    HasTimeSeriesData = x.AllocationBridgeSitesFact
+                        .Any(bridge => bridge.Site.SiteVariableAmountsFact.Count != 0)
+                })
                 .ToListAsync();
         }
 
