@@ -915,7 +915,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterResourceManager();
 
             // Act
-            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+            var result = await manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = reportingUnitUuid,
+            });
 
             // Assert
             result.Should().BeEmpty();
@@ -941,7 +944,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var manager = CreateWaterResourceManager();
 
             // Act
-            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+            var result = await manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = reportingUnitUuid,
+            });
 
             // Assert
             result.Should().NotBeNull();
