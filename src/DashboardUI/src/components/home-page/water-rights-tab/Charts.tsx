@@ -278,6 +278,14 @@ function SeriesChart(props: {
     }
   }, [chartType]);
 
+  const sortedData = useMemo(() => {
+    return data.data.sort((a, b) => b.y - a.y);
+  }, [data.data]);
+
+  const xAxisCategories = useMemo(() => {
+    return data.data.map((d) => d.name);
+  }, [data.data]);
+
   const chartOptions: Highcharts.Options = useMemo(() => {
     return {
       ...chartOptionsBase,
@@ -288,14 +296,17 @@ function SeriesChart(props: {
         ...chartOptionsBase.subtitle,
         text: subTitle,
       },
+      xAxis: {
+        categories: xAxisCategories,
+      },
       series: [
         {
-          data: data.data.sort((a, b) => b.y - a.y),
+          data: sortedData,
           type: highchartsChartType,
         },
       ],
     };
-  }, [chartOptionsBase, subTitle, highchartsChartType, data.data]);
+  }, [chartOptionsBase, subTitle, highchartsChartType, sortedData]);
 
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
