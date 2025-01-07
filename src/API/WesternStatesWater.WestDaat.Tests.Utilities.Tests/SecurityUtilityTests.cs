@@ -94,7 +94,7 @@ public class SecurityUtilityTests : UtilitiesTestBase
     }
 
     [TestMethod]
-    public void Get_UserContext_GetOrganizationPermissions_NotOrgPermissions_ShouldThrow()
+    public void Get_UserContext_GetOrganizationPermissions_NotOrgMember_ShouldHaveNoPermission()
     {
         // Arrange
         var securityUtility = new SecurityUtility();
@@ -113,14 +113,13 @@ public class SecurityUtilityTests : UtilitiesTestBase
         };
 
         // Act
-        Action action = () => securityUtility.Get(new OrganizationPermissionsGetRequest
+        var permissions = securityUtility.Get(new OrganizationPermissionsGetRequest
         {
             Context = userContext,
             OrganizationId = unrelatedOrganization
         });
 
         // Assert
-        action.Should().Throw<InvalidOperationException>()
-            .WithMessage($"User does not have roles for organization '{unrelatedOrganization}'.");
+        permissions.Should().BeEmpty();
     }
 }

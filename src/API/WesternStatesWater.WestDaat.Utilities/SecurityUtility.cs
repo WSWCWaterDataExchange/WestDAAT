@@ -47,7 +47,6 @@ internal class SecurityUtility : ISecurityUtility
         return uniquePermissions.ToArray();
     }
 
-
     private static string[] GetOrganizationPermissions(OrganizationPermissionsGetRequest request)
     {
         var userContext = (UserContext)request.Context;
@@ -55,21 +54,11 @@ internal class SecurityUtility : ISecurityUtility
             or.OrganizationId == request.OrganizationId
         );
 
-        if (organizationRoles is null)
-        {
-            throw new InvalidOperationException($"User does not have roles for organization '{request.OrganizationId}'.");
-        }
+        // If the user is not a member of the organization, they have no roles
+        var organizationRoleNames = organizationRoles?.RoleNames ?? [];
 
         var uniquePermissions = new HashSet<string>();
-        foreach (var role in userContext.Roles)
-        {
-            if (RolePermissions.TryGetValue(role, out var permissions))
-            {
-                uniquePermissions.UnionWith(permissions);
-            }
-        }
-
-        foreach (var role in organizationRoles.RoleNames)
+        foreach (var role in organizationRoleNames)
         {
             if (RolePermissions.TryGetValue(role, out var permissions))
             {
