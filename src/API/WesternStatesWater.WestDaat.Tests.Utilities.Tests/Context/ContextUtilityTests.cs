@@ -71,7 +71,7 @@ public class ContextUtilityTests
         orgRole2.RoleNames.Should().Contain("OrganizationAdmin");
         orgRole2.RoleNames.Should().Contain("TechnicalReviewer");
     }
-    
+
     [TestMethod]
     public void BuildContext_UserContext_NoOrganizations_ShouldHaveNoOrganizationRoles()
     {
@@ -93,7 +93,7 @@ public class ContextUtilityTests
         var userContext = (UserContext)context;
         userContext.OrganizationRoles.Length.Should().Be(0);
     }
-    
+
     [TestMethod]
     public void BuildContext_UserContext_InvalidJwt_ShouldThrow()
     {
@@ -111,7 +111,7 @@ public class ContextUtilityTests
         action.Should().Throw<InvalidOperationException>()
             .WithMessage("Authorization header did not contain a valid JWT.");
     }
-    
+
     [TestMethod]
     public void BuildContext_UserContext_MalformedRoleClaim_ShouldThrow()
     {
@@ -137,6 +137,33 @@ public class ContextUtilityTests
         // Assert
         action.Should().Throw<UnauthorizedException>()
             .WithMessage("Organization roles were improperly formatted.");
+    }
+
+    [TestMethod]
+    public void BuildContext_UserContext_GlobalAdminRole_ShouldSetContext()
+    {
+        // Arrange
+        var roles = new[] { "GlobalAdmin" };
+        var orgRoles = new List<KeyValuePair<Guid, string>> { };
+
+        var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid(), orgRoles, roles);
+        StringValues headerValue = jwt;
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+
+        // Act
+        var context = utility.GetContext();
+
+        // Assert
+        context.Should().BeOfType<UserContext>();
+        var userContext = (UserContext)context;
+        
+        userContext.Roles.Length.Should().Be(1);
+        userContext.Roles.Single().Should().Be("GlobalAdmin");
     }
 
     [TestMethod]

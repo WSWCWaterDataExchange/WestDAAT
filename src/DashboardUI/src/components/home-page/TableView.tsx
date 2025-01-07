@@ -4,13 +4,13 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import PieCharts from './water-rights-tab/PieCharts';
+import Charts from './water-rights-tab/Charts';
 import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import { DropdownOption } from '../../data-contracts/DropdownOption';
 
 function TableView() {
   const [show, setshow] = useState(false);
-  const [activeTab, setActiveTab] = useState('pieChart');
+  const [activeTab, setActiveTab] = useState('charts');
   const [selectedDropdownValue, setSelectedDropdownValue] = useState<DropdownOption | null>(null);
 
   const toggleShow = () => setshow(!show);
@@ -26,23 +26,19 @@ function TableView() {
         <Icon path={show ? mdiChevronDown : mdiChevronUp} />
       </Button>
       <div className={`analytics-and-table-content ${show ? 'toggle-on' : 'toggle-off'}`}>
-        <Tab.Container
-          activeKey={activeTab}
-          onSelect={(tab) => setActiveTab(tab || 'pieChart')}
-          id="analytics-and-table"
-        >
-          <Nav variant="tabs" defaultActiveKey="pieChart">
+        <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || 'charts')} id="analytics-and-table">
+          <Nav variant="tabs" defaultActiveKey="charts">
             <Nav.Item>
-              <Nav.Link eventKey="pieChart">Chart Summary</Nav.Link>
+              <Nav.Link eventKey="charts">Chart Summary</Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="dataTable">Data Table</Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="pieChart">
-              {activeTab === 'pieChart' && show && (
-                <PieCharts
+            <Tab.Pane eventKey="charts">
+              {activeTab === 'charts' && show && (
+                <Charts
                   selectedDropdownOption={selectedDropdownValue}
                   setSelectedDropdownOption={setSelectedDropdownValue}
                 />

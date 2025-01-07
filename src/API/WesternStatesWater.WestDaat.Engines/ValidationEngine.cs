@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore.Query;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.Extensions;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
@@ -22,33 +24,30 @@ internal class ValidationEngine : IValidationEngine
         _securityUtility = securityUtility;
     }
 
-    public async Task<ErrorBase> Validate(RequestBase request)
+    public Task<ErrorBase> Validate(RequestBase request)
     {
         var context = _contextUtility.GetContext();
-        var permissions = await _securityUtility.GetPermissions(context);
 
         return request switch
         {
-            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context, permissions),
-
+            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private ErrorBase ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context,
-        object permissions)
+    private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context)
     {
-        // If context cannot make a request of this type.
-        if (permissions is 1)
+        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest());
+        if (!permissions.Contains(Permissions.ConservationApplicationStore))
         {
             return CreateForbiddenError(request, context);
         }
 
-        // If the resources required to fulfill the request are not accessible to the user, or they
-        // do not exist.
-        if (permissions is 2)
+        // If the resources required to fulfill the request are not accessible to the user, or they do not exist.
+        var application = await Task.FromResult(1);
+        if (application is 2)
         {
             return CreateNotFoundError(
                 context,
@@ -58,7 +57,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // If there is additional business logic validation that the request doesn't pass.
-        if (permissions is 3)
+        if (permissions.Length == 3)
         {
             return new ValidationError(new Dictionary<string, string[]>
             {
