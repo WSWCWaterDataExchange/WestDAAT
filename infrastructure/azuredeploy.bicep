@@ -385,7 +385,7 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
   }
 }
 
-resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
+resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   name: resource_name_dashes_var
   location: location
   sku: {
@@ -395,6 +395,7 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
   properties: {
     disableLocalAuth: false
     zoneRedundant: false
+    minimumTlsVersion: '1.2'
   }
 }
 
