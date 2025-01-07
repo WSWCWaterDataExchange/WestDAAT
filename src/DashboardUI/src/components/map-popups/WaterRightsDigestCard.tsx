@@ -86,6 +86,14 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
                 <FormattedDate>{currWaterRight.priorityDate}</FormattedDate>
               </div>
             </div>
+            {currWaterRight.hasTimeSeriesData && (
+              <div className="mt-2">
+                <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
+                  Time Series Landing Page{' '}
+                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                </a>
+              </div>
+            )}
           </div>
         ),
       }}

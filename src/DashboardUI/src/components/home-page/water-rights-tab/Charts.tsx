@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HC_Data from 'highcharts/modules/export-data';
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
-import { Col, Container, ProgressBar, Row } from 'react-bootstrap';
+import { Col, Container, Nav, ProgressBar, Row, Tab } from 'react-bootstrap';
 import { useGetAnalyticsSummaryInfo } from '../../../hooks/queries';
 import { useColorMappings } from './hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
@@ -25,55 +25,99 @@ if (typeof Highcharts === 'object') {
   });
 }
 
-const chartExporting = {
+type SupportedSeriesChartTypes = 'pieChart' | 'barChart';
+
+const chartExporting: Highcharts.ExportingOptions = {
   chartOptions: {
     plotOptions: {
       pie: {
         dataLabels: {
           enabled: true,
-          format: '<b>{point.name}</b>:<br>{point.y:,.0f} ({point.percentage:.1f}%)',
+          formatter: function () {
+            let result = '<b>';
+            if (this.point.name) {
+              result += `${this.point.name}</b>:<br>`;
+            }
+            if (this.point.y) {
+              result += `${this.point.y.toFixed(0)} `;
+            }
+            if (this.point.percentage) {
+              result += `(${this.point.percentage.toFixed(1)}%)`;
+            }
+            return result;
+          },
         },
       },
     },
   },
 };
 
-const chartCommonOptions = {
-  chart: {
-    type: 'pie',
-  },
+const chartCommonOptions: Highcharts.Options = {
   subtitle: {},
   series: [],
   exporting: chartExporting,
 };
 
-const flowOptionsBase = {
+const flowOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Cumulative Flow (CSF) of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.1f}</b>',
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(1)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
-const countOptionsBase = {
+const countOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Count of Water Rights',
   },
   tooltip: {
-    pointFormat: '<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.0f}</b>',
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(0)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
-const volumeOptionsBase = {
+const volumeOptionsBase: Highcharts.Options = {
   ...chartCommonOptions,
   title: {
     text: 'Cumulative Volume (AF) of Water Rights',
   },
   tooltip: {
-    pointFormat: `<b>{point.percentage:.1f}% &nbsp;&nbsp; {point.y:,.2f}</b>`,
+    pointFormatter: function () {
+      let result = '<b>';
+      if (this.percentage) {
+        result += `${this.percentage.toFixed(1)}% &nbsp;&nbsp; `;
+      }
+      if (this.y) {
+        result += `${this.y?.toFixed(2)}`;
+      }
+
+      result += '</b>';
+      return result;
+    },
   },
 };
 
@@ -87,18 +131,19 @@ type ChartDataType = {
   data: ChartSeriesDataType[];
 };
 
-interface PieChartsProps {
+interface ChartsProps {
   selectedDropdownOption: DropdownOption | null;
   setSelectedDropdownOption: (option: DropdownOption) => void;
 }
 
-function PieCharts(props: PieChartsProps) {
+function Charts(props: ChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
   const request: WaterRightsSearchCriteriaWithGrouping = {
     ...searchCriteria,
     groupValue: Number(props.selectedDropdownOption?.value),
   };
-  const { data: pieChartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
+  const { data: chartSearchResults, isFetching } = useGetAnalyticsSummaryInfo(request);
+  const [chartType, setChartType] = useState<SupportedSeriesChartTypes>('pieChart');
 
   const { getBeneficialUseColor } = useColorMappings();
 
@@ -117,9 +162,9 @@ function PieCharts(props: PieChartsProps) {
         data: [],
       },
     ];
-    if (!pieChartSearchResults || !pieChartSearchResults.analyticsSummaryInformation) return initData;
+    if (!chartSearchResults || !chartSearchResults.analyticsSummaryInformation) return initData;
 
-    return pieChartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
+    return chartSearchResults.analyticsSummaryInformation.reduce((prev, curr, index) => {
       const [flow, vol, point] = prev;
       const name = curr.primaryUseCategoryName ?? 'Unspecified';
       const color = getBeneficialUseColor(name, index);
@@ -137,7 +182,7 @@ function PieCharts(props: PieChartsProps) {
       }
       return [flow, vol, point];
     }, initData);
-  }, [pieChartSearchResults, getBeneficialUseColor]);
+  }, [chartSearchResults, getBeneficialUseColor]);
 
   return (
     <div>
@@ -147,30 +192,51 @@ function PieCharts(props: PieChartsProps) {
         </a>
       </div>
 
-      <AnalyticsInfoGroupingDropdown
-        isFetching={isFetching}
-        analyticsSummaryInformationResponse={pieChartSearchResults}
-        selectedDropdownOption={props.selectedDropdownOption}
-        setSelectedDropdownOption={props.setSelectedDropdownOption}
-      />
+      <Container fluid={true}>
+        <Row>
+          <Col lg="3">
+            <div>
+              <span>Chart Type</span>
+            </div>
+            <Tab.Container activeKey={chartType} onSelect={(tab) => setChartType(tab as SupportedSeriesChartTypes)}>
+              <Nav variant="pills" defaultActiveKey="pieChart">
+                <Nav.Item>
+                  <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="barChart">Bar Graph</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Tab.Container>
+          </Col>
+          <Col lg="9">
+            <AnalyticsInfoGroupingDropdown
+              isFetching={isFetching}
+              analyticsSummaryInformationResponse={chartSearchResults}
+              selectedDropdownOption={props.selectedDropdownOption}
+              setSelectedDropdownOption={props.setSelectedDropdownOption}
+            />
+          </Col>
+        </Row>
+      </Container>
 
-      {pieChartSearchResults?.analyticsSummaryInformation &&
-        pieChartSearchResults?.analyticsSummaryInformation?.length > 0 && (
+      {chartSearchResults?.analyticsSummaryInformation &&
+        chartSearchResults?.analyticsSummaryInformation?.length > 0 && (
           <Container fluid={true}>
             <Row>
               <Col lg="4">
-                <ChartData name="count" data={pointData} />
+                <SeriesChart name="count" data={pointData} chartType={chartType} />
               </Col>
               <Col lg="4">
-                <ChartData name="flow" data={flowData} />
+                <SeriesChart name="flow" data={flowData} chartType={chartType} />
               </Col>
               <Col lg="4">
-                <ChartData name="volume" data={volumeData} />
+                <SeriesChart name="volume" data={volumeData} chartType={chartType} />
               </Col>
             </Row>
           </Container>
         )}
-      {pieChartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
+      {chartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
         <div className="d-flex justify-content-center">No results found</div>
       )}
       {isFetching && (
@@ -183,10 +249,14 @@ function PieCharts(props: PieChartsProps) {
   );
 }
 
-export default PieCharts;
+export default Charts;
 
-function ChartData(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataType }) {
-  const { name, data } = props;
+function SeriesChart(props: {
+  name: 'volume' | 'flow' | 'count';
+  data: ChartDataType;
+  chartType: SupportedSeriesChartTypes;
+}) {
+  const { name, data, chartType } = props;
 
   const [chartOptionsBase, subTitle] = useMemo(() => {
     switch (name) {
@@ -199,20 +269,44 @@ function ChartData(props: { name: 'volume' | 'flow' | 'count'; data: ChartDataTy
     }
   }, [name, data.sum]);
 
-  const chartOptions = useMemo(() => {
+  const highchartsChartType: Highcharts.SeriesOptionsType['type'] = useMemo(() => {
+    switch (chartType) {
+      case 'pieChart':
+        return 'pie';
+      case 'barChart':
+        return 'column';
+    }
+  }, [chartType]);
+
+  const sortedData = useMemo(() => {
+    return data.data.sort((a, b) => b.y - a.y);
+  }, [data.data]);
+
+  const xAxisCategories = useMemo(() => {
+    return data.data.map((d) => d.name);
+  }, [data.data]);
+
+  const chartOptions: Highcharts.Options = useMemo(() => {
     return {
       ...chartOptionsBase,
+      chart: {
+        type: highchartsChartType,
+      },
       subtitle: {
         ...chartOptionsBase.subtitle,
         text: subTitle,
       },
+      xAxis: {
+        categories: xAxisCategories,
+      },
       series: [
         {
-          data: data.data.sort((a, b) => b.y - a.y),
+          data: sortedData,
+          type: highchartsChartType,
         },
       ],
     };
-  }, [chartOptionsBase, subTitle, data.data]);
+  }, [chartOptionsBase, subTitle, highchartsChartType, sortedData]);
 
   return data.data.length > 0 ? (
     <HighchartsReact highcharts={Highcharts} options={chartOptions} />
