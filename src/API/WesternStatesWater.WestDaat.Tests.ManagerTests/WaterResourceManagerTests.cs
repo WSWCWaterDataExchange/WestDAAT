@@ -904,7 +904,37 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task GetOverlayInfoById_ThrowsException_WhenNoOverlayEntriesFound()
+        public async Task GetOverlayInfoById_SearchByMultipleFields_ShouldThrow()
+        {
+            // Arrange
+            var manager = CreateWaterResourceManager();
+
+            // Act
+            var call = () => manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = "test",
+                AllocationUUID = "test"
+            });
+
+            // Assert
+            await call.Should().ThrowAsync<WestDaatException>();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_SearchByNoFields_ShouldThrow()
+        {
+            // Arrange
+            var manager = CreateWaterResourceManager();
+
+            // Act
+            var call = () => manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria());
+
+            // Assert
+            await call.Should().ThrowAsync<WestDaatException>();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_NoOverlayEntriesFound_Success()
         {
             // Arrange
             var reportingUnitUuid = "test_uuid";
