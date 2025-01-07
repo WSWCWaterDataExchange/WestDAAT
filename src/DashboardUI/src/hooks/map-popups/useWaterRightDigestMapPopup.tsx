@@ -1,5 +1,4 @@
-import React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSiteClickedOnMap from './useSiteClickedOnMap';
 import ErrorCard from '../../components/map-popups/ErrorCard';
 import LoadingCard from '../../components/map-popups/LoadingCard';
@@ -19,7 +18,7 @@ function useWaterRightDigestMapPopup() {
   }, [siteData, setCurrentIndex]);
 
   const result = useMemo(() => {
-    if (!siteUuid) {
+    if (!siteUuid || oType) {
       return undefined;
     }
     if (isFetching) {
@@ -41,7 +40,7 @@ function useWaterRightDigestMapPopup() {
         onClosePopup={handleClosePopup}
       />
     );
-  }, [isFetching, siteUuid, siteData, currentIndex, handleClosePopup, setCurrentIndex]);
+  }, [isFetching, siteUuid, oType, siteData, currentIndex, handleClosePopup, setCurrentIndex]);
 
   useEffect(() => {
     if (result) {
@@ -49,4 +48,5 @@ function useWaterRightDigestMapPopup() {
     }
   }, [result, updatePopup]);
 }
+
 export default useWaterRightDigestMapPopup;
