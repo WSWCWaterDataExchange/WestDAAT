@@ -21,6 +21,9 @@ CREATE TABLE UserOrganizations
     CONSTRAINT FK_Organizations FOREIGN KEY (OrganizationId) REFERENCES Organizations (Id)
 );
 
+CREATE INDEX IX_UserOrganizations_UserId ON UserOrganizations(UserId);
+CREATE INDEX IX_UserOrganizations_OrganizationId ON UserOrganizations(OrganizationId);
+
 CREATE TABLE UserOrganizationRoles
 (
     Id                 UNIQUEIDENTIFIER NOT NULL CONSTRAINT PK_UserOrganizationRoles_Id PRIMARY KEY NONCLUSTERED,
@@ -28,3 +31,5 @@ CREATE TABLE UserOrganizationRoles
     Role               NVARCHAR(255)    NOT NULL,
     CONSTRAINT FK_UserOrganizations FOREIGN KEY (UserOrganizationId) REFERENCES UserOrganizations (Id)
 );
+
+CREATE INDEX IX_UserOrganizationRoles_UserOrganizationId ON UserOrganizationRoles(UserOrganizationId);
