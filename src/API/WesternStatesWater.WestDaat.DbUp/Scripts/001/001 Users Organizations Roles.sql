@@ -33,3 +33,9 @@ CREATE TABLE UserOrganizationRoles
 );
 
 CREATE INDEX IX_UserOrganizationRoles_UserOrganizationId ON UserOrganizationRoles(UserOrganizationId);
+
+CREATE TABLE UserRoles
+(
+    Id   UNIQUEIDENTIFIER NOT NULL CONSTRAINT PK_UserRoles_Id PRIMARY KEY NONCLUSTERED,
+    Role NVARCHAR(255)    NOT NULL
+);
