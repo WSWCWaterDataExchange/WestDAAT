@@ -12,16 +12,31 @@ export function useMapLegend() {
   const { legendItems: nldiLegendItems } = useNldiMapLegend();
 
   useEffect(() => {
-    setLegend(
-      <>
-        <h1>OVERLAY INFO</h1>
-        {overlayLegendItems}
+    const legendContent = (
+      <div>
+        {overlayLegendItems && (
+          <div>
+            <h5><strong>Overlay Info</strong></h5>
+            {overlayLegendItems}
+          </div>
+        )}
 
-        <h1>BENEFICIAL USE</h1>
-        {wadeLegendItems}
+        {wadeLegendItems && (
+          <div>
+            <h5><strong>Beneficial Use</strong></h5>
+            {wadeLegendItems}
+          </div>
+        )}
 
-        {nldiLegendItems}
-      </>
+        {nldiLegendItems && (
+          <div>
+            <h5><strong>NLDI Legend</strong></h5>
+            {nldiLegendItems}
+          </div>
+        )}
+      </div>
     );
-  }, [setLegend, wadeLegendItems, nldiLegendItems, overlayLegendItems]);
+
+    setLegend(legendContent);
+  }, [setLegend, overlayLegendItems, wadeLegendItems, nldiLegendItems]);
 }
