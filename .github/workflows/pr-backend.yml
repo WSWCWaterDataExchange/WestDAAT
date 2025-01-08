@@ -42,5 +42,5 @@ jobs:
     - name: .NET Test
       run: dotnet test
       env:
-          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       working-directory: src/API
