@@ -13,6 +13,7 @@ const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
   mapLayerNames.nldiUsgsPointsLayer,
+  mapLayerNames.overlayTypesPolygonsLayer
 ];
 export function useDisplayOptions() {
   const {

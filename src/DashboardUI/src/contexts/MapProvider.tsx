@@ -266,6 +266,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
           updatedFillColorSet[value.layer] = value.fillColor;
         });
         if (!deepEqual(s, updatedFillColorSet)) {
+          console.log("Updated fillColors for layer:", updatedFillColorSet); // Log updated colors
           return updatedFillColorSet;
         }
         return s;
@@ -273,6 +274,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
     },
     [setFillColors],
   );
+
 
   const [iconImages, setIconImages] = useState<MapLayerIconImagesType>({});
   const setLayerIconImages = useCallback(

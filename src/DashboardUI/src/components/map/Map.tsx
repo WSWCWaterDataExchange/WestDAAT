@@ -213,8 +213,15 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       });
 
       mapConfig.layers.forEach((a: any) => {
-        mapInstance.addLayer(a);
+        console.log(`Adding layer with id: ${a.id}`);
+        try {
+          mapInstance.addLayer(a);
+          console.log(`Successfully added layer: ${a.id}`);
+        } catch (error) {
+          console.error(`Failed to add layer ${a.id}:`, error);
+        }
       });
+
       mapInstance.resize();
       setMap(mapInstance);
     });
@@ -425,9 +432,18 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
   useEffect(() => {
     if (!map) return;
     for (const key in fillColors) {
+      console.log(`Setting fill-color for layer "${key}" with value:`, fillColors[key]);
       map.setPaintProperty(key, 'fill-color', fillColors[key]);
     }
   }, [map, fillColors]);
+
+  useEffect(() => {
+    if (!map) return;
+    const layerExists = map.getLayer('overlayTypesPolygonsLayer');
+    console.log('Overlay Types Polygons Layer exists:', !!layerExists);
+  }, [map]);
+
+
 
   useEffect(() => {
     if (!map) return;

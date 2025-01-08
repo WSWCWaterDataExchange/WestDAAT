@@ -10,21 +10,34 @@ export function useOverlayTypeLegend() {
 
   const renderedOverlayTypes = useMemo(() => {
     const types = new Set<string>();
-    for (const feature of renderedFeatures) {
+
+    // Log only features with oType
+    renderedFeatures.forEach((feature) => {
       const raw = feature?.properties?.oType;
-      if (typeof raw === 'string') {
-        try {
-          const arrayOfTypes = JSON.parse(raw);
-          if (Array.isArray(arrayOfTypes)) {
-            arrayOfTypes.forEach((type) => {
-              if (typeof type === 'string' && type.trim().length > 0) {
-                types.add(type);
+      if (raw) {
+        console.log("Feature with oType:", {
+          properties: feature.properties, // Log all properties
+          rawOType: raw, // Log raw oType value
+        });
+
+        if (typeof raw === 'string') {
+          try {
+            const arrayOfTypes = JSON.parse(raw);
+            if (Array.isArray(arrayOfTypes)) {
+              const sortedTypes = arrayOfTypes
+                .filter((type) => typeof type === 'string' && type.trim().length > 0)
+                .sort();
+              if (sortedTypes.length > 0) {
+                types.add(sortedTypes[0]); // Add the first alphabetically
               }
-            });
+            }
+          } catch {
+            console.error("Error parsing oType for feature:", raw); // Log errors parsing oType
           }
-        } catch {}
+        }
       }
-    }
+    });
+
     return Array.from(types);
   }, [renderedFeatures]);
 
@@ -48,18 +61,23 @@ export function useOverlayTypeLegend() {
     if (colorMappings.length > 0) {
       fillColor = ['case'];
       colorMappings.forEach(({ key, color }) => {
-        fillColor.push(['==', ['get', 'oType'], key]);
+        fillColor.push(['==', ['get', 'oType'], JSON.stringify([key])]); // Match raw stringified JSON
         fillColor.push(color);
       });
       fillColor.push(fallbackColor);
     } else {
       fillColor = fallbackColor;
     }
+
+    console.log("Applying fillColor to overlayTypesPolygonsLayer:", fillColor);
+
     setLayerFillColors({
       layer: mapLayerNames.overlayTypesPolygonsLayer,
       fillColor,
     });
   }, [colorMappings, fallbackColor, setLayerFillColors]);
+
+
 
   return { legendItems };
 }
