@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
 
-public class EnrichJwtResponse
+public class EnrichJwtResponse : UserLoadResponseBase
 {
     public string Version { get; set; }
     public string Action { get; set; }
