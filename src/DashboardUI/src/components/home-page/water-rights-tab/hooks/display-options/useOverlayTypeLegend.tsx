@@ -16,17 +16,12 @@ export function useOverlayTypeLegend() {
         return [];
       }
     };
-    let colorMappings = [...overlayTypeColors]
-
-    colorMappings = colorMappings.filter((a) =>
+    return overlayTypeColors.filter((a) =>
       renderedFeatures.some(
         (b) => b.properties && tryParseJsonArray(b.properties['oType']).some((c: string) => c === a.key),
       ),
     );
-    return colorMappings;
-  }, [renderedFeatures]);
-
-
+  }, [renderedFeatures, overlayTypeColors]);
 
   const legendItems = useMemo(() => {
     if (renderedOverlayTypes.length === 0) return undefined;
@@ -38,27 +33,19 @@ export function useOverlayTypeLegend() {
   }, [renderedOverlayTypes]);
 
   useEffect(() => {
-    if (!renderedFeatures || renderedFeatures.length === 0) {
-      return;
-    }
-    let colorArray: any;
-    if (overlayTypeColors.length > 0) {
-      colorArray = ['case'];
-      renderedOverlayTypes.forEach((a) => {
-        colorArray.push(['in', a.key, ['get', 'oType']]);
-        colorArray.push(a.color);
-      });
-      colorArray.push(fallbackColor);
-    } else {
-      colorArray = fallbackColor;
-    }
-    console.log("Applying fillColor to overlayTypesPolygonsLayer:", colorArray);
+    let colorArray: any = ['case'];
+
+    overlayTypeColors.forEach((a) => {
+      colorArray.push(['in', a.key, ['get', 'oType']]);
+      colorArray.push(a.color);
+    });
+    colorArray.push(fallbackColor);
 
     setLayerFillColors({
       layer: mapLayerNames.overlayTypesPolygonsLayer,
       fillColor: colorArray,
     });
-  }, [overlayTypeColors, fallbackColor, setLayerFillColors, renderedOverlayTypes]);
+  }, [overlayTypeColors, fallbackColor, setLayerFillColors]);
 
   return { legendItems };
 }

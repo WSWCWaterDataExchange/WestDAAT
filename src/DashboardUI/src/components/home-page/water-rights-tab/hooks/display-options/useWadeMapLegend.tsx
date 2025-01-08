@@ -109,8 +109,6 @@ export function useWadeLegend() {
       colorArray = fallbackColor;
     }
 
-    console.log("Applying fillColor to waterRightsPointsLayer", colorArray)
-
     setLayerCircleColors({
       layer: mapLayerNames.waterRightsPointsLayer,
       circleColor: colorArray,
