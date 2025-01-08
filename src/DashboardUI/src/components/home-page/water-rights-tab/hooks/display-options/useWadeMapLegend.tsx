@@ -19,7 +19,7 @@ export function useWadeLegend() {
     displayOptions: { mapGrouping: mapGroupingOption },
   } = useWaterRightsContext();
 
-  const { beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, overlayTypeColors, fallbackColor } = useColorMappings();
+  const { beneficialUseColors, ownerClassificationColors, waterSourceTypeColors, fallbackColor } = useColorMappings();
 
   const mapGroupingColors = useMemo(() => {
     switch (mapGroupingOption) {
@@ -108,6 +108,8 @@ export function useWadeLegend() {
     } else {
       colorArray = fallbackColor;
     }
+
+    console.log("Applying fillColor to waterRightsPointsLayer", colorArray)
 
     setLayerCircleColors({
       layer: mapLayerNames.waterRightsPointsLayer,

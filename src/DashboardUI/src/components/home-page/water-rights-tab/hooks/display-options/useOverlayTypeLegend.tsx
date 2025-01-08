@@ -9,75 +9,56 @@ export function useOverlayTypeLegend() {
   const { overlayTypeColors, fallbackColor } = useColorMappings();
 
   const renderedOverlayTypes = useMemo(() => {
-    const types = new Set<string>();
-
-    // Log only features with oType
-    renderedFeatures.forEach((feature) => {
-      const raw = feature?.properties?.oType;
-      if (raw) {
-        console.log("Feature with oType:", {
-          properties: feature.properties, // Log all properties
-          rawOType: raw, // Log raw oType value
-        });
-
-        if (typeof raw === 'string') {
-          try {
-            const arrayOfTypes = JSON.parse(raw);
-            if (Array.isArray(arrayOfTypes)) {
-              const sortedTypes = arrayOfTypes
-                .filter((type) => typeof type === 'string' && type.trim().length > 0)
-                .sort();
-              if (sortedTypes.length > 0) {
-                types.add(sortedTypes[0]); // Add the first alphabetically
-              }
-            }
-          } catch {
-            console.error("Error parsing oType for feature:", raw); // Log errors parsing oType
-          }
-        }
+    const tryParseJsonArray = (value: any) => {
+      try {
+        return JSON.parse(value ?? '[]');
+      } catch {
+        return [];
       }
-    });
+    };
+    let colorMappings = [...overlayTypeColors]
 
-    return Array.from(types);
+    colorMappings = colorMappings.filter((a) =>
+      renderedFeatures.some(
+        (b) => b.properties && tryParseJsonArray(b.properties['oType']).some((c: string) => c === a.key),
+      ),
+    );
+    return colorMappings;
   }, [renderedFeatures]);
 
-  const colorMappings = useMemo(() => {
-    return overlayTypeColors.filter((colorObj) =>
-      renderedOverlayTypes.includes(colorObj.key),
-    );
-  }, [overlayTypeColors, renderedOverlayTypes]);
+
 
   const legendItems = useMemo(() => {
-    if (colorMappings.length === 0) return undefined;
-    return colorMappings.map((colorObj) => (
+    if (renderedOverlayTypes.length === 0) return undefined;
+    return renderedOverlayTypes.map((colorObj) => (
       <MapLegendCircleItem key={colorObj.key} color={colorObj.color}>
         {colorObj.key}
       </MapLegendCircleItem>
     ));
-  }, [colorMappings]);
+  }, [renderedOverlayTypes]);
 
   useEffect(() => {
-    let fillColor: any;
-    if (colorMappings.length > 0) {
-      fillColor = ['case'];
-      colorMappings.forEach(({ key, color }) => {
-        fillColor.push(['==', ['get', 'oType'], JSON.stringify([key])]); // Match raw stringified JSON
-        fillColor.push(color);
-      });
-      fillColor.push(fallbackColor);
-    } else {
-      fillColor = fallbackColor;
+    if (!renderedFeatures || renderedFeatures.length === 0) {
+      return;
     }
-
-    console.log("Applying fillColor to overlayTypesPolygonsLayer:", fillColor);
+    let colorArray: any;
+    if (overlayTypeColors.length > 0) {
+      colorArray = ['case'];
+      renderedOverlayTypes.forEach((a) => {
+        colorArray.push(['in', a.key, ['get', 'oType']]);
+        colorArray.push(a.color);
+      });
+      colorArray.push(fallbackColor);
+    } else {
+      colorArray = fallbackColor;
+    }
+    console.log("Applying fillColor to overlayTypesPolygonsLayer:", colorArray);
 
     setLayerFillColors({
       layer: mapLayerNames.overlayTypesPolygonsLayer,
-      fillColor,
+      fillColor: colorArray,
     });
-  }, [colorMappings, fallbackColor, setLayerFillColors]);
-
-
+  }, [overlayTypeColors, fallbackColor, setLayerFillColors, renderedOverlayTypes]);
 
   return { legendItems };
 }

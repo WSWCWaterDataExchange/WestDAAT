@@ -8,12 +8,11 @@ import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
 import { useAlerts } from '../useAlerts';
 
-const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
+const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer, mapLayerNames.overlayTypesPolygonsLayer];
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
   mapLayerNames.nldiUsgsPointsLayer,
-  mapLayerNames.overlayTypesPolygonsLayer
 ];
 export function useDisplayOptions() {
   const {

@@ -54,7 +54,6 @@ export function useColorMappings() {
     );
   }, [allOverlays, getColorByIndex]);
 
-
   const getBeneficialUseColor = useCallback(
     (beneficialUseName: string) => {
       return beneficialUseColors.find((item) => item.key === beneficialUseName)?.color ?? fallbackColor;

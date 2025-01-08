@@ -216,7 +216,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         console.log(`Adding layer with id: ${a.id}`);
         try {
           mapInstance.addLayer(a);
-          console.log(`Successfully added layer: ${a.id}`);
+          console.log(`Successfully added layer: ${a.id}`, 'Layer color:', a.paint['fill-color']);
         } catch (error) {
           console.error(`Failed to add layer ${a.id}:`, error);
         }
