@@ -15,21 +15,21 @@ export function useMapLegend() {
     const legendContent = (
       <div>
         {overlayLegendItems && (
-          <div className="mb-2">
+          <div className="mb-3">
             <h5><strong>Overlay Info</strong></h5>
             {overlayLegendItems}
           </div>
         )}
 
         {wadeLegendItems && (
-          <div className="mb-2">
+          <div className="mb-3">
             <h5><strong>Beneficial Use</strong></h5>
             {wadeLegendItems}
           </div>
         )}
 
         {nldiLegendItems && (
-          <div className="mb-2">
+          <div className="mb-3">
             <h5><strong>NLDI Legend</strong></h5>
             {nldiLegendItems}
           </div>
