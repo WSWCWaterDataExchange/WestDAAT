@@ -29,34 +29,147 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
-        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping groupValue)
         {
-            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
+            using var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
             await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
             await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
-
-            var analyticsSummary = await db.AllocationAmountsFact
-                .AsNoTracking()
-                .Where(predicate)
-                // Distinct forces proper grouping by beneficialUse query
-                .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
-                .Distinct()
-                .GroupBy(a => a.PrimaryBeneficialUseCategory)
-                .Select(a => new AnalyticsSummaryInformation
-                {
-                    Flow = a.Sum(c => c.AllocationFlow_CFS),
-                    PrimaryUseCategoryName = a.Key,
-                    Points = a.Count(),
-                    Volume = a.Sum(c => c.AllocationVolume_AF),
-                })
-                .ToArrayAsync();
+            
+            var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(db, predicate, groupValue);
 
             ts.Complete();
 
             return analyticsSummary;
+        }
+
+        private async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformationWithGrouping(DatabaseContext db, ExpressionStarter<AllocationAmountsFact> predicate, Common.AnalyticsInformationGrouping groupBy)
+        {
+            switch (groupBy)
+            {
+                case Common.AnalyticsInformationGrouping.BeneficialUse:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.PrimaryBeneficialUseCategory)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.OwnerType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.OwnerClassificationCV, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.OwnerClassificationCV)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.AllocationType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationTypeCv, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.AllocationTypeCv)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.LegalStatus:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationLegalStatusCv, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.AllocationLegalStatusCv)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.SiteType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Join(db.AllocationBridgeSitesFact,
+                            aaf => aaf.AllocationAmountId,
+                            absf => absf.AllocationAmountId,
+                            (aaf, absf) => new { aaf, absf })
+                        .Join(db.SitesDim,
+                            combined => combined.absf.SiteId,
+                            sd => sd.SiteId,
+                            (combined, sd) => new { combined.aaf, sd })
+                        .Join(db.SiteType,
+                            cvst => cvst.sd.SiteTypeCv,
+                            st => st.Name,
+                            (cvst, st) => new { cvst.aaf, st })
+                        .GroupBy(x => x.st.WaDEName)
+                        .Select(g => new AnalyticsSummaryInformation
+                        {
+                            PrimaryUseCategoryName = g.Key,
+                            Flow = g.Sum(x => x.aaf.AllocationFlow_CFS),
+                            Volume = g.Sum(x => x.aaf.AllocationVolume_AF),
+                            Points = g.Count()
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.WaterSourceType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Join(db.AllocationBridgeSitesFact,
+                            aaf => aaf.AllocationAmountId,
+                            absf => absf.AllocationAmountId,
+                            (aaf, absf) => new { aaf, absf })
+                        .Join(db.SitesDim,
+                            combined => combined.absf.SiteId,
+                            sd => sd.SiteId,
+                            (combined, sd) => new { combined.aaf, sd })
+                        .Join(db.WaterSourceBridgeSitesFact,
+                            wsbridge => wsbridge.sd.SiteId,
+                            wsbridge => wsbridge.SiteId,
+                            (wsbridge, ws) => new { wsbridge.aaf, ws })
+                        .Join(db.WaterSourcesDim,
+                            ws => ws.ws.WaterSourceId,
+                            wsdim => wsdim.WaterSourceId,
+                            (ws, wsdim) => new { ws.aaf, wsdim })
+                        .Join(db.WaterSourceType,
+                            cvwst => cvwst.wsdim.WaterSourceTypeCv,
+                            wst => wst.Name,
+                            (cvwst, wst) => new { cvwst.aaf, wst })
+                        .GroupBy(x => x.wst.WaDEName)
+                        .Select(g => new AnalyticsSummaryInformation
+                        {
+                            Flow = g.Sum(x => x.aaf.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = g.Key,
+                            Points = g.Count(),
+                            Volume = g.Sum(x => x.aaf.AllocationVolume_AF)
+                        })
+                        .ToArrayAsync();
+                default:
+                    throw new NotSupportedException($"Support for grouping by value {groupBy} is not implemented");
+            }
         }
 
         public async Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchCriteria)
@@ -324,7 +437,15 @@ namespace WesternStatesWater.WestDaat.Accessors
             db.Database.SetCommandTimeout(int.MaxValue);
             return await db.AllocationAmountsFact
                 .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
-                .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
+                .Select(x => new WaterRightsDigest
+                {
+                    AllocationUuid = x.AllocationUuid,
+                    NativeId = x.AllocationNativeId,
+                    PriorityDate = x.AllocationPriorityDateNavigation.Date,
+                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList(),
+                    HasTimeSeriesData = x.AllocationBridgeSitesFact
+                        .Any(bridge => bridge.Site.SiteVariableAmountsFact.Count != 0)
+                })
                 .ToListAsync();
         }
 

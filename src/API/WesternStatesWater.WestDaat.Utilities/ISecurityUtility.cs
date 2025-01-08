@@ -1,8 +1,8 @@
-using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
 public interface ISecurityUtility
 {
-    Task<object> GetPermissions(ContextBase context);
+    string[] Get(PermissionsGetRequestBase request);
 }

@@ -20,14 +20,13 @@ var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 var wadedbserver = ((Environment == 'prod'))
   ? 'wade-production-server.database.windows.net'
   : 'wade-qa-server.database.windows.net'
-var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA_Server'
+var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA'
 
 // Role Definitions (Different per tenant). 
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
 param azureServiceBusDataSenderRoleDefinitionName string = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
 param azureServiceBusReceiverRoleDefinitionName string = '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
 param azureServiceBusDataOwnerDefinitionName string = '090c5cfd-751d-490a-894a-3ce6f1109419'
-
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
@@ -226,45 +225,9 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
     reserved: false
     isXenon: false
     hyperV: false
-siteConfig: {
-      appSettings: [
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
-        }
-        {
-          name: 'AzureWebJobsSecretStorageType'
-          value: 'files'
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
-        }
-        {
-          name: 'Database:AccessTokenDatabaseTenantId'
-          value: subscription().tenantId
-        }
-        {
-          name: 'Database:AccessTokenDatabaseResource'
-          value: 'https://database.windows.net/'
-        }
-        {
-          name: 'Database:ConnectionString'
-          value: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-        }
-        {
-          name: 'MessageBus:ServiceBusUrl'
-          value: '${service_bus.name}.servicebus.windows.net'
-        }
-      ]
+    siteConfig: {
+      // Don't include the appSettings here. They will get merged in separate step
+      // Doing so will clobber existing app settings
     }
     scmSiteAlsoStopped: false
     clientAffinityEnabled: false
@@ -278,6 +241,36 @@ siteConfig: {
     redundancyMode: 'None'
     storageAccountRequired: false
     keyVaultReferenceIdentity: 'SystemAssigned'
+  }
+}
+
+var fnAppSettings = {
+  'Database:AccessTokenDatabaseResource': 'https://database.windows.net/'
+  'Database:AccessTokenDatabaseTenantId': subscription().tenantId
+  'Database:ConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
+  'Nldi:MaxDownstreamDiversionDistance': '500'
+  'Nldi:MaxDownstreamMainDistance': '500'
+  'Nldi:MaxUpstreamMainDistance': '500'
+  'Nldi:MaxUpstreamTributaryDistance': '500'
+  'Smtp:FeedbackFrom': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackTo:0': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
+  APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
+  AzureWebJobsSecretStorageType: 'files'
+  AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
+  FUNCTIONS_EXTENSION_VERSION: '~4'
+  FUNCTIONS_WORKER_RUNTIME: 'dotnet-isolated'
+  WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
+  WEBSITE_CONTENTSHARE: 'westdaat-qa-1234'
+}
+
+module appSettings 'appsettings.bicep' = {
+  name: 'functionAppSettings'
+  params: {
+    fnName: sites_fn_resource.name
+    currentAppSettings: list('${sites_fn_resource.id}/config/appsettings', '2020-12-01').properties
+    appSettings: fnAppSettings
   }
 }
 
@@ -345,6 +338,8 @@ resource sites_fn_web 'Microsoft.Web/sites/config@2021-03-01' = {
     cors: {
       allowedOrigins: [
         'https://portal.azure.com'
+        'https://westdaatqa.azureedge.net'
+        'https://westdaatqa.westernstateswater.org'
       ]
       supportCredentials: false
     }
@@ -390,7 +385,7 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
   }
 }
 
-resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
+resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   name: resource_name_dashes_var
   location: location
   sku: {
@@ -400,6 +395,7 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
   properties: {
     disableLocalAuth: false
     zoneRedundant: false
+    minimumTlsVersion: '1.2'
   }
 }
 
@@ -416,7 +412,6 @@ resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = 
     name: queueName
   }
 ]
-
 
 // Role Assignments
 // Note - You must be an Owner or User Access Administrator to assign roles.
