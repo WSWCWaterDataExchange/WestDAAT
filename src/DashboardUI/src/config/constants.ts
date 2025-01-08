@@ -77,3 +77,14 @@ export const colorList = [
   '#00A277',
   '#B11D6C',
 ];
+
+export const overlaysColorList = [
+  '#99FF99',
+  '#FF9999',
+  '#9999FF',
+  '#FF99FF',
+  '#FFFF99',
+  '#99FFFF',
+  '#FFB380',
+  '#C8A2C8',
+];

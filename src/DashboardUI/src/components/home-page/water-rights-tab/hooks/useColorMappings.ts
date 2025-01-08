@@ -12,7 +12,7 @@ export function useColorMappings() {
     },
   } = useWaterRightsContext();
 
-  const { fallbackColor, getColorByIndex } = useColorMappingsBase();
+  const { fallbackColor, getColorByIndex, getOverlayColorByIndex } = useColorMappingsBase();
 
   const beneficialUseColors = useMemo(() => {
     let colorIndex = 0;
@@ -49,10 +49,10 @@ export function useColorMappings() {
     return (
       allOverlays?.map((oType) => ({
         key: oType,
-        color: getColorByIndex(colorIndex++),
+        color: getOverlayColorByIndex(colorIndex++),
       })) ?? []
     );
-  }, [allOverlays, getColorByIndex]);
+  }, [allOverlays, getOverlayColorByIndex]);
 
   const getBeneficialUseColor = useCallback(
     (beneficialUseName: string, index: number) => {
