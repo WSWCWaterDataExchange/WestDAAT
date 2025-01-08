@@ -699,42 +699,29 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
 
+            var query = db.RegulatoryOverlayDim
+                .AsNoTracking()
+                .AsQueryable();
+
             if (!string.IsNullOrEmpty(searchCriteria.ReportingUnitUUID))
             {
-                return await db.RegulatoryOverlayDim
-                    .AsNoTracking()
+                query = query
                     .Where(ro => ro.RegulatoryReportingUnitsFact
-                        .Any(rr => rr.ReportingUnit.ReportingUnitUuid == searchCriteria.ReportingUnitUUID))
-                    .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
-                    .ToListAsync();
+                        .Any(rr => rr.ReportingUnit.ReportingUnitUuid == searchCriteria.ReportingUnitUUID));
             }
             else if (!string.IsNullOrEmpty(searchCriteria.AllocationUUID))
             {
-                return await db.AllocationAmountsFact
-                    .AsNoTracking()
-                    .Where(aaf => aaf.AllocationUuid == searchCriteria.AllocationUUID)
-                    .Join(db.AllocationBridgeSitesFact,
-                        aaf => aaf.AllocationAmountId,
-                        absf => absf.AllocationAmountId,
-                        (aaf, absf) => new { aaf, absf })
-                    .Join(db.SitesDim,
-                        combined => combined.absf.SiteId,
-                        site => site.SiteId,
-                        (combined, site) => new { combined.aaf, site })
-                    .Join(db.RegulatoryOverlayBridgeSitesFact,
-                        combined => combined.site.SiteId,
-                        robsf => robsf.SiteId,
-                        (combined, robsf) => new { combined.aaf, robsf })
-                    .Join(db.RegulatoryOverlayDim,
-                        combined => combined.robsf.RegulatoryOverlayId,
-                        ro => ro.RegulatoryOverlayId,
-                        (combined, ro) => new { combined.aaf, ro })
-                    .Select(combined => combined.ro)
-                    .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
-                    .ToListAsync();
+                query = query
+                    .Where(ro => ro.RegulatoryOverlayBridgeSitesFact
+                        .Any(robsf => robsf.Site.AllocationBridgeSitesFact
+                            .Any(absf => absf.AllocationAmount.AllocationUuid == searchCriteria.AllocationUUID)
+                        )
+                    );
             }
 
-            throw new NotImplementedException();
+            return await query
+                .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
+                .ToListAsync();
         }
 
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
