@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore.Query;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.Extensions;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -31,6 +31,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context),
+            UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -66,6 +67,17 @@ internal class ValidationEngine : IValidationEngine
         }
 
         return null;
+    }
+
+    private Task<ErrorBase> ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            EnrichJwtRequest => null,
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
     }
 
     private ForbiddenError CreateForbiddenError(
