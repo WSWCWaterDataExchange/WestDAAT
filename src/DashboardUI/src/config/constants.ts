@@ -40,7 +40,10 @@ export enum waterRightsProperties {
   allocationTypes = 'allocType',
   legalStatuses = 'ls',
   siteTypes = 'sType',
-  overlayType = 'oType',
+}
+
+export enum overlayProperties {
+  overlayType = 'oType'
 }
 
 export enum nldiSiteProperties {
