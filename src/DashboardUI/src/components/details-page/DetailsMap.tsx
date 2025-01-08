@@ -15,7 +15,7 @@ function DetailsMap(props: detailsMapProps) {
   const { setVisibleLayers, setGeoJsonData, setMapBoundSettings: setMapBounds } = useMapContext();
 
   useEffect(() => {
-    setVisibleLayers([mapLayerNames.siteLocationsPointsLayer, mapLayerNames.siteLocationsPolygonsLayer, mapLayerNames.overlayTypesPolygonsLayer]);
+    setVisibleLayers([mapLayerNames.siteLocationsPointsLayer, mapLayerNames.siteLocationsPolygonsLayer]);
   }, [setVisibleLayers]);
 
   useEffect(() => {

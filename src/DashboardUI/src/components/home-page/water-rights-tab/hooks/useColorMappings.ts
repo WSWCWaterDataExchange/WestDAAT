@@ -49,7 +49,7 @@ export function useColorMappings() {
     return (
       allOverlays?.map((oType) => ({
         key: oType,
-        color: getColorByIndex(colorIndex++),  // picks next color from the colorList
+        color: getColorByIndex(colorIndex++),
       })) ?? []
     );
   }, [allOverlays, getColorByIndex]);

@@ -41,7 +41,7 @@ const defaultPointPaintConfiguration = {
     pointSizes.maxPointSizeZoomLevel,
     0.3,
   ],
-  'circle-color': '#FE2346',
+  'circle-color': '#ff0000',
   'circle-opacity': 0.75,
 };
 
@@ -133,7 +133,7 @@ const mapsJson = {
       },
       type:'fill',
       paint: {
-      "fill-color": "#FF0000",
+      "fill-color": "#ff0000",
       "fill-opacity": 0.5
       },
       filter: ['has', 'oType']

@@ -215,7 +215,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       mapConfig.layers.forEach((a: any) => {
         mapInstance.addLayer(a);
       });
-
       mapInstance.resize();
       setMap(mapInstance);
     });
@@ -429,8 +428,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       map.setPaintProperty(key, 'fill-color', fillColors[key]);
     }
   }, [map, fillColors]);
-
-
 
   useEffect(() => {
     if (!map) return;
