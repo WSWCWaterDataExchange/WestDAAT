@@ -44,6 +44,9 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
         // Note - azure b2c requires the namespace to be prefixed with "extension_"
         //  {
         //   "extension_westdaat/userId": "<guid>",
+        //   "extension_westdaat/roles": [
+        //     "rol_GlobalAdmin"
+        //   ],
         //   "extension_westdaat/organizationRoles": [
         //     "org_d3b07384-d9a7-4f3b-8a1d-6e5c3e2b7f4f/rol_Member",
         //     "org_d3b07384-d9a7-4f3b-8a1d-6e5c3e2b7f4f/rol_TechnicalReviewer",
