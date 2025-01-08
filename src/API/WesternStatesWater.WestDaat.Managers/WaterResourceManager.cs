@@ -216,8 +216,8 @@ namespace WesternStatesWater.WestDaat.Managers
 
         async Task<List<ClientContracts.OverlayTableEntry>> ClientContracts.IWaterResourceManager.GetOverlayInfoById(ClientContracts.OverlayDetailsSearchCriteria searchCriteria)
         {
-            var searchCriteriaFieldsEmptyCheck = new[] { searchCriteria.ReportingUnitUUID, searchCriteria.AllocationUUID };
-            if (searchCriteriaFieldsEmptyCheck.Select(string.IsNullOrEmpty).Count(@bool => @bool) != 1)
+            var searchCriteriaFields = new[] { searchCriteria.ReportingUnitUUID, searchCriteria.AllocationUUID };
+            if (searchCriteriaFields.Select(string.IsNullOrWhiteSpace).Count(@bool => @bool) != 1)
             {
                 throw new WestDaatException("Only one search criteria field should be non-empty");
             }
