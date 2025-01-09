@@ -2,45 +2,63 @@ name: PR Backend
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [develop, master]
   pull_request:
-    branches: [ develop, master ]
-
+    branches: [develop, master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: src/API
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Start Docker Containers
-      run: docker compose -f ci-compose.yml up -d
-      working-directory: .github
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: .NET Build
-      run: dotnet build --no-restore
-    - name: Create Database
-      run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
-    - name: Check out WaDE2.0
-      uses: actions/checkout@v2
-      with:
-        repository: WSWCWaterDataExchange/WaDE2.0
-        ref: develop
-    - name: DbUp
-      run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
-      working-directory: source/WesternStatesWater.WaDE.DbUp
-    - uses: actions/checkout@v2
-    - name: .NET Test
-      run: dotnet test
-      env:
+      - uses: actions/checkout@v2
+      - name: Start Docker Containers
+        run: docker compose -f ci-compose.yml up -d
+        working-directory: .github
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: .NET Build
+        run: dotnet build --no-restore
+      - name: Create Database
+        run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
+      - name: Check out WaDE2.0
+        uses: actions/checkout@v2
+        with:
+          repository: WSWCWaterDataExchange/WaDE2.0
+          ref: develop
+      - name: DbUp
+        run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
+        working-directory: source/WesternStatesWater.WaDE.DbUp
+      - uses: actions/checkout@v2
+      - name: .NET Test
+        run: dotnet test
+        env:
           Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
-      working-directory: src/API
+        working-directory: src/API
+
+      - name: Generate OpenAPI document
+        id: oai
+        uses: Azure/azure-functions-openapi-extension/actions/build-openapi@v1
+        with:
+          functionAppPath: "bin/Debug/net6.0"
+          requestUri: "http://localhost:5001/api/openapi/v3.json"
+          documentPath: "generated"
+          documentName: "openapi.json"
+          delay: "30"
+          isRemote: "false"
+
+      - name: Check generated OpenAPI document
+        shell: pwsh
+        run: |
+          echo "Generated Document: ${{ steps.oai.outputs.generated }}"
+
+          $json = Get-Content -Path ${{ steps.oai.outputs.generated }} | ConvertFrom-Json
+          $result = $json.openapi -eq "3.0.1"
+          echo "Check result: $result"
