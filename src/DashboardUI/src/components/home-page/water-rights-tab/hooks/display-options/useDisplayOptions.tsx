@@ -7,6 +7,8 @@ import { useMapLegend } from './useMapLegend';
 import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
 import { useAlerts } from '../useAlerts';
+import useOverlayDigestMapPopup from "../../../../../hooks/map-popups/useOverlayDigestMapPopup";
+import useSiteClickedOnMap from '../../../../../hooks/map-popups/useSiteClickedOnMap';
 
 const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
 const nldiLayers = [
@@ -14,12 +16,14 @@ const nldiLayers = [
   mapLayerNames.nldiUsgsLocationLayer,
   mapLayerNames.nldiUsgsPointsLayer,
 ];
+
 export function useDisplayOptions() {
   const {
     filters: { riverBasinNames, isNldiFilterActive },
   } = useWaterRightsContext();
 
   const { setVisibleLayers } = useMapContext();
+  const { oType } = useSiteClickedOnMap();
 
   useEffect(() => {
     const visible = [...allWaterRightsLayers];
@@ -33,6 +37,7 @@ export function useDisplayOptions() {
   useMapPointScaling();
 
   useNldiMapPopup();
+  useOverlayDigestMapPopup();
   useWaterRightDigestMapPopup();
 
   useAlerts();

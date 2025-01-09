@@ -1,4 +1,4 @@
-import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem } from '@data-contracts';
+import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem, OverlayDigest } from '@data-contracts';
 import axios from 'axios';
 import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
@@ -15,6 +15,12 @@ export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRigh
 export const getSiteDigest = async (siteUuid: string): Promise<SiteDigest> => {
   const url = new URL(`Sites/${siteUuid}/Digest`, process.env.REACT_APP_WEBAPI_URL);
   const { data } = await axios.get<SiteDigest>(url.toString());
+  return data;
+};
+
+export const getOverlayDigests = async (overlayUuid: string): Promise<OverlayDigest[]> => {
+  const url = new URL(`Overlays/${overlayUuid}/OverlayDigest`, process.env.REACT_APP_WEBAPI_URL);
+  const { data } = await axios.get<OverlayDigest[]>(url.toString());
   return data;
 };
 

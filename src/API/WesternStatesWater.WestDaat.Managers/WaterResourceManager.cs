@@ -256,6 +256,11 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             return (await _waterAllocationAccessor.GetWaterRightsDigestsBySite(siteUuid)).Map<List<ClientContracts.WaterRightsDigest>>();
         }
+        
+        async Task<List<ClientContracts.OverlayDigest>> ClientContracts.IWaterResourceManager.GetOverlayDigestsByUuid(string siteUuid)
+        {
+            return (await _waterAllocationAccessor.GetOverlayDigestsByUuid(siteUuid)).Map<List<ClientContracts.OverlayDigest>>();
+        }
 
         async Task<Feature> ClientContracts.IWaterResourceManager.GetWaterSiteLocation(string siteUuid)
         {
