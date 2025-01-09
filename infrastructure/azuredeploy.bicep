@@ -385,6 +385,19 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
   }
 }
 
+resource api_management 'Microsoft.ApiManagement/service@2024-05-01' = {
+  name: resource_name_var
+  location: location
+  sku: {
+    name: 'Consumption'
+    capacity: 0
+  }
+  properties: {
+    publisherEmail: 'rjames@wswc.utah.gov'
+    publisherName: 'Western States Water Council'
+  }
+}
+
 resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   name: resource_name_dashes_var
   location: location
