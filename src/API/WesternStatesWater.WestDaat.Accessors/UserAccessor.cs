@@ -15,11 +15,17 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     public async Task<UserLoadRolesResponse> GetUserRoles(UserLoadRolesRequest request)
     {
         // mock implementation
-        var userRoleNames = await Task.FromResult(new string[] { "role1", "role2" });
+
+        await Task.CompletedTask;
+        var userId = Guid.NewGuid();
+        var userRoles = new string[] { "role1", "role2" };
+        var userOrganizationRoles = new string[] { "organizationRole1", "organizationRole2" };
 
         return new UserLoadRolesResponse
         {
-            RoleNames = userRoleNames
+            UserId = userId,
+            UserRoles = userRoles,
+            UserOrganizationRoles = userOrganizationRoles
         };
     }
 }

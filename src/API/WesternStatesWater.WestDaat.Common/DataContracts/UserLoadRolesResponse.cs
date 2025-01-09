@@ -2,5 +2,7 @@
 
 public class UserLoadRolesResponse
 {
-    public string[] RoleNames { get; set; }
+    public Guid UserId { get; set; }
+    public string[] UserRoles { get; set; }
+    public string[] UserOrganizationRoles { get; set; }
 }
