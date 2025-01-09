@@ -28,6 +28,21 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OverlayDetails, ClientContracts.OverlayDetails>()
                 .ForMember(dest => dest.Geometry, opt => opt.Ignore());
             CreateMap<CommonContracts.OverlayTableEntry, ClientContracts.OverlayTableEntry>();
+
+            AddUserMappings();
+        }
+
+        private void AddUserMappings()
+        {
+            CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserLoadRolesRequest>()
+                .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+
+            const string azureB2CVersionString = "1.0.0";
+            const string azureB2CContinuanceAction = "Continue";
+            CreateMap<CommonContracts.UserLoadRolesResponse, ClientContracts.Responses.Admin.EnrichJwtResponse>()
+                .ForMember(dest => dest.Version, opt => opt.Map(() => azureB2CVersionString))
+                .ForMember(dest => dest.Action, opt => opt.Map(() => azureB2CContinuanceAction))
+                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => string.Join(',', src.RoleNames)));
         }
     }
 }
