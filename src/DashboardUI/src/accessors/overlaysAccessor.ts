@@ -21,3 +21,12 @@ export const getWaterRightsInfoListByReportingUnitUuid = async (
   );
   return data;
 };
+
+export const getWaterRightsInfoListByAllocationUuid = async (
+  allocationUuid: string,
+): Promise<WaterRightsInfoListItem[]> => {
+  const { data } = await axios.get<WaterRightsInfoListItem[]>(
+    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/Overlays`,
+  );
+  return data;
+};
