@@ -142,6 +142,18 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.StatutoryEffectiveDate, opt => opt.MapFrom(source => source.StatutoryEffectiveDate))
                 .ForMember(dest => dest.StatutoryEndDate, opt => opt.MapFrom(source => source.StatutoryEndDate))
                 .ForMember(dest => dest.OverlayStatusDesc, opt => opt.MapFrom(source => source.RegulatoryDescription));
+            
+            CreateMap<EF.ReportingUnitsDim, OverlayDigest>()
+                .ForMember(dest => dest.WaDeAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
+                .ForMember(dest => dest.ReportingAreaNativeId, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
+                .ForMember(dest => dest.ReportingAreaName, opt => opt.MapFrom(source => source.ReportingUnitName))
+                .ForMember(dest => dest.WaDeOverlayAreaType, opt => opt.MapFrom(source =>
+                    source.RegulatoryReportingUnitsFact
+                        .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
+                        .Distinct()
+                        .ToList()))
+                .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
+
         }
     }
 }
