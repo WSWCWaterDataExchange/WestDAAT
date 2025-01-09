@@ -921,18 +921,51 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
-        public async Task GetOverlayInfoById_ThrowsException_WhenNoOverlayEntriesFound()
+        public async Task GetOverlayInfoById_SearchByMultipleFields_ShouldThrow()
+        {
+            // Arrange
+            var manager = CreateWaterResourceManager();
+
+            // Act
+            var call = () => manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = "test",
+                AllocationUUID = "test"
+            });
+
+            // Assert
+            await call.Should().ThrowAsync<WestDaatException>();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_SearchByNoFields_ShouldThrow()
+        {
+            // Arrange
+            var manager = CreateWaterResourceManager();
+
+            // Act
+            var call = () => manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria());
+
+            // Assert
+            await call.Should().ThrowAsync<WestDaatException>();
+        }
+
+        [TestMethod]
+        public async Task GetOverlayInfoById_NoOverlayEntriesFound_Success()
         {
             // Arrange
             var reportingUnitUuid = "test_uuid";
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(It.Is<CommonContracts.OverlayDetailsSearchCriteria>(searchCriteria => searchCriteria.ReportingUnitUUID == reportingUnitUuid)))
                 .ReturnsAsync((List<CommonContracts.OverlayTableEntry>)null)
                 .Verifiable();
 
             var manager = CreateWaterResourceManager();
 
             // Act
-            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+            var result = await manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = reportingUnitUuid,
+            });
 
             // Assert
             result.Should().BeEmpty();
@@ -947,18 +980,21 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var reportingUnitUuid = "test_uuid";
             var overlayEntries = new List<CommonContracts.OverlayTableEntry>
             {
-                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1"},
-                new CommonContracts.OverlayTableEntry {WaDEOverlayUuid = "overlay_2" }
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_1" },
+                new CommonContracts.OverlayTableEntry { WaDEOverlayUuid = "overlay_2" }
             };
 
-            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(reportingUnitUuid))
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayInfoById(It.Is<CommonContracts.OverlayDetailsSearchCriteria>(searchCriteria => searchCriteria.ReportingUnitUUID == reportingUnitUuid)))
                 .ReturnsAsync(overlayEntries)
                 .Verifiable();
 
             var manager = CreateWaterResourceManager();
 
             // Act
-            var result = await manager.GetOverlayInfoById(reportingUnitUuid);
+            var result = await manager.GetOverlayInfoById(new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = reportingUnitUuid,
+            });
 
             // Assert
             result.Should().NotBeNull();
