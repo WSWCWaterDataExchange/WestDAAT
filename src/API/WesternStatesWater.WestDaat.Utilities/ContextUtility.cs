@@ -89,7 +89,12 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static string[] GetRoles(IEnumerable<Claim> claims)
     {
-        var rolesClaim = claims.Single(claim => claim.Type == $"{ClaimNamespace}/roles");
+        var rolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/roles");
+
+        if (rolesClaim is null || string.IsNullOrEmpty(rolesClaim.Value))
+        {
+            return [];
+        }
 
         // value is a csv string
         var roles = rolesClaim.Value.Split(",")
@@ -101,7 +106,12 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static OrganizationRole[] GetOrganizationRoles(IEnumerable<Claim> claims)
     {
-        var orgRolesClaim = claims.Single(claim => claim.Type == $"{ClaimNamespace}/organizationRoles");
+        var orgRolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/organizationRoles");
+
+        if (orgRolesClaim is null || string.IsNullOrEmpty(orgRolesClaim.Value))
+        {
+            return [];
+        }
 
         // value is csv string
         var orgRoleStrings = orgRolesClaim.Value.Split(",");
