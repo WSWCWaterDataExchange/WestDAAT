@@ -1,7 +1,8 @@
 using System.Reflection;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Function;
-
 
 [TestClass]
 public class OpenApiTests
@@ -20,7 +21,7 @@ public class OpenApiTests
                 && t.FullName.EndsWith("Function"))
             .ToArray();
 
-        functionClasses.ShouldNotBeEmpty();
+        functionClasses.Should().NotBeEmpty();
 
         HashSet<string> openApiOperations = new();
 
@@ -41,9 +42,9 @@ public class OpenApiTests
                     .GetCustomAttributes()
                     .SingleOrDefault(attribute => attribute is OpenApiOperationAttribute) as OpenApiOperationAttribute;
 
-                openApiOperationAttribute.ShouldNotBeNull();
+                openApiOperationAttribute.Should().NotBeNull();
 
-                openApiOperations.Add(openApiOperationAttribute.OperationId).ShouldBe(true, $"Duplicate operationId: {openApiOperationAttribute.OperationId}");
+                openApiOperations.Add(openApiOperationAttribute.OperationId).Should().Be(true, $"Duplicate operationId: {openApiOperationAttribute.OperationId}");
             }
         }
     }
@@ -62,7 +63,7 @@ public class OpenApiTests
                 && t.FullName.EndsWith("Function"))
             .ToArray();
 
-        functionClasses.ShouldNotBeEmpty();
+        functionClasses.Should().NotBeEmpty();
 
         foreach (var functionClass in functionClasses)
         {
@@ -95,15 +96,15 @@ public class OpenApiTests
 
                 var hasSingleHttpMethod = httpTriggerAttribute?.Methods?.Length == 1;
 
-                hasSingleHttpMethod.ShouldBeTrue(
+                hasSingleHttpMethod.Should().BeTrue(
                     $"{functionClass.Name}.{functionMethod.Name} should have a single HTTP method. To support multiple methods use multiple functions. This is due to OpenApiExtension limitations.");
 
                 CheckRouteParameterAttributePresence(functionMethod, functionClass);
 
-                hasOpenApiOperationAttribute.ShouldBeTrue(
+                hasOpenApiOperationAttribute.Should().BeTrue(
                     $"{functionClass.Name}.{functionMethod.Name} should be decorated with OpenApiOperation attribute");
 
-                hasOpenApiResponseAttribute.ShouldBeTrue(
+                hasOpenApiResponseAttribute.Should().BeTrue(
                     $"{functionClass.Name}.{functionMethod.Name} should be decorated with OpenApiResponseWithBodyAttribute or OpenApiResponseWithoutBodyAttribute attribute");
             }
         }
@@ -126,9 +127,10 @@ public class OpenApiTests
                         attribute is OpenApiParameterAttribute);
                 if (!hasOpenApiParameterAttribute)
                 {
-                    hasOpenApiParameterAttribute.ShouldBeTrue(
+                    hasOpenApiParameterAttribute.Should().BeTrue(
                         $"{functionClass.Name}.{functionMethod.Name} should be decorated with OpenApiParameter attribute since it contains a route parameter");
                 }
             }
         }
     }
+}

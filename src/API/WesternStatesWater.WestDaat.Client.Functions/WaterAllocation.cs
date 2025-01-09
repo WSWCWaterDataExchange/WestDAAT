@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using WesternStatesWater.WestDaat.Common.Exceptions;
@@ -26,6 +25,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         private readonly ILogger _logger;
 
         [Function(nameof(NldiFeatures))]
+        [OpenApiOperation(nameof(NldiFeatures))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> NldiFeatures([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequestData req, double latitude, double longitude)
         {
             _logger.LogInformation("Getting NLDI Features []");
@@ -40,6 +41,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
         // Water Right Routes
         [Function(nameof(FindWaterRights))]
+        [OpenApiOperation(nameof(FindWaterRights))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterRightsSearchResults))]
         public async Task<HttpResponseData> FindWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/find")] HttpRequestData request)
         {
             var searchRequest = await ParseRequestBody<WaterRightsSearchCriteriaWithPaging>(request);
@@ -49,6 +52,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightDetails))]
+        [OpenApiOperation(nameof(GetWaterRightDetails))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterRightDetails))]
         public async Task<HttpResponseData> GetWaterRightDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}")] HttpRequestData request, string allocationUuid)
         {
             var result = await _waterResourceManager.GetWaterRightDetails(allocationUuid);
@@ -57,6 +62,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightSiteInfoList))]
+        [OpenApiOperation(nameof(GetWaterRightSiteInfoList))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<SiteInfoListItem>))]
         public async Task<HttpResponseData> GetWaterRightSiteInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Sites")] HttpRequestData request, string allocationUuid)
         {
             var result = await _waterResourceManager.GetWaterRightSiteInfoList(allocationUuid);
@@ -65,6 +72,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightSourceInfoList))]
+        [OpenApiOperation(nameof(GetWaterRightSourceInfoList))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<WaterSourceInfoListItem>))]
         public async Task<HttpResponseData> GetWaterRightSourceInfoList([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Sources")] HttpRequestData request, string allocationUuid)
         {
             var result = await _waterResourceManager.GetWaterRightSourceInfoList(allocationUuid);
@@ -73,6 +82,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightSiteLocations))]
+        [OpenApiOperation(nameof(GetWaterRightSiteLocations))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> GetWaterRightSiteLocations([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/SiteLocations")] HttpRequestData request, string allocationUuid)
         {
             var result = await _waterResourceManager.GetWaterRightSiteLocations(allocationUuid);
@@ -81,6 +92,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetAnalyticsSummaryInformation))]
+        [OpenApiOperation(nameof(GetAnalyticsSummaryInformation))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(AnalyticsSummaryInformationResponse))]
         public async Task<HttpResponseData> GetAnalyticsSummaryInformation([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/AnalyticsSummaryInformation")] HttpRequestData request)
         {
             var searchRequest = await ParseRequestBody<WaterRightsSearchCriteriaWithGrouping>(request);
@@ -91,6 +104,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightsEnvelope))]
+        [OpenApiOperation(nameof(GetWaterRightsEnvelope))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> GetWaterRightsEnvelope([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/DataEnvelope")] HttpRequestData request)
         {
             var searchRequest = await ParseRequestBody<WaterRightsSearchCriteria>(request);
@@ -102,6 +117,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
         // Site Routes
         [Function(nameof(GetWaterAllocationSiteDetails))]
+        [OpenApiOperation(nameof(GetWaterAllocationSiteDetails))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(string))]
         public async Task<HttpResponseData> GetWaterAllocationSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "sites/{siteUuid}/geoconnex")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetWaterAllocationSiteGeoconnexIntegrationData(siteUuid);
@@ -110,6 +127,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetSiteDetails))]
+        [OpenApiOperation(nameof(GetSiteDetails))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteDetails))]
         public async Task<HttpResponseData> GetSiteDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteDetails(siteUuid);
@@ -118,6 +137,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterRightSiteDigest))]
+        [OpenApiOperation(nameof(GetWaterRightSiteDigest))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<WaterRightsDigest>))]
         public async Task<HttpResponseData> GetWaterRightSiteDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/WaterRightsDigest")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetWaterRightsDigestsBySite(siteUuid);
@@ -126,6 +147,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetOverlayDigest))]
+        [OpenApiOperation(nameof(GetOverlayDigest))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<OverlayDigest>))]
         public async Task<HttpResponseData> GetOverlayDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/OverlayDigest")] HttpRequestData request, string overlayUuid)
         {
             var result = await _waterResourceManager.GetOverlayDigestsByUuid(overlayUuid);
@@ -134,6 +157,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetSiteDigest))]
+        [OpenApiOperation(nameof(GetSiteDigest))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteDigest))]
         public async Task<HttpResponseData> GetSiteDigest([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Digest")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteDigest(siteUuid);
@@ -142,6 +167,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetSiteLocation))]
+        [OpenApiOperation(nameof(GetSiteLocation))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(GeoJSON.Text.Feature.Feature))]
         public async Task<HttpResponseData> GetSiteLocation([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteLocation")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetWaterSiteLocation(siteUuid);
@@ -150,6 +177,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterSiteSourceListByUuid))]
+        [OpenApiOperation(nameof(GetWaterSiteSourceListByUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<WaterSourceInfoListItem>))]
         public async Task<HttpResponseData> GetWaterSiteSourceListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Sources")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetWaterSiteSourceInfoListByUuid(siteUuid);
@@ -158,6 +187,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetWaterSiteRightsListByUuid))]
+        [OpenApiOperation(nameof(GetWaterSiteRightsListByUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<WaterRightInfoListItem>))]
         public async Task<HttpResponseData> GetWaterSiteRightsListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Rights")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetWaterSiteRightsInfoListByUuid(siteUuid);
@@ -166,6 +197,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetWaterRightsListByReportingUnitUuid))]
+        [OpenApiOperation(nameof(GetWaterRightsListByReportingUnitUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<WaterRightInfoListItem>))]
         public async Task<HttpResponseData> GetWaterRightsListByReportingUnitUuid(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{reportingUnitUuid}/Rights")] HttpRequestData request,
             string reportingUnitUuid)
@@ -175,6 +208,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetSiteUsageByByUuid))]
+        [OpenApiOperation(nameof(GetSiteUsageByByUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteUsage))]
         public async Task<HttpResponseData> GetSiteUsageByByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/SiteUsage")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteUsageBySiteUuid(siteUuid);
@@ -183,6 +218,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetSiteVariableInfoListByUuid))]
+        [OpenApiOperation(nameof(GetSiteVariableInfoListByUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<VariableInfoListItem>))]
         public async Task<HttpResponseData> GetSiteVariableInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Variables")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteVariableInfoListByUuid(siteUuid);
@@ -191,6 +228,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetOverlayTableDetails))]
+        [OpenApiOperation(nameof(GetOverlayTableDetails))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<OverlayTableEntry>))]
         public async Task<HttpResponseData> GetOverlayTableDetails(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] 
             HttpRequestData request, string overlayUuid)
@@ -205,6 +244,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetOverlayTableDetailsByAllocation))]
+        [OpenApiOperation(nameof(GetOverlayTableDetailsByAllocation))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<OverlayTableEntry>))]
         public async Task<HttpResponseData> GetOverlayTableDetailsByAllocation(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Overlays")]
             HttpRequestData request, string allocationUuid)
@@ -219,15 +260,18 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetOverlayDetails))]
+        [OpenApiOperation(nameof(GetOverlayDetails))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
             var overlay = await _waterResourceManager.GetOverlayDetails(overlayUuid);
             
             return await CreateOkResponse(request, overlay);
-            
         }
         
         [Function(nameof(GetSiteMethodInfoListByUuid))]
+        [OpenApiOperation(nameof(GetSiteMethodInfoListByUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(List<MethodInfoListItem>))]
         public async Task<HttpResponseData> GetSiteMethodInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Methods")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteMethodInfoListByUuid(siteUuid);
@@ -236,6 +280,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(DownloadWaterRights))]
+        [OpenApiOperation(nameof(DownloadWaterRights))]
+        [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
         public async Task<IActionResult> DownloadWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/download")] HttpRequest request)
         {
             // the IO operations have to be synchronous 
