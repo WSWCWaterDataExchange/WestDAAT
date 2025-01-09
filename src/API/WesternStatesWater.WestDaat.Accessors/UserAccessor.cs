@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -10,4 +11,44 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     }
 
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+
+    public async Task<UserLoadResponseBase> Load(UserLoadRequestBase request)
+    {
+        return request switch
+        {
+            UserLoadRolesRequest req => await GetUserRoles(req),
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private async Task<UserLoadRolesResponse> GetUserRoles(UserLoadRolesRequest request)
+    {
+        // mock implementation
+
+        await Task.CompletedTask;
+        var userId = Guid.NewGuid();
+        var userRoles = new string[] { "role1", "role2" };
+        var userOrganizationRoles = new UserOrganizationRoleDetails[]
+        {
+            new UserOrganizationRoleDetails
+            {
+                OrganizationId = Guid.NewGuid(),
+                Role = "organizationRole1"
+            },
+            new UserOrganizationRoleDetails
+            {
+                OrganizationId = Guid.NewGuid(),
+                Role = "organizationRole2"
+            },
+        };
+
+        return new UserLoadRolesResponse
+        {
+            UserId = userId,
+            UserRoles = userRoles,
+            UserOrganizationRoles = userOrganizationRoles
+        };
+    }
+
 }
