@@ -38,6 +38,6 @@ public class UserIntegrationTests : IntegrationTestBase
         response.Action.Should().Be(expectedAzureB2CAction);
         response.Extension_WestDaat_UserId.Should().NotBeEmpty();
         response.Extension_WestDaat_Roles.Should().Be("role1,role2");
-        response.Extension_WestDaat_OrganizationRoles.Should().Be("organizationRole1,organizationRole2");
+        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll("organizationRole1", "organizationRole2");
     }
 }

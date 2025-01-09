@@ -46,7 +46,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Action, opt => opt.MapFrom(_ => azureB2CContinuanceAction))
                 .ForMember(dest => dest.Extension_WestDaat_UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => string.Join(',', src.UserRoles)))
-                .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src => string.Join(',', src.UserOrganizationRoles)))
+                .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src => 
+                    string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"{orgRole.OrganizationId}/{orgRole.Role}"))
+                    )
+                )
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
     }

@@ -29,7 +29,19 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         await Task.CompletedTask;
         var userId = Guid.NewGuid();
         var userRoles = new string[] { "role1", "role2" };
-        var userOrganizationRoles = new string[] { "organizationRole1", "organizationRole2" };
+        var userOrganizationRoles = new UserOrganizationRoleDetails[]
+        {
+            new UserOrganizationRoleDetails
+            {
+                OrganizationId = Guid.NewGuid(),
+                Role = "organizationRole1"
+            },
+            new UserOrganizationRoleDetails
+            {
+                OrganizationId = Guid.NewGuid(),
+                Role = "organizationRole2"
+            },
+        };
 
         return new UserLoadRolesResponse
         {
