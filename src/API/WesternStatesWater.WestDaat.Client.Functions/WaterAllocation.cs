@@ -199,21 +199,34 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
         
-        [Function(nameof(GetOverlayTableDetails))]
-        public async Task<HttpResponseData> GetOverlayTableDetails(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Overlays/Legal")] HttpRequestData request)
+        [Function(nameof(GetOverlayTableDetailsByReportingUnit))]
+        public async Task<HttpResponseData> GetOverlayTableDetailsByReportingUnit(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/Legal/ReportingUnit/{reportingUnitUuid}")] 
+            HttpRequestData request, string reportingUnitUuid)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
+            var searchCriteria = new OverlayDetailsSearchCriteria
             {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var searchCriteria = JsonConvert.DeserializeObject<OverlayDetailsSearchCriteria>(requestBody);
+                ReportingUnitUUID = reportingUnitUuid,
+            };
 
             var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
             return await CreateOkResponse(request, overlayTable);
         }
-        
+
+        [Function(nameof(GetOverlayTableDetailsByAllocation))]
+        public async Task<HttpResponseData> GetOverlayTableDetailsByAllocation(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/Legal/Allocation/{allocationUuid}")]
+            HttpRequestData request, string allocationUuid)
+        {
+            var searchCriteria = new OverlayDetailsSearchCriteria
+            {
+                AllocationUUID = allocationUuid,
+            };
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
+            return await CreateOkResponse(request, overlayTable);
+        }
+
         [Function(nameof(GetOverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
