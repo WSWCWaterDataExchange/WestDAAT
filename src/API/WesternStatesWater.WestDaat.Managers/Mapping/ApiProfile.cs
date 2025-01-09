@@ -42,7 +42,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.UserLoadRolesResponse, ClientContracts.Responses.Admin.EnrichJwtResponse>()
                 .ForMember(dest => dest.Version, opt => opt.MapFrom(_ => azureB2CVersionString))
                 .ForMember(dest => dest.Action, opt => opt.MapFrom(_ => azureB2CContinuanceAction))
-                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => string.Join(',', src.RoleNames)));
+                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => string.Join(',', src.RoleNames)))
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
     }
 }
