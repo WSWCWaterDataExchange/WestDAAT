@@ -1,11 +1,21 @@
 import { useCallback } from 'react';
-import { colorList } from '../config/constants';
+import { colorList, overlaysColorList} from '../config/constants';
 
-const fallbackColor = '#000000';
+const fallbackColor = '#000000'; // Single fallback color for all cases
+
 export function useColorMappings() {
   const getColorByIndex = useCallback((i: number) => {
     return colorList[i % colorList.length];
   }, []);
 
-  return { getColorByIndex, fallbackColor };
+  const getOverlayColorByIndex = useCallback((i: number) => {
+    return overlaysColorList[i % overlaysColorList.length];
+  }, []);
+
+
+  return {
+    getColorByIndex,
+    getOverlayColorByIndex,
+    fallbackColor,
+  };
 }
