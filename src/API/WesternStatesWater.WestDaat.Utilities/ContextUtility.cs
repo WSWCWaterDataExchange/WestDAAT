@@ -91,7 +91,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
     {
         var rolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/roles");
 
-        if (rolesClaim is null || string.IsNullOrEmpty(rolesClaim.Value))
+        if (string.IsNullOrEmpty(rolesClaim?.Value))
         {
             return [];
         }
@@ -108,7 +108,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
     {
         var orgRolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/organizationRoles");
 
-        if (orgRolesClaim is null || string.IsNullOrEmpty(orgRolesClaim.Value))
+        if (string.IsNullOrEmpty(orgRolesClaim?.Value))
         {
             return [];
         }
