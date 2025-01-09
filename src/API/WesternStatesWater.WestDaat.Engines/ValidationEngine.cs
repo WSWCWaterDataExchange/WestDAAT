@@ -73,7 +73,7 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            EnrichJwtRequest => null,
+            EnrichJwtRequest => Task.FromResult((ErrorBase) null),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
