@@ -33,5 +33,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<OverlayDetails> GetOverlayDetails(string overlayUuid);
         
         Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid);
+        
+        Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid);
     }
 }
