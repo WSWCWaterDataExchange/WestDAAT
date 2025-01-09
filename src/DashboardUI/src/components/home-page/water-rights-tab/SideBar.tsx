@@ -103,9 +103,11 @@ function SideBar() {
               <label className="fw-bold">OVERLAY FILTER {isOverlayFilterActive}</label>
             </Accordion.Header>
             <Accordion.Body>
-              <Overlays />
+              <Overlays isOverlayFilterActive={isOverlayFilterActive} />
             </Accordion.Body>
           </Accordion.Item>
+
+
 
           <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header onClick={toggleWaterRightFilters}>
