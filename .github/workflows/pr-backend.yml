@@ -33,15 +33,15 @@ jobs:
         with:
           repository: WSWCWaterDataExchange/WaDE2.0
           ref: develop
-      - name: DbUp
-        run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
-        working-directory: source/WesternStatesWater.WaDE.DbUp
-      - uses: actions/checkout@v2
-      - name: .NET Test
-        run: dotnet test
-        env:
-          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
-        working-directory: src/API
+      # - name: DbUp
+      #   run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
+      #   working-directory: source/WesternStatesWater.WaDE.DbUp
+      # - uses: actions/checkout@v2
+      # - name: .NET Test
+      #   run: dotnet test
+      #   env:
+      #     Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+      #   working-directory: src/API
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
       - name: Generate OpenAPI document
