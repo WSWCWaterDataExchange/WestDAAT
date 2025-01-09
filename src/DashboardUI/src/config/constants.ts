@@ -42,6 +42,10 @@ export enum waterRightsProperties {
   siteTypes = 'sType',
 }
 
+export enum overlayProperties {
+  overlayType = 'oType'
+}
+
 export enum nldiSiteProperties {
   sourceName = 'sourceName',
   identifier = 'identifier',

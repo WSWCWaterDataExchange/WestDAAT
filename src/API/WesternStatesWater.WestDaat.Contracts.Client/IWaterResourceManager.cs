@@ -58,4 +58,6 @@ public interface IWaterResourceManager : IServiceContractBase
     Task<DashboardFilters> LoadFilters();
 
     Task WaterRightsAsZip(Stream responseStream, WaterRightsSearchCriteriaWithFilterUrl searchRequest);
+    
+    Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string siteUuid);
 }
