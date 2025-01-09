@@ -14,7 +14,8 @@ public class AdminFunction : FunctionBase
     private readonly IUserManager _userManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "admin";
+    // "_" prefix is necessary because Azure Functions reserves the route "admin"
+    private const string RouteBase = "_admin";
 
     public AdminFunction(IUserManager userManager, ILogger<AdminFunction> logger)
     {
@@ -27,17 +28,17 @@ public class AdminFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{RouteBase}/enrichJwt")]
         HttpRequestData req)
     {
-        var enrichJwtRequest = ParseRequestBody<EnrichJwtRequest>(req);
+        var enrichJwtRequest = await ParseRequestBody<EnrichJwtRequest>(req);
         var results = await _userManager.Load<EnrichJwtRequest, EnrichJwtResponse>(enrichJwtRequest);
         return await CreateOkResponse(req, results);
     }
 
-    private T ParseRequestBody<T>(HttpRequestData req)
+    private async Task<T> ParseRequestBody<T>(HttpRequestData req)
     {
         string requestBody = string.Empty;
         using (StreamReader streamReader = new StreamReader(req.Body))
         {
-            requestBody = streamReader.ReadToEnd();
+            requestBody = await streamReader.ReadToEndAsync();
         }
 
         return JsonConvert.DeserializeObject<T>(requestBody);
