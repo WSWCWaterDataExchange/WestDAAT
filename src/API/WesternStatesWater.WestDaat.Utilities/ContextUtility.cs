@@ -44,11 +44,8 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
         // Note - azure b2c requires the namespace to be prefixed with "extension_"
         //  {
         //   "extension_westdaat/userId": "<guid>",
-        //   "extension_westdaat/organizationRoles": [
-        //     "org_d3b07384-d9a7-4f3b-8a1d-6e5c3e2b7f4f/rol_Member",
-        //     "org_d3b07384-d9a7-4f3b-8a1d-6e5c3e2b7f4f/rol_TechnicalReviewer",
-        //     "org_e4b0f8a2-5c7d-4a8b-9e2c-7d6f3e1b8c5d/rol_OrganizationAdmin"
-        //   ]
+        //   "extension_westdaat/roles": "rol_<role name>,rol_<role name>" // csv string
+        //   "extension_westdaat/organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
         // }
 
         var jwt = GetJwt(authHeader);
@@ -92,9 +89,11 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static string[] GetRoles(IEnumerable<Claim> claims)
     {
-        var roles = claims
-            .Where(claim => claim.Type == $"{ClaimNamespace}/roles")
-            .Select(claim => claim.Value.Replace("rol_", ""))
+        var rolesClaim = claims.Single(claim => claim.Type == $"{ClaimNamespace}/roles");
+
+        // value is a csv string
+        var roles = rolesClaim.Value.Split(",")
+            .Select(role => role.Replace("rol_", ""))
             .ToArray();
 
         return roles;
@@ -102,10 +101,12 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static OrganizationRole[] GetOrganizationRoles(IEnumerable<Claim> claims)
     {
-        var claimValues = claims
-            .Where(claim => claim.Type == $"{ClaimNamespace}/organizationRoles")
-            .Select(claim => claim.Value.Split("/"))
-            .ToArray();
+        var orgRolesClaim = claims.Single(claim => claim.Type == $"{ClaimNamespace}/organizationRoles");
+
+        // value is csv string
+        var orgRoleStrings = orgRolesClaim.Value.Split(",");
+
+        var claimValues = orgRoleStrings.Select(orgRoleString => orgRoleString.Split("/")).ToArray();
 
         if (claimValues.Any(claimValue => claimValue.Length != 2))
         {
