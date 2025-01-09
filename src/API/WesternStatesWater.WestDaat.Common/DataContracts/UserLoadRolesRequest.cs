@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class UserLoadRolesRequest
+public class UserLoadRolesRequest : UserLoadRequestBase
 {
     public string ExternalAuthId { get; set; }
 }

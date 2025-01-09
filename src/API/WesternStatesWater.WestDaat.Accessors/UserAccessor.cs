@@ -12,7 +12,17 @@ internal class UserAccessor : AccessorBase, IUserAccessor
 
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
-    public async Task<UserLoadRolesResponse> GetUserRoles(UserLoadRolesRequest request)
+    public async Task<UserLoadResponseBase> Load(UserLoadRequestBase request)
+    {
+        return request switch
+        {
+            UserLoadRolesRequest req => await GetUserRoles(req),
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private async Task<UserLoadRolesResponse> GetUserRoles(UserLoadRolesRequest request)
     {
         // mock implementation
 
@@ -28,4 +38,5 @@ internal class UserAccessor : AccessorBase, IUserAccessor
             UserOrganizationRoles = userOrganizationRoles
         };
     }
+
 }

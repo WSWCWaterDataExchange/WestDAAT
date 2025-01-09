@@ -20,7 +20,7 @@ public class EnrichJwtRequestHandler : IRequestHandler<EnrichJwtRequest, EnrichJ
     public async Task<EnrichJwtResponse> Handle(EnrichJwtRequest request)
     {
         var accessorRequest = request.Map<CommonContracts.UserLoadRolesRequest>();
-        var accessorResponse = await UserAccessor.GetUserRoles(accessorRequest);
+        var accessorResponse = (CommonContracts.UserLoadRolesResponse) await UserAccessor.Load(accessorRequest);
 
         return accessorResponse.Map<EnrichJwtResponse>();
     }
