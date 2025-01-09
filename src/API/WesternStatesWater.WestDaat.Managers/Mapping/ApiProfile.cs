@@ -50,7 +50,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     )
                 )
                 .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src => 
-                        string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"org_{orgRole.OrganizationId}/{orgRole.Role}"))
+                        string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
                     )
                 )
                 .ForMember(dest => dest.Error, opt => opt.Ignore());

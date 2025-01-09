@@ -40,8 +40,9 @@ public class UserIntegrationTests : IntegrationTestBase
         response.Extension_WestDaat_Roles.Should().Be("rol_role1,rol_role2");
 
         const string orgRolePrefix = "org_";
+        const string rolePrefix = "rol_";
         const string orgRole1 = "organizationRole1";
         const string orgRole2 = "organizationRole2";
-        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll(orgRolePrefix, orgRole1, orgRole2);
+        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll(orgRolePrefix, rolePrefix, orgRole1, orgRole2);
     }
 }
