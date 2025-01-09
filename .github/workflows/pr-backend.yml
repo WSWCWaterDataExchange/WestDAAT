@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: DbUp
         run: dotnet run --args "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!;"
-        working-directory: source/WesternStatesWater.WestDAAT.DbUp
+        working-directory: source/WesternStatesWater.WestDaat.DbUp
       - name: .NET Test
         run: dotnet test
         env:
