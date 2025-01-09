@@ -48,7 +48,7 @@ jobs:
         id: oai
         uses: Azure/azure-functions-openapi-extension/actions/build-openapi@v1
         with:
-          functionAppPath: "./WesternStatesWater.WestDaat.Client.Functions"
+          functionAppPath: "src/API/WesternStatesWater.WestDaat.Client.Functions"
           requestUri: "http://localhost:5001/api/openapi/v3.json"
           documentPath: "generated"
           documentName: "openapi.json"
