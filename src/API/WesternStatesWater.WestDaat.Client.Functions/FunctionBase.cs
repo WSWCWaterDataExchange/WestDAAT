@@ -1,9 +1,11 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using System.Text.Json;
 using Azure.Core.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker.Http;
+using Newtonsoft.Json;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 
@@ -124,6 +126,17 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 statusCode);
 
             return response;
+        }
+
+        protected async Task<T> ParseRequestBody<T>(HttpRequestData req)
+        {
+            string requestBody = string.Empty;
+            using (StreamReader streamReader = new StreamReader(req.Body))
+            {
+                requestBody = await streamReader.ReadToEndAsync();
+            }
+
+            return JsonConvert.DeserializeObject<T>(requestBody);
         }
     }
 }

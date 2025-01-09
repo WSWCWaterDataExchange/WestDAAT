@@ -33,14 +33,4 @@ public class AdminFunction : FunctionBase
         return await CreateOkResponse(req, results);
     }
 
-    private async Task<T> ParseRequestBody<T>(HttpRequestData req)
-    {
-        string requestBody = string.Empty;
-        using (StreamReader streamReader = new StreamReader(req.Body))
-        {
-            requestBody = await streamReader.ReadToEndAsync();
-        }
-
-        return JsonConvert.DeserializeObject<T>(requestBody);
-    }
 }

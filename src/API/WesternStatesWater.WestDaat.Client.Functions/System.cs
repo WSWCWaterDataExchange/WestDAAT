@@ -38,14 +38,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/riverBasins")]
             HttpRequestData request)
         {
-            string requestBody = String.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-
-            var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
-
+            var basinNames = await ParseRequestBody<string[]>(request);
             _logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
             var result = _waterResourceManager.GetRiverBasinPolygonsByName(basinNames);
 
@@ -57,14 +50,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")]
             HttpRequestData request)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-
-            var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
-
+            var feedbackRequest = await ParseRequestBody<FeedbackRequest>(request);
             await _notificationManager.SendFeedback(feedbackRequest);
 
             return request.CreateResponse(HttpStatusCode.OK);

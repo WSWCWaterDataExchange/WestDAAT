@@ -21,8 +21,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
             string name = req.Query["name"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            var data = await ParseRequestBody<dynamic>(req);
             name = name ?? data?.name;
 
             var result = testManager.TestMe("Test Me");
