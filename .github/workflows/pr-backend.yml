@@ -44,3 +44,4 @@ jobs:
       env:
           Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       working-directory: src/API
+
