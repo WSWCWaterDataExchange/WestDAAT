@@ -20,11 +20,12 @@ public class UserIntegrationTests : IntegrationTestBase
     public async Task GetUserRoles_Success()
     {
         // Arrange
+        var userExternalAuthId = "1234";
 
         // Act
         var request = new CLI.Requests.Admin.EnrichJwtRequest
         {
-            ObjectId = "1234",
+            ObjectId = userExternalAuthId,
         };
         var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
 
