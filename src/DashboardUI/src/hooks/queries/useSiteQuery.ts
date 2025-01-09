@@ -8,7 +8,7 @@ import {
   getSiteDigest,
   getSiteUsage,
   getSiteVariableInfoList,
-  getSiteMethodInfoList,
+  getSiteMethodInfoList, getOverlayDigests,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
@@ -25,6 +25,12 @@ export function useWaterRightsDigests(siteUuid: string) {
 export function useSiteDigest(siteUuid: string) {
   return useQuery(['site.siteDigest', siteUuid], async () => await getSiteDigest(siteUuid), {
     enabled: !!siteUuid,
+  });
+}
+
+export function useOverlayDigests(overlayUuid: string | undefined) {
+  return useQuery(['overlay.Digests', overlayUuid], async () => await getOverlayDigests(overlayUuid!), {
+    enabled: !!overlayUuid,
   });
 }
 
