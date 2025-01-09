@@ -191,16 +191,36 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetOverlayTableDetails))]
-        public async Task<HttpResponseData> GetOverlayTableDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] HttpRequestData request, string overlayUuid)
+        public async Task<HttpResponseData> GetOverlayTableDetails(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] 
+            HttpRequestData request, string overlayUuid)
         {
-            var overlayTable = await _waterResourceManager.GetOverlayInfoById(overlayUuid);
+            var searchCriteria = new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = overlayUuid,
+            };
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
             return await CreateOkResponse(request, overlayTable);
         }
-        
+
+        [Function(nameof(GetOverlayTableDetailsByAllocation))]
+        public async Task<HttpResponseData> GetOverlayTableDetailsByAllocation(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Overlays")]
+            HttpRequestData request, string allocationUuid)
+        {
+            var searchCriteria = new OverlayDetailsSearchCriteria
+            {
+                AllocationUUID = allocationUuid,
+            };
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
+            return await CreateOkResponse(request, overlayTable);
+        }
+
         [Function(nameof(GetOverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
-            
             var overlay = await _waterResourceManager.GetOverlayDetails(overlayUuid);
             
             return await CreateOkResponse(request, overlay);

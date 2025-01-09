@@ -214,14 +214,16 @@ namespace WesternStatesWater.WestDaat.Managers
             return overlayClient;
         }
 
-        async Task<List<ClientContracts.OverlayTableEntry>> ClientContracts.IWaterResourceManager.GetOverlayInfoById(string reportingUnitUuid)
+        async Task<List<ClientContracts.OverlayTableEntry>> ClientContracts.IWaterResourceManager.GetOverlayInfoById(ClientContracts.OverlayDetailsSearchCriteria searchCriteria)
         {
-            if (string.IsNullOrWhiteSpace(reportingUnitUuid))
+            var searchCriteriaFields = new[] { searchCriteria.ReportingUnitUUID, searchCriteria.AllocationUUID };
+            if (searchCriteriaFields.Select(string.IsNullOrWhiteSpace).Count(@bool => @bool) != 1)
             {
-                throw new WestDaatException("Reporting Unit UUID cannot be null or empty.");
+                throw new WestDaatException("Only one search criteria field should be non-empty");
             }
 
-            var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(reportingUnitUuid);
+            var request = searchCriteria.Map<OverlayDetailsSearchCriteria>();
+            var overlayEntries = await _waterAllocationAccessor.GetOverlayInfoById(request);
 
             return overlayEntries.Map<List<ClientContracts.OverlayTableEntry>>();
         }

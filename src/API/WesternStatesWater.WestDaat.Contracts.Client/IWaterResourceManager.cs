@@ -19,7 +19,7 @@ public interface IWaterResourceManager : IServiceContractBase
 
     Task<OverlayDetails> GetOverlayDetails(string overlayUuid);
 
-    Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid);
+    Task<List<OverlayTableEntry>> GetOverlayInfoById(OverlayDetailsSearchCriteria searchCriteria);
 
     FeatureCollection GetRiverBasinPolygonsByName(string[] basinNames);
 

@@ -708,19 +708,34 @@ namespace WesternStatesWater.WestDaat.Accessors
             return overlay;
         }
 
-        public async Task<List<OverlayTableEntry>> GetOverlayInfoById(string reportingUnitUuid)
+        public async Task<List<OverlayTableEntry>> GetOverlayInfoById(OverlayDetailsSearchCriteria searchCriteria)
         {
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
 
-            var entries = await db.RegulatoryOverlayDim
+            var query = db.RegulatoryOverlayDim
                 .AsNoTracking()
-                .Where(ro => ro.RegulatoryReportingUnitsFact
-                    .Any(rr => rr.ReportingUnit.ReportingUnitUuid == reportingUnitUuid))
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchCriteria.ReportingUnitUUID))
+            {
+                query = query
+                    .Where(ro => ro.RegulatoryReportingUnitsFact
+                        .Any(rr => rr.ReportingUnit.ReportingUnitUuid == searchCriteria.ReportingUnitUUID));
+            }
+            else if (!string.IsNullOrEmpty(searchCriteria.AllocationUUID))
+            {
+                query = query
+                    .Where(ro => ro.RegulatoryOverlayBridgeSitesFact
+                        .Any(robsf => robsf.Site.AllocationBridgeSitesFact
+                            .Any(absf => absf.AllocationAmount.AllocationUuid == searchCriteria.AllocationUUID)
+                        )
+                    );
+            }
+
+            return await query
                 .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
                 .ToListAsync();
-
-            return entries;
         }
 
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)

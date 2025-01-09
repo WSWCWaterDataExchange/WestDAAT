@@ -1,15 +1,16 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { createContext, FC, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
   useWaterRightDetails,
+  useWaterRightsInfoListByAllocationUuid,
   useWaterRightSiteInfoList,
   useWaterRightSiteLocations,
   useWaterRightSourceInfoList,
 } from '../../../hooks/queries';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
+import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, WaterRightsInfoListItem } from '@data-contracts';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -20,9 +21,10 @@ export interface HostData {
   siteLocationsQuery: Query<FeatureCollection<Geometry, GeoJsonProperties>>;
   siteInfoListQuery: Query<SiteInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
+  waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
 }
 
-type ActiveTabType = 'site' | 'source';
+export type ActiveTabType = 'site' | 'source' | 'rights';
 
 interface WaterRightDetailsPageContextState {
   allocationUuid: string | undefined;
@@ -40,6 +42,7 @@ const defaultState: WaterRightDetailsPageContextState = {
     siteLocationsQuery: defaultQuery,
     siteInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
+    waterRightsInfoListQuery: defaultQuery,
   },
 };
 
@@ -62,6 +65,9 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
   const sourceInfoListQuery = useWaterRightSourceInfoList(allocationUuid, {
     enabled: activeTab === 'source',
   });
+  const waterRightsInfoListQuery = useWaterRightsInfoListByAllocationUuid(allocationUuid, {
+    enabled: activeTab === 'rights',
+  });
 
   const filterContextProviderValue: WaterRightDetailsPageContextState = {
     allocationUuid,
@@ -72,6 +78,7 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
       siteLocationsQuery,
       siteInfoListQuery,
       sourceInfoListQuery,
+      waterRightsInfoListQuery,
     },
   };
 
