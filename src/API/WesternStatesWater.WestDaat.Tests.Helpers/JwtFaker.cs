@@ -20,20 +20,22 @@ public static class JwtFaker
 
         if (orgRoles is not null)
         {
-            claims.AddRange(orgRoles.Select(orgId =>
+            claims.Add(
                 new Claim(
                     "extension_westdaat/organizationRoles",
-                    $"org_{orgId.Key}/rol_{orgId.Value}"
-                )));
+                    string.Join(',', orgRoles.Select(orgId =>$"org_{orgId.Key}/rol_{orgId.Value}"))
+                )
+            );
         }
 
         if (roles is not null)
         {
-            claims.AddRange(roles.Select(role =>
+            claims.Add(
                 new Claim(
                     "extension_westdaat/roles",
-                    $"rol_{role}"
-                )));
+                    string.Join(',', roles.Select(role => $"rol_{role}"))
+                )
+            );
         }
 
         var jwt = new JwtSecurityToken(
