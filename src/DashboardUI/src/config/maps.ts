@@ -3,6 +3,8 @@ import { nldi, pointSizes, waterRightsProperties } from './constants';
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
   waterRightsPolygonsLayer: 'waterRightsPolygons',
+  overlayTypesPolygonsLayer: 'overlayTypesPolygons',
+  overlayTypesPolygonsBorderLayer: 'overlayTypesPolygonsBorder',
   riverBasinsLayer: 'river-basins',
   siteLocationsPolygonsLayer: 'site-locations-polygons',
   siteLocationsPointsLayer: 'site-locations-points',
@@ -120,7 +122,40 @@ const mapsJson = {
         'fill-color': '#ff0000',
         'fill-opacity': 0.5,
       },
+      filter: ['has', 'podPou']
     },
+    {
+      id: mapLayerNames.overlayTypesPolygonsLayer,
+      friendlyName: 'Overlay Types Polygons',
+      'source-layer': 'polygons',
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type:'fill',
+      paint: {
+      "fill-color": "#ff0000",
+      "fill-opacity": 0.5
+      },
+      filter: ['has', 'oType']
+    },
+    {
+      id: mapLayerNames.overlayTypesPolygonsBorderLayer,
+      friendlyName: 'Overlay Types Polygons Borders',
+      'source-layer': 'polygons',
+      source: mapSourceNames.waterRightsVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'line',
+      paint: {
+        "line-color": "#000000",
+        "line-width": .2,
+        "line-opacity": .5
+      },
+      filter: ['has', 'oType']
+    },
+
     {
       id: mapLayerNames.waterRightsPointsLayer,
       friendlyName: 'Water Rights Points',
