@@ -403,6 +403,23 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             result.Should().NotBeNull();
             _waterAllocationAccessorMock.Verify();
         }
+        
+        [TestMethod]
+        public async Task WaterResourceManager_GetOverlayDigestsByUuid()
+        {
+            var siteUuid = new Faker().Random.String(11, 'A', 'z');
+            _waterAllocationAccessorMock.Setup(x => x.GetOverlayDigestsByUuid(siteUuid))
+                .ReturnsAsync(new List<CommonContracts.OverlayDigest> { })
+                .Verifiable();
+
+            var manager = CreateWaterResourceManager();
+
+            var result = await manager.GetOverlayDigestsByUuid(siteUuid);
+
+            result.Should().NotBeNull();
+            _waterAllocationAccessorMock.Verify();
+        }
+
 
         [TestMethod]
         public async Task WaterResourceManager_GetWaterRightSiteLocations()
