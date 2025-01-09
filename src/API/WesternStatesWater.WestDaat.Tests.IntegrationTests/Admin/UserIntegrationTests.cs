@@ -36,6 +36,8 @@ public class UserIntegrationTests : IntegrationTestBase
         const string expectedAzureB2CAction = "Continue";
         response.Version.Should().Be(expectedAzureB2CVersion);
         response.Action.Should().Be(expectedAzureB2CAction);
-        response.Extension_WestDaat_Roles.Should().BeEquivalentTo("role1,role2");
+        response.Extension_WestDaat_UserId.Should().NotBeEmpty();
+        response.Extension_WestDaat_Roles.Should().Be("role1,role2");
+        response.Extension_WestDaat_OrganizationRoles.Should().Be("organizationRole1,organizationRole2");
     }
 }
