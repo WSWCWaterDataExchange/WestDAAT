@@ -130,8 +130,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
         protected async Task<T> ParseRequestBody<T>(HttpRequestData req)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(req.Body))
+            var requestBody = string.Empty;
+            using (var streamReader = new StreamReader(req.Body))
             {
                 requestBody = await streamReader.ReadToEndAsync();
             }
