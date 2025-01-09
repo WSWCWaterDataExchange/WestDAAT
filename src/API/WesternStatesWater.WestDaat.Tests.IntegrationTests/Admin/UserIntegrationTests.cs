@@ -37,7 +37,11 @@ public class UserIntegrationTests : IntegrationTestBase
         response.Version.Should().Be(expectedAzureB2CVersion);
         response.Action.Should().Be(expectedAzureB2CAction);
         response.Extension_WestDaat_UserId.Should().NotBeEmpty();
-        response.Extension_WestDaat_Roles.Should().Be("role1,role2");
-        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll("organizationRole1", "organizationRole2");
+        response.Extension_WestDaat_Roles.Should().Be("rol_role1,rol_role2");
+
+        const string orgRolePrefix = "org_";
+        const string orgRole1 = "organizationRole1";
+        const string orgRole2 = "organizationRole2";
+        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll(orgRolePrefix, orgRole1, orgRole2);
     }
 }
