@@ -5,7 +5,9 @@ import { OverlayDetailsProvider } from '../components/details-page/overlay/Provi
 function OverlayDetailsPage() {
   return (
     <OverlayDetailsProvider>
+      <span>skibidi layout start</span>
       <Layout />
+      <span>skibidi layout end</span>
     </OverlayDetailsProvider>
   );
 }
