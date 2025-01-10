@@ -105,7 +105,7 @@ resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/stor
   }
 }
 
-resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-15' = {
+resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2024-09-01' = {
   parent: resource_name
   name: resource_name_var
   location: 'Global'
@@ -134,6 +134,43 @@ resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-1
         }
       }
     ]
+    deliveryPolicy: {
+      description: ''
+      rules: [
+        {
+          actions: [
+            {
+              name: 'UrlRedirect'
+              parameters: {
+                customFragment: null
+                customHostname: null
+                customPath: null
+                customQueryString: null
+                destinationProtocol: 'Https'
+                redirectType: 'Moved'
+                typeName: 'DeliveryRuleUrlRedirectActionParameters'
+              }
+            }
+          ]
+          conditions: [
+            {
+              name: 'RequestScheme'
+              parameters: {
+                matchValues: [
+                  'HTTP'
+                ]
+                negateCondition: false
+                operator: 'Equal'
+                transforms: []
+                typeName: 'DeliveryRuleRequestSchemeConditionParameters'
+              }
+            }
+          ]
+          name: 'HTTPS'
+          order: 1
+        }
+      ]
+    }
     originGroups: []
     geoFilters: []
     urlSigningKeys: []
