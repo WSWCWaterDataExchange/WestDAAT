@@ -46,7 +46,6 @@ jobs:
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
       - name: Update OpenAPI Script Permissions
-        id: oai
         run: chmod 777 ./get-openapi-document.sh
         working-directory: .github/workflows
 
