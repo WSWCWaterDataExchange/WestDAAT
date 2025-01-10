@@ -26,8 +26,8 @@ jobs:
         run: dotnet restore
       - name: .NET Build
         run: dotnet build --no-restore
-      # - name: Create Database
-      #   run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
+      - name: Create Database
+        run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
       # - name: Check out WaDE2.0
       #   uses: actions/checkout@v2
       #   with:
@@ -43,23 +43,16 @@ jobs:
       #     Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       #   working-directory: src/API
 
+
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
       - name: Generate OpenAPI document
         id: oai
-        uses: Azure/azure-functions-openapi-extension/actions/build-openapi@v1
-        with:
-          functionAppPath: "src/API/WesternStatesWater.WestDaat.Client.Functions"
-          requestUri: "http://localhost:5001/api/openapi/v3.json"
-          documentPath: "generated"
-          documentName: "openapi.json"
-          delay: "30"
-          isRemote: "false"
+        run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o "."
 
       - name: Check generated OpenAPI document
         shell: pwsh
         run: |
-          echo "Generated Document: ${{ steps.oai.outputs.generated }}"
-
-          $json = Get-Content -Path ${{ steps.oai.outputs.generated }} | ConvertFrom-Json
+          echo "Generated Document:"
+          $json = Get-Content -Path ./swagger.json | ConvertFrom-Json
           $result = $json.openapi -eq "3.0.1"
           echo "Check result: $result"
