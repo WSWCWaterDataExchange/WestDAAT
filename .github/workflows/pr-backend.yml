@@ -48,6 +48,7 @@ jobs:
       - name: Generate OpenAPI document
         id: oai
         run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o "."
+        working-directory: .github/workflows
 
       - name: Check generated OpenAPI document
         shell: pwsh
@@ -56,3 +57,4 @@ jobs:
           $json = Get-Content -Path ./swagger.json | ConvertFrom-Json
           $result = $json.openapi -eq "3.0.1"
           echo "Check result: $result"
+        working-directory: .github/workflows
