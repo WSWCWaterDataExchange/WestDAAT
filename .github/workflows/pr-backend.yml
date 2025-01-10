@@ -1,12 +1,10 @@
 name: PR Backend
 
-on: workflow_dispatch
-
-  # Re-enable after testing is complete
-  # push:
-  #   branches: [develop, master]
-  # pull_request:
-  #   branches: [develop, master]
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+    branches: [develop, master]
 
 jobs:
   build:
@@ -44,7 +42,6 @@ jobs:
       #   env:
       #     Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       #   working-directory: src/API
-
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
 
