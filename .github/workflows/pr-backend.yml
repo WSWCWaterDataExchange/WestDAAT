@@ -45,23 +45,21 @@ jobs:
 
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
+
+      # Required to run func commands in the generation shell script
       - name: Install Azure Functions Core Tools
         run: sudo apt-get install -y azure-functions-core-tools-4
 
+      # Need permissions to run the script
       - name: Update OpenAPI Script Permissions
         run: chmod 777 ./get-openapi-document.sh
         working-directory: .github/workflows
 
+      # Generate OpenAPI document via shell script
       - name: Generate OpenAPI document
         id: oai
-        run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o ".github/workflows"
+        run: ./get-openapi-document.sh -d 30 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o ".github/workflows"
         working-directory: .github/workflows
 
       - name: Check generated OpenAPI document
-        shell: pwsh
-        run: |
-          echo "Generated Document:"
-          $json = Get-Content -Path ./swagger.json | ConvertFrom-Json
-          $result = $json.openapi -eq "3.0.1"
-          echo "Check result: $result"
-        working-directory: .github/workflows
+        run: cat .github/workflows/openapi-document.json
