@@ -1,5 +1,11 @@
 name: PR Backend
 
+env:
+  RESOURCE_GROUP_NAME: 'WestDAAT_QA'
+  APIM_NAME: 'westdaatqa'
+  API_NAME: 'westdaat-fn-api-qa'
+  API_URL: 'https://westdaatqa.azure-api.net/api'
+
 on:
   push:
     branches: [develop, master]
@@ -74,5 +80,8 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az account show
-            az storage -h
+            az apim api import --path api --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
+              --service-name ${{ env.APIM_NAME }} --api-id ${{ env.API_NAME }} --path 'api/app' \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --service-url ${{ env.API_URL }} --subscription-required false
+        
