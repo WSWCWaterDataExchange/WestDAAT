@@ -59,8 +59,7 @@ public class OpenApiTests
         var functionClasses = assembly.GetTypes()
             .Where(t =>
                 t.FullName != null
-                && String.Equals(t.Namespace, @namespace, StringComparison.Ordinal)
-                && t.FullName.EndsWith("Function"))
+                && String.Equals(t.Namespace, @namespace, StringComparison.Ordinal))
             .ToArray();
 
         functionClasses.Should().NotBeEmpty();
@@ -100,6 +99,7 @@ public class OpenApiTests
                     $"{functionClass.Name}.{functionMethod.Name} should have a single HTTP method. To support multiple methods use multiple functions. This is due to OpenApiExtension limitations.");
 
                 CheckRouteParameterAttributePresence(functionMethod, functionClass);
+                Console.WriteLine(functionMethod.Name);
 
                 hasOpenApiOperationAttribute.Should().BeTrue(
                     $"{functionClass.Name}.{functionMethod.Name} should be decorated with OpenApiOperation attribute");

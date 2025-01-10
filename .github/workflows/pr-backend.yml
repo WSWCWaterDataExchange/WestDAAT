@@ -75,7 +75,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
 
-      - name: Azure CLI script
+      - name: Deploy API to APIM
         uses: azure/cli@v2
         with:
           azcliversion: latest
