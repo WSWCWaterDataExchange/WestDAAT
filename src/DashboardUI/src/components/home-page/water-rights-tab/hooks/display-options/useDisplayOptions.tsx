@@ -41,7 +41,6 @@ export function useDisplayOptions() {
       visible.push(...nldiLayers);
     }
 
-    // MAIN OVERLAY TOGGLE: add overlay layers if on
     if (isOverlayFilterActive) {
       visible.push(...overlayLayers);
     }

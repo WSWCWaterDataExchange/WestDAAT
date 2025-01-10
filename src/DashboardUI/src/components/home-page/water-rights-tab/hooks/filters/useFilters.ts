@@ -16,6 +16,7 @@ import { useIncludeExemptFilter } from './useIncludeExemptFilter';
 import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
+import { useOverlaysFilter } from './useOverlaysFilter';
 
 const allWaterRightsLayers = [
   mapLayerNames.waterRightsPointsLayer,
@@ -41,6 +42,7 @@ export function useFilters() {
   const { mapFilters: allocationTypesFilter } = useAllocationOwnerFilter();
   const { mapFilters: legalStatusesFilter } = useLegalStatusesFilter();
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
+  const { mapFilters: overlaysMapFilters } = useOverlaysFilter();
 
   const allMapFilters = useMemo(() => {
     const filterSet = ['all'] as any[];
@@ -86,11 +88,27 @@ export function useFilters() {
   ]);
 
   useEffect(() => {
-    setLayerFilters(
-      allWaterRightsLayers.map((layer) => ({
-        layer,
+    setLayerFilters([
+      {
+        layer: mapLayerNames.waterRightsPointsLayer,
         filter: allMapFilters,
-      })),
-    );
-  }, [allMapFilters, setLayerFilters]);
+      },
+      {
+        layer: mapLayerNames.waterRightsPolygonsLayer,
+        filter: allMapFilters,
+      },
+      {
+        layer: mapLayerNames.overlayTypesPolygonsLayer,
+        filter: overlaysMapFilters
+          ? ['all', ['has','oType'], overlaysMapFilters]
+          : ['==','oType','_FAKE_'],
+      },
+      {
+        layer: mapLayerNames.overlayTypesPolygonsLayer,
+        filter: overlaysMapFilters
+          ? ['all', ['has','oType'], overlaysMapFilters]
+          : ['==','oType','_FAKE_'],
+      },
+    ]);
+  }, [allMapFilters, overlaysMapFilters, setLayerFilters]);
 }
