@@ -62,4 +62,4 @@ jobs:
         working-directory: .github/workflows
 
       - name: Check generated OpenAPI document
-        run: cat .github/workflows/openapi-document.json
+        run: cat .github/workflows/swagger.json
