@@ -11,6 +11,7 @@ import { UseQueryResult } from 'react-query';
 export interface WaterRightsFilters {
   beneficialUseNames?: string[];
   overlays?: string[];
+  isOverlayFilterActive?: boolean;
   ownerClassifications?: string[];
   waterSourceTypes?: string[];
   riverBasinNames?: string[];
@@ -69,6 +70,7 @@ export interface WaterRightsContextState {
 export const defaultFilters: WaterRightsFilters = {
   beneficialUseNames: undefined,
   overlays: undefined,
+  isOverlayFilterActive: false,
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,

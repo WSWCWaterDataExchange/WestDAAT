@@ -17,10 +17,13 @@ import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
 
-const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
+const allWaterRightsLayers = [
+  mapLayerNames.waterRightsPointsLayer,
+  mapLayerNames.waterRightsPolygonsLayer,
+];
 
 export function useFilters() {
-  const { setLayerFilters: setMapLayerFilters } = useMapContext();
+  const { setLayerFilters } = useMapContext();
 
   const { mapFilters: podPouMapFilters } = usePodPouFilter();
   const { mapFilters: includeExemptMapFilters } = useIncludeExemptFilter();
@@ -83,10 +86,11 @@ export function useFilters() {
   ]);
 
   useEffect(() => {
-    setMapLayerFilters(
-      allWaterRightsLayers.map((a) => {
-        return { layer: a, filter: allMapFilters };
-      }),
+    setLayerFilters(
+      allWaterRightsLayers.map((layer) => ({
+        layer,
+        filter: allMapFilters,
+      })),
     );
-  }, [allMapFilters, setMapLayerFilters]);
+  }, [allMapFilters, setLayerFilters]);
 }

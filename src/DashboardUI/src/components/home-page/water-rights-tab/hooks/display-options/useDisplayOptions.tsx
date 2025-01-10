@@ -7,38 +7,52 @@ import { useMapLegend } from './useMapLegend';
 import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
 import { useAlerts } from '../useAlerts';
-import useOverlayDigestMapPopup from "../../../../../hooks/map-popups/useOverlayDigestMapPopup";
+import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
 import useSiteClickedOnMap from '../../../../../hooks/map-popups/useSiteClickedOnMap';
 
-const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer, mapLayerNames.overlayTypesPolygonsLayer, mapLayerNames.overlayTypesPolygonsBorderLayer];
+const baseLayers = [
+  mapLayerNames.waterRightsPointsLayer,
+  mapLayerNames.waterRightsPolygonsLayer,
+];
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
   mapLayerNames.nldiUsgsPointsLayer,
 ];
+const overlayLayers = [
+  mapLayerNames.overlayTypesPolygonsLayer,
+  mapLayerNames.overlayTypesPolygonsBorderLayer,
+];
 
 export function useDisplayOptions() {
   const {
-    filters: { riverBasinNames, isNldiFilterActive },
+    filters: { riverBasinNames, isNldiFilterActive, isOverlayFilterActive },
   } = useWaterRightsContext();
-
   const { setVisibleLayers } = useMapContext();
-  const { oType } = useSiteClickedOnMap();
 
   useEffect(() => {
-    const visible = [...allWaterRightsLayers];
-    if ((riverBasinNames?.length ?? 0) > 0) visible.push(mapLayerNames.riverBasinsLayer);
-    if (isNldiFilterActive) visible.push(...nldiLayers);
+    const visible = [...baseLayers];
+
+    if ((riverBasinNames?.length ?? 0) > 0) {
+      visible.push(mapLayerNames.riverBasinsLayer);
+    }
+
+    if (isNldiFilterActive) {
+      visible.push(...nldiLayers);
+    }
+
+    // MAIN OVERLAY TOGGLE: add overlay layers if on
+    if (isOverlayFilterActive) {
+      visible.push(...overlayLayers);
+    }
 
     setVisibleLayers(visible);
-  }, [riverBasinNames, isNldiFilterActive, setVisibleLayers]);
+  }, [riverBasinNames, isNldiFilterActive, isOverlayFilterActive, setVisibleLayers]);
 
   useMapLegend();
   useMapPointScaling();
-
   useNldiMapPopup();
   useOverlayDigestMapPopup();
   useWaterRightDigestMapPopup();
-
   useAlerts();
 }
