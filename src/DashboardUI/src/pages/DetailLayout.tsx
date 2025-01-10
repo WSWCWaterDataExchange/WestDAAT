@@ -24,11 +24,8 @@ function DetailLayout() {
         {/* An <Outlet> renders whatever child route is currently active,
             so you can think about this <Outlet> as a placeholder for
             the child routes we defined above. */}
-        <span>skibidi1</span>
         <SiteNavbar />
-        <span>skibidi2</span>
         <Outlet />
-        <span>skibidi3</span>
         <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
       </div>
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />

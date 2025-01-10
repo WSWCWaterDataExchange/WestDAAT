@@ -16,27 +16,37 @@ type DetailsPageComponent = React.FunctionComponent<EmptyPropsWithChildren> & De
 const DetailsPage: DetailsPageComponent = function DetailsPage({ children }: EmptyPropsWithChildren) {
   const { findChild: findHeader } = useChildrenByTypes('DetailsHeader');
   const header = useMemo(() => {
-    return findHeader(children);
+    const x = findHeader(children);
+    console.log('Header', x);
+    return x;
   }, [children, findHeader]);
 
   const { findChild: findProperties } = useChildrenByTypes('DetailsProperties');
   const properties = useMemo(() => {
-    return findProperties(children);
+    const x = findProperties(children);
+    console.log('Properties', x);
+    return x;
   }, [children, findProperties]);
 
   const { findChild: findMap } = useChildrenByTypes('DetailsMap');
   const map = useMemo(() => {
-    return findMap(children);
+    const x = findMap(children);
+    console.log('Map', x);
+    return x;
   }, [children, findMap]);
 
   const { findChild: findTabs } = useChildrenByTypes('DetailsTabs');
   const tabs = useMemo(() => {
-    return findTabs(children);
+    const x = findTabs(children);
+    console.log('Tabs', x);
+    return x;
   }, [children, findTabs]);
 
   const { findChild: findLineChart } = useChildrenByTypes('DetailsLineChart');
   const lineGraph = useMemo(() => {
-    return findLineChart(children);
+    const x = findLineChart(children);
+    console.log('LineChart', x);
+    return x;
   }, [children, findLineChart]);
 
   return (
