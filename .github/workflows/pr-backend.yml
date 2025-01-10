@@ -45,6 +45,11 @@ jobs:
 
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
+      - name: Update OpenAPI Script Permissions
+        id: oai
+        run: chmod 777 ./get-openapi-document.sh
+        working-directory: .github/workflows
+
       - name: Generate OpenAPI document
         id: oai
         run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o "."
