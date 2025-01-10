@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate OpenAPI document
         id: oai
-        run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o "."
+        run: ./get-openapi-document.sh -d 45 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o ".github/workflows"
         working-directory: .github/workflows
 
       - name: Check generated OpenAPI document
