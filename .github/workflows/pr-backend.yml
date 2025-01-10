@@ -45,6 +45,9 @@ jobs:
 
 
       # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
+      - name: Install Azure Functions Core Tools
+        run: sudo apt-get install -y azure-functions-core-tools-4
+
       - name: Update OpenAPI Script Permissions
         run: chmod 777 ./get-openapi-document.sh
         working-directory: .github/workflows
