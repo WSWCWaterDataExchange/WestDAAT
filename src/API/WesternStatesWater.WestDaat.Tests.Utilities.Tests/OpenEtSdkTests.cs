@@ -65,4 +65,44 @@ public class OpenEtSdkTests : UtilitiesTestBase
         response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
         response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
     }
+
+    [TestMethod]
+    [Ignore("This test is ignored because it uses the real api.")]
+    public async Task RasterTimeseriesPolygon_RealApi_Success()
+    {
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var closedLinestringCoordinates = new[]
+        {
+            new Coordinate(-119.7937, 35.58995),
+            new Coordinate(-119.7937, 35.53326),
+            new Coordinate(-119.71268, 35.53326),
+            new Coordinate(-119.71268, 35.58995),
+            new Coordinate(-119.7937, 35.58995),
+        };
+
+        var request = new RasterTimeseriesPolygonRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePolygon(closedLinestringCoordinates),
+            Interval = RasterTimeseriesInterval.Monthly,
+            Model = RasterTimeseriesModel.SSEBop,
+            PixelReducer = RasterTimeseriesPixelReducer.Mean,
+            ReferenceEt = RasterTimeseriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeseriesFileFormat.JSON,
+            OutputUnits = RasterTimeseriesOutputUnits.Millimeters,
+            Variable = RasterTimeseriesCollectionVariable.ET,
+        };
+
+        var sdk = CreateOpenEtSdk(new HttpClient());
+        var response = await sdk.RasterTimeseriesPolygon(request);
+
+        response.Should().NotBeNull();
+
+        const int monthsInYear = 12;
+        response.Data.Should().HaveCount(monthsInYear);
+        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
+        response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
+    }
 }
