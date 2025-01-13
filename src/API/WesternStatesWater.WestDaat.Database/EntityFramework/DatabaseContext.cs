@@ -24,13 +24,13 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 if (ShouldUseAzureAccessTokenAuth())
                 {
                     var connection = new SqlConnection();
-                    connection.ConnectionString = _configuration.ConnectionString;
+                    connection.ConnectionString = _configuration.WadeConnectionString;
                     connection.AccessToken = GetAzureAccessToken();
                     optionsBuilder.UseSqlServer(connection, x => x.UseNetTopologySuite());
                 }
                 else
                 {
-                    optionsBuilder.UseSqlServer(_configuration.ConnectionString, x => x.UseNetTopologySuite());
+                    optionsBuilder.UseSqlServer(_configuration.WadeConnectionString, x => x.UseNetTopologySuite());
                 }
             }
         }
@@ -49,8 +49,8 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
         {
             // If a password is supplied, use sql auth, otherwise use AD Auth
             var containsPassword =
-                _configuration.ConnectionString.Contains("password", StringComparison.InvariantCultureIgnoreCase) ||
-                _configuration.ConnectionString.Contains("integrated security",
+                _configuration.WadeConnectionString.Contains("password", StringComparison.InvariantCultureIgnoreCase) ||
+                _configuration.WadeConnectionString.Contains("integrated security",
                     StringComparison.InvariantCultureIgnoreCase);
             return !containsPassword;
         }
