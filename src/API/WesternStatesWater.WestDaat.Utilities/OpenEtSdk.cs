@@ -35,7 +35,7 @@ internal class OpenEtSdk : IOpenEtSdk
                 }
             },
             { "file_format", request.OutputExtension.ToString() },
-            { "geometry", request.Geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray() },
+            { "geometry", ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(request.Geometry) },
             { "interval", request.Interval.ToString() },
             { "model", request.Model.ToString() },
             { "reducer", request.PixelReducer.ToString() },
@@ -63,6 +63,11 @@ internal class OpenEtSdk : IOpenEtSdk
         {
             Data = responseData
         };
+    }
+
+    private double[] ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(NetTopologySuite.Geometries.Geometry geometry)
+    {
+        return geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray();
     }
 
     private string ConvertRasterTimeseriesUnits(RasterTimeseriesOutputUnits outputUnits)
