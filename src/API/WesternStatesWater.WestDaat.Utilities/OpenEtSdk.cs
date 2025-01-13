@@ -47,7 +47,7 @@ internal class OpenEtSdk : IOpenEtSdk
         var jsonString = JsonSerializer.Serialize(requestDictionary);
         var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-        var uri = new Uri("https://openet-api.org/raster/timeseries/polygon");
+        var uri = new Uri("raster/timeseries/polygon", UriKind.Relative);
         var response = await _httpClient.PostAsync(uri, httpContent);
 
         if (!response.IsSuccessStatusCode)
