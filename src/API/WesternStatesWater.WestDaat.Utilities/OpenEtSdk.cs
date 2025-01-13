@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -18,8 +19,8 @@ internal class OpenEtSdk : IOpenEtSdk
         _httpClient = httpClient;
         _logger = logger;
 
-        _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", openEtConfiguration.ApiKey);
+        _httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+        _httpClient.DefaultRequestHeaders.Add(HeaderNames.Authorization, openEtConfiguration.ApiKey);
     }
 
     public async Task<RasterTimeSeriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeSeriesPolygonRequest request)
