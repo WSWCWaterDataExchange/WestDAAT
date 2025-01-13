@@ -22,6 +22,8 @@ var wadedbserver = ((Environment == 'prod'))
   : 'wade-qa-server.database.windows.net'
 var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA'
 
+var westdaatdbname = 'WestDAAT'
+
 // Role Definitions (Different per tenant). 
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
 param azureServiceBusDataSenderRoleDefinitionName string = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
@@ -247,7 +249,8 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
 var fnAppSettings = {
   'Database:AccessTokenDatabaseResource': 'https://database.windows.net/'
   'Database:AccessTokenDatabaseTenantId': subscription().tenantId
-  'Database:ConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  'Database:WadeConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
   'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
   'Nldi:MaxDownstreamDiversionDistance': '500'
   'Nldi:MaxDownstreamMainDistance': '500'
@@ -395,6 +398,50 @@ resource api_management 'Microsoft.ApiManagement/service@2024-05-01' = {
   properties: {
     publisherEmail: 'rjames@wswc.utah.gov'
     publisherName: 'Western States Water Council'
+  }
+}
+
+resource sql_server 'Microsoft.Sql/servers@2021-11-01' = {
+  name: resource_name_dashes_var
+  location: location
+  properties: {
+    version: '12.0'
+    publicNetworkAccess: 'Enabled'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      azureADOnlyAuthentication: true
+      tenantId: tenant().tenantId
+      login: sites_fn_resource.name
+      principalType: 'Application'
+      sid: sites_fn_resource.identity.principalId
+    }
+  }
+}
+
+resource sql_server_database 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
+  parent: sql_server
+  name: westdaatdbname
+  location: location
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 5
+  }
+  properties: {
+    collation: 'SQL_Latin1_General_CP1_CI_AS'
+    maxSizeBytes: 2147483648
+    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
+    zoneRedundant: false
+    readScale: 'Disabled'
+  }
+}
+
+resource allowAccessToAzureServices 'Microsoft.Sql/servers/firewallRules@2021-11-01' = {
+  parent: sql_server
+  name: 'allow-access-to-azure-services'
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
   }
 }
 
