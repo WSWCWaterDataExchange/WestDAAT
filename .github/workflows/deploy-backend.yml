@@ -74,7 +74,7 @@ jobs:
     # needs: deploy-funtion-app
     defaults:
       run:
-        working-directory: src/API/.github/workflows
+        working-directory: .github/workflows
 
     steps:
       # Required to run func commands in the generation shell script
