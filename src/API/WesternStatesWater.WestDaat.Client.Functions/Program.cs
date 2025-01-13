@@ -47,7 +47,7 @@ var host = new HostBuilder()
         services.AddScoped(_ => configuration.GetNldiConfiguration());
         services.AddScoped(_ => configuration.GetPerformanceConfiguration());
         services.AddScoped(_ => configuration.GetSmtpConfiguration());
-        services.AddScoped(_ => configuration.GetOpenEtConfiguration())
+        services.AddScoped(_ => configuration.GetOpenEtConfiguration());
 
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
