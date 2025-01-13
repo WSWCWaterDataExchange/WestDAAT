@@ -1,7 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using RichardSzalay.MockHttp;
 using System.Net.Http;
-using System.Text.Json;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
