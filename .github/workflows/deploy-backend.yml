@@ -73,6 +73,8 @@ jobs:
         working-directory: .github/workflows
 
     steps:
+      - uses: actions/checkout@v2
+
       # Required to run func commands in the generation shell script
       - name: Install Azure Functions Core Tools
         run: sudo apt-get install -y azure-functions-core-tools-4
