@@ -19,6 +19,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             },
             { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi/" },
             { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.BaseAddress)}", "https://openet-api.org/" },
+            { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.ApiKey)}", "API_KEY" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
