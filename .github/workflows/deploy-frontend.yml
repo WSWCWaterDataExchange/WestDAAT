@@ -71,7 +71,8 @@ jobs:
           cache-dependency-path: ./src/DashboardUI/package-lock.json
           cache: "npm"
 
-      # Workaround to set environment variables from inputs
+      # Workaround to set environment variables from inputs.
+      # At time of writing it is not possible to pass environment variables to a reusable workflow.
       - run: echo "REACT_APP_AUTH_REDIRECT_URL=${{ inputs.react-app-auth-redirect-url }}" >> $GITHUB_ENV
       - run: echo "REACT_APP_WEBAPI_URL=${{ inputs.react-app-webapi-url }}" >> $GITHUB_ENV
       - run: echo "REACT_APP_AUTH_CLIENT_ID=${{ inputs.react-app-auth-client-id }}" >> $GITHUB_ENV
