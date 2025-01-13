@@ -70,7 +70,7 @@ export interface WaterRightsContextState {
 export const defaultFilters: WaterRightsFilters = {
   beneficialUseNames: undefined,
   overlays: undefined,
-  isOverlayFilterActive: false,
+  isOverlayFilterActive: true,
   ownerClassifications: undefined,
   allocationOwner: undefined,
   waterSourceTypes: undefined,
