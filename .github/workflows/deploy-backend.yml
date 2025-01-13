@@ -1,0 +1,113 @@
+# This workflow is environment agnostic and can be used to deploy to any environment.
+# This work flow will be called by the environment specific workflows.
+# All inputs will be passed in by the environment specific workflows.
+
+name: Deploy Backend
+
+env:
+  FUNCTION_APP_DIR: "src/API/WesternStatesWater.WestDaat.Client.Functions"
+  DOTNET_VERSION: "8.0.x"
+
+on:
+  workflow_call:
+    inputs:
+      azure-resource-group:
+        description: "The resource group name in Azure"
+        required: true
+        type: string
+      azure-publish-profile:
+        description: "The publish profile for the Azure Function App"
+        required: true
+        type: string
+      azure-cli-credentials:
+        description: "The credentials for the Azure CLI"
+        required: true
+        type: string
+      azure-functionapp-name:
+        description: "The name of the Azure Function App"
+        required: true
+        type: string
+      azure-apim-name:
+        description: "The name of the Azure API Management service"
+        required: true
+        type: string
+      azure-api-name:
+        description: "The name of the API in Azure API Management"
+        required: true
+        type: string
+      azure-api-url:
+        description: "The URL of the API in Azure API Management"
+        required: true
+        type: string
+
+jobs:
+  deploy-funtion-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FUNCTION_APP_DIR }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: "Build Function App"
+        run: dotnet build --configuration Release --output ./fnapp
+      - name: "Deploy Function App"
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ inputs.azure-functionapp-name }}
+          package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
+          publish-profile: ${{ inputs.azure-publish-profile }}
+
+  deploy-apim-api:
+    runs-on: ubuntu-latest
+    needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: src/DashboardUI
+
+    steps:
+      # Required to run func commands in the generation shell script
+      - name: Install Azure Functions Core Tools
+        run: sudo apt-get install -y azure-functions-core-tools-4
+
+      # Need permissions to run the script
+      - name: Update OpenAPI Script Permissions
+        run: chmod 777 ./get-openapi-document.sh
+        working-directory: .github/workflows
+
+      # Generate OpenAPI document via shell script
+      - name: Generate OpenAPI document
+        id: oai
+        run: ./get-openapi-document.sh -d 30 -p ${{ env.FUNCTION_APP_DIR }} -o ".github/workflows"
+        working-directory: .github/workflows
+
+      - name: Check generated OpenAPI document
+        run: cat swagger.json
+        working-directory: .github/workflows
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ inputs.azure-cli-credentials }}
+
+      - name: Deploy API to APIM
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
+              --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api/app' \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --service-url ${{ inputs.azure-api-url }} --subscription-required false
+
+      - name: Azure cli logout
+        run: |
+          az logout
+        if: always()
