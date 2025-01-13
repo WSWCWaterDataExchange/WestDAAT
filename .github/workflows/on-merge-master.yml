@@ -1,26 +1,7 @@
-# This workflow will build and push a .NET Core app to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net60&pivots=development-environment-vscode
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
 name: Deploy Staging
 
 env:
-  FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
   REACT_APP_WEBAPI_URL: 'https://westdaat-staging.azurewebsites.net/api/'
   REACT_APP_AUTH_REDIRECT_URL: 'https://westdaatstaging.westernstateswater.org/authredirect.html' # the URL used by Azure B2C to redirect to your app after login
   REACT_APP_AUTH_CLIENT_ID: 'a4db62cd-d2ef-425e-8c69-37f4349f925e'
@@ -28,14 +9,6 @@ env:
   REACT_APP_AUTH_KNOWN_AUTHORITY: 'https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com'
   REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL: 'https://api.maptiler.com/tiles/441a16bb-0a9e-4e71-8c84-da267d516a09/tiles.json?key=IauIQDaqjd29nJc5kJse'
   REACT_APP_GA_ID: 'G-KFL0TGM4B8'             # set the Google Analytics measurement ID
-  AZURE_RESOURCE_GROUP: WestDAAT_Staging         # set the resource group name
-  AZURE_FUNCTIONAPP_NAME: westdaat-staging       # set this to the name of your Azure Web App
-  AZURE_STORAGE_ACCOUNT_NAME: westdaatstaging    # set the storage account of static site
-  AZURE_CDN_ENDPOINT_NAME: westdaatstaging       # set the storage account of static site
-  AZURE_CDN_PROFILE_NAME: westdaatstaging        # set the cdn profile name
-  DOTNET_VERSION: '8.0.x'                     # set this to the .NET Core version to use
-  NODE_VERSION: '16.x'                        # set this to the node version to use
-
 
 on:
   push:
@@ -44,69 +17,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-funtion-app:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.FUNCTION_APP_DIR }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: 'Build Function App'
-        run: dotnet build --configuration Release --output ./fnapp
-      - name: 'Deploy Function App'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
-          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_STAGING }}
-
-  deploy-static-site:
-    runs-on: ubuntu-latest
-    needs: deploy-funtion-app
-    defaults:
-      run:
-        working-directory: src/DashboardUI
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache-dependency-path: ./src/DashboardUI/package-lock.json
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: rm build/robots.allowall.txt
-    
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
-
-    - name: Upload to blob storage
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --overwrite
-    
-    - name: Purge CDN endpoint
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az cdn endpoint purge --content-paths  "/*" --profile-name ${{ env.AZURE_CDN_PROFILE_NAME }} --name ${{ env.AZURE_CDN_ENDPOINT_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
-
-    - name: Azure cli logout
-      run: |
-            az logout
-      if: always()
-
+  deploy-backend:
+    uses: ./.github/workflows/deploy-backend.yml
+    with:
+      azure-resource-group: WestDAAT_Staging
+      azure-functionapp-name: westdaat-staging
+      azure-apim-name: westdaatstaging
+      azure-api-name: westdaat-fn-api-staging
+      azure-api-url: https://westdaatstaging.azure-api.net/api
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
+      azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_STAGING }}
+  deploy-frontend:
+    uses: ./.github/workflows/deploy-frontend.yml
+    needs: deploy-backend
+    with:
+      azure-resource-group: WestDAAT_Staging
+      azure-storage-account-name: westdaatstaging
+      azure-cdn-endpoint-name: westdaatstaging
+      azure-cdn-profile-name: westdaatstaging
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
