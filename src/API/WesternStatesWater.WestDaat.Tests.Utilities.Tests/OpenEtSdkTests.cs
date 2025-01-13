@@ -110,7 +110,7 @@ public class OpenEtSdkTests : UtilitiesTestBase
         // Act
         var sdk = CreateOpenEtSdk(new HttpClient()
         {
-            BaseAddress = new Uri("https://openet-api.org/")
+            BaseAddress = new Uri(Configuration.GetOpenEtConfiguration().BaseAddress)
         });
         var response = await sdk.RasterTimeseriesPolygon(request);
 
