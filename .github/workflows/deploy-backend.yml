@@ -72,6 +72,9 @@ jobs:
     # TODO TODO TODO Re-enable this 
     # TODO TODO TODO Re-enable this 
     # needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: src/API/.github/workflows
 
     steps:
       # Required to run func commands in the generation shell script
@@ -81,17 +84,14 @@ jobs:
       # Need permissions to run the script
       - name: Update OpenAPI Script Permissions
         run: chmod 777 ./get-openapi-document.sh
-        working-directory: .github/workflows
 
       # Generate OpenAPI document via shell script
       - name: Generate OpenAPI document
         id: oai
-        run: ./get-openapi-document.sh -d 30 -p ${{ env.FUNCTION_APP_DIR }} -o ".github/workflows"
-        working-directory: .github/workflows
+        run: ./get-openapi-document.sh -d 30 -p ${{ env.FUNCTION_APP_DIR }} -o "./"
 
       - name: Check generated OpenAPI document
         run: cat swagger.json
-        working-directory: .github/workflows
 
       - name: Azure Login
         uses: azure/login@v2
@@ -105,7 +105,7 @@ jobs:
           inlineScript: |
             az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
               --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api/app' \
-              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --specification-format OpenApiJson --specification-path swagger.json \
               --service-url ${{ inputs.azure-api-url }} --subscription-required false
 
       - name: Azure cli logout
