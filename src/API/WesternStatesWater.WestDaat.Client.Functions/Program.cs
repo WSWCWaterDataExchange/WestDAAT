@@ -96,6 +96,11 @@ var host = new HostBuilder()
             a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
         });
 
+        services.AddHttpClient<IOpenEtSdk, OpenEtSdk>(a =>
+        {
+            a.BaseAddress = new Uri(configuration.GetOpenEtConfiguration().BaseAddress);
+        });
+
         services.AddLogging(logging =>
         {
             logging.AddConsole();
