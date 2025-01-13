@@ -16,7 +16,6 @@ export function Overlays() {
 
   return (
     <div className="position-relative flex-grow-1">
-      <h5 className="fw-bold">OVERLAY INFO</h5>
       <div className="mb-3">
         <label className="form-label fw-bolder">Overlay Type</label>
         {overlaysData.map((overlayKey) => {
