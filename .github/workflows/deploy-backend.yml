@@ -68,9 +68,6 @@ jobs:
   deploy-apim-api:
     runs-on: ubuntu-latest
     needs: deploy-funtion-app
-    defaults:
-      run:
-        working-directory: src/DashboardUI
 
     steps:
       # Required to run func commands in the generation shell script
