@@ -62,5 +62,7 @@ public class OpenEtSdkTests : UtilitiesTestBase
 
         const int monthsInYear = 12;
         response.Data.Should().HaveCount(monthsInYear);
+        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
+        response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
     }
 }
