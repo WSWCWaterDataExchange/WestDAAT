@@ -25,6 +25,31 @@ on:
         description: "The CDN profile name for the static site"
         required: true
         type: string
+      # REACT_APP_AUTH_REDIRECT_URL
+      react-app-auth-redirect-url:
+        description: "The URL used by Azure B2C to redirect to your app after login"
+        required: true
+        type: string
+      # REACT_APP_WEBAPI_URL
+      react-app-webapi-url:
+        required: true
+        type: string
+      # REACT_APP_AUTH_CLIENT_ID
+      react-app-auth-client-id: 
+        required: true
+        type: string
+      # REACT_APP_AUTH_AUTHORITY
+      react-app-auth-authority:
+        required: true
+        type: string
+      # REACT_APP_AUTH_KNOWN_AUTHORITY
+      react-app-auth-known-authority:
+        required: true
+        type: string
+      # REACT_APP_GA_ID
+      react-app-ga-id:
+        required: true
+        type: string
     secrets:
       azure-cli-credentials:
         description: "The credentials for the Azure CLI"
@@ -45,6 +70,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache-dependency-path: ./src/DashboardUI/package-lock.json
           cache: "npm"
+
+      # Workaround to set environment variables from inputs
+      - run: echo "REACT_APP_AUTH_REDIRECT_URL=${{ inputs.react-app-auth-redirect-url }}" >> $GITHUB_ENV
+      - run: echo "REACT_APP_WEBAPI_URL=${{ inputs.react-app-webapi-url }}" >> $GITHUB_ENV
+      - run: echo "REACT_APP_AUTH_CLIENT_ID=${{ inputs.react-app-auth-client-id }}" >> $GITHUB_ENV
+      - run: echo "REACT_APP_AUTH_AUTHORITY=${{ inputs.react-app-auth-authority }}" >> $GITHUB_ENV
+      - run: echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
+      - run: echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
+
       - run: npm ci
       - run: npm run build
       - run: rm build/robots.allowall.txt
