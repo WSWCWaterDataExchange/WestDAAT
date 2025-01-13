@@ -29,6 +29,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(NldiFeatures))]
         [OpenApiOperation(nameof(NldiFeatures))]
         [OpenApiParameter("latitude", Type = typeof(double), In = ParameterLocation.Path, Required = true)]
+        [OpenApiParameter("longitude", Type = typeof(double), In = ParameterLocation.Path, Required = true)]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> NldiFeatures([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "NldiFeatures/@{latitude},{longitude}")] HttpRequestData req, double latitude, double longitude)
         {
