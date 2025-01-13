@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import {
   useOverlayDetails,
   useOverlayInfoById,
+  useWaterRightsInfoListByAllocationUuid,
   useWaterRightsInfoListByReportingUnitUuid,
 } from '../../../hooks/queries';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
@@ -16,7 +17,8 @@ const defaultQuery = { data: undefined, isError: false, isLoading: false };
 export interface HostData {
   detailsQuery: Query<OverlayDetails>;
   overlayInfoListQuery: Query<OverlayTableEntry[]>;
-  waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
+  waterRightsInfoListByReportingUnitQuery: Query<WaterRightsInfoListItem[]>;
+  waterRightsInfoListByAllocationQuery: Query<WaterRightsInfoListItem[]>;
   geometryFeature: FeatureCollection | null;
 }
 
@@ -36,7 +38,8 @@ const defaultState: OverlayDetailsPageContextState = {
   hostData: {
     detailsQuery: defaultQuery,
     overlayInfoListQuery: defaultQuery,
-    waterRightsInfoListQuery: defaultQuery,
+    waterRightsInfoListByReportingUnitQuery: defaultQuery,
+    waterRightsInfoListByAllocationQuery: defaultQuery,
     geometryFeature: null,
   },
 };
@@ -53,7 +56,8 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
   const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
   const detailsQuery = useOverlayDetails(overlayUuid);
   const overlayInfoListQuery = useOverlayInfoById(overlayUuid);
-  const waterRightsInfoListQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid);
+  const waterRightsInfoListByReportingUnitQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid);
+  const waterRightsInfoListByAllocationQuery = useWaterRightsInfoListByAllocationUuid(overlayUuid);
   const geometryFeature: FeatureCollection | null = detailsQuery.data?.geometry || null;
 
   const contextValue: OverlayDetailsPageContextState = {
@@ -63,7 +67,8 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
     hostData: {
       detailsQuery,
       overlayInfoListQuery,
-      waterRightsInfoListQuery,
+      waterRightsInfoListByReportingUnitQuery,
+      waterRightsInfoListByAllocationQuery,
       geometryFeature,
     },
   };

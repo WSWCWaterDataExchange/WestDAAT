@@ -7,8 +7,7 @@ export function useChildrenByTypes(type: string | string[]) {
   }, [type]);
 
   const typeOfComponent = (component: any) => {
-    const result = component?.props?.__type || component?.type?.name || undefined;
-    return result;
+    return component?.props?.__type || component?.type?.displayName || component?.type?.name || undefined;
   };
 
   type ChildrenType = Parameters<typeof React.Children.toArray>[0];

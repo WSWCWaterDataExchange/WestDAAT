@@ -1,7 +1,12 @@
+using FluentAssertions.Common;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Managers.Handlers;
@@ -36,14 +41,26 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             var serviceCollection = new ServiceCollection()
                 .AddLogging(config => config.AddConsole());
 
+            RegisterConfigurationServices(serviceCollection);
             RegisterManagerServices(serviceCollection);
             RegisterEngineServices(serviceCollection);
             RegisterAccessorServices(serviceCollection);
+            RegisterDatabaseServices(serviceCollection);
             RegisterUtilityServices(serviceCollection);
 
             Services = serviceCollection.BuildServiceProvider();
 
             _loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+        }
+
+        private void RegisterConfigurationServices(IServiceCollection serviceCollection)
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory)
+                .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .Build();
+
+            serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
         }
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)
@@ -79,6 +96,11 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             serviceCollection.AddTransient<ITestAccessor, TestAccessor>();
             serviceCollection.AddTransient<IUserAccessor, UserAccessor>();
             serviceCollection.AddTransient<IWaterAllocationAccessor, WaterAllocationAccessor>();
+        }
+
+        private void RegisterDatabaseServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         }
 
         private void RegisterUtilityServices(IServiceCollection serviceCollection)

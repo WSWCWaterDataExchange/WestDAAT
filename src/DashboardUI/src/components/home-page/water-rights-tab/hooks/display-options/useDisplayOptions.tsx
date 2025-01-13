@@ -10,7 +10,7 @@ import { useAlerts } from '../useAlerts';
 import useOverlayDigestMapPopup from "../../../../../hooks/map-popups/useOverlayDigestMapPopup";
 import useSiteClickedOnMap from '../../../../../hooks/map-popups/useSiteClickedOnMap';
 
-const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
+const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer, mapLayerNames.overlayTypesPolygonsLayer, mapLayerNames.overlayTypesPolygonsBorderLayer];
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,

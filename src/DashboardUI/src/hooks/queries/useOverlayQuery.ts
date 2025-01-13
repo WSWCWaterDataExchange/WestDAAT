@@ -2,6 +2,7 @@ import { useQuery } from 'react-query';
 import {
   getOverlayDetails,
   getOverlayInfoById,
+  getWaterRightsInfoListByAllocationUuid,
   getWaterRightsInfoListByReportingUnitUuid,
 } from '../../accessors/overlaysAccessor';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
@@ -43,6 +44,22 @@ export function useWaterRightsInfoListByReportingUnitUuid(
   return useQuery(
     ['overlay.Legal', reportingUnitUuid],
     async () => await getWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid!),
+    setOptions,
+  );
+}
+
+export function useWaterRightsInfoListByAllocationUuid(
+  allocationUuid: string | undefined,
+  options?: UseQueryOptionsParameter<undefined, WaterRightsInfoListItem[]>,
+) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled !== false && !!allocationUuid,
+  };
+
+  return useQuery(
+    ['overlay.Legal', allocationUuid],
+    async () => await getWaterRightsInfoListByAllocationUuid(allocationUuid!),
     setOptions,
   );
 }

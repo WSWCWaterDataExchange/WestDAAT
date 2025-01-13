@@ -27,8 +27,33 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.MethodInfoListItem, ClientContracts.MethodInfoListItem>();
             CreateMap<CommonContracts.OverlayDetails, ClientContracts.OverlayDetails>()
                 .ForMember(dest => dest.Geometry, opt => opt.Ignore());
+            CreateMap<ClientContracts.OverlayDetailsSearchCriteria, CommonContracts.OverlayDetailsSearchCriteria>();
             CreateMap<CommonContracts.OverlayTableEntry, ClientContracts.OverlayTableEntry>();
             CreateMap<CommonContracts.OverlayDigest, ClientContracts.OverlayDigest>();
+
+            AddUserMappings();
+        }
+
+        private void AddUserMappings()
+        {
+            CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserLoadRolesRequest>()
+                .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+
+            const string azureB2CVersionString = "1.0.0";
+            const string azureB2CContinuanceAction = "Continue";
+            CreateMap<CommonContracts.UserLoadRolesResponse, ClientContracts.Responses.Admin.EnrichJwtResponse>()
+                .ForMember(dest => dest.Version, opt => opt.MapFrom(_ => azureB2CVersionString))
+                .ForMember(dest => dest.Action, opt => opt.MapFrom(_ => azureB2CContinuanceAction))
+                .ForMember(dest => dest.Extension_WestDaat_UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => 
+                        string.Join(',', src.UserRoles.Select(role => $"rol_{role}"))
+                    )
+                )
+                .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src => 
+                        string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
+                    )
+                )
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
     }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, Table, Tabs } from 'react-bootstrap';
-import { useWaterRightDetailsContext } from './Provider';
+import { ActiveTabType, useWaterRightDetailsContext } from './Provider';
+import OverlayDetailsTable from '../OverlayDetailsTable';
 
 export enum WaterRightTab {
   SiteInfo = 'SiteInfo',
@@ -14,16 +15,13 @@ function WaterRightTabs() {
     hostData: {
       siteInfoListQuery: { data: siteInfoList },
       sourceInfoListQuery: { data: sourceInfoList },
+      waterRightsInfoListQuery: { data: waterRightsInfoList },
     },
   } = useWaterRightDetailsContext();
 
   return (
     <>
-      <Tabs
-        onSelect={(a) => setActiveTab(a === 'site' ? a : 'source')}
-        activeKey={activeTab}
-        className="mb-3 custom-tabs"
-      >
+      <Tabs onSelect={(a) => setActiveTab(a as ActiveTabType)} activeKey={activeTab} className="mb-3 custom-tabs">
         <Tab eventKey="site" title="Site Info">
           <Table hover>
             <thead>
@@ -58,6 +56,7 @@ function WaterRightTabs() {
             </tbody>
           </Table>
         </Tab>
+
         <Tab eventKey="source" title="Water Source Info">
           <Table hover>
             <thead>
@@ -81,6 +80,10 @@ function WaterRightTabs() {
               ))}
             </tbody>
           </Table>
+        </Tab>
+
+        <Tab eventKey="rights" title="Administrative/Regulatory Overlay Info">
+          <OverlayDetailsTable waterRightsInfoList={waterRightsInfoList} />
         </Tab>
       </Tabs>
     </>

@@ -42,14 +42,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(FindWaterRights))]
         public async Task<HttpResponseData> FindWaterRights([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/find")] HttpRequestData request)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithPaging>(requestBody);
-
+            var searchRequest = await ParseRequestBody<WaterRightsSearchCriteriaWithPaging>(request);
             var result = await _waterResourceManager.FindWaterRights(searchRequest);
 
             return await CreateOkResponse(request, result);
@@ -90,12 +83,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetAnalyticsSummaryInformation))]
         public async Task<HttpResponseData> GetAnalyticsSummaryInformation([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/AnalyticsSummaryInformation")] HttpRequestData request)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteriaWithGrouping>(requestBody);
+            var searchRequest = await ParseRequestBody<WaterRightsSearchCriteriaWithGrouping>(request);
 
             var result = await _waterResourceManager.GetAnalyticsSummaryInformation(searchRequest);
 
@@ -105,12 +93,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetWaterRightsEnvelope))]
         public async Task<HttpResponseData> GetWaterRightsEnvelope([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WaterRights/DataEnvelope")] HttpRequestData request)
         {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var searchRequest = JsonConvert.DeserializeObject<WaterRightsSearchCriteria>(requestBody);
+            var searchRequest = await ParseRequestBody<WaterRightsSearchCriteria>(request);
 
             var result = await _waterResourceManager.GetWaterRightsEnvelope(searchRequest);
 
@@ -208,16 +191,36 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
         
         [Function(nameof(GetOverlayTableDetails))]
-        public async Task<HttpResponseData> GetOverlayTableDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] HttpRequestData request, string overlayUuid)
+        public async Task<HttpResponseData> GetOverlayTableDetails(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}/Legal")] 
+            HttpRequestData request, string overlayUuid)
         {
-            var overlayTable = await _waterResourceManager.GetOverlayInfoById(overlayUuid);
+            var searchCriteria = new OverlayDetailsSearchCriteria
+            {
+                ReportingUnitUUID = overlayUuid,
+            };
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
             return await CreateOkResponse(request, overlayTable);
         }
-        
+
+        [Function(nameof(GetOverlayTableDetailsByAllocation))]
+        public async Task<HttpResponseData> GetOverlayTableDetailsByAllocation(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "WaterRights/{allocationUuid}/Overlays")]
+            HttpRequestData request, string allocationUuid)
+        {
+            var searchCriteria = new OverlayDetailsSearchCriteria
+            {
+                AllocationUUID = allocationUuid,
+            };
+
+            var overlayTable = await _waterResourceManager.GetOverlayInfoById(searchCriteria);
+            return await CreateOkResponse(request, overlayTable);
+        }
+
         [Function(nameof(GetOverlayDetails))]
         public async Task<HttpResponseData> GetOverlayDetails([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Overlays/{overlayUuid}")] HttpRequestData request, string overlayUuid)
         {
-            
             var overlay = await _waterResourceManager.GetOverlayDetails(overlayUuid);
             
             return await CreateOkResponse(request, overlay);
