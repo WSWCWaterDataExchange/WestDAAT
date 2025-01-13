@@ -1,11 +1,5 @@
 name: PR Backend
 
-env:
-  RESOURCE_GROUP_NAME: 'WestDAAT_QA'
-  APIM_NAME: 'westdaatqa'
-  API_NAME: 'westdaat-fn-api-qa'
-  API_URL: 'https://westdaatqa.azure-api.net/api'
-
 on:
   push:
     branches: [develop, master]
@@ -34,54 +28,17 @@ jobs:
         run: dotnet build --no-restore
       - name: Create Database
         run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
-      # - name: Check out WaDE2.0
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: WSWCWaterDataExchange/WaDE2.0
-      #     ref: develop
-      # - name: DbUp
-      #   run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
-      #   working-directory: source/WesternStatesWater.WaDE.DbUp
-      # - uses: actions/checkout@v2
-      # - name: .NET Test
-      #   run: dotnet test
-      #   env:
-      #     Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
-      #   working-directory: src/API
-
-      # Test OpenAPI document generation. Will move to on-merge-*.yml when ready.
-
-      # Required to run func commands in the generation shell script
-      - name: Install Azure Functions Core Tools
-        run: sudo apt-get install -y azure-functions-core-tools-4
-
-      # Need permissions to run the script
-      - name: Update OpenAPI Script Permissions
-        run: chmod 777 ./get-openapi-document.sh
-        working-directory: .github/workflows
-
-      # Generate OpenAPI document via shell script
-      - name: Generate OpenAPI document
-        id: oai
-        run: ./get-openapi-document.sh -d 30 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o ".github/workflows"
-        working-directory: .github/workflows
-
-      - name: Check generated OpenAPI document
-        run: cat swagger.json
-        working-directory: .github/workflows
-
-      - name: Azure Login
-        uses: azure/login@v2
+      - name: Check out WaDE2.0
+        uses: actions/checkout@v2
         with:
-          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
-
-      - name: Deploy API to APIM
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az apim api import --path api --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
-              --service-name ${{ env.APIM_NAME }} --api-id ${{ env.API_NAME }} --path 'api/app' \
-              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
-              --service-url ${{ env.API_URL }} --subscription-required false
-        
+          repository: WSWCWaterDataExchange/WaDE2.0
+          ref: develop
+      - name: DbUp
+        run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
+        working-directory: source/WesternStatesWater.WaDE.DbUp
+      - uses: actions/checkout@v2
+      - name: .NET Test
+        run: dotnet test
+        env:
+          Database__ConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API

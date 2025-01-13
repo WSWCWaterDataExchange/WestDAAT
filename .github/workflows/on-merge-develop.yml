@@ -26,14 +26,17 @@ env:
   REACT_APP_AUTH_CLIENT_ID: 'ab3cf308-8a7e-404e-977c-d0227f4a48c4'
   REACT_APP_AUTH_AUTHORITY: 'https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin'
   REACT_APP_AUTH_KNOWN_AUTHORITY: 'https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com'
-  REACT_APP_GA_ID: 'G-KFL0TGM4B8'             # set the Google Analytics measurement ID
-  AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource group name
-  AZURE_FUNCTIONAPP_NAME: westdaat-qa         # set this to the name of your Azure Web App
-  AZURE_STORAGE_ACCOUNT_NAME: westdaatqa      # set the storage account of static site
-  AZURE_CDN_ENDPOINT_NAME: westdaatqa         # set the storage account of static site
-  AZURE_CDN_PROFILE_NAME: westdaatqa          # set the cdn profile name
-  DOTNET_VERSION: '8.0.x'                     # set this to the .NET Core version to use
-  NODE_VERSION: '16.x'                        # set this to the node version to use
+  REACT_APP_GA_ID: 'G-KFL0TGM4B8'                       # set the Google Analytics measurement ID
+  AZURE_RESOURCE_GROUP: WestDAAT_QA                     # set the resource group name
+  AZURE_FUNCTIONAPP_NAME: westdaat-qa                   # set this to the name of your Azure Web App
+  AZURE_STORAGE_ACCOUNT_NAME: westdaatqa                # set the storage account of static site
+  AZURE_CDN_ENDPOINT_NAME: westdaatqa                   # set the storage account of static site
+  AZURE_CDN_PROFILE_NAME: westdaatqa                    # set the cdn profile name
+  AZURE_APIM_NAME: 'westdaatqa'                         # set this to the name of your Azure API Management service
+  AZURE_API_NAME: 'westdaat-fn-api-qa'                  # set this to the name of your API in Azure API Management
+  AZURE_API_URL: 'https://westdaatqa.azure-api.net/api' # set this to the URL of your API in Azure API Management
+  DOTNET_VERSION: '8.0.x'                               # set this to the .NET Core version to use
+  NODE_VERSION: '16.x'                                  # set this to the node version to use
 
 on:
   push:
@@ -108,3 +111,50 @@ jobs:
             az logout
       if: always()
 
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: src/DashboardUI
+
+    steps:
+        # Required to run func commands in the generation shell script
+      - name: Install Azure Functions Core Tools
+        run: sudo apt-get install -y azure-functions-core-tools-4
+
+      # Need permissions to run the script
+      - name: Update OpenAPI Script Permissions
+        run: chmod 777 ./get-openapi-document.sh
+        working-directory: .github/workflows
+
+      # Generate OpenAPI document via shell script
+      - name: Generate OpenAPI document
+        id: oai
+        run: ./get-openapi-document.sh -d 30 -p "src/API/WesternStatesWater.WestDaat.Client.Functions" -o ".github/workflows"
+        working-directory: .github/workflows
+
+      - name: Check generated OpenAPI document
+        run: cat swagger.json
+        working-directory: .github/workflows
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+
+      - name: Deploy API to APIM
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az apim api import --path api --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --service-name ${{ env.AZURE_APIM_NAME }} --api-id ${{ env.AZURE_API_NAME }} --path 'api/app' \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --service-url ${{ env.AZURE_API_URL }} --subscription-required false
+
+      - name: Azure cli logout
+        run: |
+              az logout
+        if: always()
+        
