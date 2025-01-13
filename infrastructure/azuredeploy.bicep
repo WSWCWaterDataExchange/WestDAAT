@@ -398,6 +398,9 @@ resource sql_server 'Microsoft.Sql/servers@2021-11-01' = {
       administratorType: 'ActiveDirectory'
       azureADOnlyAuthentication: true
       tenantId: tenant().tenantId
+      login: sites_fn_resource.name
+      principalType: 'Application'
+      sid: sites_fn_resource.identity.principalId
     }
   }
 }
