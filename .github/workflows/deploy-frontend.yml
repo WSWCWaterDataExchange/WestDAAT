@@ -1,0 +1,80 @@
+# This workflow is environment agnostic and can be used to deploy to any environment.
+# This workflow will be called by the environment specific workflows (qa/prod/etc).
+
+name: Deploy Frontend
+
+env:
+  NODE_VERSION: "16.x" # set this to the node version to use
+
+on:
+  workflow_call:
+    inputs:
+      azure-resource-group:
+        description: "The resource group name in Azure"
+        required: true
+        type: string
+      azure-storage-account-name:
+        description: "The storage account name for the static site"
+        required: true
+        type: string
+      azure-cdn-endpoint-name:
+        description: "The CDN endpoint name for the static site"
+        required: true
+        type: string
+      azure-cdn-profile-name:
+        description: "The CDN profile name for the static site"
+        required: true
+        type: string
+    secrets:
+      azure-cli-credentials:
+        description: "The credentials for the Azure CLI"
+        required: true
+jobs:
+  deploy-static-site:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/DashboardUI
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: ./src/DashboardUI/package-lock.json
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build
+      - run: rm build/robots.allowall.txt
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --destination '$web' \
+              --source 'src/DashboardUI/build' \
+              --account-name ${{ inputs.azure-storage-account-name }} \
+              --auth-mode key --overwrite
+
+      - name: Purge CDN endpoint
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az cdn endpoint purge \
+              --content-paths  "/*" \
+              --profile-name ${{ inputs.azure-cdn-profile-name }} \
+              --name ${{ inputs.azure-cdn-endpoint-name }} \
+              --resource-group ${{ inputs.azure-resource-group }}
+
+      - name: Azure cli logout
+        run: |
+          az logout
+        if: always()
