@@ -55,7 +55,6 @@ internal class OpenEtSdk : IOpenEtSdk
             throw new WestDaatException($"OpenET API returned status code {response.StatusCode}");
         }
 
-        // convert response to RasterTimeseriesPolygonResponse
         var responseContent = await response.Content.ReadAsStringAsync();
         var responseData = JsonSerializer.Deserialize<RasterTimeseriesPolygonResponseDatapoint[]>(responseContent);
 
