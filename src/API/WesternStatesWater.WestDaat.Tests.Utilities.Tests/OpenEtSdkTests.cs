@@ -50,18 +50,18 @@ public class OpenEtSdkTests : UtilitiesTestBase
             new Coordinate(-119.7937, 35.58995),
         };
 
-        var request = new RasterTimeseriesPolygonRequest
+        var request = new RasterTimeSeriesPolygonRequest
         {
             DateRangeStart = DateOnly.FromDateTime(lastYear),
             DateRangeEnd = DateOnly.FromDateTime(currentYear),
             Geometry = new GeometryFactory().CreatePolygon(closedLinestringCoordinates),
-            Interval = RasterTimeseriesInterval.Monthly,
-            Model = RasterTimeseriesModel.SSEBop,
-            PixelReducer = RasterTimeseriesPixelReducer.Mean,
-            ReferenceEt = RasterTimeseriesReferenceEt.GridMET,
-            OutputExtension = RasterTimeseriesFileFormat.JSON,
-            OutputUnits = RasterTimeseriesOutputUnits.Millimeters,
-            Variable = RasterTimeseriesCollectionVariable.ET,
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            PixelReducer = RasterTimeSeriesPixelReducer.Mean,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
         };
         
         // Act
@@ -93,18 +93,18 @@ public class OpenEtSdkTests : UtilitiesTestBase
             new Coordinate(-119.7937, 35.58995),
         };
 
-        var request = new RasterTimeseriesPolygonRequest
+        var request = new RasterTimeSeriesPolygonRequest
         {
             DateRangeStart = DateOnly.FromDateTime(lastYear),
             DateRangeEnd = DateOnly.FromDateTime(currentYear),
             Geometry = new GeometryFactory().CreatePolygon(closedLinestringCoordinates),
-            Interval = RasterTimeseriesInterval.Monthly,
-            Model = RasterTimeseriesModel.SSEBop,
-            PixelReducer = RasterTimeseriesPixelReducer.Mean,
-            ReferenceEt = RasterTimeseriesReferenceEt.GridMET,
-            OutputExtension = RasterTimeseriesFileFormat.JSON,
-            OutputUnits = RasterTimeseriesOutputUnits.Millimeters,
-            Variable = RasterTimeseriesCollectionVariable.ET,
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            PixelReducer = RasterTimeSeriesPixelReducer.Mean,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
         };
 
         // Act

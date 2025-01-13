@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeseriesOutputUnits
+public enum RasterTimeSeriesOutputUnits
 {
     None = 0,
     Millimeters = 1,

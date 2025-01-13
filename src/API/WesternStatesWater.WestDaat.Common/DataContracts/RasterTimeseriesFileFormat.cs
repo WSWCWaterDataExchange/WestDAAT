@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeseriesFileFormat
+public enum RasterTimeSeriesFileFormat
 {
     None = 0,
     JSON = 1

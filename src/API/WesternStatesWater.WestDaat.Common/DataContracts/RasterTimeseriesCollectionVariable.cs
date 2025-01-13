@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeseriesCollectionVariable
+public enum RasterTimeSeriesCollectionVariable
 {
     None = 0,
     ET = 1

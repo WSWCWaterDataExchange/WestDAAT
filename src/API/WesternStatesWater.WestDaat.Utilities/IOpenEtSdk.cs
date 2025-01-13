@@ -4,5 +4,5 @@ namespace WesternStatesWater.WestDaat.Utilities;
 
 public interface IOpenEtSdk
 {
-    Task<RasterTimeseriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeseriesPolygonRequest request);
+    Task<RasterTimeSeriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeSeriesPolygonRequest request);
 }

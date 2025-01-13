@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeseriesInterval
+public enum RasterTimeSeriesInterval
 {
     None = 0,
     Monthly = 1

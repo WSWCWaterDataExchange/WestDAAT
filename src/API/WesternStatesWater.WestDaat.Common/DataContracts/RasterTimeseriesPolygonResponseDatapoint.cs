@@ -2,7 +2,7 @@
 
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class RasterTimeseriesPolygonResponseDatapoint
+public class RasterTimeSeriesPolygonResponseDatapoint
 {
     [JsonPropertyName("time")]
     public DateOnly Time { get; set; }

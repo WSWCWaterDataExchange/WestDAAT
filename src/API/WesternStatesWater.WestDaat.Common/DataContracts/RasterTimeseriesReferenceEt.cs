@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeseriesReferenceEt
+public enum RasterTimeSeriesReferenceEt
 {
     None = 0,
     GridMET = 1

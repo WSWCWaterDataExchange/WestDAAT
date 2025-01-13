@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class RasterTimeseriesPolygonResponse
+public class RasterTimeSeriesPolygonResponse
 {
-    public RasterTimeseriesPolygonResponseDatapoint[] Data { get; set; }
+    public RasterTimeSeriesPolygonResponseDatapoint[] Data { get; set; }
 }

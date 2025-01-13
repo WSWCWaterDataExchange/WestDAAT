@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class RasterTimeseriesPolygonRequest
+public class RasterTimeSeriesPolygonRequest
 {
     /// <summary>
     /// Inclusive start date.
@@ -14,17 +14,17 @@ public class RasterTimeseriesPolygonRequest
 
     public NetTopologySuite.Geometries.Geometry Geometry { get; set; }
 
-    public RasterTimeseriesInterval Interval { get; set; }
+    public RasterTimeSeriesInterval Interval { get; set; }
 
-    public RasterTimeseriesModel Model { get; set; }
+    public RasterTimeSeriesModel Model { get; set; }
 
-    public RasterTimeseriesPixelReducer PixelReducer { get; set; }
+    public RasterTimeSeriesPixelReducer PixelReducer { get; set; }
 
-    public RasterTimeseriesReferenceEt ReferenceEt { get; set; }
+    public RasterTimeSeriesReferenceEt ReferenceEt { get; set; }
 
-    public RasterTimeseriesOutputUnits OutputUnits { get; set; }
+    public RasterTimeSeriesOutputUnits OutputUnits { get; set; }
 
-    public RasterTimeseriesCollectionVariable Variable { get; set; }
+    public RasterTimeSeriesCollectionVariable Variable { get; set; }
 
-    public RasterTimeseriesFileFormat OutputExtension { get; set; }
+    public RasterTimeSeriesFileFormat OutputExtension { get; set; }
 }

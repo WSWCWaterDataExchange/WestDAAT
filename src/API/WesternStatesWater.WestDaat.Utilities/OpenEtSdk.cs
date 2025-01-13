@@ -22,7 +22,7 @@ internal class OpenEtSdk : IOpenEtSdk
         _httpClient.DefaultRequestHeaders.Add("Authorization", openEtConfiguration.ApiKey);
     }
 
-    public async Task<RasterTimeseriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeseriesPolygonRequest request)
+    public async Task<RasterTimeSeriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeSeriesPolygonRequest request)
     {
         var requestDictionary = new Dictionary<string, object>
         {
@@ -56,9 +56,9 @@ internal class OpenEtSdk : IOpenEtSdk
         }
 
         var responseContent = await response.Content.ReadAsStringAsync();
-        var responseData = JsonSerializer.Deserialize<RasterTimeseriesPolygonResponseDatapoint[]>(responseContent);
+        var responseData = JsonSerializer.Deserialize<RasterTimeSeriesPolygonResponseDatapoint[]>(responseContent);
 
-        return new RasterTimeseriesPolygonResponse
+        return new RasterTimeSeriesPolygonResponse
         {
             Data = responseData
         };
@@ -69,11 +69,11 @@ internal class OpenEtSdk : IOpenEtSdk
         return geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray();
     }
 
-    private string ConvertRasterTimeseriesUnits(RasterTimeseriesOutputUnits outputUnits)
+    private string ConvertRasterTimeseriesUnits(RasterTimeSeriesOutputUnits outputUnits)
     {
         return outputUnits switch
         {
-            RasterTimeseriesOutputUnits.Millimeters => "mm",
+            RasterTimeSeriesOutputUnits.Millimeters => "mm",
             _ => throw new NotImplementedException($"Output units {outputUnits} not implemented"),
         };
     }
