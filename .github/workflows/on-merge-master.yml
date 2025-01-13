@@ -33,4 +33,4 @@ jobs:
       react-app-auth-known-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com
       react-app-ga-id: G-KFL0TGM4B8
     secrets:
-      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
