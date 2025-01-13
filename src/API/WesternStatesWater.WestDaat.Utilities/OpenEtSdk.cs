@@ -12,7 +12,7 @@ internal class OpenEtSdk : IOpenEtSdk
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
-    public OpenEtSdk(HttpClient httpClient, ILogger<UsgsNldiSdk> logger)
+    public OpenEtSdk(HttpClient httpClient, ILogger<OpenEtSdk> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
@@ -26,12 +26,12 @@ internal class OpenEtSdk : IOpenEtSdk
                 "date_range", 
                 new string[] 
                 {
-                    request.DateRangeStart.ToString("YYYY-MM-dd"), 
-                    request.DateRangeEnd.ToString("YYYY-MM-dd")
+                    request.DateRangeStart.ToString("yyyy-MM-dd"), 
+                    request.DateRangeEnd.ToString("yyyy-MM-dd")
                 }
             },
             { "file_format", request.OutputExtension.ToString() },
-            { "geometry", request.Geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).ToArray() },
+            { "geometry", request.Geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray() },
             { "interval", request.Interval.ToString() },
             { "model", request.Model.ToString() },
             { "reducer", request.PixelReducer.ToString() },
@@ -40,7 +40,8 @@ internal class OpenEtSdk : IOpenEtSdk
             { "variable", request.Variable.ToString() },
         };
 
-        var httpContent = new StringContent(JsonSerializer.Serialize(requestDictionary), Encoding.UTF8, "application/json");
+        var jsonString = JsonSerializer.Serialize(requestDictionary);
+        var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
         var uri = new Uri("https://openet-api.org/raster/timeseries/polygon");
         var response = await _httpClient.PostAsync(uri, httpContent);
