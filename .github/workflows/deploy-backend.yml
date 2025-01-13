@@ -86,7 +86,7 @@ jobs:
       # Generate OpenAPI document via shell script
       - name: Generate OpenAPI document
         id: oai
-        run: ./get-openapi-document.sh -d 30 -p ${{ env.FUNCTION_APP_DIR }} -o "./"
+        run: ./get-openapi-document.sh -d 45 -p ${{ env.FUNCTION_APP_DIR }} -o "./"
 
       - name: Check generated OpenAPI document
         run: cat swagger.json
