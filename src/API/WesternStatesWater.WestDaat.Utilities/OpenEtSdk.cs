@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 
@@ -12,13 +13,13 @@ internal class OpenEtSdk : IOpenEtSdk
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
-    public OpenEtSdk(HttpClient httpClient, ILogger<OpenEtSdk> logger)
+    public OpenEtSdk(HttpClient httpClient, OpenEtConfiguration openEtConfiguration, ILogger<OpenEtSdk> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
 
         _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "test");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", openEtConfiguration.ApiKey);
     }
 
     public async Task<RasterTimeseriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeseriesPolygonRequest request)

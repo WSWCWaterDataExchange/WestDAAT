@@ -2,6 +2,7 @@
 using RichardSzalay.MockHttp;
 using System.Net.Http;
 using System.Text.Json;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -20,7 +21,7 @@ public class OpenEtSdkTests : UtilitiesTestBase
 
     private OpenEtSdk CreateOpenEtSdk(HttpClient httpClient)
     {
-        return new(httpClient, CreateLogger<OpenEtSdk>());
+        return new(httpClient, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
     }
 
     [TestMethod]
