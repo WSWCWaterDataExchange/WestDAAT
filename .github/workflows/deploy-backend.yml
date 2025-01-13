@@ -1,6 +1,5 @@
 # This workflow is environment agnostic and can be used to deploy to any environment.
-# This work flow will be called by the environment specific workflows.
-# All inputs will be passed in by the environment specific workflows.
+# This workflow will be called by the environment specific workflows (qa/prod/etc).
 
 name: Deploy Backend
 
