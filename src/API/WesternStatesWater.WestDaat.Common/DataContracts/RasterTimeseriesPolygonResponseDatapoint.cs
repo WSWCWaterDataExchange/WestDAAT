@@ -1,8 +1,12 @@
-﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
+﻿using System.Text.Json.Serialization;
+
+namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public class RasterTimeseriesPolygonResponseDatapoint
 {
+    [JsonPropertyName("time")]
     public DateOnly Time { get; set; }
 
-    public double Et { get; set; }
+    [JsonPropertyName("et")]
+    public double Evapotranspiration { get; set; }
 }

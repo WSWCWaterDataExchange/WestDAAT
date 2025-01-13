@@ -16,6 +16,9 @@ internal class OpenEtSdk : IOpenEtSdk
     {
         _httpClient = httpClient;
         _logger = logger;
+
+        _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "test");
     }
 
     public async Task<RasterTimeseriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeseriesPolygonRequest request)
@@ -36,7 +39,7 @@ internal class OpenEtSdk : IOpenEtSdk
             { "model", request.Model.ToString() },
             { "reducer", request.PixelReducer.ToString() },
             { "reference_et", request.ReferenceEt.ToString() },
-            { "units", request.OutputUnits.ToString() },
+            { "units", ConvertRasterTimeseriesUnits(request.OutputUnits) },
             { "variable", request.Variable.ToString() },
         };
 
@@ -53,6 +56,20 @@ internal class OpenEtSdk : IOpenEtSdk
 
         // convert response to RasterTimeseriesPolygonResponse
         var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<RasterTimeseriesPolygonResponse>(responseContent);
+        var responseData = JsonSerializer.Deserialize<RasterTimeseriesPolygonResponseDatapoint[]>(responseContent);
+
+        return new RasterTimeseriesPolygonResponse
+        {
+            Data = responseData
+        };
+    }
+
+    private string ConvertRasterTimeseriesUnits(RasterTimeseriesOutputUnits outputUnits)
+    {
+        return outputUnits switch
+        {
+            RasterTimeseriesOutputUnits.Millimeters => "mm",
+            _ => throw new NotImplementedException($"Output units {outputUnits} not implemented"),
+        };
     }
 }

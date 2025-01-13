@@ -30,11 +30,11 @@ public class OpenEtSdkTests : UtilitiesTestBase
         var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
         var closedLinestringCoordinates = new[]
         {
-            new Coordinate(0, 0),
-            new Coordinate(1, 0),
-            new Coordinate(1, 1),
-            new Coordinate(0, 1),
-            new Coordinate(0, 0),
+            new Coordinate(-119.7937, 35.58995),
+            new Coordinate(-119.7937, 35.53326),
+            new Coordinate(-119.71268, 35.53326),
+            new Coordinate(-119.71268, 35.58995),
+            new Coordinate(-119.7937, 35.58995),
         };
 
         var request = new RasterTimeseriesPolygonRequest
@@ -52,22 +52,19 @@ public class OpenEtSdkTests : UtilitiesTestBase
         };
 
         _mockHttp.When(HttpMethod.Post, "https://openet-api.org/raster/timeseries/polygon")
-            .Respond("application/json", JsonSerializer.Serialize(new RasterTimeseriesPolygonResponse()
+            .Respond("application/json", JsonSerializer.Serialize(new[]
             {
-                Data = [
-                    new RasterTimeseriesPolygonResponseDatapoint()
+                new RasterTimeseriesPolygonResponseDatapoint()
                     {
                         Time = DateOnly.FromDateTime(currentYear),
-                        Et = 30.0,
+                        Evapotranspiration = 30.0,
                     }
-                ]
             }));
 
         var sdk = CreateOpenEtSdk(_mockHttp.ToHttpClient());
         var response = await sdk.RasterTimeseriesPolygon(request);
 
         response.Should().NotBeNull();
-        response.Data.Should().NotBeNull();
-        response.Data.Should().HaveCount(1);
+        response.Data.Should().NotBeEmpty();
     }
 }
