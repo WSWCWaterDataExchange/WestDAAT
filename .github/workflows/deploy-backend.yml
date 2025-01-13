@@ -41,37 +41,33 @@ on:
 
 
 jobs:
-  # deploy-funtion-app:
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ${{ env.FUNCTION_APP_DIR }}
+  deploy-funtion-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FUNCTION_APP_DIR }}
 
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: Set up .NET Core
-  #       uses: actions/setup-dotnet@v1
-  #       with:
-  #         dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-  #     - name: "Build Function App"
-  #       run: dotnet build --configuration Release --output ./fnapp
-  #     - name: "Deploy Function App"
-  #       uses: Azure/functions-action@v1
-  #       id: fa
-  #       with:
-  #         app-name: ${{ inputs.azure-functionapp-name }}
-  #         package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
-  #         publish-profile: ${{ secrets.azure-function-publish-profile }}
+      - name: "Build Function App"
+        run: dotnet build --configuration Release --output ./fnapp
+      - name: "Deploy Function App"
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ inputs.azure-functionapp-name }}
+          package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
+          publish-profile: ${{ secrets.azure-function-publish-profile }}
 
   deploy-apim-api:
     runs-on: ubuntu-latest
-    # TODO TODO TODO Re-enable this 
-    # TODO TODO TODO Re-enable this 
-    # TODO TODO TODO Re-enable this 
-    # TODO TODO TODO Re-enable this 
-    # needs: deploy-funtion-app
+    needs: deploy-funtion-app
     defaults:
       run:
         working-directory: .github/workflows
