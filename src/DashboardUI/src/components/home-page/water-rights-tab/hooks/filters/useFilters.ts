@@ -18,11 +18,6 @@ import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
 import { useOverlaysFilter } from './useOverlaysFilter';
 
-const allWaterRightsLayers = [
-  mapLayerNames.waterRightsPointsLayer,
-  mapLayerNames.waterRightsPolygonsLayer,
-];
-
 export function useFilters() {
   const { setLayerFilters } = useMapContext();
 

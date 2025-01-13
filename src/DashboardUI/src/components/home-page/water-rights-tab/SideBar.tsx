@@ -24,7 +24,7 @@ import { useNldiFilter } from './hooks/filters/useNldiFilter';
 import { AllocationTypeSelect } from './filters/AllocationTypeSelect';
 import { LegalStatusSelect } from './filters/LegalStatusSelect';
 import { SiteTypeSelect } from './filters/SiteTypeSelect';
-import {useOverlaysFilter} from "./hooks/filters/useOverlaysFilter";
+import { useOverlaysFilter } from "./hooks/filters/useOverlaysFilter";
 
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
