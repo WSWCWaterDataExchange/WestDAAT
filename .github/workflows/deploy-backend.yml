@@ -103,7 +103,7 @@ jobs:
           inlineScript: |
             az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
               --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api/app' \
-              --specification-format OpenApiJson --specification-path swagger.json \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
               --service-url ${{ inputs.azure-api-url }} --subscription-required false
 
       - name: Azure cli logout
