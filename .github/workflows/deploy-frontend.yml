@@ -71,14 +71,14 @@ jobs:
           cache-dependency-path: ./src/DashboardUI/package-lock.json
           cache: "npm"
 
-      # Workaround to set environment variables from inputs.
-      # At time of writing it is not possible to pass environment variables to a reusable workflow.
-      - run: echo "REACT_APP_AUTH_REDIRECT_URL=${{ inputs.react-app-auth-redirect-url }}" >> $GITHUB_ENV
-      - run: echo "REACT_APP_WEBAPI_URL=${{ inputs.react-app-webapi-url }}" >> $GITHUB_ENV
-      - run: echo "REACT_APP_AUTH_CLIENT_ID=${{ inputs.react-app-auth-client-id }}" >> $GITHUB_ENV
-      - run: echo "REACT_APP_AUTH_AUTHORITY=${{ inputs.react-app-auth-authority }}" >> $GITHUB_ENV
-      - run: echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
-      - run: echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
+      - name: Set environment variables
+        run: |
+          echo "REACT_APP_AUTH_REDIRECT_URL=${{ inputs.react-app-auth-redirect-url }}" >> $GITHUB_ENV
+          echo "REACT_APP_WEBAPI_URL=${{ inputs.react-app-webapi-url }}" >> $GITHUB_ENV
+          echo "REACT_APP_AUTH_CLIENT_ID=${{ inputs.react-app-auth-client-id }}" >> $GITHUB_ENV
+          echo "REACT_APP_AUTH_AUTHORITY=${{ inputs.react-app-auth-authority }}" >> $GITHUB_ENV
+          echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
+          echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
 
       - run: npm ci
       - run: npm run build
