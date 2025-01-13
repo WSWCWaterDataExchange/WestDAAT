@@ -23,7 +23,11 @@ public class OpenEtSdkTests : UtilitiesTestBase
 
     private OpenEtSdk CreateOpenEtSdk(HttpClient httpClient)
     {
-        httpClient.BaseAddress = new Uri(baseAddress);
+        if (httpClient.BaseAddress == null)
+        {
+            httpClient.BaseAddress = new Uri(baseAddress);
+        }
+        
         return new(httpClient, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
     }
 
@@ -104,7 +108,10 @@ public class OpenEtSdkTests : UtilitiesTestBase
         };
 
         // Act
-        var sdk = CreateOpenEtSdk(new HttpClient());
+        var sdk = CreateOpenEtSdk(new HttpClient()
+        {
+            BaseAddress = new Uri("https://openet-api.org/")
+        });
         var response = await sdk.RasterTimeseriesPolygon(request);
 
         // Assert
