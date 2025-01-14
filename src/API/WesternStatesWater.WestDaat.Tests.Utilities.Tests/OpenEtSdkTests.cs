@@ -33,7 +33,7 @@ public class OpenEtSdkTests : UtilitiesTestBase
     }
 
     [TestMethod]
-    public async Task RasterTimeSeriesPolygon_RequestSerializesSuccessfully()
+    public void RasterTimeSeriesPolygon_RequestSerializesSuccessfully()
     {
         // Arrange
         // remove whitespace from expected json
