@@ -66,6 +66,19 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
             return result;
         }
 
+        public override async Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            var result = await base
+                .SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken)
+                .ConfigureAwait(false);
+
+            ChangeTracker.Clear();
+
+            return result;
+        }
+
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOrganization> UserOrganizations { get; set; }
