@@ -5,7 +5,7 @@ public class User
     public User()
     {
         UserRoles = new HashSet<UserRole>();
-        UserOrganizationRoles = new HashSet<UserOrganizationRole>();
+        UserOrganizations = new HashSet<UserOrganization>();
     }
 
     public Guid Id { get; set; }
@@ -18,5 +18,5 @@ public class User
 
     public virtual ICollection<UserRole> UserRoles { get; set; }
 
-    public virtual ICollection<UserOrganizationRole> UserOrganizationRoles { get; set; }
+    public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }
