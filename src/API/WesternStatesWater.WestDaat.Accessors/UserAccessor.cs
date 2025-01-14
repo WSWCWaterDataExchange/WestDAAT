@@ -30,8 +30,8 @@ internal class UserAccessor : AccessorBase, IUserAccessor
 
         var user = await db.Users
             .Include(u => u.UserRoles)
-            .Include(u => u.UserOrganizationRoles)
-                .ThenInclude(uor => uor.UserOrganization)
+            .Include(u => u.UserOrganizations)
+                .ThenInclude(uor => uor.UserOrganizationRoles)
             .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
 
         if (user == null)
@@ -43,11 +43,11 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         {
             UserId = user.Id,
             UserRoles = user.UserRoles.Select(ur => ur.Role).ToArray(),
-            UserOrganizationRoles = user.UserOrganizationRoles.Select(uor => new UserOrganizationRoleDetails
+            UserOrganizationRoles = user.UserOrganizations.SelectMany(uo => uo.UserOrganizationRoles.Select(uor => new UserOrganizationRoleDetails
             {
-                OrganizationId = uor.UserOrganization.OrganizationId,
+                OrganizationId = uo.OrganizationId,
                 Role = uor.Role
-            }).ToArray()
+            })).ToArray()
         };
     }
 
