@@ -93,6 +93,7 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.azure-cli-credentials }}
+          enable-AzPSSession: true # Required for Azure Powershell to work
 
       - name: Deploy API to APIM
         uses: azure/cli@v2
