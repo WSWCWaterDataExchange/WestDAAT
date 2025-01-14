@@ -80,6 +80,7 @@ var host = new HostBuilder()
 
         // Database
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
+        services.AddTransient<IWestdaatDatabaseContextFactory, WestdaatDatabaseContextFactory>();
         
         // Utilities / Sdks
         services.AddScoped<IContextUtility, ContextUtility>();

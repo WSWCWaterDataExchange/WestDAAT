@@ -33,7 +33,6 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
                 services.AddScoped(_ => config.GetPerformanceConfiguration());
                 services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
                 services.AddScoped<IWaterResourceManager, WaterResourceManager>();
-                services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
                 
                 services.AddScoped<IWaterAllocationAccessor, WaterAllocationAccessor>();
                 services.AddScoped<ISiteAccessor, SiteAccessor>();
