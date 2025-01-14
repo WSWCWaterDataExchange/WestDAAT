@@ -38,7 +38,7 @@
                 );
             }">
                 <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. JWT is missing or invalid.">
-                    <openid-config url="https://login.microsoftonline.com/tfp/enteryournamehere/b2c_1_signin/v2.0/.well-known/openid-configuration" />
+                    <openid-config url="https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/B2C_1_signupsignin/v2.0/.well-known/openid-configuration" />
                     <audiences>
                         <audience>
                             11112222-bbbb-3333-cccc-4444dddd5555
