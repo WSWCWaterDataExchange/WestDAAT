@@ -111,12 +111,12 @@ jobs:
           azPSVersion: "latest"
           inlineScript: |
             # Find and replace variables for current environment
-            (Get-Content ./apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-audience }}') | Set-Content ./apim_policies.xml
-            (Get-Content ./apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-issuer }}') | Set-Content ./apim_policies.xml
-            (Get-Content ./apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}') | Set-Content ./apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-audience }}') | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-issuer }}')   | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')   | Set-Content ./infrastructure/apim_policies.xml
 
             # Print file contents
-            get-content ./apim_policies.xml
+            get-content ./infrastructure/apim_policies.xml
 
             # Set Policies in Azure. Raw+xml format is required
             $apimContext = New-AzApiManagementContext \
@@ -126,9 +126,8 @@ jobs:
             Set-AzApiManagementPolicy \
               -Context $apimContext \
               -ApiId ${{ inputs.azure-api-name }} \
-              -PolicyFilePath apim_policies.xml \
+              -PolicyFilePath ./infrastructure/apim_policies.xml \
               -Format application/vnd.ms-azure-apim.policy.raw+xml
-          working-directory: infrastructure
           
 
       - name: Azure cli logout
