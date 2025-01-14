@@ -25,20 +25,19 @@ import { AllocationTypeSelect } from './filters/AllocationTypeSelect';
 import { LegalStatusSelect } from './filters/LegalStatusSelect';
 import { SiteTypeSelect } from './filters/SiteTypeSelect';
 import { useOverlaysFilter } from "./hooks/filters/useOverlaysFilter";
+import {useWaterRightsFilters} from "./hooks/filters/useWaterRightsFilter";
 
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
   const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
-  const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
+  const { isWaterRightsFilterActive, toggleWaterRightsFilters } = useWaterRightsFilters();
   const { isOverlayFilterActive, setOverlayFilterActive } = useOverlaysFilter();
 
   const [activeKeys, setActiveKeys] = useState(
     isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
   );
 
-  const toggleWaterRightFilters = useCallback(() => {
-    setWaterRightsFilterActive(!isWaterRightsFilterActive);
-  }, [isWaterRightsFilterActive, setWaterRightsFilterActive]);
+
 
   const toggleNldiFilterStatus = useCallback(() => {
     setNldiMapActiveStatus(!isNldiFilterActive);
@@ -109,40 +108,42 @@ function SideBar() {
           </Accordion.Item>
 
           <Accordion.Item eventKey="siteSelectionFilters">
-            <Accordion.Header onClick={toggleWaterRightFilters}>
+            <Accordion.Header>
               <Form.Check
                 type="switch"
                 id="waterRightSelection"
                 label=""
                 checked={isWaterRightsFilterActive}
-                onChange={toggleWaterRightFilters}
+                onChange={() => toggleWaterRightsFilters()}
               />
-              <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive}</label>
+              <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive ? 'ON' : 'OFF'}</label>
             </Accordion.Header>
-            <Accordion.Body>
-              <div className="mb-3">
-                <a
-                  href="https://westernstateswater.org/wade/westdaat-filter-documentation/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn about WestDAAT filters
-                </a>
-              </div>
-              <StatesSelect />
-              <BeneficialUseSelect />
-              <WaterSourceTypesSelect />
-              <AllocationOwnerSearch />
-              <OwnerClassificationType />
-              <AllocationTypeSelect />
-              <LegalStatusSelect />
-              <SiteTypeSelect />
-              <RiverBasinSelect />
-              <SiteContent />
-              <PriorityDateRange />
-              <FlowRange />
-              <VolumeRange />
-            </Accordion.Body>
+            {isWaterRightsFilterActive && (
+              <Accordion.Body>
+                <div className="mb-3">
+                  <a
+                    href="https://westernstateswater.org/wade/westdaat-filter-documentation/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Learn about WestDAAT filters
+                  </a>
+                </div>
+                <StatesSelect />
+                <BeneficialUseSelect />
+                <WaterSourceTypesSelect />
+                <AllocationOwnerSearch />
+                <OwnerClassificationType />
+                <AllocationTypeSelect />
+                <LegalStatusSelect />
+                <SiteTypeSelect />
+                <RiverBasinSelect />
+                <SiteContent />
+                <PriorityDateRange />
+                <FlowRange />
+                <VolumeRange />
+              </Accordion.Body>
+            )}
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={toggleNldiFilterStatus}>
