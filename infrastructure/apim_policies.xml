@@ -44,7 +44,6 @@
                             11112222-bbbb-3333-cccc-4444dddd5555
                         </audience>
                     </audiences>
-                    </required-claims>
                 </validate-jwt>
             </when>
         </choose>
