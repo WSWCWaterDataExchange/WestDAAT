@@ -22,7 +22,7 @@ public class UserIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _userManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task GetUserRoles_Success()
+    public async Task Load_EnrichJwt_ShouldReturnContinueResponseWithCorrectData()
     {
         // Arrange
         var user = new UserFaker().Generate();
