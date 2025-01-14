@@ -1,5 +1,9 @@
-﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
+﻿using System.Text.Json.Serialization;
+using WesternStatesWater.WestDaat.Common.DataContracts.Converters;
 
+namespace WesternStatesWater.WestDaat.Common.DataContracts;
+
+[JsonConverter(typeof(RasterTimeSeriesPolygonRequestConverter))]
 public class RasterTimeSeriesPolygonRequest
 {
     /// <summary>

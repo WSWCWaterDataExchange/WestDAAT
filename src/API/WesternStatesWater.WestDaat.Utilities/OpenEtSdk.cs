@@ -25,27 +25,7 @@ internal class OpenEtSdk : IOpenEtSdk
 
     public async Task<RasterTimeSeriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeSeriesPolygonRequest request)
     {
-        var requestDictionary = new Dictionary<string, object>
-        {
-            {
-                "date_range", 
-                new string[] 
-                {
-                    request.DateRangeStart.ToString("yyyy-MM-dd"), 
-                    request.DateRangeEnd.ToString("yyyy-MM-dd")
-                }
-            },
-            { "file_format", request.OutputExtension.ToString() },
-            { "geometry", ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(request.Geometry) },
-            { "interval", request.Interval.ToString() },
-            { "model", request.Model.ToString() },
-            { "reducer", request.PixelReducer.ToString() },
-            { "reference_et", request.ReferenceEt.ToString() },
-            { "units", ConvertRasterTimeseriesUnits(request.OutputUnits) },
-            { "variable", request.Variable.ToString() },
-        };
-
-        var jsonString = JsonSerializer.Serialize(requestDictionary);
+        var jsonString = JsonSerializer.Serialize(request);
         var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
         var uri = new Uri("raster/timeseries/polygon", UriKind.Relative);

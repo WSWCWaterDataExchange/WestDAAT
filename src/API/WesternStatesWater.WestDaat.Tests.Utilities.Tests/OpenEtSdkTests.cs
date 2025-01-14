@@ -1,6 +1,8 @@
 ﻿using NetTopologySuite.Geometries;
 using RichardSzalay.MockHttp;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
@@ -28,6 +30,65 @@ public class OpenEtSdkTests : UtilitiesTestBase
         }
         
         return new(httpClient, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
+    }
+
+    [TestMethod]
+    public async Task RasterTimeSeriesPolygon_RequestSerializesSuccessfully()
+    {
+        // Arrange
+        // remove whitespace from expected json
+        var expectedJson = Regex.Replace("""
+            {   
+                "date_range":["2024-01-01","2025-01-01"],
+                "geometry":[
+                    -119.7937,35.53326,
+                    -119.7937,35.58995,
+                    -119.71268,35.58995,
+                    -119.71268,35.53326,
+                    -119.7937,35.53326
+                ],
+                "file_format":"JSON",
+                "interval":"Monthly",
+                "model":"SSEBop",
+                "reducer":"Mean",
+                "reference_et":"GridMET",
+                "units":"mm",
+                "variable":"ET"
+            }
+            """,
+            @"\s",
+            string.Empty);
+
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var closedLinestringCoordinates = new[]
+        {
+            new Coordinate(-119.7937, 35.58995),
+            new Coordinate(-119.7937, 35.53326),
+            new Coordinate(-119.71268, 35.53326),
+            new Coordinate(-119.71268, 35.58995),
+            new Coordinate(-119.7937, 35.58995),
+        };
+
+        var request = new RasterTimeSeriesPolygonRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePolygon(closedLinestringCoordinates),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            PixelReducer = RasterTimeSeriesPixelReducer.Mean,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var serializedRequest = JsonSerializer.Serialize(request);
+
+        // Assert
+        serializedRequest.Should().Be(expectedJson);
     }
 
     [TestMethod]
