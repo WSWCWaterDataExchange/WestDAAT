@@ -34,10 +34,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
                 .ThenInclude(uor => uor.UserOrganizationRoles)
             .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
 
-        if (user == null)
-        {
-            throw new NotFoundException($"User not found for auth id {request.ExternalAuthId}");
-        }
+        NotFoundException.ThrowIfNull(user, $"User not found for auth id {request.ExternalAuthId}");
 
         return new UserLoadRolesResponse
         {
