@@ -36,7 +36,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
 
         if (user == null)
         {
-            throw new WestDaatException($"User not found for auth id {request.ExternalAuthId}");
+            throw new NotFoundException($"User not found for auth id {request.ExternalAuthId}");
         }
 
         return new UserLoadRolesResponse
