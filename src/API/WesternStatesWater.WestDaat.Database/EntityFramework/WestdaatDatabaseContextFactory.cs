@@ -2,9 +2,9 @@
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
-    public class WestdaatDatabaseContextFactory : IWestDaatDatabaseContextFactory
+    public class WestDaatDatabaseContextFactory : IWestDaatDatabaseContextFactory
     {
-        public WestdaatDatabaseContextFactory(DatabaseConfiguration configuration)
+        public WestDaatDatabaseContextFactory(DatabaseConfiguration configuration)
         {
             _configuration = configuration;
         }
