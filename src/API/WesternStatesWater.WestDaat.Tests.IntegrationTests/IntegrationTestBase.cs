@@ -37,7 +37,9 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             _transactionScopeFixture = new TransactionScope(
                 TransactionScopeOption.Required,
-                transactionOptions);
+                transactionOptions,
+                TransactionScopeAsyncFlowOption.Enabled
+            );
 
             var serviceCollection = new ServiceCollection()
                 .AddLogging(config => config.AddConsole());
