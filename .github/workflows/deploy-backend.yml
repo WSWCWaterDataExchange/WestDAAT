@@ -126,8 +126,10 @@ jobs:
             Set-AzApiManagementPolicy \
               -Context $apimContext \
               -ApiId ${{ inputs.azure-api-name }} \
-              -PolicyFilePath ./infrastructure/apim_policies.xml \
+              -PolicyFilePath apim_policies.xml \
               -Format application/vnd.ms-azure-apim.policy.raw+xml
+          working-directory: infrastructure
+          
 
       - name: Azure cli logout
         run: |
