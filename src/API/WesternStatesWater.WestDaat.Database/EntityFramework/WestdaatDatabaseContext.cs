@@ -78,6 +78,11 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.Property(e => e.Name)
                     .HasColumnName(nameof(Organization.Name))
                     .IsRequired();
+
+                entity.HasMany(e => e.UserOrganizations)
+                    .WithOne(uo => uo.Organization)
+                    .HasForeignKey(uo => uo.OrganizationId)
+                    .HasConstraintName("FK_Organizations");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -101,6 +106,16 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName(nameof(User.CreatedAt))
                     .IsRequired();
+
+                entity.HasMany(u => u.UserRoles)
+                    .WithOne(ur => ur.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .HasConstraintName("FK_UserRoles_Users");
+
+                entity.HasMany(u => u.UserOrganizations)
+                    .WithOne(uo => uo.User)
+                    .HasForeignKey(uo => uo.UserId)
+                    .HasConstraintName("FK_Users");
             });
 
             modelBuilder.Entity<UserOrganization>(entity =>
