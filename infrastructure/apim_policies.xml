@@ -1,0 +1,72 @@
+<policies>
+    <inbound>
+        <base />
+        <choose>
+            <!-- Allow for specified routes to have anonymous access since login/JWT is not required. -->
+            <when condition="@{
+                var url = context.Operation.UrlTemplate.ToLower();
+                return !(
+                    url.Equals("/_admin/enrichJwt") ||
+                    url.Equals("/TestMe") ||
+                    url.Equals("/system/filters") ||
+                    url.Equals("/system/riverBasins") ||
+                    url.Equals("/system/feedback") ||
+                    url.Equals("/NldiFeatures/@{latitude}{longitude}") ||
+                    url.Equals("/WaterRights/find") ||
+                    url.Equals("/WaterRights/{allocationUuid}") ||
+                    url.Equals("/WaterRights/{allocationUuid}/Sites") ||
+                    url.Equals("/WaterRights/{allocationUuid}/Sources") ||
+                    url.Equals("/WaterRights/{allocationUuid}/SiteLocations") ||
+                    url.Equals("/WaterRights/AnalyticsSummaryInformation") ||
+                    url.Equals("/WaterRights/DataEnvelope") ||
+                    url.Equals("/sites/{siteUuid}/geoconnex") ||
+                    url.Equals("/Sites/{siteUuid}") ||
+                    url.Equals("/Sites/{siteUuid}/WaterRightsDigest") ||
+                    url.Equals("/Overlays/{overlayUuid}/OverlayDigest") ||
+                    url.Equals("/Sites/{siteUuid}/Digest") ||
+                    url.Equals("/Sites/{siteUuid}/SiteLocation") ||
+                    url.Equals("/Sites/{siteUuid}/Sources") ||
+                    url.Equals("/Sites/{siteUuid}/Rights") ||
+                    url.Equals("/Overlays/{reportingUnitUuid}/Rights") ||
+                    url.Equals("/Sites/{siteUuid}/SiteUsage") ||
+                    url.Equals("/Sites/{siteUuid}/Variables") ||
+                    url.Equals("/Overlays/{overlayUuid}/Legal") ||
+                    url.Equals("/WaterRights/{allocationUuid}/Overlays") ||
+                    url.Equals("/Overlays/{overlayUuid}") ||
+                    url.Equals("/Sites/{siteUuid}/Methods") ||
+                    url.Equals("/WaterRights/download") 
+                );
+            }">
+                <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. JWT is missing or invalid.">
+                    <openid-config url="https://login.microsoftonline.com/tfp/enteryournamehere/b2c_1_signin/v2.0/.well-known/openid-configuration" />
+                    <audiences>
+                        <audience>
+                            11112222-bbbb-3333-cccc-4444dddd5555
+                        </audience>
+                    </audiences>
+                    </required-claims>
+                </validate-jwt>
+            </when>
+        </choose>
+        <cors>
+            <allowed-origins>
+                <origin>{2}</origin>
+            </allowed-origins>
+            <allowed-methods preflight-result-max-age="1209600">
+                <method>*</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+        </cors>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
