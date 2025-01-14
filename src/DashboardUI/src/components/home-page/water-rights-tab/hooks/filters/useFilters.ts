@@ -95,14 +95,10 @@ export function useFilters() {
       {
         layer: mapLayerNames.overlayTypesPolygonsLayer,
         filter: overlaysMapFilters
-          ? ['all', ['has','oType'], overlaysMapFilters]
-          : ['==','oType','_FAKE_'],
       },
       {
         layer: mapLayerNames.overlayTypesPolygonsLayer,
         filter: overlaysMapFilters
-          ? ['all', ['has','oType'], overlaysMapFilters]
-          : ['==','oType','_FAKE_'],
       },
     ]);
   }, [allMapFilters, overlaysMapFilters, setLayerFilters]);
