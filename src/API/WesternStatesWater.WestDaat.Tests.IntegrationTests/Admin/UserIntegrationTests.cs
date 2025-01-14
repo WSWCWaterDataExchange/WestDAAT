@@ -45,7 +45,6 @@ public class UserIntegrationTests : IntegrationTestBase
         await _dbContext.UserOrganizationRoles.AddRangeAsync(userOrganizationRoles);
 
         await _dbContext.SaveChangesAsync();
-        _dbContext.ChangeTracker.Clear();
 
         // Act
         var request = new CLI.Requests.Admin.EnrichJwtRequest
