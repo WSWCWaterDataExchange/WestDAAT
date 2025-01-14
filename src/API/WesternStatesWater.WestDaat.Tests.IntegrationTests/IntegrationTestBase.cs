@@ -2,6 +2,7 @@ using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors;
@@ -53,11 +54,21 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             _loggerFactory = Services.GetRequiredService<ILoggerFactory>();
         }
 
+        public static Dictionary<string, string> DefaultTestConfiguration => new()
+        {
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}", "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}", "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
+        };
+
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)
         {
             var config = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
                 .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
