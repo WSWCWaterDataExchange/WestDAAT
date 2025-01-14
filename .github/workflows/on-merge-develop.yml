@@ -14,7 +14,7 @@ jobs:
       azure-functionapp-name: westdaat-qa
       azure-apim-name: westdaatqa
       azure-api-name: westdaat-fn-api-qa
-      azure-api-url: https://westdaatqa.azure-api.net/api
+      azure-api-url: https://westdaat-qa.azurewebsites.net/api
       azure-auth-tenant-name: westdaatqa
       azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # Found in JWT token
       azure-cors-domain: https://westdaatqa.westernstateswater.org
