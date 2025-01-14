@@ -37,8 +37,6 @@ on:
       azure-cli-credentials:
         description: "The credentials for the Azure CLI"
         required: true
-      
-
 
 jobs:
   deploy-funtion-app:
@@ -108,8 +106,9 @@ jobs:
 
       # Using powershell since setting APIM policies aren't supported in azure cli (yet)
       - name: Apply APIM API Policies
-        uses: azure/powershell@v1
+        uses: azure/powershell@v2
         with:
+          azPSVersion: "latest"
           inlineScript: |
             # Find and replace variables for current environment
             (Get-Content ./apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-audience }}') | Set-Content ./apim_policies.xml
@@ -123,7 +122,7 @@ jobs:
             $apimContext = New-AzApiManagementContext \
               -ResourceGroupName ${{ inputs.azure-resource-group }} \
               -ServiceName ${{ inputs.azure-apim-name }}
-            
+
             Set-AzApiManagementPolicy \
               -Context $apimContext \
               -ApiId ${{ inputs.azure-api-name }} \
