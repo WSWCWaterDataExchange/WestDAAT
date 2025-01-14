@@ -119,14 +119,14 @@ jobs:
             get-content ./infrastructure/apim_policies.xml
 
             # Set Policies in Azure. Raw+xml format is required
-            $apimContext = New-AzApiManagementContext \
-              -ResourceGroupName ${{ inputs.azure-resource-group }} \
+            $apimContext = New-AzApiManagementContext `
+              -ResourceGroupName ${{ inputs.azure-resource-group }} `
               -ServiceName ${{ inputs.azure-apim-name }}
 
-            Set-AzApiManagementPolicy \
-              -Context $apimContext \
-              -ApiId ${{ inputs.azure-api-name }} \
-              -PolicyFilePath ./infrastructure/apim_policies.xml \
+            Set-AzApiManagementPolicy `
+              -Context $apimContext `
+              -ApiId ${{ inputs.azure-api-name }} `
+              -PolicyFilePath ./infrastructure/apim_policies.xml `
               -Format application/vnd.ms-azure-apim.policy.raw+xml
           
 
