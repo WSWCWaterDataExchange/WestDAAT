@@ -14,6 +14,7 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Utilities;
+using Organization = WesternStatesWater.WestDaat.Common.DataContracts.Organization;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
