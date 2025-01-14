@@ -6,35 +6,35 @@
             <when condition="@{
                 var url = context.Operation.UrlTemplate.ToLower();
                 return !(
-                    url.Equals("/_admin/enrichJwt") ||
-                    url.Equals("/TestMe") ||
-                    url.Equals("/system/filters") ||
-                    url.Equals("/system/riverBasins") ||
+                    url.Equals("/_admin/enrichjwt") ||
+                    url.Equals("/nldifeatures/@{latitude}{longitude}") ||
+                    url.Equals("/overlays/{overlayuuid}") ||
+                    url.Equals("/overlays/{overlayuuid}/legal") ||
+                    url.Equals("/overlays/{overlayuuid}/overlaydigest") ||
+                    url.Equals("/overlays/{reportingunituuid}/rights") ||
+                    url.Equals("/sites/{siteuuid}") ||
+                    url.Equals("/sites/{siteuuid}/digest") ||
+                    url.Equals("/sites/{siteuuid}/geoconnex") ||
+                    url.Equals("/sites/{siteuuid}/methods") ||
+                    url.Equals("/sites/{siteuuid}/rights") ||
+                    url.Equals("/sites/{siteuuid}/sitelocation") ||
+                    url.Equals("/sites/{siteuuid}/siteusage") ||
+                    url.Equals("/sites/{siteuuid}/sources") ||
+                    url.Equals("/sites/{siteuuid}/variables") ||
+                    url.Equals("/sites/{siteuuid}/waterrightsdigest") ||
                     url.Equals("/system/feedback") ||
-                    url.Equals("/NldiFeatures/@{latitude}{longitude}") ||
-                    url.Equals("/WaterRights/find") ||
-                    url.Equals("/WaterRights/{allocationUuid}") ||
-                    url.Equals("/WaterRights/{allocationUuid}/Sites") ||
-                    url.Equals("/WaterRights/{allocationUuid}/Sources") ||
-                    url.Equals("/WaterRights/{allocationUuid}/SiteLocations") ||
-                    url.Equals("/WaterRights/AnalyticsSummaryInformation") ||
-                    url.Equals("/WaterRights/DataEnvelope") ||
-                    url.Equals("/sites/{siteUuid}/geoconnex") ||
-                    url.Equals("/Sites/{siteUuid}") ||
-                    url.Equals("/Sites/{siteUuid}/WaterRightsDigest") ||
-                    url.Equals("/Overlays/{overlayUuid}/OverlayDigest") ||
-                    url.Equals("/Sites/{siteUuid}/Digest") ||
-                    url.Equals("/Sites/{siteUuid}/SiteLocation") ||
-                    url.Equals("/Sites/{siteUuid}/Sources") ||
-                    url.Equals("/Sites/{siteUuid}/Rights") ||
-                    url.Equals("/Overlays/{reportingUnitUuid}/Rights") ||
-                    url.Equals("/Sites/{siteUuid}/SiteUsage") ||
-                    url.Equals("/Sites/{siteUuid}/Variables") ||
-                    url.Equals("/Overlays/{overlayUuid}/Legal") ||
-                    url.Equals("/WaterRights/{allocationUuid}/Overlays") ||
-                    url.Equals("/Overlays/{overlayUuid}") ||
-                    url.Equals("/Sites/{siteUuid}/Methods") ||
-                    url.Equals("/WaterRights/download") 
+                    url.Equals("/system/filters") ||
+                    url.Equals("/system/riverbasins") ||
+                    url.Equals("/testme") ||
+                    url.Equals("/waterrights/{allocationuuid}") ||
+                    url.Equals("/waterrights/{allocationuuid}/overlays") ||
+                    url.Equals("/waterrights/{allocationuuid}/sitelocations") ||
+                    url.Equals("/waterrights/{allocationuuid}/sites") ||
+                    url.Equals("/waterrights/{allocationuuid}/sources") ||
+                    url.Equals("/waterrights/analyticssummaryinformation") ||
+                    url.Equals("/waterrights/dataenvelope") ||
+                    url.Equals("/waterrights/download") ||
+                    url.Equals("/waterrights/find")
                 );
             }">
                 <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. JWT is missing or invalid.">
@@ -50,7 +50,7 @@
         </choose>
         <cors>
             <allowed-origins>
-                <origin>{2}</origin>
+                <origin>https://localhost</origin>
             </allowed-origins>
             <allowed-methods preflight-result-max-age="1209600">
                 <method>*</method>
