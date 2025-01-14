@@ -70,6 +70,14 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.HasKey(e => e.Id);
 
                 entity.ToTable("Organizations", "dbo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName(nameof(Organization.Id))
+                    .IsRequired();
+
+                entity.Property(e => e.Name)
+                    .HasColumnName(nameof(Organization.Name))
+                    .IsRequired();
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -77,6 +85,22 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.HasKey(e => e.Id);
 
                 entity.ToTable("Users", "dbo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName(nameof(User.Id))
+                    .IsRequired();
+
+                entity.Property(e => e.Email)
+                    .HasColumnName(nameof(User.Email))
+                    .IsRequired();
+
+                entity.Property(e => e.ExternalAuthId)
+                    .HasColumnName(nameof(User.ExternalAuthId))
+                    .IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName(nameof(User.CreatedAt))
+                    .IsRequired();
             });
 
             modelBuilder.Entity<UserOrganization>(entity =>
@@ -84,6 +108,18 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.HasKey(e => e.Id);
 
                 entity.ToTable("UserOrganizations", "dbo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName(nameof(UserOrganization.Id))
+                    .IsRequired();
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName(nameof(UserOrganization.UserId))
+                    .IsRequired();
+
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName(nameof(UserOrganization.OrganizationId))
+                    .IsRequired();
             });
 
             modelBuilder.Entity<UserOrganizationRole>(entity =>
@@ -91,6 +127,18 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.HasKey(e => e.Id);
 
                 entity.ToTable("UserOrganizationRoles", "dbo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName(nameof(UserOrganizationRole.Id))
+                    .IsRequired();
+
+                entity.Property(e => e.UserOrganizationId)
+                    .HasColumnName(nameof(UserOrganizationRole.UserOrganizationId))
+                    .IsRequired();
+
+                entity.Property(e => e.Role)
+                    .HasColumnName(nameof(UserOrganizationRole.Role))
+                    .IsRequired();
             });
 
             modelBuilder.Entity<UserRole>(entity =>
@@ -98,6 +146,18 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
                 entity.HasKey(e => e.Id);
 
                 entity.ToTable("UserRoles", "dbo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName(nameof(UserRole.Id))
+                    .IsRequired();
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName(nameof(UserRole.UserId))
+                    .IsRequired();
+
+                entity.Property(e => e.Role)
+                    .HasColumnName(nameof(UserRole.Role))
+                    .IsRequired();
             });
         }
     }
