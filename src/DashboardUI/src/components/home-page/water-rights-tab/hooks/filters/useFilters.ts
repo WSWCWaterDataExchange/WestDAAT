@@ -16,11 +16,10 @@ import { useIncludeExemptFilter } from './useIncludeExemptFilter';
 import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
-
-const allWaterRightsLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
+import { useOverlaysFilter } from './useOverlaysFilter';
 
 export function useFilters() {
-  const { setLayerFilters: setMapLayerFilters } = useMapContext();
+  const { setLayerFilters } = useMapContext();
 
   const { mapFilters: podPouMapFilters } = usePodPouFilter();
   const { mapFilters: includeExemptMapFilters } = useIncludeExemptFilter();
@@ -38,6 +37,7 @@ export function useFilters() {
   const { mapFilters: allocationTypesFilter } = useAllocationOwnerFilter();
   const { mapFilters: legalStatusesFilter } = useLegalStatusesFilter();
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
+  const { mapFilters: overlaysMapFilters } = useOverlaysFilter();
 
   const allMapFilters = useMemo(() => {
     const filterSet = ['all'] as any[];
@@ -83,10 +83,23 @@ export function useFilters() {
   ]);
 
   useEffect(() => {
-    setMapLayerFilters(
-      allWaterRightsLayers.map((a) => {
-        return { layer: a, filter: allMapFilters };
-      }),
-    );
-  }, [allMapFilters, setMapLayerFilters]);
+    setLayerFilters([
+      {
+        layer: mapLayerNames.waterRightsPointsLayer,
+        filter: allMapFilters,
+      },
+      {
+        layer: mapLayerNames.waterRightsPolygonsLayer,
+        filter: allMapFilters,
+      },
+      {
+        layer: mapLayerNames.overlayTypesPolygonsLayer,
+        filter: overlaysMapFilters
+      },
+      {
+        layer: mapLayerNames.overlayTypesPolygonsLayer,
+        filter: overlaysMapFilters
+      },
+    ]);
+  }, [allMapFilters, overlaysMapFilters, setLayerFilters]);
 }
