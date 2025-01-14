@@ -26,10 +26,8 @@ jobs:
         run: dotnet restore
       - name: .NET Build
         run: dotnet build --no-restore
-      - name: Create WaDE2 Database
+      - name: Create Database
         run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WaDE2'
-      - name: Create WestDAAT Database
-        run: docker exec -i mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P 'DevP@ssw0rd!' -Q 'create database WestDAAT'
       - name: Check out WaDE2.0
         uses: actions/checkout@v2
         with:
@@ -38,14 +36,6 @@ jobs:
       - name: DbUp
         run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
         working-directory: source/WesternStatesWater.WaDE.DbUp
-      - name: Check out WestDAAT
-        uses: actions/checkout@v2
-        with:
-          repository: WSWCWaterDataExchange/WestDAAT
-          ref: develop
-      - name: DbUp
-        run: dotnet run --args "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!;"
-        working-directory: source/WesternStatesWater.WestDAAT.DbUp
       - uses: actions/checkout@v2
       - name: .NET Test
         run: dotnet test
