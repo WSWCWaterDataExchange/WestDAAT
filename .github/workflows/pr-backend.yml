@@ -42,7 +42,7 @@ jobs:
           repository: WSWCWaterDataExchange/WestDaat
       - name: DbUp WestDaat
         run: dotnet run --args "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!;"
-        working-directory: source/WesternStatesWater.WestDaat.DbUp
+        working-directory: src/WesternStatesWater.WestDaat.DbUp
       - uses: actions/checkout@v2
       - name: .NET Test
         run: dotnet test
