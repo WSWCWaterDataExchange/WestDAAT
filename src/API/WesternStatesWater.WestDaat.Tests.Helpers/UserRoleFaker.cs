@@ -2,8 +2,13 @@
 
 public class UserRoleFaker : Faker<EF.UserRole>
 {
-    public UserRoleFaker()
+    public UserRoleFaker(EF.User user = null)
     {
-        RuleFor(ur => ur.Role, f => f.Name.JobTitle()
+        RuleFor(ur => ur.Role, f => f.Name.JobTitle());
+
+        if (user != null)
+        {
+            RuleFor(ur => ur.User, () => user);
+        }
     }
 }
