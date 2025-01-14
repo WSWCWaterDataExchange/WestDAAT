@@ -56,3 +56,7 @@
 ## Deployment
 - Setting secrets for deployment: https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md
 - To set secret with Azure Credientials, there should already be app registrations for the github actions, so just need to renew secret and put the new secret in the json (need at least Application Administrator role)
+
+## OpenET Integration
+- The OpenET SDK requires an api key to function. For local development, you will want to use the Dev api key.
+- The api keys are listed on the OpenET website: https://account.etdata.org/settings/api
