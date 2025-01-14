@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Managers\WesternStatesWater.WestDaat.Managers.csproj" />
+	<ProjectReference Include="..\WesternStatesWater.WestDaat.Tests.Helpers\WesternStatesWater.WestDaat.Tests.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

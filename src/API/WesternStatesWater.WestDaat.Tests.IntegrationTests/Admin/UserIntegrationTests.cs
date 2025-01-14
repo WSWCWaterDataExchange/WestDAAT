@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -6,11 +7,15 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 public class UserIntegrationTests : IntegrationTestBase
 {
     private CLI.IUserManager _userManager;
+    private Database.EntityFramework.WestdaatDatabaseContext _dbContext;
 
     [TestInitialize]
     public void TestInitialize()
     {
         _userManager = Services.GetRequiredService<CLI.IUserManager>();
+
+        var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestdaatDatabaseContextFactory>();
+        _dbContext = dbContextFactory.Create();
     }
     
     [TestMethod]
@@ -20,12 +25,32 @@ public class UserIntegrationTests : IntegrationTestBase
     public async Task GetUserRoles_Success()
     {
         // Arrange
-        var userExternalAuthId = "1234";
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var userRoles = new UserRoleFaker()
+            .RuleFor(ur => ur.User, () => user)
+            .Generate(2);
+        var userOrganization = new UserOrganizationFaker()
+            .RuleFor(uo => uo.User, () => user)
+            .RuleFor(uo => uo.Organization, () => organization)
+            .Generate();
+        var userOrganizationRoles = new UserOrganizationRoleFaker()
+            .RuleFor(uor => uor.UserOrganization, () => userOrganization)
+            .Generate(2);
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.UserRoles.AddRangeAsync(userRoles);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
+        await _dbContext.UserOrganizationRoles.AddRangeAsync(userOrganizationRoles);
+
+        await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.Clear();
 
         // Act
         var request = new CLI.Requests.Admin.EnrichJwtRequest
         {
-            ObjectId = userExternalAuthId,
+            ObjectId = user.ExternalAuthId,
         };
         var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
 
