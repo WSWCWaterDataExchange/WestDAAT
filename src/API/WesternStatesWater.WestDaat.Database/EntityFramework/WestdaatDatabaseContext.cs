@@ -60,5 +60,45 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
         public virtual DbSet<UserOrganization> UserOrganizations { get; set; }
         public virtual DbSet<UserOrganizationRole> UserOrganizationRoles { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("Organizations", "dbo");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("Users", "dbo");
+            });
+
+            modelBuilder.Entity<UserOrganization>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("UserOrganizations", "dbo");
+            });
+
+            modelBuilder.Entity<UserOrganizationRole>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("UserOrganizationRoles", "dbo");
+            });
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("UserRoles", "dbo");
+            });
+        }
     }
 }
