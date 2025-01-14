@@ -60,9 +60,5 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
         public virtual DbSet<UserOrganization> UserOrganizations { get; set; }
         public virtual DbSet<UserOrganizationRole> UserOrganizationRoles { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        }
     }
 }
