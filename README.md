@@ -60,4 +60,3 @@
 ## OpenET Integration
 - The OpenET SDK requires an api key to function. For local development, you will want to use the Dev api key.
 - The api keys are listed on the OpenET website: https://account.etdata.org/settings/api
-- The login for this website is stored in Keeper
