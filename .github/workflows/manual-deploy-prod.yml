@@ -11,6 +11,9 @@ jobs:
       azure-apim-name: westdaatprod
       azure-api-name: westdaat-fn-api-prod
       azure-api-url: https://westdaatprod.azure-api.net/api
+      azure-auth-tenant-name: westdaat
+      azure-auth-audience: 10beb81f-fdfd-43f3-91fd-bb463e331d41 # Found in JWT token
+      azure-cors-domain: https://westdaat.westernstateswater.org
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_PROD }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_PROD }}
