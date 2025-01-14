@@ -95,7 +95,58 @@ public class OpenEtSdkTests : UtilitiesTestBase
     public async Task RasterTimeseriesPolygon_MockedApi_Success()
     {
         // Arrange
-        var responseContentString = """[{"time":"2024-01-01","et":16.184},{"time":"2024-02-01","et":27.359},{"time":"2024-03-01","et":46.508},{"time":"2024-04-01","et":54.863},{"time":"2024-05-01","et":93.419},{"time":"2024-06-01","et":118.884},{"time":"2024-07-01","et":136.422},{"time":"2024-08-01","et":117.174},{"time":"2024-09-01","et":93.941},{"time":"2024-10-01","et":70.393},{"time":"2024-11-01","et":26.606},{"time":"2024-12-01","et":17.882}]""";
+        var responseContentString = """
+        [
+            {
+                "time":"2024-01-01",
+                "et":16.184
+            },
+            {
+                "time":"2024-02-01",
+                "et":27.359
+            },
+            {
+                "time":"2024-03-01",
+                "et":46.508
+            },
+            {
+                "time":"2024-04-01",
+                "et":54.863
+            },
+            {
+                "time":"2024-05-01",
+                "et":93.419
+            },
+            {
+                "time":"2024-06-01",
+                "et":118.884
+            },
+            {
+                "time":"2024-07-01",
+                "et":136.422
+            },
+            {
+                "time":"2024-08-01",
+                "et":117.174
+            },
+            {
+                "time":"2024-09-01",
+                "et":93.941
+            },
+            {
+                "time":"2024-10-01",
+                "et":70.393
+            },
+            {
+                "time":"2024-11-01",
+                "et":26.606
+            },
+            {
+                "time":"2024-12-01",
+                "et":17.882
+            }
+        ]
+        """;
         _mockHttp.When(HttpMethod.Post, baseAddress + "raster/timeseries/polygon")
             .Respond("application/json", responseContentString);
 
