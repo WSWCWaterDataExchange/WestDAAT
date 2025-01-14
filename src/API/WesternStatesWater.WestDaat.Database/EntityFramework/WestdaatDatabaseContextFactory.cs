@@ -2,7 +2,7 @@
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
-    public class WestdaatDatabaseContextFactory : IWestdaatDatabaseContextFactory
+    public class WestdaatDatabaseContextFactory : IWestDaatDatabaseContextFactory
     {
         public WestdaatDatabaseContextFactory(DatabaseConfiguration configuration)
         {
@@ -11,9 +11,9 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
 
         private readonly DatabaseConfiguration _configuration;
 
-        WestdaatDatabaseContext IWestdaatDatabaseContextFactory.Create()
+        WestDaatDatabaseContext IWestDaatDatabaseContextFactory.Create()
         {
-            return new WestdaatDatabaseContext(_configuration);
+            return new WestDaatDatabaseContext(_configuration);
         }
     }
 }

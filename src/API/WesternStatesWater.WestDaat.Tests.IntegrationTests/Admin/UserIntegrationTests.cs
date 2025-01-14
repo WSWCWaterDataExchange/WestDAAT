@@ -7,14 +7,14 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 public class UserIntegrationTests : IntegrationTestBase
 {
     private CLI.IUserManager _userManager;
-    private Database.EntityFramework.WestdaatDatabaseContext _dbContext;
+    private Database.EntityFramework.WestDaatDatabaseContext _dbContext;
 
     [TestInitialize]
     public void TestInitialize()
     {
         _userManager = Services.GetRequiredService<CLI.IUserManager>();
 
-        var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestdaatDatabaseContextFactory>();
+        var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestDaatDatabaseContextFactory>();
         _dbContext = dbContextFactory.Create();
     }
     

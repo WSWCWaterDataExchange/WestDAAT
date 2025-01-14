@@ -7,12 +7,12 @@ namespace WesternStatesWater.WestDaat.Accessors;
 
 internal class UserAccessor : AccessorBase, IUserAccessor
 {
-    public UserAccessor(ILogger<UserAccessor> logger, EF.IWestdaatDatabaseContextFactory westdaatDatabaseContextFactory) : base(logger)
+    public UserAccessor(ILogger<UserAccessor> logger, EF.IWestDaatDatabaseContextFactory westdaatDatabaseContextFactory) : base(logger)
     {
         _westdaatDatabaseContextFactory = westdaatDatabaseContextFactory;
     }
 
-    private readonly EF.IWestdaatDatabaseContextFactory _westdaatDatabaseContextFactory;
+    private readonly EF.IWestDaatDatabaseContextFactory _westdaatDatabaseContextFactory;
 
     public async Task<UserLoadResponseBase> Load(UserLoadRequestBase request)
     {

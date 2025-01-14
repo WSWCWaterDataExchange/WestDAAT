@@ -112,7 +112,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private void RegisterDatabaseServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
-            serviceCollection.AddTransient<IWestdaatDatabaseContextFactory, WestdaatDatabaseContextFactory>();
+            serviceCollection.AddTransient<IWestDaatDatabaseContextFactory, WestdaatDatabaseContextFactory>();
         }
 
         private void RegisterUtilityServices(IServiceCollection serviceCollection)

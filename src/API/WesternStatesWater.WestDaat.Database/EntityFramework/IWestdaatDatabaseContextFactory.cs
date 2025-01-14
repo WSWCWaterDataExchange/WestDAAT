@@ -1,7 +1,7 @@
 ﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
-    public interface IWestdaatDatabaseContextFactory
+    public interface IWestDaatDatabaseContextFactory
     {
-        public WestdaatDatabaseContext Create();
+        public WestDaatDatabaseContext Create();
     }
 }

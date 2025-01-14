@@ -32,7 +32,7 @@ namespace WesternStatesWater.WestDaat.Tools.JSONLDGenerator
                     services.AddScoped(_ => config.GetBlobStorageConfiguration());
                     services.AddScoped(_ => config.GetPerformanceConfiguration());
                     services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
-                    services.AddTransient<IWestdaatDatabaseContextFactory, WestdaatDatabaseContextFactory>();
+                    services.AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>();
                     services.AddScoped<ISiteAccessor, SiteAccessor>();
                     services.AddScoped<IBlobStorageSdk, BlobStorageSdk>();
                     services.AddScoped<ITemplateResourceSdk, TemplateResourceSdk>();

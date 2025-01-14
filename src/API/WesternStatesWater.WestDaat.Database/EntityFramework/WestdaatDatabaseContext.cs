@@ -6,9 +6,9 @@ using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
-    public partial class WestdaatDatabaseContext : DbContext
+    public partial class WestDaatDatabaseContext : DbContext
     {
-        public WestdaatDatabaseContext(DatabaseConfiguration configuration)
+        public WestDaatDatabaseContext(DatabaseConfiguration configuration)
         {
             _configuration = configuration;
         }
