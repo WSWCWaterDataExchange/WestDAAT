@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: WSWCWaterDataExchange/WaDE2.0
+          ref: develop
       - name: DbUp WaDE2.0
         run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
         working-directory: source/WesternStatesWater.WaDE.DbUp
