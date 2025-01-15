@@ -44,7 +44,8 @@ export class CustomRenderCircleControl extends CustomMapControl {
   handleMapClick = (e: MapMouseEvent) => {
     const point = [e.lngLat.lng, e.lngLat.lat];
 
-    const generatedCircle = this.generateCircleAtPoint(point, 100);
+    const radiusInKm = 100;
+    const generatedCircle = this.generateCircleAtPoint(point, radiusInKm);
     this.renderGeoJsonPolygonToMap(this._mapInstance, generatedCircle);
   };
 
@@ -52,8 +53,8 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._toolIsActive = !this._toolIsActive;
   };
 
-  generateCircleAtPoint(point: number[], radius: number): Feature<Polygon, GeoJsonProperties> {
-    return circle(point, radius, { steps: 100 });
+  generateCircleAtPoint(point: number[], radiusInKm: number): Feature<Polygon, GeoJsonProperties> {
+    return circle(point, radiusInKm, { steps: 100 });
   }
 
   resetSourceAndLayer = (): void => {
