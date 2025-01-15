@@ -4,9 +4,9 @@ import { Button, Nav, Tab } from 'react-bootstrap';
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
-import Charts from './water-rights-tab/Charts';
-import AnalyticsDataTable from './water-rights-tab/AnalyticsDataTable';
 import { DropdownOption } from '../../data-contracts/DropdownOption';
+import AnalyticsDataTable from "./water-rights-tab/map-options/components/AnalyticsDataTable";
+import Charts from "./water-rights-tab/map-options/components/Charts";
 
 function TableView() {
   const [show, setshow] = useState(false);
