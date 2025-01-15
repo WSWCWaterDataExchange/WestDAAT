@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.IO;
-using System.Net;
-using System.Text.Json;
-using Azure.Core.Serialization;
+﻿using System.Net;
+using GeoJSON.Text.Feature;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -24,6 +21,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         private readonly ILogger _logger;
 
         [Function(nameof(GetDashboardFilters))]
+        [OpenApiOperation(nameof(GetDashboardFilters))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(DashboardFilters))]
         public async Task<HttpResponseData> GetDashboardFilters([HttpTrigger(AuthorizationLevel.Anonymous, "get",
                 Route = "system/filters")]
             HttpRequestData req)
@@ -34,6 +33,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(GetRiverBasinPolygonsByName))]
+        [OpenApiOperation(nameof(GetRiverBasinPolygonsByName))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> GetRiverBasinPolygonsByName(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/riverBasins")]
             HttpRequestData request)
@@ -46,6 +47,8 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         }
 
         [Function(nameof(PostFeedback))]
+        [OpenApiOperation(nameof(PostFeedback))]
+        [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
         public async Task<HttpResponseData> PostFeedback(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")]
             HttpRequestData request)

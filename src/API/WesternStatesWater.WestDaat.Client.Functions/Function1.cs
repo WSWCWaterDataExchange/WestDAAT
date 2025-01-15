@@ -12,8 +12,10 @@ namespace WesternStatesWater.WestDaat.Client.Functions
     public class Function1(ITestManager testManager) : FunctionBase
     {
         [Function("TestMe")]
+        [OpenApiOperation("TestMe")]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(string))]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]
             HttpRequestData req,
             ILogger log)
         {

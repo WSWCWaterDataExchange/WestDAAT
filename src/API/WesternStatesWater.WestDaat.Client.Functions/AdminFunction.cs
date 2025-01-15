@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
@@ -24,6 +25,8 @@ public class AdminFunction : FunctionBase
     }
 
     [Function(nameof(EnrichJwt))]
+    [OpenApiOperation(nameof(EnrichJwt))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EnrichJwtResponse))]
     public async Task<HttpResponseData> EnrichJwt(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{RouteBase}/enrichJwt")]
         HttpRequestData req)
