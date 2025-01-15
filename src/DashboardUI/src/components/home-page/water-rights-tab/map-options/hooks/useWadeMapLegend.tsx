@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
 import { mapLayerNames } from '../../../../../config/maps';
-import { MapGrouping } from '../components/MapGroupingClass';
+import { MapGroupingClass } from '../components/MapGroupingClass';
 import { useColorMappings } from './useColorMappings';
 import { MapLegendCircleItem } from '../../../../map/MapLegendItem';
 
@@ -23,11 +23,11 @@ export function useWadeLegend() {
 
   const mapGroupingColors = useMemo(() => {
     switch (mapGroupingOption) {
-      case MapGrouping.BeneficialUse:
+      case MapGroupingClass.BeneficialUse:
         return beneficialUseColors;
-      case MapGrouping.OwnerClassification:
+      case MapGroupingClass.OwnerClassification:
         return ownerClassificationColors;
-      case MapGrouping.WaterSourceType:
+      case MapGroupingClass.WaterSourceType:
         return waterSourceTypeColors;
     }
   }, [mapGroupingOption, beneficialUseColors, ownerClassificationColors, waterSourceTypeColors]);
@@ -43,21 +43,21 @@ export function useWadeLegend() {
     let colorMappings = [...mapGroupingColors];
     //we first filter our colors by the filters because some points may meet multiple criteria and we don't want a filtered out color to show in the legend.
     if (
-      mapGroupingOption === (MapGrouping.BeneficialUse as string) &&
+      mapGroupingOption === (MapGroupingClass.BeneficialUse as string) &&
       beneficialUseFilters &&
       beneficialUseFilters?.length > 0
     ) {
       colorMappings = colorMappings.filter((a) => beneficialUseFilters?.some((b) => b === a.key));
     }
     if (
-      mapGroupingOption === (MapGrouping.WaterSourceType as string) &&
+      mapGroupingOption === (MapGroupingClass.WaterSourceType as string) &&
       waterSourceTypeFilters &&
       waterSourceTypeFilters.length > 0
     ) {
       colorMappings = colorMappings.filter((a) => waterSourceTypeFilters?.some((b) => b === a.key));
     }
     if (
-      mapGroupingOption === (MapGrouping.OwnerClassification as string) &&
+      mapGroupingOption === (MapGroupingClass.OwnerClassification as string) &&
       ownerClassificationsFilters &&
       ownerClassificationsFilters.length > 0
     ) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useCallback, useMemo } from 'react';
 import { MultiValue } from 'react-select';
 import Select from 'react-select';
-import { useStatesFilter } from '../../../hooks/filters/useStatesFilter';
+import { useStatesFilter } from "../hooks/useStatesFilter";
 import { useWaterRightsContext } from '../../Provider';
 
 export function StatesSelect() {

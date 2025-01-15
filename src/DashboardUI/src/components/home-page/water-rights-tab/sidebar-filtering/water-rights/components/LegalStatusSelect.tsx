@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLegalStatusesFilter } from '../../../hooks/filters/useLegalStatusesFilter';
+import { useLegalStatusesFilter } from "../hooks/useLegalStatusesFilter";
 import { useWaterRightsContext } from '../../Provider';
 import { useCallback, useMemo } from 'react';
 import Select, { MultiValue } from 'react-select';

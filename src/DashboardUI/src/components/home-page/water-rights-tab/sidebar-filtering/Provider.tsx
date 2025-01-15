@@ -2,9 +2,9 @@ import React from 'react';
 import { createContext, FC, useCallback, useContext, useEffect, useState } from 'react';
 import { BeneficialUseListItem } from '@data-contracts';
 import { DataPoints, Directions } from '../../../../data-contracts/nldi';
-import { useDisplayOptionsUrlParameters } from './hooks/url-parameters/useDisplayOptionsUrlParameters';
+import { useDisplayOptionsUrlParameters } from "../map-options/hooks/useDisplayOptionsUrlParameters";
 import { defaultDisplayOptions, DisplayOptions } from '../map-options/components/DisplayOptions';
-import { useFiltersUrlParameters } from './hooks/url-parameters/useFiltersUrlParameters';
+import { useFiltersUrlParameters } from "../map-options/hooks/useFiltersUrlParameters";
 import { useDashboardFilters } from '../../../../hooks/queries';
 import { UseQueryResult } from 'react-query';
 

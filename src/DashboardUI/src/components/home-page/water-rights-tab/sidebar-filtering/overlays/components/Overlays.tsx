@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { useOverlaysFilter } from '../../../hooks/filters/useOverlaysFilter';
+import { useOverlaysFilter } from "../hooks/useOverlaysFilter";
 
 export function Overlays() {
   const {

@@ -1,11 +1,11 @@
-import { MapGrouping } from './MapGroupingClass';
+import { MapGroupingClass } from './MapGroupingClass';
 
 export interface DisplayOptions {
   pointSize: 'd' | 'f' | 'v';
-  mapGrouping: MapGrouping;
+  mapGrouping: MapGroupingClass;
 }
 
 export const defaultDisplayOptions: DisplayOptions = {
   pointSize: 'd',
-  mapGrouping: MapGrouping.BeneficialUse,
+  mapGrouping: MapGroupingClass.BeneficialUse,
 };

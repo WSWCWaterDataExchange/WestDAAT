@@ -2,7 +2,7 @@ import React from 'react';
 import { useCallback, useMemo } from 'react';
 import { MultiValue } from 'react-select';
 import Select from 'react-select';
-import { useWaterSourceTypesFilter } from '../../../hooks/filters/useWaterSourceTypesFilter';
+import { useWaterSourceTypesFilter } from "../hooks/useWaterSourceTypesFilter";
 import { useWaterRightsContext } from '../../Provider';
 
 export function WaterSourceTypesSelect() {

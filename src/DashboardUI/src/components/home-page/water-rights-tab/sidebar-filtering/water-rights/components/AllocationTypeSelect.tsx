@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useAllocationTypesFilter } from '../../../hooks/filters/useAllocationTypesFilter';
+import { useAllocationTypesFilter } from "../hooks/useAllocationTypesFilter";
 import { useWaterRightsContext } from '../../Provider';
 import Select, { MultiValue } from 'react-select';
 

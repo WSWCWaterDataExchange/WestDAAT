@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChangeEvent, useCallback } from 'react';
 import { ButtonGroup, ToggleButton } from 'react-bootstrap';
-import { usePodPouFilter } from '../../hooks/filters/usePodPouFilter';
+import { usePodPouFilter } from "../hooks/usePodPouFilter";
 
 const podPouRadios = [
   { name: 'All', value: '' },

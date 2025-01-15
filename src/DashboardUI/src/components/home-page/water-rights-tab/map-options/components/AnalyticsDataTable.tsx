@@ -4,7 +4,7 @@ import { Button, ProgressBar, Table } from 'react-bootstrap';
 import { WaterRightsSearchResults } from '../../../../../data-contracts/WaterRightsSearchResults';
 import { FormattedDate } from '../../../../FormattedDate';
 import { useFindWaterRights } from '../../../../../hooks/queries';
-import { useWaterRightsSearchCriteria } from './hooks/useWaterRightsSearchCriteria';
+import { useWaterRightsSearchCriteria } from "../hooks/useWaterRightsSearchCriteria";
 import { formatNumber } from '../../../../../utilities/valueFormatters';
 
 function AnalyticsDataTable() {

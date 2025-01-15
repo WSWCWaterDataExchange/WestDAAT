@@ -8,7 +8,7 @@ import { useDrag } from 'react-dnd';
 import Icon from '@mdi/react';
 import './nldi-filters.scss';
 import { defaultNldiFilters } from '../../Provider';
-import { useNldiFilter } from '../../hooks/filters/useNldiFilter';
+import { useNldiFilter } from "../hooks/useNldiFilter";
 
 export function Nldi() {
   const { nldiFilterData, setDataPoints, setDirections, setLatLong } = useNldiFilter();

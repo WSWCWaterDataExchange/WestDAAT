@@ -4,7 +4,7 @@ import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../.
 import CloseCircleOutline from 'mdi-react/CloseCircleOutlineIcon';
 import SyncIcon from 'mdi-react/SyncIcon';
 import { useCallback, useEffect, useState } from 'react';
-import { useBeneficialUsesFilter } from '../../../hooks/filters/useBeneficialUsesFilter';
+import { useBeneficialUsesFilter } from "../hooks/useBeneficialUsesFilter";
 import { useWaterRightsContext } from '../../Provider';
 
 interface GroupedOption {
