@@ -1,46 +1,49 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Helpers.Errors.Model;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
-public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContextUtility
+public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityProviderConfiguration identityProviderConfiguration) : IContextUtility
 {
     private const string ClaimNamespace = "extension_westdaat";
 
-    private readonly ContextBase _context = Build(httpContextAccessor);
+    private readonly ContextBase _context = null;
 
-    private static ContextBase Build(IHttpContextAccessor httpContextAccessor)
+    private ContextBase Build()
     {
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
         {
             string authHeaderString = authHeader;
-            
+
             if (authHeaderString.StartsWith("Bearer"))
             {
-                return BuildUserContext(authHeader);
+                return BuildUserContext(authHeaderString);
             }
-            
-            if(authHeaderString.StartsWith("Basic"))
+
+            if (authHeaderString.StartsWith("Basic"))
             {
-                return new AnonymousContext();
+                return BuildIdentityProviderContext(authHeaderString);
             }
         }
 
         return new AnonymousContext();
     }
 
-    public ContextBase GetContext() => _context;
+    public ContextBase GetContext() => _context ?? Build();
 
     public T GetRequiredContext<T>() where T : ContextBase
     {
-        if (_context is not T context)
+        if (GetContext() is not T context)
         {
             throw new InvalidOperationException(
-                $"Context is of type '{_context.GetType().Name}', not of the " +
+                $"Context is of type '{GetContext().GetType().Name}', not of the " +
                 $"requested type '{typeof(T).Name}'."
             );
         }
@@ -151,5 +154,37 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
             ).ToArray();
 
         return orgRoles;
+    }
+
+    private IdentityProviderContext BuildIdentityProviderContext(string authHeader)
+    {
+        var (username, password) = ParseBasicAuthHeader(authHeader);
+
+        ValidateIdentityProviderCredentials(username, password);
+
+        return new IdentityProviderContext();
+    }
+
+    private (string Username, string Password) ParseBasicAuthHeader(string authHeader)
+    {
+        var basicAuth = authHeader.Replace("Basic ", string.Empty);
+        var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(basicAuth));
+        var parts = decoded.Split(":");
+
+        if (parts.Length != 2)
+        {
+            throw new InvalidOperationException("Basic auth header is not in a valid format.");
+        }
+
+        return (parts[0], parts[1]);
+    }
+
+    private void ValidateIdentityProviderCredentials(string username, string password)
+    {
+        if (username != identityProviderConfiguration.ApiConnectorUsername ||
+            password != identityProviderConfiguration.ApiConnectorPassword)
+        {
+            throw new InvalidOperationException("Invalid username or password.");
+        }
     }
 }
