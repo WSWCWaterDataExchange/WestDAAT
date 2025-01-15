@@ -51,19 +51,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate", "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj", "{25C64908-689E-4D52-B814-A41021918B88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests", "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests\WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests.csproj", "{3BA6F160-1CE7-4328-B546-33274602BED5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests", "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests\WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests.csproj", "{3BA6F160-1CE7-4328-B546-33274602BED5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Database", "WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj", "{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Database", "WesternStatesWater.WestDaat.Database\WesternStatesWater.WaDE.Database.csproj", "{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "10. Shared", "10. Shared", "{0F6EE164-87A5-420B-9A7D-F168C4A5ED0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.Shared", "WesternStatesWater.Shared\WesternStatesWater.Shared.csproj", "{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.Shared", "WesternStatesWater.Shared\WesternStatesWater.Shared.csproj", "{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.Shared.Tests", "WesternStatesWater.Shared.Tests\WesternStatesWater.Shared.Tests.csproj", "{3506C59B-983D-4F13-A167-3D683437B7C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.Shared.Tests", "WesternStatesWater.Shared.Tests\WesternStatesWater.Shared.Tests.csproj", "{3506C59B-983D-4F13-A167-3D683437B7C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Tests.FunctionTests", "WesternStatesWater.WestDaat.Tests.FunctionTests\WesternStatesWater.WestDaat.Tests.FunctionTests.csproj", "{87BD42D2-2A0B-4999-AAC1-FF56756A2297}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.FunctionTests", "WesternStatesWater.WestDaat.Tests.FunctionTests\WesternStatesWater.WestDaat.Tests.FunctionTests.csproj", "{87BD42D2-2A0B-4999-AAC1-FF56756A2297}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.DbUp", "WesternStatesWater.WestDaat.DbUp\WesternStatesWater.WestDaat.DbUp.csproj", "{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.DbUp", "WesternStatesWater.WestDaat.DbUp\WesternStatesWater.WestDaat.DbUp.csproj", "{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
