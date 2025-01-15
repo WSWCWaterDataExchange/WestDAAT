@@ -18,6 +18,8 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
                 "Server=localhost;Initial Catalog=WestDAAT;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
             { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://labs.waterdata.usgs.gov/api/nldi/" },
+            { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.BaseAddress)}", "https://openet-api.org/" },
+            { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.ApiKey)}", "API_KEY" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "50" },
@@ -61,7 +63,12 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         {
             return config.GetSection(ConfigurationRootNames.MessageBus).Get<MessageBusConfiguration>() ?? new MessageBusConfiguration();
         }
-        
+
+        public static OpenEtConfiguration GetOpenEtConfiguration(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.OpenEt).Get<OpenEtConfiguration>() ?? new OpenEtConfiguration();
+        }
+
         public static TokenCredential TokenCredential => new ChainedTokenCredential(
             new AzureCliCredential(), // When Local
             new DefaultAzureCredential() // When Azure
@@ -78,5 +85,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public const string Performance = "Performance";
         public const string MessageBus = "MessageBus";
         public const string Environment = "Environment";
+        public const string OpenEt = "OpenET";
     }
 }

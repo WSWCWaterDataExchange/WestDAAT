@@ -3,6 +3,7 @@ import { nldi, pointSizes, waterRightsProperties } from './constants';
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
   waterRightsPolygonsLayer: 'waterRightsPolygons',
+  overlayPolygonsLayer: 'overlayPolygons',
   overlayTypesPolygonsLayer: 'overlayTypesPolygons',
   overlayTypesPolygonsBorderLayer: 'overlayTypesPolygonsBorder',
   riverBasinsLayer: 'river-basins',
@@ -15,6 +16,7 @@ export const mapLayerNames = {
 
 export const mapSourceNames = {
   waterRightsVectorTiles: 'water-rights-vector-tiles',
+  overlayVectorTiles: 'overlay-vector-tiles',
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
@@ -71,6 +73,12 @@ const mapsJson = {
       volatile: true,
     },
     {
+      id: mapSourceNames.overlayVectorTiles,
+      type: 'vector',
+      url: process.env.REACT_APP_OVERLAY_VECTOR_TILE_URL,
+      volatile: true,
+    },
+    {
       id: mapSourceNames.nldiGeoJson,
       type: 'geojson',
       data: {
@@ -110,6 +118,35 @@ const mapsJson = {
       },
     },
     {
+      id: mapLayerNames.overlayTypesPolygonsLayer,
+      friendlyName: 'Overlay Types Polygons',
+      'source-layer': 'polygons',
+      source: mapSourceNames.overlayVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'fill',
+      paint: {
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.5,
+      },
+    },
+    {
+      id: mapLayerNames.overlayTypesPolygonsBorderLayer,
+      friendlyName: 'Overlay Types Polygons Borders',
+      'source-layer': 'polygons',
+      source: mapSourceNames.overlayVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'line',
+      paint: {
+        'line-color': '#000000',
+        'line-width': 0.2,
+        'line-opacity': 0.5,
+      },
+    },
+    {
       id: mapLayerNames.waterRightsPolygonsLayer,
       friendlyName: 'Water Rights Polygons',
       'source-layer': 'polygons',
@@ -124,38 +161,6 @@ const mapsJson = {
       },
       filter: ['has', 'podPou']
     },
-    {
-      id: mapLayerNames.overlayTypesPolygonsLayer,
-      friendlyName: 'Overlay Types Polygons',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type:'fill',
-      paint: {
-      "fill-color": "#ff0000",
-      "fill-opacity": 0.5
-      },
-      filter: ['has', 'oType']
-    },
-    {
-      id: mapLayerNames.overlayTypesPolygonsBorderLayer,
-      friendlyName: 'Overlay Types Polygons Borders',
-      'source-layer': 'polygons',
-      source: mapSourceNames.waterRightsVectorTiles,
-      layout: {
-        visibility: 'visible',
-      },
-      type: 'line',
-      paint: {
-        "line-color": "#000000",
-        "line-width": .2,
-        "line-opacity": .5
-      },
-      filter: ['has', 'oType']
-    },
-
     {
       id: mapLayerNames.waterRightsPointsLayer,
       friendlyName: 'Water Rights Points',
