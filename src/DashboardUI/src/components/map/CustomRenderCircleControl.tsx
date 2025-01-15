@@ -24,11 +24,20 @@ export class CustomRenderCircleControl extends CustomMapControl {
     return this._mapInstance.getLayer(circleLayerId);
   };
 
+  registerClickHandler = (): void => {
+    this._mapInstance.on('click', this.handleMapClick);
+  };
+
+  deRegisterClickHandler = (): void => {
+    this._mapInstance.off('click', this.handleMapClick);
+  };
+
   handleToolClicked = (): void => {
     if (this._toolIsActive) {
-      this._mapInstance.on('click', this.handleMapClick);
+      this.registerClickHandler();
     } else {
-      this._mapInstance.off('click', this.handleMapClick);
+      this.deRegisterClickHandler();
+      this.resetSourceAndLayer();
     }
   };
 
