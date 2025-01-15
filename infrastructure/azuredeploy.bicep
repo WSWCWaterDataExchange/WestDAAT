@@ -26,8 +26,8 @@ var westdaatdbname = 'WestDAAT'
 
 // Role Definitions (Different per tenant). 
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
-param azureServiceBusDataSenderRoleDefinitionName string = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
-param azureServiceBusReceiverRoleDefinitionName string = '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
+var azureServiceBusDataSenderRoleDefinitionName = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
+var azureServiceBusReceiverRoleDefinitionName = '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
