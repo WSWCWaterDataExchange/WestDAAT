@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
-namespace WesternStatesWater.WaDE.Database.EntityFramework
+namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
     public partial class WestDaatDatabaseContext : DbContext
     {

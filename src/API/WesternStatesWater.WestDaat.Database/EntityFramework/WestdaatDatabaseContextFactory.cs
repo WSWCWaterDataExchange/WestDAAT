@@ -1,6 +1,6 @@
 ﻿using WesternStatesWater.WestDaat.Common.Configuration;
 
-namespace WesternStatesWater.WaDE.Database.EntityFramework
+namespace WesternStatesWater.WestDaat.Database.EntityFramework
 {
     public class WestDaatDatabaseContextFactory : IWestDaatDatabaseContextFactory
     {
