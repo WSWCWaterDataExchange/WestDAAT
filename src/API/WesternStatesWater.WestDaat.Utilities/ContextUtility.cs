@@ -43,13 +43,13 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
         // Example jwt claims:
         // Note - azure b2c requires the namespace to be prefixed with "extension_"
         //  {
-        //   "extension_westdaat/userId": "<guid>",
-        //   "extension_westdaat/roles": "rol_<role name>,rol_<role name>" // csv string
-        //   "extension_westdaat/organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
+        //   "extension_westdaat_userId": "<guid>",
+        //   "extension_westdaat_roles": "rol_<role name>,rol_<role name>" // csv string
+        //   "extension_westdaat_organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
         // }
 
         var jwt = GetJwt(authHeader);
-        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}/userId");
+        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
         var roles = GetRoles(jwt.Claims);
         var orgRoles = GetOrganizationRoles(jwt.Claims);
         var externalAuthId = GetClaimValue(jwt.Claims, "sub");
@@ -89,7 +89,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static string[] GetRoles(IEnumerable<Claim> claims)
     {
-        var rolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/roles");
+        var rolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}_roles");
 
         if (string.IsNullOrEmpty(rolesClaim?.Value))
         {
@@ -106,7 +106,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
 
     private static OrganizationRole[] GetOrganizationRoles(IEnumerable<Claim> claims)
     {
-        var orgRolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}/organizationRoles");
+        var orgRolesClaim = claims.FirstOrDefault(claim => claim.Type == $"{ClaimNamespace}_organizationRoles");
 
         if (string.IsNullOrEmpty(orgRolesClaim?.Value))
         {
