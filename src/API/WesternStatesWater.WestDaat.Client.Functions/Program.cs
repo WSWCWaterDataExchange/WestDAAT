@@ -39,6 +39,7 @@ var host = new HostBuilder()
         var configuration = context.Configuration;
 
         services.AddHttpContextAccessor();
+        services.AddOpenApi();
 
         // Config
         services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
