@@ -3,6 +3,13 @@ name: Deploy Prod
 on:
   workflow_dispatch:
 jobs:
+  deploy-infrastructure:
+    uses: ./.github/workflows/deploy-infrastructure.yml
+    with:
+      azure-resource-group: WestDAAT_Prod
+      azure-bicep-params-file: azuredeploy.prod.json
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_PROD }}
   deploy-backend:
     uses: ./.github/workflows/deploy-backend.yml
     with:
