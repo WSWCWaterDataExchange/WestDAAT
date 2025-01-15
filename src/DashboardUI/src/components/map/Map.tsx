@@ -22,10 +22,9 @@ import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Polygon } from
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
-import { circle } from '@turf/turf';
-import { Map as MapInstance } from 'mapbox-gl';
 
 import './map.scss';
+import { CustomRenderCircleControl } from './CustomRenderCircleControl';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -148,28 +147,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     }
   };
 
-  const renderGeoJsonPolygonToMap = (
-    mapInstance: MapInstance,
-    polygon: Feature<Polygon, GeoJsonProperties>,
-    sourceName: string,
-    layerName: string,
-  ) => {
-    mapInstance.addSource(sourceName, {
-      type: 'geojson',
-      data: polygon,
-    });
-
-    mapInstance.addLayer({
-      id: layerName,
-      type: 'fill',
-      source: sourceName,
-      paint: {
-        'fill-color': 'orange',
-        'fill-opacity': 0.5,
-      },
-    });
-  };
-
   useEffect(() => {
     if (map && uploadedGeoJSON) {
       uploadGeoJsonToMapbox(uploadedGeoJSON);
@@ -203,12 +180,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       if (handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
       mapInstance.addControl(new mapboxgl.ScaleControl());
+      mapInstance.addControl(new CustomRenderCircleControl(mapInstance));
 
       mapboxDrawControl(mapInstance);
-
-      const circleRadiusInMeters = 100;
-      const geoJsonCircle = circle([-100, 40], circleRadiusInMeters, { steps: 100 });
-      renderGeoJsonPolygonToMap(mapInstance, geoJsonCircle, 'circle-source', 'circle-layer');
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
