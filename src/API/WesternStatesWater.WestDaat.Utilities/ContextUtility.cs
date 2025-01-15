@@ -17,9 +17,16 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor) : IContext
     {
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
         {
-            if (((string)authHeader)!.StartsWith("Bearer"))
+            string authHeaderString = authHeader;
+            
+            if (authHeaderString.StartsWith("Bearer"))
             {
                 return BuildUserContext(authHeader);
+            }
+            
+            if(authHeaderString.StartsWith("Basic"))
+            {
+                return new AnonymousContext();
             }
         }
 
