@@ -12,7 +12,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   private _toolIsActive: boolean = false;
 
   constructor(mapInstance: MapInstance) {
-    super(mdiCircle, 'render a circle', () => {
+    super(mdiCircle, 'tooltip - render a circle', () => {
       this.toggleToolActive();
 
       this._mapInstance = mapInstance;
@@ -26,7 +26,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
   handleToolClicked = (): void => {
     if (this._toolIsActive) {
-      console.log('register map click handler');
       this._mapInstance.on('click', this.handleMapClick);
     } else {
       this._mapInstance.off('click', this.handleMapClick);
@@ -34,7 +33,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   handleMapClick = (e: MapMouseEvent) => {
-    console.log('map clicked', e);
     const point = [e.lngLat.lng, e.lngLat.lat];
 
     const generatedCircle = this.generateCircleAtPoint(point, 100);
@@ -43,7 +41,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
   toggleToolActive = (): void => {
     this._toolIsActive = !this._toolIsActive;
-    console.log('active toggled:', this._toolIsActive);
   };
 
   generateCircleAtPoint(point: number[], radius: number): Feature<Polygon, GeoJsonProperties> {
