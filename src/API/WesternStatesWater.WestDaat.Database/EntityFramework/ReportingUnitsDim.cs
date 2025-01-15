@@ -1,6 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 
-namespace WesternStatesWater.WestDaat.Database.EntityFramework
+namespace WesternStatesWater.WaDE.Database.EntityFramework
 {
     public partial class ReportingUnitsDim
     {

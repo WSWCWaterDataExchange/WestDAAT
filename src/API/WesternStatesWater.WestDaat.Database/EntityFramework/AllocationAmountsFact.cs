@@ -3,7 +3,7 @@ using LinqKit;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Utilities;
 
-namespace WesternStatesWater.WestDaat.Database.EntityFramework
+namespace WesternStatesWater.WaDE.Database.EntityFramework
 {
     public partial class AllocationAmountsFact
     {
