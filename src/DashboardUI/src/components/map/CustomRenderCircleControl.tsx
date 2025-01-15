@@ -16,7 +16,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this.toggleToolActive();
 
       this._mapInstance = mapInstance;
-      this.registerMapCircleSourceAndLayer();
       this.handleToolClicked();
     });
   }
@@ -25,42 +24,12 @@ export class CustomRenderCircleControl extends CustomMapControl {
     return this._mapInstance.getLayer(circleLayerId);
   };
 
-  registerMapCircleSourceAndLayer = (): void => {
-    const existingSource = this._mapInstance.getSource(circleSource);
-    if (!existingSource) {
-      this._mapInstance.addSource(circleSource, {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [],
-          },
-          properties: {},
-        },
-      });
-      console.log('registered source', this._mapInstance.getSource(circleSource));
-    }
-
-    const existingLayer = this.getCircleLayer();
-    if (!existingLayer) {
-      this._mapInstance.addLayer({
-        id: circleLayerId,
-        type: 'fill',
-        source: circleSource,
-        paint: {
-          'fill-color': 'orange',
-          'fill-opacity': 0.5,
-        },
-      });
-      console.log('registered layer', this.getCircleLayer());
-    }
-  };
-
   handleToolClicked = (): void => {
     if (this._toolIsActive) {
       console.log('register map click handler');
       this._mapInstance.on('click', this.handleMapClick);
+    } else {
+      this._mapInstance.off('click', this.handleMapClick);
     }
   };
 
@@ -81,10 +50,30 @@ export class CustomRenderCircleControl extends CustomMapControl {
     return circle(point, radius, { steps: 100 });
   }
 
+  resetSourceAndLayer = (): void => {
+    if (this._mapInstance.getLayer(circleLayerId)) {
+      this._mapInstance.removeLayer(circleLayerId);
+    }
+    if (this._mapInstance.getSource(circleSource)) {
+      this._mapInstance.removeSource(circleSource);
+    }
+  };
+
   renderGeoJsonPolygonToMap = (mapInstance: MapInstance, polygon: Feature<Polygon, GeoJsonProperties>) => {
+    this.resetSourceAndLayer();
     mapInstance.addSource(circleSource, {
       type: 'geojson',
       data: polygon,
+    });
+
+    this._mapInstance.addLayer({
+      id: circleLayerId,
+      type: 'fill',
+      source: circleSource,
+      paint: {
+        'fill-color': 'orange',
+        'fill-opacity': 0.5,
+      },
     });
   };
 }
