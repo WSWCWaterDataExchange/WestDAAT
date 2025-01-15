@@ -1,8 +1,5 @@
-@description('Specifies the location for resources.')
-param location string = 'westus'
-
-@description('Product name. (Example \'tenzing\')')
-param Product string = 'WestDAAT'
+var location = 'westus'
+var Product = 'WestDAAT'
 
 @description('Used to determine naming convention for resources')
 @allowed([
