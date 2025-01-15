@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class UserFaker : Faker<EF.User>
+public class UserFaker : Faker<EFWD.User>
 {
     public UserFaker()
     {
