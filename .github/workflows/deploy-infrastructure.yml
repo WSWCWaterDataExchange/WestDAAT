@@ -5,7 +5,6 @@ name: Deploy Infrastructure
 
 env:
   AZURE_SUBSCRIPTION_ID: 7847533a-6a20-4b25-a2b5-f50e005985c5
-  AZURE_LOCATION: westus
 
 on:
   workflow_call:
@@ -46,7 +45,6 @@ jobs:
           type: deployment
           operation: create
           name: AzureDeploy
-          location: ${{ env.AZURE_LOCATION }}
           scope: resourceGroup
           resource-group-name: ${{ inputs.azure-resource-group }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
