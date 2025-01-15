@@ -1,0 +1,69 @@
+<policies>
+    <inbound>
+        <base />
+        <choose>
+            <!-- Allow for specified routes to have anonymous access since login/JWT is not required. -->
+            <when condition="@{
+                var url = context.Operation.UrlTemplate.ToLower();
+                return !(
+                    url.Equals("/_admin/enrichjwt") ||
+                    url.Equals("/nldifeatures/@{latitude}{longitude}") ||
+                    url.Equals("/overlays/{overlayuuid}") ||
+                    url.Equals("/overlays/{overlayuuid}/legal") ||
+                    url.Equals("/overlays/{overlayuuid}/overlaydigest") ||
+                    url.Equals("/overlays/{reportingunituuid}/rights") ||
+                    url.Equals("/sites/{siteuuid}") ||
+                    url.Equals("/sites/{siteuuid}/digest") ||
+                    url.Equals("/sites/{siteuuid}/geoconnex") ||
+                    url.Equals("/sites/{siteuuid}/methods") ||
+                    url.Equals("/sites/{siteuuid}/rights") ||
+                    url.Equals("/sites/{siteuuid}/sitelocation") ||
+                    url.Equals("/sites/{siteuuid}/siteusage") ||
+                    url.Equals("/sites/{siteuuid}/sources") ||
+                    url.Equals("/sites/{siteuuid}/variables") ||
+                    url.Equals("/sites/{siteuuid}/waterrightsdigest") ||
+                    url.Equals("/system/feedback") ||
+                    url.Equals("/system/filters") ||
+                    url.Equals("/system/riverbasins") ||
+                    url.Equals("/testme") ||
+                    url.Equals("/waterrights/{allocationuuid}") ||
+                    url.Equals("/waterrights/{allocationuuid}/overlays") ||
+                    url.Equals("/waterrights/{allocationuuid}/sitelocations") ||
+                    url.Equals("/waterrights/{allocationuuid}/sites") ||
+                    url.Equals("/waterrights/{allocationuuid}/sources") ||
+                    url.Equals("/waterrights/analyticssummaryinformation") ||
+                    url.Equals("/waterrights/dataenvelope") ||
+                    url.Equals("/waterrights/download") ||
+                    url.Equals("/waterrights/find")
+                );
+            }">
+                <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. JWT is missing or invalid.">
+                    <openid-config url="https://{0}.b2clogin.com/{0}.onmicrosoft.com/B2C_1_signupsignin/v2.0/.well-known/openid-configuration" />
+                    <audiences>
+                        <audience>{1}</audience>
+                    </audiences>
+                </validate-jwt>
+            </when>
+        </choose>
+        <cors>
+            <allowed-origins>
+                <origin>{2}</origin>
+            </allowed-origins>
+            <allowed-methods preflight-result-max-age="1209600">
+                <method>*</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+        </cors>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
