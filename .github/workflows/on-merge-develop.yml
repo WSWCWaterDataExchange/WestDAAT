@@ -16,7 +16,7 @@ jobs:
       azure-api-name: westdaat-fn-api-qa
       azure-api-url: https://westdaat-qa.azurewebsites.net/api
       azure-auth-tenant-name: westdaatqa
-      azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # Found in JWT token
+      azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # # App Registration ID
       azure-cors-domain: https://westdaatqa.westernstateswater.org
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}

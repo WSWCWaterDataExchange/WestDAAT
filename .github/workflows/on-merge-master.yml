@@ -16,7 +16,7 @@ jobs:
       azure-api-name: westdaat-fn-api-staging
       azure-api-url: https://westdaat-staging.azurewebsites.net/api
       azure-auth-tenant-name: westdaatstaging
-      azure-auth-audience: a4db62cd-d2ef-425e-8c69-37f4349f925e # Found in JWT token
+      azure-auth-audience: a4db62cd-d2ef-425e-8c69-37f4349f925e # App Registration ID
       azure-cors-domain: https://westdaatstaging.westernstateswater.org
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
