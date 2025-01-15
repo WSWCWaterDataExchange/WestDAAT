@@ -2,7 +2,14 @@ import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
 import { circle, distance } from '@turf/turf';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
-import { CustomLayerInterface, LayerSpecification, MapEvent, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
+import {
+  CustomLayerInterface,
+  LayerSpecification,
+  MapEvent,
+  Map as MapInstance,
+  MapMouseEvent,
+  MapTouchEvent,
+} from 'mapbox-gl';
 
 const circleLayerId: string = 'circle-layer';
 const circleSource: string = 'circle-source';
@@ -29,13 +36,11 @@ export class CustomRenderCircleControl extends CustomMapControl {
   registerClickHandlers = (): void => {
     console.log('register click handlers');
     // this._mapInstance.on('click', this.handleMapClick);
-    this._mapInstance.on('dragstart', (e) => {
-      console.log('touchstart:', e);
+    this._mapInstance.on('touchstart', (e) => {
       this.handleTouchStart(e);
     });
 
-    this._mapInstance.on('drag', (e) => {
-      console.log('touchmove:', e);
+    this._mapInstance.on('touchmove', (e) => {
       this.handleTouchMove(e);
     });
   };
@@ -53,38 +58,18 @@ export class CustomRenderCircleControl extends CustomMapControl {
     }
   };
 
-  // handleMapClick = (e: MapMouseEvent) => {
-  //   console.log('clicked map');
-  //   this._circleCenterPoint = [e.lngLat.lng, e.lngLat.lat];
-  // };
-
-  handleTouchStart = (e: MapEvent) => {
-    const center = e.target.getCenter();
-    this._circleCenterPoint = [center.lng, center.lat];
+  handleTouchStart = (e: MapTouchEvent) => {
+    this._circleCenterPoint = [e.lngLat.lng, e.lngLat.lat];
+    console.log('touch start, set center', this._circleCenterPoint);
   };
 
-  handleTouchMove = (e: MapEvent) => {
-    const center = e.target.getCenter();
-    const currentLocation = [center.lng, center.lat];
+  handleTouchMove = (e: MapTouchEvent) => {
+    const currentLocation = [e.lngLat.lng, e.lngLat.lat];
     const distanceFromCircleCenterToMouseInKm = distance(this._circleCenterPoint!, currentLocation, {
       units: 'kilometers',
     });
+    console.log('touch move, distance:', distanceFromCircleCenterToMouseInKm);
     const circleFeature = this.generateCircleAtPoint(this._circleCenterPoint!, distanceFromCircleCenterToMouseInKm);
-    this.renderGeoJsonPolygonToMap(this._mapInstance, circleFeature);
-  };
-
-  handleMapDrag = (e: MapEvent) => {
-    if (!this._circleCenterPoint) {
-      return;
-    }
-    console.log('dragged map');
-
-    const mouseLocationLngLat = e.target.getCenter();
-    const mouseLocation = [mouseLocationLngLat.lng, mouseLocationLngLat.lat];
-    const distanceFromCircleCenterToMouseInKm = distance(this._circleCenterPoint, mouseLocation, {
-      units: 'kilometers',
-    });
-    const circleFeature = this.generateCircleAtPoint(this._circleCenterPoint, distanceFromCircleCenterToMouseInKm);
     this.renderGeoJsonPolygonToMap(this._mapInstance, circleFeature);
   };
 
