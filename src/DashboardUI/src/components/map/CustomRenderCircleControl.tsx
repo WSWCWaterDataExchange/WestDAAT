@@ -1,8 +1,8 @@
 import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
-import { circle } from '@turf/turf';
+import { circle, distance } from '@turf/turf';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
-import { CustomLayerInterface, LayerSpecification, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
+import { CustomLayerInterface, LayerSpecification, MapEvent, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
 
 const circleLayerId: string = 'circle-layer';
 const circleSource: string = 'circle-source';
@@ -10,6 +10,8 @@ const circleSource: string = 'circle-source';
 export class CustomRenderCircleControl extends CustomMapControl {
   private _mapInstance!: MapInstance;
   private _toolIsActive: boolean = false;
+
+  private _circleCenterPoint: number[] | undefined;
 
   constructor(mapInstance: MapInstance) {
     super(mdiCircle, 'tooltip - render a circle', () => {
@@ -24,29 +26,66 @@ export class CustomRenderCircleControl extends CustomMapControl {
     return this._mapInstance.getLayer(circleLayerId);
   };
 
-  registerClickHandler = (): void => {
-    this._mapInstance.on('click', this.handleMapClick);
+  registerClickHandlers = (): void => {
+    console.log('register click handlers');
+    // this._mapInstance.on('click', this.handleMapClick);
+    this._mapInstance.on('dragstart', (e) => {
+      console.log('touchstart:', e);
+      this.handleTouchStart(e);
+    });
+
+    this._mapInstance.on('drag', (e) => {
+      console.log('touchmove:', e);
+      this.handleTouchMove(e);
+    });
   };
 
   deRegisterClickHandler = (): void => {
-    this._mapInstance.off('click', this.handleMapClick);
+    // this._mapInstance.off('click', this.handleMapClick);
   };
 
   handleToolClicked = (): void => {
     if (this._toolIsActive) {
-      this.registerClickHandler();
+      this.registerClickHandlers();
     } else {
       this.deRegisterClickHandler();
       this.resetSourceAndLayer();
     }
   };
 
-  handleMapClick = (e: MapMouseEvent) => {
-    const point = [e.lngLat.lng, e.lngLat.lat];
+  // handleMapClick = (e: MapMouseEvent) => {
+  //   console.log('clicked map');
+  //   this._circleCenterPoint = [e.lngLat.lng, e.lngLat.lat];
+  // };
 
-    const radiusInKm = 100;
-    const generatedCircle = this.generateCircleAtPoint(point, radiusInKm);
-    this.renderGeoJsonPolygonToMap(this._mapInstance, generatedCircle);
+  handleTouchStart = (e: MapEvent) => {
+    const center = e.target.getCenter();
+    this._circleCenterPoint = [center.lng, center.lat];
+  };
+
+  handleTouchMove = (e: MapEvent) => {
+    const center = e.target.getCenter();
+    const currentLocation = [center.lng, center.lat];
+    const distanceFromCircleCenterToMouseInKm = distance(this._circleCenterPoint!, currentLocation, {
+      units: 'kilometers',
+    });
+    const circleFeature = this.generateCircleAtPoint(this._circleCenterPoint!, distanceFromCircleCenterToMouseInKm);
+    this.renderGeoJsonPolygonToMap(this._mapInstance, circleFeature);
+  };
+
+  handleMapDrag = (e: MapEvent) => {
+    if (!this._circleCenterPoint) {
+      return;
+    }
+    console.log('dragged map');
+
+    const mouseLocationLngLat = e.target.getCenter();
+    const mouseLocation = [mouseLocationLngLat.lng, mouseLocationLngLat.lat];
+    const distanceFromCircleCenterToMouseInKm = distance(this._circleCenterPoint, mouseLocation, {
+      units: 'kilometers',
+    });
+    const circleFeature = this.generateCircleAtPoint(this._circleCenterPoint, distanceFromCircleCenterToMouseInKm);
+    this.renderGeoJsonPolygonToMap(this._mapInstance, circleFeature);
   };
 
   toggleToolActive = (): void => {
