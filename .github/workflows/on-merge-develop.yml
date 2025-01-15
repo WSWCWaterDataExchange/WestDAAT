@@ -29,6 +29,8 @@ jobs:
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
+      azure-b2c-basic-username: ${{ secrets.AZURE_B2C_BASIC_USERNAME_QA }}
+      azure-b2c-basic-password: ${{ secrets.AZURE_B2C_BASIC_PASSWORD_QA }}
   deploy-frontend:
     uses: ./.github/workflows/deploy-frontend.yml
     needs: deploy-backend

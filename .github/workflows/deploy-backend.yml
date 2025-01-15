@@ -49,6 +49,12 @@ on:
       azure-cli-credentials:
         description: "The credentials for the Azure CLI"
         required: true
+      azure-b2c-basic-username:
+        description: "The username for the Azure B2C basic authentication from APIM to FunctionApp"
+        required: true
+      azure-b2c-basic-password:
+        description: "The password for the Azure B2C basic authentication from APIM to FunctionApp"
+        required: true
 
 jobs:
   deploy-funtion-app:
@@ -124,9 +130,11 @@ jobs:
           azPSVersion: "latest"
           inlineScript: |
             # Find and replace variables for current environment
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}') | Set-Content ./infrastructure/apim_policies.xml
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')    | Set-Content ./infrastructure/apim_policies.xml
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')      | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}')   | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')      | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')        | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ secrets.azure-b2c-basic-username }}') | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{4}', '${{ secrets.azure-b2c-basic-password }}') | Set-Content ./infrastructure/apim_policies.xml
 
             # Print file contents
             get-content ./infrastructure/apim_policies.xml

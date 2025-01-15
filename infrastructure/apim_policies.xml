@@ -44,6 +44,13 @@
                     </audiences>
                 </validate-jwt>
             </when>
+            <!-- B2C Will send basic auth to APIM -->
+            <when condition="@{
+                var url = context.Operation.UrlTemplate.ToLower();
+                return url.Equals("/_admin/enrichjwt");
+            }">
+              <authentication-basic username="{3}" password="{4}" />
+            </when>
         </choose>
         <cors>
             <allowed-origins>
