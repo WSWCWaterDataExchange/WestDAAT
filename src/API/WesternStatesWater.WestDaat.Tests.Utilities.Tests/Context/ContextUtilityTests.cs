@@ -28,6 +28,20 @@ public class ContextUtilityTests
     }
 
     [TestMethod]
+    public void BuildContext_AnonymousContext_BasicAuth_ShouldSetContext()
+    {
+        StringValues headerValue = "Basic base64encodedstring";
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+
+        utility.GetContext().Should().BeOfType<AnonymousContext>();
+    }
+
+    [TestMethod]
     public void BuildContext_UserContext_ShouldSetContext()
     {
         // Arrange
@@ -45,7 +59,7 @@ public class ContextUtilityTests
         };
 
         var jwt = JwtFaker.Generate(userId, externalAuthId, orgRoles);
-        StringValues headerValue = jwt;
+        StringValues headerValue = $"Bearer {jwt}";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
@@ -77,7 +91,7 @@ public class ContextUtilityTests
     {
         // Arrange
         var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid());
-        StringValues headerValue = jwt;
+        StringValues headerValue = $"Bearer {jwt}";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
@@ -98,7 +112,7 @@ public class ContextUtilityTests
     public void BuildContext_UserContext_InvalidJwt_ShouldThrow()
     {
         // Arrange
-        StringValues headerValue = "not a token";
+        StringValues headerValue = "Bearer not_a_token";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
@@ -125,7 +139,7 @@ public class ContextUtilityTests
         };
 
         var jwt = JwtFaker.Generate(userId, externalAuthId, orgRoles);
-        StringValues headerValue = jwt;
+        StringValues headerValue = $"Bearer {jwt}";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
@@ -147,7 +161,7 @@ public class ContextUtilityTests
         var orgRoles = new List<KeyValuePair<Guid, string>> { };
 
         var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid(), orgRoles, roles);
-        StringValues headerValue = jwt;
+        StringValues headerValue = $"Bearer {jwt}";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
@@ -161,7 +175,7 @@ public class ContextUtilityTests
         // Assert
         context.Should().BeOfType<UserContext>();
         var userContext = (UserContext)context;
-        
+
         userContext.Roles.Length.Should().Be(1);
         userContext.Roles.Single().Should().Be("GlobalAdmin");
     }
@@ -170,7 +184,7 @@ public class ContextUtilityTests
     public void GetRequiredContext_ContextMatchesRequestedType_ShouldReturnContext()
     {
         var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid());
-        StringValues headerValue = jwt;
+        StringValues headerValue = $"Bearer {jwt}";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
