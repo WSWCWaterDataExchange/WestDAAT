@@ -7,6 +7,14 @@ on:
   workflow_dispatch:
 
 jobs:
+  # TODO replicate for staging/prod after testing
+  deploy-infrastructure:
+    uses: ./.github/workflows/deploy-infrastructure.yml
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-bicep-params-file: azuredeploy.qa.json
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
   deploy-backend:
     uses: ./.github/workflows/deploy-backend.yml
     with:
