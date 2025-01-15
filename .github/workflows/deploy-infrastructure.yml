@@ -44,5 +44,5 @@ jobs:
           scope: resourceGroup
           resource-group-name: ${{ inputs.azure-resource-group }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-          template-file: ./azuredeploy.bicep
-          parameters-file: ./${{ inputs.azure-bicep-params-file }}
+          template-file: ./infrastructure/azuredeploy.bicep
+          parameters-file: ./infrastructure/${{ inputs.azure-bicep-params-file }}
