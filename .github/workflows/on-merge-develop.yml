@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # TODO replicate for staging/prod after testing
   deploy-infrastructure:
     uses: ./.github/workflows/deploy-infrastructure.yml
     with:
