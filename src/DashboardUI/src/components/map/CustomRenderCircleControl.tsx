@@ -38,7 +38,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
       this._mapInstance = mapInstance;
 
-      this.resetSourcesAndLayers();
+      this.resetAllSourcesAndLayers();
       this.resetControlState();
       this.initializeSourcesAndLayers();
 
@@ -119,6 +119,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     circleData.cardinalMarkers = newMarkers;
 
     // 4. re-render
+    console.log('marker dragged');
     this.renderFinishedCirclesAndMarkersToMap();
   };
 
@@ -143,6 +144,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       cardinalMarkers: markers,
     });
     this._inProgressCircleCenterPoint = undefined;
+    console.log('finished in-progress circle, re-render');
     this.renderFinishedCirclesAndMarkersToMap();
   };
 
@@ -233,20 +235,18 @@ export class CustomRenderCircleControl extends CustomMapControl {
     });
   };
 
-  resetSourcesAndLayers = (): void => {
-    if (this._mapInstance.getLayer(circlesLayerId)) {
-      this._mapInstance.removeLayer(circlesLayerId);
+  resetSourceAndLayer = (sourceId: string, layerId: string): void => {
+    if (this._mapInstance.getLayer(layerId)) {
+      this._mapInstance.removeLayer(layerId);
     }
-    if (this._mapInstance.getSource(circlesSourceId)) {
-      this._mapInstance.removeSource(circlesSourceId);
+    if (this._mapInstance.getSource(sourceId)) {
+      this._mapInstance.removeSource(sourceId);
     }
+  };
 
-    if (this._mapInstance.getLayer(inProgressCircleLayerId)) {
-      this._mapInstance.removeLayer(inProgressCircleLayerId);
-    }
-    if (this._mapInstance.getSource(inProgressCircleSourceId)) {
-      this._mapInstance.removeSource(inProgressCircleSourceId);
-    }
+  resetAllSourcesAndLayers = (): void => {
+    this.resetSourceAndLayer(circlesSourceId, circlesLayerId);
+    this.resetSourceAndLayer(inProgressCircleSourceId, inProgressCircleLayerId);
   };
 
   resetControlState = (): void => {
@@ -260,6 +260,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   renderFinishedCirclesAndMarkersToMap = () => {
+    console.log('render circles and markers', this._circlesState);
     const circlesSource = this._mapInstance.getSource<GeoJSONSource>(circlesSourceId)!;
     circlesSource.setData({
       type: 'FeatureCollection',
@@ -277,6 +278,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this._inProgressCircleCenterPoint!,
       circleEdgePoint,
     );
+    console.log('render in progress circle', circle);
     const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
     source.setData({
       type: 'Feature',
