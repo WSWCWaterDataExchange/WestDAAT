@@ -46,31 +46,28 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
         this._mapInstance = mapInstance;
 
-        this.removeAllSourcesAndLayers();
-        this.resetControlState();
-        this.initializeSourcesAndLayers();
-
-        this.toggleMapEventListeners();
+        if (this._toolIsActive) {
+          // activate tool
+          this.initializeSourcesAndLayers();
+          this.enableMapEventListeners();
+        } else {
+          // deactivate tool
+          this.removeAllSourcesAndLayers();
+          this.resetControlState();
+          this.disableMapEventListeners();
+        }
       },
     );
   }
 
-  registerClickHandlers = (): void => {
+  enableMapEventListeners = (): void => {
     this._mapInstance.on('click', this.handleMouseClick);
     this._mapInstance.on('mousemove', this.handleMouseMove);
   };
 
-  deRegisterClickHandler = (): void => {
+  disableMapEventListeners = (): void => {
     this._mapInstance.off('click', this.handleMouseClick);
     this._mapInstance.off('mousemove', this.handleMouseMove);
-  };
-
-  toggleMapEventListeners = (): void => {
-    if (this._toolIsActive) {
-      this.registerClickHandlers();
-    } else {
-      this.deRegisterClickHandler();
-    }
   };
 
   handleMouseClick = (e: MapMouseEvent) => {
