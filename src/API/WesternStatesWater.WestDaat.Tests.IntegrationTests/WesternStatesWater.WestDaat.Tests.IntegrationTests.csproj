@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Client.Functions\WesternStatesWater.WestDaat.Client.Functions.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Managers\WesternStatesWater.WestDaat.Managers.csproj" />
   </ItemGroup>
   <ItemGroup>

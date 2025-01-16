@@ -1,0 +1,149 @@
+# This workflow is environment agnostic and can be used to deploy to any environment.
+# This workflow will be called by the environment specific workflows (qa/prod/etc).
+
+name: Deploy Backend
+
+env:
+  FUNCTION_APP_DIR: "src/API/WesternStatesWater.WestDaat.Client.Functions"
+  DOTNET_VERSION: "8.0.x"
+
+on:
+  workflow_call:
+    inputs:
+      azure-resource-group:
+        description: "The resource group name in Azure"
+        required: true
+        type: string
+      azure-functionapp-name:
+        description: "The name of the Azure Function App"
+        required: true
+        type: string
+      azure-apim-name:
+        description: "The name of the Azure API Management service"
+        required: true
+        type: string
+      azure-api-name:
+        description: "The name of the API in Azure API Management"
+        required: true
+        type: string
+      azure-api-url:
+        description: "The URL of the API in Azure API Management"
+        required: true
+        type: string
+      azure-auth-tenant-name:
+        description: "The Azure B2C tenant name"
+        required: true
+        type: string
+      azure-auth-audience:
+        description: "The Azure B2C audience"
+        required: true
+        type: string
+      azure-cors-domain:
+        description: "The domain to allow CORS requests from"
+        required: true
+        type: string
+    secrets:
+      azure-function-publish-profile:
+        description: "The publish profile for the Azure Function App"
+        required: true
+      azure-cli-credentials:
+        description: "The credentials for the Azure CLI"
+        required: true
+
+jobs:
+  deploy-funtion-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FUNCTION_APP_DIR }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: "Build Function App"
+        run: dotnet build --configuration Release --output ./fnapp
+      - name: "Deploy Function App"
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ inputs.azure-functionapp-name }}
+          package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
+          publish-profile: ${{ secrets.azure-function-publish-profile }}
+
+  deploy-apim-api:
+    runs-on: ubuntu-latest
+    needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: .github/workflows
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Required to run func commands in the generation shell script
+      - name: Install Azure Functions Core Tools
+        run: sudo apt-get install -y azure-functions-core-tools-4
+
+      # Need permissions to run the script
+      - name: Update OpenAPI Script Permissions
+        run: chmod 777 ./get-openapi-document.sh
+
+      # Generate OpenAPI document via shell script
+      - name: Generate OpenAPI document
+        id: oai
+        run: ./get-openapi-document.sh -d 60 -p ${{ env.FUNCTION_APP_DIR }} -o ".github/workflows"
+
+      - name: Check generated OpenAPI document
+        run: cat swagger.json
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+          enable-AzPSSession: true # Required for Azure Powershell to work
+
+      - name: Deploy API to APIM
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
+              --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api' \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --service-url ${{ inputs.azure-api-url }} --subscription-required false
+
+      # Using powershell since setting APIM policies aren't supported in azure cli (yet)
+      - name: Apply APIM API Policies
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            # Find and replace variables for current environment
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}') | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')    | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')      | Set-Content ./infrastructure/apim_policies.xml
+
+            # Print file contents
+            get-content ./infrastructure/apim_policies.xml
+
+            # Set Policies in Azure. Raw+xml format is required
+            $apimContext = New-AzApiManagementContext `
+              -ResourceGroupName ${{ inputs.azure-resource-group }} `
+              -ServiceName ${{ inputs.azure-apim-name }}
+
+            Set-AzApiManagementPolicy `
+              -Context $apimContext `
+              -ApiId ${{ inputs.azure-api-name }} `
+              -PolicyFilePath ./infrastructure/apim_policies.xml `
+              -Format application/vnd.ms-azure-apim.policy.raw+xml
+          
+
+      - name: Azure cli logout
+        run: |
+          az logout
+        if: always()

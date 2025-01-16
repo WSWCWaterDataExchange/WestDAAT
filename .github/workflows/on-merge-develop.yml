@@ -1,39 +1,4 @@
-# This workflow will build and push a .NET Core app to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net60&pivots=development-environment-vscode
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
-
 name: Deploy QA
-
-env:
-  FUNCTION_APP_DIR: 'src/API/WesternStatesWater.WestDaat.Client.Functions'
-  REACT_APP_WEBAPI_URL: 'https://westdaat-qa.azurewebsites.net/api/'
-  REACT_APP_AUTH_REDIRECT_URL: 'https://westdaatqa.westernstateswater.org/authredirect.html' # the URL used by Azure B2C to redirect to your app after login
-  REACT_APP_AUTH_CLIENT_ID: 'ab3cf308-8a7e-404e-977c-d0227f4a48c4'
-  REACT_APP_AUTH_AUTHORITY: 'https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin'
-  REACT_APP_AUTH_KNOWN_AUTHORITY: 'https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com'
-  REACT_APP_GA_ID: 'G-KFL0TGM4B8'             # set the Google Analytics measurement ID
-  AZURE_RESOURCE_GROUP: WestDAAT_QA           # set the resource group name
-  AZURE_FUNCTIONAPP_NAME: westdaat-qa         # set this to the name of your Azure Web App
-  AZURE_STORAGE_ACCOUNT_NAME: westdaatqa      # set the storage account of static site
-  AZURE_CDN_ENDPOINT_NAME: westdaatqa         # set the storage account of static site
-  AZURE_CDN_PROFILE_NAME: westdaatqa          # set the cdn profile name
-  DOTNET_VERSION: '8.0.x'                     # set this to the .NET Core version to use
-  NODE_VERSION: '16.x'                        # set this to the node version to use
 
 on:
   push:
@@ -42,69 +7,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-funtion-app:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.FUNCTION_APP_DIR }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: 'Build Function App'
-        run: dotnet build --configuration Release --output ./fnapp
-      - name: 'Deploy Function App'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.FUNCTION_APP_DIR }}/fnapp'
-          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
-
-  deploy-static-site:
-    runs-on: ubuntu-latest
-    needs: deploy-funtion-app
-    defaults:
-      run:
-        working-directory: src/DashboardUI
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache-dependency-path: ./src/DashboardUI/package-lock.json
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: rm build/robots.allowall.txt
-    
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-          creds: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
-
-    - name: Upload to blob storage
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-            az storage blob upload-batch --destination '$web' --source 'src/DashboardUI/build' --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key --overwrite
-    
-    - name: Purge CDN endpoint
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az cdn endpoint purge --content-paths  "/*" --profile-name ${{ env.AZURE_CDN_PROFILE_NAME }} --name ${{ env.AZURE_CDN_ENDPOINT_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
-
-    - name: Azure cli logout
-      run: |
-            az logout
-      if: always()
-
+  deploy-infrastructure:
+    uses: ./.github/workflows/deploy-infrastructure.yml
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-bicep-params-file: azuredeploy.qa.json
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+  deploy-backend:
+    uses: ./.github/workflows/deploy-backend.yml
+    needs: deploy-infrastructure
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-functionapp-name: westdaat-qa
+      azure-apim-name: westdaatqa
+      azure-api-name: westdaat-fn-api-qa
+      azure-api-url: https://westdaat-qa.azurewebsites.net/api
+      azure-auth-tenant-name: westdaatqa
+      azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # App Registration ID
+      azure-cors-domain: https://westdaatqa.westernstateswater.org
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+      azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
+  deploy-frontend:
+    uses: ./.github/workflows/deploy-frontend.yml
+    needs: deploy-backend
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-storage-account-name: westdaatqa
+      azure-cdn-endpoint-name: westdaatqa
+      azure-cdn-profile-name: westdaatqa
+      react-app-auth-redirect-url: https://westdaatqa.westernstateswater.org/authredirect.html
+      react-app-webapi-url: https://westdaat-qa.azurewebsites.net/api/
+      react-app-auth-client-id: ab3cf308-8a7e-404e-977c-d0227f4a48c4
+      react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin
+      react-app-auth-known-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com
+      react-app-ga-id: G-KFL0TGM4B8
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}

@@ -39,6 +39,7 @@ var host = new HostBuilder()
         var configuration = context.Configuration;
 
         services.AddHttpContextAccessor();
+        services.AddOpenApi();
 
         // Config
         services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
@@ -47,6 +48,7 @@ var host = new HostBuilder()
         services.AddScoped(_ => configuration.GetNldiConfiguration());
         services.AddScoped(_ => configuration.GetPerformanceConfiguration());
         services.AddScoped(_ => configuration.GetSmtpConfiguration());
+        services.AddScoped(_ => configuration.GetOpenEtConfiguration());
 
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
@@ -94,6 +96,11 @@ var host = new HostBuilder()
         services.AddHttpClient<IUsgsNldiSdk, UsgsNldiSdk>(a =>
         {
             a.BaseAddress = new Uri(configuration.GetUsgsNldiServiceConfiguration().BaseAddress);
+        });
+
+        services.AddHttpClient<IOpenEtSdk, OpenEtSdk>(a =>
+        {
+            a.BaseAddress = new Uri(configuration.GetOpenEtConfiguration().BaseAddress);
         });
 
         services.AddLogging(logging =>
