@@ -23,6 +23,9 @@ interface CirclesState {
   circleFeatures: CircleData[];
 }
 
+/**
+ * Custom control for drawing multiple resizable circles on the map.
+ */
 export class CustomRenderCircleControl extends CustomMapControl {
   private _mapInstance!: MapInstance;
   private _toolIsActive: boolean = false;
@@ -33,17 +36,21 @@ export class CustomRenderCircleControl extends CustomMapControl {
   private _inProgressCircleCenterPoint: number[] | undefined;
 
   constructor(mapInstance: MapInstance) {
-    super(mdiCircle, `circle tool`, () => {
-      this.toggleToolActive();
+    super(
+      mdiCircle,
+      `multiple circle tool - click to activate, click again to deactivate and remove circles from the map`,
+      () => {
+        this.toggleToolActive();
 
-      this._mapInstance = mapInstance;
+        this._mapInstance = mapInstance;
 
-      this.removeAllSourcesAndLayers();
-      this.resetControlState();
-      this.initializeSourcesAndLayers();
+        this.removeAllSourcesAndLayers();
+        this.resetControlState();
+        this.initializeSourcesAndLayers();
 
-      this.toggleMapEventListeners();
-    });
+        this.toggleMapEventListeners();
+      },
+    );
   }
 
   registerClickHandlers = (): void => {
