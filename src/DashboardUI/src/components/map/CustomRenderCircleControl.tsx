@@ -4,15 +4,20 @@ import { circle, distance } from '@turf/turf';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import { CustomLayerInterface, GeoJSONSource, LayerSpecification, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
 
-const circleLayerId: string = 'circle-layer';
-const circleSource: string = 'circle-source';
+const circlesLayerId: string = 'circle-layer';
+const circlesSource: string = 'circle-source';
+
+const inProgressCircleLayerId: string = 'in-progress-circle-layer';
+const inProgressCircleSource: string = 'in-progress-circle-source';
+
+type Circle = Feature<Polygon, GeoJsonProperties>;
 
 export class CustomRenderCircleControl extends CustomMapControl {
   private _mapInstance!: MapInstance;
   private _toolIsActive: boolean = false;
 
-  private _circleCenterPoint: number[] | undefined;
-  private _circleEdgePoint: number[] | undefined;
+  private _circleFeatures: Circle[] = [];
+  private _inProgressCircleCenterPoint: number[] | undefined;
 
   constructor(mapInstance: MapInstance) {
     super(mdiCircle, `circle tool`, () => {
@@ -20,15 +25,15 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
       this._mapInstance = mapInstance;
 
-      this.resetSourceAndLayer();
-      this.initializeSourceAndLayer();
+      this.resetSourcesAndLayers();
+      this.initializeSourcesAndLayers();
 
-      this.handleToolClicked();
+      this.toggleMapEventListeners();
     });
   }
 
   getCircleLayer = (): LayerSpecification | CustomLayerInterface | undefined => {
-    return this._mapInstance.getLayer(circleLayerId);
+    return this._mapInstance.getLayer(circlesLayerId);
   };
 
   registerClickHandlers = (): void => {
@@ -41,56 +46,78 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._mapInstance.off('mousemove', this.handleMouseMove);
   };
 
-  handleToolClicked = (): void => {
+  toggleMapEventListeners = (): void => {
     if (this._toolIsActive) {
       this.registerClickHandlers();
     } else {
       this.deRegisterClickHandler();
-      this.resetSourceAndLayer();
+      this.resetSourcesAndLayers();
       this.resetControlState();
     }
   };
 
   handleMouseClick = (e: MapMouseEvent) => {
     const coords = [e.lngLat.lng, e.lngLat.lat];
-    if (!this._circleCenterPoint) {
-      this._circleCenterPoint = coords;
-      console.log('click 1, set center', this._circleCenterPoint);
+    if (!this._inProgressCircleCenterPoint) {
+      this._inProgressCircleCenterPoint = coords;
     } else {
-      this._circleEdgePoint = coords;
-      console.log('click 2, set edge', this._circleEdgePoint);
-
-      this.renderCircle(this._circleCenterPoint!, this._circleEdgePoint!);
+      const circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
+        this._inProgressCircleCenterPoint,
+        coords,
+      );
+      this._circleFeatures.push(circleFeature);
+      this._inProgressCircleCenterPoint = undefined;
+      this.renderCirclesToMap();
     }
   };
 
   handleMouseMove = (e: MapMouseEvent) => {
-    // render the potential circle only while the first coord is set and the second coord is not set
-    if (!this._circleCenterPoint || this._circleEdgePoint) {
+    // render the potential circle only while the first coord is set
+    if (!this._inProgressCircleCenterPoint) {
       return;
     }
     const coords = [e.lngLat.lng, e.lngLat.lat];
-    this.renderCircle(this._circleCenterPoint, coords);
+    this.renderInProgressCircle(coords);
   };
 
-  renderCircle = (circleCenterPoint: number[], circleEdgePoint: number[]) => {
+  generateCircleWithRadiusFromCenterPointToEdgePoint = (
+    circleCenterPoint: number[],
+    circleEdgePoint: number[],
+  ): Circle => {
     const distanceFromCircleCenterToMouseInKm = distance(circleCenterPoint, circleEdgePoint, {
       units: 'kilometers',
     });
-    const circleFeature = this.generateCircleAtPoint(circleCenterPoint, distanceFromCircleCenterToMouseInKm);
-    this.renderGeoJsonPolygonToMap(this._mapInstance, circleFeature);
+    return this.generateCircleAtPoint(circleCenterPoint, distanceFromCircleCenterToMouseInKm);
   };
 
   toggleToolActive = (): void => {
     this._toolIsActive = !this._toolIsActive;
   };
 
-  generateCircleAtPoint(point: number[], radiusInKm: number): Feature<Polygon, GeoJsonProperties> {
+  generateCircleAtPoint(point: number[], radiusInKm: number): Circle {
     return circle(point, radiusInKm, { steps: 100 });
   }
 
-  initializeSourceAndLayer = (): void => {
-    this._mapInstance.addSource(circleSource, {
+  initializeSourcesAndLayers = (): void => {
+    this._mapInstance.addSource(circlesSource, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    this._mapInstance.addLayer({
+      id: circlesLayerId,
+      type: 'fill',
+      source: circlesSource,
+      paint: {
+        'fill-color': 'orange',
+        'fill-opacity': 0.5,
+      },
+    });
+
+    this._mapInstance.addSource(inProgressCircleSource, {
       type: 'geojson',
       data: {
         type: 'Feature',
@@ -103,9 +130,9 @@ export class CustomRenderCircleControl extends CustomMapControl {
     });
 
     this._mapInstance.addLayer({
-      id: circleLayerId,
+      id: inProgressCircleLayerId,
       type: 'fill',
-      source: circleSource,
+      source: inProgressCircleSource,
       paint: {
         'fill-color': 'orange',
         'fill-opacity': 0.5,
@@ -113,22 +140,45 @@ export class CustomRenderCircleControl extends CustomMapControl {
     });
   };
 
-  resetSourceAndLayer = (): void => {
-    if (this._mapInstance.getLayer(circleLayerId)) {
-      this._mapInstance.removeLayer(circleLayerId);
+  resetSourcesAndLayers = (): void => {
+    if (this._mapInstance.getLayer(circlesLayerId)) {
+      this._mapInstance.removeLayer(circlesLayerId);
     }
-    if (this._mapInstance.getSource(circleSource)) {
-      this._mapInstance.removeSource(circleSource);
+    if (this._mapInstance.getSource(circlesSource)) {
+      this._mapInstance.removeSource(circlesSource);
+    }
+
+    if (this._mapInstance.getLayer(inProgressCircleLayerId)) {
+      this._mapInstance.removeLayer(inProgressCircleLayerId);
+    }
+    if (this._mapInstance.getSource(inProgressCircleSource)) {
+      this._mapInstance.removeSource(inProgressCircleSource);
     }
   };
 
   resetControlState = (): void => {
-    this._circleCenterPoint = undefined;
-    this._circleEdgePoint = undefined;
+    this._inProgressCircleCenterPoint = undefined;
+    this._circleFeatures = [];
   };
 
-  renderGeoJsonPolygonToMap = (mapInstance: MapInstance, polygon: Feature<Polygon, GeoJsonProperties>) => {
-    const source: GeoJSONSource = mapInstance.getSource(circleSource)!;
-    source.setData(polygon);
+  renderCirclesToMap = () => {
+    const source: GeoJSONSource = this._mapInstance.getSource(circlesSource)!;
+    source.setData({
+      type: 'FeatureCollection',
+      features: this._circleFeatures,
+    });
+  };
+
+  renderInProgressCircle = (circleEdgePoint: number[]) => {
+    const circle = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
+      this._inProgressCircleCenterPoint!,
+      circleEdgePoint,
+    );
+    const source: GeoJSONSource = this._mapInstance.getSource(inProgressCircleSource)!;
+    source.setData({
+      type: 'Feature',
+      properties: {},
+      geometry: circle.geometry,
+    });
   };
 }
