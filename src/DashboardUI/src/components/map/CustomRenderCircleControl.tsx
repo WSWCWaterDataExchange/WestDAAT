@@ -1,6 +1,8 @@
 import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
-import { circle, destination, distance } from '@turf/turf';
+import { circle } from '@turf/circle';
+import { destination } from '@turf/destination';
+import { distance } from '@turf/distance';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import { GeoJSONSource, Map as MapInstance, MapMouseEvent, Marker } from 'mapbox-gl';
 
