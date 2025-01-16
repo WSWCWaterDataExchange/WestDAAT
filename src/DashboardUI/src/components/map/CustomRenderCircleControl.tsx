@@ -107,7 +107,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     );
 
     // update circle's markers
-    // 1. remove markers, excluding the one being dragged
+    // 1. remove markers from the map, excluding the one being dragged
     circleData.cardinalMarkers.forEach((m) => {
       if (m !== marker) {
         m.remove();
@@ -119,7 +119,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     const newMarkers = this.generateMarkersForCircle(circleData.centerPoint, circleData.edgePoint);
     newMarkers[markerIndex] = marker;
 
-    // 3. attach to state
+    // 3. overwrite markers in state
     circleData.cardinalMarkers = newMarkers;
 
     // 4. re-render
