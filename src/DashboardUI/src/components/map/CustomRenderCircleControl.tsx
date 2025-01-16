@@ -74,6 +74,15 @@ export class CustomRenderCircleControl extends CustomMapControl {
     }
   };
 
+  handleMouseMove = (e: MapMouseEvent) => {
+    // render the potential circle only while the first coord is set
+    if (!this._inProgressCircleCenterPoint) {
+      return;
+    }
+    const coords = [e.lngLat.lng, e.lngLat.lat];
+    this.renderInProgressCircle(coords);
+  };
+
   startInProgressCircle = (coords: number[]): void => {
     this._inProgressCircleCenterPoint = coords;
   };
@@ -96,15 +105,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
     });
     this._inProgressCircleCenterPoint = undefined;
     this.renderFinishedCirclesAndMarkersToMap();
-  };
-
-  handleMouseMove = (e: MapMouseEvent) => {
-    // render the potential circle only while the first coord is set
-    if (!this._inProgressCircleCenterPoint) {
-      return;
-    }
-    const coords = [e.lngLat.lng, e.lngLat.lat];
-    this.renderInProgressCircle(coords);
   };
 
   generateCircleWithRadiusFromCenterPointToEdgePoint = (
@@ -133,8 +133,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       )
       .map((dest) => {
         return new Marker({
-          // location?
-          offset: [0, 0],
+          draggable: true,
         }).setLngLat(dest.geometry.coordinates as [number, number]);
       });
 
