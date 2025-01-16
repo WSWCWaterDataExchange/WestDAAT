@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  # deploy-infrastructure:
-  #   uses: ./.github/workflows/deploy-infrastructure.yml
-  #   with:
-  #     azure-resource-group: WestDAAT_QA
-  #     azure-bicep-params-file: azuredeploy.qa.json
-  #   secrets:
-  #     azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+  deploy-infrastructure:
+    uses: ./.github/workflows/deploy-infrastructure.yml
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-bicep-params-file: azuredeploy.qa.json
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
   deploy-backend:
     uses: ./.github/workflows/deploy-backend.yml
-    # needs: deploy-infrastructure
+    needs: deploy-infrastructure
     with:
       azure-resource-group: WestDAAT_QA
       azure-functionapp-name: westdaat-qa
@@ -29,19 +29,19 @@ jobs:
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
-  # deploy-frontend:
-  #   uses: ./.github/workflows/deploy-frontend.yml
-  #   needs: deploy-backend
-  #   with:
-  #     azure-resource-group: WestDAAT_QA
-  #     azure-storage-account-name: westdaatqa
-  #     azure-cdn-endpoint-name: westdaatqa
-  #     azure-cdn-profile-name: westdaatqa
-  #     react-app-auth-redirect-url: https://westdaatqa.westernstateswater.org/authredirect.html
-  #     react-app-webapi-url: https://westdaat-qa.azurewebsites.net/api/
-  #     react-app-auth-client-id: ab3cf308-8a7e-404e-977c-d0227f4a48c4
-  #     react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin
-  #     react-app-auth-known-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com
-  #     react-app-ga-id: G-KFL0TGM4B8
-  #   secrets:
-  #     azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
+  deploy-frontend:
+    uses: ./.github/workflows/deploy-frontend.yml
+    needs: deploy-backend
+    with:
+      azure-resource-group: WestDAAT_QA
+      azure-storage-account-name: westdaatqa
+      azure-cdn-endpoint-name: westdaatqa
+      azure-cdn-profile-name: westdaatqa
+      react-app-auth-redirect-url: https://westdaatqa.westernstateswater.org/authredirect.html
+      react-app-webapi-url: https://westdaat-qa.azurewebsites.net/api/
+      react-app-auth-client-id: ab3cf308-8a7e-404e-977c-d0227f4a48c4
+      react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin
+      react-app-auth-known-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com
+      react-app-ga-id: G-KFL0TGM4B8
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}

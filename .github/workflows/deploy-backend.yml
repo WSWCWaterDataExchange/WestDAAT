@@ -129,7 +129,6 @@ jobs:
               --query functionKeys.default \
               --output tsv)
             echo "FN_APP_KEY=$FN_APP_KEY" >> $GITHUB_ENV
-            echo $FN_APP_KEY
 
       # Using powershell since setting APIM policies aren't supported in azure cli (yet)
       - name: Apply APIM API Policies
