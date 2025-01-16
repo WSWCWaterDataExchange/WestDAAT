@@ -264,21 +264,19 @@ export class CustomRenderCircleControl extends CustomMapControl {
     // north, east, south, west
     const cardinalDirectionBearings = [0, 90, 180, 270];
 
-    const circleMarkersAtCardinalPoints: Marker[] = cardinalDirectionBearings
-      .map((bearing) =>
-        destination(circleCenterPoint, distanceFromCenterToEdgeInKm, bearing, {
-          units: 'kilometers',
-        }),
-      )
-      .map((dest) => {
-        const marker = new Marker({
-          draggable: true,
-        }).setLngLat(dest.geometry.coordinates as [number, number]);
-
-        marker.on('drag', this.handleMarkerDrag);
-
-        return marker;
+    const circleMarkersAtCardinalPoints: Marker[] = cardinalDirectionBearings.map((bearing) => {
+      const markerPositionAtCardinalPoint = destination(circleCenterPoint, distanceFromCenterToEdgeInKm, bearing, {
+        units: 'kilometers',
       });
+
+      const marker = new Marker({
+        draggable: true,
+      }).setLngLat(markerPositionAtCardinalPoint.geometry.coordinates as [number, number]);
+
+      marker.on('drag', this.handleMarkerDrag);
+
+      return marker;
+    });
 
     return circleMarkersAtCardinalPoints;
   };
