@@ -10,6 +10,9 @@ const circlesSource: string = 'circle-source';
 const inProgressCircleLayerId: string = 'in-progress-circle-layer';
 const inProgressCircleSource: string = 'in-progress-circle-source';
 
+const circleHandlesLayerId: string = 'circle-handles-layer';
+const circleHandlesSource: string = 'circle-handles-source';
+
 type CircleFeature = Feature<Polygon, GeoJsonProperties>;
 
 interface CircleData {
@@ -150,6 +153,24 @@ export class CustomRenderCircleControl extends CustomMapControl {
         'fill-opacity': 0.5,
       },
     });
+
+    this._mapInstance.addSource(circleHandlesSource, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    this._mapInstance.addLayer({
+      id: circleHandlesLayerId,
+      type: 'fill',
+      source: circleHandlesSource,
+      paint: {
+        'fill-color': 'orange',
+        'fill-opacity': 1,
+      },
+    });
   };
 
   resetSourcesAndLayers = (): void => {
@@ -165,6 +186,13 @@ export class CustomRenderCircleControl extends CustomMapControl {
     }
     if (this._mapInstance.getSource(inProgressCircleSource)) {
       this._mapInstance.removeSource(inProgressCircleSource);
+    }
+
+    if (this._mapInstance.getLayer(circleHandlesLayerId)) {
+      this._mapInstance.removeLayer(circleHandlesLayerId);
+    }
+    if (this._mapInstance.getSource(circleHandlesSource)) {
+      this._mapInstance.removeSource(circleHandlesSource);
     }
   };
 
