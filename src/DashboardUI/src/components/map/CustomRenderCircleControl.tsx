@@ -1,6 +1,6 @@
 import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
-import { circle, distance } from '@turf/turf';
+import { center, circle, distance } from '@turf/turf';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import { GeoJSONSource, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
 
@@ -10,13 +10,25 @@ const circlesSource: string = 'circle-source';
 const inProgressCircleLayerId: string = 'in-progress-circle-layer';
 const inProgressCircleSource: string = 'in-progress-circle-source';
 
-type Circle = Feature<Polygon, GeoJsonProperties>;
+type CircleFeature = Feature<Polygon, GeoJsonProperties>;
+
+interface CircleData {
+  centerPoint: number[];
+  edgePoint: number[];
+  feature: CircleFeature;
+}
+
+interface CirclesState {
+  circleFeatures: CircleData[];
+}
 
 export class CustomRenderCircleControl extends CustomMapControl {
   private _mapInstance!: MapInstance;
   private _toolIsActive: boolean = false;
 
-  private _circleFeatures: Circle[] = [];
+  private _circlesState: CirclesState = {
+    circleFeatures: [],
+  };
   private _inProgressCircleCenterPoint: number[] | undefined;
 
   constructor(mapInstance: MapInstance) {
@@ -61,7 +73,11 @@ export class CustomRenderCircleControl extends CustomMapControl {
         this._inProgressCircleCenterPoint,
         coords,
       );
-      this._circleFeatures.push(circleFeature);
+      this._circlesState.circleFeatures.push({
+        centerPoint: this._inProgressCircleCenterPoint,
+        edgePoint: coords,
+        feature: circleFeature,
+      });
       this._inProgressCircleCenterPoint = undefined;
       this.renderFinishedCirclesToMap();
     }
@@ -79,7 +95,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   generateCircleWithRadiusFromCenterPointToEdgePoint = (
     circleCenterPoint: number[],
     circleEdgePoint: number[],
-  ): Circle => {
+  ): CircleFeature => {
     const distanceFromCircleCenterToMouseInKm = distance(circleCenterPoint, circleEdgePoint, {
       units: 'kilometers',
     });
@@ -90,7 +106,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._toolIsActive = !this._toolIsActive;
   };
 
-  generateCircleAtPoint(point: number[], radiusInKm: number): Circle {
+  generateCircleAtPoint(point: number[], radiusInKm: number): CircleFeature {
     return circle(point, radiusInKm, { steps: 100 });
   }
 
@@ -154,14 +170,16 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
   resetControlState = (): void => {
     this._inProgressCircleCenterPoint = undefined;
-    this._circleFeatures = [];
+    this._circlesState = {
+      circleFeatures: [],
+    };
   };
 
   renderFinishedCirclesToMap = () => {
     const source = this._mapInstance.getSource<GeoJSONSource>(circlesSource)!;
     source.setData({
       type: 'FeatureCollection',
-      features: this._circleFeatures,
+      features: this._circlesState.circleFeatures.map((circleData) => circleData.feature),
     });
   };
 
