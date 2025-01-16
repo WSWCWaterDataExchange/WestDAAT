@@ -83,6 +83,28 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this.renderInProgressCircle(coords);
   };
 
+  handleMarkerDrag = (e: { type: 'drag'; target: Marker }): void => {
+    const marker = e.target;
+
+    // find existing marker
+    const circleData = this._circlesState.circleFeatures.find((circleData) =>
+      circleData.cardinalMarkers.includes(marker),
+    );
+
+    // marker is attached to a circle - update the circle to match the marker's new location
+    if (circleData) {
+      const markerCoords = marker.getLngLat();
+      circleData.edgePoint = [markerCoords.lng, markerCoords.lat];
+
+      circleData.circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
+        circleData.centerPoint,
+        circleData.edgePoint,
+      );
+
+      this.renderFinishedCirclesAndMarkersToMap();
+    }
+  };
+
   startInProgressCircle = (coords: number[]): void => {
     this._inProgressCircleCenterPoint = coords;
   };
@@ -132,9 +154,13 @@ export class CustomRenderCircleControl extends CustomMapControl {
         }),
       )
       .map((dest) => {
-        return new Marker({
+        const marker = new Marker({
           draggable: true,
         }).setLngLat(dest.geometry.coordinates as [number, number]);
+
+        marker.on('drag', this.handleMarkerDrag);
+
+        return marker;
       });
 
     return circleMarkersAtCardinalPoints;
