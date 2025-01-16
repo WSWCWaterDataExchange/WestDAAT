@@ -1,7 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Helpers.Errors.Model;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
@@ -13,6 +15,12 @@ public class ContextUtilityTests
 {
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 
+    private readonly IdentityProviderConfiguration _identityProviderConfigurationMock = new()
+    {
+        ApiConnectorUsername = "tmctesterson",
+        ApiConnectorPassword = "secretpassword"
+    };
+
     [TestMethod]
     public void BuildContext_AnonymousContext_ShouldSetContext()
     {
@@ -22,23 +30,64 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(false);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = new ContextUtility(_httpContextAccessorMock.Object, _identityProviderConfigurationMock);
 
         utility.GetContext().Should().BeOfType<AnonymousContext>();
     }
 
     [TestMethod]
-    public void BuildContext_AnonymousContext_BasicAuth_ShouldSetContext()
+    public void BuildContext_IdentityProviderContext_ShouldSetContext()
     {
-        StringValues headerValue = "Basic base64encodedstring";
+        StringValues headerValue = "Basic dG1jdGVzdGVyc29uOnNlY3JldHBhc3N3b3Jk";
 
         _httpContextAccessorMock
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
-        utility.GetContext().Should().BeOfType<AnonymousContext>();
+        utility.GetContext().Should().BeOfType<IdentityProviderContext>();
+    }
+
+    [DataTestMethod]
+    [DataRow("Basic username_only")]
+    [DataRow("Basic too:many:parts")]
+    [DataRow("Basic ")]
+    public void BuildContext_IdentityProviderContext_InvalidFormat_ShouldThrow(string basicValue)
+    {
+        var base64Value = Convert.ToBase64String(Encoding.UTF8.GetBytes(basicValue));
+        StringValues headerValue = $"Basic {base64Value}";
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = BuildContextUtility();
+
+        Action action = () => utility.GetContext();
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("Basic auth header is not in a valid format.");
+    }
+    
+    [DataTestMethod]
+    [DataRow("Basic mctesterson:wrongpassword")]
+    [DataRow("Basic wrongusername:supersecretpassword")]
+    public void BuildContext_IdentityProviderContext_InvalidCredentials_ShouldThrow(string basicValue)
+    {
+        var base64Value = Convert.ToBase64String(Encoding.UTF8.GetBytes(basicValue));
+        StringValues headerValue = $"Basic {base64Value}";
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = BuildContextUtility();
+
+        Action action = () => utility.GetContext();
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("Invalid username or password.");
     }
 
     [TestMethod]
@@ -65,7 +114,7 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
         // Act
         var context = utility.GetContext();
@@ -97,7 +146,7 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
         // Act
         var context = utility.GetContext();
@@ -118,8 +167,10 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
+        var utility = BuildContextUtility();
+
         // Act
-        Action action = () => new ContextUtility(_httpContextAccessorMock.Object);
+        var action = () => utility.GetContext();
 
         // Assert
         action.Should().Throw<InvalidOperationException>()
@@ -145,8 +196,10 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
+        var utility = BuildContextUtility();
+
         // Act
-        Action action = () => new ContextUtility(_httpContextAccessorMock.Object);
+        Action action = () => utility.GetContext();
 
         // Assert
         action.Should().Throw<UnauthorizedException>()
@@ -167,7 +220,7 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
         // Act
         var context = utility.GetContext();
@@ -190,7 +243,7 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(true);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
         utility.GetRequiredContext<UserContext>().Should().BeOfType<UserContext>();
     }
@@ -204,11 +257,17 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(false);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object);
+        var utility = BuildContextUtility();
 
+        // Act
         Action action = () => utility.GetRequiredContext<UserContext>();
 
         action.Should().Throw<InvalidOperationException>()
             .WithMessage("Context is of type 'AnonymousContext', not of the requested type 'UserContext'.");
+    }
+
+    private ContextUtility BuildContextUtility()
+    {
+        return new ContextUtility(_httpContextAccessorMock.Object, _identityProviderConfigurationMock);
     }
 }
