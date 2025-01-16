@@ -1,24 +1,26 @@
 import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
-import { center, circle, distance } from '@turf/turf';
-import { Feature, GeoJsonProperties, Polygon } from 'geojson';
+import { circle, destination, distance } from '@turf/turf';
+import { Feature, GeoJsonProperties, Point, Polygon } from 'geojson';
 import { GeoJSONSource, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
 
 const circlesLayerId: string = 'circle-layer';
-const circlesSource: string = 'circle-source';
+const circlesSourceId: string = 'circle-source';
 
 const inProgressCircleLayerId: string = 'in-progress-circle-layer';
-const inProgressCircleSource: string = 'in-progress-circle-source';
+const inProgressCircleSourceId: string = 'in-progress-circle-source';
 
 const circleHandlesLayerId: string = 'circle-handles-layer';
-const circleHandlesSource: string = 'circle-handles-source';
+const circleHandlesSourceId: string = 'circle-handles-source';
 
 type CircleFeature = Feature<Polygon, GeoJsonProperties>;
+type HandleFeature = Feature<Point, GeoJsonProperties>;
 
 interface CircleData {
   centerPoint: number[];
   edgePoint: number[];
-  feature: CircleFeature;
+  circleFeature: CircleFeature;
+  handleFeatures: HandleFeature[];
 }
 
 interface CirclesState {
@@ -70,20 +72,34 @@ export class CustomRenderCircleControl extends CustomMapControl {
   handleMouseClick = (e: MapMouseEvent) => {
     const coords = [e.lngLat.lng, e.lngLat.lat];
     if (!this._inProgressCircleCenterPoint) {
-      this._inProgressCircleCenterPoint = coords;
+      this.startInProgressCircle(coords);
     } else {
-      const circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
-        this._inProgressCircleCenterPoint,
-        coords,
-      );
-      this._circlesState.circleFeatures.push({
-        centerPoint: this._inProgressCircleCenterPoint,
-        edgePoint: coords,
-        feature: circleFeature,
-      });
-      this._inProgressCircleCenterPoint = undefined;
-      this.renderFinishedCirclesToMap();
+      this.finishInProgressCircle(coords);
     }
+  };
+
+  startInProgressCircle = (coords: number[]): void => {
+    this._inProgressCircleCenterPoint = coords;
+  };
+
+  finishInProgressCircle = (coords: number[]): void => {
+    // generate circle
+    const circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
+      this._inProgressCircleCenterPoint!,
+      coords,
+    );
+
+    // generate handles
+    const handleFeatures = this.generateHandlesForCircle(this._inProgressCircleCenterPoint!, coords);
+
+    this._circlesState.circleFeatures.push({
+      centerPoint: this._inProgressCircleCenterPoint!,
+      edgePoint: coords,
+      circleFeature,
+      handleFeatures,
+    });
+    this._inProgressCircleCenterPoint = undefined;
+    this.renderFinishedCirclesAndHandlesToMap();
   };
 
   handleMouseMove = (e: MapMouseEvent) => {
@@ -99,10 +115,27 @@ export class CustomRenderCircleControl extends CustomMapControl {
     circleCenterPoint: number[],
     circleEdgePoint: number[],
   ): CircleFeature => {
-    const distanceFromCircleCenterToMouseInKm = distance(circleCenterPoint, circleEdgePoint, {
+    const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
       units: 'kilometers',
     });
-    return this.generateCircleAtPoint(circleCenterPoint, distanceFromCircleCenterToMouseInKm);
+    return this.generateCircleAtPoint(circleCenterPoint, distanceFromCenterToEdgeInKm);
+  };
+
+  generateHandlesForCircle = (circleCenterPoint: number[], circleEdgePoint: number[]): HandleFeature[] => {
+    const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
+      units: 'kilometers',
+    });
+
+    // north, east, south, west
+    const cardinalDirectionBearings = [0, 90, 180, 270];
+
+    const circleHandlesAtCardinalPoints: HandleFeature[] = cardinalDirectionBearings.map((bearing) =>
+      destination(circleCenterPoint, distanceFromCenterToEdgeInKm, bearing, {
+        units: 'kilometers',
+      }),
+    );
+
+    return circleHandlesAtCardinalPoints;
   };
 
   toggleToolActive = (): void => {
@@ -114,7 +147,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   }
 
   initializeSourcesAndLayers = (): void => {
-    this._mapInstance.addSource(circlesSource, {
+    this._mapInstance.addSource(circlesSourceId, {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -125,14 +158,14 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._mapInstance.addLayer({
       id: circlesLayerId,
       type: 'fill',
-      source: circlesSource,
+      source: circlesSourceId,
       paint: {
         'fill-color': 'orange',
         'fill-opacity': 0.5,
       },
     });
 
-    this._mapInstance.addSource(inProgressCircleSource, {
+    this._mapInstance.addSource(inProgressCircleSourceId, {
       type: 'geojson',
       data: {
         type: 'Feature',
@@ -147,14 +180,14 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._mapInstance.addLayer({
       id: inProgressCircleLayerId,
       type: 'fill',
-      source: inProgressCircleSource,
+      source: inProgressCircleSourceId,
       paint: {
         'fill-color': 'orange',
         'fill-opacity': 0.5,
       },
     });
 
-    this._mapInstance.addSource(circleHandlesSource, {
+    this._mapInstance.addSource(circleHandlesSourceId, {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -164,11 +197,15 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
     this._mapInstance.addLayer({
       id: circleHandlesLayerId,
-      type: 'fill',
-      source: circleHandlesSource,
+      type: 'symbol',
+      source: circleHandlesSourceId,
+      layout: {
+        'icon-image': 'marker-15',
+        'icon-size': 2,
+        'icon-allow-overlap': true, // verify if needed
+      },
       paint: {
-        'fill-color': 'orange',
-        'fill-opacity': 1,
+        'icon-color': 'red',
       },
     });
   };
@@ -177,22 +214,22 @@ export class CustomRenderCircleControl extends CustomMapControl {
     if (this._mapInstance.getLayer(circlesLayerId)) {
       this._mapInstance.removeLayer(circlesLayerId);
     }
-    if (this._mapInstance.getSource(circlesSource)) {
-      this._mapInstance.removeSource(circlesSource);
+    if (this._mapInstance.getSource(circlesSourceId)) {
+      this._mapInstance.removeSource(circlesSourceId);
     }
 
     if (this._mapInstance.getLayer(inProgressCircleLayerId)) {
       this._mapInstance.removeLayer(inProgressCircleLayerId);
     }
-    if (this._mapInstance.getSource(inProgressCircleSource)) {
-      this._mapInstance.removeSource(inProgressCircleSource);
+    if (this._mapInstance.getSource(inProgressCircleSourceId)) {
+      this._mapInstance.removeSource(inProgressCircleSourceId);
     }
 
     if (this._mapInstance.getLayer(circleHandlesLayerId)) {
       this._mapInstance.removeLayer(circleHandlesLayerId);
     }
-    if (this._mapInstance.getSource(circleHandlesSource)) {
-      this._mapInstance.removeSource(circleHandlesSource);
+    if (this._mapInstance.getSource(circleHandlesSourceId)) {
+      this._mapInstance.removeSource(circleHandlesSourceId);
     }
   };
 
@@ -203,11 +240,17 @@ export class CustomRenderCircleControl extends CustomMapControl {
     };
   };
 
-  renderFinishedCirclesToMap = () => {
-    const source = this._mapInstance.getSource<GeoJSONSource>(circlesSource)!;
-    source.setData({
+  renderFinishedCirclesAndHandlesToMap = () => {
+    const circlesSource = this._mapInstance.getSource<GeoJSONSource>(circlesSourceId)!;
+    circlesSource.setData({
       type: 'FeatureCollection',
-      features: this._circlesState.circleFeatures.map((circleData) => circleData.feature),
+      features: this._circlesState.circleFeatures.map((circleData) => circleData.circleFeature),
+    });
+
+    const handlesSource = this._mapInstance.getSource<GeoJSONSource>(circleHandlesSourceId)!;
+    handlesSource.setData({
+      type: 'FeatureCollection',
+      features: this._circlesState.circleFeatures.flatMap((circleData) => circleData.handleFeatures),
     });
   };
 
@@ -216,7 +259,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this._inProgressCircleCenterPoint!,
       circleEdgePoint,
     );
-    const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSource)!;
+    const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
     source.setData({
       type: 'Feature',
       properties: {},
