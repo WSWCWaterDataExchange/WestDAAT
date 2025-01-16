@@ -123,11 +123,11 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az functionapp keys list \
+            echo "FN_APP_KEY=$(az functionapp keys list \
               --name ${{ inputs.azure-functionapp-name }} \
               --resource-group ${{ inputs.azure-resource-group }} \
               --query functionKeys.default \
-              --output tsv
+              --output tsv)" >> $GITHUB_ENV
 
       # Using powershell since setting APIM policies aren't supported in azure cli (yet)
       - name: Apply APIM API Policies
@@ -136,15 +136,10 @@ jobs:
           azPSVersion: "latest"
           inlineScript: |
             # Find and replace variables for current environment
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}')  | Set-Content ./infrastructure/apim_policies.xml
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')     | Set-Content ./infrastructure/apim_policies.xml
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')       | Set-Content ./infrastructure/apim_policies.xml
-
-            # TODO Fix this because it doesn't work
-            # TODO Fix this because it doesn't work
-            # TODO Fix this because it doesn't work
-            # TODO Fix this because it doesn't work
-            (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ steps.list-keys.outputs.stdout }}') | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}')      | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')         | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')           | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ steps.list-keys.outputs.FN_APP_KEY }}') | Set-Content ./infrastructure/apim_policies.xml
 
             # Print file contents
             get-content ./infrastructure/apim_policies.xml
@@ -159,7 +154,6 @@ jobs:
               -ApiId ${{ inputs.azure-api-name }} `
               -PolicyFilePath ./infrastructure/apim_policies.xml `
               -Format application/vnd.ms-azure-apim.policy.raw+xml
-          
 
       - name: Azure cli logout
         run: |
