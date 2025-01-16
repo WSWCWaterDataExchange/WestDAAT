@@ -126,7 +126,8 @@ jobs:
             az functionapp keys list \
               --name ${{ inputs.azure-functionapp-name }} \
               --resource-group ${{ inputs.azure-resource-group }} \
-              --query functionKeys.default --output tsv
+              --query functionKeys.default \
+              --output tsv
 
       # Using powershell since setting APIM policies aren't supported in azure cli (yet)
       - name: Apply APIM API Policies
@@ -138,6 +139,11 @@ jobs:
             (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}')  | Set-Content ./infrastructure/apim_policies.xml
             (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')     | Set-Content ./infrastructure/apim_policies.xml
             (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')       | Set-Content ./infrastructure/apim_policies.xml
+
+            # TODO Fix this because it doesn't work
+            # TODO Fix this because it doesn't work
+            # TODO Fix this because it doesn't work
+            # TODO Fix this because it doesn't work
             (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ steps.list-keys.outputs.stdout }}') | Set-Content ./infrastructure/apim_policies.xml
 
             # Print file contents
