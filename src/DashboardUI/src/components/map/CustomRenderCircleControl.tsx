@@ -38,7 +38,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
       this._mapInstance = mapInstance;
 
-      this.resetAllSourcesAndLayers();
+      this.removeAllSourcesAndLayers();
       this.resetControlState();
       this.initializeSourcesAndLayers();
 
@@ -235,7 +235,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     });
   };
 
-  resetSourceAndLayer = (sourceId: string, layerId: string): void => {
+  removeSourceAndLayer = (sourceId: string, layerId: string): void => {
     if (this._mapInstance.getLayer(layerId)) {
       this._mapInstance.removeLayer(layerId);
     }
@@ -244,9 +244,9 @@ export class CustomRenderCircleControl extends CustomMapControl {
     }
   };
 
-  resetAllSourcesAndLayers = (): void => {
-    this.resetSourceAndLayer(circlesSourceId, circlesLayerId);
-    this.resetSourceAndLayer(inProgressCircleSourceId, inProgressCircleLayerId);
+  removeAllSourcesAndLayers = (): void => {
+    this.removeSourceAndLayer(circlesSourceId, circlesLayerId);
+    this.removeSourceAndLayer(inProgressCircleSourceId, inProgressCircleLayerId);
   };
 
   resetControlState = (): void => {
