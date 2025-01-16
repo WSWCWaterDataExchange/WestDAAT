@@ -1,31 +1,16 @@
-import React from 'react';
-import { useCallback, useMemo, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import { Accordion, Form } from 'react-bootstrap';
-import BeneficialUseSelect from './water-rights/components/BeneficialUseSelect';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Accordion, Button, Form } from 'react-bootstrap';
 import { useWaterRightsContext } from './Provider';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
-
-import { MapTheme }  from '../map-options/components/MapTheme';
+import { useNldiFilter } from './nldi/hooks/useNldiFilter';
+import { useOverlaysFilter } from './overlays/hooks/useOverlaysFilter';
+import { MapTheme } from '../map-options/components/MapTheme';
 import { PointSize } from '../map-options/components/PointSize';
 import { MapGrouping } from '../map-options/components/MapGrouping';
-import { useNldiFilter} from "./nldi/hooks/useNldiFilter";
-import { AllocationTypeSelect } from './water-rights/components/AllocationTypeSelect';
-import { LegalStatusSelect } from './water-rights/components/LegalStatusSelect';
-import { SiteTypeSelect } from './water-rights/components/SiteTypeSelect';
-import { useOverlaysFilter} from "./overlays/hooks/useOverlaysFilter";
-import {PodPou} from "../map-options/components/PodPou";
-import Overlays from "./overlays/components/Overlays";
-import {StatesSelect} from "./water-rights/components/StatesSelect";
-import {WaterSourceTypesSelect} from "./water-rights/components/WaterSourceTypesSelect";
-import {AllocationOwnerSearch} from "./water-rights/components/AllocationOwnerSearch";
-import {OwnerClassificationType} from "./water-rights/components/OwnerClassificationType";
-import {RiverBasinSelect} from "./water-rights/components/RiverBasinSelect";
-import {SiteContent} from "./water-rights/components/SiteContent";
-import {PriorityDateRange} from "./water-rights/components/PriorityDateRange";
-import {FlowRange} from "./nldi/components/FlowRange";
-import {VolumeRange} from "./water-rights/components/VolumeRange";
-import {Nldi} from "./nldi/components/Nldi";
+import { PodPou } from '../map-options/components/PodPou';
+import Overlays from './overlays/components/Overlays';
+import WaterRights from "./water-rights/components/WaterRights";
+import { Nldi } from './nldi/components/Nldi';
 
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
@@ -61,6 +46,7 @@ function SideBar() {
     },
     [setActiveKeys],
   );
+
   const openAccordionKeys = useMemo(() => {
     const keys = [...activeKeys].filter((a) => a !== 'nldi' && a !== 'siteSelectionFilters' && a !== 'overlayFilters');
     if (isNldiFilterActive) {
@@ -121,28 +107,7 @@ function SideBar() {
               <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive}</label>
             </Accordion.Header>
             <Accordion.Body>
-              <div className="mb-3">
-                <a
-                  href="https://westernstateswater.org/wade/westdaat-filter-documentation/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn about WestDAAT filters
-                </a>
-              </div>
-              <StatesSelect />
-              <BeneficialUseSelect />
-              <WaterSourceTypesSelect />
-              <AllocationOwnerSearch />
-              <OwnerClassificationType />
-              <AllocationTypeSelect />
-              <LegalStatusSelect />
-              <SiteTypeSelect />
-              <RiverBasinSelect />
-              <SiteContent />
-              <PriorityDateRange />
-              <FlowRange />
-              <VolumeRange />
+              <WaterRights />
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
