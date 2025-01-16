@@ -119,7 +119,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
     circleData.cardinalMarkers = newMarkers;
 
     // 4. re-render
-    console.log('marker dragged');
     this.renderFinishedCirclesAndMarkersToMap();
   };
 
@@ -144,7 +143,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       cardinalMarkers: markers,
     });
     this._inProgressCircleCenterPoint = undefined;
-    console.log('finished in-progress circle, re-render');
     this.renderFinishedCirclesAndMarkersToMap();
   };
 
@@ -259,8 +257,24 @@ export class CustomRenderCircleControl extends CustomMapControl {
     };
   };
 
+  resetSourceData = (sourceId: string): void => {
+    switch (sourceId) {
+      case inProgressCircleSourceId: {
+        const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
+        source.setData({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        });
+        break;
+      }
+    }
+  };
+
   renderFinishedCirclesAndMarkersToMap = () => {
-    console.log('render circles and markers', this._circlesState);
     const circlesSource = this._mapInstance.getSource<GeoJSONSource>(circlesSourceId)!;
     circlesSource.setData({
       type: 'FeatureCollection',
@@ -271,6 +285,9 @@ export class CustomRenderCircleControl extends CustomMapControl {
     for (const marker of this._circlesState.circleFeatures.flatMap((circleData) => circleData.cardinalMarkers)) {
       marker.addTo(this._mapInstance);
     }
+
+    // clear in-progress circle
+    this.resetSourceData(inProgressCircleSourceId);
   };
 
   renderInProgressCircle = (circleEdgePoint: number[]) => {
@@ -278,7 +295,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this._inProgressCircleCenterPoint!,
       circleEdgePoint,
     );
-    console.log('render in progress circle', circle);
     const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
     source.setData({
       type: 'Feature',
