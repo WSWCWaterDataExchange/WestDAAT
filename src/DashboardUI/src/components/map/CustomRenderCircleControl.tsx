@@ -21,8 +21,8 @@ interface CircleData {
   cardinalMarkers: Marker[];
 }
 
-interface CirclesState {
-  circleFeatures: CircleData[];
+interface ComponentState {
+  circles: CircleData[];
 }
 
 /**
@@ -32,8 +32,8 @@ export class CustomRenderCircleControl extends CustomMapControl {
   private _mapInstance!: MapInstance;
   private _toolIsActive: boolean = false;
 
-  private _circlesState: CirclesState = {
-    circleFeatures: [],
+  private _circlesState: ComponentState = {
+    circles: [],
   };
   private _inProgressCircleCenterPoint: number[] | undefined;
 
@@ -94,9 +94,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   handleMarkerDrag = (e: { type: 'drag'; target: Marker }): void => {
     // validate marker exists
     const marker = e.target;
-    const circleData = this._circlesState.circleFeatures.find((circleData) =>
-      circleData.cardinalMarkers.includes(marker),
-    );
+    const circleData = this._circlesState.circles.find((circleData) => circleData.cardinalMarkers.includes(marker));
 
     if (!circleData) {
       throw new Error('Marker not found');
@@ -145,7 +143,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     // generate markers
     const markers = this.generateMarkersForCircle(this._inProgressCircleCenterPoint!, coords);
 
-    this._circlesState.circleFeatures.push({
+    this._circlesState.circles.push({
       centerPoint: this._inProgressCircleCenterPoint!,
       edgePoint: coords,
       circleFeature,
@@ -258,11 +256,11 @@ export class CustomRenderCircleControl extends CustomMapControl {
 
   resetControlState = (): void => {
     // markers are attached directly to the map, so they need to be removed manually
-    this._circlesState.circleFeatures.flatMap((circleData) => circleData.cardinalMarkers).forEach((m) => m.remove());
+    this._circlesState.circles.flatMap((circleData) => circleData.cardinalMarkers).forEach((m) => m.remove());
 
     this._inProgressCircleCenterPoint = undefined;
     this._circlesState = {
-      circleFeatures: [],
+      circles: [],
     };
   };
 
@@ -287,11 +285,11 @@ export class CustomRenderCircleControl extends CustomMapControl {
     const circlesSource = this._mapInstance.getSource<GeoJSONSource>(circlesSourceId)!;
     circlesSource.setData({
       type: 'FeatureCollection',
-      features: this._circlesState.circleFeatures.map((circleData) => circleData.circleFeature),
+      features: this._circlesState.circles.map((circleData) => circleData.circleFeature),
     });
 
     // render markers
-    for (const marker of this._circlesState.circleFeatures.flatMap((circleData) => circleData.cardinalMarkers)) {
+    for (const marker of this._circlesState.circles.flatMap((circleData) => circleData.cardinalMarkers)) {
       marker.addTo(this._mapInstance);
     }
 
