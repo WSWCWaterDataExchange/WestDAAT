@@ -154,6 +154,9 @@ export class CustomRenderCircleControl extends CustomMapControl {
         });
         break;
       }
+      default: {
+        throw new Error(`resetting source ${sourceId} not implemented`);
+      }
     }
   };
 
