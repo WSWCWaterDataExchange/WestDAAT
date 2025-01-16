@@ -89,7 +89,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   handleMarkerDrag = (e: { type: 'drag'; target: Marker }): void => {
-    // validate marker exists
+    // validate marker exists in state
     const marker = e.target;
     const circleData = this._circlesState.circles.find((circleData) => circleData.cardinalMarkers.includes(marker));
 
