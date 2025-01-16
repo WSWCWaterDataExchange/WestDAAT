@@ -15,7 +15,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   private _circleEdgePoint: number[] | undefined;
 
   constructor(mapInstance: MapInstance) {
-    super(mdiCircle, 'tooltip - render a circle', () => {
+    super(mdiCircle, `circle tool`, () => {
       this.toggleToolActive();
 
       this._mapInstance = mapInstance;
@@ -32,13 +32,13 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   registerClickHandlers = (): void => {
-    console.log('register click handlers');
     this._mapInstance.on('click', this.handleMouseClick);
     this._mapInstance.on('mousemove', this.handleMouseMove);
   };
 
   deRegisterClickHandler = (): void => {
     this._mapInstance.off('click', this.handleMouseClick);
+    this._mapInstance.off('mousemove', this.handleMouseMove);
   };
 
   handleToolClicked = (): void => {
@@ -51,7 +51,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   handleMouseClick = (e: MapMouseEvent) => {
-    console.log('CLICK');
     const coords = [e.lngLat.lng, e.lngLat.lat];
     if (!this._circleCenterPoint) {
       this._circleCenterPoint = coords;
@@ -65,7 +64,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   handleMouseMove = (e: MapMouseEvent) => {
-    console.log('MOVE');
     // render the potential circle only while the first coord is set and the second coord is not set
     if (!this._circleCenterPoint || this._circleEdgePoint) {
       return;
@@ -124,23 +122,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   renderGeoJsonPolygonToMap = (mapInstance: MapInstance, polygon: Feature<Polygon, GeoJsonProperties>) => {
-    // this.resetSourceAndLayer();
-    // mapInstance.addSource(circleSource, {
-    //   type: 'geojson',
-    //   data: polygon,
-    // });
-
-    // this._mapInstance.addLayer({
-    //   id: circleLayerId,
-    //   type: 'fill',
-    //   source: circleSource,
-    //   paint: {
-    //     'fill-color': 'orange',
-    //     'fill-opacity': 0.5,
-    //   },
-    // });
-
-    // attempt 2
     const source: GeoJSONSource = mapInstance.getSource(circleSource)!;
     source.setData(polygon);
   };
