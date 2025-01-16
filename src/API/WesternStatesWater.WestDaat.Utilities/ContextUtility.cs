@@ -14,8 +14,6 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 {
     private const string ClaimNamespace = "extension_westdaat";
 
-    private readonly ContextBase _context = null;
-
     private ContextBase Build()
     {
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
@@ -36,7 +34,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
         return new AnonymousContext();
     }
 
-    public ContextBase GetContext() => _context ?? Build();
+    public ContextBase GetContext() => Build();
 
     public T GetRequiredContext<T>() where T : ContextBase
     {

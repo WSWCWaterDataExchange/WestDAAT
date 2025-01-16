@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
@@ -106,6 +107,10 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private void RegisterUtilityServices(IServiceCollection serviceCollection)
         {
             ContextUtilityMock = new Mock<IContextUtility>();
+            ContextUtilityMock
+                .Setup(mock => mock.GetContext())
+                .Returns(new AnonymousContext());
+
             serviceCollection.AddScoped(_ => ContextUtilityMock.Object);
             serviceCollection.AddTransient<ISecurityUtility, SecurityUtility>();
         }
