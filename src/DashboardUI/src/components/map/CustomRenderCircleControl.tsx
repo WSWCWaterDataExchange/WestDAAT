@@ -2,7 +2,7 @@ import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
 import { circle, distance } from '@turf/turf';
 import { Feature, GeoJsonProperties, Polygon } from 'geojson';
-import { CustomLayerInterface, GeoJSONSource, LayerSpecification, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
+import { GeoJSONSource, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
 
 const circlesLayerId: string = 'circle-layer';
 const circlesSource: string = 'circle-source';
@@ -31,10 +31,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this.toggleMapEventListeners();
     });
   }
-
-  getCircleLayer = (): LayerSpecification | CustomLayerInterface | undefined => {
-    return this._mapInstance.getLayer(circlesLayerId);
-  };
 
   registerClickHandlers = (): void => {
     this._mapInstance.on('click', this.handleMouseClick);
@@ -67,7 +63,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       );
       this._circleFeatures.push(circleFeature);
       this._inProgressCircleCenterPoint = undefined;
-      this.renderCirclesToMap();
+      this.renderFinishedCirclesToMap();
     }
   };
 
@@ -161,7 +157,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     this._circleFeatures = [];
   };
 
-  renderCirclesToMap = () => {
+  renderFinishedCirclesToMap = () => {
     const source: GeoJSONSource = this._mapInstance.getSource(circlesSource)!;
     source.setData({
       type: 'FeatureCollection',
