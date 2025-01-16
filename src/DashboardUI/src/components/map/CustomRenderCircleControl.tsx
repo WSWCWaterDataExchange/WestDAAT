@@ -39,6 +39,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this._mapInstance = mapInstance;
 
       this.resetSourcesAndLayers();
+      this.resetControlState();
       this.initializeSourcesAndLayers();
 
       this.toggleMapEventListeners();
@@ -60,8 +61,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this.registerClickHandlers();
     } else {
       this.deRegisterClickHandler();
-      this.resetSourcesAndLayers();
-      this.resetControlState();
     }
   };
 
@@ -251,6 +250,9 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   resetControlState = (): void => {
+    // markers are attached directly to the map, so they need to be removed manually
+    this._circlesState.circleFeatures.flatMap((circleData) => circleData.cardinalMarkers).forEach((m) => m.remove());
+
     this._inProgressCircleCenterPoint = undefined;
     this._circlesState = {
       circleFeatures: [],
