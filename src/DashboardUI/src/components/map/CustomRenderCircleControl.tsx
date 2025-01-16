@@ -84,25 +84,43 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   handleMarkerDrag = (e: { type: 'drag'; target: Marker }): void => {
+    // validate marker exists
     const marker = e.target;
-
-    // find existing marker
     const circleData = this._circlesState.circleFeatures.find((circleData) =>
       circleData.cardinalMarkers.includes(marker),
     );
 
-    // marker is attached to a circle - update the circle to match the marker's new location
-    if (circleData) {
-      const markerCoords = marker.getLngLat();
-      circleData.edgePoint = [markerCoords.lng, markerCoords.lat];
-
-      circleData.circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
-        circleData.centerPoint,
-        circleData.edgePoint,
-      );
-
-      this.renderFinishedCirclesAndMarkersToMap();
+    if (!circleData) {
+      throw new Error('Marker not found');
     }
+
+    // update the circle to match the marker's new location
+    const markerCoords = marker.getLngLat();
+    circleData.edgePoint = [markerCoords.lng, markerCoords.lat];
+
+    circleData.circleFeature = this.generateCircleWithRadiusFromCenterPointToEdgePoint(
+      circleData.centerPoint,
+      circleData.edgePoint,
+    );
+
+    // update circle's markers
+    // 1. remove markers, excluding the one being dragged
+    circleData.cardinalMarkers.forEach((m) => {
+      if (m !== marker) {
+        m.remove();
+      }
+    });
+
+    // 2. generate new markers, preserving the one being dragged
+    const markerIndex = circleData.cardinalMarkers.indexOf(marker);
+    const newMarkers = this.generateMarkersForCircle(circleData.centerPoint, circleData.edgePoint);
+    newMarkers[markerIndex] = marker;
+
+    // 3. attach to state
+    circleData.cardinalMarkers = newMarkers;
+
+    // 4. re-render
+    this.renderFinishedCirclesAndMarkersToMap();
   };
 
   startInProgressCircle = (coords: number[]): void => {
