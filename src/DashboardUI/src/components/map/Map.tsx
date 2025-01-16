@@ -18,13 +18,13 @@ import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
-import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
+import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
+import { CustomRenderCircleControl } from './CustomRenderCircleControl';
 
 import './map.scss';
-import { CustomRenderCircleControl } from './CustomRenderCircleControl';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
