@@ -158,7 +158,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
   };
 
   renderFinishedCirclesToMap = () => {
-    const source: GeoJSONSource = this._mapInstance.getSource(circlesSource)!;
+    const source = this._mapInstance.getSource<GeoJSONSource>(circlesSource)!;
     source.setData({
       type: 'FeatureCollection',
       features: this._circleFeatures,
@@ -170,7 +170,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
       this._inProgressCircleCenterPoint!,
       circleEdgePoint,
     );
-    const source: GeoJSONSource = this._mapInstance.getSource(inProgressCircleSource)!;
+    const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSource)!;
     source.setData({
       type: 'Feature',
       properties: {},
