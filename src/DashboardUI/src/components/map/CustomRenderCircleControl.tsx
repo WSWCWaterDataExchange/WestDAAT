@@ -140,6 +140,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     // generate markers
     const markers = this.generateMarkersForCircle(this._inProgressCircleCenterPoint!, coords);
 
+    // add data to state
     this._circlesState.circles.push({
       centerPoint: this._inProgressCircleCenterPoint!,
       edgePoint: coords,
@@ -147,7 +148,12 @@ export class CustomRenderCircleControl extends CustomMapControl {
       cardinalMarkers: markers,
     });
     this._inProgressCircleCenterPoint = undefined;
+
+    // re-render
     this.renderFinishedCirclesAndMarkersToMap();
+
+    // clear in-progress circle
+    this.resetSourceData(inProgressCircleSourceId);
   };
 
   generateCircleWithRadiusFromCenterPointToEdgePoint = (
@@ -289,9 +295,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
     for (const marker of this._circlesState.circles.flatMap((circleData) => circleData.cardinalMarkers)) {
       marker.addTo(this._mapInstance);
     }
-
-    // clear in-progress circle
-    this.resetSourceData(inProgressCircleSourceId);
   };
 
   renderInProgressCircle = (circleEdgePoint: number[]) => {
