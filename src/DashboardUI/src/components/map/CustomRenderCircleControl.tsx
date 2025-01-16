@@ -60,6 +60,10 @@ export class CustomRenderCircleControl extends CustomMapControl {
     );
   }
 
+  toggleToolActive = (): void => {
+    this._toolIsActive = !this._toolIsActive;
+  };
+
   enableMapEventListeners = (): void => {
     this._mapInstance.on('click', this.handleMouseClick);
     this._mapInstance.on('mousemove', this.handleMouseMove);
@@ -68,6 +72,89 @@ export class CustomRenderCircleControl extends CustomMapControl {
   disableMapEventListeners = (): void => {
     this._mapInstance.off('click', this.handleMouseClick);
     this._mapInstance.off('mousemove', this.handleMouseMove);
+  };
+
+  initializeSourcesAndLayers = (): void => {
+    this._mapInstance.addSource(circlesSourceId, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    this._mapInstance.addLayer({
+      id: circlesLayerId,
+      type: 'fill',
+      source: circlesSourceId,
+      paint: {
+        'fill-color': 'orange',
+        'fill-opacity': 0.5,
+      },
+    });
+
+    this._mapInstance.addSource(inProgressCircleSourceId, {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [],
+        },
+      },
+    });
+
+    this._mapInstance.addLayer({
+      id: inProgressCircleLayerId,
+      type: 'fill',
+      source: inProgressCircleSourceId,
+      paint: {
+        'fill-color': 'orange',
+        'fill-opacity': 0.5,
+      },
+    });
+  };
+
+  removeSourceAndLayer = (sourceId: string, layerId: string): void => {
+    if (this._mapInstance.getLayer(layerId)) {
+      this._mapInstance.removeLayer(layerId);
+    }
+    if (this._mapInstance.getSource(sourceId)) {
+      this._mapInstance.removeSource(sourceId);
+    }
+  };
+
+  removeAllSourcesAndLayers = (): void => {
+    this.removeSourceAndLayer(circlesSourceId, circlesLayerId);
+    this.removeSourceAndLayer(inProgressCircleSourceId, inProgressCircleLayerId);
+  };
+
+  resetControlState = (): void => {
+    // markers are attached directly to the map, so they need to be removed manually
+    this._circlesState.circles.flatMap((circleData) => circleData.cardinalMarkers).forEach((m) => m.remove());
+
+    this._inProgressCircleCenterPoint = undefined;
+    this._circlesState = {
+      circles: [],
+    };
+  };
+
+  resetSourceData = (sourceId: string): void => {
+    switch (sourceId) {
+      case inProgressCircleSourceId: {
+        const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
+        source.setData({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        });
+        break;
+      }
+    }
   };
 
   handleMouseClick = (e: MapMouseEvent) => {
@@ -163,7 +250,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
       units: 'kilometers',
     });
-    return this.generateCircleAtPoint(circleCenterPoint, distanceFromCenterToEdgeInKm);
+    return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
   };
 
   generateMarkersForCircle = (circleCenterPoint: number[], circleEdgePoint: number[]): Marker[] => {
@@ -191,97 +278,6 @@ export class CustomRenderCircleControl extends CustomMapControl {
       });
 
     return circleMarkersAtCardinalPoints;
-  };
-
-  toggleToolActive = (): void => {
-    this._toolIsActive = !this._toolIsActive;
-  };
-
-  generateCircleAtPoint(point: number[], radiusInKm: number): CircleFeature {
-    return circle(point, radiusInKm, { steps: 100 });
-  }
-
-  initializeSourcesAndLayers = (): void => {
-    this._mapInstance.addSource(circlesSourceId, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    });
-
-    this._mapInstance.addLayer({
-      id: circlesLayerId,
-      type: 'fill',
-      source: circlesSourceId,
-      paint: {
-        'fill-color': 'orange',
-        'fill-opacity': 0.5,
-      },
-    });
-
-    this._mapInstance.addSource(inProgressCircleSourceId, {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'Polygon',
-          coordinates: [],
-        },
-      },
-    });
-
-    this._mapInstance.addLayer({
-      id: inProgressCircleLayerId,
-      type: 'fill',
-      source: inProgressCircleSourceId,
-      paint: {
-        'fill-color': 'orange',
-        'fill-opacity': 0.5,
-      },
-    });
-  };
-
-  removeSourceAndLayer = (sourceId: string, layerId: string): void => {
-    if (this._mapInstance.getLayer(layerId)) {
-      this._mapInstance.removeLayer(layerId);
-    }
-    if (this._mapInstance.getSource(sourceId)) {
-      this._mapInstance.removeSource(sourceId);
-    }
-  };
-
-  removeAllSourcesAndLayers = (): void => {
-    this.removeSourceAndLayer(circlesSourceId, circlesLayerId);
-    this.removeSourceAndLayer(inProgressCircleSourceId, inProgressCircleLayerId);
-  };
-
-  resetControlState = (): void => {
-    // markers are attached directly to the map, so they need to be removed manually
-    this._circlesState.circles.flatMap((circleData) => circleData.cardinalMarkers).forEach((m) => m.remove());
-
-    this._inProgressCircleCenterPoint = undefined;
-    this._circlesState = {
-      circles: [],
-    };
-  };
-
-  resetSourceData = (sourceId: string): void => {
-    switch (sourceId) {
-      case inProgressCircleSourceId: {
-        const source = this._mapInstance.getSource<GeoJSONSource>(inProgressCircleSourceId)!;
-        source.setData({
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Polygon',
-            coordinates: [],
-          },
-        });
-        break;
-      }
-    }
   };
 
   renderFinishedCirclesAndMarkersToMap = () => {
