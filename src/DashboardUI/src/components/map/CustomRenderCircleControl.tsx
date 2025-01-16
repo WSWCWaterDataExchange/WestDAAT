@@ -1,8 +1,8 @@
 import { mdiCircle } from '@mdi/js';
 import { CustomMapControl } from './CustomMapControl';
 import { circle, destination, distance } from '@turf/turf';
-import { Feature, GeoJsonProperties, Point, Polygon } from 'geojson';
-import { GeoJSONSource, Map as MapInstance, MapMouseEvent } from 'mapbox-gl';
+import { Feature, GeoJsonProperties, Polygon } from 'geojson';
+import { GeoJSONSource, Map as MapInstance, MapMouseEvent, Marker } from 'mapbox-gl';
 
 const circlesLayerId: string = 'circle-layer';
 const circlesSourceId: string = 'circle-source';
@@ -14,13 +14,12 @@ const circleHandlesLayerId: string = 'circle-handles-layer';
 const circleHandlesSourceId: string = 'circle-handles-source';
 
 type CircleFeature = Feature<Polygon, GeoJsonProperties>;
-type HandleFeature = Feature<Point, GeoJsonProperties>;
 
 interface CircleData {
   centerPoint: number[];
   edgePoint: number[];
   circleFeature: CircleFeature;
-  handleFeatures: HandleFeature[];
+  handleFeatures: Marker[];
 }
 
 interface CirclesState {
@@ -121,7 +120,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     return this.generateCircleAtPoint(circleCenterPoint, distanceFromCenterToEdgeInKm);
   };
 
-  generateHandlesForCircle = (circleCenterPoint: number[], circleEdgePoint: number[]): HandleFeature[] => {
+  generateHandlesForCircle = (circleCenterPoint: number[], circleEdgePoint: number[]): Marker[] => {
     const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
       units: 'kilometers',
     });
@@ -129,11 +128,18 @@ export class CustomRenderCircleControl extends CustomMapControl {
     // north, east, south, west
     const cardinalDirectionBearings = [0, 90, 180, 270];
 
-    const circleHandlesAtCardinalPoints: HandleFeature[] = cardinalDirectionBearings.map((bearing) =>
-      destination(circleCenterPoint, distanceFromCenterToEdgeInKm, bearing, {
-        units: 'kilometers',
-      }),
-    );
+    const circleHandlesAtCardinalPoints: Marker[] = cardinalDirectionBearings
+      .map((bearing) =>
+        destination(circleCenterPoint, distanceFromCenterToEdgeInKm, bearing, {
+          units: 'kilometers',
+        }),
+      )
+      .map((dest) => {
+        return new Marker({
+          // location?
+          offset: [0, 0],
+        }).setLngLat(dest.geometry.coordinates as [number, number]);
+      });
 
     return circleHandlesAtCardinalPoints;
   };
@@ -247,11 +253,10 @@ export class CustomRenderCircleControl extends CustomMapControl {
       features: this._circlesState.circleFeatures.map((circleData) => circleData.circleFeature),
     });
 
-    const handlesSource = this._mapInstance.getSource<GeoJSONSource>(circleHandlesSourceId)!;
-    handlesSource.setData({
-      type: 'FeatureCollection',
-      features: this._circlesState.circleFeatures.flatMap((circleData) => circleData.handleFeatures),
-    });
+    // render markers
+    for (const marker of this._circlesState.circleFeatures.flatMap((circleData) => circleData.handleFeatures)) {
+      marker.addTo(this._mapInstance);
+    }
   };
 
   renderInProgressCircle = (circleEdgePoint: number[]) => {
