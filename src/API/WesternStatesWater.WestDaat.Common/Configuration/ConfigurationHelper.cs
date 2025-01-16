@@ -69,6 +69,11 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             return config.GetSection(ConfigurationRootNames.OpenEt).Get<OpenEtConfiguration>() ?? new OpenEtConfiguration();
         }
 
+        public static IdentityProviderConfiguration GetIdentityProviderConfiguration(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Identity).Get<IdentityProviderConfiguration>() ?? new IdentityProviderConfiguration();
+        }
+
         public static TokenCredential TokenCredential => new ChainedTokenCredential(
             new AzureCliCredential(), // When Local
             new DefaultAzureCredential() // When Azure
@@ -86,5 +91,6 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         public const string MessageBus = "MessageBus";
         public const string Environment = "Environment";
         public const string OpenEt = "OpenET";
+        public const string Identity = "Identity";
     }
 }
