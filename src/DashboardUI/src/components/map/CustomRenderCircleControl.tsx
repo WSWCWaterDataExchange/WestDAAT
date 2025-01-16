@@ -47,6 +47,7 @@ export class CustomRenderCircleControl extends CustomMapControl {
     } else {
       this.deRegisterClickHandler();
       this.resetSourceAndLayer();
+      this.resetControlState();
     }
   };
 
@@ -119,6 +120,11 @@ export class CustomRenderCircleControl extends CustomMapControl {
     if (this._mapInstance.getSource(circleSource)) {
       this._mapInstance.removeSource(circleSource);
     }
+  };
+
+  resetControlState = (): void => {
+    this._circleCenterPoint = undefined;
+    this._circleEdgePoint = undefined;
   };
 
   renderGeoJsonPolygonToMap = (mapInstance: MapInstance, polygon: Feature<Polygon, GeoJsonProperties>) => {
