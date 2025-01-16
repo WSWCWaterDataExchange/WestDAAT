@@ -106,11 +106,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private void RegisterUtilityServices(IServiceCollection serviceCollection)
         {
-            ContextUtilityMock = new Mock<IContextUtility>();
-            ContextUtilityMock
-                .Setup(mock => mock.GetContext())
-                .Returns(new AnonymousContext());
-
+            ContextUtilityMock = new Mock<IContextUtility>(MockBehavior.Strict);
             serviceCollection.AddScoped(_ => ContextUtilityMock.Object);
             serviceCollection.AddTransient<ISecurityUtility, SecurityUtility>();
         }
@@ -132,6 +128,27 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        protected void UseAnonymousContext()
+        {
+            ContextUtilityMock
+                .Setup(mock => mock.GetContext())
+                .Returns(new AnonymousContext());
+        }
+
+        protected void UseIdentityProviderContext()
+        {
+            ContextUtilityMock
+                .Setup(mock => mock.GetContext())
+                .Returns(new IdentityProviderContext());
+        }
+
+        protected void UseUserContext()
+        {
+            ContextUtilityMock
+                .Setup(mock => mock.GetContext())
+                .Returns(new UserContext());
         }
     }
 }

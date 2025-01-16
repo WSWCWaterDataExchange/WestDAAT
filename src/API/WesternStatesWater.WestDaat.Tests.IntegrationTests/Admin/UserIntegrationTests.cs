@@ -22,16 +22,13 @@ public class UserIntegrationTests : IntegrationTestBase
     public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_Success()
     {
         // Arrange
-        var userExternalAuthId = "1234";
-        ContextUtilityMock
-            .Setup(mock => mock.GetContext())
-            .Returns(new IdentityProviderContext());
+        UseIdentityProviderContext();
 
         // Act
         var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
             new CLI.Requests.Admin.EnrichJwtRequest
             {
-                ObjectId = userExternalAuthId,
+                ObjectId = "1234",
             });
 
         // Assert

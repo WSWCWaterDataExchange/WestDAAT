@@ -14,26 +14,6 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 {
     private const string ClaimNamespace = "extension_westdaat";
 
-    private ContextBase Build()
-    {
-        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
-        {
-            string authHeaderString = authHeader;
-
-            if (authHeaderString.StartsWith("Bearer"))
-            {
-                return BuildUserContext(authHeaderString);
-            }
-
-            if (authHeaderString.StartsWith("Basic"))
-            {
-                return BuildIdentityProviderContext(authHeaderString);
-            }
-        }
-
-        return new AnonymousContext();
-    }
-
     public ContextBase GetContext() => Build();
 
     public T GetRequiredContext<T>() where T : ContextBase
@@ -48,7 +28,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 
         return context;
     }
-
+    
     private static UserContext BuildUserContext(string authHeader)
     {
         // Example jwt claims:
@@ -154,16 +134,7 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
         return orgRoles;
     }
 
-    private IdentityProviderContext BuildIdentityProviderContext(string authHeader)
-    {
-        var (username, password) = ParseBasicAuthHeader(authHeader);
-
-        ValidateIdentityProviderCredentials(username, password);
-
-        return new IdentityProviderContext();
-    }
-
-    private (string Username, string Password) ParseBasicAuthHeader(string authHeader)
+    private static (string Username, string Password) ParseBasicAuthHeader(string authHeader)
     {
         var basicAuth = authHeader.Replace("Basic ", string.Empty);
         var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(basicAuth));
@@ -175,6 +146,35 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
         }
 
         return (parts[0], parts[1]);
+    }
+    
+    private ContextBase Build()
+    {
+        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
+        {
+            string authHeaderString = authHeader;
+
+            if (authHeaderString.StartsWith("Bearer"))
+            {
+                return BuildUserContext(authHeaderString);
+            }
+
+            if (authHeaderString.StartsWith("Basic"))
+            {
+                return BuildIdentityProviderContext(authHeaderString);
+            }
+        }
+
+        return new AnonymousContext();
+    }
+
+    private IdentityProviderContext BuildIdentityProviderContext(string authHeader)
+    {
+        var (username, password) = ParseBasicAuthHeader(authHeader);
+
+        ValidateIdentityProviderCredentials(username, password);
+
+        return new IdentityProviderContext();
     }
 
     private void ValidateIdentityProviderCredentials(string username, string password)
