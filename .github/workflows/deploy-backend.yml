@@ -117,6 +117,19 @@ jobs:
               --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
               --service-url ${{ inputs.azure-api-url }} --subscription-required false
 
+      - name: List Function App Keys
+        id: list-keys
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            FN_APP_KEY=$(az functionapp keys list \
+              --name ${{ inputs.azure-functionapp-name }} \
+              --resource-group ${{ inputs.azure-resource-group }} \
+              --query functionKeys.default \
+              --output tsv)
+            echo "FN_APP_KEY=$FN_APP_KEY" >> $GITHUB_ENV
+
       # Using powershell since setting APIM policies aren't supported in azure cli (yet)
       - name: Apply APIM API Policies
         uses: azure/powershell@v2
@@ -127,6 +140,7 @@ jobs:
             (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}') | Set-Content ./infrastructure/apim_policies.xml
             (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')    | Set-Content ./infrastructure/apim_policies.xml
             (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')      | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ env.FN_APP_KEY }}')                | Set-Content ./infrastructure/apim_policies.xml
 
             # Print file contents
             get-content ./infrastructure/apim_policies.xml
@@ -141,7 +155,6 @@ jobs:
               -ApiId ${{ inputs.azure-api-name }} `
               -PolicyFilePath ./infrastructure/apim_policies.xml `
               -Format application/vnd.ms-azure-apim.policy.raw+xml
-          
 
       - name: Azure cli logout
         run: |

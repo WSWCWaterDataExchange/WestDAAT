@@ -56,6 +56,10 @@
                 <header>*</header>
             </allowed-headers>
         </cors>
+        <!-- Function App Key so only APIM may hit the endpoints. -->
+        <set-header name="x-functions-key" exists-action="override">
+            <value>{3}</value>
+        </set-header>
     </inbound>
     <backend>
         <base />
