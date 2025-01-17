@@ -44,11 +44,12 @@ var host = new HostBuilder()
         // Config
         services.AddScoped(_ => configuration.GetBlobStorageConfiguration());
         services.AddScoped(_ => configuration.GetDatabaseConfiguration());
+        services.AddScoped(_ => configuration.GetIdentityProviderConfiguration());
         services.AddScoped(_ => configuration.GetMessageBusConfiguration());
         services.AddScoped(_ => configuration.GetNldiConfiguration());
+        services.AddScoped(_ => configuration.GetOpenEtConfiguration());
         services.AddScoped(_ => configuration.GetPerformanceConfiguration());
         services.AddScoped(_ => configuration.GetSmtpConfiguration());
-        services.AddScoped(_ => configuration.GetOpenEtConfiguration());
 
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
