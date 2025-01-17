@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { pointSizes, waterRightsProperties } from '../../../../../config/constants';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import useLastKnownValue from '../../../../../hooks/useLastKnownValue';

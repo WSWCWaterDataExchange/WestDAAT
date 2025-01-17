@@ -3,7 +3,7 @@ import MapProvider from '../../../../../contexts/MapProvider';
 import MainPanel from '../../../MainPanel';
 import SidePanel from '../../../SidePanel';
 import TableView from '../../../TableView';
-import { useWaterRightsContext, WaterRightsProvider } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext, WaterRightsProvider } from '../../sidebar-filtering/WaterRightsProvider';
 import SideBar from '../../sidebar-filtering/SideBar';
 import Map from '../../../../map/Map';
 import { useDisplayOptions} from "../hooks/useDisplayOptions";
@@ -15,12 +15,15 @@ import UploadModal from './UploadModal';
 import { useEffect } from 'react';
 import { useHomePageContext } from '../../../Provider';
 import { useMapFitRequested} from "../hooks/useMapFitRequested";
+import {OverlaysProvider} from "../../sidebar-filtering/OverlaysProvider";
 
 export function WaterRightsTab() {
   return (
     <MapProvider>
       <WaterRightsProvider>
+        <OverlaysProvider>
         <WaterRightsLayout />
+        </OverlaysProvider>
       </WaterRightsProvider>
     </MapProvider>
   );

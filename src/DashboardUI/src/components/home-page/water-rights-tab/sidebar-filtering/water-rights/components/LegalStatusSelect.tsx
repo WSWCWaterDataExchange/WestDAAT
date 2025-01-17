@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLegalStatusesFilter } from "../hooks/useLegalStatusesFilter";
-import { useWaterRightsContext } from '../../Provider';
+import { useWaterRightsContext } from '../../WaterRightsProvider';
 import { useCallback, useMemo } from 'react';
 import Select, { MultiValue } from 'react-select';
 

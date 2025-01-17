@@ -5,7 +5,7 @@ import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { useAppContext } from '../../../../../contexts/AppProvider';
 import { SignIn } from '../../../../SignIn';
 import { WaterRightsSearchCriteriaWithFilterUrl } from '../../../../../data-contracts/WaterRightsSearchCriteria';
-import { WaterRightsFilters } from '../../sidebar-filtering/Provider';
+import { WaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider';
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../../../../../hooks/queries';
 import { useHomePageContext } from '../../../Provider';

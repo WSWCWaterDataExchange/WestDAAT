@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Accordion, Button, Form } from 'react-bootstrap';
-import { useWaterRightsContext } from './Provider';
+import { useWaterRightsContext } from './WaterRightsProvider';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
 import { useNldiFilter } from './nldi/hooks/useNldiFilter';
 import { useOverlaysFilter } from './overlays/hooks/useOverlaysFilter';

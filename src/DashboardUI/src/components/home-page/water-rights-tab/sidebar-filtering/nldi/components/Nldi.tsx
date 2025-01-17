@@ -7,7 +7,7 @@ import { nldi } from '../../../../../../config/constants';
 import { useDrag } from 'react-dnd';
 import Icon from '@mdi/react';
 import './nldi-filters.scss';
-import { defaultNldiFilters } from '../../Provider';
+import { defaultNldiFilters } from '../../WaterRightsProvider';
 import { useNldiFilter } from "../hooks/useNldiFilter";
 
 export function Nldi() {

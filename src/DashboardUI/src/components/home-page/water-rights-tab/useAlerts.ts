@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useNldiPinDropAlert, useNoMapResults } from '../../../hooks/useMapAlert';
-import { useWaterRightsContext } from './sidebar-filtering/Provider';
+import { useWaterRightsContext } from './sidebar-filtering/WaterRightsProvider';
 import useProgressIndicator from '../../../hooks/useProgressIndicator';
 import { useNldiFilter } from './sidebar-filtering/nldi/hooks/useNldiFilter';
 import { useRiverBasinFilter } from './sidebar-filtering/water-rights/hooks/useRiverBasinFilter';

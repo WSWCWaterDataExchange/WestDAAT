@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useWaterRightsContext, WaterRightsFilters } from '../../Provider';
+import { useWaterRightsContext, WaterRightsFilters } from '../../WaterRightsProvider';
 import { waterRightsProperties } from '../../../../../../config/constants';
 import { useStringContainsFilter as useStringContainsFilterBase } from '../../../../../../hooks/filters/useStringContainsFilter';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import { useOwnerClassificationsFilter } from "../hooks/useOwnerClassificationsFilter";
 import { useCallback } from 'react';
-import { useWaterRightsContext } from '../../Provider';
+import { useWaterRightsContext } from '../../WaterRightsProvider';
 
 export function OwnerClassificationType() {
   const { ownerClassifications, setOwnerClassifications } = useOwnerClassificationsFilter();

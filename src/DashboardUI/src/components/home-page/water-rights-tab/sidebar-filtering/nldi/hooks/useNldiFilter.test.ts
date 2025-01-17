@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { useNldiFilter } from './useNldiFilter';
-import * as WaterRightsProvider from '../../Provider';
+import * as WaterRightsProvider from '../../WaterRightsProvider';
 import * as NldiQueries from '../../../../../../hooks/queries/useNldiQuery';
 import { DataPoints, Directions } from '../../../../../../data-contracts/nldi';
 
-let currFilters = { ...WaterRightsProvider.defaultFilters };
+let currFilters = { ...WaterRightsProvider.defaultWaterRightsFilters };
 const differentNldiFilters = {
   latitude: 30,
   longitude: -90,
@@ -47,7 +47,7 @@ describe('setNldiMapActiveStatus', () => {
     [true, differentNldiFilters, true, differentNldiFilters],
   ])('set', (initialIsActive, initialNldiData, setValue, expectedNldiData) => {
     currFilters = {
-      ...WaterRightsProvider.defaultFilters,
+      ...WaterRightsProvider.defaultWaterRightsFilters,
       isNldiFilterActive: initialIsActive,
       nldiFilterData: initialNldiData,
     };
@@ -61,7 +61,7 @@ describe('setNldiMapActiveStatus', () => {
 
     expect(mockSetFilters).toBeCalledTimes(1);
     expect(mockSetFilters.mock.calls[0][0](currFilters)).toEqual({
-      ...WaterRightsProvider.defaultFilters,
+      ...WaterRightsProvider.defaultWaterRightsFilters,
       isNldiFilterActive: setValue,
       nldiFilterData: expectedNldiData,
     });
@@ -160,7 +160,7 @@ describe('setLatLong', () => {
     [true, differentNldiFilters, 20, -80, { ...differentNldiFilters, latitude: 20, longitude: -80 }],
   ])('set', (initialIsActive, initialNldiData, setLat, setLng, expectedNldiData) => {
     currFilters = {
-      ...WaterRightsProvider.defaultFilters,
+      ...WaterRightsProvider.defaultWaterRightsFilters,
       isNldiFilterActive: initialIsActive,
       nldiFilterData: initialNldiData,
     };
@@ -174,7 +174,7 @@ describe('setLatLong', () => {
 
     expect(mockSetFilters).toBeCalledTimes(1);
     expect(mockSetFilters.mock.calls[0][0](currFilters)).toEqual({
-      ...WaterRightsProvider.defaultFilters,
+      ...WaterRightsProvider.defaultWaterRightsFilters,
       isNldiFilterActive: initialIsActive,
       nldiFilterData: expectedNldiData,
     });

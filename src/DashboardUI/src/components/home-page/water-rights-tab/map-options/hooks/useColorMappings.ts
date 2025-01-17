@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { useColorMappings as useColorMappingsBase } from '../../../../../hooks/useColorMappings';
+import {useOverlaysContext} from "../../sidebar-filtering/OverlaysProvider";
 
 export function useColorMappings() {
   const {
@@ -8,9 +9,10 @@ export function useColorMappings() {
       beneficialUsesQuery: { data: allBeneficialUses },
       ownerClassificationsQuery: { data: allOwnerClassifications },
       waterSourcesQuery: { data: allWaterSourceTypes },
-      overlaysQuery: { data: allOverlays },
     },
   } = useWaterRightsContext();
+
+  const { overlaysData: allOverlays } = useOverlaysContext();
 
   const { fallbackColor, getColorByIndex, getOverlayColorByIndex } = useColorMappingsBase();
 

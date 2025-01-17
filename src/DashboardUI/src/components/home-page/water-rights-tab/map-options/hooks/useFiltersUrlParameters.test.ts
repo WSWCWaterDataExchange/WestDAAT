@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import * as urlParameters from '../../../../../hooks/url-parameters/useUrlParameters';
-import { NldiFilters, WaterRightsFilters, defaultFilters } from '../../sidebar-filtering/Provider';
+import { NldiFilters, WaterRightsFilters, defaultWaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider';
 import { useFiltersUrlParameters } from './useFiltersUrlParameters';
 import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../data-contracts/BeneficialUseListItem';
@@ -100,9 +100,9 @@ describe('setParameter', () => {
     expect(mockSetParameterWaterRights.mock.calls[0][0]).toBeUndefined();
   });
   test.each([
-    [undefined, defaultFilters.allocationOwner],
-    ['', defaultFilters.allocationOwner],
-    [' ', defaultFilters.allocationOwner],
+    [undefined, defaultWaterRightsFilters.allocationOwner],
+    ['', defaultWaterRightsFilters.allocationOwner],
+    [' ', defaultWaterRightsFilters.allocationOwner],
     ['a', 'a'],
     [' a', 'a'],
     ['a ', 'a'],
@@ -125,8 +125,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.beneficialUseNames],
-    [[], defaultFilters.beneficialUseNames],
+    [undefined, defaultWaterRightsFilters.beneficialUseNames],
+    [[], defaultWaterRightsFilters.beneficialUseNames],
     [['a'], ['a']],
   ])('beneficialUseNames %j', (initial, expected) => {
     const filters = {
@@ -146,9 +146,9 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [false, undefined, defaultFilters.nldiFilterData],
-    [false, populatedNldiFilterData, defaultFilters.nldiFilterData],
-    [true, undefined, defaultFilters.nldiFilterData],
+    [false, undefined, defaultWaterRightsFilters.nldiFilterData],
+    [false, populatedNldiFilterData, defaultWaterRightsFilters.nldiFilterData],
+    [true, undefined, defaultWaterRightsFilters.nldiFilterData],
     [true, populatedNldiFilterData, populatedNldiFilterData],
   ])('beneficialUseNames %j', (initialIsNldiFilterActive, initialNldiFilterData, expected) => {
     const filters = {
@@ -170,8 +170,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.ownerClassifications],
-    [[], defaultFilters.ownerClassifications],
+    [undefined, defaultWaterRightsFilters.ownerClassifications],
+    [[], defaultWaterRightsFilters.ownerClassifications],
     [['a'], ['a']],
   ])('ownerClassifications %j', (initial, expected) => {
     const filters = {
@@ -191,8 +191,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.polylines],
-    [[], defaultFilters.polylines],
+    [undefined, defaultWaterRightsFilters.polylines],
+    [[], defaultWaterRightsFilters.polylines],
     [[geoJsonDataNew], [geoJsonDataNew]],
   ])('polylines %j', (initial, expected) => {
     const filters = { ...filtersWithDefinedNldiActive, polylines: initial };
@@ -209,8 +209,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.riverBasinNames],
-    [[], defaultFilters.riverBasinNames],
+    [undefined, defaultWaterRightsFilters.riverBasinNames],
+    [[], defaultWaterRightsFilters.riverBasinNames],
     [['a'], ['a']],
   ])('riverBasinNames %j', (initial, expected) => {
     const filters = {
@@ -230,8 +230,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.states],
-    [[], defaultFilters.states],
+    [undefined, defaultWaterRightsFilters.states],
+    [[], defaultWaterRightsFilters.states],
     [['a'], ['a']],
   ])('states %j', (initial, expected) => {
     const filters = { ...filtersWithDefinedNldiActive, states: initial };
@@ -248,8 +248,8 @@ describe('setParameter', () => {
   });
 
   test.each([
-    [undefined, defaultFilters.waterSourceTypes],
-    [[], defaultFilters.waterSourceTypes],
+    [undefined, defaultWaterRightsFilters.waterSourceTypes],
+    [[], defaultWaterRightsFilters.waterSourceTypes],
     [['a'], ['a']],
   ])('states %j', (initial, expected) => {
     const filters = {

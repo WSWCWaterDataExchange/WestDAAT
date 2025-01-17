@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { useWaterRightsContext } from '../../Provider';
+import { useWaterRightsContext } from '../../WaterRightsProvider';
 import { useRiverBasinPolygons } from '../../../../../../hooks/queries/useSystemQuery';
 import { useGeoJsonFilter } from '../../../../../../hooks/filters/useGeoJsonFilter';
 import { useMapContext } from '../../../../../../contexts/MapProvider';

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { WaterRightsFilters, useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { WaterRightsFilters, useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { WaterRightsSearchCriteria } from '../../../../../data-contracts/WaterRightsSearchCriteria';
 import moment from 'moment';
 

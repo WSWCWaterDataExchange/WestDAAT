@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useWaterRightsContext, WaterRightsFilters } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext, WaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider';
 import { useGeoJsonFilter as useGeoJsonFilterBase } from '../../../../../hooks/filters/useGeoJsonFilter';
 
 type ValidGeoJsonFilters = 'polylines';

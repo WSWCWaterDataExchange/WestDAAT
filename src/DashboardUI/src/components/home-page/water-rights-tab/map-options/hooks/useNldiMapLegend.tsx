@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMemo } from 'react';
 import { nldi } from '../../../../../config/constants';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { DataPoints } from '../../../../../data-contracts/nldi';
 import { MapLegendCircleItem, MapLegendItem, MapLegendMarkerItem } from '../../../../map/MapLegendItem';
 

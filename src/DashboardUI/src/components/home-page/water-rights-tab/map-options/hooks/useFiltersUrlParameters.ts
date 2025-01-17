@@ -1,6 +1,6 @@
 import urlParameterKeys, { depricatedUrlParameterKeys } from '../../../../../hooks/url-parameters/urlParameterKeys';
 import { useUrlParameters } from '../../../../../hooks/url-parameters/useUrlParameters';
-import { WaterRightsFilters, defaultFilters } from '../../sidebar-filtering/Provider';
+import { WaterRightsFilters, defaultWaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider';
 import { useCallback, useEffect } from 'react';
 import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem } from '@data-contracts';
@@ -15,7 +15,7 @@ type WaterRightsFiltersV1Type = Optional<WaterRightsFilters, 'isNldiFilterActive
 
 export function useFiltersUrlParameters() {
   const { getParameter: getParameterOptionalNldi, setParameter: setParameterOptionalNldi } =
-    useUrlParameters<WaterRightsFiltersV1Type>(paramName, defaultFilters);
+    useUrlParameters<WaterRightsFiltersV1Type>(paramName, defaultWaterRightsFilters);
   const { getParameter: getIsNldiParameterActive, setParameter: setIsNldiParameterActive } = useUrlParameters<
     boolean | undefined
   >(depricatedUrlParameterKeys.isWaterRightsNldiFilterActive, undefined);
@@ -31,22 +31,22 @@ export function useFiltersUrlParameters() {
         allocationOwner:
           (filters.allocationOwner?.trim().length ?? 0) > 0
             ? filters.allocationOwner?.trim()
-            : defaultFilters.allocationOwner,
+            : defaultWaterRightsFilters.allocationOwner,
         beneficialUseNames:
           (filters.beneficialUseNames?.length ?? 0) > 0
             ? filters.beneficialUseNames
-            : defaultFilters.beneficialUseNames,
-        nldiFilterData: filters.isNldiFilterActive ? filters.nldiFilterData : defaultFilters.nldiFilterData,
+            : defaultWaterRightsFilters.beneficialUseNames,
+        nldiFilterData: filters.isNldiFilterActive ? filters.nldiFilterData : defaultWaterRightsFilters.nldiFilterData,
         ownerClassifications:
           (filters.ownerClassifications?.length ?? 0) > 0
             ? filters.ownerClassifications
-            : defaultFilters.ownerClassifications,
-        polylines: (filters.polylines?.length ?? 0) > 0 ? filters.polylines : defaultFilters.polylines,
+            : defaultWaterRightsFilters.ownerClassifications,
+        polylines: (filters.polylines?.length ?? 0) > 0 ? filters.polylines : defaultWaterRightsFilters.polylines,
         riverBasinNames:
-          (filters.riverBasinNames?.length ?? 0) > 0 ? filters.riverBasinNames : defaultFilters.riverBasinNames,
-        states: (filters.states?.length ?? 0) > 0 ? filters.states : defaultFilters.states,
+          (filters.riverBasinNames?.length ?? 0) > 0 ? filters.riverBasinNames : defaultWaterRightsFilters.riverBasinNames,
+        states: (filters.states?.length ?? 0) > 0 ? filters.states : defaultWaterRightsFilters.states,
         waterSourceTypes:
-          (filters.waterSourceTypes?.length ?? 0) > 0 ? filters.waterSourceTypes : defaultFilters.waterSourceTypes,
+          (filters.waterSourceTypes?.length ?? 0) > 0 ? filters.waterSourceTypes : defaultWaterRightsFilters.waterSourceTypes,
       };
       setParameterOptionalNldi(slimmedFilters);
     },

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useWaterRightsContext, defaultNldiFilters } from '../../Provider';
+import { useWaterRightsContext, defaultNldiFilters } from '../../WaterRightsProvider';
 import { waterRightsProperties } from '../../../../../../config/constants';
 import { DataPoints, Directions } from '../../../../../../data-contracts/nldi';
 import { useNldiFeatures } from '../../../../../../hooks/queries/useNldiQuery';

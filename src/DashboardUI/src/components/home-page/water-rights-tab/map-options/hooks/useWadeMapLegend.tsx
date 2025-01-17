@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useMemo } from 'react';
 import { useMapContext } from '../../../../../contexts/MapProvider';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { mapLayerNames } from '../../../../../config/maps';
 import { MapGroupingClass } from '../components/MapGroupingClass';
 import { useColorMappings } from './useColorMappings';

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { HostData, useWaterRightsContext, WaterRightsFilters } from '../../Provider';
+import { HostData, useWaterRightsContext, WaterRightsFilters } from '../../WaterRightsProvider';
 import { waterRightsProperties } from '../../../../../../config/constants';
 import { useInFilter as useInFilterBase } from '../../../../../../hooks/filters/useInFilter';
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 
 export function usePointSizeDisplayOption() {
   const {

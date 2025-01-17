@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
-import { useWaterRightsContext } from '../../sidebar-filtering/Provider';
-import { useMapPointScaling } from './useMapPointScaling';
+import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider'; // only for water-rights filters
+import { useOverlaysContext } from '../../sidebar-filtering/OverlaysProvider'; // new
 import { mapLayerNames } from '../../../../../config/maps';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useMapLegend } from './useMapLegend';
+import { useMapPointScaling } from './useMapPointScaling';
 import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
-import { useAlerts } from '../../useAlerts';
 import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
+import { useAlerts } from '../../useAlerts';
 import useSiteClickedOnMap from '../../../../../hooks/map-popups/useSiteClickedOnMap';
 
 const baseLayers = [
@@ -26,8 +27,11 @@ const overlayLayers = [
 
 export function useDisplayOptions() {
   const {
-    filters: { riverBasinNames, isNldiFilterActive, isOverlayFilterActive },
+    filters: { riverBasinNames, isNldiFilterActive },
   } = useWaterRightsContext();
+
+  const { isOverlayFilterActive } = useOverlaysContext();
+
   const { setVisibleLayers } = useMapContext();
 
   useEffect(() => {
