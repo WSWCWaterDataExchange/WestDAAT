@@ -299,6 +299,13 @@ namespace WesternStatesWater.WestDaat.Managers
                 SiteUsagePoints = siteUsagePoints.Map<List<ClientContracts.SiteUsagePoint>>()
             };
         }
+        
+        async Task<List<ClientContracts.SiteUsageTableEntry>> ClientContracts.IWaterResourceManager.GetSiteUsageTableEntriesBySiteUuid(string siteUuid)
+        {
+            var siteUsageTableEntries = await _siteAccessor.GetSiteUsageTableEntriesBySiteUuid(siteUuid);
+            return siteUsageTableEntries.Map<List<ClientContracts.SiteUsageTableEntry>>();
+        }
+
 
         async Task<List<ClientContracts.VariableInfoListItem>> ClientContracts.IWaterResourceManager.GetSiteVariableInfoListByUuid(string siteUuid)
         {

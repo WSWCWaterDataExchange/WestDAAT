@@ -30,6 +30,8 @@ public interface IWaterResourceManager : IServiceContractBase
     Task<List<MethodInfoListItem>> GetSiteMethodInfoListByUuid(string siteUuid);
 
     Task<SiteUsage> GetSiteUsageBySiteUuid(string siteUuid);
+    
+    Task<List<SiteUsageTableEntry>> GetSiteUsageTableEntriesBySiteUuid(string siteUuid);
 
     Task<List<VariableInfoListItem>> GetSiteVariableInfoListByUuid(string siteUuid);
 
