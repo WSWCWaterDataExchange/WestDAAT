@@ -1,35 +1,71 @@
 import MapboxDraw, { DrawCustomMode, MapMouseEvent } from '@mapbox/mapbox-gl-draw';
-import { GeoJSON } from 'geojson';
+import circle from '@turf/circle';
+import distance from '@turf/distance';
+import { Feature, GeoJSON, GeoJsonProperties, Polygon } from 'geojson';
+
+interface CircleDrawModeState {
+  inProgressCircleCenterPoint: [number, number] | undefined;
+}
+
+const defaultState = (): CircleDrawModeState => ({
+  inProgressCircleCenterPoint: undefined,
+});
 
 export const CustomCircleDrawMode: DrawCustomMode = {
   // inherit functionality from existing polygon draw tool
   ...MapboxDraw.modes.draw_polygon,
 
-  onSetup: (opts) => {
+  onSetup: function (opts: any): CircleDrawModeState {
     // Initialization logic for your custom mode
-    console.log('setup draw mode');
-    return { ...opts }; // Return any state your mode needs
+    return defaultState();
   },
 
-  onClick: (state: any, e: MapMouseEvent) => {
-    // Handle mouse click events
-    console.log('click');
+  onClick: function (state: CircleDrawModeState, e: MapMouseEvent) {
+    const circleHasBeenStarted = state.inProgressCircleCenterPoint !== undefined;
+
+    const coords = e.lngLat.toArray();
+    if (circleHasBeenStarted) {
+      const circle = generateCircleWithRadiusFromCenterPointToEdgePoint(state.inProgressCircleCenterPoint!, coords);
+      const circleFeature = this.newFeature({
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: circle.geometry.coordinates,
+        },
+      });
+      this.addFeature(circleFeature);
+    } else {
+      state.inProgressCircleCenterPoint = coords;
+    }
   },
 
-  onMouseMove: (state: any, e: MapMouseEvent) => {
+  onMouseMove: function (state: CircleDrawModeState, e: MapMouseEvent) {
     // Handle mouse movement
   },
 
-  onKeyUp: (state: any, e: KeyboardEvent) => {
+  onKeyUp: function (state: CircleDrawModeState, e: KeyboardEvent) {
     // Handle keyboard input if needed
   },
 
-  onStop: (state: any) => {
+  onStop: function (state: CircleDrawModeState) {
     // Cleanup when the mode ends
   },
 
   // Required: Get the features your mode is managing
-  toDisplayFeatures: (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) => {
+  toDisplayFeatures: function (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) {
     display(geojson); // Pass features to Mapbox Draw to render
   },
+};
+
+type CircleFeature = Feature<Polygon, GeoJsonProperties>;
+
+const generateCircleWithRadiusFromCenterPointToEdgePoint = (
+  circleCenterPoint: number[],
+  circleEdgePoint: number[],
+): CircleFeature => {
+  const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
+    units: 'kilometers',
+  });
+  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
 };
