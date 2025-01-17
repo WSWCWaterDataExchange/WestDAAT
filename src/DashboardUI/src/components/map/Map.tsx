@@ -26,6 +26,7 @@ import { CustomRenderCircleControl } from './CustomRenderCircleControl';
 
 import './map.scss';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
+import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -111,8 +112,8 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     }
   };
 
-  const mapboxDrawControl = (mapInstance: mapboxgl.Map) => {
-    if (!handleMapDrawnPolygonChange) return;
+  const mapboxDrawControl = (mapInstance: mapboxgl.Map): MapboxDraw | null => {
+    if (!handleMapDrawnPolygonChange) return null;
     const dc = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
@@ -126,7 +127,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     });
 
     mapInstance.addControl(dc);
-    dc.changeMode('draw_circle');
 
     const callback = () => {
       if (handleMapDrawnPolygonChange) handleMapDrawnPolygonChange(dc.getAll().features);
@@ -137,6 +137,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     mapInstance.on('draw.delete', callback);
 
     setDrawControl(dc);
+    return dc;
   };
 
   const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
@@ -186,9 +187,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       if (handleMapFitChange) mapInstance.addControl(new CustomFitControl(handleMapFitChange));
       mapInstance.addControl(new CustomShareControl());
       mapInstance.addControl(new mapboxgl.ScaleControl());
-      mapInstance.addControl(new CustomRenderCircleControl(mapInstance));
 
-      mapboxDrawControl(mapInstance);
+      const dc = mapboxDrawControl(mapInstance);
+      mapInstance.addControl(new CustomCircleDrawModeControl(dc));
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
