@@ -1,0 +1,52 @@
+# This workflow is environment agnostic and can be used to deploy to any environment.
+# This workflow will be called by the environment specific workflows (qa/prod/etc).
+
+name: Deploy Infrastructure
+
+env:
+  AZURE_SUBSCRIPTION_ID: 7847533a-6a20-4b25-a2b5-f50e005985c5
+
+on:
+  workflow_call:
+    inputs:
+      azure-resource-group:
+        description: "The resource group name in Azure"
+        required: true
+        type: string
+      azure-bicep-params-file:
+        description: "The parameters file for the Bicep deployment"
+        required: true
+        type: string
+    secrets:
+      azure-cli-credentials:
+        description: "The credentials for the Azure CLI"
+        required: true
+
+jobs:
+  deploy-bicep:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+          enable-AzPSSession: true # Required for Azure Powershell to work
+
+      # https://github.com/marketplace/actions/bicep-deploy
+      - name: Deployment
+        uses: azure/bicep-deploy@v1
+        with:
+          type: deployment
+          operation: create
+          name: AzureDeploy
+          scope: resourceGroup
+          resource-group-name: ${{ inputs.azure-resource-group }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          template-file: ./infrastructure/azuredeploy.bicep
+          parameters-file: ./infrastructure/${{ inputs.azure-bicep-params-file }}
