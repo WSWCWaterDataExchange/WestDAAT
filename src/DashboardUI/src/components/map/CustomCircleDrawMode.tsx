@@ -51,25 +51,22 @@ export const CustomCircleDrawMode: DrawCustomMode = {
     }
 
     // render the in-progress circle:
+    // delete the existing one, render a new one
+    this.deleteFeature(state.inProgressCircleId!);
 
-    let circleFeature = this.getFeature(state.inProgressCircleId!);
+    const circle = generateCircleWithRadiusFromCenterPointToEdgePoint(state.inProgressCircleCenterPoint!, coords);
+    const circleFeature = this.newFeature({
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: circle.geometry.coordinates,
+      },
+    });
 
-    // first time this activates, the circle should not exist yet. create it
-    if (!circleFeature) {
-      console.log('generate new circle...');
-      const circle = generateCircleWithRadiusFromCenterPointToEdgePoint(state.inProgressCircleCenterPoint!, coords);
-      circleFeature = this.newFeature({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'Polygon',
-          coordinates: circle.geometry.coordinates,
-        },
-      });
-      // newFeature generates an id for the feature automatically; track it:
-      state.inProgressCircleId = String(circleFeature.id);
-      this.addFeature(circleFeature);
-    }
+    // newFeature generates an id for the feature automatically; track it:
+    state.inProgressCircleId = String(circleFeature.id);
+    this.addFeature(circleFeature);
 
     console.log('circleFeature', circleFeature);
     circleFeature.setProperty('radius', distance(state.inProgressCircleCenterPoint!, coords, { units: 'kilometers' }));
