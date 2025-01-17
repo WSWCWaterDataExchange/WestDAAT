@@ -4,10 +4,10 @@ import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useBeneficialUsesFilter } from './useBeneficialUsesFilter';
 import { useFlowFilters } from './useFlowFilters';
 import { useIncludeExemptFilter } from './useIncludeExemptFilter';
-import { useNldiFilter} from "../../nldi/hooks/useNldiFilter";
+import { useNldiFilter } from '../../nldi/hooks/useNldiFilter';
 import { useOwnerClassificationsFilter } from './useOwnerClassificationsFilter';
-import { usePodPouFilter } from "../../../map-options/hooks/usePodPouFilter";
-import { usePolylinesFilter } from "../../../map-options/hooks/usePolylinesFilter";
+import { usePodPouFilter } from '../../../map-options/hooks/usePodPouFilter';
+import { usePolylinesFilter } from '../../../map-options/hooks/usePolylinesFilter';
 import { usePriorityDateFilters } from './usePriorityDateFilters';
 import { useRiverBasinFilter } from './useRiverBasinFilter';
 import { useSiteTypesFilter } from './useSiteTypesFilter';
@@ -33,7 +33,7 @@ export function useWaterRightsFilter() {
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
 
   return useMemo(() => {
-    const filters = [
+    return [
       podPouMapFilters,
       includeExemptMapFilters,
       beneficialUsesMapFilters,
@@ -50,8 +50,6 @@ export function useWaterRightsFilter() {
       legalStatusesFilter,
       siteTypesFilter,
     ];
-
-    return filters.filter(Boolean);
   }, [
     podPouMapFilters,
     includeExemptMapFilters,
