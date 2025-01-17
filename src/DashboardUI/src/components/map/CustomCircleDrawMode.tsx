@@ -28,17 +28,17 @@ export const CustomCircleDrawMode: DrawCustomMode = {
     const coords = e.lngLat.toArray();
     const circleHasBeenStarted = state.inProgressCircleCenterPoint !== undefined;
 
-    if (circleHasBeenStarted) {
+    if (!circleHasBeenStarted) {
+      // starting a new circle
+      // set the center point
+      state.inProgressCircleCenterPoint = coords;
+    } else {
       // finish the circle
       // unset the id
       state.inProgressCircleId = undefined;
 
       // unset the center point
       state.inProgressCircleCenterPoint = undefined;
-    } else {
-      // starting a new circle
-      // set the center point
-      state.inProgressCircleCenterPoint = coords;
     }
   },
 
