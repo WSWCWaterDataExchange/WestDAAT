@@ -53,6 +53,22 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
 
         [TestMethod]
+        public async Task ExecuteAsync_EmptyBody_ShouldReturnValidationError()
+        {
+            // Can happen when request body is empty
+            var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(null);
+
+            response.Should().NotBeNull();
+            response.Should().BeOfType<TestResponse>();
+            response.Error.Should().NotBeNull();
+            response.Error.Should().BeOfType<ValidationError>();
+
+            var error = (ValidationError)response.Error!;
+            error.Errors.Keys.Count.Should().Be(1);
+            error.Errors["request"].Should().Contain("Request object is null");
+        }
+
+        [TestMethod]
         public async Task ExecuteAsync_EngineValidationFails_ShouldHaltAndReturnError()
         {
             var request = new TestRequest { Id = 42 };

@@ -89,6 +89,14 @@ namespace WesternStatesWater.WestDaat.Managers
         {
             try
             {
+                // Will occur if request body is empty
+                if (request is null)
+                {
+                    return CreateErrorResponse<TRequest, TResponse>(new ValidationError(
+                        new Dictionary<string, string[]> { { nameof(request), ["Request object is null"] } }
+                    ));
+                }
+
                 var inputValidationResult = await request.ValidateAsync();
 
                 if (!inputValidationResult.IsValid)
