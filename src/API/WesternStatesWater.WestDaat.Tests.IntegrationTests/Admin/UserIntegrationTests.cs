@@ -24,7 +24,7 @@ public class UserIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _userManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task Load_EnrichJwt_ShouldReturnContinueResponseWithCorrectData()
+    public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_Success()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -44,11 +44,11 @@ public class UserIntegrationTests : IntegrationTestBase
         UseIdentityProviderContext();
 
         // Act
-        var request = new CLI.Requests.Admin.EnrichJwtRequest
-        {
-            ObjectId = user.ExternalAuthId,
-        };
-        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
+            new CLI.Requests.Admin.EnrichJwtRequest
+            {
+                ObjectId = user.ExternalAuthId,
+            });
 
         // Assert
         response.Should().NotBeNull();
@@ -66,36 +66,6 @@ public class UserIntegrationTests : IntegrationTestBase
         userOrganizationRoles.All(uor => response.Extension_WestDaat_OrganizationRoles
             .Contains($"org_{uor.UserOrganization.OrganizationId}/rol_{uor.Role}")
         ).Should().BeTrue();
-    }
-
-    [TestMethod]
-    public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_Success()
-    {
-        // Arrange
-        UseIdentityProviderContext();
-
-        // Act
-        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
-            new CLI.Requests.Admin.EnrichJwtRequest
-            {
-                ObjectId = "1234",
-            });
-
-        // Assert
-        response.Should().NotBeNull();
-
-        const string expectedAzureB2CVersion = "1.0.0";
-        const string expectedAzureB2CAction = "Continue";
-        response.Version.Should().Be(expectedAzureB2CVersion);
-        response.Action.Should().Be(expectedAzureB2CAction);
-        response.Extension_WestDaat_UserId.Should().NotBeEmpty();
-        response.Extension_WestDaat_Roles.Should().Be("rol_role1,rol_role2");
-
-        const string orgRolePrefix = "org_";
-        const string rolePrefix = "rol_";
-        const string orgRole1 = "organizationRole1";
-        const string orgRole2 = "organizationRole2";
-        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll(orgRolePrefix, rolePrefix, orgRole1, orgRole2);
     }
 
     [DataTestMethod]
