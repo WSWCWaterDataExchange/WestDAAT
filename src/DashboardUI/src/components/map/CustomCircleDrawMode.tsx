@@ -39,6 +39,9 @@ export const CustomCircleDrawMode: DrawCustomMode = {
 
       // unset the center point
       state.inProgressCircleCenterPoint = undefined;
+
+      // switch back to the default mode
+      this.changeMode('simple_select');
     }
   },
 
