@@ -14,7 +14,7 @@ public static class JwtFaker
     {
         var claims = new List<Claim>
         {
-            new("extension_westdaat/userId", userId.ToString()),
+            new("extension_westdaat_userId", userId.ToString()),
             new("sub", externalAuthId.ToString())
         };
 
@@ -22,7 +22,7 @@ public static class JwtFaker
         {
             claims.Add(
                 new Claim(
-                    "extension_westdaat/organizationRoles",
+                    "extension_westdaat_organizationRoles",
                     string.Join(',', orgRoles.Select(orgId =>$"org_{orgId.Key}/rol_{orgId.Value}"))
                 )
             );
@@ -32,7 +32,7 @@ public static class JwtFaker
         {
             claims.Add(
                 new Claim(
-                    "extension_westdaat/roles",
+                    "extension_westdaat_roles",
                     string.Join(',', roles.Select(role => $"rol_{role}"))
                 )
             );

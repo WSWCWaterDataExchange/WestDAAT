@@ -7,8 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  deploy-infrastructure:
+    uses: ./.github/workflows/deploy-infrastructure.yml
+    with:
+      azure-resource-group: WestDAAT_Staging
+      azure-bicep-params-file: azuredeploy.staging.json
+    secrets:
+      azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
   deploy-backend:
     uses: ./.github/workflows/deploy-backend.yml
+    needs: deploy-infrastructure
     with:
       azure-resource-group: WestDAAT_Staging
       azure-functionapp-name: westdaat-staging

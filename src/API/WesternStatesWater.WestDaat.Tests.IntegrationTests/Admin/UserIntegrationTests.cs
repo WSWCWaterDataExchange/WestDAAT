@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Tests.Helpers;
+using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -17,12 +19,12 @@ public class UserIntegrationTests : IntegrationTestBase
         var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestDaatDatabaseContextFactory>();
         _dbContext = dbContextFactory.Create();
     }
-    
+
     [TestMethod]
     public void SmokeTest() => _userManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task Load_EnrichJwt_ShouldReturnContinueResponseWithCorrectData()
+    public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_Success()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -39,12 +41,14 @@ public class UserIntegrationTests : IntegrationTestBase
 
         await _dbContext.SaveChangesAsync();
 
+        UseIdentityProviderContext();
+
         // Act
-        var request = new CLI.Requests.Admin.EnrichJwtRequest
-        {
-            ObjectId = user.ExternalAuthId,
-        };
-        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
+            new CLI.Requests.Admin.EnrichJwtRequest
+            {
+                ObjectId = user.ExternalAuthId,
+            });
 
         // Assert
         response.Should().NotBeNull();
@@ -62,5 +66,26 @@ public class UserIntegrationTests : IntegrationTestBase
         userOrganizationRoles.All(uor => response.Extension_WestDaat_OrganizationRoles
             .Contains($"org_{uor.UserOrganization.OrganizationId}/rol_{uor.Role}")
         ).Should().BeTrue();
+    }
+
+    [DataTestMethod]
+    [DataRow(typeof(AnonymousContext))]
+    [DataRow(typeof(UserContext))]
+    public async Task Load_EnrichJwtRequest_InvalidContext_ShouldThrow(Type contextType)
+    {
+        // Arrange
+        ContextUtilityMock
+            .Setup(mock => mock.GetContext())
+            .Returns(Activator.CreateInstance(contextType) as ContextBase);
+
+        // Act
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
+            new CLI.Requests.Admin.EnrichJwtRequest
+            {
+                ObjectId = "1234",
+            });
+
+        // Assert
+        response.Error.Should().BeOfType<ForbiddenError>();
     }
 }

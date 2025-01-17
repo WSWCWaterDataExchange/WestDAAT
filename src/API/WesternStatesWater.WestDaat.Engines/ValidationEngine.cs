@@ -24,13 +24,13 @@ internal class ValidationEngine : IValidationEngine
         _securityUtility = securityUtility;
     }
 
-    public Task<ErrorBase> Validate(RequestBase request)
+    public async Task<ErrorBase> Validate(RequestBase request)
     {
         var context = _contextUtility.GetContext();
 
         return request switch
         {
-            ApplicationStoreRequestBase req => ValidateApplicationStoreRequest(req, context),
+            ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -69,15 +69,25 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private Task<ErrorBase> ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
+    private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
     {
         return request switch
         {
-            EnrichJwtRequest => Task.FromResult((ErrorBase) null),
+            EnrichJwtRequest => ValidateEnrichJwtRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
+    }
+
+    private ErrorBase ValidateEnrichJwtRequest(ContextBase context)
+    {
+        if (context is not IdentityProviderContext)
+        {
+            return CreateForbiddenError(new EnrichJwtRequest(), context);
+        }
+
+        return null;
     }
 
     private ForbiddenError CreateForbiddenError(
