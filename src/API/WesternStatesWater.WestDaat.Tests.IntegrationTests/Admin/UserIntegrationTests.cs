@@ -41,6 +41,8 @@ public class UserIntegrationTests : IntegrationTestBase
 
         await _dbContext.SaveChangesAsync();
 
+        UseIdentityProviderContext();
+
         // Act
         var request = new CLI.Requests.Admin.EnrichJwtRequest
         {
