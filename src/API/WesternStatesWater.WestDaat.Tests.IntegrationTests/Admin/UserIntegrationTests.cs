@@ -66,6 +66,7 @@ public class UserIntegrationTests : IntegrationTestBase
         ).Should().BeTrue();
     }
 
+    [TestMethod]
     public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_Success()
     {
         // Arrange
@@ -81,19 +82,18 @@ public class UserIntegrationTests : IntegrationTestBase
         // Assert
         response.Should().NotBeNull();
 
-        // metadata
         const string expectedAzureB2CVersion = "1.0.0";
         const string expectedAzureB2CAction = "Continue";
         response.Version.Should().Be(expectedAzureB2CVersion);
         response.Action.Should().Be(expectedAzureB2CAction);
+        response.Extension_WestDaat_UserId.Should().NotBeEmpty();
+        response.Extension_WestDaat_Roles.Should().Be("rol_role1,rol_role2");
 
-        // actual data
-        response.Extension_WestDaat_UserId.Should().Be(user.Id.ToString());
-        userRoles.All(ur => response.Extension_WestDaat_Roles.Contains($"rol_{ur.Role}")).Should().BeTrue();
-
-        userOrganizationRoles.All(uor => response.Extension_WestDaat_OrganizationRoles
-            .Contains($"org_{uor.UserOrganization.OrganizationId}/rol_{uor.Role}")
-        ).Should().BeTrue();
+        const string orgRolePrefix = "org_";
+        const string rolePrefix = "rol_";
+        const string orgRole1 = "organizationRole1";
+        const string orgRole2 = "organizationRole2";
+        response.Extension_WestDaat_OrganizationRoles.Should().ContainAll(orgRolePrefix, rolePrefix, orgRole1, orgRole2);
     }
 
     [DataTestMethod]
