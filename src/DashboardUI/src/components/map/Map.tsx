@@ -25,6 +25,7 @@ import { ToastContainer } from 'react-toastify';
 import { CustomRenderCircleControl } from './CustomRenderCircleControl';
 
 import './map.scss';
+import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -118,9 +119,14 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         polygon: true,
         trash: true,
       },
+      modes: {
+        ...MapboxDraw.modes,
+        draw_circle: CustomCircleDrawMode,
+      },
     });
 
     mapInstance.addControl(dc);
+    dc.changeMode('draw_circle');
 
     const callback = () => {
       if (handleMapDrawnPolygonChange) handleMapDrawnPolygonChange(dc.getAll().features);
