@@ -49,7 +49,6 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         number,
         number,
       ];
-      console.log('center point', state.customState.circleState.circleCenterPointLngLat);
     }
 
     return state;
@@ -71,27 +70,31 @@ export const CustomDirectSelectMode: DrawCustomMode = {
           number,
           number,
         ];
-        console.log('center point updated', state.customState.circleState.circleCenterPointLngLat);
       }
     };
 
-    const dragVertex2 = (e: MapboxDraw.MapMouseEvent) => {
-      // find new coordinate location via mouse position
-      const newCoordPosition = e.lngLat;
+    const dragVertex = (e: MapboxDraw.MapMouseEvent) => {
+      // determine whether to override the drag behavior
+      if (state.feature?.properties?.isCircle) {
+        // find new coordinate location via mouse position
+        const newCoordPosition = e.lngLat;
 
-      // generate new coordinates
-      const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
-        state.customState.circleState.circleCenterPointLngLat!,
-        newCoordPosition.toArray(),
-      );
+        // generate new coordinates
+        const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
+          state.customState.circleState.circleCenterPointLngLat!,
+          newCoordPosition.toArray(),
+        );
 
-      // update the feature with the new coordinates
-      state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
+        // update the feature with the new coordinates
+        state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
+      } else {
+        baseMode.onDrag?.call(this, state, e);
+      }
     };
 
-    // determine whether to call base implementation or custom implementation
+    // determine whether to move the whole feature or just a vertex
     if (state.selectedCoordPaths.length > 0) {
-      dragVertex2(e);
+      dragVertex(e);
     } else {
       dragFeature();
     }
@@ -108,6 +111,5 @@ const generateCircleWithRadiusFromCenterPointToEdgePoint = (
   const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
     units: 'kilometers',
   });
-  console.log('update circle with radius', distanceFromCenterToEdgeInKm);
   return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
 };
