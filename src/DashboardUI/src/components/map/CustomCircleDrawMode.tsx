@@ -90,6 +90,10 @@ export const CustomCircleDrawMode: DrawCustomMode = {
     }
   },
 
+  onStop: function (state: CircleDrawModeState) {
+    // Cleanup when the mode ends
+  },
+
   // Required: Get the features your mode is managing
   toDisplayFeatures: function (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) {
     display(geojson); // Pass features to Mapbox Draw to render
