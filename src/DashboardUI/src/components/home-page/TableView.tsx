@@ -20,8 +20,7 @@ function TableView() {
       <Button
         type="button"
         className={`table-view-toggle-btn ${show ? 'toggle-on' : 'toggle-off'}`}
-        onClick={toggleShow}
-      >
+        onClick={toggleShow}>
         <span>ANALYTICS &amp; TABLE</span>
         <Icon path={show ? mdiChevronDown : mdiChevronUp} />
       </Button>
