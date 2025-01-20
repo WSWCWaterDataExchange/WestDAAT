@@ -16,7 +16,7 @@ interface CircleSelectModeState {
   dragMoveLocation: LngLat;
   dragMoving: boolean;
   featureId: string;
-  feature: GeoJSON.Feature | null | undefined; //?
+  feature: MapboxDraw.DrawPolygon | null | undefined; //?
   selectedCoordPaths: string[];
 }
 
@@ -29,7 +29,7 @@ const defaultCustomState: CircleSelectModeState['customState'] = {
 
 // DrawCustomMode type definition doesn't allow for extending the type with additional properties
 // although the js implementation of `direct_select` does exactly that
-export const CustomDirectSelectMode: DrawCustomMode & { [key: string]: any } = {
+export const CustomDirectSelectMode: DrawCustomMode = {
   ...baseMode,
 
   onSetup: function (opts): CircleSelectModeState {
@@ -51,12 +51,7 @@ export const CustomDirectSelectMode: DrawCustomMode & { [key: string]: any } = {
     state.dragMoving = true;
     e.originalEvent.stopPropagation();
 
-    // determine whether to call base implementation or custom implementation
-    if (state.selectedCoordPaths.length > 0) {
-      const delta = new LngLat(e.lngLat.lng - state.dragMoveLocation.lng, e.lngLat.lat - state.dragMoveLocation.lat);
-      this.dragVertex(state, e, delta);
-    } else {
-      // drag feature
+    const dragFeature = () => {
       // call base implementation, let it handle the drag
       baseMode.onDrag?.call(this, state, e);
 
@@ -68,14 +63,17 @@ export const CustomDirectSelectMode: DrawCustomMode & { [key: string]: any } = {
         ];
         console.log('center point updated', state.customState.circleState.circleCenterPoint);
       }
+    };
+
+    // determine whether to call base implementation or custom implementation
+    if (state.selectedCoordPaths.length > 0) {
+      // const delta = new LngLat(e.lngLat.lng - state.dragMoveLocation.lng, e.lngLat.lat - state.dragMoveLocation.lat);
+      // this.dragVertex(state, e, delta);
+    } else {
+      dragFeature();
     }
 
     // post-processing copied from base implementation
     state.dragMoveLocation = e.lngLat;
-  },
-
-  dragVertex: (state: CircleSelectModeState, e: MapboxDraw.MapMouseEvent, delta: LngLat) => {
-    // not calling base mode dragVertex, overwriting entirely
-    console.log('dragging vertex', state, e, delta);
   },
 };
