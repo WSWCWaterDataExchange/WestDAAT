@@ -30,7 +30,6 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
-import { CustomCircleSelectMode } from './CustomCircleSelectMode';
 
 import './map.scss';
 
@@ -129,7 +128,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       modes: {
         ...MapboxDraw.modes,
         draw_circle: CustomCircleDrawMode,
-        drag_circle: CustomCircleSelectMode,
       },
     });
 
@@ -184,17 +182,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       }
     });
 
-    const handleClickedFeatures = (dc: MapboxDraw, allFeatures: Feature<Geometry, GeoJsonProperties>[]) => {
-      const circleFeatures = allFeatures.filter(
-        (a) => a?.properties?.isCircle === true && !a?.properties?.isInProgress,
-      );
-      if (circleFeatures.length > 0) {
-        // select the first circle feature
-        dc.changeMode('drag_circle', { featureId: circleFeatures[0].id });
-        return;
-      }
-    };
-
     mapInstance.once('load', () => {
       const mapSettings: MapSettings = defaultMapLocationData;
       mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
@@ -233,18 +220,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
-      });
-
-      mapInstance.on('click', (e: MapMouseEvent) => {
-        const featureIds = dc?.getFeatureIdsAt(e.point);
-        if (!featureIds) {
-          return;
-        }
-
-        const features = featureIds.map((id) => dc!.get(id)!);
-        if (features.length > 0) {
-          handleClickedFeatures(dc!, features);
-        }
       });
 
       mapConfig.sources.forEach((a) => {
