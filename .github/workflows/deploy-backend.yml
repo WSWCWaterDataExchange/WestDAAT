@@ -97,9 +97,8 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.azure-cli-credentials }}
-          enable-AzPSSession: true # Required for Azure Powershell to work
 
-      - name: create-whitelist-ip-in-db-firewall
+      - name: Create Database Firewall Rule
         id: create-whitelist-ip-in-db-firewall
         uses: azure/CLI@v1
         with:
@@ -108,17 +107,17 @@ jobs:
             agentIP=$(curl -s https://api.ipify.org/)
             az sql server firewall-rule create \
               --resource-group "${{ inputs.azure-resource-group }}" \
-              --server WestDAAT \
+              --server ${{ inputs.database-server-name }} \
               --name ${{ env.FIREWALL_RULE_NAME }} \
               --start-ip-address $agentIP \
               --end-ip-address $agentIP
 
-      - name: update-database
+      - name: Update Database
         run: dotnet run --configuration Release
         env:
           ConnectionStrings__WestDaatDatabase: ${{ secrets.database-connection-string}}
 
-      - name: remove-whitelist-ip-in-db-firewall
+      - name: Remove Database Firewall Rule
         uses: azure/CLI@v1
         if: success() || steps.create-whitelist-ip-in-db-firewall.outputs.exit_code == 0
         with:
