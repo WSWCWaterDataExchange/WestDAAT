@@ -1,5 +1,8 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
+import circle from '@turf/circle';
+import distance from '@turf/distance';
+import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import { LngLat } from 'mapbox-gl';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
@@ -10,7 +13,7 @@ interface CircleSelectModeState {
   customState: {
     isCircle: boolean;
     circleState: {
-      circleCenterPoint: [number, number] | undefined;
+      circleCenterPointLngLat: [number, number] | undefined;
     };
   };
   // inherited properties from base implementation
@@ -25,9 +28,11 @@ interface CircleSelectModeState {
 const defaultCustomState: CircleSelectModeState['customState'] = {
   isCircle: false,
   circleState: {
-    circleCenterPoint: undefined,
+    circleCenterPointLngLat: undefined,
   },
 };
+
+type CircleFeature = Feature<Polygon, GeoJsonProperties>;
 
 // DrawCustomMode type definition doesn't allow for extending the type with additional properties
 // although the js implementation of `direct_select` does exactly that
@@ -40,8 +45,11 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     state.customState = defaultCustomState;
 
     if (state.feature?.properties?.isCircle) {
-      state.customState.circleState.circleCenterPoint = center(state.feature).geometry.coordinates as [number, number];
-      console.log('center point', state.customState.circleState.circleCenterPoint);
+      state.customState.circleState.circleCenterPointLngLat = center(state.feature).geometry.coordinates as [
+        number,
+        number,
+      ];
+      console.log('center point', state.customState.circleState.circleCenterPointLngLat);
     }
 
     return state;
@@ -59,33 +67,31 @@ export const CustomDirectSelectMode: DrawCustomMode = {
 
       if (state.feature?.properties?.isCircle) {
         // afterwards update the center point of the circle
-        state.customState.circleState.circleCenterPoint = center(state.feature).geometry.coordinates as [
+        state.customState.circleState.circleCenterPointLngLat = center(state.feature).geometry.coordinates as [
           number,
           number,
         ];
-        console.log('center point updated', state.customState.circleState.circleCenterPoint);
+        console.log('center point updated', state.customState.circleState.circleCenterPointLngLat);
       }
     };
 
-    const dragVertex = () => {
-      const delta = new LngLat(e.lngLat.lng - state.dragMoveLocation.lng, e.lngLat.lat - state.dragMoveLocation.lat);
+    const dragVertex2 = (e: MapboxDraw.MapMouseEvent) => {
+      // find new coordinate location via mouse position
+      const newCoordPosition = e.lngLat;
 
-      // temp - copied logic from base implementation
-      // todo: update to resize circle
-      const selectedCoords = state.selectedCoordPaths.map((coord_path) => state.feature?.getCoordinate(coord_path));
+      // generate new coordinates
+      const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
+        state.customState.circleState.circleCenterPointLngLat!,
+        newCoordPosition.toArray(),
+      );
 
-      // we don't need to constrain the coordinates (as the base implementation does) because the map cannot be resized past the north and south poles
-      for (let i = 0; i < selectedCoords.length; i++) {
-        const coord = selectedCoords[i];
-        if (!coord) continue;
-
-        state.feature?.updateCoordinate(state.selectedCoordPaths[i], coord[0] + delta.lng, coord[1] + delta.lat);
-      }
+      // update the feature with the new coordinates
+      state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
     };
 
     // determine whether to call base implementation or custom implementation
     if (state.selectedCoordPaths.length > 0) {
-      dragVertex();
+      dragVertex2(e);
     } else {
       dragFeature();
     }
@@ -93,4 +99,15 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     // post-processing copied from base implementation
     state.dragMoveLocation = e.lngLat;
   },
+};
+
+const generateCircleWithRadiusFromCenterPointToEdgePoint = (
+  circleCenterPoint: number[],
+  circleEdgePoint: number[],
+): CircleFeature => {
+  const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
+    units: 'kilometers',
+  });
+  console.log('update circle with radius', distanceFromCenterToEdgeInKm);
+  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
 };
