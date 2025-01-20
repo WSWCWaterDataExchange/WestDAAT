@@ -1,4 +1,6 @@
-import { FeatureCollection, GeoJsonProperties, Geometry, Position } from 'geojson';
+import { circle } from '@turf/circle';
+import { distance } from '@turf/distance';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Polygon, Position } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 
 export function getLatsLongsFromFeatureCollection(featureCollection: FeatureCollection<Geometry, GeoJsonProperties>) {
@@ -24,3 +26,13 @@ export function getLatsLongsFromFeatureCollection(featureCollection: FeatureColl
 
   return positions.map((a) => new mapboxgl.LngLat(a[0], a[1]));
 }
+
+export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
+  circleCenterPoint: number[],
+  circleEdgePoint: number[],
+): Feature<Polygon, GeoJsonProperties> => {
+  const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
+    units: 'kilometers',
+  });
+  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
+};

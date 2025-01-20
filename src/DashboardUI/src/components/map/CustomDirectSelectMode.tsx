@@ -1,9 +1,7 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
-import circle from '@turf/circle';
-import distance from '@turf/distance';
-import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import { LngLat } from 'mapbox-gl';
+import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
 
@@ -32,15 +30,12 @@ const defaultCustomState: CircleSelectModeState['customState'] = {
   },
 };
 
-type CircleFeature = Feature<Polygon, GeoJsonProperties>;
-
 // DrawCustomMode type definition doesn't allow for extending the type with additional properties
 // although the js implementation of `direct_select` does exactly that
 export const CustomDirectSelectMode: DrawCustomMode = {
   ...baseMode,
 
   onSetup: function (opts): CircleSelectModeState {
-    // initialize state
     const state: CircleSelectModeState = baseMode.onSetup?.call(this, opts);
     state.customState = defaultCustomState;
 
@@ -102,14 +97,4 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     // post-processing copied from base implementation
     state.dragMoveLocation = e.lngLat;
   },
-};
-
-const generateCircleWithRadiusFromCenterPointToEdgePoint = (
-  circleCenterPoint: number[],
-  circleEdgePoint: number[],
-): CircleFeature => {
-  const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
-    units: 'kilometers',
-  });
-  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
 };

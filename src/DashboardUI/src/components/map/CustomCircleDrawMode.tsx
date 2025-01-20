@@ -1,9 +1,6 @@
 import MapboxDraw, { DrawCustomMode, MapMouseEvent } from '@mapbox/mapbox-gl-draw';
-import circle from '@turf/circle';
-import distance from '@turf/distance';
-import { Feature, GeoJSON, GeoJsonProperties, Polygon } from 'geojson';
-
-type CircleFeature = Feature<Polygon, GeoJsonProperties>;
+import { GeoJSON } from 'geojson';
+import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
 
 interface CircleDrawModeState {
   inProgressCircleCenterPoint: [number, number] | undefined;
@@ -98,14 +95,4 @@ export const CustomCircleDrawMode: DrawCustomMode = {
   toDisplayFeatures: function (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) {
     display(geojson); // Pass features to Mapbox Draw to render
   },
-};
-
-const generateCircleWithRadiusFromCenterPointToEdgePoint = (
-  circleCenterPoint: number[],
-  circleEdgePoint: number[],
-): CircleFeature => {
-  const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
-    units: 'kilometers',
-  });
-  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
 };
