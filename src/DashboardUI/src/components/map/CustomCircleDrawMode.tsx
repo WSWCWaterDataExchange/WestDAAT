@@ -15,6 +15,8 @@ const defaultState = (): CircleDrawModeState => ({
   inProgressCircleId: undefined,
 });
 
+// todo: this doesn't seem to fire the draw.create event when you create the circle? not sure if needed
+
 export const CustomCircleDrawMode: DrawCustomMode = {
   // inherit functionality from existing polygon draw tool
   ...MapboxDraw.modes.draw_polygon,
@@ -63,7 +65,9 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       // create new circle feature if it doesn't exist
       circleFeature = this.newFeature({
         type: 'Feature',
-        properties: {},
+        properties: {
+          isCircle: true,
+        },
         geometry: {
           type: 'Polygon',
           coordinates: circle.geometry.coordinates,
