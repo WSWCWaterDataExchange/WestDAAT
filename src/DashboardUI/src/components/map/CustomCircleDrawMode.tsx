@@ -111,5 +111,5 @@ const generateCircleWithRadiusFromCenterPointToEdgePoint = (
   const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
     units: 'kilometers',
   });
-  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
+  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 20 });
 };
