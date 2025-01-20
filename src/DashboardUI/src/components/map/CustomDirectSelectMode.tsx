@@ -1,6 +1,7 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
 import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
@@ -96,5 +97,48 @@ export const CustomDirectSelectMode: DrawCustomMode = {
 
     // post-processing copied from base implementation
     state.dragMoveLocation = e.lngLat;
+  },
+
+  toDisplayFeatures: function (
+    state: CircleSelectModeState,
+    geojson: Feature<Geometry, GeoJsonProperties>,
+    display: (geojson: GeoJSON) => void,
+  ) {
+    const getRightmostCoordinate = (): Position => {
+      return state
+        .feature!.getCoordinates()
+        .map((position) => position[1])
+        .reduce((prevLng, currentLng) => (prevLng > currentLng ? prevLng : currentLng));
+    };
+
+    // determine whether to override the base implementation
+    if (state.feature?.properties?.isCircle) {
+      // display the circle feature
+      if (state.featureId === geojson.properties?.id) {
+        geojson.properties.active = 'true';
+        display(geojson);
+
+        const supplementaryPointLocation = getRightmostCoordinate();
+
+        // render the supplementary point manually so it doesn't become part of the map's feature collection
+        const vertex: Feature<Geometry, GeoJsonProperties> = {
+          type: 'Feature',
+          properties: {
+            meta: 'vertex',
+            parent: geojson.properties.id,
+            coord_path: '0.0',
+            active: 'true',
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [supplementaryPointLocation[0], supplementaryPointLocation[1]],
+          },
+        };
+        display(vertex);
+      }
+    } else {
+      // call base implementation
+      baseMode.toDisplayFeatures?.call(this, state, geojson, display);
+    }
   },
 };

@@ -30,9 +30,9 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
+import { CustomDirectSelectMode } from './CustomDirectSelectMode';
 
 import './map.scss';
-import { CustomDirectSelectMode } from './CustomDirectSelectMode';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
