@@ -104,12 +104,38 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     geojson: Feature<Geometry, GeoJsonProperties>,
     display: (geojson: GeoJSON) => void,
   ) {
-    const getRightmostCoordinate = (): Position => {
-      return state
-        .feature!.getCoordinates()
-        .map((position) => position[1])
-        .reduce((prevLng, currentLng) => (prevLng > currentLng ? prevLng : currentLng));
+    const getCardinalDirectionCoordinatesOnFeature = (): Position[] => {
+      // technically this gets the coordinates that align most closely with the cardinal directions
+      // but the distinction doesn't really matter for a circle containing a sufficient number of points
+      const allCoords = state.feature!.getCoordinates()[0];
+      const north = allCoords.reduce((prevCoord, currentCoord) =>
+        prevCoord[1] > currentCoord[1] ? prevCoord : currentCoord,
+      );
+      const east = allCoords.reduce((prevCoord, currentCoord) =>
+        prevCoord[0] > currentCoord[0] ? prevCoord : currentCoord,
+      );
+      const south = allCoords.reduce((prevCoord, currentCoord) =>
+        prevCoord[1] < currentCoord[1] ? prevCoord : currentCoord,
+      );
+      const west = allCoords.reduce((prevCoord, currentCoord) =>
+        prevCoord[0] < currentCoord[0] ? prevCoord : currentCoord,
+      );
+      return [north, east, south, west];
     };
+
+    const buildVertex = (parentId: string, coordinates: Position): Feature<Geometry, GeoJsonProperties> => ({
+      type: 'Feature',
+      properties: {
+        meta: 'vertex',
+        parent: parentId,
+        coord_path: '0.0',
+        active: 'true',
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: [coordinates[0], coordinates[1]],
+      },
+    });
 
     // determine whether to override the base implementation
     if (state.feature?.properties?.isCircle) {
@@ -118,23 +144,11 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         geojson.properties.active = 'true';
         display(geojson);
 
-        const supplementaryPointLocation = getRightmostCoordinate();
-
         // render the supplementary point manually so it doesn't become part of the map's feature collection
-        const vertex: Feature<Geometry, GeoJsonProperties> = {
-          type: 'Feature',
-          properties: {
-            meta: 'vertex',
-            parent: geojson.properties.id,
-            coord_path: '0.0',
-            active: 'true',
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [supplementaryPointLocation[0], supplementaryPointLocation[1]],
-          },
-        };
-        display(vertex);
+        const cardinalDirectionCoordinatePositions = getCardinalDirectionCoordinatesOnFeature();
+        cardinalDirectionCoordinatePositions
+          .map((position) => buildVertex(geojson.properties!.id, position))
+          .forEach((vertex) => display(vertex));
       }
     } else {
       // call base implementation
