@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text.Json;
 using Azure.Core.Serialization;
@@ -34,6 +35,11 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         /// </summary>
         protected static async Task<HttpResponseData> CreateOkResponse<T>(HttpRequestData request, T response)
         {
+            if (response.GetType().IsSubclassOf(typeof(ResponseBase)))
+            {
+                throw new InvalidOperationException("This method should not be used with ResponseBase objects. Use CreateResponse instead.");
+            }
+
             var data = request.CreateResponse(HttpStatusCode.OK);
 
             await data.WriteAsJsonAsync((object)response, new JsonObjectSerializer(JsonSerializerOptions));
