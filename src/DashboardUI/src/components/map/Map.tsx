@@ -185,7 +185,9 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     });
 
     const handleClickedFeatures = (dc: MapboxDraw, allFeatures: Feature<Geometry, GeoJsonProperties>[]) => {
-      const circleFeatures = allFeatures.filter((a) => a.properties?.isCircle === true && !a.properties?.isInProgress);
+      const circleFeatures = allFeatures.filter(
+        (a) => a?.properties?.isCircle === true && !a?.properties?.isInProgress,
+      );
       if (circleFeatures.length > 0) {
         // select the first circle feature
         dc.changeMode('drag_circle', { featureId: circleFeatures[0].id });
