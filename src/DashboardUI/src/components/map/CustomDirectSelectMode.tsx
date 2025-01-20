@@ -105,7 +105,7 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     display: (geojson: GeoJSON) => void,
   ) {
     const getCardinalDirectionCoordinatesOnFeature = (): Position[] => {
-      // technically this gets the coordinates that align most closely with the cardinal directions
+      // technically this gets the coordinates that align *most closely* with the cardinal directions
       // but the distinction doesn't really matter for a circle containing a sufficient number of points
       const allCoords = state.feature!.getCoordinates()[0];
       const north = allCoords.reduce((prevCoord, currentCoord) =>
