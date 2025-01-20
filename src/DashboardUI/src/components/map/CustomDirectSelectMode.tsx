@@ -8,7 +8,7 @@ import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilit
 
 const baseMode = MapboxDraw.modes.direct_select;
 
-interface CircleSelectModeState {
+interface CustomDirectSelectModeState {
   customState: {
     isCircle: boolean;
     circleState: {
@@ -24,7 +24,7 @@ interface CircleSelectModeState {
   selectedCoordPaths: string[];
 }
 
-const defaultCustomState: CircleSelectModeState['customState'] = {
+const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   isCircle: false,
   circleState: {
     circleCenterPointLngLat: undefined,
@@ -36,8 +36,9 @@ const defaultCustomState: CircleSelectModeState['customState'] = {
 export const CustomDirectSelectMode: DrawCustomMode = {
   ...baseMode,
 
-  onSetup: function (opts): CircleSelectModeState {
-    const state: CircleSelectModeState = baseMode.onSetup?.call(this, opts);
+  // when a polygon is clicked on, this method is called to initialize the state
+  onSetup: function (opts): CustomDirectSelectModeState {
+    const state: CustomDirectSelectModeState = baseMode.onSetup?.call(this, opts);
     state.customState = defaultCustomState;
 
     if (state.feature?.properties?.isCircle) {
@@ -50,7 +51,7 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     return state;
   },
 
-  onDrag: function (state: CircleSelectModeState, e: MapboxDraw.MapMouseEvent) {
+  onDrag: function (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) {
     // validation copied from base implementation
     if (state.canDragMove !== true) return;
     state.dragMoving = true;
@@ -75,13 +76,13 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         // find new coordinate location via mouse position
         const newCoordPosition = e.lngLat;
 
-        // generate new coordinates
+        // generate new coordinates for the whole circle
         const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
           state.customState.circleState.circleCenterPointLngLat!,
           newCoordPosition.toArray(),
         );
 
-        // update the feature with the new coordinates
+        // overwrite the circles coordinates with the new coordinates
         state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
       } else {
         baseMode.onDrag?.call(this, state, e);
@@ -100,24 +101,24 @@ export const CustomDirectSelectMode: DrawCustomMode = {
   },
 
   toDisplayFeatures: function (
-    state: CircleSelectModeState,
+    state: CustomDirectSelectModeState,
     geojson: Feature<Geometry, GeoJsonProperties>,
     display: (geojson: GeoJSON) => void,
   ) {
     const getCardinalDirectionCoordinatesOnFeature = (): Position[] => {
       // technically this gets the coordinates that align *most closely* with the cardinal directions
       // but the distinction doesn't really matter for a circle containing a sufficient number of points
-      const allCoords = state.feature!.getCoordinates()[0];
-      const north = allCoords.reduce((prevCoord, currentCoord) =>
+      const allCoordinateLngLatValues = state.feature!.getCoordinates()[0];
+      const north = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[1] > currentCoord[1] ? prevCoord : currentCoord,
       );
-      const east = allCoords.reduce((prevCoord, currentCoord) =>
+      const east = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[0] > currentCoord[0] ? prevCoord : currentCoord,
       );
-      const south = allCoords.reduce((prevCoord, currentCoord) =>
+      const south = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[1] < currentCoord[1] ? prevCoord : currentCoord,
       );
-      const west = allCoords.reduce((prevCoord, currentCoord) =>
+      const west = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[0] < currentCoord[0] ? prevCoord : currentCoord,
       );
       return [north, east, south, west];
@@ -143,9 +144,9 @@ export const CustomDirectSelectMode: DrawCustomMode = {
       geojson.properties.active = 'true';
       display(geojson);
 
-      // render the supplementary point manually so it doesn't become part of the map's feature collection
-      const cardinalDirectionCoordinatePositions = getCardinalDirectionCoordinatesOnFeature();
-      cardinalDirectionCoordinatePositions
+      // render marker points manually rather than add them to the map's feature collection
+      const draggableMarkerPositions = getCardinalDirectionCoordinatesOnFeature();
+      draggableMarkerPositions
         .map((position) => buildVertex(geojson.properties!.id, position))
         .forEach((vertex) => display(vertex));
     } else {
