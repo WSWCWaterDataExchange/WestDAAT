@@ -1,16 +1,18 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
 internal class UserAccessor : AccessorBase, IUserAccessor
 {
-    public UserAccessor(ILogger<UserAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
+    public UserAccessor(ILogger<UserAccessor> logger, EFWD.IWestDaatDatabaseContextFactory westdaatDatabaseContextFactory) : base(logger)
     {
-        _databaseContextFactory = databaseContextFactory;
+        _westdaatDatabaseContextFactory = westdaatDatabaseContextFactory;
     }
 
-    private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+    private readonly EFWD.IWestDaatDatabaseContextFactory _westdaatDatabaseContextFactory;
 
     public async Task<UserLoadResponseBase> Load(UserLoadRequestBase request)
     {
@@ -24,30 +26,25 @@ internal class UserAccessor : AccessorBase, IUserAccessor
 
     private async Task<UserLoadRolesResponse> GetUserRoles(UserLoadRolesRequest request)
     {
-        // mock implementation
+        await using var db = _westdaatDatabaseContextFactory.Create();
 
-        await Task.CompletedTask;
-        var userId = Guid.NewGuid();
-        var userRoles = new string[] { "role1", "role2" };
-        var userOrganizationRoles = new UserOrganizationRoleDetails[]
-        {
-            new UserOrganizationRoleDetails
-            {
-                OrganizationId = Guid.NewGuid(),
-                Role = "organizationRole1"
-            },
-            new UserOrganizationRoleDetails
-            {
-                OrganizationId = Guid.NewGuid(),
-                Role = "organizationRole2"
-            },
-        };
+        var user = await db.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.UserOrganizations)
+                .ThenInclude(uor => uor.UserOrganizationRoles)
+            .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
+
+        NotFoundException.ThrowIfNull(user, $"User not found for auth id {request.ExternalAuthId}");
 
         return new UserLoadRolesResponse
         {
-            UserId = userId,
-            UserRoles = userRoles,
-            UserOrganizationRoles = userOrganizationRoles
+            UserId = user.Id,
+            UserRoles = user.UserRoles.Select(ur => ur.Role).ToArray(),
+            UserOrganizationRoles = user.UserOrganizations.SelectMany(uo => uo.UserOrganizationRoles.Select(uor => new UserOrganizationRoleDetails
+            {
+                OrganizationId = uo.OrganizationId,
+                Role = uor.Role
+            })).ToArray()
         };
     }
 

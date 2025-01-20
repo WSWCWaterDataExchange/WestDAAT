@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import SiteFooter from '../SiteFooter';
 import SiteNavbar from '../SiteNavbar';
 import FeedbackModal from '../FeedbackModal';
-import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
+import { WaterRightsTab } from "./water-rights-tab/map-options/components/WaterRightsTab";
 import { useHomePageContext } from './Provider';
 import './home-page.scss';
 
