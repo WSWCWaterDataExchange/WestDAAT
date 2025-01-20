@@ -138,18 +138,16 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     });
 
     // determine whether to override the base implementation
-    if (state.feature?.properties?.isCircle) {
+    if (state.feature?.properties?.isCircle && state.featureId === geojson.properties?.id) {
       // display the circle feature
-      if (state.featureId === geojson.properties?.id) {
-        geojson.properties.active = 'true';
-        display(geojson);
+      geojson.properties.active = 'true';
+      display(geojson);
 
-        // render the supplementary point manually so it doesn't become part of the map's feature collection
-        const cardinalDirectionCoordinatePositions = getCardinalDirectionCoordinatesOnFeature();
-        cardinalDirectionCoordinatePositions
-          .map((position) => buildVertex(geojson.properties!.id, position))
-          .forEach((vertex) => display(vertex));
-      }
+      // render the supplementary point manually so it doesn't become part of the map's feature collection
+      const cardinalDirectionCoordinatePositions = getCardinalDirectionCoordinatesOnFeature();
+      cardinalDirectionCoordinatePositions
+        .map((position) => buildVertex(geojson.properties!.id, position))
+        .forEach((vertex) => display(vertex));
     } else {
       // call base implementation
       baseMode.toDisplayFeatures?.call(this, state, geojson, display);
