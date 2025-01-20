@@ -1,6 +1,6 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Tests.Helpers;
-using EF = WesternStatesWater.WestDaat.Database.EntityFramework;
+using EF = WesternStatesWater.WaDE.Database.EntityFramework;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
