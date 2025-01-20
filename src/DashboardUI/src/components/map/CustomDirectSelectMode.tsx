@@ -65,10 +65,25 @@ export const CustomDirectSelectMode: DrawCustomMode = {
       }
     };
 
+    const dragVertex = () => {
+      const delta = new LngLat(e.lngLat.lng - state.dragMoveLocation.lng, e.lngLat.lat - state.dragMoveLocation.lat);
+
+      // temp - copied logic from base implementation
+      // todo: update to resize circle
+      const selectedCoords = state.selectedCoordPaths.map((coord_path) => state.feature?.getCoordinate(coord_path));
+
+      // we don't need to constrain the coordinates (as the base implementation does) because the map cannot be resized past the north and south poles
+      for (let i = 0; i < selectedCoords.length; i++) {
+        const coord = selectedCoords[i];
+        if (!coord) continue;
+
+        state.feature?.updateCoordinate(state.selectedCoordPaths[i], coord[0] + delta.lng, coord[1] + delta.lat);
+      }
+    };
+
     // determine whether to call base implementation or custom implementation
     if (state.selectedCoordPaths.length > 0) {
-      // const delta = new LngLat(e.lngLat.lng - state.dragMoveLocation.lng, e.lngLat.lat - state.dragMoveLocation.lat);
-      // this.dragVertex(state, e, delta);
+      dragVertex();
     } else {
       dragFeature();
     }
