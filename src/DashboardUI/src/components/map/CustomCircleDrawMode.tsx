@@ -15,8 +15,6 @@ const defaultState = (): CircleDrawModeState => ({
   inProgressCircleId: undefined,
 });
 
-// todo: this doesn't seem to fire the draw.create event when you create the circle? not sure if needed
-
 export const CustomCircleDrawMode: DrawCustomMode = {
   // inherit functionality from existing polygon draw tool
   ...MapboxDraw.modes.draw_polygon,
@@ -40,7 +38,9 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       // thus preventing an overlapping click event from editing the circle via the same click that finishes it
       const inProgressCircleId = state.inProgressCircleId!;
       setTimeout(() => {
-        this.getFeature(inProgressCircleId).setProperty('isInProgress', false);
+        const feature = this.getFeature(inProgressCircleId);
+        feature.setProperty('isInProgress', false);
+        this.map.fire('draw.create', { features: [feature] });
       }, 0);
 
       // unset the id
@@ -88,14 +88,6 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       // update existing circle feature if it does exist
       circleFeature.setCoordinates(circle.geometry.coordinates as any);
     }
-  },
-
-  onKeyUp: function (state: CircleDrawModeState, e: KeyboardEvent) {
-    // Handle keyboard input if needed
-  },
-
-  onStop: function (state: CircleDrawModeState) {
-    // Cleanup when the mode ends
   },
 
   // Required: Get the features your mode is managing
