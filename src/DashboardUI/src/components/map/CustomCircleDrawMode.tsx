@@ -46,7 +46,8 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       // unset the center point
       state.inProgressCircleCenterPoint = undefined;
 
-      this.changeMode('simple_select');
+      const defaultMapMode = 'simple_select';
+      this.changeMode(defaultMapMode);
     }
   },
 
@@ -59,11 +60,10 @@ export const CustomCircleDrawMode: DrawCustomMode = {
     }
 
     // render the in-progress circle:
-    let circleFeature = this.getFeature(state.inProgressCircleId ?? '');
-
     // generate the new geometry
     const circle = generateCircleWithRadiusFromCenterPointToEdgePoint(state.inProgressCircleCenterPoint!, coords);
 
+    let circleFeature = this.getFeature(state.inProgressCircleId ?? '');
     if (!circleFeature) {
       // create new circle feature if it doesn't exist
       circleFeature = this.newFeature({
@@ -80,6 +80,8 @@ export const CustomCircleDrawMode: DrawCustomMode = {
 
       // newFeature generates an id for the feature automatically; track it:
       state.inProgressCircleId = String(circleFeature.id);
+
+      // add the circle to the map
       this.addFeature(circleFeature);
     } else {
       // update existing circle feature if it does exist
@@ -88,11 +90,11 @@ export const CustomCircleDrawMode: DrawCustomMode = {
   },
 
   onStop: function (state: CircleDrawModeState) {
-    // Cleanup when the mode ends
+    // no cleanup needed. we do want to leave this method in place to prevent the default behavior though
   },
 
-  // Required: Get the features your mode is managing
   toDisplayFeatures: function (state, geojson: GeoJSON, display: (feature: GeoJSON) => void) {
-    display(geojson); // Pass features to Mapbox Draw to render
+    // render the circle
+    display(geojson);
   },
 };
