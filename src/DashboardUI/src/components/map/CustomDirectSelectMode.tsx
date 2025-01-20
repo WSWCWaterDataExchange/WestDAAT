@@ -2,6 +2,8 @@ import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
 
+// base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
+
 const baseMode = MapboxDraw.modes.direct_select;
 
 interface CircleSelectModeState {
@@ -11,7 +13,7 @@ interface CircleSelectModeState {
       circleCenterPoint: [number, number] | undefined;
     };
   };
-  // inherited properties
+  // inherited properties from base implementation
   canDragMove: boolean;
   dragMoveLocation: LngLat;
   dragMoving: boolean;
