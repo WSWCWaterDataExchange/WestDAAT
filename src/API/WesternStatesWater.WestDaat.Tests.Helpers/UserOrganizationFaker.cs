@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class UserOrganizationFaker : Faker<EF.UserOrganization>
+public class UserOrganizationFaker : Faker<EFWD.UserOrganization>
 {
-    public UserOrganizationFaker(EF.User user = null, EF.Organization organization = null)
+    public UserOrganizationFaker(EFWD.User user = null, EFWD.Organization organization = null)
     {
         if (user != null)
         {

@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class UserOrganizationRoleFaker : Faker<EF.UserOrganizationRole>
+public class UserOrganizationRoleFaker : Faker<EFWD.UserOrganizationRole>
 {
-    public UserOrganizationRoleFaker(EF.UserOrganization userOrganization = null)
+    public UserOrganizationRoleFaker(EFWD.UserOrganization userOrganization = null)
     {
         RuleFor(uor => uor.Role, f => f.Name.JobTitle());
 

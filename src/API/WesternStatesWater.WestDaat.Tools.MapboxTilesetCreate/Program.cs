@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Utilities;

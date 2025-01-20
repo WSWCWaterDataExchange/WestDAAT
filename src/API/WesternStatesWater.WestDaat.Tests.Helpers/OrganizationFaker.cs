@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class OrganizationFaker : Faker<EF.Organization>
+public class OrganizationFaker : Faker<EFWD.Organization>
 {
     public OrganizationFaker()
     {

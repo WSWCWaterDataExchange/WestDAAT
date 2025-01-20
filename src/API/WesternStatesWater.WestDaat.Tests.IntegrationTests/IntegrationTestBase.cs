@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
