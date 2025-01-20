@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import mapboxgl, { LayerSpecification, GeoJSONSourceSpecification, LngLat, NavigationControl } from 'mapbox-gl';
+import mapboxgl, {
+  LayerSpecification,
+  GeoJSONSourceSpecification,
+  LngLat,
+  NavigationControl,
+  MapMouseEvent,
+} from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
@@ -22,11 +28,11 @@ import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
-import { CustomRenderCircleControl } from './CustomRenderCircleControl';
-
-import './map.scss';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
+import { CustomCircleSelectMode } from './CustomCircleSelectMode';
+
+import './map.scss';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -123,6 +129,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       modes: {
         ...MapboxDraw.modes,
         draw_circle: CustomCircleDrawMode,
+        drag_circle: CustomCircleSelectMode,
       },
     });
 
@@ -177,6 +184,15 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       }
     });
 
+    const handleClickedFeatures = (dc: MapboxDraw, allFeatures: Feature<Geometry, GeoJsonProperties>[]) => {
+      const circleFeatures = allFeatures.filter((a) => a.properties?.isCircle === true);
+      if (circleFeatures.length > 0) {
+        // select the first circle feature
+        dc.changeMode('drag_circle', { featureId: circleFeatures[0].id });
+        return;
+      }
+    };
+
     mapInstance.once('load', () => {
       const mapSettings: MapSettings = defaultMapLocationData;
       mapInstance.setCenter(new mapboxgl.LngLat(mapSettings.longitude, mapSettings.latitude));
@@ -215,6 +231,18 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       mapInstance.on('mousemove', (e) => {
         setCoords(e.lngLat.wrap());
+      });
+
+      mapInstance.on('click', (e: MapMouseEvent) => {
+        const featureIds = dc?.getFeatureIdsAt(e.point);
+        if (!featureIds) {
+          return;
+        }
+
+        const features = featureIds.map((id) => dc!.get(id)!);
+        if (features.length > 0) {
+          handleClickedFeatures(dc!, features);
+        }
       });
 
       mapConfig.sources.forEach((a) => {
