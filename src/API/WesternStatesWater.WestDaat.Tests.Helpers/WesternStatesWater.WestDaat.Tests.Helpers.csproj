@@ -24,6 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Accessors\WesternStatesWater.WestDaat.Accessors.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
+	<ProjectReference Include="..\WesternStatesWater.WaDE.Database\WesternStatesWater.WaDE.Database.csproj" />
+	<ProjectReference Include="..\WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
