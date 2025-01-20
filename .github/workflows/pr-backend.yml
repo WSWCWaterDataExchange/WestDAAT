@@ -33,12 +33,22 @@ jobs:
         with:
           repository: WSWCWaterDataExchange/WaDE2.0
           ref: develop
-      - name: DbUp
+      - name: DbUp WaDE2.0
         run: dotnet run --args "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!;"
         working-directory: source/WesternStatesWater.WaDE.DbUp
+      - name: Check out WestDaat
+        uses: actions/checkout@v2
+        with:
+          repository: WSWCWaterDataExchange/WestDaat
+      - name: DbUp WestDaat
+        run: dotnet run
+        working-directory: src/API/WesternStatesWater.WestDaat.DbUp
+        env:
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       - uses: actions/checkout@v2
       - name: .NET Test
         run: dotnet test
         env:
           Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
         working-directory: src/API

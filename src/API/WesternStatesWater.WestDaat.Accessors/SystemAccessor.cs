@@ -5,7 +5,7 @@ using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {

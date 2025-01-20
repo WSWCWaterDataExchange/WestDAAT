@@ -1,6 +1,6 @@
 using System.Transactions;
 using Microsoft.Extensions.Configuration;
-using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests;

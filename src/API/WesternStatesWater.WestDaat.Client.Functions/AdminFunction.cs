@@ -33,7 +33,7 @@ public class AdminFunction : FunctionBase
     {
         var enrichJwtRequest = await ParseRequestBody<EnrichJwtRequest>(req);
         var results = await _userManager.Load<EnrichJwtRequest, EnrichJwtResponse>(enrichJwtRequest);
-        return await CreateOkResponse(req, results);
+        return await CreateResponse(req, results);
     }
 
 }
