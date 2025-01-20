@@ -93,6 +93,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+          enable-AzPSSession: true # Required for Azure Powershell to work
+
       - name: create-whitelist-ip-in-db-firewall
         id: create-whitelist-ip-in-db-firewall
         uses: azure/CLI@v1
@@ -111,7 +117,7 @@ jobs:
         run: dotnet run --configuration Release
         env:
           ConnectionStrings__WestDaatDatabase: ${{ secrets.database-connection-string}}
-          
+
       - name: remove-whitelist-ip-in-db-firewall
         uses: azure/CLI@v1
         if: success() || steps.create-whitelist-ip-in-db-firewall.outputs.exit_code == 0
