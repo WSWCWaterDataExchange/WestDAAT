@@ -32,6 +32,7 @@ import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 
 import './map.scss';
+import { CustomDirectSelectMode } from './CustomDirectSelectMode';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -127,6 +128,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
       },
       modes: {
         ...MapboxDraw.modes,
+        direct_select: CustomDirectSelectMode,
         draw_circle: CustomCircleDrawMode,
       },
     });
