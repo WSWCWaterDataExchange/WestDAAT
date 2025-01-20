@@ -10,7 +10,7 @@ import './nldi-filters.scss';
 import { defaultNldiFilters } from '../../WaterRightsProvider';
 import { useNldiFilter } from "../hooks/useNldiFilter";
 
-export function Nldi() {
+export function NldiFilters() {
   const { nldiFilterData, setDataPoints, setDirections, setLatLong } = useNldiFilter();
 
   const nldiFilters = useMemo(() => {

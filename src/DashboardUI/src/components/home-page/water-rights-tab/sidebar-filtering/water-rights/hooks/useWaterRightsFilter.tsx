@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useBeneficialUsesFilter } from './useBeneficialUsesFilter';
@@ -33,7 +33,7 @@ export function useWaterRightsFilter() {
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
 
   return useMemo(() => {
-    return [
+    const rawFilters = [
       podPouMapFilters,
       includeExemptMapFilters,
       beneficialUsesMapFilters,
@@ -50,6 +50,8 @@ export function useWaterRightsFilter() {
       legalStatusesFilter,
       siteTypesFilter,
     ];
+
+    return rawFilters.filter((filter) => Array.isArray(filter) && filter.length > 0);
   }, [
     podPouMapFilters,
     includeExemptMapFilters,

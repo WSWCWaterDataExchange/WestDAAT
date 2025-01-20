@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useOverlaysFilter } from "../hooks/useOverlaysFilter";
 
-export function Overlays() {
+export function OverlaysFilter() {
   const {
     isOverlayFilterActive,
     overlaysData,
@@ -39,4 +39,4 @@ export function Overlays() {
   );
 }
 
-export default Overlays;
+export default OverlaysFilter;

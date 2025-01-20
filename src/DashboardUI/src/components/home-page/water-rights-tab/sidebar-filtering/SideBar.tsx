@@ -8,9 +8,9 @@ import { MapTheme } from '../map-options/components/MapTheme';
 import { PointSize } from '../map-options/components/PointSize';
 import { MapGrouping } from '../map-options/components/MapGrouping';
 import { PodPou } from '../map-options/components/PodPou';
-import Overlays from './overlays/components/Overlays';
+import OverlaysFilter from './overlays/components/OverlaysFilter';
 import WaterRights from "./water-rights/components/WaterRights";
-import { Nldi } from './nldi/components/Nldi';
+import { NldiFilters } from './nldi/components/NldiFilters';
 
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
@@ -91,7 +91,7 @@ function SideBar() {
               <label className="fw-bold">OVERLAY FILTER {isOverlayFilterActive}</label>
             </Accordion.Header>
             <Accordion.Body>
-              <Overlays />
+              <OverlaysFilter />
             </Accordion.Body>
           </Accordion.Item>
 
@@ -138,7 +138,7 @@ function SideBar() {
               </label>
             </div>
             <Accordion.Body>
-              <Nldi />
+              <NldiFilters />
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
