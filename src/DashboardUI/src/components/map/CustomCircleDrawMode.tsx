@@ -36,13 +36,19 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       state.inProgressCircleCenterPoint = coords;
     } else {
       // finish the circle
+      // settimeout allows us to remove the `isInProgress` flag after the circle finishes rendering,
+      // thus preventing an overlapping click event from editing the circle via the same click that finishes it
+      const inProgressCircleId = state.inProgressCircleId!;
+      setTimeout(() => {
+        this.getFeature(inProgressCircleId).setProperty('isInProgress', false);
+      }, 0);
+
       // unset the id
       state.inProgressCircleId = undefined;
 
       // unset the center point
       state.inProgressCircleCenterPoint = undefined;
 
-      // switch back to the default mode
       this.changeMode('simple_select');
     }
   },
@@ -67,6 +73,7 @@ export const CustomCircleDrawMode: DrawCustomMode = {
         type: 'Feature',
         properties: {
           isCircle: true,
+          isInProgress: true,
         },
         geometry: {
           type: 'Polygon',
