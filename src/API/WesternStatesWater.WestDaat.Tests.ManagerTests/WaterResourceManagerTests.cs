@@ -779,6 +779,45 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
         
         [TestMethod]
+        public async Task GetSiteUsageTableEntriesBySiteUuid_Results_Returned()
+        {
+            // Arrange
+            var mockData = new List<CommonContracts.SiteUsageTableEntry>
+            {
+                new CommonContracts.SiteUsageTableEntry
+                {
+                    WaDEVariableId = "var-uuid",
+                    WaDEMethodUuid = "method-uuid",
+                    WaDEWaterSourceUuid = "water-source-uuid",
+                    TimeframeStart = DateTime.Now.AddDays(-10),
+                    TimeframeEnd = DateTime.Now,
+                    ReportYear = "2023",
+                    Amount = 123.45,
+                    BeneficialUse = "Agriculture",
+                    PopulationServed = 1000,
+                    CropDutyAmount = 1.2,
+                    CommunityWaterSupplySystem = "Community A"
+                }
+            };
+
+            _siteAccessorMock.Setup(x => x.GetSiteUsageTableEntriesBySiteUuid(It.IsAny<string>()))
+                .ReturnsAsync(mockData).Verifiable();
+
+            // Act
+            var manager = CreateWaterResourceManager();
+            var result = await manager.GetSiteUsageTableEntriesBySiteUuid("test-site-uuid");
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(1);
+            var entry = result.First();
+            entry.WaDEVariableId.Should().Be("var-uuid");
+            entry.Amount.Should().Be(123.45);
+            entry.BeneficialUse.Should().Be("Agriculture");
+            _siteAccessorMock.Verify();
+        }
+
+        [TestMethod]
         public async Task GetSiteVariableInfoListBySiteUuid_Results_Returned()
         {
             //Arrange
