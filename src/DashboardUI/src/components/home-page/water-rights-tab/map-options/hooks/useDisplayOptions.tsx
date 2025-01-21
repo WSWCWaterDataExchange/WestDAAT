@@ -15,6 +15,7 @@ const baseLayers = [
   mapLayerNames.waterRightsPointsLayer,
   mapLayerNames.waterRightsPolygonsLayer,
 ];
+
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
@@ -23,6 +24,11 @@ const nldiLayers = [
 const overlayLayers = [
   mapLayerNames.overlayTypesPolygonsLayer,
   mapLayerNames.overlayTypesPolygonsBorderLayer,
+];
+
+const timeSeriesLayers = [
+  mapLayerNames.timeSeriesPointsLayer,
+  mapLayerNames.timeSeriesPolygonsLayer
 ];
 
 export function useDisplayOptions() {
@@ -48,6 +54,8 @@ export function useDisplayOptions() {
     if (isOverlayFilterActive) {
       visible.push(...overlayLayers);
     }
+
+    visible.push(...timeSeriesLayers);
 
     setVisibleLayers(visible);
   }, [riverBasinNames, isNldiFilterActive, isOverlayFilterActive, setVisibleLayers]);
