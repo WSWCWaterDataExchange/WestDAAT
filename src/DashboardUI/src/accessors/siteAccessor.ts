@@ -1,55 +1,58 @@
 import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem, OverlayDigest } from '@data-contracts';
-import axios from 'axios';
 import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
 import { SiteUsage } from '../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../data-contracts/VariableInfoListItem';
 import { MethodInfoListItem } from '../data-contracts/MethodInfoListItem';
+import westDaatApi from './westDaatApi';
 
 export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {
-  const url = new URL(`Sites/${siteUuid}/WaterRightsDigest`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<WaterRightDigest[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterRightDigest[]>(`Sites/${siteUuid}/WaterRightsDigest`);
   return data;
 };
 
 export const getSiteDigest = async (siteUuid: string): Promise<SiteDigest> => {
-  const url = new URL(`Sites/${siteUuid}/Digest`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<SiteDigest>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<SiteDigest>(`Sites/${siteUuid}/Digest`);
   return data;
 };
 
 export const getOverlayDigests = async (overlayUuid: string): Promise<OverlayDigest[]> => {
-  const url = new URL(`Overlays/${overlayUuid}/OverlayDigest`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<OverlayDigest[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<OverlayDigest[]>(`Overlays/${overlayUuid}/OverlayDigest`);
   return data;
 };
 
 export const getWaterSiteLocation = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}/SiteLocation`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>(
+    `Sites/${siteUuid}/SiteLocation`,
+  );
   return data;
 };
 
 export const getWaterSiteSourceInfoList = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}/Sources`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<WaterSourceInfoListItem[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterSourceInfoListItem[]>(`Sites/${siteUuid}/Sources`);
   return data;
 };
 
 export const getWaterRightInfoList = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}/Rights`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<WaterRightInfoListItem[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterRightInfoListItem[]>(`Sites/${siteUuid}/Rights`);
   return data;
 };
 
 export const getSiteDetails = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<SiteDetails>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<SiteDetails>(`Sites/${siteUuid}`);
   return data;
 };
 
 export const getSiteUsage = async (siteUuid: string) => {
-  const { data } = await axios.get<SiteUsage>(`${process.env.REACT_APP_WEBAPI_URL}Sites/${siteUuid}/SiteUsage`);
+  const api = await westDaatApi();
+  const { data } = await api.get<SiteUsage>(`Sites/${siteUuid}/SiteUsage`);
 
   data.siteUsagePoints = data.siteUsagePoints.map((d) => ({
     variableUuid: d.variableUuid,
@@ -61,13 +64,13 @@ export const getSiteUsage = async (siteUuid: string) => {
 };
 
 export const getSiteVariableInfoList = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}/Variables`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<VariableInfoListItem[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<VariableInfoListItem[]>(`Sites/${siteUuid}/Variables`);
   return data;
 };
 
 export const getSiteMethodInfoList = async (siteUuid: string) => {
-  const url = new URL(`Sites/${siteUuid}/Methods`, process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<MethodInfoListItem[]>(url.toString());
+  const api = await westDaatApi();
+  const { data } = await api.get<MethodInfoListItem[]>(`Sites/${siteUuid}/Methods`);
   return data;
 };
