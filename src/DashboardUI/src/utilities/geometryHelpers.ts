@@ -47,3 +47,17 @@ export const generatePointAtCoords = (coords: number[]): Feature<Geometry, GeoJs
     },
   };
 };
+
+export const generateLineStringBetweenCoords = (
+  coords1: number[],
+  coords2: number[],
+): Feature<Geometry, GeoJsonProperties> => {
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates: [coords1, coords2],
+    },
+  };
+};

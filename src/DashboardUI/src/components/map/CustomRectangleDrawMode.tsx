@@ -1,6 +1,6 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import { GeoJSON } from 'geojson';
-import { generatePointAtCoords } from '../../utilities/geometryHelpers';
+import { generateLineStringBetweenCoords, generatePointAtCoords } from '../../utilities/geometryHelpers';
 
 interface RectangleDrawModeState {
   firstCornerPoint: [number, number] | undefined;
@@ -43,6 +43,17 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
 
       state.firstCornerPoint = mouseClickCoords;
       state.firstCornerPointId = String(pointFeature.id);
+    } else if (!state.secondCornerPoint) {
+      const point = generatePointAtCoords(mouseClickCoords);
+      const pointFeature = this.newFeature(point);
+      this.addFeature(pointFeature);
+
+      state.secondCornerPoint = mouseClickCoords;
+      state.secondCornerPointId = String(pointFeature.id);
+
+      const line = generateLineStringBetweenCoords(state.firstCornerPoint, state.secondCornerPoint);
+      const lineFeature = this.newFeature(line);
+      this.addFeature(lineFeature);
     }
   },
 
