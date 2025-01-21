@@ -28,7 +28,7 @@ public class AdminFunction : FunctionBase
     [OpenApiOperation(nameof(EnrichJwt))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EnrichJwtResponse))]
     public async Task<HttpResponseData> EnrichJwt(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{RouteBase}/enrichJwt")]
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/enrichJwt")]
         HttpRequestData req)
     {
         var enrichJwtRequest = await ParseRequestBody<EnrichJwtRequest>(req);
