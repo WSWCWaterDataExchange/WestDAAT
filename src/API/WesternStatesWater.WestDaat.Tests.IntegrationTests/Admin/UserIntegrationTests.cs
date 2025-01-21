@@ -48,6 +48,7 @@ public class UserIntegrationTests : IntegrationTestBase
             new CLI.Requests.Admin.EnrichJwtRequest
             {
                 ObjectId = user.ExternalAuthId,
+                Email = user.Email
             });
 
         // Assert
@@ -83,6 +84,7 @@ public class UserIntegrationTests : IntegrationTestBase
             new CLI.Requests.Admin.EnrichJwtRequest
             {
                 ObjectId = "1234",
+                Email = "email@website"
             });
 
         // Assert
