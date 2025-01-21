@@ -116,7 +116,7 @@ jobs:
       - name: Update Database
         run: dotnet run --configuration Release
         env:
-          ConnectionStrings__WestDaatDatabase: ${{ secrets.database-connection-string}}
+          ConnectionStrings__WestDaatDatabase: ${{ inputs.database-connection-string}}
 
       - name: Remove Database Firewall Rule
         uses: azure/CLI@v1
