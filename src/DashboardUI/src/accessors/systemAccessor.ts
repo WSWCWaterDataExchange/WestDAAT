@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
 import { DashboardFilters } from '../data-contracts/DashboardFilters';
+import useWestDaatApi from './westDaatApi';
 
 export const getFilters = async (): Promise<DashboardFilters> => {
-  const url = new URL('system/filters', process.env.REACT_APP_WEBAPI_URL);
-  const { data } = await axios.get<DashboardFilters>(url.toString());
+  const westDaatApi = useWestDaatApi();
+  const { data } = await westDaatApi.get('system/filters');
   return data;
 };
 
