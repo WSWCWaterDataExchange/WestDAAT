@@ -24,6 +24,8 @@ public static class MapboxTileset
         try
         {
             await CreateAllocations(db, dir);
+            // New step for timeseries
+            await CreateTimeSeries(db, dir);
             await CreateOverlays(db, dir);
         }
         catch (Exception ex)
@@ -90,12 +92,8 @@ public static class MapboxTileset
                         properties.Add("minPri", GetUnixTime(site.MinPriorityDate.Value)!.Value);
                     if (site.MaxPriorityDate.HasValue)
                         properties.Add("maxPri", GetUnixTime(site.MaxPriorityDate.Value)!.Value);
-                    if (site.StartDate.HasValue)
-                        properties.Add("minTs", GetUnixTime(site.StartDate.Value)!.Value);
-                    if (site.EndDate.HasValue)
-                        properties.Add("maxTs", GetUnixTime(site.EndDate.Value)!.Value);
-                    var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
 
+                    var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
                     var feature = new Feature(geometry, properties);
 
                     switch (geometry.Type)
@@ -127,7 +125,10 @@ public static class MapboxTileset
 
                 page++;
                 end = sites.Length < take;
-                lastSiteId = sites[^1].SiteId;
+                if (sites.Length > 0)
+                {
+                    lastSiteId = sites[^1].SiteId;
+                }
             }
 
             string[] pointFiles = tempPointsDir.GetFiles()
@@ -165,6 +166,118 @@ public static class MapboxTileset
             Directory.Delete(Path.Combine(geoJsonDirectoryPath, "Allocations"), true);
         }
     }
+    internal static async Task CreateTimeSeries(DatabaseContext db, string geoJsonDirectoryPath)
+    {
+        var tempPointsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points"));
+        var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Polygons"));
+        var tempUnknownDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Unknown"));
+
+        try
+        {
+            bool end = false;
+            int page = 0;
+            int take = 10000;
+            long lastSiteId = 0;
+            while (!end)
+            {
+                ConcurrentBag<Feature> pointFeatures = [];
+                ConcurrentBag<Feature> polygonFeatures = [];
+                ConcurrentBag<Feature> unknownFeatures = [];
+
+                Console.WriteLine($"Fetching time series records {page * take} to {(page + 1) * take}");
+                var sites = await db.TimeSeriesView
+                    .AsNoTracking()
+                    .OrderBy(s => s.SiteId)
+                    .Where(s => s.SiteId > lastSiteId)
+                    .Take(take)
+                    .ToArrayAsync();
+
+                Parallel.ForEach(sites, site =>
+                {
+                    var properties = new Dictionary<string, object>
+                    {
+                        { "uuid", site.SiteUuid },
+                        { "podPou", site.PodPou },
+                    };
+
+                    if (site.StartDate.HasValue)
+                        properties.Add("startDate", GetUnixTime(site.StartDate.Value));
+                    if (site.EndDate.HasValue)
+                        properties.Add("endDate", GetUnixTime(site.EndDate.Value));
+
+                    var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
+                    var feature = new Feature(geometry, properties);
+
+                    switch (geometry.Type)
+                    {
+                        case GeoJSON.Text.GeoJSONObjectType.Point:
+                        case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
+                            pointFeatures.Add(feature);
+                            break;
+                        case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                        case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                            polygonFeatures.Add(feature);
+                            break;
+                        default:
+                            unknownFeatures.Add(feature);
+                            break;
+                    }
+                });
+
+                var pointsTask = WriteFeatures(pointFeatures,
+                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points", Path.GetRandomFileName()));
+                var polygonsTask = WriteFeatures(polygonFeatures,
+                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Polygons", Path.GetRandomFileName()));
+                var unknownTask = WriteFeatures(unknownFeatures,
+                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Unknown", Path.GetRandomFileName()));
+
+                await pointsTask;
+                await polygonsTask;
+                await unknownTask;
+
+                page++;
+                end = sites.Length < take;
+                if (sites.Length > 0)
+                {
+                    lastSiteId = sites[^1].SiteId;
+                }
+            }
+
+            string[] pointFiles = tempPointsDir.GetFiles()
+                .Where(f => !f.Name.Contains("DS_Store"))
+                .Select(f => f.FullName).ToArray();
+
+            if (pointFiles.Length > 0)
+            {
+                Console.WriteLine("Combining temp TimeSeries point files...");
+                await CombineFiles(pointFiles, Path.Combine(geoJsonDirectoryPath, "TimeSeries.Points.geojson"));
+            }
+
+            string[] polygonsFiles = tempPolygonsDir.GetFiles()
+                .Where(f => !f.Name.Contains("DS_Store"))
+                .Select(f => f.FullName).ToArray();
+
+            if (polygonsFiles.Length > 0)
+            {
+                Console.WriteLine("Combining temp TimeSeries polygon files...");
+                await CombineFiles(polygonsFiles, Path.Combine(geoJsonDirectoryPath, "TimeSeries.Polygons.geojson"));
+            }
+
+            string[] unknownFiles = tempUnknownDir.GetFiles()
+                .Where(f => !f.Name.Contains("DS_Store"))
+                .Select(f => f.FullName).ToArray();
+
+            if (unknownFiles.Length > 0)
+            {
+                Console.WriteLine("Combining temp TimeSeries unknown files...");
+                await CombineFiles(unknownFiles, Path.Combine(geoJsonDirectoryPath, "TimeSeries.Unknown.geojson"));
+            }
+        }
+        finally
+        {
+            Directory.Delete(Path.Combine(geoJsonDirectoryPath, "TimeSeries"), true);
+        }
+    }
 
     internal static async Task CreateOverlays(DatabaseContext db, string geoJsonDirectoryPath)
     {
@@ -185,7 +298,6 @@ public static class MapboxTileset
             };
 
             var geometry = overlay.Geometry.AsGeoJsonGeometry();
-
             var feature = new Feature(geometry, properties);
 
             switch (geometry.Type)
@@ -200,13 +312,11 @@ public static class MapboxTileset
             }
         });
 
-
         if (polygonFeatures.Count > 0)
         {
             Console.WriteLine("Creating overlays polygons file...");
             await WriteFeatures(polygonFeatures, Path.Combine(geoJsonDirectoryPath, "Overlays.Polygons.geojson"));
         }
-
 
         if (unknownFeatures.Count > 0)
         {
