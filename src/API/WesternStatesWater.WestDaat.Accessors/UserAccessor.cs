@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -64,12 +65,23 @@ internal class UserAccessor : AccessorBase, IUserAccessor
 
     public async Task<UserStoreResponseBase> Store(UserStoreRequestBase request)
     {
-        // temp
-        await Task.CompletedTask;
         return request switch
         {
+            UserStoreCreateRequest req => await CreateUser(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
+    }
+
+    public async Task<UserStoreResponseBase> CreateUser(UserStoreCreateRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var entity = DtoMapper.Map<EFWD.User>(request);
+
+        await db.Users.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new UserStoreResponseBase();
     }
 }
