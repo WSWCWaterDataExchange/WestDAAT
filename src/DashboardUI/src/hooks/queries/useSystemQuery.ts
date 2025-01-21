@@ -1,8 +1,10 @@
 import { useQuery } from 'react-query';
 import { getFilters, getRiverBasinPolygonsByName } from '../../accessors/systemAccessor';
+import { useMsal } from '@azure/msal-react';
 
 export function useDashboardFilters() {
-  return useQuery(['system.filters'], getFilters);
+  const msalContext = useMsal();
+  return useQuery(['system.filters'], async () => await getFilters(msalContext));
 }
 
 export function useRiverBasinPolygons(riverBasinNames: string[]) {

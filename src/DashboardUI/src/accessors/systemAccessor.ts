@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { FeedbackRequest } from '../data-contracts/FeedbackRequest';
 import { DashboardFilters } from '../data-contracts/DashboardFilters';
-import useWestDaatApi from './westDaatApi';
+import { IMsalContext } from '@azure/msal-react';
+import westDaatApi from './westDaatApi';
 
-export const getFilters = async (): Promise<DashboardFilters> => {
-  const westDaatApi = useWestDaatApi();
-  const { data } = await westDaatApi.get('system/filters');
+export const getFilters = async (msalContext: IMsalContext): Promise<DashboardFilters> => {
+  const api = await westDaatApi(msalContext);
+  const { data } = await api.get('system/filters');
   return data;
 };
 
