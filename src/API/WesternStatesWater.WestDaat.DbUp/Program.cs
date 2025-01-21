@@ -17,6 +17,7 @@ class Program
                     { "ConnectionStrings:WestDaatDatabase", "Server=localhost;Initial Catalog=WestDAAT;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
                     { "ConnectionStrings:WestDaatDatabaseTest", "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" }
                 }!)
+                .AddEnvironmentVariables()
                 .AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
             return builder.Build();
