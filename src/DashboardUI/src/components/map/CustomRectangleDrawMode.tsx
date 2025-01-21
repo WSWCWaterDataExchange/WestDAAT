@@ -1,27 +1,15 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
-import { GeoJSON } from 'geojson';
-import { generateLineStringBetweenCoords, generatePointAtCoords } from '../../utilities/geometryHelpers';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry } from 'geojson';
+import bboxPolygon from '@turf/bbox-polygon';
 
 interface RectangleDrawModeState {
-  firstCornerPoint: [number, number] | undefined;
-  firstCornerPointId: string | undefined;
-  secondCornerPoint: [number, number] | undefined;
-  secondCornerPointId: string | undefined;
-  thirdCornerPoint: [number, number] | undefined;
-  thirdCornerPointId: string | undefined;
-  fourthCornerPoint: [number, number] | undefined;
-  fourthCornerPointId: string | undefined;
+  rectangleDrawFeature: MapboxDraw.DrawFeature | undefined;
+  firstPointCoords: [number, number] | undefined;
 }
 
 const defaultState = (): RectangleDrawModeState => ({
-  firstCornerPoint: undefined,
-  firstCornerPointId: undefined,
-  secondCornerPoint: undefined,
-  secondCornerPointId: undefined,
-  thirdCornerPoint: undefined,
-  thirdCornerPointId: undefined,
-  fourthCornerPoint: undefined,
-  fourthCornerPointId: undefined,
+  rectangleDrawFeature: undefined,
+  firstPointCoords: undefined,
 });
 
 export const CustomRectangleDrawMode: DrawCustomMode = {
@@ -30,38 +18,50 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
 
   onSetup: function (opts: any): RectangleDrawModeState {
     // Initialization logic for your custom mode
-    return defaultState();
+    const rectangleFeature: Feature<Geometry, GeoJsonProperties> = {
+      type: 'Feature',
+      properties: {
+        isRectangle: true,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [[]],
+      },
+    };
+    const rectangleDrawFeature = this.newFeature(rectangleFeature);
+
+    const state = defaultState();
+    state.rectangleDrawFeature = rectangleDrawFeature;
+    return state;
   },
 
   onClick: function (state: RectangleDrawModeState, e: MapboxDraw.MapMouseEvent) {
     const mouseClickCoords = e.lngLat.toArray();
 
-    if (!state.firstCornerPoint) {
+    if (!state.firstPointCoords) {
       // place the first point
-      const point = generatePointAtCoords(mouseClickCoords);
-      const pointFeature = this.newFeature(point);
-      this.addFeature(pointFeature);
+      state.firstPointCoords = mouseClickCoords;
+    } else {
+      // finalize the rectangle
+      const [minx, miny] = state.firstPointCoords;
+      const [maxx, maxy] = mouseClickCoords;
 
-      state.firstCornerPoint = mouseClickCoords;
-      state.firstCornerPointId = String(pointFeature.id);
-    } else if (!state.secondCornerPoint) {
-      // place the second point
-      const point = generatePointAtCoords(mouseClickCoords);
-      const pointFeature = this.newFeature(point);
-      this.addFeature(pointFeature);
+      const rectangleFeature = bboxPolygon([minx, miny, maxx, maxy]);
+      const rectangleDrawFeature = this.newFeature(rectangleFeature);
+      this.addFeature(rectangleDrawFeature);
 
-      state.secondCornerPoint = mouseClickCoords;
-      state.secondCornerPointId = String(pointFeature.id);
-
-      // draw a line between points 1 and 2
-      const line = generateLineStringBetweenCoords(state.firstCornerPoint, state.secondCornerPoint);
-      const lineFeature = this.newFeature(line);
-      this.addFeature(lineFeature);
+      // exit rectangle drawing mode
+      this.map.fire('draw.create', { features: [rectangleDrawFeature] });
+      this.changeMode('simple_select');
     }
   },
 
   onMouseMove: function (state: RectangleDrawModeState, e: MapboxDraw.MapMouseEvent) {
     // temp - do nothing
+  },
+
+  onStop: function (state: RectangleDrawModeState) {
+    // no cleanup needed. we do want to leave this method in place to prevent the default behavior though
   },
 
   toDisplayFeatures: function (state: any, geojson: GeoJSON, display: (geojson: GeoJSON) => void): void {

@@ -36,28 +36,3 @@ export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
   });
   return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
 };
-
-export const generatePointAtCoords = (coords: number[]): Feature<Geometry, GeoJsonProperties> => {
-  return {
-    type: 'Feature',
-    properties: {},
-    geometry: {
-      type: 'Point',
-      coordinates: coords,
-    },
-  };
-};
-
-export const generateLineStringBetweenCoords = (
-  coords1: number[],
-  coords2: number[],
-): Feature<Geometry, GeoJsonProperties> => {
-  return {
-    type: 'Feature',
-    properties: {},
-    geometry: {
-      type: 'LineString',
-      coordinates: [coords1, coords2],
-    },
-  };
-};
