@@ -3,18 +3,24 @@ import { GeoJSON } from 'geojson';
 
 interface RectangleDrawModeState {
   firstCornerPoint: [number, number] | undefined;
+  firstCornerPointId: string | undefined;
   secondCornerPoint: [number, number] | undefined;
+  secondCornerPointId: string | undefined;
   thirdCornerPoint: [number, number] | undefined;
+  thirdCornerPointId: string | undefined;
   fourthCornerPoint: [number, number] | undefined;
-  inProgressRectangleId: string | undefined;
+  fourthCornerPointId: string | undefined;
 }
 
 const defaultState = (): RectangleDrawModeState => ({
   firstCornerPoint: undefined,
+  firstCornerPointId: undefined,
   secondCornerPoint: undefined,
+  secondCornerPointId: undefined,
   thirdCornerPoint: undefined,
+  thirdCornerPointId: undefined,
   fourthCornerPoint: undefined,
-  inProgressRectangleId: undefined,
+  fourthCornerPointId: undefined,
 });
 
 export const CustomRectangleDrawMode: DrawCustomMode = {
