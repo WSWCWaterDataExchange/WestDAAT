@@ -2,7 +2,10 @@ import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
 import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
-import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
+import {
+  generateCircleWithRadiusFromCenterPointToEdgePoint,
+  getCardinalDirectionCoordinatesOnFeature,
+} from '../../utilities/geometryHelpers';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
 
@@ -105,26 +108,6 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     geojson: Feature<Geometry, GeoJsonProperties>,
     display: (geojson: GeoJSON) => void,
   ) {
-    const getCardinalDirectionCoordinatesOnFeature = (
-      featureCoordinates: Position[],
-    ): [Position, Position, Position, Position] => {
-      // technically this gets the coordinates that align *most closely* with the cardinal directions
-      // but the distinction doesn't really matter for a circle containing a sufficient number of points
-      const north = featureCoordinates.reduce((prevCoord, currentCoord) =>
-        prevCoord[1] > currentCoord[1] ? prevCoord : currentCoord,
-      );
-      const east = featureCoordinates.reduce((prevCoord, currentCoord) =>
-        prevCoord[0] > currentCoord[0] ? prevCoord : currentCoord,
-      );
-      const south = featureCoordinates.reduce((prevCoord, currentCoord) =>
-        prevCoord[1] < currentCoord[1] ? prevCoord : currentCoord,
-      );
-      const west = featureCoordinates.reduce((prevCoord, currentCoord) =>
-        prevCoord[0] < currentCoord[0] ? prevCoord : currentCoord,
-      );
-      return [north, east, south, west];
-    };
-
     const buildVertex = (parentId: string, coordinates: Position): Feature<Geometry, GeoJsonProperties> => ({
       type: 'Feature',
       properties: {

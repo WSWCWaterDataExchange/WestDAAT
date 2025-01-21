@@ -1,9 +1,11 @@
 import { circle } from '@turf/circle';
 import { distance } from '@turf/distance';
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Polygon, Position } from 'geojson';
-import mapboxgl from 'mapbox-gl';
+import { LngLat } from 'mapbox-gl';
 
-export function getLatsLongsFromFeatureCollection(featureCollection: FeatureCollection<Geometry, GeoJsonProperties>) {
+export function getLatsLongsFromFeatureCollection(
+  featureCollection: FeatureCollection<Geometry, GeoJsonProperties>,
+): LngLat[] {
   let positions: Position[] = [];
 
   featureCollection.features.forEach((x) => {
@@ -24,7 +26,7 @@ export function getLatsLongsFromFeatureCollection(featureCollection: FeatureColl
     }
   });
 
-  return positions.map((a) => new mapboxgl.LngLat(a[0], a[1]));
+  return positions.map((a) => new LngLat(a[0], a[1]));
 }
 
 export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
@@ -35,4 +37,24 @@ export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
     units: 'kilometers',
   });
   return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
+};
+
+export const getCardinalDirectionCoordinatesOnFeature = (
+  featureCoordinates: Position[],
+): [Position, Position, Position, Position] => {
+  // technically this gets the coordinates that align *most closely* with the cardinal directions
+  // but the distinction doesn't really matter for a circle containing a sufficient number of points
+  const north = featureCoordinates.reduce((prevCoord, currentCoord) =>
+    prevCoord[1] > currentCoord[1] ? prevCoord : currentCoord,
+  );
+  const east = featureCoordinates.reduce((prevCoord, currentCoord) =>
+    prevCoord[0] > currentCoord[0] ? prevCoord : currentCoord,
+  );
+  const south = featureCoordinates.reduce((prevCoord, currentCoord) =>
+    prevCoord[1] < currentCoord[1] ? prevCoord : currentCoord,
+  );
+  const west = featureCoordinates.reduce((prevCoord, currentCoord) =>
+    prevCoord[0] < currentCoord[0] ? prevCoord : currentCoord,
+  );
+  return [north, east, south, west];
 };

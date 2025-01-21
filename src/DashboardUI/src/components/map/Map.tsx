@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import mapboxgl, {
-  LayerSpecification,
-  GeoJSONSourceSpecification,
-  LngLat,
-  NavigationControl,
-  MapMouseEvent,
-} from 'mapbox-gl';
+import mapboxgl, { LayerSpecification, GeoJSONSourceSpecification, LngLat, NavigationControl } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useAppContext } from '../../contexts/AppProvider';
