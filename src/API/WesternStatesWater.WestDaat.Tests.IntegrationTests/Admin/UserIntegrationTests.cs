@@ -69,6 +69,28 @@ public class UserIntegrationTests : IntegrationTestBase
         ).Should().BeTrue();
     }
 
+    [TestMethod]
+    public async Task Load_EnrichJwtRequest_AsIdentityProviderContext_ShouldCreateUserIfDoesNotExist()
+    {
+        // Arrange
+        UseIdentityProviderContext();
+
+        // Act
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
+            new CLI.Requests.Admin.EnrichJwtRequest
+            {
+                ObjectId = "1234",
+                Email = "email@website",
+            });
+
+        // Assert
+        response.Should().NotBeNull();
+
+        response.Extension_WestDaat_UserId.Should().NotBeEmpty();
+        response.Extension_WestDaat_Roles.Should().BeEmpty();
+        response.Extension_WestDaat_OrganizationRoles.Should().BeEmpty();
+    }
+
     [DataTestMethod]
     [DataRow(typeof(AnonymousContext))]
     [DataRow(typeof(UserContext))]
