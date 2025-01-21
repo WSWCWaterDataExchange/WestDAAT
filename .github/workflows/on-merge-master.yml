@@ -26,6 +26,8 @@ jobs:
       azure-auth-tenant-name: westdaatstaging
       azure-auth-audience: a4db62cd-d2ef-425e-8c69-37f4349f925e # App Registration ID
       azure-cors-domain: https://westdaatstaging.westernstateswater.org
+      database-server-name: westdaat-staging
+      database-connection-string: Server=tcp:westdaat-staging.database.windows.net,1433;Initial Catalog=WestDAAT;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_STAGING }}

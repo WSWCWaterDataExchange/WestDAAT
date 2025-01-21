@@ -4,6 +4,7 @@
 name: Deploy Backend
 
 env:
+  FIREWALL_RULE_NAME: GitHubAction_${{ inputs.azure-resource-group }}_${{ github.run_number }}
   FUNCTION_APP_DIR: "src/API/WesternStatesWater.WestDaat.Client.Functions"
   DOTNET_VERSION: "8.0.x"
 
@@ -42,6 +43,14 @@ on:
         description: "The domain to allow CORS requests from"
         required: true
         type: string
+      database-server-name:
+        description: "The name of the database server"
+        required: true
+        type: string
+      database-connection-string:
+        description: "The connection string for the database. Contains no secrets."
+        required: true
+        type: string
     secrets:
       azure-function-publish-profile:
         description: "The publish profile for the Azure Function App"
@@ -74,6 +83,51 @@ jobs:
           app-name: ${{ inputs.azure-functionapp-name }}
           package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
           publish-profile: ${{ secrets.azure-function-publish-profile }}
+
+  deploy-database:
+    runs-on: ubuntu-latest
+    needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: src/API/WesternStatesWater.WestDaat.DbUp
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+
+      - name: Create Database Firewall Rule
+        id: create-whitelist-ip-in-db-firewall
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            set -eu
+            agentIP=$(curl -s https://api.ipify.org/)
+            az sql server firewall-rule create \
+              --resource-group "${{ inputs.azure-resource-group }}" \
+              --server ${{ inputs.database-server-name }} \
+              --name ${{ env.FIREWALL_RULE_NAME }} \
+              --start-ip-address $agentIP \
+              --end-ip-address $agentIP
+
+      - name: Update Database
+        run: dotnet run --configuration Release
+        env:
+          ConnectionStrings__WestDaatDatabase: ${{ inputs.database-connection-string}}
+
+      - name: Remove Database Firewall Rule
+        uses: azure/CLI@v1
+        if: success() || steps.create-whitelist-ip-in-db-firewall.outputs.exit_code == 0
+        with:
+          inlineScript: |
+            set -eu
+            az sql server firewall-rule delete \
+              --resource-group "${{ inputs.azure-resource-group }}" \
+              --server "${{ inputs.database-server-name }}" \
+              --name ${{ env.FIREWALL_RULE_NAME }}
 
   deploy-apim-api:
     runs-on: ubuntu-latest
