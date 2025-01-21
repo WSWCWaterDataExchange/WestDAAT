@@ -54,12 +54,11 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 
-        var user = await db.Users
-            .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
+        var userExists = await db.Users.AnyAsync(u => u.ExternalAuthId == request.ExternalAuthId);
 
         return new UserExistsResponse
         {
-            UserExists = user != null
+            UserExists = userExists
         };
     }
 
