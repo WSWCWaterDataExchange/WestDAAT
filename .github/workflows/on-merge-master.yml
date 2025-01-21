@@ -40,7 +40,7 @@ jobs:
       azure-cdn-endpoint-name: westdaatstaging
       azure-cdn-profile-name: westdaatstaging
       react-app-auth-redirect-url: https://westdaatstaging.westernstateswater.org/authredirect.html
-      react-app-webapi-url: https://westdaatstaging.azure-api.net/
+      react-app-webapi-url: https://westdaatstaging.azure-api.net/api/
       react-app-auth-client-id: a4db62cd-d2ef-425e-8c69-37f4349f925e
       react-app-auth-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com/b2c_1_signupsignin
       react-app-auth-known-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com
