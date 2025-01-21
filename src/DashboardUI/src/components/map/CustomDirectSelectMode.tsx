@@ -105,21 +105,20 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     geojson: Feature<Geometry, GeoJsonProperties>,
     display: (geojson: GeoJSON) => void,
   ) {
-    const getCardinalDirectionCoordinatesOnFeature = (
-      featureCoordinates: Position[],
-    ): [Position, Position, Position, Position] => {
+    const getCardinalDirectionCoordinatesOnFeature = (): Position[] => {
       // technically this gets the coordinates that align *most closely* with the cardinal directions
       // but the distinction doesn't really matter for a circle containing a sufficient number of points
-      const north = featureCoordinates.reduce((prevCoord, currentCoord) =>
+      const allCoordinateLngLatValues = state.feature!.getCoordinates()[0];
+      const north = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[1] > currentCoord[1] ? prevCoord : currentCoord,
       );
-      const east = featureCoordinates.reduce((prevCoord, currentCoord) =>
+      const east = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[0] > currentCoord[0] ? prevCoord : currentCoord,
       );
-      const south = featureCoordinates.reduce((prevCoord, currentCoord) =>
+      const south = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[1] < currentCoord[1] ? prevCoord : currentCoord,
       );
-      const west = featureCoordinates.reduce((prevCoord, currentCoord) =>
+      const west = allCoordinateLngLatValues.reduce((prevCoord, currentCoord) =>
         prevCoord[0] < currentCoord[0] ? prevCoord : currentCoord,
       );
       return [north, east, south, west];
@@ -146,7 +145,7 @@ export const CustomDirectSelectMode: DrawCustomMode = {
       display(geojson);
 
       // render marker points manually rather than add them to the map's feature collection
-      const draggableMarkerPositions = getCardinalDirectionCoordinatesOnFeature(state.feature!.getCoordinates()[0]);
+      const draggableMarkerPositions = getCardinalDirectionCoordinatesOnFeature();
       draggableMarkerPositions
         .map((position) => buildVertex(geojson.properties!.id, position))
         .forEach((vertex) => display(vertex));
