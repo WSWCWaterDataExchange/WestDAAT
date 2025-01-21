@@ -17,7 +17,7 @@ describe('useAuthenticationContext', () => {
       expect(result).toEqual(roles);
     });
 
-    it('should return undefined if no roles', () => {
+    it('should return empty array if no roles', () => {
       // Arrange
       const token = buildToken({});
 
@@ -25,7 +25,7 @@ describe('useAuthenticationContext', () => {
       const result = parseRoles(token);
 
       // Assert
-      expect(result).toBeUndefined();
+      expect(result).toEqual([]);
     });
   });
 
@@ -45,7 +45,7 @@ describe('useAuthenticationContext', () => {
       expect(result).toEqual(orgRoles);
     });
 
-    it('should return undefined if no organization roles', () => {
+    it('should return empty if no organization roles', () => {
       // Arrange
       const token = buildToken({});
 
@@ -53,16 +53,16 @@ describe('useAuthenticationContext', () => {
       const result = parseOrganizationRoles(token);
 
       // Assert
-      expect(result).toBeUndefined();
+      expect(result).toEqual([]);
     });
   });
 
   const buildToken = (token: { roles?: string[]; orgRoles?: OrganizationRole[] }): { [key: string]: any } => {
     return {
-      [rolesClaim]: token?.roles?.join(','),
+      [rolesClaim]: token?.roles?.join(',') ?? "",
       [orgRolesClaim]: token?.orgRoles
         ?.map((or) => or.roles.map((r) => `org_${or.organizationId}/rol_${r}`).join(','))
-        .join(','),
+        .join(',') ?? "",
     };
   };
 });

@@ -68,12 +68,21 @@ export function useAuthenticationContext(): IAuthenticationContext {
 export const parseRoles = (token: { [key: string]: any } | undefined): string[] | undefined => {
   // Come in the form of "rol_<role1>,rol_<role2>,rol_<role3>"
   const rolesClaims = parseTokenClaims(token, 'extension_westdaat_roles');
+
+  if (!rolesClaims) {
+    return [];
+  }
+
   return rolesClaims?.split(',')?.map((role: string) => role.replace('rol_', ''));
 };
 
 export const parseOrganizationRoles = (token: { [key: string]: any } | undefined): OrganizationRole[] | undefined => {
   // Come in the form of "org_<orgId1>/rol_<role1>,org_<orgId1>/rol_<role2>,org_<orgId2>/rol_<role1>"
   const orgRoleClaims = parseTokenClaims(token, 'extension_westdaat_organizationRoles');
+
+  if (!orgRoleClaims) {
+    return [];
+  }
 
   const flatOrgRoles = orgRoleClaims?.split(',')?.map((orgRole: string) => {
     const [org, role] = orgRole.split('/');
