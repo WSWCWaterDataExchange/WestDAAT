@@ -3,13 +3,13 @@ import axios, { AxiosInstance } from 'axios';
 
 const API_URL = process.env.REACT_APP_WEBAPI_URL;
 
-const westDaatApi = async (msalContext: IMsalContext): Promise<AxiosInstance> => {
+const westDaatApi = async (msalContext?: IMsalContext): Promise<AxiosInstance> => {
   const api = axios.create({
     baseURL: API_URL,
   });
 
-  // User not logged in. Don't set auth header.
-  if (msalContext.accounts.length === 0) {
+  // If auth is not required, or user not logged in, don't add auth headers.
+  if (!msalContext || msalContext.accounts.length === 0) {
     return api;
   }
 
