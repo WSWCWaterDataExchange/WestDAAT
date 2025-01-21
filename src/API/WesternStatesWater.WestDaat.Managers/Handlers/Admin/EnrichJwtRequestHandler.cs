@@ -19,6 +19,15 @@ public class EnrichJwtRequestHandler : IRequestHandler<EnrichJwtRequest, EnrichJ
 
     public async Task<EnrichJwtResponse> Handle(EnrichJwtRequest request)
     {
+        var userExistsRequest = request.Map<CommonContracts.UserExistsRequest>();
+        var userExistsResponse = (CommonContracts.UserExistsResponse)await UserAccessor.Load(userExistsRequest);
+
+        if (!userExistsResponse.UserExists)
+        {
+            var createUserRequest = request.Map<CommonContracts.UserStoreCreateRequest>();
+            await UserAccessor.Store(createUserRequest);
+        }
+
         var accessorRequest = request.Map<CommonContracts.UserLoadRolesRequest>();
         var accessorResponse = (CommonContracts.UserLoadRolesResponse) await UserAccessor.Load(accessorRequest);
 
