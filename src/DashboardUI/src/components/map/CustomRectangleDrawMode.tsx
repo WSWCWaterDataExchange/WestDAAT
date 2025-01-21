@@ -45,7 +45,11 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
       state.firstPointCoords = mouseClickCoords;
     } else {
       // rectangle is done. exit rectangle drawing mode
-      this.map.fire('draw.create', { features: [state.rectangleDrawFeature!] });
+      setTimeout(() => {
+        state.rectangleDrawFeature!.setProperty('isInProgress', false);
+        this.map.fire('draw.create', { features: [state.rectangleDrawFeature!] });
+      }, 0);
+
       this.changeMode('simple_select');
     }
   },
