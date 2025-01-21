@@ -48,4 +48,14 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         };
     }
 
+    public async Task<UserStoreResponseBase> Store(UserStoreRequestBase request)
+    {
+        // temp
+        await Task.CompletedTask;
+        return request switch
+        {
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
 }
