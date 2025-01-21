@@ -235,6 +235,18 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
         
+        [Function(nameof(GetSiteUsageInfoBySiteUuid))]
+        [OpenApiOperation(nameof(GetSiteUsageInfoBySiteUuid))]
+        [OpenApiParameter("siteUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteUsageListItem[]))]
+        public async Task<HttpResponseData> GetSiteUsageInfoBySiteUuid(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/UsageTable")] HttpRequestData request, 
+            string siteUuid)
+        {
+            var result = await _waterResourceManager.GetSiteUsageInfoListBySiteUuid(siteUuid);
+            return await CreateOkResponse(request, result);
+        }
+        
         [Function(nameof(GetSiteVariableInfoListByUuid))]
         [OpenApiOperation(nameof(GetSiteVariableInfoListByUuid))]
         [OpenApiParameter("siteUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]
@@ -242,7 +254,6 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         public async Task<HttpResponseData> GetSiteVariableInfoListByUuid([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Sites/{siteUuid}/Variables")] HttpRequestData request, string siteUuid)
         {
             var result = await _waterResourceManager.GetSiteVariableInfoListByUuid(siteUuid);
-        
             return await CreateOkResponse(request, result);
         }
         
