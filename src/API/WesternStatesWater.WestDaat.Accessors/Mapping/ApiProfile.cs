@@ -159,7 +159,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
         private void AddUserMappings()
         {
-            CreateMap<UserStoreCreateRequest, EFWD.User>();
+            CreateMap<UserStoreCreateRequest, EFWD.User>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
         }
     }
 }

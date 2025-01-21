@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common.Context;
+using System.Data.Entity;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -76,12 +77,12 @@ public class UserIntegrationTests : IntegrationTestBase
         UseIdentityProviderContext();
 
         // Act
-        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(
-            new CLI.Requests.Admin.EnrichJwtRequest
-            {
-                ObjectId = "1234",
-                Email = "email@website",
-            });
+        var request = new CLI.Requests.Admin.EnrichJwtRequest
+        {
+            ObjectId = "1234",
+            Email = "email@website"
+        };
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
 
         // Assert
         response.Should().NotBeNull();
@@ -89,6 +90,10 @@ public class UserIntegrationTests : IntegrationTestBase
         response.Extension_WestDaat_UserId.Should().NotBeEmpty();
         response.Extension_WestDaat_Roles.Should().BeEmpty();
         response.Extension_WestDaat_OrganizationRoles.Should().BeEmpty();
+
+        var dbUser = _dbContext.Users.Single(u => u.ExternalAuthId == request.ObjectId);
+        dbUser.Email.Should().Be(request.Email);
+        dbUser.CreatedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
     }
 
     [DataTestMethod]
