@@ -27,10 +27,10 @@ jobs:
       azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # App Registration ID
       azure-cors-domain: https://westdaatqa.westernstateswater.org
       database-server-name: westdaat-qa
+      database-connection-string: Server=tcp:westdaat-qa.database.windows.net,1433;Initial Catalog=WestDAAT;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
-      database-connection-string: ${{ secrets.WestDAAT_CONNECTION_STRING_QA }}
   # deploy-frontend:
   #   uses: ./.github/workflows/deploy-frontend.yml
   #   needs: deploy-backend
