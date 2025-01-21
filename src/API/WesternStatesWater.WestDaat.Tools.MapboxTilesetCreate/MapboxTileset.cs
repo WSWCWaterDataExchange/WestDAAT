@@ -24,7 +24,6 @@ public static class MapboxTileset
         try
         {
             await CreateAllocations(db, dir);
-            // New step for timeseries
             await CreateTimeSeries(db, dir);
             await CreateOverlays(db, dir);
         }
