@@ -49,7 +49,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
         isAuthenticated,
         user: {
           emailAddress: result?.account?.username ?? null,
-          externalAuthId: idTokenClaims?.sub, // Subject is b2c user id
+          externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
           roles: parseRoles(idTokenClaims),
           organizationRoles: parseOrganizationRoles(idTokenClaims),
         },
