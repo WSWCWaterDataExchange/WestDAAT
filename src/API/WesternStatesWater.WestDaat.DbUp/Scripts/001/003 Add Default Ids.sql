@@ -1,0 +1,14 @@
+ALTER TABLE Organizations
+    ADD CONSTRAINT DF_Organizations_Id DEFAULT NEWID() FOR Id;
+
+ALTER TABLE Users
+    ADD CONSTRAINT DF_Users_Id DEFAULT NEWID() FOR Id;
+
+ALTER TABLE UserOrganizations
+    ADD CONSTRAINT DF_UserOrganizations_Id DEFAULT NEWID() FOR Id;
+
+ALTER TABLE UserOrganizationRoles
+    ADD CONSTRAINT DF_UserOrganizationRoles_Id DEFAULT NEWID() FOR Id;
+
+ALTER TABLE UserRoles
+    ADD CONSTRAINT DF_UserRoles_Id DEFAULT NEWID() FOR Id;
