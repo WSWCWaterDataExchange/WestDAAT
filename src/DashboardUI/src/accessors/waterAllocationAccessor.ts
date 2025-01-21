@@ -1,5 +1,4 @@
 import { SiteInfoListItem, WaterRightDetails, WaterSourceInfoListItem } from '@data-contracts';
-import axios from 'axios';
 import { saveAs } from 'file-saver';
 import {
   WaterRightsSearchCriteria,
@@ -9,56 +8,50 @@ import {
 import { WaterRightsSearchResults } from '../data-contracts/WaterRightsSearchResults';
 import { FeatureCollection } from 'geojson';
 import { AnalyticsSummaryInformationResponse } from '../data-contracts/AnalyticsSummaryInformationResponse';
+import westDaatApi from './westDaatApi';
 
 export const getWaterRightDetails = async (allocationUuid: string) => {
-  const { data } = await axios.get<WaterRightDetails>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}`,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterRightDetails>(`WaterRights/${allocationUuid}`);
   return data;
 };
 
 export const getWaterRightAnalyticsSummaryInfo = async (searchCriteria: WaterRightsSearchCriteria) => {
-  const { data } = await axios.post<AnalyticsSummaryInformationResponse>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/AnalyticsSummaryInformation`,
+  const api = await westDaatApi();
+  const { data } = await api.post<AnalyticsSummaryInformationResponse>(
+    `WaterRights/AnalyticsSummaryInformation`,
     searchCriteria,
   );
   return data;
 };
 
 export const getWaterRightDataEnvelope = async (searchCriteria: WaterRightsSearchCriteria) => {
-  const { data } = await axios.post<FeatureCollection>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/DataEnvelope`,
-    searchCriteria,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.post<FeatureCollection>(`WaterRights/DataEnvelope`, searchCriteria);
   return data;
 };
 
 export const findWaterRight = async (searchCriteria: WaterRightsSearchCriteriaWithPaging) => {
-  const { data } = await axios.post<WaterRightsSearchResults>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/find`,
-    searchCriteria,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.post<WaterRightsSearchResults>(`WaterRights/find`, searchCriteria);
   return data;
 };
 
 export const getWaterRightSiteInfoList = async (allocationUuid: string) => {
-  const { data } = await axios.get<SiteInfoListItem[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/Sites`,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.get<SiteInfoListItem[]>(`WaterRights/${allocationUuid}/Sites`);
   return data;
 };
 
 export const getWaterRightSourceInfoList = async (allocationUuid: string) => {
-  const { data } = await axios.get<WaterSourceInfoListItem[]>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/Sources`,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterSourceInfoListItem[]>(`WaterRights/${allocationUuid}/Sources`);
   return data;
 };
 
 export const getWaterRightSiteLocations = async (allocationUuid: string) => {
-  const { data } = await axios.get<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>(
-    `${process.env.REACT_APP_WEBAPI_URL}WaterRights/${allocationUuid}/SiteLocations`,
-  );
+  const api = await westDaatApi();
+  const { data } = await api.get<FeatureCollection>(`WaterRights/${allocationUuid}/SiteLocations`);
   return data;
 };
 

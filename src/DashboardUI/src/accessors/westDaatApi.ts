@@ -1,46 +1,25 @@
-import { useMsal } from '@azure/msal-react';
-import axios from 'axios';
+import { IMsalContext } from '@azure/msal-react';
+import axios, { AxiosInstance } from 'axios';
 
 const API_URL = process.env.REACT_APP_WEBAPI_URL;
-const { instance: msalContext, accounts } = useMsal();
 
-const useWestDaatApi = () => {
+const westDaatApi = async (msalContext?: IMsalContext): Promise<AxiosInstance> => {
   const api = axios.create({
     baseURL: API_URL,
   });
 
-  api.interceptors.request.use(
-    (config) => {
-      const tokenRequest = {
-        scopes: ['user.read'],
-        account: accounts[0],
-      };
+  // If auth is not required, or user not logged in, don't add auth headers.
+  if (!msalContext || msalContext.accounts.length === 0) {
+    return api;
+  }
 
-      msalContext
-        ?.acquireTokenSilent(tokenRequest)
-        .then((response) => {
-          config.headers['Authorization'] = `Bearer ${response.idToken}`;
-        })
-        .catch(() => {
-          msalContext
-            .acquireTokenPopup(tokenRequest)
-            .then((response) => {
-              config.headers['Authorization'] = `Bearer ${response.idToken}`;
-            })
-            .catch((error) => {
-              // Acquire token interactive failure
-              console.error(error);
-            });
-        });
+  const tokenResponse = await msalContext.instance.acquireTokenSilent({
+    scopes: ['openid', 'offline_access', process.env.REACT_APP_AUTH_CLIENT_ID ?? ''],
+  });
 
-      return config;
-    },
-    (error) => {
-      Promise.reject(error);
-    },
-  );
+  api.defaults.headers.common.Authorization = `Bearer ${tokenResponse.accessToken}`;
 
   return api;
 };
 
-export default useWestDaatApi;
+export default westDaatApi;
