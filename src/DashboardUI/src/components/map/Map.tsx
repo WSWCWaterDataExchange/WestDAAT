@@ -33,6 +33,8 @@ import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode';
 
 import './map.scss';
+import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
+import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -130,6 +132,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         ...MapboxDraw.modes,
         direct_select: CustomDirectSelectMode,
         draw_circle: CustomCircleDrawMode,
+        draw_rectangle: CustomRectangleDrawMode,
       },
     });
 
@@ -197,6 +200,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       const dc = mapboxDrawControl(mapInstance);
       mapInstance.addControl(new CustomCircleDrawModeControl(dc));
+      mapInstance.addControl(new CustomRectangleDrawModeControl(dc));
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
