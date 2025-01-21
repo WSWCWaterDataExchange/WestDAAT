@@ -37,6 +37,7 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
     const mouseClickCoords = e.lngLat.toArray();
 
     if (!state.firstCornerPoint) {
+      // place the first point
       const point = generatePointAtCoords(mouseClickCoords);
       const pointFeature = this.newFeature(point);
       this.addFeature(pointFeature);
@@ -44,6 +45,7 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
       state.firstCornerPoint = mouseClickCoords;
       state.firstCornerPointId = String(pointFeature.id);
     } else if (!state.secondCornerPoint) {
+      // place the second point
       const point = generatePointAtCoords(mouseClickCoords);
       const pointFeature = this.newFeature(point);
       this.addFeature(pointFeature);
@@ -51,6 +53,7 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
       state.secondCornerPoint = mouseClickCoords;
       state.secondCornerPointId = String(pointFeature.id);
 
+      // draw a line between points 1 and 2
       const line = generateLineStringBetweenCoords(state.firstCornerPoint, state.secondCornerPoint);
       const lineFeature = this.newFeature(line);
       this.addFeature(lineFeature);
