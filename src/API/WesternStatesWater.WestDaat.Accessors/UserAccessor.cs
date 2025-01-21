@@ -18,6 +18,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         return request switch
         {
+            UserExistsRequest req => await GetUserExists(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -45,6 +46,19 @@ internal class UserAccessor : AccessorBase, IUserAccessor
                 OrganizationId = uo.OrganizationId,
                 Role = uor.Role
             })).ToArray()
+        };
+    }
+
+    private async Task<UserExistsResponse> GetUserExists(UserExistsRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var user = await db.Users
+            .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
+
+        return new UserExistsResponse
+        {
+            UserExists = user != null
         };
     }
 
