@@ -36,3 +36,14 @@ export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
   });
   return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
 };
+
+export const generatePointAtCoords = (coords: number[]): Feature<Geometry, GeoJsonProperties> => {
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Point',
+      coordinates: coords,
+    },
+  };
+};
