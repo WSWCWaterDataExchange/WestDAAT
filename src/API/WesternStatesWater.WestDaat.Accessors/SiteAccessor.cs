@@ -100,12 +100,12 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ToListAsync();
         }
         
-        public async Task<IEnumerable<SiteUsageTableEntry>> GetSiteUsageTableEntriesBySiteUuid(string siteUuid)
+        public async Task<IEnumerable<SiteUsageListItem>> GetSiteUsageInfoListBySiteUuid(string siteUuid)
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SiteVariableAmountsFact
                 .Where(x => x.Site.SiteUuid == siteUuid)
-                .ProjectTo<SiteUsageTableEntry>(DtoMapper.Configuration)
+                .ProjectTo<SiteUsageListItem>(DtoMapper.Configuration)
                 .OrderBy(x => x.TimeframeStart)
                 .ToListAsync();
         }

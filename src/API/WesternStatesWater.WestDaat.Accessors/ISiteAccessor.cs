@@ -20,7 +20,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         
         Task<IEnumerable<SiteUsagePoint>> GetSiteUsageBySiteUuid(string siteUuid);
         
-        Task<IEnumerable<SiteUsageTableEntry>> GetSiteUsageTableEntriesBySiteUuid(string siteUuid);
+        Task<IEnumerable<SiteUsageListItem>> GetSiteUsageInfoListBySiteUuid(string siteUuid);
         
         Task<IEnumerable<VariableInfoListItem>> GetVariableInfoListByUuid(string siteUuid);
 

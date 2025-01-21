@@ -779,14 +779,14 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         }
         
         [TestMethod]
-        public async Task GetSiteUsageTableEntriesBySiteUuid_Results_Returned()
+        public async Task GetSiteUsageInfoListBySiteUuid_Results_Returned()
         {
             // Arrange
-            var mockData = new List<CommonContracts.SiteUsageTableEntry>
+            var mockData = new List<CommonContracts.SiteUsageListItem>
             {
-                new CommonContracts.SiteUsageTableEntry
+                new CommonContracts.SiteUsageListItem
                 {
-                    WaDEVariableId = "var-uuid",
+                    WaDEVariableUuid = "var-uuid",
                     WaDEMethodUuid = "method-uuid",
                     WaDEWaterSourceUuid = "water-source-uuid",
                     TimeframeStart = DateTime.Now.AddDays(-10),
@@ -800,18 +800,18 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                 }
             };
 
-            _siteAccessorMock.Setup(x => x.GetSiteUsageTableEntriesBySiteUuid(It.IsAny<string>()))
+            _siteAccessorMock.Setup(x => x.GetSiteUsageInfoListBySiteUuid(It.IsAny<string>()))
                 .ReturnsAsync(mockData).Verifiable();
 
             // Act
             var manager = CreateWaterResourceManager();
-            var result = await manager.GetSiteUsageTableEntriesBySiteUuid("test-site-uuid");
+            var result = await manager.GetSiteUsageInfoListBySiteUuid("test-site-uuid");
 
             // Assert
             result.Should().NotBeNull();
             result.Should().HaveCount(1);
             var entry = result.First();
-            entry.WaDEVariableId.Should().Be("var-uuid");
+            entry.WaDEVariableUuid.Should().Be("var-uuid");
             entry.Amount.Should().Be(123.45);
             entry.BeneficialUse.Should().Be("Agriculture");
             _siteAccessorMock.Verify();

@@ -300,10 +300,10 @@ namespace WesternStatesWater.WestDaat.Managers
             };
         }
         
-        async Task<List<ClientContracts.SiteUsageTableEntry>> ClientContracts.IWaterResourceManager.GetSiteUsageTableEntriesBySiteUuid(string siteUuid)
+        async Task<List<ClientContracts.SiteUsageListItem>> ClientContracts.IWaterResourceManager.GetSiteUsageInfoListBySiteUuid(string siteUuid)
         {
-            var siteUsageTableEntries = await _siteAccessor.GetSiteUsageTableEntriesBySiteUuid(siteUuid);
-            return siteUsageTableEntries.Map<List<ClientContracts.SiteUsageTableEntry>>();
+            var siteUsageTableEntries = await _siteAccessor.GetSiteUsageInfoListBySiteUuid(siteUuid);
+            return siteUsageTableEntries.Map<List<ClientContracts.SiteUsageListItem>>();
         }
 
 

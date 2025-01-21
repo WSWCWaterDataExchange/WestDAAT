@@ -91,8 +91,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.VariableSpecific.AmountUnitCv))
                 ;
             
-            CreateMap<EF.SiteVariableAmountsFact, SiteUsageTableEntry>()
-                .ForMember(dest => dest.WaDEVariableId, opt => opt.MapFrom(src => src.VariableSpecific.VariableSpecificUuid))
+            CreateMap<EF.SiteVariableAmountsFact, SiteUsageListItem>()
+                .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(src => src.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(src => src.Method.MethodUuid))
                 .ForMember(dest => dest.WaDEWaterSourceUuid, opt => opt.MapFrom(src => src.WaterSource.WaterSourceUuid))
                 .ForMember(dest => dest.TimeframeStart, opt => opt.MapFrom(src => src.TimeframeStartNavigation.Date))

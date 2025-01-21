@@ -1,8 +1,8 @@
 namespace WesternStatesWater.WestDaat.Contracts.Client;
 
-public class SiteUsageTableEntry
+public class SiteUsageListItem
 {
-    public string WaDEVariableId { get; set; }
+    public string WaDEVariableUuid { get; set; }
     public string WaDEMethodUuid { get; set; }
     public string WaDEWaterSourceUuid { get; set; }
     public DateTime TimeframeStart { get; set; }

@@ -451,7 +451,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
         
         [TestMethod]
-        public async Task SiteAccessor_GetSiteUsageTableEntriesBySiteUuid()
+        public async Task SiteAccessor_GetSiteUsageInfoListBySiteUuid()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
@@ -488,7 +488,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Act
             var accessor = CreateSiteAccessor();
-            var result = await accessor.GetSiteUsageTableEntriesBySiteUuid(siteDims[0].SiteUuid);
+            var result = await accessor.GetSiteUsageInfoListBySiteUuid(siteDims[0].SiteUuid);
 
             // Assert
             result.Should().HaveCount(10);
