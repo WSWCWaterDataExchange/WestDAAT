@@ -60,33 +60,33 @@ on:
         required: true
 
 jobs:
-  # deploy-funtion-app:
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ${{ env.FUNCTION_APP_DIR }}
+  deploy-funtion-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FUNCTION_APP_DIR }}
 
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: Set up .NET Core
-  #       uses: actions/setup-dotnet@v1
-  #       with:
-  #         dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-  #     - name: "Build Function App"
-  #       run: dotnet build --configuration Release --output ./fnapp
-  #     - name: "Deploy Function App"
-  #       uses: Azure/functions-action@v1
-  #       id: fa
-  #       with:
-  #         app-name: ${{ inputs.azure-functionapp-name }}
-  #         package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
-  #         publish-profile: ${{ secrets.azure-function-publish-profile }}
+      - name: "Build Function App"
+        run: dotnet build --configuration Release --output ./fnapp
+      - name: "Deploy Function App"
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ inputs.azure-functionapp-name }}
+          package: "${{ env.FUNCTION_APP_DIR }}/fnapp"
+          publish-profile: ${{ secrets.azure-function-publish-profile }}
 
   deploy-database:
     runs-on: ubuntu-latest
-    # needs: deploy-funtion-app
+    needs: deploy-funtion-app
     defaults:
       run:
         working-directory: src/API/WesternStatesWater.WestDaat.DbUp
@@ -129,88 +129,88 @@ jobs:
               --server "${{ inputs.database-server-name }}" \
               --name ${{ env.FIREWALL_RULE_NAME }}
 
-  # deploy-apim-api:
-  #   runs-on: ubuntu-latest
-  #   needs: deploy-funtion-app
-  #   defaults:
-  #     run:
-  #       working-directory: .github/workflows
+  deploy-apim-api:
+    runs-on: ubuntu-latest
+    needs: deploy-funtion-app
+    defaults:
+      run:
+        working-directory: .github/workflows
 
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #     # Required to run func commands in the generation shell script
-  #     - name: Install Azure Functions Core Tools
-  #       run: sudo apt-get install -y azure-functions-core-tools-4
+      # Required to run func commands in the generation shell script
+      - name: Install Azure Functions Core Tools
+        run: sudo apt-get install -y azure-functions-core-tools-4
 
-  #     # Need permissions to run the script
-  #     - name: Update OpenAPI Script Permissions
-  #       run: chmod 777 ./get-openapi-document.sh
+      # Need permissions to run the script
+      - name: Update OpenAPI Script Permissions
+        run: chmod 777 ./get-openapi-document.sh
 
-  #     # Generate OpenAPI document via shell script
-  #     - name: Generate OpenAPI document
-  #       id: oai
-  #       run: ./get-openapi-document.sh -d 60 -p ${{ env.FUNCTION_APP_DIR }} -o ".github/workflows"
+      # Generate OpenAPI document via shell script
+      - name: Generate OpenAPI document
+        id: oai
+        run: ./get-openapi-document.sh -d 60 -p ${{ env.FUNCTION_APP_DIR }} -o ".github/workflows"
 
-  #     - name: Check generated OpenAPI document
-  #       run: cat swagger.json
+      - name: Check generated OpenAPI document
+        run: cat swagger.json
 
-  #     - name: Azure Login
-  #       uses: azure/login@v2
-  #       with:
-  #         creds: ${{ secrets.azure-cli-credentials }}
-  #         enable-AzPSSession: true # Required for Azure Powershell to work
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure-cli-credentials }}
+          enable-AzPSSession: true # Required for Azure Powershell to work
 
-  #     - name: Deploy API to APIM
-  #       uses: azure/cli@v2
-  #       with:
-  #         azcliversion: latest
-  #         inlineScript: |
-  #           az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
-  #             --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api' \
-  #             --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
-  #             --service-url ${{ inputs.azure-api-url }} --subscription-required false
+      - name: Deploy API to APIM
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az apim api import --path api --resource-group ${{ inputs.azure-resource-group }} \
+              --service-name ${{ inputs.azure-apim-name }} --api-id ${{ inputs.azure-api-name }} --path 'api' \
+              --specification-format OpenApiJson --specification-path .github/workflows/swagger.json \
+              --service-url ${{ inputs.azure-api-url }} --subscription-required false
 
-  #     - name: List Function App Keys
-  #       id: list-keys
-  #       uses: azure/cli@v2
-  #       with:
-  #         azcliversion: latest
-  #         inlineScript: |
-  #           FN_APP_KEY=$(az functionapp keys list \
-  #             --name ${{ inputs.azure-functionapp-name }} \
-  #             --resource-group ${{ inputs.azure-resource-group }} \
-  #             --query functionKeys.default \
-  #             --output tsv)
-  #           echo "FN_APP_KEY=$FN_APP_KEY" >> $GITHUB_ENV
+      - name: List Function App Keys
+        id: list-keys
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            FN_APP_KEY=$(az functionapp keys list \
+              --name ${{ inputs.azure-functionapp-name }} \
+              --resource-group ${{ inputs.azure-resource-group }} \
+              --query functionKeys.default \
+              --output tsv)
+            echo "FN_APP_KEY=$FN_APP_KEY" >> $GITHUB_ENV
 
-  #     # Using powershell since setting APIM policies aren't supported in azure cli (yet)
-  #     - name: Apply APIM API Policies
-  #       uses: azure/powershell@v2
-  #       with:
-  #         azPSVersion: "latest"
-  #         inlineScript: |
-  #           # Find and replace variables for current environment
-  #           (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}') | Set-Content ./infrastructure/apim_policies.xml
-  #           (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')    | Set-Content ./infrastructure/apim_policies.xml
-  #           (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')      | Set-Content ./infrastructure/apim_policies.xml
-  #           (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ env.FN_APP_KEY }}')                | Set-Content ./infrastructure/apim_policies.xml
+      # Using powershell since setting APIM policies aren't supported in azure cli (yet)
+      - name: Apply APIM API Policies
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            # Find and replace variables for current environment
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{0}', '${{ inputs.azure-auth-tenant-name }}') | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{1}', '${{ inputs.azure-auth-audience }}')    | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{2}', '${{ inputs.azure-cors-domain }}')      | Set-Content ./infrastructure/apim_policies.xml
+            (Get-Content ./infrastructure/apim_policies.xml).replace('{3}', '${{ env.FN_APP_KEY }}')                | Set-Content ./infrastructure/apim_policies.xml
 
-  #           # Print file contents
-  #           get-content ./infrastructure/apim_policies.xml
+            # Print file contents
+            get-content ./infrastructure/apim_policies.xml
 
-  #           # Set Policies in Azure. Raw+xml format is required
-  #           $apimContext = New-AzApiManagementContext `
-  #             -ResourceGroupName ${{ inputs.azure-resource-group }} `
-  #             -ServiceName ${{ inputs.azure-apim-name }}
+            # Set Policies in Azure. Raw+xml format is required
+            $apimContext = New-AzApiManagementContext `
+              -ResourceGroupName ${{ inputs.azure-resource-group }} `
+              -ServiceName ${{ inputs.azure-apim-name }}
 
-  #           Set-AzApiManagementPolicy `
-  #             -Context $apimContext `
-  #             -ApiId ${{ inputs.azure-api-name }} `
-  #             -PolicyFilePath ./infrastructure/apim_policies.xml `
-  #             -Format application/vnd.ms-azure-apim.policy.raw+xml
+            Set-AzApiManagementPolicy `
+              -Context $apimContext `
+              -ApiId ${{ inputs.azure-api-name }} `
+              -PolicyFilePath ./infrastructure/apim_policies.xml `
+              -Format application/vnd.ms-azure-apim.policy.raw+xml
 
-  #     - name: Azure cli logout
-  #       run: |
-  #         az logout
-  #       if: always()
+      - name: Azure cli logout
+        run: |
+          az logout
+        if: always()
