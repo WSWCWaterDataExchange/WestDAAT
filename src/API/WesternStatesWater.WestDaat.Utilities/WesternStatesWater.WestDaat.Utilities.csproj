@@ -24,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Contracts.Client\WesternStatesWater.WestDaat.Contracts.Client.csproj" />
+    <ProjectReference Include="..\WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\GeoConnexJsonLDResource.Designer.cs">

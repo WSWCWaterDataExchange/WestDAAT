@@ -2,18 +2,21 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Helpers.Errors.Model;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
 public class ContextUtility(
     IHttpContextAccessor httpContextAccessor,
     IdentityProviderConfiguration identityProviderConfiguration,
-    EnvironmentConfiguration environmentConfiguration
+    EnvironmentConfiguration environmentConfiguration,
+    IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory
 ) : IContextUtility
 {
     private const string ClaimNamespace = "extension_westdaat";
@@ -31,17 +34,6 @@ public class ContextUtility(
         }
 
         return context;
-    }
-
-    private static UserContext BuildDevelopmentUserContext()
-    {
-        return new UserContext
-        {
-            UserId = new Guid("00000000-0000-0000-0000-000000000000"),
-            Roles = new[] { "GlobalAdmin" },
-            OrganizationRoles = [],
-            ExternalAuthId = "development"
-        };
     }
 
     private static JwtSecurityToken GetJwt(string authHeaderValue)
@@ -138,11 +130,20 @@ public class ContextUtility(
         return (parts[0], parts[1]);
     }
 
+    private static User FetchDevelopmentUser(WestDaatDatabaseContext db, string userId)
+    {
+        return db.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.UserOrganizations)
+            .ThenInclude(uo => uo.UserOrganizationRoles)
+            .SingleOrDefault(u => u.Id == new Guid(userId));
+    }
+
     private UserContext BuildUserContext(string authHeader)
     {
         if (environmentConfiguration.IsDevelopment)
         {
-            return BuildDevelopmentUserContext();
+            return BuildDevelopmentUserContext(authHeader);
         }
 
         // Example jwt claims:
@@ -166,6 +167,47 @@ public class ContextUtility(
             OrganizationRoles = orgRoles,
             ExternalAuthId = externalAuthId,
         };
+    }
+
+    private UserContext BuildDevelopmentUserContext(string authHeaderValue)
+    {
+        // Obtain user id from jwt and see if the user exists locally
+        var jwt = GetJwt(authHeaderValue);
+        var userId = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
+        var db = westDaatDatabaseContextFactory.Create();
+        var user = FetchDevelopmentUser(db, userId);
+
+        // Create the user if it does not exist
+        if (user == null)
+        {
+            var externalAuthId = GetClaimValue(jwt.Claims, "sub");
+            var email = GetClaimValue(jwt.Claims, "emails");
+
+            db.Users.Add(new User
+            {
+                Id = new Guid(userId),
+                ExternalAuthId = externalAuthId,
+                Email = email,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+
+            db.SaveChanges();
+            user = FetchDevelopmentUser(db, userId);
+        }
+
+        var userContext = new UserContext
+        {
+            UserId = user.Id,
+            Roles = user.UserRoles.Select(ur => ur.Role).ToArray(),
+            OrganizationRoles = user.UserOrganizations.Select(uo => new OrganizationRole
+            {
+                OrganizationId = uo.OrganizationId,
+                RoleNames = uo.UserOrganizationRoles.Select(uor => uor.Role).ToArray()
+            }).ToArray(),
+            ExternalAuthId = user.ExternalAuthId
+        };
+
+        return userContext;
     }
 
     private ContextBase Build()
