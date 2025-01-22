@@ -1,4 +1,3 @@
-using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -6,6 +5,7 @@ using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
@@ -37,7 +37,9 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             _transactionScopeFixture = new TransactionScope(
                 TransactionScopeOption.Required,
-                transactionOptions);
+                transactionOptions,
+                TransactionScopeAsyncFlowOption.Enabled
+            );
 
             var serviceCollection = new ServiceCollection()
                 .AddLogging(config => config.AddConsole());
@@ -54,11 +56,21 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             _loggerFactory = Services.GetRequiredService<ILoggerFactory>();
         }
 
+        public static Dictionary<string, string> DefaultTestConfiguration => new()
+        {
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}", "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
+            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}", "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
+        };
+
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)
         {
             var config = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
                 .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
@@ -104,6 +116,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         private void RegisterDatabaseServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
+            serviceCollection.AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>();
         }
 
         private void RegisterUtilityServices(IServiceCollection serviceCollection)

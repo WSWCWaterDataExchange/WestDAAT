@@ -8,6 +8,7 @@ using WesternStatesWater.WestDaat.Client.Functions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Utilities;
@@ -85,6 +86,7 @@ var host = new HostBuilder()
 
         // Database
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
+        services.AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>();
         
         // Utilities / Sdks
         services.AddScoped<IContextUtility, ContextUtility>();

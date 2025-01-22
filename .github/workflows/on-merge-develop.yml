@@ -26,6 +26,8 @@ jobs:
       azure-auth-tenant-name: westdaatqa
       azure-auth-audience: ab3cf308-8a7e-404e-977c-d0227f4a48c4 # App Registration ID
       azure-cors-domain: https://westdaatqa.westernstateswater.org
+      database-server-name: westdaat-qa
+      database-connection-string: Server=tcp:westdaat-qa.database.windows.net,1433;Initial Catalog=WestDAAT;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_QA }}
       azure-function-publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE_QA }}
@@ -38,7 +40,7 @@ jobs:
       azure-cdn-endpoint-name: westdaatqa
       azure-cdn-profile-name: westdaatqa
       react-app-auth-redirect-url: https://westdaatqa.westernstateswater.org/authredirect.html
-      react-app-webapi-url: https://westdaat-qa.azurewebsites.net/api/
+      react-app-webapi-url: https://westdaatqa.azure-api.net/api/
       react-app-auth-client-id: ab3cf308-8a7e-404e-977c-d0227f4a48c4
       react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin
       react-app-auth-known-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com
