@@ -200,6 +200,16 @@ export const CustomDirectSelectMode: DrawCustomMode = {
       draggableMarkerPositions
         .map((position) => buildVertex(geojson.properties!.id, position))
         .forEach((vertex) => display(vertex));
+    } else if (state.feature?.properties?.isRectangle && state.featureId === geojson.properties?.id) {
+      // override rendering - default polygon tool displays midpoint markers which we don't want
+      // display the rectangle feature
+      geojson.properties.active = 'true';
+      display(geojson);
+
+      // render marker points manually rather than add them to the map's feature collection
+      const rectangle = state.feature;
+      const corners = rectangle.getCoordinates()[0];
+      corners.map((position) => buildVertex(geojson.properties!.id, position)).forEach((vertex) => display(vertex));
     } else {
       // call base implementation
       baseMode.toDisplayFeatures?.call(this, state, geojson, display);
