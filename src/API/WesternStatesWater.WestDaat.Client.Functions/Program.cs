@@ -55,6 +55,7 @@ var host = new HostBuilder()
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
+        services.AddTransient<IOrganizationManager, AdminManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
         services.AddTransient<IWaterResourceManager, WaterResourceManager>();
@@ -76,6 +77,7 @@ var host = new HostBuilder()
         // Accessors
         services.AddTransient<IApplicationAccessor, ApplicationAccessor>();
         services.AddTransient<INldiAccessor, NldiAccessor>();
+        services.AddTransient<IOrganizationAccessor, OrganizationAccessor>();
         services.AddTransient<ISiteAccessor, SiteAccessor>();
         services.AddTransient<ISystemAccessor, SystemAccessor>();
         services.AddTransient<ITestAccessor, TestAccessor>();
