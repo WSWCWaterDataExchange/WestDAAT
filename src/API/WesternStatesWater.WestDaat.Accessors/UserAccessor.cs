@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -18,6 +19,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         return request switch
         {
+            UserExistsRequest req => await GetUserExists(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -48,4 +50,37 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         };
     }
 
+    private async Task<UserExistsResponse> GetUserExists(UserExistsRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var userExists = await db.Users.AnyAsync(u => u.ExternalAuthId == request.ExternalAuthId);
+
+        return new UserExistsResponse
+        {
+            UserExists = userExists
+        };
+    }
+
+    public async Task<UserStoreResponseBase> Store(UserStoreRequestBase request)
+    {
+        return request switch
+        {
+            UserStoreCreateRequest req => await CreateUser(req),
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    public async Task<UserStoreResponseBase> CreateUser(UserStoreCreateRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var entity = DtoMapper.Map<EFWD.User>(request);
+
+        await db.Users.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new UserStoreResponseBase();
+    }
 }
