@@ -1,7 +1,7 @@
 import MapboxDraw, { DrawCustomMode, DrawCustomModeThis } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
-import { Feature, GeoJSON, GeoJsonProperties, Geometry } from 'geojson';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { dragFeature, dragVertex } from './CustomDirectSelectModeDragHelpers';
 import { handleDisplayCircle, handleDisplayRectangle } from './CustomDirectSelectModeDisplayHelpers';
 
@@ -16,6 +16,9 @@ export interface CustomDirectSelectModeState {
       circleCenterPointLngLat: [number, number] | undefined;
     };
     isRectangle: boolean;
+    rectangleState: {
+      cornerFeatures: MapboxDraw.DrawPoint[];
+    };
   };
   // inherited properties from base implementation
   canDragMove: boolean;
@@ -32,6 +35,9 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
     circleCenterPointLngLat: undefined,
   },
   isRectangle: false,
+  rectangleState: {
+    cornerFeatures: [],
+  },
 };
 
 export type DirectSelectDrawModeInstance = DrawCustomMode & DrawCustomModeThis;
@@ -51,6 +57,34 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         number,
         number,
       ];
+    } else if (state.feature?.properties?.isRectangle) {
+      // get rectangle's child corner coordinate features
+      const sources = this.map.getStyle()!.sources;
+      const rectangleCornerFeatures = Object.keys(sources)
+        .map((sourceKey) => sources[sourceKey])
+        .filter((source) => source.type === 'geojson')
+        .map((geoJsonSource) => geoJsonSource.data)
+        .filter(
+          (geoJsonSourceData): geoJsonSourceData is GeoJSON<Geometry, GeoJsonProperties> =>
+            typeof geoJsonSourceData === 'object',
+        )
+        .filter((geoJsonSourceData) => geoJsonSourceData.type === 'FeatureCollection')
+        .flatMap((geoJsonSourceData) => geoJsonSourceData.features)
+        // the rectangle's child corner features are all Point geometries
+        // find the relevant points corresponding to this rectangle
+        .filter(
+          (feature): feature is Feature<Point, GeoJsonProperties> => feature.properties?.parent === state.feature?.id,
+        );
+
+      // the corner features exist in the map's source, but this draw mode isn't aware of them and thus cannot render markers over them.
+      // register the corner features in the draw mode (if they haven't been already) and add to state so they can be rendered.
+      const rectangleCornerDrawFeatures = rectangleCornerFeatures.map(
+        (feature) => (this.getFeature(String(feature.id)) ?? this.newFeature(feature)) as MapboxDraw.DrawPoint,
+      );
+
+      state.customState.rectangleState = {
+        cornerFeatures: rectangleCornerDrawFeatures,
+      };
     }
 
     return state;
@@ -82,7 +116,7 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     if (state.feature?.properties?.isCircle && state.featureId === geojson.properties?.id) {
       handleDisplayCircle(state, geojson, display);
     } else if (state.feature?.properties?.isRectangle && state.featureId === geojson.properties?.id) {
-      handleDisplayRectangle(state, geojson, display);
+      handleDisplayRectangle(this, state, geojson, display);
     } else {
       // call base implementation
       directSelectBaseMode.toDisplayFeatures?.call(this, state, geojson, display);
