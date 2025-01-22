@@ -43,7 +43,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
     if (!isTimeSeriesFilterActive || timeSeries.length === 0) {
       return null;
     }
-    const exprs = timeSeries.map((key) => ['==', ['get', 'timeSeriesType'], key]);
+    const exprs = timeSeries.map((key) => ['==', ['get', 'startDate'], key]);
     return ['any', ...exprs];
   }, [isTimeSeriesFilterActive, timeSeries]);
 
