@@ -27,9 +27,11 @@ export const handleDisplayRectangle = (
   geojson.properties!.active = 'true';
   display(geojson);
 
-  // render marker points manually rather than add them to the map's feature collection
   const rectangle = state.feature!;
   const corners = rectangle.getCoordinates()[0];
+  console.log('render corners', corners);
+
+  // render marker points manually rather than add them to the map's feature collection
   corners.map((position) => buildVertex(geojson.properties!.id, position)).forEach((vertex) => display(vertex));
 };
 

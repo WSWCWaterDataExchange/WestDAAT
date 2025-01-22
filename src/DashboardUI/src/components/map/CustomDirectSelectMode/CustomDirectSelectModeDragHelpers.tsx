@@ -57,28 +57,6 @@ const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDra
 };
 
 const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
-  const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
-    return points
-      .map((point) => ({
-        point,
-        distance: distance(newPoint, point, { units: 'kilometers' }),
-      }))
-      .reduce((prevPoint, currentPoint) => (prevPoint.distance < currentPoint.distance ? prevPoint : currentPoint))
-      .point;
-  };
-
-  const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: Position): Position[] => {
-    const [lng1, lat1] = activeCorner;
-    const [lng2, lat2] = oppositeCorner;
-
-    return [
-      [lng1, lat1],
-      [lng2, lat1],
-      [lng2, lat2],
-      [lng1, lat2],
-    ];
-  };
-
   const rectangle = state.feature!;
   const corners = rectangle.getCoordinates()[0];
   const activeCorner = findClosestPointToPoint(e.lngLat.toArray(), corners);
@@ -101,4 +79,25 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
     }),
   );
   rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
+};
+
+const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
+  return points
+    .map((point) => ({
+      point,
+      distance: distance(newPoint, point, { units: 'kilometers' }),
+    }))
+    .reduce((prevPoint, currentPoint) => (prevPoint.distance < currentPoint.distance ? prevPoint : currentPoint)).point;
+};
+
+const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: Position): Position[] => {
+  const [lng1, lat1] = activeCorner;
+  const [lng2, lat2] = oppositeCorner;
+
+  return [
+    [lng1, lat1],
+    [lng2, lat1],
+    [lng2, lat2],
+    [lng1, lat2],
+  ];
 };
