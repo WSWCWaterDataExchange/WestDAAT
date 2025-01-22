@@ -1,5 +1,9 @@
 import { Feature, GeoJsonProperties, Geometry, Position, GeoJSON } from 'geojson';
 import { CustomDirectSelectModeState } from './CustomDirectSelectMode';
+import center from '@turf/center';
+import { distance } from '@turf/distance';
+import destination from '@turf/destination';
+import { bearing } from '@turf/bearing';
 
 export const handleDisplayCircle = (
   state: CustomDirectSelectModeState,
@@ -28,11 +32,28 @@ export const handleDisplayRectangle = (
   display(geojson);
 
   const rectangle = state.feature!;
-  const corners = rectangle.getCoordinates()[0];
-  console.log('render corners', corners);
+  const cornersPositions = rectangle.getCoordinates()[0];
 
-  // render marker points manually rather than add them to the map's feature collection
-  corners.map((position) => buildVertex(geojson.properties!.id, position)).forEach((vertex) => display(vertex));
+  // render corners
+  const corners = cornersPositions.map((position) => buildVertex(geojson.properties!.id, position));
+  corners.forEach(display);
+
+  // render the rotation points:
+  const centerPoint = center(rectangle);
+
+  // generate rotation markers 10% further away from corners
+  const distanceFromCenterToCorners = cornersPositions.map((corner) => ({
+    dist: distance(centerPoint, corner, { units: 'kilometers' }),
+    bearingValue: bearing(centerPoint, corner),
+  }));
+
+  const rotationMarkers = distanceFromCenterToCorners
+    .map(({ dist, bearingValue }) => destination(centerPoint, dist * 1.1, bearingValue).geometry.coordinates)
+    .map((coords) => buildVertex(geojson.properties!.id, coords));
+  console.log('corners', corners, 'rotation markers', rotationMarkers);
+
+  // render rotation markers
+  rotationMarkers.forEach(display);
 };
 
 const getCardinalDirectionCoordinatesOnFeature = (allCoordinateLngLatValues: Position[]): Position[] => {

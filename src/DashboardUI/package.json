@@ -39,6 +39,7 @@
     "@react-hook/debounce": "^4.0.0",
     "@turf/bbox": "^7.2.0",
     "@turf/bbox-polygon": "^7.2.0",
+    "@turf/bearing": "^7.2.0",
     "@turf/center": "^7.2.0",
     "@turf/circle": "^7.2.0",
     "@turf/combine": "^7.2.0",
