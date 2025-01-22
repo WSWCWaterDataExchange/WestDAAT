@@ -1,4 +1,4 @@
-import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
+import MapboxDraw, { DrawCustomMode, DrawCustomModeThis } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
 import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
@@ -36,6 +36,8 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   isRectangle: false,
 };
 
+type DrawModeInstance = DrawCustomMode & DrawCustomModeThis;
+
 // DrawCustomMode type definition doesn't allow for extending the type with additional properties
 // although the js implementation of `direct_select` does exactly that
 export const CustomDirectSelectMode: DrawCustomMode = {
@@ -62,89 +64,11 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     state.dragMoving = true;
     e.originalEvent.stopPropagation();
 
-    const dragFeature = () => {
-      // call base implementation, let it handle the drag
-      baseMode.onDrag?.call(this, state, e);
-
-      if (state.feature?.properties?.isCircle) {
-        // afterwards update the center point of the circle
-        state.customState.circleState.circleCenterPointLngLat = center(state.feature).geometry.coordinates as [
-          number,
-          number,
-        ];
-      }
-    };
-
-    const dragVertex = (e: MapboxDraw.MapMouseEvent) => {
-      // determine whether to override the drag behavior
-      if (state.feature?.properties?.isCircle) {
-        // find new coordinate location via mouse position
-        const newCoordPosition = e.lngLat;
-
-        // generate new coordinates for the whole circle
-        const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
-          state.customState.circleState.circleCenterPointLngLat!,
-          newCoordPosition.toArray(),
-        );
-
-        // overwrite the circles coordinates with the new coordinates
-        state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
-      } else if (state.feature?.properties?.isRectangle) {
-        const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
-          return points
-            .map((point) => ({
-              point,
-              distance: distance(newPoint, point, { units: 'kilometers' }),
-            }))
-            .reduce((prevPoint, currentPoint) =>
-              prevPoint.distance < currentPoint.distance ? prevPoint : currentPoint,
-            ).point;
-        };
-
-        const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: Position): Position[] => {
-          const [lng1, lat1] = activeCorner;
-          const [lng2, lat2] = oppositeCorner;
-
-          return [
-            [lng1, lat1],
-            [lng2, lat1],
-            [lng2, lat2],
-            [lng1, lat2],
-          ];
-        };
-
-        const rectangle = state.feature;
-        const corners = rectangle.getCoordinates()[0];
-        const activeCorner = findClosestPointToPoint(e.lngLat.toArray(), corners);
-        const oppositeCornerIndex = (corners.indexOf(activeCorner) + 2) % 4;
-        const oppositeCorner = corners[oppositeCornerIndex];
-
-        activeCorner[0] = e.lngLat.lng;
-        activeCorner[1] = e.lngLat.lat;
-
-        const newRectangleCoordinates = computeNewRectangleCoordinates(activeCorner, oppositeCorner);
-
-        const newRectangleGeometry = bboxPolygon(
-          bbox({
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: [newRectangleCoordinates],
-            },
-          }),
-        );
-        rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
-      } else {
-        baseMode.onDrag?.call(this, state, e);
-      }
-    };
-
     // determine whether to move the whole feature or just a vertex
     if (state.selectedCoordPaths.length > 0) {
-      dragVertex(e);
+      dragVertex(this, state, e);
     } else {
-      dragFeature();
+      dragFeature(this, state, e);
     }
 
     // post-processing copied from base implementation
@@ -215,4 +139,89 @@ export const CustomDirectSelectMode: DrawCustomMode = {
       baseMode.toDisplayFeatures?.call(this, state, geojson, display);
     }
   },
+};
+
+const dragFeature = (_this: DrawModeInstance, state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // call base implementation, let it handle the drag
+  baseMode.onDrag?.call(_this, state, e);
+
+  if (state.feature?.properties?.isCircle) {
+    // afterwards update the center point of the circle
+    state.customState.circleState.circleCenterPointLngLat = center(state.feature).geometry.coordinates as [
+      number,
+      number,
+    ];
+  }
+};
+
+const dragVertex = (_this: DrawModeInstance, state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // determine whether to override the drag behavior
+  if (state.feature?.properties?.isCircle) {
+    handleDragCircleVertex(state, e);
+  } else if (state.feature?.properties?.isRectangle) {
+    handleDragRectangleVertex(state, e);
+  } else {
+    baseMode.onDrag?.call(_this, state, e);
+  }
+};
+
+const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // find new coordinate location via mouse position
+  const newCoordPosition = e.lngLat;
+
+  // generate new coordinates for the whole circle
+  const newCoordinates = generateCircleWithRadiusFromCenterPointToEdgePoint(
+    state.customState.circleState.circleCenterPointLngLat!,
+    newCoordPosition.toArray(),
+  );
+
+  // overwrite the circles coordinates with the new coordinates
+  state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
+};
+
+const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
+    return points
+      .map((point) => ({
+        point,
+        distance: distance(newPoint, point, { units: 'kilometers' }),
+      }))
+      .reduce((prevPoint, currentPoint) => (prevPoint.distance < currentPoint.distance ? prevPoint : currentPoint))
+      .point;
+  };
+
+  const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: Position): Position[] => {
+    const [lng1, lat1] = activeCorner;
+    const [lng2, lat2] = oppositeCorner;
+
+    return [
+      [lng1, lat1],
+      [lng2, lat1],
+      [lng2, lat2],
+      [lng1, lat2],
+    ];
+  };
+
+  const rectangle = state.feature!;
+  const corners = rectangle.getCoordinates()[0];
+  const activeCorner = findClosestPointToPoint(e.lngLat.toArray(), corners);
+  const oppositeCornerIndex = (corners.indexOf(activeCorner) + 2) % 4;
+  const oppositeCorner = corners[oppositeCornerIndex];
+
+  activeCorner[0] = e.lngLat.lng;
+  activeCorner[1] = e.lngLat.lat;
+
+  const newRectangleCoordinates = computeNewRectangleCoordinates(activeCorner, oppositeCorner);
+
+  const newRectangleGeometry = bboxPolygon(
+    bbox({
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [newRectangleCoordinates],
+      },
+    }),
+  );
+  rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
 };
