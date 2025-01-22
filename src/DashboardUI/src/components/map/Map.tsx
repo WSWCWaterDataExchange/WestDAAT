@@ -30,7 +30,7 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
-import { CustomDirectSelectMode } from './CustomDirectSelectMode';
+import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 
 import './map.scss';
 import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
