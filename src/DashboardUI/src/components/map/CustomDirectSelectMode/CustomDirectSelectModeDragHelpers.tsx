@@ -58,16 +58,20 @@ const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDra
 
 const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
   const rectangle = state.feature!;
-  const corners = rectangle.getCoordinates()[0];
-  const activeCorner = findClosestPointToPoint(e.lngLat.toArray(), corners);
-  const oppositeCornerIndex = (corners.indexOf(activeCorner) + 2) % 4;
-  const oppositeCorner = corners[oppositeCornerIndex];
 
-  activeCorner[0] = e.lngLat.lng;
-  activeCorner[1] = e.lngLat.lat;
+  // find the closest corner to the dragged vertex
+  const rectangleMarkerPositions = rectangle.getCoordinates()[0];
+  const dragPosition = e.lngLat.toArray() as Position;
+  const selectedMarkerPosition = findClosestPointToPoint(dragPosition, rectangleMarkerPositions);
 
-  const newRectangleCoordinates = computeNewRectangleCoordinates(activeCorner, oppositeCorner);
+  // also find the opposite corner
+  const oppositeCornerIndex = (rectangleMarkerPositions.indexOf(selectedMarkerPosition) + 2) % 4;
+  const oppositeCorner = rectangleMarkerPositions[oppositeCornerIndex];
 
+  // build the four corners of the rectangle using these two opposing corners
+  const newRectangleCoordinates = computeNewRectangleCoordinates(dragPosition, oppositeCorner);
+
+  // update the rectangle with the new coordinates
   const newRectangleGeometry = bboxPolygon(
     bbox({
       type: 'Feature',
