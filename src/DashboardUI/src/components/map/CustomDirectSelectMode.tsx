@@ -101,45 +101,63 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
       } else if (state.feature?.properties?.isRectangle) {
         // find the corner being dragged
-        // const vertexBeingDraggedPosition = state.feature.getCoordinate(state.selectedCoordPaths[0]);
-        // const [vertexLng, vertexLat] = vertexBeingDraggedPosition;
+        console.log('dragging rectangle', state.feature);
+        const vertexBeingDraggedPosition = state.feature.getCoordinate(state.selectedCoordPaths[0]);
+        const [vertexLng, vertexLat] = vertexBeingDraggedPosition;
 
-        // // determine which corner this is
-        // const [centerLng, centerLat] = center(state.feature).geometry.coordinates as [number, number];
+        const [centerLng, centerLat] = center(state.feature).geometry.coordinates as [number, number];
 
-        // const isTopLeft = vertexLng < centerLng && vertexLat < centerLat;
-        // const isTopRight = vertexLng > centerLng && vertexLat < centerLat;
-        // const isBottomLeft = vertexLng < centerLng && vertexLat > centerLat;
-        // const isBottomRight = vertexLng > centerLng && vertexLat > centerLat;
+        // determine which corner this is
+        // latitude: -90 at south pole to +90 at north pole
+        // longitude: -180 to +180 at international date line. 0 at prime meridian (greenwich, great britain)
+        const isTopLeft = vertexLng < centerLng && vertexLat > centerLat;
+        const isTopRight = vertexLng > centerLng && vertexLat > centerLat;
+        const isBottomLeft = vertexLng < centerLng && vertexLat < centerLat;
+        const isBottomRight = vertexLng > centerLng && vertexLat < centerLat;
 
-        const mousePosition = e.lngLat.toArray();
+        console.log(state.feature.getCoordinates());
 
-        const mergedGeometry: FeatureCollection<Point | Polygon, GeoJsonProperties> = {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Polygon',
-                coordinates: state.feature.getCoordinates(),
-              },
-            },
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: mousePosition,
-              },
-            },
-          ],
-        };
+        let oppositeCornerLng: number = 0,
+          oppositeCornerLat: number = 0;
+        if (isTopLeft) {
+          console.log('top left');
+          const bottomRightCorner = state.feature
+            .getCoordinates()[0]
+            .filter((coord) => coord[0] > centerLng && coord[1] > centerLat)[0];
+          oppositeCornerLng = bottomRightCorner[0];
+          oppositeCornerLat = bottomRightCorner[1];
+        } else if (isTopRight) {
+          console.log('top right');
+          const bottomLeftCorner = state.feature
+            .getCoordinates()[0]
+            .filter((coord) => coord[0] < centerLng && coord[1] > centerLat)[0];
+          oppositeCornerLng = bottomLeftCorner[0];
+          oppositeCornerLat = bottomLeftCorner[1];
+        } else if (isBottomLeft) {
+          console.log('bottom left');
+          const topRightCorner = state.feature
+            .getCoordinates()[0]
+            .filter((coord) => coord[0] > centerLng && coord[1] < centerLat)[0];
+          oppositeCornerLng = topRightCorner[0];
+          oppositeCornerLat = topRightCorner[1];
+        } else if (isBottomRight) {
+          console.log('bottom right');
+          const topLeftCorner = state.feature
+            .getCoordinates()[0]
+            .filter((coord) => coord[0] < centerLng && coord[1] < centerLat)[0];
+          oppositeCornerLng = topLeftCorner[0];
+          oppositeCornerLat = topLeftCorner[1];
+        } else {
+          console.log('how did we get here');
+        }
 
-        const combinedGeometry = combine(mergedGeometry);
-        const updatedRectangleGeometry = bboxPolygon(bbox(combinedGeometry));
-        console.log('updatedRectangleGeometry', updatedRectangleGeometry);
-
+        // create a new rectangle using the opposite corner and the current mouse position as the bounding box
+        const updatedRectangleGeometry = bboxPolygon([
+          oppositeCornerLng,
+          oppositeCornerLat,
+          e.lngLat.lng,
+          e.lngLat.lat,
+        ]);
         state.feature.setCoordinates(updatedRectangleGeometry.geometry.coordinates);
       } else {
         baseMode.onDrag?.call(this, state, e);
