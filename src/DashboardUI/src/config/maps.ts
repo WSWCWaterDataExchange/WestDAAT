@@ -82,7 +82,7 @@ const mapsJson = {
       volatile: true,
     },
     {
-      id:mapSourceNames.timeSeriesVectorTiles,
+      id: mapSourceNames.timeSeriesVectorTiles,
       type: 'vector',
       url: process.env.REACT_APP_TIME_SERIES_VECTOR_TILE_URL,
       volatile: true,
@@ -168,7 +168,7 @@ const mapsJson = {
         'fill-color': '#ff0000',
         'fill-opacity': 0.5,
       },
-      filter: ['has', 'podPou']
+      filter: ['has', 'podPou'],
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,
@@ -267,10 +267,10 @@ const mapsJson = {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
-    {
+    /*    {
       id: mapLayerNames.timeSeriesPolygonsLayer,
       friendlyName: 'Time Series Polygons',
-      'source-layer': 'polygons', // Adjust to match your tile layer name
+      'source-layer': 'polygons',
       source: mapSourceNames.timeSeriesVectorTiles,
       layout: {
         visibility: 'visible',
@@ -280,7 +280,7 @@ const mapsJson = {
         'fill-color': '#008080',
         'fill-opacity': 0.75,
       },
-    },
+    },*/
     {
       id: mapLayerNames.timeSeriesPointsLayer,
       friendlyName: 'Time Series Points',

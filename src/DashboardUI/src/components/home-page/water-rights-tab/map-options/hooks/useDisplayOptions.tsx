@@ -9,27 +9,18 @@ import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
 import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
 import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
 import { useAlerts } from '../../useAlerts';
-import useSiteClickedOnMap from '../../../../../hooks/map-popups/useSiteClickedOnMap';
+import { useTimeSeriesFilter } from '../../sidebar-filtering/time-series/hooks/useTimeSeriesFilter';
 
-const baseLayers = [
-  mapLayerNames.waterRightsPointsLayer,
-  mapLayerNames.waterRightsPolygonsLayer,
-];
+const baseLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
 
 const nldiLayers = [
   mapLayerNames.nldiFlowlinesLayer,
   mapLayerNames.nldiUsgsLocationLayer,
   mapLayerNames.nldiUsgsPointsLayer,
 ];
-const overlayLayers = [
-  mapLayerNames.overlayTypesPolygonsLayer,
-  mapLayerNames.overlayTypesPolygonsBorderLayer,
-];
+const overlayLayers = [mapLayerNames.overlayTypesPolygonsLayer, mapLayerNames.overlayTypesPolygonsBorderLayer];
 
-const timeSeriesLayers = [
-  mapLayerNames.timeSeriesPointsLayer,
-  mapLayerNames.timeSeriesPolygonsLayer
-];
+const timeSeriesLayers = [mapLayerNames.timeSeriesPointsLayer]; //mapLayerNames.timeSeriesPolygonsLayer add this if polygons are added
 
 export function useDisplayOptions() {
   const {
@@ -37,6 +28,8 @@ export function useDisplayOptions() {
   } = useWaterRightsContext();
 
   const { isOverlayFilterActive } = useOverlaysContext();
+
+  const { isTimeSeriesFilterActive } = useTimeSeriesFilter();
 
   const { setVisibleLayers } = useMapContext();
 
@@ -55,10 +48,12 @@ export function useDisplayOptions() {
       visible.push(...overlayLayers);
     }
 
-    visible.push(...timeSeriesLayers);
+    if (isTimeSeriesFilterActive) {
+      visible.push(...timeSeriesLayers);
+    }
 
     setVisibleLayers(visible);
-  }, [riverBasinNames, isNldiFilterActive, isOverlayFilterActive, setVisibleLayers]);
+  }, [riverBasinNames, isNldiFilterActive, isOverlayFilterActive, isTimeSeriesFilterActive, setVisibleLayers]);
 
   useMapLegend();
   useMapPointScaling();

@@ -9,14 +9,17 @@ import { PointSize } from '../map-options/components/PointSize';
 import { MapGrouping } from '../map-options/components/MapGrouping';
 import { PodPou } from '../map-options/components/PodPou';
 import OverlaysFilter from './overlays/components/OverlaysFilter';
-import WaterRights from "./water-rights/components/WaterRights";
+import WaterRights from './water-rights/components/WaterRights';
 import { NldiFilters } from './nldi/components/NldiFilters';
+import { useTimeSeriesFilter } from './time-series/hooks/useTimeSeriesFilter';
+import TimeSeriesFilter from './time-series/components/TimeSeriesFilter';
 
 function SideBar() {
   const { resetUserOptions } = useWaterRightsContext();
   const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
   const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
   const { isOverlayFilterActive, setOverlayFilterActive } = useOverlaysFilter();
+  const { isTimeSeriesFilterActive, setTimeSeriesFilterActive } = useTimeSeriesFilter();
 
   const [activeKeys, setActiveKeys] = useState(
     isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
@@ -48,7 +51,14 @@ function SideBar() {
   );
 
   const openAccordionKeys = useMemo(() => {
-    const keys = [...activeKeys].filter((a) => a !== 'nldi' && a !== 'siteSelectionFilters' && a !== 'overlayFilters');
+    const keys = [...activeKeys].filter(
+      (key) =>
+        key !== 'nldi' && key !== 'siteSelectionFilters' && key !== 'overlayFilters' && key !== 'timeSeriesFilters',
+    );
+
+    if (isTimeSeriesFilterActive) {
+      keys.push('timeSeriesFilters');
+    }
     if (isNldiFilterActive) {
       keys.push('nldi');
     }
@@ -58,8 +68,9 @@ function SideBar() {
     if (isOverlayFilterActive) {
       keys.push('overlayFilters');
     }
+
     return keys;
-  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive]);
+  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive, isTimeSeriesFilterActive]);
 
   return (
     <>
@@ -108,6 +119,21 @@ function SideBar() {
             </Accordion.Header>
             <Accordion.Body>
               <WaterRights />
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="timeSeriesFilters">
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="timeSeriesToggle"
+                label=""
+                checked={isTimeSeriesFilterActive}
+                onChange={() => setTimeSeriesFilterActive(!isTimeSeriesFilterActive)}
+              />
+              <label className="fw-bold">TIME SERIES FILTER</label>
+            </Accordion.Header>
+            <Accordion.Body>
+              <TimeSeriesFilter />
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
