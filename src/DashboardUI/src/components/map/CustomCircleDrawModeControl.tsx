@@ -4,7 +4,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 export class CustomCircleDrawModeControl extends CustomMapControl {
   constructor(mapboxDraw: MapboxDraw | null) {
-    super(mdiVectorCircle, 'circle draw tool', () => {
+    super(mdiVectorCircle, 'Circle tool', () => {
       mapboxDraw?.changeMode('draw_circle');
     });
   }
