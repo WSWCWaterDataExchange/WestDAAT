@@ -26,14 +26,14 @@ internal class OrganizationAccessor : AccessorBase, IOrganizationAccessor
     {
         // temporary implementation
         await Task.CompletedTask;
-        var organizations = new List<OrganizationListDetails>
+        var organizations = new OrganizationListItem[]
         {
-            new OrganizationListDetails()
+            new OrganizationListItem()
             {
-                OrganizationUuid = Guid.NewGuid().ToString(),
-                OrganizationName = "organization1",
-                OrganizationDomainName = "organization1.com",
-                UserCount = 1
+                OrganizationId = Guid.NewGuid(),
+                Name = "organization1",
+                UserCount = 1,
+                EmailDomain = "organization1.com",
             },
         };
         
