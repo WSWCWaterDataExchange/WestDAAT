@@ -23,7 +23,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [Function(nameof(GetDashboardFilters))]
         [OpenApiOperation(nameof(GetDashboardFilters))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(DashboardFilters))]
-        public async Task<HttpResponseData> GetDashboardFilters([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+        public async Task<HttpResponseData> GetDashboardFilters([HttpTrigger(AuthorizationLevel.Function, "get",
                 Route = "system/filters")]
             HttpRequestData req)
         {
@@ -36,7 +36,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [OpenApiOperation(nameof(GetRiverBasinPolygonsByName))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
         public async Task<HttpResponseData> GetRiverBasinPolygonsByName(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/riverBasins")]
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "system/riverBasins")]
             HttpRequestData request)
         {
             var basinNames = await ParseRequestBody<string[]>(request);
@@ -50,7 +50,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         [OpenApiOperation(nameof(PostFeedback))]
         [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
         public async Task<HttpResponseData> PostFeedback(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")]
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "system/feedback")]
             HttpRequestData request)
         {
             var feedbackRequest = await ParseRequestBody<FeedbackRequest>(request);

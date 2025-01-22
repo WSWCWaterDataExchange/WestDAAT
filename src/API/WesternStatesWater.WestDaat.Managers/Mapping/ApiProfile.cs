@@ -23,6 +23,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.AnalyticsSummaryInformation, ClientContracts.AnalyticsSummaryInformation>();
             CreateMap<CommonContracts.DashboardFilters, ClientContracts.DashboardFilters>();
             CreateMap<CommonContracts.SiteUsagePoint, ClientContracts.SiteUsagePoint>();
+            CreateMap<CommonContracts.SiteUsageListItem, ClientContracts.SiteUsageListItem>();
             CreateMap<CommonContracts.VariableInfoListItem, ClientContracts.VariableInfoListItem>();
             CreateMap<CommonContracts.MethodInfoListItem, ClientContracts.MethodInfoListItem>();
             CreateMap<CommonContracts.OverlayDetails, ClientContracts.OverlayDetails>()
@@ -54,6 +55,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     )
                 )
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserExistsRequest>()
+                .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+            CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserStoreCreateRequest>()
+                .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
         }
     }
 }

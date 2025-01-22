@@ -63,7 +63,10 @@ export const CustomCircleDrawMode: DrawCustomMode = {
     // generate the new geometry
     const circle = generateCircleWithRadiusFromCenterPointToEdgePoint(state.inProgressCircleCenterPoint!, coords);
 
-    let circleFeature = this.getFeature(state.inProgressCircleId ?? '');
+    let circleFeature: MapboxDraw.DrawPolygon = this.getFeature(
+      state.inProgressCircleId ?? '',
+    ) as MapboxDraw.DrawPolygon;
+
     if (!circleFeature) {
       // create new circle feature if it doesn't exist
       circleFeature = this.newFeature({
@@ -76,7 +79,7 @@ export const CustomCircleDrawMode: DrawCustomMode = {
           type: 'Polygon',
           coordinates: circle.geometry.coordinates,
         },
-      });
+      }) as MapboxDraw.DrawPolygon;
 
       // newFeature generates an id for the feature automatically; track it:
       state.inProgressCircleId = String(circleFeature.id);
@@ -85,7 +88,7 @@ export const CustomCircleDrawMode: DrawCustomMode = {
       this.addFeature(circleFeature);
     } else {
       // update existing circle feature if it does exist
-      circleFeature.setCoordinates(circle.geometry.coordinates as any);
+      circleFeature.setCoordinates(circle.geometry.coordinates);
     }
   },
 

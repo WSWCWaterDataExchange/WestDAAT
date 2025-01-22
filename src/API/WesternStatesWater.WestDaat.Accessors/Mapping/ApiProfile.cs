@@ -90,6 +90,19 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.VariableSpecific.AmountUnitCv))
                 ;
+            
+            CreateMap<EF.SiteVariableAmountsFact, SiteUsageListItem>()
+                .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(src => src.VariableSpecific.VariableSpecificUuid))
+                .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(src => src.Method.MethodUuid))
+                .ForMember(dest => dest.WaDEWaterSourceUuid, opt => opt.MapFrom(src => src.WaterSource.WaterSourceUuid))
+                .ForMember(dest => dest.TimeframeStart, opt => opt.MapFrom(src => src.TimeframeStartNavigation.Date))
+                .ForMember(dest => dest.TimeframeEnd, opt => opt.MapFrom(src => src.TimeframeEndNavigation.Date))
+                .ForMember(dest => dest.ReportYear, opt => opt.MapFrom(src => src.ReportYearCv))
+                .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+                .ForMember(dest => dest.BeneficialUse, opt => opt.MapFrom(src => src.PrimaryBeneficialUse.WaDEName))
+                .ForMember(dest => dest.PopulationServed, opt => opt.MapFrom(src => src.PopulationServed))
+                .ForMember(dest => dest.CropDutyAmount, opt => opt.MapFrom(src => src.AllocationCropDutyAmount))
+                .ForMember(dest => dest.CommunityWaterSupplySystem, opt => opt.MapFrom(src => src.CommunityWaterSupplySystem));
 
             CreateMap<EF.VariablesDim, VariableInfoListItem>()
                 .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(source => source.VariableSpecificUuid))
@@ -154,6 +167,16 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
 
+            AddUserMappings();
+        }
+
+        private void AddUserMappings()
+        {
+            CreateMap<UserStoreCreateRequest, EFWD.User>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
+                .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
         }
     }
 }
