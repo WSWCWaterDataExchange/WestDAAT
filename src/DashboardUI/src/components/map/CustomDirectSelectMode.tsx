@@ -1,8 +1,21 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
-import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJSON,
+  GeoJsonProperties,
+  Geometry,
+  MultiPolygon,
+  Point,
+  Polygon,
+  Position,
+} from 'geojson';
 import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
+import bboxPolygon from '@turf/bbox-polygon';
+import combine from '@turf/combine';
+import bbox from '@turf/bbox';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
 
@@ -14,6 +27,7 @@ interface CustomDirectSelectModeState {
     circleState: {
       circleCenterPointLngLat: [number, number] | undefined;
     };
+    isRectangle: boolean;
   };
   // inherited properties from base implementation
   canDragMove: boolean;
@@ -29,6 +43,7 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   circleState: {
     circleCenterPointLngLat: undefined,
   },
+  isRectangle: false,
 };
 
 // DrawCustomMode type definition doesn't allow for extending the type with additional properties
@@ -84,6 +99,48 @@ export const CustomDirectSelectMode: DrawCustomMode = {
 
         // overwrite the circles coordinates with the new coordinates
         state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
+      } else if (state.feature?.properties?.isRectangle) {
+        // find the corner being dragged
+        // const vertexBeingDraggedPosition = state.feature.getCoordinate(state.selectedCoordPaths[0]);
+        // const [vertexLng, vertexLat] = vertexBeingDraggedPosition;
+
+        // // determine which corner this is
+        // const [centerLng, centerLat] = center(state.feature).geometry.coordinates as [number, number];
+
+        // const isTopLeft = vertexLng < centerLng && vertexLat < centerLat;
+        // const isTopRight = vertexLng > centerLng && vertexLat < centerLat;
+        // const isBottomLeft = vertexLng < centerLng && vertexLat > centerLat;
+        // const isBottomRight = vertexLng > centerLng && vertexLat > centerLat;
+
+        const mousePosition = e.lngLat.toArray();
+
+        const mergedGeometry: FeatureCollection<Point | Polygon, GeoJsonProperties> = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Polygon',
+                coordinates: state.feature.getCoordinates(),
+              },
+            },
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: mousePosition,
+              },
+            },
+          ],
+        };
+
+        const combinedGeometry = combine(mergedGeometry);
+        const updatedRectangleGeometry = bboxPolygon(bbox(combinedGeometry));
+        console.log('updatedRectangleGeometry', updatedRectangleGeometry);
+
+        state.feature.setCoordinates(updatedRectangleGeometry.geometry.coordinates);
       } else {
         baseMode.onDrag?.call(this, state, e);
       }
