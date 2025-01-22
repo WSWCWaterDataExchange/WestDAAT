@@ -1,20 +1,9 @@
 import MapboxDraw, { DrawCustomMode } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
-import {
-  Feature,
-  FeatureCollection,
-  GeoJSON,
-  GeoJsonProperties,
-  Geometry,
-  MultiPolygon,
-  Point,
-  Polygon,
-  Position,
-} from 'geojson';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
 import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
 import bboxPolygon from '@turf/bbox-polygon';
-import combine from '@turf/combine';
 import bbox from '@turf/bbox';
 import distance from '@turf/distance';
 
