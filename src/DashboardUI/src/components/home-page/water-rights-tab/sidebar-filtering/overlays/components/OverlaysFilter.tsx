@@ -1,14 +1,9 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { useOverlaysFilter } from "../hooks/useOverlaysFilter";
+import { useOverlaysFilter } from '../hooks/useOverlaysFilter';
 
 export function OverlaysFilter() {
-  const {
-    isOverlayFilterActive,
-    overlaysData,
-    overlays,
-    toggleOverlay,
-  } = useOverlaysFilter();
+  const { isOverlayFilterActive, overlaysData, overlays, toggleOverlay } = useOverlaysFilter();
 
   if (!overlaysData) {
     return <div>Loading overlays...</div>;

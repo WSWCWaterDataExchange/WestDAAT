@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDebounceCallback } from '@react-hook/debounce';
 import NumericRange from '../../../../../NumericRange';
-import { useVolumeFilters } from "../hooks/useVolumeFilters";
+import { useVolumeFilters } from '../hooks/useVolumeFilters';
 
 const minControlProps = {
   placeholder: 'Min Volume',

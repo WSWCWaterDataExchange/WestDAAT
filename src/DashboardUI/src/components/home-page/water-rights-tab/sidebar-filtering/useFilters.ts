@@ -11,7 +11,6 @@ export function useFilters() {
   const waterRightsFilters = useWaterRightsFilter();
   const { mapFilters: overlaysMapFilters } = useOverlaysFilter();
   const { mapFilters: timeSeriesMapFilters } = useTimeSeriesFilter();
-
   const allMapFilters = useMemo(() => ['all', ...waterRightsFilters], [waterRightsFilters]);
 
   useEffect(() => {
@@ -32,10 +31,8 @@ export function useFilters() {
         layer: mapLayerNames.timeSeriesPointsLayer,
         filter: timeSeriesMapFilters,
       },
-      /*      {
-        layer: mapLayerNames.timeSeriesPolygonsLayer,
-        filter: timeSeriesMapFilters,
-      },*/
+      // if you have timeSeries polygons, add them:
+      // { layer: mapLayerNames.timeSeriesPolygonsLayer, filter: timeSeriesMapFilters },
     ]);
   }, [allMapFilters, overlaysMapFilters, timeSeriesMapFilters, setLayerFilters]);
 }

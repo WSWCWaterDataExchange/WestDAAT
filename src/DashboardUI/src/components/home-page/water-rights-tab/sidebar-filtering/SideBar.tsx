@@ -1,45 +1,53 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Accordion, Button, Form } from 'react-bootstrap';
-import { useWaterRightsContext } from './WaterRightsProvider';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
+
+import { useWaterRightsContext } from './WaterRightsProvider';
+
 import { useNldiFilter } from './nldi/hooks/useNldiFilter';
+
 import { useOverlaysFilter } from './overlays/hooks/useOverlaysFilter';
+
+import { useTimeSeriesFilter } from './time-series/hooks/useTimeSeriesFilter';
+
 import { MapTheme } from '../map-options/components/MapTheme';
 import { PointSize } from '../map-options/components/PointSize';
 import { MapGrouping } from '../map-options/components/MapGrouping';
 import { PodPou } from '../map-options/components/PodPou';
+
 import OverlaysFilter from './overlays/components/OverlaysFilter';
 import WaterRights from './water-rights/components/WaterRights';
-import { NldiFilters } from './nldi/components/NldiFilters';
-import { useTimeSeriesFilter } from './time-series/hooks/useTimeSeriesFilter';
 import TimeSeriesFilter from './time-series/components/TimeSeriesFilter';
+import { NldiFilters } from './nldi/components/NldiFilters';
 
 function SideBar() {
-  const { resetUserOptions } = useWaterRightsContext();
-  const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
-  const [isWaterRightsFilterActive, setWaterRightsFilterActive] = useState(false);
-  const { isOverlayFilterActive, setOverlayFilterActive } = useOverlaysFilter();
-  const { isTimeSeriesFilterActive, setTimeSeriesFilterActive } = useTimeSeriesFilter();
-
-  const [activeKeys, setActiveKeys] = useState(
-    isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
-  );
-
+  const { filters, setFilters, resetUserOptions } = useWaterRightsContext();
+  const { isWaterRightsFilterActive } = filters;
   const toggleWaterRightFilters = useCallback(() => {
-    setWaterRightsFilterActive(!isWaterRightsFilterActive);
-  }, [isWaterRightsFilterActive, setWaterRightsFilterActive]);
+    setFilters((prev) => ({
+      ...prev,
+      isWaterRightsFilterActive: !prev.isWaterRightsFilterActive,
+    }));
+  }, [setFilters]);
 
-  const toggleNldiFilterStatus = useCallback(() => {
-    setNldiMapActiveStatus(!isNldiFilterActive);
-  }, [isNldiFilterActive, setNldiMapActiveStatus]);
-
+  const { isOverlayFilterActive, setOverlayFilterActive } = useOverlaysFilter();
   const toggleOverlayFilter = useCallback(() => {
     setOverlayFilterActive(!isOverlayFilterActive);
   }, [isOverlayFilterActive, setOverlayFilterActive]);
 
+  const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
+  const toggleNldiFilterStatus = useCallback(() => {
+    setNldiMapActiveStatus(!isNldiFilterActive);
+  }, [isNldiFilterActive, setNldiMapActiveStatus]);
+
+  const { isTimeSeriesFilterActive, setTimeSeriesFilterActive } = useTimeSeriesFilter();
   const toggleTimeSeriesFilter = useCallback(() => {
     setTimeSeriesFilterActive(!isTimeSeriesFilterActive);
   }, [isTimeSeriesFilterActive, setTimeSeriesFilterActive]);
+
+  const [activeKeys, setActiveKeys] = useState<string[]>(
+    isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
+  );
 
   const setOpenAccordionKeys = useCallback(
     (keys: AccordionEventKey) => {
@@ -72,9 +80,8 @@ function SideBar() {
     if (isOverlayFilterActive) {
       keys.push('overlayFilters');
     }
-
     return keys;
-  }, [activeKeys, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive, isTimeSeriesFilterActive]);
+  }, [activeKeys, isTimeSeriesFilterActive, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive]);
 
   return (
     <>
@@ -83,8 +90,9 @@ function SideBar() {
           Reset All Filters
         </Button>
       </div>
+
       <div className="position-relative flex-grow-1 panel-content">
-        <Accordion flush activeKey={openAccordionKeys} alwaysOpen onSelect={setOpenAccordionKeys}>
+        <Accordion flush alwaysOpen activeKey={openAccordionKeys} onSelect={setOpenAccordionKeys}>
           <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
@@ -96,30 +104,17 @@ function SideBar() {
           </Accordion.Item>
           <Accordion.Item eventKey="overlayFilters">
             <Accordion.Header onClick={toggleOverlayFilter}>
-              <Form.Check
-                type="switch"
-                id="overlayFilters"
-                label=""
-                checked={isOverlayFilterActive}
-                onChange={toggleOverlayFilter}
-              />
-              <label className="fw-bold">OVERLAY FILTER {isOverlayFilterActive}</label>
+              <Form.Check type="switch" id="overlayFilters" label="" checked={isOverlayFilterActive} />
+              <label className="fw-bold ms-2">OVERLAY FILTER</label>
             </Accordion.Header>
             <Accordion.Body>
               <OverlaysFilter />
             </Accordion.Body>
           </Accordion.Item>
-
           <Accordion.Item eventKey="siteSelectionFilters">
             <Accordion.Header onClick={toggleWaterRightFilters}>
-              <Form.Check
-                type="switch"
-                id="waterRightSelection"
-                label=""
-                checked={isWaterRightsFilterActive}
-                onChange={toggleWaterRightFilters}
-              />
-              <label className="fw-bold">WATER RIGHT SELECTION {isWaterRightsFilterActive}</label>
+              <Form.Check type="switch" id="waterRightSelection" label="" checked={isWaterRightsFilterActive} />
+              <label className="fw-bold ms-2">WATER RIGHT SELECTION</label>
             </Accordion.Header>
             <Accordion.Body>
               <WaterRights />
@@ -127,14 +122,8 @@ function SideBar() {
           </Accordion.Item>
           <Accordion.Item eventKey="timeSeriesFilters">
             <Accordion.Header onClick={toggleTimeSeriesFilter}>
-              <Form.Check
-                type="switch"
-                id="timeSeriesToggle"
-                label=""
-                checked={isTimeSeriesFilterActive}
-                onChange={toggleTimeSeriesFilter}
-              />
-              <label className="fw-bold">TIME SERIES FILTER</label>
+              <Form.Check type="switch" id="timeSeriesToggle" label="" checked={isTimeSeriesFilterActive} />
+              <label className="fw-bold ms-2">TIME SERIES FILTER</label>
             </Accordion.Header>
             <Accordion.Body>
               <TimeSeriesFilter />
@@ -142,14 +131,8 @@ function SideBar() {
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
             <Accordion.Header onClick={toggleNldiFilterStatus}>
-              <Form.Check
-                type="switch"
-                id="nldi"
-                label=""
-                checked={isNldiFilterActive}
-                onChange={toggleNldiFilterStatus}
-              />
-              <label className="fw-bold">NLDI FILTER {isNldiFilterActive}</label>
+              <Form.Check type="switch" id="nldi" label="" checked={isNldiFilterActive} />
+              <label className="fw-bold ms-2">NLDI FILTER</label>
             </Accordion.Header>
             <div className="px-4" style={{ background: 'ghostwhite' }}>
               <a

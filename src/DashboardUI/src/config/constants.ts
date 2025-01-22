@@ -43,7 +43,7 @@ export enum waterRightsProperties {
 }
 
 export enum overlayProperties {
-  overlayType = 'oType'
+  overlayType = 'oType',
 }
 
 export enum nldiSiteProperties {
