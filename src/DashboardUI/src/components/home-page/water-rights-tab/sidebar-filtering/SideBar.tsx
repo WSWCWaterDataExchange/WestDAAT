@@ -37,6 +37,10 @@ function SideBar() {
     setOverlayFilterActive(!isOverlayFilterActive);
   }, [isOverlayFilterActive, setOverlayFilterActive]);
 
+  const toggleTimeSeriesFilter = useCallback(() => {
+    setTimeSeriesFilterActive(!isTimeSeriesFilterActive);
+  }, [isTimeSeriesFilterActive, setTimeSeriesFilterActive]);
+
   const setOpenAccordionKeys = useCallback(
     (keys: AccordionEventKey) => {
       if (keys === null || keys === undefined) {
@@ -122,13 +126,13 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="timeSeriesFilters">
-            <Accordion.Header>
+            <Accordion.Header onClick={toggleTimeSeriesFilter}>
               <Form.Check
                 type="switch"
                 id="timeSeriesToggle"
                 label=""
                 checked={isTimeSeriesFilterActive}
-                onChange={() => setTimeSeriesFilterActive(!isTimeSeriesFilterActive)}
+                onChange={toggleTimeSeriesFilter}
               />
               <label className="fw-bold">TIME SERIES FILTER</label>
             </Accordion.Header>
