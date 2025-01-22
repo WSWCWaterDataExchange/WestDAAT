@@ -83,6 +83,11 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
     }),
   );
   rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
+
+  // also update the coordinates for the corner markers so they re-render while dragging
+  state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
+    cornerFeature.setCoordinates(newRectangleCoordinates[index]);
+  });
 };
 
 const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
