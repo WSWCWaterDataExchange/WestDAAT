@@ -6,4 +6,6 @@ namespace WesternStatesWater.WestDaat.Accessors;
 public interface IUserAccessor : IServiceContractBase
 {
     Task<UserLoadResponseBase> Load(UserLoadRequestBase request);
+
+    Task<UserStoreResponseBase> Store(UserStoreRequestBase request);
 }
