@@ -21,5 +21,8 @@
     "LogLevel": {
       "Default": "Information"
     }
+  },
+  "Environment": {
+    "IsDevelopment": true
   }
 }

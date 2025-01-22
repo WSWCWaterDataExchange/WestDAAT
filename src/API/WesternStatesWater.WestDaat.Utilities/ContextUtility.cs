@@ -10,7 +10,11 @@ using WesternStatesWater.WestDaat.Common.Context;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
-public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityProviderConfiguration identityProviderConfiguration) : IContextUtility
+public class ContextUtility(
+    IHttpContextAccessor httpContextAccessor,
+    IdentityProviderConfiguration identityProviderConfiguration,
+    EnvironmentConfiguration environmentConfiguration
+) : IContextUtility
 {
     private const string ClaimNamespace = "extension_westdaat";
 
@@ -28,29 +32,15 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 
         return context;
     }
-    
-    private static UserContext BuildUserContext(string authHeader)
+
+    private static UserContext BuildDevelopmentUserContext()
     {
-        // Example jwt claims:
-        // Note - azure b2c requires the namespace to be prefixed with "extension_"
-        //  {
-        //   "extension_westdaat_userId": "<guid>",
-        //   "extension_westdaat_roles": "rol_<role name>,rol_<role name>" // csv string
-        //   "extension_westdaat_organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
-        // }
-
-        var jwt = GetJwt(authHeader);
-        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
-        var roles = GetRoles(jwt.Claims);
-        var orgRoles = GetOrganizationRoles(jwt.Claims);
-        var externalAuthId = GetClaimValue(jwt.Claims, "sub");
-
         return new UserContext
         {
-            UserId = new Guid(id),
-            Roles = roles,
-            OrganizationRoles = orgRoles,
-            ExternalAuthId = externalAuthId,
+            UserId = new Guid("00000000-0000-0000-0000-000000000000"),
+            Roles = new[] { "GlobalAdmin" },
+            OrganizationRoles = [],
+            ExternalAuthId = "development"
         };
     }
 
@@ -147,7 +137,37 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 
         return (parts[0], parts[1]);
     }
-    
+
+    private UserContext BuildUserContext(string authHeader)
+    {
+        if (environmentConfiguration.IsDevelopment)
+        {
+            return BuildDevelopmentUserContext();
+        }
+
+        // Example jwt claims:
+        // Note - azure b2c requires the namespace to be prefixed with "extension_"
+        //  {
+        //   "extension_westdaat_userId": "<guid>",
+        //   "extension_westdaat_roles": "rol_<role name>,rol_<role name>" // csv string
+        //   "extension_westdaat_organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
+        // }
+
+        var jwt = GetJwt(authHeader);
+        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
+        var roles = GetRoles(jwt.Claims);
+        var orgRoles = GetOrganizationRoles(jwt.Claims);
+        var externalAuthId = GetClaimValue(jwt.Claims, "sub");
+
+        return new UserContext
+        {
+            UserId = new Guid(id),
+            Roles = roles,
+            OrganizationRoles = orgRoles,
+            ExternalAuthId = externalAuthId,
+        };
+    }
+
     private ContextBase Build()
     {
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
