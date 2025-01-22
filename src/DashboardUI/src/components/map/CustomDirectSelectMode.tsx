@@ -16,6 +16,7 @@ import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilit
 import bboxPolygon from '@turf/bbox-polygon';
 import combine from '@turf/combine';
 import bbox from '@turf/bbox';
+import distance from '@turf/distance';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
 
@@ -100,65 +101,51 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         // overwrite the circles coordinates with the new coordinates
         state.feature?.setCoordinates(newCoordinates.geometry.coordinates);
       } else if (state.feature?.properties?.isRectangle) {
-        // find the corner being dragged
-        console.log('dragging rectangle', state.feature);
-        const vertexBeingDraggedPosition = state.feature.getCoordinate(state.selectedCoordPaths[0]);
-        const [vertexLng, vertexLat] = vertexBeingDraggedPosition;
+        const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
+          return points
+            .map((point) => ({
+              point,
+              distance: distance(newPoint, point, { units: 'kilometers' }),
+            }))
+            .reduce((prevPoint, currentPoint) =>
+              prevPoint.distance < currentPoint.distance ? prevPoint : currentPoint,
+            ).point;
+        };
 
-        const [centerLng, centerLat] = center(state.feature).geometry.coordinates as [number, number];
+        const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: Position): Position[] => {
+          const [lng1, lat1] = activeCorner;
+          const [lng2, lat2] = oppositeCorner;
 
-        // determine which corner this is
-        // latitude: -90 at south pole to +90 at north pole
-        // longitude: -180 to +180 at international date line. 0 at prime meridian (greenwich, great britain)
-        const isTopLeft = vertexLng < centerLng && vertexLat > centerLat;
-        const isTopRight = vertexLng > centerLng && vertexLat > centerLat;
-        const isBottomLeft = vertexLng < centerLng && vertexLat < centerLat;
-        const isBottomRight = vertexLng > centerLng && vertexLat < centerLat;
+          return [
+            [lng1, lat1],
+            [lng2, lat1],
+            [lng2, lat2],
+            [lng1, lat2],
+          ];
+        };
 
-        console.log(state.feature.getCoordinates());
+        const rectangle = state.feature;
+        const corners = rectangle.getCoordinates()[0];
+        const activeCorner = findClosestPointToPoint(e.lngLat.toArray(), corners);
+        const oppositeCornerIndex = (corners.indexOf(activeCorner) + 2) % 4;
+        const oppositeCorner = corners[oppositeCornerIndex];
 
-        let oppositeCornerLng: number = 0,
-          oppositeCornerLat: number = 0;
-        if (isTopLeft) {
-          console.log('top left');
-          const bottomRightCorner = state.feature
-            .getCoordinates()[0]
-            .filter((coord) => coord[0] > centerLng && coord[1] > centerLat)[0];
-          oppositeCornerLng = bottomRightCorner[0];
-          oppositeCornerLat = bottomRightCorner[1];
-        } else if (isTopRight) {
-          console.log('top right');
-          const bottomLeftCorner = state.feature
-            .getCoordinates()[0]
-            .filter((coord) => coord[0] < centerLng && coord[1] > centerLat)[0];
-          oppositeCornerLng = bottomLeftCorner[0];
-          oppositeCornerLat = bottomLeftCorner[1];
-        } else if (isBottomLeft) {
-          console.log('bottom left');
-          const topRightCorner = state.feature
-            .getCoordinates()[0]
-            .filter((coord) => coord[0] > centerLng && coord[1] < centerLat)[0];
-          oppositeCornerLng = topRightCorner[0];
-          oppositeCornerLat = topRightCorner[1];
-        } else if (isBottomRight) {
-          console.log('bottom right');
-          const topLeftCorner = state.feature
-            .getCoordinates()[0]
-            .filter((coord) => coord[0] < centerLng && coord[1] < centerLat)[0];
-          oppositeCornerLng = topLeftCorner[0];
-          oppositeCornerLat = topLeftCorner[1];
-        } else {
-          console.log('how did we get here');
-        }
+        activeCorner[0] = e.lngLat.lng;
+        activeCorner[1] = e.lngLat.lat;
 
-        // create a new rectangle using the opposite corner and the current mouse position as the bounding box
-        const updatedRectangleGeometry = bboxPolygon([
-          oppositeCornerLng,
-          oppositeCornerLat,
-          e.lngLat.lng,
-          e.lngLat.lat,
-        ]);
-        state.feature.setCoordinates(updatedRectangleGeometry.geometry.coordinates);
+        const newRectangleCoordinates = computeNewRectangleCoordinates(activeCorner, oppositeCorner);
+
+        const newRectangleGeometry = bboxPolygon(
+          bbox({
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [newRectangleCoordinates],
+            },
+          }),
+        );
+        rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
       } else {
         baseMode.onDrag?.call(this, state, e);
       }
