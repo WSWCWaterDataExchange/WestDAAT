@@ -3,6 +3,7 @@ import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useWadeLegend as useWadeMapLegend } from './useWadeMapLegend';
 import { useNldiMapLegend } from './useNldiMapLegend';
 import { useOverlayTypeLegend } from './useOverlayTypeLegend';
+import { useTimeSeriesLegend } from './useTimeSeriesLegend';
 
 export function useMapLegend() {
   const { setLegend } = useMapContext();
@@ -10,6 +11,7 @@ export function useMapLegend() {
   const { legendItems: overlayLegendItems } = useOverlayTypeLegend();
   const { legendItems: wadeLegendItems } = useWadeMapLegend();
   const { legendItems: nldiLegendItems } = useNldiMapLegend();
+  const { legendItems: timeSeriesLegendItems } = useTimeSeriesLegend();
 
   useEffect(() => {
     const legendContent = (
@@ -40,9 +42,18 @@ export function useMapLegend() {
             {nldiLegendItems}
           </div>
         )}
+
+        {timeSeriesLegendItems && (
+          <div className="mb-3">
+            <h5>
+              <strong>Time Series</strong>
+            </h5>
+            {timeSeriesLegendItems}
+          </div>
+        )}
       </div>
     );
 
     setLegend(legendContent);
-  }, [setLegend, overlayLegendItems, wadeLegendItems, nldiLegendItems]);
+  }, [setLegend, overlayLegendItems, wadeLegendItems, nldiLegendItems, timeSeriesLegendItems]);
 }

@@ -28,7 +28,7 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
   const overlaysData = dashboardFiltersQuery.data?.overlays ?? [];
 
   const [overlays, setOverlays] = useState<string[]>([]);
-  const [isOverlayFilterActive, setOverlayFilterActive] = useState<boolean>(true);
+  const [isOverlayFilterActive, setOverlayFilterActive] = useState<boolean>(false);
 
   useEffect(() => {
     if (overlaysData.length && overlays.length === 0) {

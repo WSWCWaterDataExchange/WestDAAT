@@ -92,3 +92,5 @@ export const overlaysColorList = [
   '#FFB380',
   '#C8A2C8',
 ];
+
+export const timeSeriesColor = '#FF7F50';

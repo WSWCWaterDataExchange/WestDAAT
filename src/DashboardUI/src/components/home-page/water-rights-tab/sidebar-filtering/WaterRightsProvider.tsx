@@ -89,7 +89,7 @@ export const defaultWaterRightsFilters: WaterRightsFilters = {
   maxPriorityDate: undefined,
   polylines: undefined,
   isNldiFilterActive: false,
-  isWaterRightsFilterActive: false,
+  isWaterRightsFilterActive: true,
   nldiFilterData: undefined,
 };
 
