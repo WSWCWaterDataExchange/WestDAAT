@@ -1,7 +1,7 @@
 import React from 'react';
 import SiteNavbar from '../../components/SiteNavbar';
-import SiteFooter from '../../components/SiteFooter';
 import { Outlet } from 'react-router-dom';
+import SiteFooter from '../../components/SiteFooter';
 
 export function AdminLayout() {
   return (
@@ -10,7 +10,7 @@ export function AdminLayout() {
 
       <Outlet />
 
-      <SiteFooter showFeedbackModal={() => {}} />
+      <SiteFooter />
     </div>
   );
 }
