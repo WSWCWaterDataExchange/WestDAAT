@@ -1,3 +1,4 @@
+import { Role } from '../config/role';
 import { parseRoles, OrganizationRole, parseOrganizationRoles } from './useAuthenticationContext';
 
 describe('useAuthenticationContext', () => {
@@ -7,7 +8,7 @@ describe('useAuthenticationContext', () => {
   describe('parseRoles', () => {
     it('should parse multiple roles', () => {
       // Arrange
-      const roles = ['Admin', 'SuperAdmin'];
+      const roles = [Role.GlobalAdmin, Role.TechnicalReviewer];
       const token = buildToken({ roles });
 
       // Act
@@ -33,8 +34,8 @@ describe('useAuthenticationContext', () => {
     it('should parse multiple organization roles', () => {
       // Arrange
       const orgRoles: OrganizationRole[] = [
-        { organizationId: '1', roles: ['Admin', 'SuperAdmin'] },
-        { organizationId: '2', roles: ['Admin'] },
+        { organizationId: '1', roles: [Role.GlobalAdmin, Role.TechnicalReviewer] },
+        { organizationId: '2', roles: [Role.Member] },
       ];
       const token = buildToken({ orgRoles });
 

@@ -15,6 +15,9 @@ import '../styles/navbar.scss';
 import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
+import { Link } from 'react-router-dom';
+import AuthorizedTemplate from './AuthorizedTemplate';
+import { Role } from '../config/role';
 
 interface SiteNavbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -106,6 +109,9 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
         <Offcanvas.Header closeButton></Offcanvas.Header>
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
+            <Nav.Link as={Link} to="/">
+              WestDAAT Home
+            </Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">
               About
             </Nav.Link>
@@ -126,6 +132,11 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
             >
               Terms of Service
             </Nav.Link>
+            <AuthorizedTemplate roles={[Role.GlobalAdmin, Role.OrganizationAdmin]}>
+              <Nav.Link as={Link} to="/admin">
+                Admin
+              </Nav.Link>
+            </AuthorizedTemplate>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
