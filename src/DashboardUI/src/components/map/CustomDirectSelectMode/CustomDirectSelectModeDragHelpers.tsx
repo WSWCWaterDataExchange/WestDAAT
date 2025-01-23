@@ -6,8 +6,6 @@ import {
   DirectSelectDrawModeInstance,
 } from './CustomDirectSelectMode';
 import { distance } from '@turf/distance';
-import { bboxPolygon } from '@turf/bbox-polygon';
-import { bbox } from '@turf/bbox';
 import { center } from '@turf/center';
 import { Marker } from 'mapbox-gl';
 import { transformRotate } from '@turf/transform-rotate';
@@ -128,17 +126,7 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
   const newRectangleCoordinates = computeNewRectangleCoordinates(dragPosition, oppositeCorner);
 
   // update the rectangle with the new coordinates
-  const newRectangleGeometry = bboxPolygon(
-    bbox({
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [newRectangleCoordinates],
-      },
-    }),
-  );
-  rectangle.setCoordinates(newRectangleGeometry.geometry.coordinates);
+  rectangle.setCoordinates([newRectangleCoordinates]);
 
   // also update the coordinates for the corner markers so they re-render while dragging
   state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
