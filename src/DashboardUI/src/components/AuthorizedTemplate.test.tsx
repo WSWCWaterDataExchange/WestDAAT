@@ -12,6 +12,7 @@ describe('AuthorizedTemplate', () => {
   it('renders children when user has required role', () => {
     mockUseAuthenticationContext.mockReturnValue({
       isAuthenticated: true,
+      authenticationComplete: true,
       user: {
         emailAddress: 'wesley@westdaat.com',
         roles: [Role.GlobalAdmin],
@@ -31,6 +32,7 @@ describe('AuthorizedTemplate', () => {
   it('renders children when user has required organization role', () => {
     mockUseAuthenticationContext.mockReturnValue({
       isAuthenticated: true,
+      authenticationComplete: true,
       user: {
         emailAddress: 'wesley@westdaat.com',
         roles: [],
@@ -55,6 +57,7 @@ describe('AuthorizedTemplate', () => {
   it('does not render children when user does not have required role', () => {
     mockUseAuthenticationContext.mockReturnValue({
       isAuthenticated: true,
+      authenticationComplete: true,
       user: {
         emailAddress: 'wesley@westdaat.com',
         roles: [Role.Member],
@@ -74,6 +77,7 @@ describe('AuthorizedTemplate', () => {
   it('does not render children when user is not authenticated', () => {
     mockUseAuthenticationContext.mockReturnValue({
       isAuthenticated: false,
+      authenticationComplete: true,
       user: null,
     });
 

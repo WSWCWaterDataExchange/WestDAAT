@@ -27,12 +27,14 @@ export interface OrganizationRole {
 }
 
 export interface IAuthenticationContext {
+  authenticationComplete: boolean;
   isAuthenticated: boolean;
   user: User | null;
 }
 
 export function useAuthenticationContext(): IAuthenticationContext {
   const [authContext, setAuthContext] = useState<IAuthenticationContext>({
+    authenticationComplete: false,
     isAuthenticated: false,
     user: null,
   });
@@ -42,12 +44,15 @@ export function useAuthenticationContext(): IAuthenticationContext {
 
   const { result } = useMsalAuthentication(InteractionType.Silent, loginRequest);
 
+  const authenticationComplete = inProgress === InteractionStatus.None;
+
   useEffect(() => {
     if (isAuthenticated && inProgress !== InteractionStatus.Startup) {
       const idTokenClaims = result?.account?.idTokenClaims;
 
       setAuthContext({
         isAuthenticated,
+        authenticationComplete,
         user: {
           emailAddress: result?.account?.username ?? null,
           externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
@@ -60,9 +65,15 @@ export function useAuthenticationContext(): IAuthenticationContext {
     } else {
       setAuthContext({
         isAuthenticated,
+        authenticationComplete,
         user: null,
       });
     }
+
+    setAuthContext((prev) => ({
+      ...prev,
+      authenticationComplete: inProgress === InteractionStatus.None,
+    }));
   }, [result, isAuthenticated, inProgress]);
 
   return authContext;

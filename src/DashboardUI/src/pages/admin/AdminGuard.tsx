@@ -6,7 +6,7 @@ import { useAppContext } from '../../contexts/AppProvider';
 
 export const AdminGuard = () => {
   const {
-    authenticationContext: { isAuthenticated, user },
+    authenticationContext: { authenticationComplete, user },
   } = useAppContext();
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ export const AdminGuard = () => {
   const isAllowed = hasRole || hasOrgRole;
 
   // Must wait for the authContext to be set before checking if the user is allowed
-  if (isAuthenticated && !isAllowed) {
+  if (authenticationComplete && !isAllowed) {
     navigate('/');
   }
 

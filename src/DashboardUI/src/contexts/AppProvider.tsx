@@ -12,7 +12,7 @@ interface AppContextState {
 }
 
 const defaultAppContextState = {
-  authenticationContext: { isAuthenticated: false, user: null },
+  authenticationContext: { isAuthenticated: false, user: null, authenticationComplete: false },
   setUrlParam: () => {},
   getUrlParam: <T,>(): T | undefined => undefined,
 };
