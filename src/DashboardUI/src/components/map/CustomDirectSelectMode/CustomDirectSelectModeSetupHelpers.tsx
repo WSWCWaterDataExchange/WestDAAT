@@ -30,7 +30,6 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     drawnFeature.setProperty('isCorner', true);
     return drawnFeature;
   });
-  console.log('corner features', rectangleCornerDrawFeatures);
 
   const rotationMarkerPositions = computeRectangleRotationMarkerPositions(state.feature!);
 
