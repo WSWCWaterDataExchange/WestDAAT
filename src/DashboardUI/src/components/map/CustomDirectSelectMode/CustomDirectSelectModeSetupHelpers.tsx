@@ -77,7 +77,7 @@ const getAllMapGeoJsonFeatures = (map: mapboxgl.Map): Feature<Geometry, GeoJsonP
     .flatMap((geoJsonSourceData) => geoJsonSourceData.features);
 };
 
-const computeRectangleRotationMarkerPositions = (rectangleFeature: MapboxDraw.DrawPolygon): Position[] => {
+export const computeRectangleRotationMarkerPositions = (rectangleFeature: MapboxDraw.DrawPolygon): Position[] => {
   // find the midpoints of the rectangle's edges
   const rectangleCoordinates = rectangleFeature.getCoordinates()[0];
   const rectangleEdgeMidpoints: Position[] = [

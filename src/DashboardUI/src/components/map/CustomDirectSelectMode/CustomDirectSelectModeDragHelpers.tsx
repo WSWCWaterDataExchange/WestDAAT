@@ -12,6 +12,7 @@ import { center } from '@turf/center';
 import { Marker } from 'mapbox-gl';
 import { transformRotate } from '@turf/transform-rotate';
 import bearing from '@turf/bearing';
+import { computeRectangleRotationMarkerPositions } from './CustomDirectSelectModeSetupHelpers';
 
 export const dragFeature = (
   _this: DirectSelectDrawModeInstance,
@@ -22,12 +23,38 @@ export const dragFeature = (
   directSelectBaseMode.onDrag?.call(_this, state, e);
 
   if (state.feature?.properties?.isCircle) {
-    // afterwards update the center point of the circle
-    state.customState.circleState.circleCenterPointLngLat = center(state.feature).geometry.coordinates as [
-      number,
-      number,
-    ];
+    handleDragCircle(state, e);
+  } else if (state.feature?.properties?.isRectangle) {
+    handleDragRectangle(state, e);
   }
+};
+
+const handleDragCircle = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // afterwards update the center point of the circle
+  state.customState.circleState.circleCenterPointLngLat = center(state.feature!).geometry.coordinates as [
+    number,
+    number,
+  ];
+};
+
+const handleDragRectangle = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // update the corner features
+  const updatedRectangleCoordinates = state.feature!.getCoordinates();
+  state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
+    cornerFeature.setCoordinates(updatedRectangleCoordinates[0][index]);
+  });
+
+  // update the rotation markers
+  const updatedRotationMarkerPositions = computeRectangleRotationMarkerPositions(state.feature!);
+  state.customState.rectangleState.rotationMarkers.forEach((marker, index) => {
+    const newPosition = updatedRotationMarkerPositions[index];
+    marker.setLngLat({ lng: newPosition[0], lat: newPosition[1] });
+  });
+
+  // update the rotation marker positions
+  state.customState.rectangleState.rotationMarkerPositions = state.customState.rectangleState.rotationMarkers.map(
+    (marker) => marker.getLngLat().toArray(),
+  );
 };
 
 export const dragVertex = (
