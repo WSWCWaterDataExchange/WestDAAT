@@ -15,14 +15,21 @@ export const handleSetupCircle = (state: CustomDirectSelectModeState) => {
 };
 
 export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state: CustomDirectSelectModeState) => {
+  const rectangleCornerDrawFeatures = setupRectangleCorners(_this, state);
+  const { rotationMarkers, rotationMarkerPositions } = setupRectangleRotationMarkers(_this, state);
+
+  state.customState.rectangleState = {
+    cornerFeatures: rectangleCornerDrawFeatures,
+    rotationMarkers: rotationMarkers,
+    rotationMarkerPositions: rotationMarkerPositions,
+  };
+};
+
+const setupRectangleCorners = (_this: DirectSelectDrawModeInstance, state: CustomDirectSelectModeState) => {
   // get rectangle's child corner Point features
-  // they aren't available directly as part of the polygon so we have to grab them in a roundabout way
-  const rectangleCornerFeatures = getAllMapGeoJsonFeatures(_this.map)
-    // the rectangle's child corner features are all Point geometries
-    // find the relevant points corresponding to this rectangle
-    .filter(
-      (feature): feature is Feature<Point, GeoJsonProperties> => feature.properties?.parent === state.feature?.id,
-    );
+  const rectangleCornerFeatures = getAllMapGeoJsonFeatures(_this.map).filter(
+    (feature): feature is Feature<Point, GeoJsonProperties> => feature.properties?.parent === state.feature?.id,
+  );
 
   // register the corner features in this draw mode and track them in state
   const rectangleCornerDrawFeatures = rectangleCornerFeatures.map((feature) => {
@@ -31,9 +38,12 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     return drawnFeature;
   });
 
+  return rectangleCornerDrawFeatures;
+};
+
+const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, state: CustomDirectSelectModeState) => {
   const rotationMarkerPositions = computeRectangleRotationMarkerPositions(state.feature!);
 
-  // 3. create marker features and track in state
   const rotationMarkers = rotationMarkerPositions.map((position) => {
     return new Marker({
       color: 'red',
@@ -47,12 +57,10 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     marker.on('drag', (e) => handleDragRectangleMarker(state, e));
   });
 
-  state.customState.rectangleState = {
-    cornerFeatures: rectangleCornerDrawFeatures,
-    rotationMarkers: rotationMarkers,
-    rotationMarkerPositions: rotationMarkerPositions,
+  return {
+    rotationMarkers,
+    rotationMarkerPositions,
   };
-  console.log(state.feature, state.customState.rectangleState);
 };
 
 const getAllMapGeoJsonFeatures = (map: mapboxgl.Map): Feature<Geometry, GeoJsonProperties>[] => {
@@ -70,8 +78,7 @@ const getAllMapGeoJsonFeatures = (map: mapboxgl.Map): Feature<Geometry, GeoJsonP
 };
 
 const computeRectangleRotationMarkerPositions = (rectangleFeature: MapboxDraw.DrawPolygon): Position[] => {
-  // create the rotation features as well and track them
-  // 1. find the midpoints of the rectangle's edges
+  // find the midpoints of the rectangle's edges
   const rectangleCoordinates = rectangleFeature.getCoordinates()[0];
   const rectangleEdgeMidpoints: Position[] = [
     // only putting a marker above the top edge of the rectangle to simplify the drag interaction
