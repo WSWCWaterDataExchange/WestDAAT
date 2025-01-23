@@ -15,6 +15,7 @@ import '../styles/navbar.scss';
 import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
+import { Link } from 'react-router-dom';
 
 interface SiteNavbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -106,6 +107,9 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
         <Offcanvas.Header closeButton></Offcanvas.Header>
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
+            <Nav.Link as={Link} to="/">
+              WestDAAT Home
+            </Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">
               About
             </Nav.Link>
