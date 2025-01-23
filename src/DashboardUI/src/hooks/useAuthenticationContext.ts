@@ -66,7 +66,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
   return authContext;
 }
 
-export const parseRoles = (token: { [key: string]: any } | undefined): string[] | undefined => {
+export const parseRoles = (token: { [key: string]: any } | undefined): Role[] | undefined => {
   // Come in the form of "rol_<role1>,rol_<role2>,rol_<role3>"
   const rolesClaims = parseTokenClaims(token, 'extension_westdaat_roles');
 
@@ -74,7 +74,7 @@ export const parseRoles = (token: { [key: string]: any } | undefined): string[] 
     return [];
   }
 
-  return rolesClaims?.split(',')?.map((role: string) => role.replace('rol_', ''));
+  return rolesClaims?.split(',')?.map((role: string) => role.replace('rol_', '') as Role);
 };
 
 export const parseOrganizationRoles = (token: { [key: string]: any } | undefined): OrganizationRole[] | undefined => {
@@ -97,11 +97,11 @@ export const parseOrganizationRoles = (token: { [key: string]: any } | undefined
   const orgRoles = flatOrgRoles?.reduce((acc: OrganizationRole[], orgRole) => {
     const existingOrgRole = acc.find((or) => or.organizationId === orgRole.organizationId);
     if (existingOrgRole) {
-      existingOrgRole.roles.push(orgRole.role);
+      existingOrgRole.roles.push(orgRole.role as Role);
     } else {
       acc.push({
         organizationId: orgRole.organizationId,
-        roles: [orgRole.role],
+        roles: [orgRole.role as Role],
       });
     }
     return acc;
