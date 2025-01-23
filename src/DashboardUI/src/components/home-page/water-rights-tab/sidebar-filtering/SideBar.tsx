@@ -3,11 +3,8 @@ import { Accordion, Button, Form } from 'react-bootstrap';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
 
 import { useWaterRightsContext } from './WaterRightsProvider';
-
 import { useNldiFilter } from './nldi/hooks/useNldiFilter';
-
 import { useOverlaysFilter } from './overlays/hooks/useOverlaysFilter';
-
 import { useTimeSeriesFilter } from './time-series/hooks/useTimeSeriesFilter';
 
 import { MapTheme } from '../map-options/components/MapTheme';
@@ -103,8 +100,14 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="overlayFilters">
-            <Accordion.Header onClick={toggleOverlayFilter}>
-              <Form.Check type="switch" id="overlayFilters" label="" checked={isOverlayFilterActive} />
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="overlayFilters"
+                label=""
+                checked={isOverlayFilterActive}
+                onChange={toggleOverlayFilter}
+              />
               <label className="fw-bold ms-2">OVERLAY FILTER</label>
             </Accordion.Header>
             <Accordion.Body>
@@ -112,8 +115,14 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="siteSelectionFilters">
-            <Accordion.Header onClick={toggleWaterRightFilters}>
-              <Form.Check type="switch" id="waterRightSelection" label="" checked={isWaterRightsFilterActive} />
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="waterRightSelection"
+                label=""
+                checked={isWaterRightsFilterActive}
+                onChange={toggleWaterRightFilters}
+              />
               <label className="fw-bold ms-2">WATER RIGHT SELECTION</label>
             </Accordion.Header>
             <Accordion.Body>
@@ -121,8 +130,14 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="timeSeriesFilters">
-            <Accordion.Header onClick={toggleTimeSeriesFilter}>
-              <Form.Check type="switch" id="timeSeriesToggle" label="" checked={isTimeSeriesFilterActive} />
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="timeSeriesToggle"
+                label=""
+                checked={isTimeSeriesFilterActive}
+                onChange={toggleTimeSeriesFilter}
+              />
               <label className="fw-bold ms-2">TIME SERIES FILTER</label>
             </Accordion.Header>
             <Accordion.Body>
@@ -130,8 +145,14 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
-            <Accordion.Header onClick={toggleNldiFilterStatus}>
-              <Form.Check type="switch" id="nldi" label="" checked={isNldiFilterActive} />
+            <Accordion.Header>
+              <Form.Check
+                type="switch"
+                id="nldi"
+                label=""
+                checked={isNldiFilterActive}
+                onChange={toggleNldiFilterStatus}
+              />
               <label className="fw-bold ms-2">NLDI FILTER</label>
             </Accordion.Header>
             <div className="px-4" style={{ background: 'ghostwhite' }}>
