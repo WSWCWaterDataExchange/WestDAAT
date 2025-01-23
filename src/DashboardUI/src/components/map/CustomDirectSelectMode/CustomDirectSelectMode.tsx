@@ -67,7 +67,6 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     directSelectBaseMode.onStop?.call(this, state);
 
     if (state.feature?.properties?.isRectangle) {
-      console.log('remove rotation markers', state.customState.rectangleState.rotationMarkers);
       state.customState.rectangleState.rotationMarkers.forEach((marker) => marker.remove());
     }
   },
