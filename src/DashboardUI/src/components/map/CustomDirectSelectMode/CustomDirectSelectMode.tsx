@@ -158,6 +158,12 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     state.dragMoveLocation = e.lngLat;
   },
 
+  onStop: function (state: CustomDirectSelectModeState) {
+    state.customState.rectangleState.rotationFeatures.forEach((feature) => {
+      this.deleteFeature(String(feature.id));
+    });
+  },
+
   toDisplayFeatures: function (
     state: CustomDirectSelectModeState,
     geojson: Feature<Geometry, GeoJsonProperties>,
