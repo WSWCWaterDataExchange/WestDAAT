@@ -14,11 +14,9 @@ export const directSelectBaseMode = MapboxDraw.modes.direct_select;
 
 export interface CustomDirectSelectModeState {
   customState: {
-    isCircle: boolean;
     circleState: {
       circleCenterPointLngLat: [number, number] | undefined;
     };
-    isRectangle: boolean;
     rectangleState: {
       cornerFeatures: MapboxDraw.DrawPoint[];
       rotationMarkers: Marker[];
@@ -34,11 +32,9 @@ export interface CustomDirectSelectModeState {
 }
 
 const defaultCustomState: CustomDirectSelectModeState['customState'] = {
-  isCircle: false,
   circleState: {
     circleCenterPointLngLat: undefined,
   },
-  isRectangle: false,
   rectangleState: {
     cornerFeatures: [],
     rotationMarkers: [],
