@@ -129,7 +129,8 @@ const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDra
 const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
   const rectangle = state.feature!;
 
-  // find the closest corner to the dragged vertex
+  // the drag event only gives us the mouse position
+  // we need to match that to the closest corner of the rectangle
   const rectangleCornerPositions = rectangle.getCoordinates()[0];
   const dragPosition = e.lngLat.toArray() as Position;
   const selectedCornerPosition = findClosestPointToPoint(dragPosition, rectangleCornerPositions);
@@ -138,6 +139,7 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
   const oppositeCornerIndex = (rectangleCornerPositions.indexOf(selectedCornerPosition) + 2) % 4;
   const oppositeCorner = rectangleCornerPositions[oppositeCornerIndex];
 
+  // todo: this approach creates a new *axis-aligned* rectangle - it doesn't work right if the rect is rotated
   // build the four corners of the rectangle using these two opposing corners
   const newRectangleCoordinates = computeNewRectangleCoordinates(dragPosition, oppositeCorner);
 
