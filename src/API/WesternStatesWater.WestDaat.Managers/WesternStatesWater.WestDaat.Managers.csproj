@@ -31,6 +31,9 @@
     <Compile Update="UserManager.cs">
       <DependentUpon>AdminManager.cs</DependentUpon>
     </Compile>
+    <Compile Update="OrganizationManager.cs">
+      <DependentUpon>AdminManager.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Handlers\Conservation\" />
