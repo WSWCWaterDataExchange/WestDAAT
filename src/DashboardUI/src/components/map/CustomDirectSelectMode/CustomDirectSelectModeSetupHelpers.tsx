@@ -22,7 +22,7 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     cornerFeatures: rectangleCornerDrawFeatures,
     rotationMarkers: rotationMarkers,
     rotationMarkerPositions: rotationMarkerPositions,
-    totalRotationAngle: 0,
+    totalRotationAngle: state.feature!.properties?.rotationAngle ?? 0,
   };
 };
 
@@ -56,6 +56,9 @@ const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, stat
 
   rotationMarkers.forEach((marker) => {
     marker.on('drag', (e) => handleDragRectangleRotationMarker(state, e));
+    marker.on('dragend', () => {
+      _this.changeMode('simple_select');
+    });
   });
 
   return {
