@@ -132,6 +132,15 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     return state;
   },
 
+  onStop: function (state: CustomDirectSelectModeState) {
+    directSelectBaseMode.onStop?.call(this, state);
+
+    if (state.feature?.properties?.isRectangle) {
+      console.log('remove rotation markers', state.customState.rectangleState.rotationMarkers);
+      state.customState.rectangleState.rotationMarkers.forEach((marker) => marker.remove());
+    }
+  },
+
   onDrag: function (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) {
     // validation copied from base implementation
     if (state.canDragMove !== true) return;
