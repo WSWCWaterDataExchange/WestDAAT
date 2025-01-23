@@ -29,7 +29,6 @@ export const handleDisplayRectangle = (
   display(geojson);
 
   state.customState.rectangleState.cornerFeatures.forEach((corner) => display(corner.toGeoJSON()));
-  state.customState.rectangleState.rotationFeatures.forEach((rotationMarker) => display(rotationMarker.toGeoJSON()));
 };
 
 const getCardinalDirectionCoordinatesOnFeature = (allCoordinateLngLatValues: Position[]): Position[] => {
