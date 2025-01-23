@@ -115,7 +115,14 @@ export const CustomDirectSelectMode: DrawCustomMode = {
           color: 'red',
         })
           .setLngLat({ lng: position[0], lat: position[1] })
+          .setDraggable(true)
           .addTo(this.map);
+      });
+
+      rotationMarkers.forEach((marker) => {
+        marker.on('drag', (e: any) => {
+          console.log(e, 'DRAGGING');
+        });
       });
 
       state.customState.rectangleState = {
