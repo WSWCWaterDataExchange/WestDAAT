@@ -33,6 +33,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OverlayDigest, ClientContracts.OverlayDigest>();
 
             AddUserMappings();
+            AddOrganizationMappings();
         }
 
         private void AddUserMappings()
@@ -46,20 +47,36 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Version, opt => opt.MapFrom(_ => azureB2CVersionString))
                 .ForMember(dest => dest.Action, opt => opt.MapFrom(_ => azureB2CContinuanceAction))
                 .ForMember(dest => dest.Extension_WestDaat_UserId, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src => 
+                .ForMember(dest => dest.Extension_WestDaat_Roles, opt => opt.MapFrom(src =>
                         string.Join(',', src.UserRoles.Select(role => $"rol_{role}"))
                     )
                 )
-                .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src => 
-                        string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
+                .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src =>
+                        string.Join(',', src.UserOrganizationRoles.Select(orgRole =>
+                            $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
                     )
                 )
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserExistsRequest>()
                 .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+
             CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserStoreCreateRequest>()
                 .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+        }
+
+        private void AddOrganizationMappings()
+        {
+            CreateMap<ClientContracts.Requests.Admin.OrganizationLoadAllRequest,
+                CommonContracts.OrganizationLoadAllRequest>();
+
+            CreateMap<CommonContracts.OrganizationLoadAllResponse,
+                    ClientContracts.Responses.Admin.OrganizationLoadAllResponse>()
+                .ForMember(dest => dest.Organizations, opt => opt.MapFrom(src => src.Organizations))
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.OrganizationListItem,
+                ClientContracts.OrganizationListItem>();
         }
     }
 }

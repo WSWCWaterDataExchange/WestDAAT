@@ -1,3 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace WesternStatesWater.Shared.DataContracts;
 
-public abstract class RequestBase;
+[JsonDerivedType(typeof(RequestBase), typeDiscriminator: "base")]
+public abstract class RequestBase
+{
+}

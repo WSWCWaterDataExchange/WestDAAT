@@ -29,7 +29,13 @@ public class OrganizationFunction : FunctionBase
         HttpRequestData req)
     {
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
-        var results = await _organizationManager.Load<OrganizationLoadRequestBase, OrganizationLoadResponseBase>(organizationLoadRequest);
-        return await CreateResponse(req, results);
+        var result = organizationLoadRequest switch
+        {
+            OrganizationLoadAllRequest request => await _organizationManager
+                .Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(request),
+            _ => throw new NotImplementedException(
+                $"Request type {organizationLoadRequest.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
     }
 }
