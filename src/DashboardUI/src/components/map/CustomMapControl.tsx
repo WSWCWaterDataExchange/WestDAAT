@@ -21,7 +21,8 @@ export class CustomMapControl {
     svg.appendChild(path);
 
     const btn = document.createElement('button');
-    btn.className = 'mapboxgl-ctrl-icon';
+    btn.className = 'mapbox-gl-draw_ctrl-draw-btn';
+    btn.title = this._text;
 
     btn.onclick = this._onClick;
 
@@ -29,7 +30,6 @@ export class CustomMapControl {
 
     const container = document.createElement('div');
     container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group containerElement';
-    container.setAttribute('data-title', this._text);
     container.appendChild(btn);
 
     return container;

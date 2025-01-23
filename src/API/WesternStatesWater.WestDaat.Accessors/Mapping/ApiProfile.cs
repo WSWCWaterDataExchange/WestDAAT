@@ -167,6 +167,16 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
 
+            AddUserMappings();
+        }
+
+        private void AddUserMappings()
+        {
+            CreateMap<UserStoreCreateRequest, EFWD.User>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
+                .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
         }
     }
 }

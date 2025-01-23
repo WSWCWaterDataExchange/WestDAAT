@@ -247,6 +247,7 @@ var fnAppSettings = {
   'Database:AccessTokenDatabaseTenantId': subscription().tenantId
   'Database:WadeConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
+  'Environment:IsDevelopment': false
   'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
   'Nldi:MaxDownstreamDiversionDistance': '500'
   'Nldi:MaxDownstreamMainDistance': '500'
@@ -406,10 +407,10 @@ resource sql_server 'Microsoft.Sql/servers@2021-11-01' = {
     administrators: {
       administratorType: 'ActiveDirectory'
       azureADOnlyAuthentication: true
-      tenantId: tenant().tenantId
       login: sites_fn_resource.name
-      principalType: 'Application'
       sid: sites_fn_resource.identity.principalId
+      principalType: 'Application'
+      tenantId: tenant().tenantId
     }
   }
 }

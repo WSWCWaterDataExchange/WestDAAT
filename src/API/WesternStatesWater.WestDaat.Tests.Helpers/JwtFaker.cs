@@ -23,7 +23,7 @@ public static class JwtFaker
             claims.Add(
                 new Claim(
                     "extension_westdaat_organizationRoles",
-                    string.Join(',', orgRoles.Select(orgId =>$"org_{orgId.Key}/rol_{orgId.Value}"))
+                    string.Join(',', orgRoles.Select(orgId => $"org_{orgId.Key}/rol_{orgId.Value}"))
                 )
             );
         }
@@ -37,6 +37,8 @@ public static class JwtFaker
                 )
             );
         }
+
+        claims.Add(new Claim("emails", "wesley@westdaat.com"));
 
         var jwt = new JwtSecurityToken(
             "issuer",
