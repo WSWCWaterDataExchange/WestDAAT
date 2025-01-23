@@ -1,4 +1,4 @@
-import { Position } from 'geojson';
+import { Feature, GeoJsonProperties, Point, Polygon, Position } from 'geojson';
 import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../../utilities/geometryHelpers';
 import {
   CustomDirectSelectModeState,
@@ -11,6 +11,7 @@ import { Marker } from 'mapbox-gl';
 import { transformRotate } from '@turf/transform-rotate';
 import bearing from '@turf/bearing';
 import { computeRectangleRotationMarkerPositions } from './CustomDirectSelectModeSetupHelpers';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 export const dragFeature = (
   _this: DirectSelectDrawModeInstance,
@@ -127,28 +128,64 @@ const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDra
 };
 
 const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+  // copy the existing rectangle
   const rectangle = state.feature!;
 
-  // the drag event only gives us the mouse position
-  // we need to match that to the closest corner of the rectangle
-  const rectangleCornerPositions = rectangle.getCoordinates()[0];
+  // the drag event only gives us the mouse position.
+  // we need to match that to the closest corner of the rectangle.
+  // assume that the rectangle is rotated.
+  const totalRotationAngle = state.customState.rectangleState.totalRotationAngle;
+
+  // 1. undo the rotation of the rectangle
+  const centerPosition = center(rectangle);
+  const unrotatedRectangle = transformRotate(rectangle, -totalRotationAngle, {
+    pivot: centerPosition,
+  });
+  const unrotatedRectangleCornerPositions = unrotatedRectangle.coordinates[0];
+
+  // 2. undo the rotation of the drag position
   const dragPosition = e.lngLat.toArray() as Position;
-  const selectedCornerPosition = findClosestPointToPoint(dragPosition, rectangleCornerPositions);
+  const dragPositionGeometry: Point = {
+    type: 'Point',
+    coordinates: dragPosition,
+  };
+  const unrotatedDragPosition = transformRotate(dragPositionGeometry, -totalRotationAngle, {
+    pivot: centerPosition,
+  }).coordinates;
+
+  // 3. find the closest corner of the unrotated rectangle to the unrotated drag position
+  const selectedUnrotatedRectangleCornerPosition = findClosestPointToPoint(
+    unrotatedDragPosition,
+    unrotatedRectangleCornerPositions,
+  );
 
   // also find the opposite corner
-  const oppositeCornerIndex = (rectangleCornerPositions.indexOf(selectedCornerPosition) + 2) % 4;
-  const oppositeCorner = rectangleCornerPositions[oppositeCornerIndex];
+  const oppositeCornerIndex =
+    (unrotatedRectangleCornerPositions.indexOf(selectedUnrotatedRectangleCornerPosition) + 2) % 4;
+  const oppositeCorner = unrotatedRectangleCornerPositions[oppositeCornerIndex];
 
-  // todo: this approach creates a new *axis-aligned* rectangle - it doesn't work right if the rect is rotated
-  // build the four corners of the rectangle using these two opposing corners
-  const newRectangleCoordinates = computeNewRectangleCoordinates(dragPosition, oppositeCorner);
+  // 4. compute the new rectangle coordinates
+  const newRectangleCoordinates = computeNewRectangleCoordinates(unrotatedDragPosition, oppositeCorner);
+  const newRectangleGeometry: Feature<Polygon, GeoJsonProperties> = {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [newRectangleCoordinates],
+    },
+  };
 
-  // update the rectangle with the new coordinates
-  rectangle.setCoordinates([newRectangleCoordinates]);
+  // 5. re-perform the rotation on the new rectangle coordinates
+  const newRotatedRectangleCoordinates = transformRotate(newRectangleGeometry, totalRotationAngle, {
+    pivot: centerPosition,
+  }).geometry.coordinates[0];
+
+  // 6. we did it! update the rectangle with the new coordinates
+  rectangle.setCoordinates([newRotatedRectangleCoordinates]);
 
   // also update the coordinates for the corner markers so they re-render while dragging
   state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
-    cornerFeature.setCoordinates(newRectangleCoordinates[index]);
+    cornerFeature.setCoordinates(newRotatedRectangleCoordinates[index]);
   });
 };
 
