@@ -63,6 +63,12 @@ export const handleDragRectangleMarker = (state: CustomDirectSelectModeState, e:
 
   // update the rotation marker position for the next frame
   state.customState.rectangleState.rotationMarkerPositions[0] = newMarkerPosition;
+
+  // update the corner markers so they re-render while dragging
+  const rectangleCoordinates = rotatedRectangleDrawFeature.coordinates[0];
+  state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
+    cornerFeature.setCoordinates(rectangleCoordinates[index]);
+  });
 };
 
 const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
