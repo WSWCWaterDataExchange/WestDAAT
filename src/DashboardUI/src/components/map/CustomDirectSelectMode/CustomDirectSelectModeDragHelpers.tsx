@@ -9,6 +9,9 @@ import { distance } from '@turf/distance';
 import { bboxPolygon } from '@turf/bbox-polygon';
 import { bbox } from '@turf/bbox';
 import { center } from '@turf/center';
+import { Marker } from 'mapbox-gl';
+import { transformRotate } from '@turf/transform-rotate';
+import bearing from '@turf/bearing';
 
 export const dragFeature = (
   _this: DirectSelectDrawModeInstance,
@@ -40,6 +43,23 @@ export const dragVertex = (
   } else {
     directSelectBaseMode.onDrag?.call(_this, state, e);
   }
+};
+
+export const handleDragRectangleMarker = (state: CustomDirectSelectModeState, e: { type: 'drag'; target: Marker }) => {
+  const newCoords = e.target.getLngLat().toArray() as Position;
+
+  const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
+
+  const previousRotationAngle = bearing(rectangleCenter, state.customState.rectangleState.rotationMarkerPositions[0]);
+  const newRotationAngle = bearing(rectangleCenter, newCoords);
+  const rotationAngleDelta = newRotationAngle - previousRotationAngle;
+
+  const rotatedRectangleDrawFeature: MapboxDraw.DrawPolygon = transformRotate(state.feature!, rotationAngleDelta, {
+    pivot: rectangleCenter,
+  });
+  state.feature!.setCoordinates(rotatedRectangleDrawFeature.coordinates);
+
+  state.customState.rectangleState.rotationMarkerPositions[0] = newCoords;
 };
 
 const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {

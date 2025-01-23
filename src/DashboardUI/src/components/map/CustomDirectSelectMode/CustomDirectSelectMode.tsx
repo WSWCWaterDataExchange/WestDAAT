@@ -1,6 +1,6 @@
 import MapboxDraw, { DrawCustomMode, DrawCustomModeThis } from '@mapbox/mapbox-gl-draw';
 import { LngLat, Marker } from 'mapbox-gl';
-import { Feature, GeoJSON, GeoJsonProperties, Geometry } from 'geojson';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry, Position } from 'geojson';
 import { dragFeature, dragVertex } from './CustomDirectSelectModeDragHelpers';
 import { handleDisplayCircle, handleDisplayRectangle } from './CustomDirectSelectModeDisplayHelpers';
 import { handleSetupCircle, handleSetupRectangle } from './CustomDirectSelectModeSetupHelpers';
@@ -17,6 +17,7 @@ export interface CustomDirectSelectModeState {
     rectangleState: {
       cornerFeatures: MapboxDraw.DrawPoint[];
       rotationMarkers: Marker[];
+      rotationMarkerPositions: Position[];
     };
   };
   // inherited properties from base implementation
@@ -35,6 +36,7 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   rectangleState: {
     cornerFeatures: [],
     rotationMarkers: [],
+    rotationMarkerPositions: [],
   },
 };
 

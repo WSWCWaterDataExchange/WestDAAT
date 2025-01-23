@@ -5,6 +5,7 @@ import { distance } from '@turf/distance';
 import { bearing } from '@turf/bearing';
 import { destination } from '@turf/destination';
 import { Marker } from 'mapbox-gl';
+import { handleDragRectangleMarker } from './CustomDirectSelectModeDragHelpers';
 
 export const handleSetupCircle = (state: CustomDirectSelectModeState) => {
   state.customState.circleState.circleCenterPointLngLat = center(state.feature!).geometry.coordinates as [
@@ -44,14 +45,13 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
   });
 
   rotationMarkers.forEach((marker) => {
-    marker.on('drag', (e: any) => {
-      console.log(e, 'DRAGGING');
-    });
+    marker.on('drag', (e) => handleDragRectangleMarker(state, e));
   });
 
   state.customState.rectangleState = {
     cornerFeatures: rectangleCornerDrawFeatures,
     rotationMarkers: rotationMarkers,
+    rotationMarkerPositions: rotationMarkerPositions,
   };
   console.log(state.feature, state.customState.rectangleState);
 };
@@ -75,10 +75,8 @@ const computeRectangleRotationMarkerPositions = (rectangleFeature: MapboxDraw.Dr
   // 1. find the midpoints of the rectangle's edges
   const rectangleCoordinates = rectangleFeature.getCoordinates()[0];
   const rectangleEdgeMidpoints: Position[] = [
+    // only putting a marker above the top edge of the rectangle to simplify the drag interaction
     [rectangleCoordinates[0], rectangleCoordinates[1]],
-    [rectangleCoordinates[1], rectangleCoordinates[2]],
-    [rectangleCoordinates[2], rectangleCoordinates[3]],
-    [rectangleCoordinates[3], rectangleCoordinates[0]],
   ].map(([start, end]) => {
     const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
     return midpoint;
