@@ -2,6 +2,7 @@ import { InteractionStatus, InteractionType } from '@azure/msal-browser';
 import { useAccount, useIsAuthenticated, useMsal, useMsalAuthentication } from '@azure/msal-react';
 import { useEffect, useState } from 'react';
 import { loginRequest } from '../authConfig';
+import { Role } from '../config/role';
 
 export interface User {
   emailAddress: string | null;
@@ -11,7 +12,7 @@ export interface User {
   /// The non-organization specific roles the user has been assigned to.
   /// This is a custom application attribute configured in b2c.
   /// </summary>
-  roles?: string[];
+  roles?: Role[];
 
   /// <summary>
   /// The organization specific roles the user has been assigned to.
@@ -22,7 +23,7 @@ export interface User {
 
 export interface OrganizationRole {
   organizationId: string;
-  roles: string[];
+  roles: Role[];
 }
 
 export interface IAuthenticationContext {

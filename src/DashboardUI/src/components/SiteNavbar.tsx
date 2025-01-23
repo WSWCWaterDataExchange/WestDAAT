@@ -130,6 +130,11 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
             >
               Terms of Service
             </Nav.Link>
+            <AuthenticatedTemplate>
+              <Nav.Link as={Link} to="/admin">
+                Admin
+              </Nav.Link>
+            </AuthenticatedTemplate>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
