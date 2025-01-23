@@ -1,17 +1,20 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Helpers.Errors.Model;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests.Context;
 
 [TestClass]
-public class ContextUtilityTests
+public class ContextUtilityTests : UtilitiesTestBase
 {
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 
@@ -20,6 +23,8 @@ public class ContextUtilityTests
         ApiConnectorUsername = "tmctesterson",
         ApiConnectorPassword = "secretpassword"
     };
+
+    private readonly EnvironmentConfiguration _environmentConfigurationMock = new();
 
     [TestMethod]
     public void BuildContext_AnonymousContext_ShouldSetContext()
@@ -30,7 +35,7 @@ public class ContextUtilityTests
             .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
             .Returns(false);
 
-        var utility = new ContextUtility(_httpContextAccessorMock.Object, _identityProviderConfigurationMock);
+        var utility = BuildContextUtility();
 
         utility.GetContext().Should().BeOfType<AnonymousContext>();
     }
@@ -69,7 +74,7 @@ public class ContextUtilityTests
         action.Should().Throw<InvalidOperationException>()
             .WithMessage("Basic auth header is not in a valid format.");
     }
-    
+
     [DataTestMethod]
     [DataRow("Basic mctesterson:wrongpassword")]
     [DataRow("Basic wrongusername:supersecretpassword")]
@@ -234,6 +239,77 @@ public class ContextUtilityTests
     }
 
     [TestMethod]
+    public void BuildContext_LocalDevelopment_NewUser_ShouldBuildDevelopmentContext()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var externalAuthId = Guid.NewGuid();
+
+        var jwt = JwtFaker.Generate(userId, externalAuthId);
+        StringValues headerValue = $"Bearer {jwt}";
+
+        _environmentConfigurationMock.IsDevelopment = true;
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = BuildContextUtility();
+
+        // Act
+        var context = utility.GetContext();
+
+        // Assert
+        context.Should().BeOfType<UserContext>();
+        var userContext = (UserContext)context;
+        userContext.UserId.Should().Be(userId);
+        userContext.ExternalAuthId.Should().Be(externalAuthId.ToString());
+    }
+
+    [TestMethod]
+    public async Task BuildContext_LocalDevelopment_ExistingUser_ShouldBuildDevelopmentContext()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var externalAuthId = Guid.NewGuid();
+
+        var db = Services.GetRequiredService<IWestDaatDatabaseContextFactory>().Create();
+        await db.Users.AddAsync(new User
+        {
+            Id = userId,
+            ExternalAuthId = externalAuthId.ToString(),
+            Email = "wesley@westdaat.com",
+            UserRoles = new List<UserRole>
+            {
+                new() { Role = "WaterNerd", }
+            }
+        });
+        await db.SaveChangesAsync();
+
+        var jwt = JwtFaker.Generate(userId, externalAuthId);
+        StringValues headerValue = $"Bearer {jwt}";
+
+        _environmentConfigurationMock.IsDevelopment = true;
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out headerValue))
+            .Returns(true);
+
+        var utility = BuildContextUtility();
+
+        // Act
+        var context = utility.GetContext();
+
+        // Assert
+        context.Should().BeOfType<UserContext>();
+        var userContext = (UserContext)context;
+        userContext.UserId.Should().Be(userId);
+        userContext.ExternalAuthId.Should().Be(externalAuthId.ToString());
+        userContext.Roles.Length.Should().Be(1);
+        userContext.Roles.Single().Should().Be("WaterNerd");
+    }
+
+    [TestMethod]
     public void GetRequiredContext_ContextMatchesRequestedType_ShouldReturnContext()
     {
         var jwt = JwtFaker.Generate(Guid.NewGuid(), Guid.NewGuid());
@@ -268,6 +344,11 @@ public class ContextUtilityTests
 
     private ContextUtility BuildContextUtility()
     {
-        return new ContextUtility(_httpContextAccessorMock.Object, _identityProviderConfigurationMock);
+        return new ContextUtility(
+            _httpContextAccessorMock.Object,
+            _identityProviderConfigurationMock,
+            _environmentConfigurationMock,
+            Services.GetRequiredService<IWestDaatDatabaseContextFactory>()
+        );
     }
 }
