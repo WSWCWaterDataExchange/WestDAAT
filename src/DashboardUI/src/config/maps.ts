@@ -12,7 +12,6 @@ export const mapLayerNames = {
   nldiFlowlinesLayer: 'nldi-flowlines',
   nldiUsgsPointsLayer: 'nldi-usgs-points',
   nldiUsgsLocationLayer: 'nldi-usgs-location',
-  customSymbolsLayer: 'custom-symbols',
 };
 
 export const mapSourceNames = {
@@ -21,7 +20,6 @@ export const mapSourceNames = {
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
-  customSymbolsGeoJson: 'custom-symbols-geojson',
 };
 
 export const defaultPointCircleRadius = [
@@ -104,14 +102,6 @@ const mapsJson = {
         features: [],
       },
     },
-    {
-      id: mapSourceNames.customSymbolsGeoJson,
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    } as mapboxgl.GeoJSONSourceSpecification & { id: string },
   ],
   layers: [
     {
@@ -169,7 +159,7 @@ const mapsJson = {
         'fill-color': '#ff0000',
         'fill-opacity': 0.5,
       },
-      filter: ['has', 'podPou'],
+      filter: ['has', 'podPou']
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,
@@ -268,15 +258,6 @@ const mapsJson = {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
-    {
-      id: mapLayerNames.customSymbolsLayer,
-      type: 'symbol',
-      source: 'point',
-      layout: {
-        'icon-image': 'todo',
-        'icon-size': 1.0,
-      },
-    } as mapboxgl.SymbolLayerSpecification,
   ],
 };
 
