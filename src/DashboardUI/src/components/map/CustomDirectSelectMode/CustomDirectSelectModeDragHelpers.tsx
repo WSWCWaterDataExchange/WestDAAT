@@ -46,20 +46,23 @@ export const dragVertex = (
 };
 
 export const handleDragRectangleMarker = (state: CustomDirectSelectModeState, e: { type: 'drag'; target: Marker }) => {
-  const newCoords = e.target.getLngLat().toArray() as Position;
-
+  // find the difference in rotation angle from one frame to the next
   const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
+  const previousMarkerPosition = state.customState.rectangleState.rotationMarkerPositions[0];
+  const newMarkerPosition = e.target.getLngLat().toArray() as Position;
 
-  const previousRotationAngle = bearing(rectangleCenter, state.customState.rectangleState.rotationMarkerPositions[0]);
-  const newRotationAngle = bearing(rectangleCenter, newCoords);
+  const previousRotationAngle = bearing(rectangleCenter, previousMarkerPosition);
+  const newRotationAngle = bearing(rectangleCenter, newMarkerPosition);
   const rotationAngleDelta = newRotationAngle - previousRotationAngle;
 
+  // update the rectangle
   const rotatedRectangleDrawFeature: MapboxDraw.DrawPolygon = transformRotate(state.feature!, rotationAngleDelta, {
     pivot: rectangleCenter,
   });
   state.feature!.setCoordinates(rotatedRectangleDrawFeature.coordinates);
 
-  state.customState.rectangleState.rotationMarkerPositions[0] = newCoords;
+  // update the rotation marker position for the next frame
+  state.customState.rectangleState.rotationMarkerPositions[0] = newMarkerPosition;
 };
 
 const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
