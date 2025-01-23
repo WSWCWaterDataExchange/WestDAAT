@@ -16,6 +16,8 @@ import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import { Link } from 'react-router-dom';
+import AuthorizedTemplate from './AuthorizedTemplate';
+import { Role } from '../config/role';
 
 interface SiteNavbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -130,11 +132,11 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
             >
               Terms of Service
             </Nav.Link>
-            <AuthenticatedTemplate>
+            <AuthorizedTemplate roles={[Role.GlobalAdmin, Role.OrganizationAdmin]}>
               <Nav.Link as={Link} to="/admin">
                 Admin
               </Nav.Link>
-            </AuthenticatedTemplate>
+            </AuthorizedTemplate>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
