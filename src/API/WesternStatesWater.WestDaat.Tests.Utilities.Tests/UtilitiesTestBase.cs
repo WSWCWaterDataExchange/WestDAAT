@@ -1,29 +1,36 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 {
     [TestClass]
     public abstract class UtilitiesTestBase : IDisposable
     {
+        protected IServiceProvider Services = null!;
+
         static UtilitiesTestBase()
         {
             Configuration = new ConfigurationBuilder()
-                                        .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
-                                        .AddInMemoryCollection(DefaultTestConfiguration)
-                                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
-                                        .AddEnvironmentVariables()
-                                        .Build();
+                .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
             { $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.UseDevelopmentEmulator)}", "true" },
-            { $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.ServiceBusUrl)}", "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;" },
+            {
+                $"{ConfigurationRootNames.MessageBus}:{nameof(MessageBusConfiguration.ServiceBusUrl)}",
+                "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+            },
         };
 
         private ILoggerFactory? _loggerFactory;
@@ -32,6 +39,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [TestInitialize]
         public void BaseTestInitialize()
         {
+            Services = new ServiceCollection()
+                .AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>()
+                .AddTransient(_ => Configuration.GetDatabaseConfiguration())
+                .AddLogging(config => config.AddConsole())
+                .BuildServiceProvider();
+
             _loggerFactory = LoggerFactory.Create(a =>
             {
                 a.AddConfiguration(Configuration.GetSection("Logging"));
