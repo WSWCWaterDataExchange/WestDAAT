@@ -70,7 +70,10 @@ export const dragVertex = (
   }
 };
 
-export const handleDragRectangleMarker = (state: CustomDirectSelectModeState, e: { type: 'drag'; target: Marker }) => {
+export const handleDragRectangleRotationMarker = (
+  state: CustomDirectSelectModeState,
+  e: { type: 'drag'; target: Marker },
+) => {
   // find the difference in rotation angle from one frame to the next
   const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
   const previousMarkerPosition = state.customState.rectangleState.rotationMarkerPositions[0];

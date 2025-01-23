@@ -5,7 +5,7 @@ import { distance } from '@turf/distance';
 import { bearing } from '@turf/bearing';
 import { destination } from '@turf/destination';
 import { Marker } from 'mapbox-gl';
-import { handleDragRectangleMarker } from './CustomDirectSelectModeDragHelpers';
+import { handleDragRectangleRotationMarker } from './CustomDirectSelectModeDragHelpers';
 
 export const handleSetupCircle = (state: CustomDirectSelectModeState) => {
   state.customState.circleState.circleCenterPointLngLat = center(state.feature!).geometry.coordinates as [
@@ -55,7 +55,7 @@ const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, stat
   });
 
   rotationMarkers.forEach((marker) => {
-    marker.on('drag', (e) => handleDragRectangleMarker(state, e));
+    marker.on('drag', (e) => handleDragRectangleRotationMarker(state, e));
   });
 
   return {
