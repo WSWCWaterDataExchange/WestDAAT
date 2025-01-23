@@ -4,7 +4,8 @@ import SiteFooter from '../SiteFooter';
 import { WaterRightsTab } from './water-rights-tab/map-options/components/WaterRightsTab';
 import { useHomePageContext } from './Provider';
 import './home-page.scss';
-import SiteNavbar, { SiteActionbar } from '../SiteNavbar';
+import SiteNavbar from '../SiteNavbar';
+import { SiteActionbar } from '../SiteActionbar';
 
 export function Layout() {
   const { downloadModal, setShowDownloadModal, uploadModal, setShowUploadModal } = useHomePageContext();
