@@ -33,23 +33,7 @@ export const handleDisplayRectangle = (
   display(geojson);
 
   state.customState.rectangleState.cornerFeatures.forEach((corner) => display(corner.toGeoJSON()));
-
-  // // render the rotation points:
-  // const centerPoint = center(rectangle);
-
-  // // generate rotation markers 10% further away from corners
-  // const distanceFromCenterToCorners = cornersPositions.map((corner) => ({
-  //   dist: distance(centerPoint, corner, { units: 'kilometers' }),
-  //   bearingValue: bearing(centerPoint, corner),
-  // }));
-
-  // const rotationMarkers = distanceFromCenterToCorners
-  //   .map(({ dist, bearingValue }) => destination(centerPoint, dist * 1.1, bearingValue).geometry.coordinates)
-  //   .map((coords) => buildVertex(geojson.properties!.id, coords, { isRotationMarker: true }));
-  // console.log('corners', corners, 'rotation markers', rotationMarkers);
-
-  // // render rotation markers
-  // rotationMarkers.forEach(display);
+  state.customState.rectangleState.rotationFeatures.forEach((rotationMarker) => display(rotationMarker.toGeoJSON()));
 };
 
 const getCardinalDirectionCoordinatesOnFeature = (allCoordinateLngLatValues: Position[]): Position[] => {

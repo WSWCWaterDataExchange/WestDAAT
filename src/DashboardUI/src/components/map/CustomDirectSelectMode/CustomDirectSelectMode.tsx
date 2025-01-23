@@ -1,9 +1,12 @@
 import MapboxDraw, { DrawCustomMode, DrawCustomModeThis } from '@mapbox/mapbox-gl-draw';
 import center from '@turf/center';
 import { LngLat } from 'mapbox-gl';
-import { Feature, GeoJSON, GeoJsonProperties, Geometry, Point } from 'geojson';
+import { Feature, GeoJSON, GeoJsonProperties, Geometry, Point, Position } from 'geojson';
 import { dragFeature, dragVertex } from './CustomDirectSelectModeDragHelpers';
 import { handleDisplayCircle, handleDisplayRectangle } from './CustomDirectSelectModeDisplayHelpers';
+import { distance } from '@turf/distance';
+import { bearing } from '@turf/bearing';
+import { destination } from '@turf/destination';
 
 // base code used for reference: https://github.com/mapbox/mapbox-gl-draw/blob/main/src/modes/direct_select.js
 
@@ -18,6 +21,7 @@ export interface CustomDirectSelectModeState {
     isRectangle: boolean;
     rectangleState: {
       cornerFeatures: MapboxDraw.DrawPoint[];
+      rotationFeatures: MapboxDraw.DrawPoint[];
     };
   };
   // inherited properties from base implementation
@@ -37,6 +41,7 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   isRectangle: false,
   rectangleState: {
     cornerFeatures: [],
+    rotationFeatures: [],
   },
 };
 
@@ -58,7 +63,8 @@ export const CustomDirectSelectMode: DrawCustomMode = {
         number,
       ];
     } else if (state.feature?.properties?.isRectangle) {
-      // get rectangle's child corner coordinate features
+      // get rectangle's child corner Point features
+      // they aren't available directly as part of the polygon so we have to grab them in a roundabout way
       const sources = this.map.getStyle()!.sources;
       const rectangleCornerFeatures = Object.keys(sources)
         .map((sourceKey) => sources[sourceKey])
@@ -76,15 +82,60 @@ export const CustomDirectSelectMode: DrawCustomMode = {
           (feature): feature is Feature<Point, GeoJsonProperties> => feature.properties?.parent === state.feature?.id,
         );
 
-      // the corner features exist in the map's source, but this draw mode isn't aware of them and thus cannot render markers over them.
-      // register the corner features in the draw mode (if they haven't been already) and add to state so they can be rendered.
-      const rectangleCornerDrawFeatures = rectangleCornerFeatures.map(
-        (feature) => (this.getFeature(String(feature.id)) ?? this.newFeature(feature)) as MapboxDraw.DrawPoint,
-      );
+      // register the corner features in this draw mode and track them in state
+      const rectangleCornerDrawFeatures = rectangleCornerFeatures.map((feature) => {
+        const drawnFeature = this.newFeature(feature) as MapboxDraw.DrawPoint;
+        drawnFeature.setProperty('isCorner', true);
+        return drawnFeature;
+      });
+      console.log('corner features', rectangleCornerDrawFeatures);
+
+      // create the rotation features as well and track them
+      // 1. find the midpoints of the rectangle's edges
+      const rectangleCoordinates = state.feature.getCoordinates()[0];
+      const rectangleEdgeMidpoints: Position[] = [
+        [rectangleCoordinates[0], rectangleCoordinates[1]],
+        [rectangleCoordinates[1], rectangleCoordinates[2]],
+        [rectangleCoordinates[2], rectangleCoordinates[3]],
+        [rectangleCoordinates[3], rectangleCoordinates[0]],
+      ].map(([start, end]) => {
+        const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+        return midpoint;
+      });
+
+      // 2. determine the position of the rotation markers
+      // add small gap so the rotation markers aren't right on the edge of the rectangle
+      const rectangleCenter = center(state.feature).geometry.coordinates as [number, number];
+      const rotationMarkerPositions = rectangleEdgeMidpoints.map((midpoint) => {
+        const distanceFromCenterToMidpoint = distance(rectangleCenter, midpoint, { units: 'kilometers' });
+        const bearingFromCenterToMidpoint = bearing(rectangleCenter, midpoint);
+        return destination(rectangleCenter, distanceFromCenterToMidpoint * 1.25, bearingFromCenterToMidpoint);
+      });
+
+      // 3. create marker features and track in state
+      const rotationMarkerFeatures = rotationMarkerPositions.map((position) => {
+        const drawnFeature = this.newFeature({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: position.geometry.coordinates,
+          },
+        }) as MapboxDraw.DrawPoint;
+        drawnFeature.setProperty('isRotationMarker', true);
+        drawnFeature.setProperty('parent', state.feature?.id);
+        return drawnFeature;
+      });
+
+      // 4. add the rotation markers to the map
+      // they aren't part of the rectangle's geometry so we have to add them manually
+      rotationMarkerFeatures.forEach((feature) => this.addFeature(feature));
 
       state.customState.rectangleState = {
         cornerFeatures: rectangleCornerDrawFeatures,
+        rotationFeatures: rotationMarkerFeatures,
       };
+      console.log(state.feature, state.customState.rectangleState);
     }
 
     return state;
