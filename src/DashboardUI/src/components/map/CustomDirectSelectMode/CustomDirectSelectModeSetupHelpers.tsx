@@ -22,6 +22,7 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     cornerFeatures: rectangleCornerDrawFeatures,
     rotationMarkers: rotationMarkers,
     rotationMarkerPositions: rotationMarkerPositions,
+    totalRotationAngle: 0,
   };
 };
 
