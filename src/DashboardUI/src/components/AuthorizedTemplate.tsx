@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import { Role } from '../config/role';
 import { hasOrganizationRole, hasUserRole } from '../utilities/securityHelpers';
+import { useAppContext } from '../contexts/AppProvider';
 
 interface AuthorizedTemplateProps {
   roles: Role[];
@@ -9,14 +9,16 @@ interface AuthorizedTemplateProps {
 }
 
 const AuthorizedTemplate = (props: AuthorizedTemplateProps) => {
-  const authContext = useAuthenticationContext();
+  const {
+    authenticationContext: { isAuthenticated, user },
+  } = useAppContext();
 
-  if (!authContext.isAuthenticated) {
+  if (!isAuthenticated) {
     return null;
   }
 
-  const hasRole = props.roles.some((role) => hasUserRole(authContext, role));
-  const hasOrgRole = props.roles.some((role) => hasOrganizationRole(authContext, role));
+  const hasRole = props.roles.some((role) => hasUserRole(user, role));
+  const hasOrgRole = props.roles.some((role) => hasOrganizationRole(user, role));
 
   const hasRequiredRole = hasRole || hasOrgRole;
   return hasRequiredRole ? props.children : null;
