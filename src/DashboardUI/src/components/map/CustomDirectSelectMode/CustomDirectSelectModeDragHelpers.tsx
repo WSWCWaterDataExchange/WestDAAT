@@ -116,13 +116,13 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
   const rectangle = state.feature!;
 
   // find the closest corner to the dragged vertex
-  const rectangleMarkerPositions = rectangle.getCoordinates()[0];
+  const rectangleCornerPositions = rectangle.getCoordinates()[0];
   const dragPosition = e.lngLat.toArray() as Position;
-  const selectedMarkerPosition = findClosestPointToPoint(dragPosition, rectangleMarkerPositions);
+  const selectedCornerPosition = findClosestPointToPoint(dragPosition, rectangleCornerPositions);
 
   // also find the opposite corner
-  const oppositeCornerIndex = (rectangleMarkerPositions.indexOf(selectedMarkerPosition) + 2) % 4;
-  const oppositeCorner = rectangleMarkerPositions[oppositeCornerIndex];
+  const oppositeCornerIndex = (rectangleCornerPositions.indexOf(selectedCornerPosition) + 2) % 4;
+  const oppositeCorner = rectangleCornerPositions[oppositeCornerIndex];
 
   // build the four corners of the rectangle using these two opposing corners
   const newRectangleCoordinates = computeNewRectangleCoordinates(dragPosition, oppositeCorner);
