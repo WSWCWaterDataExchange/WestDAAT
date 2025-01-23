@@ -16,17 +16,7 @@ export const handleSetupCircle = (state: CustomDirectSelectModeState) => {
 export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state: CustomDirectSelectModeState) => {
   // get rectangle's child corner Point features
   // they aren't available directly as part of the polygon so we have to grab them in a roundabout way
-  const sources = _this.map.getStyle()!.sources;
-  const rectangleCornerFeatures = Object.keys(sources)
-    .map((sourceKey) => sources[sourceKey])
-    .filter((source) => source.type === 'geojson')
-    .map((geoJsonSource) => geoJsonSource.data)
-    .filter(
-      (geoJsonSourceData): geoJsonSourceData is GeoJSON<Geometry, GeoJsonProperties> =>
-        typeof geoJsonSourceData === 'object',
-    )
-    .filter((geoJsonSourceData) => geoJsonSourceData.type === 'FeatureCollection')
-    .flatMap((geoJsonSourceData) => geoJsonSourceData.features)
+  const rectangleCornerFeatures = getAllMapGeoJsonFeatures(_this.map)
     // the rectangle's child corner features are all Point geometries
     // find the relevant points corresponding to this rectangle
     .filter(
@@ -41,28 +31,7 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
   });
   console.log('corner features', rectangleCornerDrawFeatures);
 
-  // create the rotation features as well and track them
-  // 1. find the midpoints of the rectangle's edges
-  const rectangleCoordinates = state.feature!.getCoordinates()[0];
-  const rectangleEdgeMidpoints: Position[] = [
-    [rectangleCoordinates[0], rectangleCoordinates[1]],
-    [rectangleCoordinates[1], rectangleCoordinates[2]],
-    [rectangleCoordinates[2], rectangleCoordinates[3]],
-    [rectangleCoordinates[3], rectangleCoordinates[0]],
-  ].map(([start, end]) => {
-    const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
-    return midpoint;
-  });
-
-  // 2. determine the position of the rotation markers
-  // add small gap so the rotation markers aren't right on the edge of the rectangle
-  const rectangleCenter = center(state.feature!).geometry.coordinates as [number, number];
-  const rotationMarkerPositions: Position[] = rectangleEdgeMidpoints.map((midpoint) => {
-    const distanceFromCenterToMidpoint = distance(rectangleCenter, midpoint, { units: 'kilometers' });
-    const bearingFromCenterToMidpoint = bearing(rectangleCenter, midpoint);
-    return destination(rectangleCenter, distanceFromCenterToMidpoint * 1.25, bearingFromCenterToMidpoint).geometry
-      .coordinates;
-  });
+  const rotationMarkerPositions = computeRectangleRotationMarkerPositions(state.feature!);
 
   // 3. create marker features and track in state
   const rotationMarkers = rotationMarkerPositions.map((position) => {
@@ -85,4 +54,45 @@ export const handleSetupRectangle = (_this: DirectSelectDrawModeInstance, state:
     rotationMarkers: rotationMarkers,
   };
   console.log(state.feature, state.customState.rectangleState);
+};
+
+const getAllMapGeoJsonFeatures = (map: mapboxgl.Map): Feature<Geometry, GeoJsonProperties>[] => {
+  const sources = map.getStyle()!.sources;
+  return Object.keys(sources)
+    .map((sourceKey) => sources[sourceKey])
+    .filter((source) => source.type === 'geojson')
+    .map((geoJsonSource) => geoJsonSource.data)
+    .filter(
+      (geoJsonSourceData): geoJsonSourceData is GeoJSON<Geometry, GeoJsonProperties> =>
+        typeof geoJsonSourceData === 'object',
+    )
+    .filter((geoJsonSourceData) => geoJsonSourceData.type === 'FeatureCollection')
+    .flatMap((geoJsonSourceData) => geoJsonSourceData.features);
+};
+
+const computeRectangleRotationMarkerPositions = (rectangleFeature: MapboxDraw.DrawPolygon): Position[] => {
+  // create the rotation features as well and track them
+  // 1. find the midpoints of the rectangle's edges
+  const rectangleCoordinates = rectangleFeature.getCoordinates()[0];
+  const rectangleEdgeMidpoints: Position[] = [
+    [rectangleCoordinates[0], rectangleCoordinates[1]],
+    [rectangleCoordinates[1], rectangleCoordinates[2]],
+    [rectangleCoordinates[2], rectangleCoordinates[3]],
+    [rectangleCoordinates[3], rectangleCoordinates[0]],
+  ].map(([start, end]) => {
+    const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+    return midpoint;
+  });
+
+  // 2. determine the position of the rotation markers
+  // add small gap so the rotation markers aren't right on the edge of the rectangle
+  const rectangleCenter = center(rectangleFeature).geometry.coordinates as [number, number];
+  const rotationMarkerPositions: Position[] = rectangleEdgeMidpoints.map((midpoint) => {
+    const distanceFromCenterToMidpoint = distance(rectangleCenter, midpoint, { units: 'kilometers' });
+    const bearingFromCenterToMidpoint = bearing(rectangleCenter, midpoint);
+    return destination(rectangleCenter, distanceFromCenterToMidpoint * 1.25, bearingFromCenterToMidpoint).geometry
+      .coordinates;
+  });
+
+  return rotationMarkerPositions;
 };
