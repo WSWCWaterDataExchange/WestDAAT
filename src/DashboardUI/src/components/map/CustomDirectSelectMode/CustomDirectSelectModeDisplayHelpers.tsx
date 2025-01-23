@@ -1,9 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry, Position, GeoJSON, Point } from 'geojson';
 import { CustomDirectSelectModeState, DirectSelectDrawModeInstance } from './CustomDirectSelectMode';
-import center from '@turf/center';
-import { distance } from '@turf/distance';
-import destination from '@turf/destination';
-import { bearing } from '@turf/bearing';
 
 export const handleDisplayCircle = (
   state: CustomDirectSelectModeState,
