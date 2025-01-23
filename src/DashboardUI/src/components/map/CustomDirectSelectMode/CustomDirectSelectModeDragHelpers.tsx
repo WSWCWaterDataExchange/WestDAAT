@@ -187,6 +187,13 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
   state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
     cornerFeature.setCoordinates(newRotatedRectangleCoordinates[index]);
   });
+
+  // also update the coordinates for the rotation markers so they re-render while dragging
+  const updatedRotationMarkerPositions = computeRectangleRotationMarkerPositions(rectangle);
+  state.customState.rectangleState.rotationMarkers.forEach((marker, index) => {
+    const newPosition = updatedRotationMarkerPositions[index];
+    marker.setLngLat({ lng: newPosition[0], lat: newPosition[1] });
+  });
 };
 
 const findClosestPointToPoint = (newPoint: Position, points: Position[]): Position => {
