@@ -58,8 +58,14 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
-            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}", "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
-            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}", "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;" },
+            {
+                $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}",
+                "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+            },
+            {
+                $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
+                "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+            },
         };
 
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)
@@ -159,11 +165,11 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .Returns(new IdentityProviderContext());
         }
 
-        protected void UseUserContext()
+        protected void UseUserContext(UserContext? context = null)
         {
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())
-                .Returns(new UserContext());
+                .Returns(context ?? new UserContext());
         }
     }
 }
