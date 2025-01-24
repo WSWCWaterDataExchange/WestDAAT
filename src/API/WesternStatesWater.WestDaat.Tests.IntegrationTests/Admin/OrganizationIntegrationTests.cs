@@ -86,6 +86,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.GetType().Should().Be<OrganizationLoadAllResponse>();
         response.Organizations.Should().BeNull();
         response.Error.Should().NotBeNull();
-        response.Error.LogMessage.Should().Contain("but did not have permission to do so.");
+        response.Error!.LogMessage.Should().Contain("but did not have permission to do so.");
     }
 }
