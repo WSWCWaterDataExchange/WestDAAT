@@ -101,7 +101,7 @@ function OverlayTabs() {
             rows={waterRightRows}
             columns={waterRightColumns}
             disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 20]}
+            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
             slots={{
               toolbar: QuickSearchToolbar,
             }}

@@ -72,7 +72,7 @@ export default function WaterRightTabs() {
             rows={sourceRows}
             columns={sourceColumns}
             disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 20]}
+            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
           />
         </div>
       </Tab>

@@ -192,7 +192,7 @@ export default function SiteTabs() {
               rows={waterSourceRows}
               columns={waterSourceColumns}
               disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
             />
           </div>
@@ -204,7 +204,7 @@ export default function SiteTabs() {
               rows={waterRightRows}
               columns={waterRightColumns}
               disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
             />
           </div>
@@ -216,7 +216,7 @@ export default function SiteTabs() {
               rows={methodRows}
               columns={methodColumns}
               disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
             />
           </div>
@@ -228,7 +228,7 @@ export default function SiteTabs() {
               rows={variableRows}
               columns={variableColumns}
               disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 20]}
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
             />
           </div>
