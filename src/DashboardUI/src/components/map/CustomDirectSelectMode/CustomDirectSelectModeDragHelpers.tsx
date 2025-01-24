@@ -71,48 +71,6 @@ export const dragVertex = (
   }
 };
 
-export const handleDragRectangleRotationMarker = (
-  state: CustomDirectSelectModeState,
-  e: { type: 'drag'; target: Marker },
-) => {
-  // find the difference in rotation angle from one frame to the next
-  const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
-  const previousMarkerPosition = state.customState.rectangleState.rotationMarkersPreviousPositions[0];
-  const newMarkerPosition = e.target.getLngLat().toArray() as Position;
-
-  const previousRotationAngle = bearing(rectangleCenter, previousMarkerPosition);
-  const newRotationAngle = bearing(rectangleCenter, newMarkerPosition);
-  const normalizedRotationAngleDelta = normalizeRotationAngle(newRotationAngle - previousRotationAngle);
-
-  // update the rectangle
-  const rotatedRectangleDrawFeature: MapboxDraw.DrawPolygon = transformRotate(
-    state.feature!,
-    normalizedRotationAngleDelta,
-    {
-      pivot: rectangleCenter,
-    },
-  );
-  state.feature!.setCoordinates(rotatedRectangleDrawFeature.coordinates);
-
-  // update the rotation marker position for the next frame
-  state.customState.rectangleState.rotationMarkersPreviousPositions[0] = newMarkerPosition;
-
-  // update the corner markers so they re-render while dragging
-  const rectangleCoordinates = rotatedRectangleDrawFeature.coordinates[0];
-  state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
-    cornerFeature.setCoordinates(rectangleCoordinates[index]);
-  });
-
-  // update the total rotation angle
-  state.customState.rectangleState.totalRotationAngle = normalizeRotationAngle(
-    state.customState.rectangleState.totalRotationAngle + normalizedRotationAngleDelta,
-  );
-};
-
-const normalizeRotationAngle = (angle: number): number => {
-  return (angle + 360) % 360;
-};
-
 const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
   // find new coordinate location via mouse position
   const newCoordPosition = e.lngLat;
@@ -215,4 +173,46 @@ const computeNewRectangleCoordinates = (activeCorner: Position, oppositeCorner: 
     [lng2, lat2],
     [lng1, lat2],
   ];
+};
+
+export const handleDragRectangleRotationMarker = (
+  state: CustomDirectSelectModeState,
+  e: { type: 'drag'; target: Marker },
+) => {
+  // find the difference in rotation angle from one frame to the next
+  const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
+  const previousMarkerPosition = state.customState.rectangleState.rotationMarkersPreviousPositions[0];
+  const newMarkerPosition = e.target.getLngLat().toArray() as Position;
+
+  const previousRotationAngle = bearing(rectangleCenter, previousMarkerPosition);
+  const newRotationAngle = bearing(rectangleCenter, newMarkerPosition);
+  const normalizedRotationAngleDelta = normalizeRotationAngle(newRotationAngle - previousRotationAngle);
+
+  // update the rectangle
+  const rotatedRectangleDrawFeature: MapboxDraw.DrawPolygon = transformRotate(
+    state.feature!,
+    normalizedRotationAngleDelta,
+    {
+      pivot: rectangleCenter,
+    },
+  );
+  state.feature!.setCoordinates(rotatedRectangleDrawFeature.coordinates);
+
+  // update the rotation marker position for the next frame
+  state.customState.rectangleState.rotationMarkersPreviousPositions[0] = newMarkerPosition;
+
+  // update the corner markers so they re-render while dragging
+  const rectangleCoordinates = rotatedRectangleDrawFeature.coordinates[0];
+  state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
+    cornerFeature.setCoordinates(rectangleCoordinates[index]);
+  });
+
+  // update the total rotation angle
+  state.customState.rectangleState.totalRotationAngle = normalizeRotationAngle(
+    state.customState.rectangleState.totalRotationAngle + normalizedRotationAngleDelta,
+  );
+};
+
+const normalizeRotationAngle = (angle: number): number => {
+  return (angle + 360) % 360;
 };
