@@ -17,7 +17,7 @@ export interface CustomDirectSelectModeState {
     rectangleState: {
       cornerFeatures: MapboxDraw.DrawPoint[];
       rotationMarkers: Marker[];
-      rotationMarkerPositions: Position[];
+      rotationMarkersPreviousPositions: Position[];
       totalRotationAngle: number;
     };
   };
@@ -37,7 +37,7 @@ const defaultCustomState: CustomDirectSelectModeState['customState'] = {
   rectangleState: {
     cornerFeatures: [],
     rotationMarkers: [],
-    rotationMarkerPositions: [],
+    rotationMarkersPreviousPositions: [],
     totalRotationAngle: 0,
   },
 };

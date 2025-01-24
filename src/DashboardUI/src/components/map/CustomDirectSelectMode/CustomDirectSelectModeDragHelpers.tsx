@@ -38,23 +38,22 @@ const handleCircleDragged = (state: CustomDirectSelectModeState) => {
 };
 
 const handleRectangleDragged = (state: CustomDirectSelectModeState) => {
-  // update the corner features
+  // update the corner points so they follow the dragged rectangle
   const updatedRectangleCoordinates = state.feature!.getCoordinates();
   state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
     cornerFeature.setCoordinates(updatedRectangleCoordinates[0][index]);
   });
 
-  // update the rotation markers
+  // update the rotation markers so they follow the dragged rectangle
   const updatedRotationMarkerPositions = computeRectangleRotationMarkerPositions(state.feature!);
   state.customState.rectangleState.rotationMarkers.forEach((marker, index) => {
     const newPosition = updatedRotationMarkerPositions[index];
     marker.setLngLat({ lng: newPosition[0], lat: newPosition[1] });
   });
 
-  // update the rotation marker positions
-  state.customState.rectangleState.rotationMarkerPositions = state.customState.rectangleState.rotationMarkers.map(
-    (marker) => marker.getLngLat().toArray(),
-  );
+  // update the rotation marker positions in state
+  state.customState.rectangleState.rotationMarkersPreviousPositions =
+    state.customState.rectangleState.rotationMarkers.map((marker) => marker.getLngLat().toArray());
 };
 
 export const dragVertex = (
@@ -78,7 +77,7 @@ export const handleDragRectangleRotationMarker = (
 ) => {
   // find the difference in rotation angle from one frame to the next
   const rectangleCenter = center(state.feature!).geometry.coordinates as Position;
-  const previousMarkerPosition = state.customState.rectangleState.rotationMarkerPositions[0];
+  const previousMarkerPosition = state.customState.rectangleState.rotationMarkersPreviousPositions[0];
   const newMarkerPosition = e.target.getLngLat().toArray() as Position;
 
   const previousRotationAngle = bearing(rectangleCenter, previousMarkerPosition);
@@ -96,7 +95,7 @@ export const handleDragRectangleRotationMarker = (
   state.feature!.setCoordinates(rotatedRectangleDrawFeature.coordinates);
 
   // update the rotation marker position for the next frame
-  state.customState.rectangleState.rotationMarkerPositions[0] = newMarkerPosition;
+  state.customState.rectangleState.rotationMarkersPreviousPositions[0] = newMarkerPosition;
 
   // update the corner markers so they re-render while dragging
   const rectangleCoordinates = rotatedRectangleDrawFeature.coordinates[0];
