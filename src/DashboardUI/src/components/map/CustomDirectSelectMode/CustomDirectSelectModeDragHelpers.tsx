@@ -18,25 +18,26 @@ export const dragFeature = (
   state: CustomDirectSelectModeState,
   e: MapboxDraw.MapMouseEvent,
 ) => {
-  // call base implementation, let it handle the drag
+  // call base implementation, let it handle dragging the feature
   directSelectBaseMode.onDrag?.call(_this, state, e);
 
+  // follow up with custom behavior
   if (state.feature?.properties?.isCircle) {
-    handleDragCircle(state, e);
+    handleCircleDragged(state);
   } else if (state.feature?.properties?.isRectangle) {
-    handleDragRectangle(state, e);
+    handleRectangleDragged(state);
   }
 };
 
-const handleDragCircle = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
-  // afterwards update the center point of the circle
+const handleCircleDragged = (state: CustomDirectSelectModeState) => {
+  // update state with the new center point of the circle
   state.customState.circleState.circleCenterPointLngLat = center(state.feature!).geometry.coordinates as [
     number,
     number,
   ];
 };
 
-const handleDragRectangle = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
+const handleRectangleDragged = (state: CustomDirectSelectModeState) => {
   // update the corner features
   const updatedRectangleCoordinates = state.feature!.getCoordinates();
   state.customState.rectangleState.cornerFeatures.forEach((cornerFeature, index) => {
