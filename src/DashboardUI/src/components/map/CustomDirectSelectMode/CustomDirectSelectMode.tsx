@@ -69,7 +69,7 @@ export const CustomDirectSelectMode: DrawCustomMode = {
     if (state.feature?.properties?.isRectangle) {
       state.customState.rectangleState.rotationMarkers.forEach((marker) => marker.remove());
 
-      // encode rotation angle into the feature
+      // encode rotation angle into the feature so we can keep track of it when the feature is re-selected
       state.feature!.setProperty('rotationAngle', state.customState.rectangleState.totalRotationAngle);
     }
   },
