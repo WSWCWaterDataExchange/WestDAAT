@@ -11,5 +11,7 @@ public class Organization
 
     public string Name { get; set; }
 
+    public string EmailDomain { get; set; }
+
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }
