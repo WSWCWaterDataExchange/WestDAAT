@@ -86,7 +86,7 @@ const handleDragCircleVertex = (state: CustomDirectSelectModeState, e: MapboxDra
 };
 
 const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: MapboxDraw.MapMouseEvent) => {
-  // copy the existing rectangle
+  // resize the rectangle based on the dragged vertex
   const rectangle = state.feature!;
 
   // the drag event only gives us the mouse position.
@@ -101,7 +101,7 @@ const handleDragRectangleVertex = (state: CustomDirectSelectModeState, e: Mapbox
   });
   const unrotatedRectangleCornerPositions = unrotatedRectangle.coordinates[0];
 
-  // 2. undo the rotation of the drag position
+  // 2. undo the rotation of the drag position relative to the rectangle center
   const dragPosition = e.lngLat.toArray() as Position;
   const dragPositionGeometry: Point = {
     type: 'Point',
