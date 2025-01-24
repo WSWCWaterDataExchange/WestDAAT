@@ -28,15 +28,13 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public async Task Load_OrganizationLoadAllRequest_GlobalAdminUser_Success()
     {
         // Arrange
-        var context = new UserContext()
+        UseUserContext(new UserContext
         {
             UserId = Guid.NewGuid(),
             Roles = [Roles.GlobalAdmin],
             OrganizationRoles = [],
             ExternalAuthId = ""
-        };
-        ContextUtilityMock.Setup(mock => mock.GetContext())
-            .Returns(context);
+        });
 
         var organization = new OrganizationFaker().Generate();
         await _dbContext.Organizations.AddAsync(organization);
@@ -65,16 +63,13 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public async Task Load_OrganizationLoadAllRequest_NotGlobalAdminUser_ShouldReturnError(string role)
     {
         // Arrange
-        var context = new UserContext()
+        UseUserContext(new UserContext
         {
             UserId = Guid.NewGuid(),
             Roles = [role],
             OrganizationRoles = [],
             ExternalAuthId = ""
-        };
-
-        ContextUtilityMock.Setup(mock => mock.GetContext())
-            .Returns(context);
+        });
 
         // Act 
         var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(

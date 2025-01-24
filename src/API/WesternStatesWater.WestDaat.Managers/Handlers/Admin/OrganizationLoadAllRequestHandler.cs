@@ -7,8 +7,7 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Admin;
 
-public class
-    OrganizationLoadAllRequestHandler : IRequestHandler<OrganizationLoadAllRequest, OrganizationLoadAllResponse>
+public class OrganizationLoadAllRequestHandler : IRequestHandler<OrganizationLoadAllRequest, OrganizationLoadAllResponse>
 {
     public IOrganizationAccessor OrganizationAccessor { get; }
 
