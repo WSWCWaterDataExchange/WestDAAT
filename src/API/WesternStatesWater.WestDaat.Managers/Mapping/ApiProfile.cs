@@ -52,8 +52,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     )
                 )
                 .ForMember(dest => dest.Extension_WestDaat_OrganizationRoles, opt => opt.MapFrom(src =>
-                        string.Join(',', src.UserOrganizationRoles.Select(orgRole =>
-                            $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
+                        string.Join(',', src.UserOrganizationRoles.Select(orgRole => $"org_{orgRole.OrganizationId}/rol_{orgRole.Role}"))
                     )
                 )
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
@@ -67,16 +66,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddOrganizationMappings()
         {
-            CreateMap<ClientContracts.Requests.Admin.OrganizationLoadAllRequest,
-                CommonContracts.OrganizationLoadAllRequest>();
+            CreateMap<ClientContracts.Requests.Admin.OrganizationLoadAllRequest, CommonContracts.OrganizationLoadAllRequest>();
 
-            CreateMap<CommonContracts.OrganizationLoadAllResponse,
-                    ClientContracts.Responses.Admin.OrganizationLoadAllResponse>()
+            CreateMap<CommonContracts.OrganizationLoadAllResponse, ClientContracts.Responses.Admin.OrganizationLoadAllResponse>()
                 .ForMember(dest => dest.Organizations, opt => opt.MapFrom(src => src.Organizations))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
-            CreateMap<CommonContracts.OrganizationListItem,
-                ClientContracts.OrganizationListItem>();
+            CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
         }
     }
 }
