@@ -595,12 +595,17 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
 
                 entity.Property(e => e.SiteId).HasColumnName("SiteID");
                 entity.Property(e => e.SiteUuid).HasColumnName("uuid");
-                entity.Property(e => e.PodPou).HasColumnName("podPou");
                 entity.Property(e => e.StartDate).HasColumnName("startDate");
                 entity.Property(e => e.EndDate).HasColumnName("endDate");
                 entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
                 entity.Property(e => e.Point).HasColumnType("point").HasColumnName("point");
+                entity.Property(e => e.State).HasColumnName("State");
+                entity.Property(e => e.PrimaryUseCategory).HasColumnName("PrimaryUseCategory");
+                entity.Property(e => e.VariableType).HasColumnName("VariableType");
+                entity.Property(e => e.SiteType).HasColumnName("SiteType");
+                entity.Property(e => e.WaterSourceType).HasColumnName("WaterSourceType");
             });
+
 
 
             modelBuilder.Entity<AllocationBridgeBeneficialUsesFact>(entity =>

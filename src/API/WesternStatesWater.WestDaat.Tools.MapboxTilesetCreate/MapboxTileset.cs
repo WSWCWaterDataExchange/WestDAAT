@@ -165,6 +165,7 @@ public static class MapboxTileset
             Directory.Delete(Path.Combine(geoJsonDirectoryPath, "Allocations"), true);
         }
     }
+    
     internal static async Task CreateTimeSeries(DatabaseContext db, string geoJsonDirectoryPath)
     {
         var tempPointsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points"));
@@ -196,7 +197,11 @@ public static class MapboxTileset
                     var properties = new Dictionary<string, object>
                     {
                         { "uuid", site.SiteUuid },
-                        { "podPou", site.PodPou },
+                        { "state", site.State },
+                        { "primaryUseCategory", site.PrimaryUseCategory },
+                        { "variableType", site.VariableType },
+                        { "siteType", site.SiteType },
+                        { "waterSourceType", site.WaterSourceType },
                     };
 
                     if (site.StartDate.HasValue)
@@ -277,6 +282,7 @@ public static class MapboxTileset
             Directory.Delete(Path.Combine(geoJsonDirectoryPath, "TimeSeries"), true);
         }
     }
+
 
     internal static async Task CreateOverlays(DatabaseContext db, string geoJsonDirectoryPath)
     {
