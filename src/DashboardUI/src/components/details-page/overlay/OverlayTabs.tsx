@@ -1,11 +1,29 @@
 import React from 'react';
-import { Tabs, Tab, Table } from 'react-bootstrap';
+import { Tabs, Tab } from 'react-bootstrap';
 import { useOverlayDetailsContext } from './Provider';
 import OverlayDetailsTable from '../OverlayDetailsTable';
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarFilterButton,
+  GridToolbarQuickFilter,
+} from '@mui/x-data-grid';
 
 export enum OverlayTab {
   Admin = 'overlay',
   WaterRight = 'right',
+}
+
+function QuickSearchToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarQuickFilter />
+      <GridToolbarFilterButton />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
 }
 
 function OverlayTabs() {
@@ -18,6 +36,53 @@ function OverlayTabs() {
     },
   } = useOverlayDetailsContext();
 
+  const waterRightRows = React.useMemo(() => {
+    if (!overlayInfoList) return [];
+    return overlayInfoList.map((entry) => ({
+      id: entry.allocationUuid,
+      ...entry,
+    }));
+  }, [overlayInfoList]);
+
+  const waterRightColumns: GridColDef[] = [
+    { field: 'allocationUuid', headerName: 'Allocation UUID', flex: 1, sortable: true },
+    { field: 'waterRightNativeId', headerName: 'Water Right Native ID', flex: 1, sortable: true },
+    { field: 'owner', headerName: 'Owner', flex: 1, sortable: true },
+    {
+      field: 'priorityDate',
+      headerName: 'Priority Date',
+      flex: 1,
+      sortable: true,
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        return new Date(value as string).toLocaleDateString();
+      },
+    },
+    { field: 'flow', headerName: 'Flow (CFS)', flex: 1, sortable: true },
+    { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
+    { field: 'legalStatus', headerName: 'Legal Status', flex: 1, sortable: true },
+    {
+      field: 'expirationDate',
+      headerName: 'Expiration Date',
+      flex: 1,
+      sortable: true,
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        return new Date(value as string).toLocaleDateString();
+      },
+    },
+    {
+      field: 'beneficialUses',
+      headerName: 'Beneficial Uses',
+      flex: 2,
+      sortable: false,
+      renderCell: (params) => {
+        const uses = params.value as string[] | undefined;
+        return uses?.length ? uses.join(', ') : '-';
+      },
+    },
+  ];
+
   return (
     <Tabs
       id="overlay-tabs"
@@ -29,37 +94,19 @@ function OverlayTabs() {
         <OverlayDetailsTable waterRightsInfoList={waterRightsInfoListByReportingUnit} />
       </Tab>
 
+      {/* Second Tab (converted to Data Grid) */}
       <Tab eventKey={OverlayTab.WaterRight} title="Related Water Right Information">
-        <Table hover>
-          <thead>
-            <tr>
-              <th>Allocation UUID</th>
-              <th>Water Right Native ID</th>
-              <th>Owner</th>
-              <th>Priority Date</th>
-              <th>Flow (CFS)</th>
-              <th>Volume (AF)</th>
-              <th>Legal Status</th>
-              <th>Expiration Date</th>
-              <th>Beneficial Uses</th>
-            </tr>
-          </thead>
-          <tbody>
-            {overlayInfoList?.map((entry) => (
-              <tr key={entry.allocationUuid}>
-                <td>{entry.allocationUuid}</td>
-                <td>{entry.waterRightNativeId}</td>
-                <td>{entry.owner}</td>
-                <td>{entry.priorityDate ? new Date(entry.priorityDate).toLocaleDateString() : '-'}</td>
-                <td>{entry.flow ?? '-'}</td>
-                <td>{entry.volume ?? '-'}</td>
-                <td>{entry.legalStatus}</td>
-                <td>{entry.expirationDate ? new Date(entry.expirationDate).toLocaleDateString() : '-'}</td>
-                <td>{entry.beneficialUses.join(', ')}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <div style={{ width: '100%', height: 600 }}>
+          <DataGrid
+            rows={waterRightRows}
+            columns={waterRightColumns}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 20]}
+            slots={{
+              toolbar: QuickSearchToolbar,
+            }}
+          />
+        </div>
       </Tab>
     </Tabs>
   );

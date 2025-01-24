@@ -1,59 +1,98 @@
 import React from 'react';
-import Table from 'react-bootstrap/esm/Table';
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+  GridToolbarFilterButton,
+  GridToolbarExport,
+} from '@mui/x-data-grid';
 import { WaterRightsInfoListItem } from '../../data-contracts';
+
+function QuickSearchToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarQuickFilter />
+      <GridToolbarFilterButton />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
+}
 
 interface OverlayDetailsTableProps {
   waterRightsInfoList: WaterRightsInfoListItem[] | undefined;
 }
 
-function OverlayDetailsTable(props: OverlayDetailsTableProps) {
+export default function OverlayDetailsTable(props: OverlayDetailsTableProps) {
   const { waterRightsInfoList } = props;
 
+  const rows = (waterRightsInfoList ?? []).map((entry) => ({
+    id: entry.waDEOverlayUuid,
+    ...entry,
+  }));
+
+  const columns: GridColDef[] = [
+    { field: 'waDEOverlayUuid', headerName: 'WaDE Overlay UUID', flex: 1, sortable: true },
+    { field: 'overlayNativeID', headerName: 'Overlay Native ID', flex: 1, sortable: true },
+    { field: 'overlayName', headerName: 'Overlay Name', flex: 1, sortable: true },
+    { field: 'overlayType', headerName: 'Overlay Type', flex: 1, sortable: true },
+    { field: 'waterSourceType', headerName: 'Water Source Type', flex: 1, sortable: true },
+    { field: 'overlayStatus', headerName: 'Overlay Status', flex: 1, sortable: true },
+    {
+      field: 'statuteLink',
+      headerName: 'Statute Link',
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => {
+        const link = params.value as string;
+        return link ? (
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            Link
+          </a>
+        ) : (
+          '-'
+        );
+      },
+    },
+    {
+      field: 'statutoryEffectiveDate',
+      headerName: 'Statutory Effective Date',
+      flex: 1,
+      sortable: true,
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        return new Date(value as string).toLocaleDateString();
+      },
+    },
+    {
+      field: 'statutoryEndDate',
+      headerName: 'Statutory End Date',
+      flex: 1,
+      sortable: true,
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        return new Date(value as string).toLocaleDateString();
+      },
+    },
+    {
+      field: 'overlayStatusDesc',
+      headerName: 'Overlay Statute Description',
+      flex: 2,
+      sortable: false,
+    },
+  ];
+
   return (
-    <Table hover>
-      <thead>
-        <tr>
-          <th>WaDE Overlay UUID</th>
-          <th>Overlay Native ID</th>
-          <th>Overlay Name</th>
-          <th>Overlay Type</th>
-          <th>Water Source Type</th>
-          <th>Overlay Status</th>
-          <th>Statute Link</th>
-          <th>Statutory Effective Date</th>
-          <th>Statutory End Date</th>
-          <th>Overlay Statue Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        {(waterRightsInfoList?.length ?? 0) === 0 && (
-          <tr>
-            <td colSpan={10} className="text-center">
-              No data available
-            </td>
-          </tr>
-        )}
-        {waterRightsInfoList?.map((entry) => (
-          <tr key={entry.waDEOverlayUuid}>
-            <td>{entry.waDEOverlayUuid}</td>
-            <td>{entry.overlayNativeID}</td>
-            <td>{entry.overlayName}</td>
-            <td>{entry.overlayType}</td>
-            <td>{entry.waterSourceType}</td>
-            <td>{entry.overlayStatus}</td>
-            <td>
-              <a href={entry.statuteLink} target="_blank" rel="noopener noreferrer">
-                Link
-              </a>
-            </td>
-            <td>{entry.statutoryEffectiveDate ? new Date(entry.statutoryEffectiveDate).toLocaleDateString() : '-'}</td>
-            <td>{entry.statutoryEndDate ? new Date(entry.statutoryEndDate).toLocaleDateString() : '-'}</td>
-            <td>{entry.overlayStatusDesc}</td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <div style={{ width: '100%', height: 600 }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        disableRowSelectionOnClick
+        pageSizeOptions={[5, 10, 20]}
+        slots={{
+          toolbar: QuickSearchToolbar,
+        }}
+      />
+    </div>
   );
 }
-
-export default OverlayDetailsTable;

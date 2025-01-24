@@ -1,10 +1,34 @@
 import React from 'react';
-import { Tab, Table, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 import { FormattedDate } from '../../FormattedDate';
 import { useSiteDetailsContext } from './Provider';
 import { SiteActiveTabType } from './enums/SiteActiveTabType';
 
-function SiteTabs() {
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridToolbarContainer,
+  GridToolbarFilterButton,
+  GridToolbarQuickFilter,
+  GridToolbarExport,
+} from '@mui/x-data-grid';
+
+function QuickSearchToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarQuickFilter />
+      <GridToolbarFilterButton />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
+}
+
+function getFormattedBeneficialUses(beneficialUses: string[]): string {
+  return beneficialUses.join(', ');
+}
+
+export default function SiteTabs() {
   const {
     activeTab,
     setActiveTab,
@@ -16,154 +40,200 @@ function SiteTabs() {
     },
   } = useSiteDetailsContext();
 
-  const getFormattedBeneficialUses = (beneficialUses: string[]) => {
-    return beneficialUses.map((use) => (use !== beneficialUses[beneficialUses.length - 1] ? `${use}, ` : use));
+  const waterSourceRows = React.useMemo(() => {
+    if (!sourceInfoList) return [];
+    return sourceInfoList.map((src) => ({
+      id: src.waterSourceUuid,
+      ...src,
+    }));
+  }, [sourceInfoList]);
+
+  const waterSourceColumns: GridColDef[] = [
+    { field: 'waterSourceUuid', headerName: 'WaDE Water Source ID', flex: 1, sortable: true },
+    { field: 'waterSourceNativeId', headerName: 'Water Source Native ID', flex: 1, sortable: true },
+    { field: 'waterSourceName', headerName: 'Water Source Name', flex: 1, sortable: true },
+    { field: 'waterSourceType', headerName: 'Water Source Type', flex: 1, sortable: true },
+  ];
+
+  const waterRightRows = React.useMemo(() => {
+    if (!waterRightInfoList) return [];
+    return waterRightInfoList.map((right) => ({
+      id: right.allocationUuid,
+      ...right,
+    }));
+  }, [waterRightInfoList]);
+
+  const waterRightColumns: GridColDef[] = [
+    {
+      field: 'allocationUuid',
+      headerName: 'WaDE Water Right Identifier',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const uuid = params.value as string;
+        return (
+          <a href={`/details/right/${uuid}`} target="_blank" rel="noopener noreferrer">
+            {uuid}
+          </a>
+        );
+      },
+    },
+    { field: 'waterRightNativeId', headerName: 'Water Right Native ID', flex: 1, sortable: true },
+    { field: 'owner', headerName: 'Owner', flex: 1, sortable: true },
+    {
+      field: 'priorityDate',
+      headerName: 'Priority Date',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const dateValue = params.value as string | undefined;
+        return dateValue ? <FormattedDate>{dateValue}</FormattedDate> : '-';
+      },
+    },
+    {
+      field: 'expirationDate',
+      headerName: 'Expiration Date',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const dateValue = params.value as string | undefined;
+        return dateValue ? <FormattedDate>{dateValue}</FormattedDate> : '-';
+      },
+    },
+    { field: 'legalStatus', headerName: 'Legal Status', flex: 1, sortable: true },
+    { field: 'flow', headerName: 'Flow (CFS)', flex: 1, sortable: true },
+    { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
+    {
+      field: 'beneficialUses',
+      headerName: 'Beneficial Use',
+      flex: 2,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const uses = params.value as string[] | undefined;
+        if (!uses || uses.length === 0) return '-';
+        return getFormattedBeneficialUses(uses);
+      },
+    },
+  ];
+
+  const methodRows = React.useMemo(() => {
+    if (!methodInfoList) return [];
+    return methodInfoList.map((m) => ({
+      id: m.waDEMethodUuid,
+      ...m,
+    }));
+  }, [methodInfoList]);
+
+  const methodColumns: GridColDef[] = [
+    { field: 'waDEMethodUuid', headerName: 'WaDE Method UUID', flex: 1, sortable: true },
+    { field: 'applicationResourceType', headerName: 'Application Resource Type', flex: 1, sortable: true },
+    { field: 'methodType', headerName: 'Method Type', flex: 1, sortable: true },
+    {
+      field: 'methodUrl',
+      headerName: 'Method Link',
+      flex: 1,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const url = params.value as string | undefined;
+        return url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            Link
+          </a>
+        ) : null;
+      },
+    },
+    {
+      field: 'waDEDataMappingProcessUrl',
+      headerName: 'WaDE Data Mapping Process',
+      flex: 1,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const url = params.value as string | undefined;
+        return url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            Link
+          </a>
+        ) : null;
+      },
+    },
+    { field: 'methodDescription', headerName: 'Method Description', flex: 2, sortable: false },
+  ];
+
+  const variableRows = React.useMemo(() => {
+    if (!variableInfoList) return [];
+    return variableInfoList.map((v) => ({
+      id: v.waDEVariableUuid,
+      ...v,
+    }));
+  }, [variableInfoList]);
+
+  const variableColumns: GridColDef[] = [
+    { field: 'waDEVariableUuid', headerName: 'WaDE Variable UUID', flex: 1, sortable: true },
+    { field: 'variable', headerName: 'Variable', flex: 1, sortable: true },
+    { field: 'variableSpecificType', headerName: 'Variable Specific Type', flex: 1, sortable: true },
+    { field: 'amountUnit', headerName: 'Amount Unit', flex: 1, sortable: true },
+    { field: 'aggregationStatistic', headerName: 'Aggregation Statistic', flex: 1, sortable: true },
+    { field: 'aggregationInterval', headerName: 'Aggregation Interval', flex: 1, sortable: true },
+    { field: 'aggregationIntervalUnit', headerName: 'Aggregation Interval Unit', flex: 1, sortable: true },
+    { field: 'reportYearStartMonth', headerName: 'Report Year Start Month', flex: 1, sortable: true },
+    { field: 'reportYearType', headerName: 'Report Year Type', flex: 1, sortable: true },
+  ];
+
+  const handleSelect = (key: string | null) => {
+    setActiveTab(key ? (key as SiteActiveTabType) : SiteActiveTabType.source);
   };
 
   return (
     <>
-      <Tabs
-        onSelect={(a) => {
-          setActiveTab(a ? (a as SiteActiveTabType) : SiteActiveTabType.source);
-        }}
-        activeKey={activeTab}
-        className="mb-3 custom-tabs"
-      >
+      <Tabs onSelect={handleSelect} activeKey={activeTab} className="mb-3 custom-tabs">
         <Tab eventKey={SiteActiveTabType.source} title="Water Source Information">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Water Source ID</th>
-                <th>Water Source Native ID</th>
-                <th>Water Source Name</th>
-                <th>Water Source Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sourceInfoList?.map((source) => (
-                <tr key={source.waterSourceUuid}>
-                  <td>{source.waterSourceUuid}</td>
-                  <td>{source.waterSourceNativeId}</td>
-                  <td>{source.waterSourceName}</td>
-                  <td>{source.waterSourceType}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={waterSourceRows}
+              columns={waterSourceColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 20]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
         </Tab>
+
         <Tab eventKey={SiteActiveTabType.right} title="Water Right Information">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Water Right Identifier</th>
-                <th>Water Right Native ID</th>
-                <th>Owner</th>
-                <th>Priority Date</th>
-                <th>Expiration Date</th>
-                <th>Legal Status</th>
-                <th>Flow (CFS)</th>
-                <th>Volume (AF)</th>
-                <th>Beneficial Use</th>
-              </tr>
-            </thead>
-            <tbody>
-              {waterRightInfoList?.map((right) => (
-                <tr key={right.allocationUuid}>
-                  <td>
-                    <a href={`/details/right/${right.allocationUuid}`} target="_blank" rel="noopener noreferrer">
-                      {right.allocationUuid}
-                    </a>
-                  </td>
-                  <td>{right.waterRightNativeId}</td>
-                  <td>{right.owner}</td>
-                  <td>
-                    <FormattedDate>{right.priorityDate}</FormattedDate>
-                  </td>
-                  <td>
-                    <FormattedDate>{right.expirationDate}</FormattedDate>
-                  </td>
-                  <td>{right.legalStatus}</td>
-                  <td>{right.flow}</td>
-                  <td>{right.volume}</td>
-                  <td>{getFormattedBeneficialUses(right.beneficialUses)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={waterRightRows}
+              columns={waterRightColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 20]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
         </Tab>
+
         <Tab eventKey={SiteActiveTabType.method} title="Method Information">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Method UUID</th>
-                <th>Application Resource Type</th>
-                <th>Method Type</th>
-                <th>Method Link</th>
-                <th>WaDE Data Mapping Process</th>
-                <th>Method Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {methodInfoList?.map((method) => (
-                <tr key={method.waDEMethodUuid}>
-                  <td>{method.waDEMethodUuid}</td>
-                  <td>{method.applicationResourceType}</td>
-                  <td>{method.methodType}</td>
-                  <td>
-                    {method.methodUrl ? (
-                      <a href={method.methodUrl} target="_blank" rel="noopener noreferrer">
-                        Link
-                      </a>
-                    ) : null}
-                  </td>
-                  <td>
-                    {method.waDEDataMappingProcessUrl ? (
-                      <a href={method.waDEDataMappingProcessUrl} target="_blank" rel="noopener noreferrer">
-                        Link
-                      </a>
-                    ) : null}
-                  </td>
-                  <td>{method.methodDescription}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={methodRows}
+              columns={methodColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 20]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
         </Tab>
+
         <Tab eventKey={SiteActiveTabType.variable} title="Variable Information">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Variable UUID</th>
-                <th>Variable</th>
-                <th>Variable Specific Type</th>
-                <th>Amount Unit</th>
-                <th>Aggregation Statistic</th>
-                <th>Aggregation Interval</th>
-                <th>Aggregation Interval Unit</th>
-                <th>Report Year Start Month</th>
-                <th>Report Year Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {variableInfoList?.map((variable) => (
-                <tr key={variable.waDEVariableUuid}>
-                  <td>{variable.waDEVariableUuid}</td>
-                  <td>{variable.variable}</td>
-                  <td>{variable.variableSpecificType}</td>
-                  <td>{variable.amountUnit}</td>
-                  <td>{variable.aggregationStatistic}</td>
-                  <td>{variable.aggregationInterval}</td>
-                  <td>{variable.aggregationIntervalUnit}</td>
-                  <td>{variable.reportYearStartMonth}</td>
-                  <td>{variable.reportYearType}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={variableRows}
+              columns={variableColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 20]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
         </Tab>
       </Tabs>
     </>
   );
 }
-
-export default SiteTabs;
