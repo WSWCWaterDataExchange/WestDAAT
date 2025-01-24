@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker.Http;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
