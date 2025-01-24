@@ -73,6 +73,11 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
         {
             return config.GetSection(ConfigurationRootNames.Identity).Get<IdentityProviderConfiguration>() ?? new IdentityProviderConfiguration();
         }
+        
+        public static EnvironmentConfiguration GetEnvironmentConfiguration(this IConfiguration config)
+        {
+            return config.GetSection(ConfigurationRootNames.Environment).Get<EnvironmentConfiguration>() ?? new EnvironmentConfiguration();
+        }
 
         public static TokenCredential TokenCredential => new ChainedTokenCredential(
             new AzureCliCredential(), // When Local

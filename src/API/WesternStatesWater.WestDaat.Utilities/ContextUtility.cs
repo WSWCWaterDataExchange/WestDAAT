@@ -2,15 +2,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Helpers.Errors.Model;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Utilities;
 
-public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityProviderConfiguration identityProviderConfiguration) : IContextUtility
+public class ContextUtility(
+    IHttpContextAccessor httpContextAccessor,
+    IdentityProviderConfiguration identityProviderConfiguration,
+    EnvironmentConfiguration environmentConfiguration,
+    IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory
+) : IContextUtility
 {
     private const string ClaimNamespace = "extension_westdaat";
 
@@ -27,31 +34,6 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
         }
 
         return context;
-    }
-    
-    private static UserContext BuildUserContext(string authHeader)
-    {
-        // Example jwt claims:
-        // Note - azure b2c requires the namespace to be prefixed with "extension_"
-        //  {
-        //   "extension_westdaat_userId": "<guid>",
-        //   "extension_westdaat_roles": "rol_<role name>,rol_<role name>" // csv string
-        //   "extension_westdaat_organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
-        // }
-
-        var jwt = GetJwt(authHeader);
-        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
-        var roles = GetRoles(jwt.Claims);
-        var orgRoles = GetOrganizationRoles(jwt.Claims);
-        var externalAuthId = GetClaimValue(jwt.Claims, "sub");
-
-        return new UserContext
-        {
-            UserId = new Guid(id),
-            Roles = roles,
-            OrganizationRoles = orgRoles,
-            ExternalAuthId = externalAuthId,
-        };
     }
 
     private static JwtSecurityToken GetJwt(string authHeaderValue)
@@ -147,7 +129,87 @@ public class ContextUtility(IHttpContextAccessor httpContextAccessor, IdentityPr
 
         return (parts[0], parts[1]);
     }
-    
+
+    private static User FetchDevelopmentUser(WestDaatDatabaseContext db, string userId)
+    {
+        return db.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.UserOrganizations)
+            .ThenInclude(uo => uo.UserOrganizationRoles)
+            .SingleOrDefault(u => u.Id == new Guid(userId));
+    }
+
+    private UserContext BuildUserContext(string authHeader)
+    {
+        if (environmentConfiguration.IsDevelopment)
+        {
+            return BuildDevelopmentUserContext(authHeader);
+        }
+
+        // Example jwt claims:
+        // Note - azure b2c requires the namespace to be prefixed with "extension_"
+        //  {
+        //   "extension_westdaat_userId": "<guid>",
+        //   "extension_westdaat_roles": "rol_<role name>,rol_<role name>" // csv string
+        //   "extension_westdaat_organizationRoles": "org_<org-guid>/rol_<role name>,org_<org-guid>/rol_<role name>" // csv string
+        // }
+
+        var jwt = GetJwt(authHeader);
+        var id = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
+        var roles = GetRoles(jwt.Claims);
+        var orgRoles = GetOrganizationRoles(jwt.Claims);
+        var externalAuthId = GetClaimValue(jwt.Claims, "sub");
+
+        return new UserContext
+        {
+            UserId = new Guid(id),
+            Roles = roles,
+            OrganizationRoles = orgRoles,
+            ExternalAuthId = externalAuthId,
+        };
+    }
+
+    private UserContext BuildDevelopmentUserContext(string authHeaderValue)
+    {
+        // Obtain user id from jwt and see if the user exists locally
+        var jwt = GetJwt(authHeaderValue);
+        var userId = GetClaimValue(jwt.Claims, $"{ClaimNamespace}_userId");
+        var db = westDaatDatabaseContextFactory.Create();
+        var user = FetchDevelopmentUser(db, userId);
+
+        // Create the user if it does not exist
+        if (user == null)
+        {
+            var externalAuthId = GetClaimValue(jwt.Claims, "sub");
+            var email = GetClaimValue(jwt.Claims, "emails");
+
+            db.Users.Add(new User
+            {
+                Id = new Guid(userId),
+                ExternalAuthId = externalAuthId,
+                Email = email,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+
+            db.SaveChanges();
+            user = FetchDevelopmentUser(db, userId);
+        }
+
+        var userContext = new UserContext
+        {
+            UserId = user.Id,
+            Roles = user.UserRoles.Select(ur => ur.Role).ToArray(),
+            OrganizationRoles = user.UserOrganizations.Select(uo => new OrganizationRole
+            {
+                OrganizationId = uo.OrganizationId,
+                RoleNames = uo.UserOrganizationRoles.Select(uor => uor.Role).ToArray()
+            }).ToArray(),
+            ExternalAuthId = user.ExternalAuthId
+        };
+
+        return userContext;
+    }
+
     private ContextBase Build()
     {
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
