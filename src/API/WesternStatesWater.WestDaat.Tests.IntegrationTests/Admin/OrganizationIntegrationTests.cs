@@ -41,10 +41,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         await _dbContext.SaveChangesAsync();
 
         // Act 
-        var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(
-            new OrganizationLoadAllRequest()
-            {
-            });
+        var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(new OrganizationLoadAllRequest() { });
 
         // Assert
         response.GetType().Should().Be<OrganizationLoadAllResponse>();
@@ -72,10 +69,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         });
 
         // Act 
-        var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(
-            new OrganizationLoadAllRequest()
-            {
-            });
+        var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(new OrganizationLoadAllRequest() { });
 
         // Assert
         response.GetType().Should().Be<OrganizationLoadAllResponse>();
