@@ -22,7 +22,6 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
       type: 'Feature',
       properties: {
         isRectangle: true,
-        isInProgress: true,
       },
       geometry: {
         type: 'Polygon',
@@ -45,11 +44,7 @@ export const CustomRectangleDrawMode: DrawCustomMode = {
       state.firstPointCoords = mouseClickCoords;
     } else {
       // rectangle is done. exit rectangle drawing mode
-      setTimeout(() => {
-        state.rectangleDrawFeature!.setProperty('isInProgress', false);
-        this.map.fire('draw.create', { features: [state.rectangleDrawFeature!] });
-      }, 0);
-
+      this.map.fire('draw.create', { features: [state.rectangleDrawFeature!] });
       this.changeMode('simple_select');
     }
   },
