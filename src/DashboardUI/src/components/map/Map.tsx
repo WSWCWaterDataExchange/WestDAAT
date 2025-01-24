@@ -275,6 +275,11 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     mapConfig.layers.forEach((a) => {
       map.on('click', a.id, (e) => {
         if (e.features && e.features.length > 0) {
+          // prevent click event if one of the drawing tools are active
+          if (drawControl?.getMode().startsWith('draw')) {
+            return;
+          }
+
           setMapClickedFeatures({
             latitude: e.lngLat.lat,
             longitude: e.lngLat.lng,
