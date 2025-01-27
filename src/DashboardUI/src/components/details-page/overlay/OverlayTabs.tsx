@@ -48,7 +48,7 @@ function OverlayTabs() {
   const waterRightColumns: GridColDef[] = [
     {
       field: 'allocationUuid',
-      headerName: 'WaDE Water Right Identifier',
+      headerName: 'Allocation UUID',
       flex: 1,
       sortable: true,
       filterable: true,
