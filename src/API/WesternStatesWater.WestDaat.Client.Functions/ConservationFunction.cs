@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -20,8 +21,11 @@ public class ConservationFunction : FunctionBase
         _logger = logger;
     }
 
+    [Function(nameof(CalculateEvapotranspiration))]
+    [OpenApiOperation(nameof(CalculateEvapotranspiration))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(CalculateEvapotranspirationResponse))]
     public async Task<HttpResponseData> CalculateEvapotranspiration(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/calculateEt")],
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/calculateEt")]
         HttpRequestData req)
     {
         var calculateEtRequest = await ParseRequestBody<CalculateEvapotranspirationRequest>(req);
