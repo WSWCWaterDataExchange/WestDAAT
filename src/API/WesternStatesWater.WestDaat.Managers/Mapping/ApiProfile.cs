@@ -1,6 +1,7 @@
 using AutoMapper;
-using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Utilities;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
@@ -34,6 +35,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
+            AddConservationMappings();
         }
 
         private void AddUserMappings()
@@ -73,6 +75,22 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
+        }
+
+        private void AddConservationMappings()
+        {
+            CreateMap<(ClientContracts.Requests.Conservation.CalculateEvapotranspirationRequest Request, string PolygonWKT),
+                CommonContracts.RasterTimeSeriesPolygonRequest>()
+                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(src => GeometryHelpers.GetGeometryByWkt(src.PolygonWKT)))
+                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Request.DateRangeStart))
+                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Request.DateRangeEnd))
+                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Request.Model))
+                .ForMember(dest => dest.Interval, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesInterval.Monthly))
+                .ForMember(dest => dest.PixelReducer, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesPixelReducer.Mean))
+                .ForMember(dest => dest.ReferenceEt, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesReferenceEt.GridMET))
+                .ForMember(dest => dest.OutputUnits, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesOutputUnits.Inches))
+                .ForMember(dest => dest.Variable, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesCollectionVariable.ET))
+                .ForMember(dest => dest.OutputExtension, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesFileFormat.JSON));
         }
     }
 }
