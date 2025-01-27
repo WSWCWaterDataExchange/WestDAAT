@@ -91,6 +91,18 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.OutputUnits, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesOutputUnits.Inches))
                 .ForMember(dest => dest.Variable, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesCollectionVariable.ET))
                 .ForMember(dest => dest.OutputExtension, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesFileFormat.JSON));
+
+            CreateMap<CommonContracts.RasterTimeSeriesPolygonResponseDatapoint, CommonContracts.EvapotranspirationTimestampedDetails>()
+                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
+                .ForMember(dest => dest.Evapotranspiration, opt => opt.MapFrom(src => src.Evapotranspiration));
+
+            CreateMap<CommonContracts.RasterTimeSeriesPolygonResponse, CommonContracts.EvapotranspirationAggregateDetails>()
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data));
+
+            CreateMap<(ClientContracts.Requests.Conservation.CalculateEvapotranspirationRequest Request, CommonContracts.RasterTimeSeriesPolygonResponse[] RasterResponses),
+                CommonContracts.CalculateTotalAverageEvapotranspirationRequest>()
+                .ForMember(dest => dest.Details, opt => opt.MapFrom(src => src.RasterResponses))
+                .ForMember(dest => dest.DesiredCompensationUnits, opt => opt.MapFrom(src => src.Request.Units));
         }
     }
 }
