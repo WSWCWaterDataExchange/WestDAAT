@@ -136,6 +136,8 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.GetType().Should().Be<OrganizationLoadAllResponse>();
         response.Error.Should().BeNull();
         response.Organizations.Should().HaveCount(3);
-        response.Organizations.Should().ContainInOrder(expected);
+        response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));
+        response.Organizations[1].Should().BeEquivalentTo(expected.ElementAt(1));
+        response.Organizations[2].Should().BeEquivalentTo(expected.ElementAt(2));
     }
 }
