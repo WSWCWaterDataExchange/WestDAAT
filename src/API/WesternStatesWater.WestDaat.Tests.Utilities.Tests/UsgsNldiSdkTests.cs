@@ -260,9 +260,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]), CleanupForDisplay((int[])data[2]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]!), CleanupForDisplay((int[])data?[1]!), CleanupForDisplay((int[])data?[2]!));
             }
         }
 
@@ -277,9 +277,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]), CleanupForDisplay((int[])data[2]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]! ?? ""), CleanupForDisplay((int[])data?[1]!), CleanupForDisplay((int[])data?[2]!));
             }
         }
 
@@ -294,9 +294,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFeaturesResponse, new[] { 10, 10, 10, 10 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]!), CleanupForDisplay((int[])data?[1]!));
             }
         }
 
