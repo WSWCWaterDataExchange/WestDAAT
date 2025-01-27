@@ -23,7 +23,7 @@ public class RasterTimeSeriesPolygonRequestConverter : JsonConverter<RasterTimeS
 
         // Geometry 
         writer.WritePropertyName("geometry");
-        var convertedGeometry = ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(value.Geometry);
+        var convertedGeometry = ConvertGeometryCoordinatesToFlattenedArray(value.Geometry);
         writer.WriteStartArray();
         foreach (var coord in convertedGeometry)
         {
@@ -44,9 +44,9 @@ public class RasterTimeSeriesPolygonRequestConverter : JsonConverter<RasterTimeS
         writer.WriteEndObject();
     }
 
-    private double[] ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(NetTopologySuite.Geometries.Geometry geometry)
+    private double[] ConvertGeometryCoordinatesToFlattenedArray(NetTopologySuite.Geometries.Geometry geometry)
     {
-        return geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray();
+        return geometry.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray();
     }
 
     private string ConvertRasterTimeseriesUnits(RasterTimeSeriesOutputUnits outputUnits)
