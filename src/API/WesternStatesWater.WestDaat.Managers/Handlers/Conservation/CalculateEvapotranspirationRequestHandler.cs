@@ -32,6 +32,10 @@ public class CalculateEvapotranspirationRequestHandler : IRequestHandler<Calcula
         var calulateTotalAverageEtResponse = CalculationEngine.CalculateTotalAverageEvapotranspiration(calculateTotalAverageEtRequest);
 
         // temp
-        return new CalculateEvapotranspirationResponse();
+        return new CalculateEvapotranspirationResponse
+        {
+            AverageTotalEtInInches = calulateTotalAverageEtResponse.TotalAverageEvapotranspiration,
+        };
+
     }
 }

@@ -2,7 +2,7 @@
 {
     public class CalculateEvapotranspirationResponse : ApplicationLoadResponseBase
     {
-        public int AverageEtAcreFeet { get; set; }
+        public double AverageTotalEtInInches { get; set; }
         public int? ConservationPayment { get; set; } // dollar amount
     }
 }
