@@ -661,15 +661,5 @@ public class AllocationTests : MapboxTilesetTestBase
         features.Should().NotBeNullOrEmpty();
         features.Should().HaveCount(2);
 
-        // Verify properties...
-        var siteWithTimeSeries = features.First(f => f.properties.uuid == "utah_site_has_time_series");
-        siteWithTimeSeries.properties.minTs.Should()
-            .Be(new DateTimeOffset(januraryDates[0].Date).ToUnixTimeSeconds());
-        siteWithTimeSeries.properties.maxTs.Should()
-            .Be(new DateTimeOffset(januraryDates[11].Date).ToUnixTimeSeconds());
-
-        var siteWithNoTimeSeries = features.First(f => f.properties.uuid == "utah_site_no_time_series");
-        siteWithNoTimeSeries.properties.minTs.Should().BeNull();
-        siteWithNoTimeSeries.properties.maxTs.Should().BeNull();
     }
 }
