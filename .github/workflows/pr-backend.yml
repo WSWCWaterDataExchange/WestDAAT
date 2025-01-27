@@ -46,9 +46,53 @@ jobs:
         env:
           Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
       - uses: actions/checkout@v2
-      - name: .NET Test
+
+      # Individually run each test project to prevent deadlock.
+      - name: .NET Integration Tests
         run: dotnet test
         env:
           Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
           Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
-        working-directory: src/API
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.IntegrationTests
+
+      - name: .NET Accessor Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.AccessorTests
+
+      - name: .NET Engine Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.EngineTests
+
+      - name: .NET Function Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.FunctionTests
+    
+      - name: .NET Manager Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.ManagerTests
+
+      - name: .NET MapboxTilesetCreate Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests
+
+      - name: .NET Utilities Tests
+        run: dotnet test
+        env:
+          Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+          Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.UtilitiesTests
