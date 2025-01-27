@@ -7,11 +7,15 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 public class ApplicationIntegrationTests : IntegrationTestBase
 {
     private IApplicationManager _applicationManager;
+    private Database.EntityFramework.WestDaatDatabaseContext _dbContext;
 
     [TestInitialize]
     public void TestInitialize()
     {
         _applicationManager = Services.GetRequiredService<IApplicationManager>();
+
+        var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestDaatDatabaseContextFactory>();
+        _dbContext = dbContextFactory.Create();
     }
 
     [TestMethod]
