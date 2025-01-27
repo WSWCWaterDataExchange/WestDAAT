@@ -2,5 +2,7 @@
 
 public class CalculateTotalAverageEvapotranspirationRequest
 {
-    public RasterTimeSeriesPolygonResponseDatapoint[][] EtDataPointsGroupedByPolygon { get; set; }
+    public EvapotranspirationAggregateDetails[] Details { get; set; }
+
+    public DesiredCompensationUnits DesiredCompensationUnits { get; set; }
 }
