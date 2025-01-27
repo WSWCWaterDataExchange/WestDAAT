@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using NetTopologySuite.IO;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
-using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 
@@ -9,20 +7,11 @@ public class CalculateEvapotranspirationRequestValidator : AbstractValidator<Cal
 {
     public CalculateEvapotranspirationRequestValidator()
     {
-        RuleFor(x => x.Polygons).NotEmpty()
-            .Must(polygons => polygons.All(polygon =>
-            {
-                try
-                {
-                    GeometryHelpers.GetGeometryByWkt(polygon);
-                }
-                catch (ParseException)
-                {
-                    return false;
-                }
-
-                return true;
-            }));
+        RuleFor(x => x.Polygons).NotEmpty();
+        RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
+        {
+            polygonEntryValidator.RuleFor(polygon => polygon).NotEmpty();
+        });
 
         RuleFor(x => x.Model).NotEmpty();
 
