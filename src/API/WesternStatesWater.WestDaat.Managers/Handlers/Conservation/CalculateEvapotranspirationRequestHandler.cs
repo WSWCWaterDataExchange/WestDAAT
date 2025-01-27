@@ -1,6 +1,7 @@
 ﻿using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
+using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 
@@ -10,10 +11,13 @@ namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class CalculateEvapotranspirationRequestHandler : IRequestHandler<CalculateEvapotranspirationRequest, CalculateEvapotranspirationResponse>
 {
+    public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
 
-    public CalculateEvapotranspirationRequestHandler(IOpenEtSdk openEtSdk)
+    public CalculateEvapotranspirationRequestHandler(ICalculationEngine calculationEngine,
+        IOpenEtSdk openEtSdk)
     {
+        CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
     }
 
@@ -24,6 +28,10 @@ public class CalculateEvapotranspirationRequestHandler : IRequestHandler<Calcula
         );
         var rasterTimeSeriesPolygonResponses = await Task.WhenAll(rasterTimeSeriesPolygonRequests.Select(OpenEtSdk.RasterTimeseriesPolygon));
 
+        var calculateTotalAverageEtRequest = DtoMapper.Map<CommonContracts.CalculateTotalAverageEvapotranspirationRequest>(rasterTimeSeriesPolygonResponses);
+        var calulateTotalAverageEtResponse = CalculationEngine.CalculateTotalAverageEvapotranspiration(calculateTotalAverageEtRequest);
 
+        // temp
+        return new CalculateEvapotranspirationResponse();
     }
 }
