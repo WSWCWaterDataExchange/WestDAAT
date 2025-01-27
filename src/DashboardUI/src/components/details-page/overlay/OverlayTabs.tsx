@@ -5,6 +5,7 @@ import OverlayDetailsTable from '../OverlayDetailsTable';
 import {
   DataGrid,
   GridColDef,
+  GridRenderCellParams,
   GridToolbarContainer,
   GridToolbarExport,
   GridToolbarFilterButton,
@@ -45,7 +46,21 @@ function OverlayTabs() {
   }, [overlayInfoList]);
 
   const waterRightColumns: GridColDef[] = [
-    { field: 'allocationUuid', headerName: 'Allocation UUID', flex: 1, sortable: true },
+    {
+      field: 'allocationUuid',
+      headerName: 'WaDE Water Right Identifier',
+      flex: 1,
+      sortable: true,
+      filterable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const uuid = params.value as string;
+        return (
+          <a href={`/details/right/${uuid}`} target="_blank" rel="noopener noreferrer">
+            {uuid}
+          </a>
+        );
+      },
+    },
     { field: 'waterRightNativeId', headerName: 'Water Right Native ID', flex: 1, sortable: true },
     { field: 'owner', headerName: 'Owner', flex: 1, sortable: true },
     {
@@ -94,7 +109,6 @@ function OverlayTabs() {
         <OverlayDetailsTable waterRightsInfoList={waterRightsInfoListByReportingUnit} />
       </Tab>
 
-      {/* Second Tab (converted to Data Grid) */}
       <Tab eventKey={OverlayTab.WaterRight} title="Related Water Right Information">
         <div style={{ width: '100%', height: 600 }}>
           <DataGrid
