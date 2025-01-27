@@ -8,5 +8,5 @@ public class RasterTimeSeriesPolygonResponseDatapoint
     public DateOnly Time { get; set; }
 
     [JsonPropertyName("et")]
-    public double Evapotranspiration { get; set; }
+    public double EvapotranspirationInInches { get; set; }
 }
