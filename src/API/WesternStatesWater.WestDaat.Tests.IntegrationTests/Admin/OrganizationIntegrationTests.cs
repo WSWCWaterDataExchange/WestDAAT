@@ -3,8 +3,8 @@ using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
-using OrganizationLoadAllRequest = WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin.OrganizationLoadAllRequest;
-using OrganizationLoadAllResponse = WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin.OrganizationLoadAllResponse;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
