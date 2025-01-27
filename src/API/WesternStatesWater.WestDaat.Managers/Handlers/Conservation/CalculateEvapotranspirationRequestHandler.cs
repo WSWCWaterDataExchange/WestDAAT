@@ -28,7 +28,7 @@ public class CalculateEvapotranspirationRequestHandler : IRequestHandler<Calcula
         );
         var rasterTimeSeriesPolygonResponses = await Task.WhenAll(rasterTimeSeriesPolygonRequests.Select(OpenEtSdk.RasterTimeseriesPolygon));
 
-        var calculateTotalAverageEtRequest = DtoMapper.Map<CommonContracts.CalculateTotalAverageEvapotranspirationRequest>(rasterTimeSeriesPolygonResponses);
+        var calculateTotalAverageEtRequest = DtoMapper.Map<CommonContracts.CalculateTotalAverageEvapotranspirationRequest>((request, rasterTimeSeriesPolygonResponses));
         var calulateTotalAverageEtResponse = CalculationEngine.CalculateTotalAverageEvapotranspiration(calculateTotalAverageEtRequest);
 
         // temp
