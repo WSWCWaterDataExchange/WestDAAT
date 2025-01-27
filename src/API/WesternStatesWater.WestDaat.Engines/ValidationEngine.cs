@@ -31,6 +31,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
+            OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -38,9 +39,13 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request, ContextBase context)
+    private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
+        ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest());
+        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        {
+            Context = context
+        });
         if (!permissions.Contains(Permissions.ConservationApplicationStore))
         {
             return CreateForbiddenError(request, context);
@@ -64,6 +69,33 @@ internal class ValidationEngine : IValidationEngine
             {
                 { "Notes", ["You must cross the T's and dot the lowercase J's."] }
             });
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            OrganizationLoadAllRequest req => ValidateOrganizationLoadAllRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private ErrorBase ValidateOrganizationLoadAllRequest(OrganizationLoadAllRequest request, ContextBase context)
+    {
+        var permissionsRequest = new DTO.PermissionsGetRequest()
+        {
+            Context = context
+        };
+        
+        var permissions = _securityUtility.Get(permissionsRequest);
+        
+        if (!permissions.Contains(Permissions.OrganizationLoadAll))
+        {
+            return CreateForbiddenError(request, context);
         }
 
         return null;

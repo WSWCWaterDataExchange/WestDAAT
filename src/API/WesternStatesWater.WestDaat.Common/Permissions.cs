@@ -8,6 +8,8 @@ public static class Permissions
 
     public const string ConservationApplicationStore = "ConservationApplication_Store";
 
+    public const string OrganizationLoadAll = "Organization_Load_All";
+
     public const string UserLoad = "User_Load";
 
     public static string[] AllPermissions()

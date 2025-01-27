@@ -12,7 +12,7 @@ public class OrganizationFunction : FunctionBase
 {
     private readonly IOrganizationManager _organizationManager;
     private readonly ILogger _logger;
-    
+
     private const string RouteBase = "organizations";
 
     public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger)
@@ -20,7 +20,7 @@ public class OrganizationFunction : FunctionBase
         _organizationManager = organizationManager;
         _logger = logger;
     }
-    
+
     [Function(nameof(OrganizationSearch))]
     [OpenApiOperation(nameof(OrganizationSearch))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OrganizationLoadResponseBase))]
@@ -29,7 +29,11 @@ public class OrganizationFunction : FunctionBase
         HttpRequestData req)
     {
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
-        var results = await _organizationManager.Load<OrganizationLoadRequestBase, OrganizationLoadResponseBase>(organizationLoadRequest);
-        return await CreateResponse(req, results);
+        var result = organizationLoadRequest switch
+        {
+            OrganizationLoadAllRequest request => await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(request),
+            _ => throw new NotImplementedException($"Request type {organizationLoadRequest.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
     }
 }
