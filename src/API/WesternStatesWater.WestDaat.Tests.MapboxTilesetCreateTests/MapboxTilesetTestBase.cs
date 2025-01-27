@@ -35,6 +35,7 @@ public class MapboxTilesetTestBase
             .SetBasePath(Environment.CurrentDirectory)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
             .Build();
 
         var dbConfig = config.GetDatabaseConfiguration();
