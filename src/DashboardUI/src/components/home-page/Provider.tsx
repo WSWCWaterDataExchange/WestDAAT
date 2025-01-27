@@ -1,5 +1,5 @@
 import React, { JSX } from 'react';
-import { createContext, FC, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import * as geojson from 'geojson';
 
 interface HomePageContextState {
