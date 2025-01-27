@@ -26,7 +26,7 @@ function DetailLayout() {
             the child routes we defined above. */}
         <SiteNavbar />
         <Outlet />
-        <SiteFooter showFeedbackModal={shouldShowFeedbackModal} />
+        <SiteFooter />
       </div>
       <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
     </>

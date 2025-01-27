@@ -4,5 +4,5 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public abstract class PermissionsGetRequestBase
 {
-    public ContextBase Context { get; init; } = null!;
+    required public ContextBase Context { get; init; } = null!;
 }

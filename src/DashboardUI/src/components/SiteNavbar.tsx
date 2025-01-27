@@ -15,11 +15,9 @@ import '../styles/navbar.scss';
 import { useState } from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
-
-interface SiteNavbarProps {
-  showDownloadModal?: (show: boolean) => void;
-  showUploadModal?: (show: boolean) => void;
-}
+import { Link } from 'react-router-dom';
+import AuthorizedTemplate from './AuthorizedTemplate';
+import { Role } from '../config/role';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
   if (!msalContext) return;
@@ -28,7 +26,7 @@ function handleLogout(msalContext: IPublicClientApplication | null) {
   });
 }
 
-function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}) {
+function SiteNavbar() {
   const { instance: msalContext } = useMsal();
   const { user } = useAuthenticationContext();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -79,33 +77,13 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
         </Container>
       </Navbar>
 
-      <Navbar bg="light" className="p-0 second-nav">
-        <Container fluid className="p-0">
-          <Nav></Nav>
-
-          <div className="d-flex">
-            <div className="p-2">
-              {showDownloadModal && (
-                <Button className="ms-1" onClick={() => showDownloadModal(true)}>
-                  Download Data
-                </Button>
-              )}
-            </div>
-            <div className="p-2">
-              {showUploadModal && (
-                <Button className="ms-1" onClick={() => showUploadModal(true)}>
-                  Upload Data
-                </Button>
-              )}
-            </div>
-          </div>
-        </Container>
-      </Navbar>
-
       <Offcanvas show={showHamburgerMenu} onHide={handleClose} className="ham-menu">
         <Offcanvas.Header closeButton></Offcanvas.Header>
         <Offcanvas.Body>
           <Nav defaultActiveKey="/" className="flex-column gap(10px)">
+            <Nav.Link as={Link} to="/">
+              WestDAAT Home
+            </Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/about ">
               About
             </Nav.Link>
@@ -126,6 +104,11 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
             >
               Terms of Service
             </Nav.Link>
+            <AuthorizedTemplate roles={[Role.GlobalAdmin, Role.OrganizationAdmin]}>
+              <Nav.Link as={Link} to="/admin">
+                Admin
+              </Nav.Link>
+            </AuthorizedTemplate>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
