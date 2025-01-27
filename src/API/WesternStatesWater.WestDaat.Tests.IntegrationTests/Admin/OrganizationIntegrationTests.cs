@@ -37,7 +37,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         });
 
         var organization = new OrganizationFaker().Generate();
-        await _dbContext.Organizations.AddRangeAsync(organization);
+        await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.SaveChangesAsync();
 
         // Act 
@@ -50,9 +50,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Organizations[0].Name.Should().Be(organization.Name);
         response.Organizations[0].UserCount.Should().Be(0);
         response.Organizations[0].EmailDomain.Should().Be(organization.EmailDomain);
-
-        // Cleanup
-        _dbContext.Remove(organization);
     }
 
     [DataTestMethod]
