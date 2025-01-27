@@ -95,4 +95,4 @@ jobs:
         env:
           Database__WadeConnectionString: "Server=localhost; Initial Catalog=WaDE2; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
           Database__WestDaatConnectionString: "Server=localhost; Initial Catalog=WestDAAT; User=sa; Password=DevP@ssw0rd!; MultipleActiveResultSets=False;TrustServerCertificate=true;"
-        working-directory: src/API/WesternStatesWater.WestDaat.Tests.UtilitiesTests
+        working-directory: src/API/WesternStatesWater.WestDaat.Tests.Utilities.Tests
