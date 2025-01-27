@@ -1,8 +1,25 @@
 import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+  GridToolbarFilterButton,
+  GridToolbarExport,
+} from '@mui/x-data-grid';
 import { ActiveTabType, useWaterRightDetailsContext } from './Provider';
 import OverlayDetailsTable from '../OverlayDetailsTable';
+
+function QuickSearchToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarQuickFilter />
+      <GridToolbarFilterButton />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
+}
 
 export default function WaterRightTabs() {
   const {
@@ -63,7 +80,15 @@ export default function WaterRightTabs() {
     <Tabs onSelect={(key) => setActiveTab(key as ActiveTabType)} activeKey={activeTab} className="mb-3 custom-tabs">
       <Tab eventKey="site" title="Site Info">
         <div style={{ width: '100%', height: 600 }}>
-          <DataGrid rows={siteRows} columns={siteColumns} disableRowSelectionOnClick pageSizeOptions={[5, 10, 20]} />
+          <DataGrid
+            rows={siteRows}
+            columns={siteColumns}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+            slots={{
+              toolbar: QuickSearchToolbar,
+            }}
+          />
         </div>
       </Tab>
       <Tab eventKey="source" title="Water Source Info">
@@ -73,6 +98,9 @@ export default function WaterRightTabs() {
             columns={sourceColumns}
             disableRowSelectionOnClick
             pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+            slots={{
+              toolbar: QuickSearchToolbar,
+            }}
           />
         </div>
       </Tab>
