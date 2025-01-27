@@ -1,4 +1,4 @@
-import React, { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import * as compress from 'lz-string';
 import { IAuthenticationContext, useAuthenticationContext } from '../hooks/useAuthenticationContext';
@@ -12,7 +12,7 @@ interface AppContextState {
 }
 
 const defaultAppContextState = {
-  authenticationContext: { isAuthenticated: false, user: null },
+  authenticationContext: { isAuthenticated: false, user: null, authenticationComplete: false },
   setUrlParam: () => {},
   getUrlParam: <T,>(): T | undefined => undefined,
 };
