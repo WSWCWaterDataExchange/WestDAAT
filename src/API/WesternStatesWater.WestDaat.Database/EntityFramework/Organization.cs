@@ -9,9 +9,9 @@ public class Organization
 
     public Guid Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string EmailDomain { get; set; }
+    public string EmailDomain { get; set; } = null!;
 
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }
