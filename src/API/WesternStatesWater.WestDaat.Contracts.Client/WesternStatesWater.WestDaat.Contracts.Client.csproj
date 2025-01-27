@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.Shared\WesternStatesWater.Shared.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
+	<ProjectReference Include="..\WesternStatesWater.WestDaat.Utilities\WesternStatesWater.WestDaat.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Requests\WaterResources\" />
