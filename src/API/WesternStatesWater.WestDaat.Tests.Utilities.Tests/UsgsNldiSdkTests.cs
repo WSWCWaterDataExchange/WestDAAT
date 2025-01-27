@@ -80,12 +80,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFeatureByCoordinates_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFeatureByCoordinates_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/position?coords=POINT%28-95.5%2038.4%29")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFeatureByCoordinates(38.4, -95.5);
@@ -156,12 +156,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFlowlines_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFlowlines_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/comidvalue/navigation/UM/flowlines?distance=50")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFlowlines("comidvalue", NavigationMode.UpstreamMain, 50);
@@ -231,12 +231,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFeatures_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFeatures_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/comidvalue/navigation/UM/WQP?distance=50")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFeatures("comidvalue", NavigationMode.UpstreamMain, FeatureDataSource.EpaWaterQualitySite, 50);

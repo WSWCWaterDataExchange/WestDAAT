@@ -51,15 +51,15 @@ public class MapboxTilesetTestBase
 
 public class Maptiler<T>
 {
-    public string type { get; set; }
-    public T properties { get; set; }
+    public string type { get; set; } = null!;
+    public required T properties { get; set; }
 }
 
 public class AllocationFeatureProperties
 {
-    public string uuid { get; set; }
-    public string o { get; set; }
-    public string[] oClass { get; set; }
+    public string uuid { get; set; } = null!;
+    public string o { get; set; } = null!;
+    public string[] oClass { get; set; } = null!;
     public string[] bu { get; set; }
     public string podPou { get; set; }
     public string[] wsType { get; set; }
@@ -80,6 +80,6 @@ public class AllocationFeatureProperties
 
 public class OverlayFeatureProperties
 {
-    public string uuid { get; set; }
-    public string[] oType { get; set; }
+    public string uuid { get; set; } = null!;
+    public string[] oType { get; set; } = null!;
 }
