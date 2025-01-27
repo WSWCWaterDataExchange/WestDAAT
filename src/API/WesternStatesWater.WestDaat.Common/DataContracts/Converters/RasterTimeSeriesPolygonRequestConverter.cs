@@ -54,6 +54,7 @@ public class RasterTimeSeriesPolygonRequestConverter : JsonConverter<RasterTimeS
         return outputUnits switch
         {
             RasterTimeSeriesOutputUnits.Millimeters => "mm",
+            RasterTimeSeriesOutputUnits.Inches => "in",
             _ => throw new NotImplementedException($"Output units {outputUnits} not implemented"),
         };
     }

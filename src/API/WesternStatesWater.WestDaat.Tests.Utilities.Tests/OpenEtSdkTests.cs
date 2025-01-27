@@ -91,8 +91,10 @@ public class OpenEtSdkTests : UtilitiesTestBase
         serializedRequest.Should().Be(expectedJson);
     }
 
-    [TestMethod]
-    public async Task RasterTimeseriesPolygon_MockedApi_Success()
+    [DataTestMethod]
+    [DataRow(RasterTimeSeriesOutputUnits.Millimeters)]
+    [DataRow(RasterTimeSeriesOutputUnits.Inches)]
+    public async Task RasterTimeseriesPolygon_MockedApi_Success(RasterTimeSeriesOutputUnits outputUnits)
     {
         // Arrange
         var responseContentString = """
@@ -171,7 +173,7 @@ public class OpenEtSdkTests : UtilitiesTestBase
             PixelReducer = RasterTimeSeriesPixelReducer.Mean,
             ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
             OutputExtension = RasterTimeSeriesFileFormat.JSON,
-            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            OutputUnits = outputUnits,
             Variable = RasterTimeSeriesCollectionVariable.ET,
         };
 
