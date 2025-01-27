@@ -40,7 +40,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             var transactionOptions = new TransactionOptions
             {
-                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsolationLevel = IsolationLevel.ReadUncommitted,
                 Timeout = TransactionManager.MaximumTimeout
             };
             _transactionScopeFixture = new TransactionScope(
