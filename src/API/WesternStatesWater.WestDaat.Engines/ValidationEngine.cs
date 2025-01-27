@@ -30,6 +30,7 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
+            ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -37,6 +38,41 @@ internal class ValidationEngine : IValidationEngine
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
+    }
+
+    private async Task<ErrorBase> ValidateApplicationLoadRequest(ApplicationLoadRequestBase request,
+        ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        {
+            Context = context
+        });
+        if (!permissions.Contains(Permissions.ConservationApplicationLoad))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // If the resources required to fulfill the request are not accessible to the user, or they do not exist.
+        var application = await Task.FromResult(1);
+        if (application is 2)
+        {
+            return CreateNotFoundError(
+                context,
+                "Conservation Application",
+                Guid.NewGuid()
+            );
+        }
+
+        // If there is additional business logic validation that the request doesn't pass.
+        if (permissions.Length == 3)
+        {
+            return new ValidationError(new Dictionary<string, string[]>
+            {
+                { "Notes", ["You must cross the T's and dot the lowercase J's."] }
+            });
+        }
+
+        return null;
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
@@ -90,9 +126,9 @@ internal class ValidationEngine : IValidationEngine
         {
             Context = context
         };
-        
+
         var permissions = _securityUtility.Get(permissionsRequest);
-        
+
         if (!permissions.Contains(Permissions.OrganizationLoadAll))
         {
             return CreateForbiddenError(request, context);
