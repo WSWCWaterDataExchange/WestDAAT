@@ -19,11 +19,6 @@ import { Link } from 'react-router-dom';
 import AuthorizedTemplate from './AuthorizedTemplate';
 import { Role } from '../config/role';
 
-interface SiteNavbarProps {
-  showDownloadModal?: (show: boolean) => void;
-  showUploadModal?: (show: boolean) => void;
-}
-
 function handleLogout(msalContext: IPublicClientApplication | null) {
   if (!msalContext) return;
   msalContext.logoutPopup().catch((e) => {
@@ -31,7 +26,7 @@ function handleLogout(msalContext: IPublicClientApplication | null) {
   });
 }
 
-function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}) {
+function SiteNavbar() {
   const { instance: msalContext } = useMsal();
   const { user } = useAuthenticationContext();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -79,29 +74,6 @@ function SiteNavbar({ showDownloadModal, showUploadModal }: SiteNavbarProps = {}
               </NavDropdown>
             </AuthenticatedTemplate>
           </Nav>
-        </Container>
-      </Navbar>
-
-      <Navbar bg="light" className="p-0 second-nav">
-        <Container fluid className="p-0">
-          <Nav></Nav>
-
-          <div className="d-flex">
-            <div className="p-2">
-              {showDownloadModal && (
-                <Button className="ms-1" onClick={() => showDownloadModal(true)}>
-                  Download Data
-                </Button>
-              )}
-            </div>
-            <div className="p-2">
-              {showUploadModal && (
-                <Button className="ms-1" onClick={() => showUploadModal(true)}>
-                  Upload Data
-                </Button>
-              )}
-            </div>
-          </div>
         </Container>
       </Navbar>
 

@@ -20,6 +20,9 @@ import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 import SiteDetailsPage from './pages/SiteDetailsPage';
 import OverlayDetailsPage from './pages/OverlayDetailsPage';
 import { clarity } from 'clarity-js';
+import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
+import { AdminGuard } from './pages/admin/AdminGuard';
+import { AdminLayout } from './pages/admin/AdminLayout';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -80,6 +83,12 @@ function App({ msalInstance }: AppProps) {
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
+                </Route>
+                <Route path="admin" element={<AdminGuard />}>
+                  <Route element={<AdminLayout />}>
+                    <Route index element={<AdminOrganizationsPage />} />
+                    <Route path="organizations" element={<AdminOrganizationsPage />} />
+                  </Route>
                 </Route>
               </Route>
             </Routes>
