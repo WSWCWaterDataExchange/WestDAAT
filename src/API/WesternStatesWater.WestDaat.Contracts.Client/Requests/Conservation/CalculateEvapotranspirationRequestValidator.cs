@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
+namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 public class CalculateEvapotranspirationRequestValidator : AbstractValidator<CalculateEvapotranspirationRequest>
 {
