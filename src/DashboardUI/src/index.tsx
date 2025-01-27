@@ -14,10 +14,7 @@ if (accounts.length > 0) {
 }
 
 msalInstance.addEventCallback((event: EventMessage) => {
-  if (
-    (event.eventType === EventType.LOGIN_SUCCESS || event.eventType === EventType.ACQUIRE_TOKEN_SUCCESS) &&
-    event.payload
-  ) {
+  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
     const payload = event.payload as AuthenticationResult;
     const account = payload.account;
     msalInstance.setActiveAccount(account);
