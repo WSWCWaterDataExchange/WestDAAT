@@ -10,7 +10,7 @@ CREATE TABLE WaterConservationApplications
 );
 
 CREATE INDEX IX_WaterConservationApplications_ApplicantUserId ON WaterConservationApplications(ApplicantUserId);
-CREATE INDEX IX_WaterConservationApplications_FundingOrganizationId ON WaterConservationApplications(OrganizationId);
+CREATE INDEX IX_WaterConservationApplications_FundingOrganizationId ON WaterConservationApplications(FundingOrganizationId);
 
 CREATE TABLE WaterConservationApplicationSubmissions
 (
