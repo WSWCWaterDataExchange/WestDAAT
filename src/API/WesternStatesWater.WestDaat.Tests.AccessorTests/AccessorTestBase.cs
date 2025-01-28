@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Transactions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -13,13 +14,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         static AccessorTestBase()
         {
             Configuration = new ConfigurationBuilder()
-                                        .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
-                                        .AddInMemoryCollection(DefaultTestConfiguration)
-                                        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
-                                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-                                        .AddEnvironmentVariables()
-                                        .Build();
+                .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
@@ -70,6 +71,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         internal IDatabaseContextFactory CreateDatabaseContextFactory()
         {
             return new DatabaseContextFactory(Configuration.GetDatabaseConfiguration());
+        }
+
+        internal IWestDaatDatabaseContextFactory CreateWestDaatDatabaseContextFactory()
+        {
+            return new WestDaatDatabaseContextFactory(Configuration.GetDatabaseConfiguration());
         }
 
         internal PerformanceConfiguration CreatePerformanceConfiguration()

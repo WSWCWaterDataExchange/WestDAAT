@@ -25,7 +25,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _organizationManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task Load_OrganizationLoadAllRequest_GlobalAdminUser_Success()
+    public async Task Load_OrganizationLoadAllRequest_GlobalAdminUser_ShouldReturnAscendingOrder()
     {
         // Arrange
         UseUserContext(new UserContext
@@ -36,20 +36,52 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        var organization = new OrganizationFaker().Generate();
-        await _dbContext.Organizations.AddAsync(organization);
+        var organizations = new OrganizationFaker().Generate(3);
+        var users = new UserFaker().Generate(3);
+        var userOrgOne = new UserOrganizationFaker(users[0], organizations[0]).Generate();
+        var userOrgTwo = new UserOrganizationFaker(users[0], organizations[1]).Generate();
+        var userOrgThree = new UserOrganizationFaker(users[1], organizations[1]).Generate();
+
+        await _dbContext.Organizations.AddRangeAsync(organizations);
+        await _dbContext.Users.AddRangeAsync(users);
+        await _dbContext.UserOrganizations.AddRangeAsync([userOrgOne, userOrgTwo, userOrgThree]);
         await _dbContext.SaveChangesAsync();
 
         // Act 
         var response = await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(new OrganizationLoadAllRequest() { });
 
         // Assert
+        var expected = new List<CLI.OrganizationListItem>()
+        {
+            new CLI.OrganizationListItem()
+            {
+                OrganizationId = organizations[0].Id,
+                Name = organizations[0].Name,
+                UserCount = 1,
+                EmailDomain = organizations[0].EmailDomain
+            },
+            new CLI.OrganizationListItem()
+            {
+                OrganizationId = organizations[1].Id,
+                Name = organizations[1].Name,
+                UserCount = 2,
+                EmailDomain = organizations[1].EmailDomain
+            },
+            new CLI.OrganizationListItem()
+            {
+                OrganizationId = organizations[2].Id,
+                Name = organizations[2].Name,
+                UserCount = 0,
+                EmailDomain = organizations[2].EmailDomain
+            }
+        }.OrderBy(org => org.Name);
+
         response.GetType().Should().Be<OrganizationLoadAllResponse>();
         response.Error.Should().BeNull();
-        response.Organizations.Should().HaveCount(1);
-        response.Organizations[0].Name.Should().Be("organization1");
-        response.Organizations[0].UserCount.Should().Be(1);
-        response.Organizations[0].EmailDomain.Should().Be("organization1.com");
+        response.Organizations.Should().HaveCount(3);
+        response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));
+        response.Organizations[1].Should().BeEquivalentTo(expected.ElementAt(1));
+        response.Organizations[2].Should().BeEquivalentTo(expected.ElementAt(2));
     }
 
     [DataTestMethod]
