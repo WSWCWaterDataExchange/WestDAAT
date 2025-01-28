@@ -13,7 +13,7 @@ public class OrganizationAccessorTests : AccessorTestBase
     {
         _organizationAccessor = new OrganizationAccessor(
             CreateLogger<OrganizationAccessor>(),
-            CreateDatabaseContextFactory()
+            CreateWestDaatDatabaseContextFactory()
         );
     }
 

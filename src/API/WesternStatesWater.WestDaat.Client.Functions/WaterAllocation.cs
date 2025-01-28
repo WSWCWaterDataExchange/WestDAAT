@@ -330,11 +330,11 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             {
                 await _waterResourceManager.WaterRightsAsZip(ms, searchRequest);
             }
-            catch (WestDaatException wex)
+            catch (WestDaatException)
             {
                 request.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 request.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 throw;

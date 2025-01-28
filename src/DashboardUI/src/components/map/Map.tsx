@@ -30,9 +30,11 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
-import { CustomDirectSelectMode } from './CustomDirectSelectMode';
+import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 
 import './map.scss';
+import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
+import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -130,6 +132,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
         ...MapboxDraw.modes,
         direct_select: CustomDirectSelectMode,
         draw_circle: CustomCircleDrawMode,
+        draw_rectangle: CustomRectangleDrawMode,
       },
     });
 
@@ -197,6 +200,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
       const dc = mapboxDrawControl(mapInstance);
       mapInstance.addControl(new CustomCircleDrawModeControl(dc));
+      mapInstance.addControl(new CustomRectangleDrawModeControl(dc));
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
@@ -271,6 +275,11 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     mapConfig.layers.forEach((a) => {
       map.on('click', a.id, (e) => {
         if (e.features && e.features.length > 0) {
+          // prevent click event if one of the drawing tools are active
+          if (drawControl?.getMode().startsWith('draw')) {
+            return;
+          }
+
           setMapClickedFeatures({
             latitude: e.lngLat.lat,
             longitude: e.lngLat.lng,

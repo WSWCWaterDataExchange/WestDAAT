@@ -165,7 +165,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .Returns(new IdentityProviderContext());
         }
 
-        protected void UseUserContext(UserContext? context = null)
+        protected void UseUserContext(UserContext context = null)
         {
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())

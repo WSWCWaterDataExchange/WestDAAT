@@ -165,7 +165,7 @@ public static class MapboxTileset
             Directory.Delete(Path.Combine(geoJsonDirectoryPath, "Allocations"), true);
         }
     }
-    
+
     internal static async Task CreateTimeSeries(DatabaseContext db, string geoJsonDirectoryPath)
     {
         var tempPointsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points"));
@@ -303,6 +303,7 @@ public static class MapboxTileset
             };
 
             var geometry = overlay.Geometry.AsGeoJsonGeometry();
+
             var feature = new Feature(geometry, properties);
 
             switch (geometry.Type)
@@ -317,11 +318,13 @@ public static class MapboxTileset
             }
         });
 
+
         if (polygonFeatures.Count > 0)
         {
             Console.WriteLine("Creating overlays polygons file...");
             await WriteFeatures(polygonFeatures, Path.Combine(geoJsonDirectoryPath, "Overlays.Polygons.geojson"));
         }
+
 
         if (unknownFeatures.Count > 0)
         {

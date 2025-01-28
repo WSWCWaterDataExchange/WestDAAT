@@ -35,6 +35,7 @@ public class MapboxTilesetTestBase
             .SetBasePath(Environment.CurrentDirectory)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
             .Build();
 
         var dbConfig = config.GetDatabaseConfiguration();
@@ -51,15 +52,15 @@ public class MapboxTilesetTestBase
 
 public class Maptiler<T>
 {
-    public string type { get; set; }
-    public T properties { get; set; }
+    public string type { get; set; } = null!;
+    public required T properties { get; set; }
 }
 
 public class AllocationFeatureProperties
 {
-    public string uuid { get; set; }
-    public string o { get; set; }
-    public string[] oClass { get; set; }
+    public string uuid { get; set; } = null!;
+    public string o { get; set; } = null!;
+    public string[] oClass { get; set; } = null!;
     public string[] bu { get; set; }
     public string podPou { get; set; }
     public string[] wsType { get; set; }
@@ -74,12 +75,10 @@ public class AllocationFeatureProperties
     public double? maxVol { get; set; }
     public long? minPri { get; set; }
     public long? maxPri { get; set; }
-    public long? minTs { get; set; }
-    public long? maxTs { get; set; }
 }
 
 public class OverlayFeatureProperties
 {
-    public string uuid { get; set; }
-    public string[] oType { get; set; }
+    public string uuid { get; set; } = null!;
+    public string[] oType { get; set; } = null!;
 }
