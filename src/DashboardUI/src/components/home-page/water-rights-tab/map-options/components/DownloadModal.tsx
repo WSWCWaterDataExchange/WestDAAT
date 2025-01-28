@@ -9,7 +9,7 @@ import { WaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider'
 import { ProgressBar } from 'react-bootstrap';
 import { useWaterRightsDownload } from '../../../../../hooks/queries';
 import { useHomePageContext } from '../../../Provider';
-import { useWaterRightsSearchCriteriaWithoutContext } from "../hooks/useWaterRightsSearchCriteria";
+import { useWaterRightsSearchCriteriaWithoutContext } from '../hooks/useWaterRightsSearchCriteria';
 
 function DownloadWaterRights(props: {
   searchCriteria: WaterRightsSearchCriteriaWithFilterUrl | null;

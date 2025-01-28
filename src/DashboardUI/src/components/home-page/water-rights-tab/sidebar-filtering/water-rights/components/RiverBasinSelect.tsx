@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { MultiValue } from 'react-select';
 import Select from 'react-select';
 import { useWaterRightsContext } from '../../WaterRightsProvider';
-import { useRiverBasinFilter } from "../hooks/useRiverBasinFilter";
+import { useRiverBasinFilter } from '../hooks/useRiverBasinFilter';
 
 export function RiverBasinSelect() {
   const { riverBasinNames, setRiverBasinNames } = useRiverBasinFilter();

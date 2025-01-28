@@ -10,9 +10,9 @@ public class User
 
     public Guid Id { get; set; }
 
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
-    public string ExternalAuthId { get; set; }
+    public string ExternalAuthId { get; set; } = null!;
 
     public DateTimeOffset CreatedAt { get; set; }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDebounceCallback } from '@react-hook/debounce';
 import NumericRange from '../../../../../NumericRange';
-import { useFlowFilters } from "../../water-rights/hooks/useFlowFilters";
+import { useFlowFilters } from '../../water-rights/hooks/useFlowFilters';
 
 const minControlProps = {
   placeholder: 'Min Flow',

@@ -6,23 +6,26 @@ import TableView from '../../../TableView';
 import { useWaterRightsContext, WaterRightsProvider } from '../../sidebar-filtering/WaterRightsProvider';
 import SideBar from '../../sidebar-filtering/SideBar';
 import Map from '../../../../map/Map';
-import { useDisplayOptions} from "../hooks/useDisplayOptions";
-import { useFilters} from "../../sidebar-filtering/useFilters";
+import { useDisplayOptions } from '../hooks/useDisplayOptions';
+import { useFilters } from '../../sidebar-filtering/useFilters';
 import { useMapUrlParameters } from '../../../hooks/useMapUrlParameters';
-import { usePolylinesFilter} from "../hooks/usePolylinesFilter";
+import { usePolylinesFilter } from '../hooks/usePolylinesFilter';
 import DownloadModal from './DownloadModal';
 import UploadModal from './UploadModal';
 import { useEffect } from 'react';
 import { useHomePageContext } from '../../../Provider';
-import { useMapFitRequested} from "../hooks/useMapFitRequested";
-import {OverlaysProvider} from "../../sidebar-filtering/OverlaysProvider";
+import { useMapFitRequested } from '../hooks/useMapFitRequested';
+import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
+import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
 
 export function WaterRightsTab() {
   return (
     <MapProvider>
       <WaterRightsProvider>
         <OverlaysProvider>
-        <WaterRightsLayout />
+          <TimeSeriesProvider>
+            <WaterRightsLayout />
+          </TimeSeriesProvider>
         </OverlaysProvider>
       </WaterRightsProvider>
     </MapProvider>

@@ -10,14 +10,21 @@ interface OverlayDigestCardProps {
 }
 
 function OverlayDigestCard({ overlay, onClosePopup }: OverlayDigestCardProps) {
-  const { waDeAreaReportingUuid, reportingAreaNativeId, reportingAreaName, waDeOverlayAreaType, nativeOverlayAreaType } = overlay;
+  const {
+    waDeAreaReportingUuid,
+    reportingAreaNativeId,
+    reportingAreaName,
+    waDeOverlayAreaType,
+    nativeOverlayAreaType,
+  } = overlay;
 
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
         header: (
           <div>
-            <strong> Overlay ID: </strong>{waDeAreaReportingUuid}
+            <strong> Overlay ID: </strong>
+            {waDeAreaReportingUuid}
           </div>
         ),
         body: (
