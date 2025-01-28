@@ -38,27 +38,26 @@ export function useAuthenticationContext(): IAuthenticationContext {
     isAuthenticated: false,
     user: null,
   });
-  const { inProgress } = useMsal();
+  const { inProgress, instance: msalContext } = useMsal();
   const activeAccount = useAccount() ?? undefined;
   const isAuthenticated = useIsAuthenticated(activeAccount);
-
-  const { result } = useMsalAuthentication(InteractionType.Silent, loginRequest);
 
   const authenticationComplete = inProgress === InteractionStatus.None;
 
   useEffect(() => {
     if (isAuthenticated && inProgress !== InteractionStatus.Startup) {
-      const idTokenClaims = result?.account?.idTokenClaims;
-
-      setAuthContext({
-        isAuthenticated,
-        authenticationComplete,
-        user: {
-          emailAddress: result?.account?.username ?? null,
-          externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
-          roles: parseRoles(idTokenClaims),
-          organizationRoles: parseOrganizationRoles(idTokenClaims),
-        },
+      msalContext.acquireTokenSilent(loginRequest).then((result) => {
+        const idTokenClaims = result?.account?.idTokenClaims;
+        setAuthContext({
+          isAuthenticated,
+          authenticationComplete,
+          user: {
+            emailAddress: result?.account?.username ?? null,
+            externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
+            roles: parseRoles(idTokenClaims),
+            organizationRoles: parseOrganizationRoles(idTokenClaims),
+          },
+        });
       });
     } else {
       setAuthContext({
@@ -72,7 +71,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
       ...prev,
       authenticationComplete: inProgress === InteractionStatus.None,
     }));
-  }, [result, isAuthenticated, inProgress]);
+  }, [isAuthenticated, inProgress]);
 
   return authContext;
 }
