@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         {
             var transactionOptions = new TransactionOptions
             {
-                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsolationLevel = IsolationLevel.Serializable, // Serializable needed for service bus
                 Timeout = TransactionManager.MaximumTimeout
             };
 
@@ -56,7 +56,7 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 transactionOptions,
                 TransactionScopeAsyncFlowOption.Enabled
             );
-            
+
             Services = new ServiceCollection()
                 .AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>()
                 .AddTransient(_ => Configuration.GetDatabaseConfiguration())
