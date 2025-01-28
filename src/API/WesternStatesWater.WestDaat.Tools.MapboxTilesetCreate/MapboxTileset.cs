@@ -90,10 +90,6 @@ public static class MapboxTileset
                         properties.Add("minPri", GetUnixTime(site.MinPriorityDate.Value)!.Value);
                     if (site.MaxPriorityDate.HasValue)
                         properties.Add("maxPri", GetUnixTime(site.MaxPriorityDate.Value)!.Value);
-                    if (site.StartDate.HasValue)
-                        properties.Add("minTs", GetUnixTime(site.StartDate.Value)!.Value);
-                    if (site.EndDate.HasValue)
-                        properties.Add("maxTs", GetUnixTime(site.EndDate.Value)!.Value);
                     var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
 
                     var feature = new Feature(geometry, properties);

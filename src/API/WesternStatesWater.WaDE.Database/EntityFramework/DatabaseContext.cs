@@ -583,8 +583,6 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
                 entity.Property(e => e.MaxAfVolume).HasColumnName("maxAfVolume");
                 entity.Property(e => e.MinPriorityDate).HasColumnName("minPriorityDate");
                 entity.Property(e => e.MaxPriorityDate).HasColumnName("maxPriorityDate");
-                entity.Property(e=> e.StartDate).HasColumnName("startDate");
-                entity.Property(e=> e.EndDate).HasColumnName("endDate");
                 entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
                 entity.Property(e => e.Point).HasColumnType("point").HasColumnName("point");
             });

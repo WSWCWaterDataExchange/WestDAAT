@@ -1,45 +1,43 @@
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
-namespace WesternStatesWater.WestDaat.Accessors;
-
-internal class OrganizationAccessor : AccessorBase, IOrganizationAccessor
+namespace WesternStatesWater.WestDaat.Accessors
 {
-    public OrganizationAccessor(ILogger<OrganizationAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
+    internal class OrganizationAccessor : AccessorBase, IOrganizationAccessor
     {
-        _databaseContextFactory = databaseContextFactory;
-    }
-    
-    private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+        private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-    public async Task<OrganizationLoadResponseBase> Load(OrganizationLoadRequestBase request)
-    {
-        return request switch
+        public OrganizationAccessor(ILogger<OrganizationAccessor> logger, EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
         {
-            OrganizationLoadAllRequest req => await GetAllOrganizations(req),
-            _ => throw new NotImplementedException(
-                $"Handling of request type '{request.GetType().Name}' is not implemented.")
-        };
-    }
+            _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
+        }
 
-    private async Task<OrganizationLoadAllResponse> GetAllOrganizations(OrganizationLoadAllRequest request)
-    {
-        // temporary implementation
-        await Task.CompletedTask;
-        var organizations = new OrganizationListItem[]
+        public async Task<OrganizationLoadResponseBase> Load(OrganizationLoadRequestBase request)
         {
-            new OrganizationListItem()
+            return request switch
             {
-                OrganizationId = Guid.NewGuid(),
-                Name = "organization1",
-                UserCount = 1,
-                EmailDomain = "organization1.com",
-            },
-        };
-        
-        return new OrganizationLoadAllResponse()
+                OrganizationLoadAllRequest => await GetAllOrganizations(),
+                _ => throw new NotImplementedException(
+                    $"Handling of request type '{request.GetType().Name}' is not implemented.")
+            };
+        }
+
+        private async Task<OrganizationLoadAllResponse> GetAllOrganizations()
         {
-            Organizations = organizations
-        };
+            await using var db = _westDaatDatabaseContextFactory.Create();
+
+            var organizations = await db.Organizations
+                .ProjectTo<OrganizationListItem>(DtoMapper.Configuration)
+                .OrderBy(org => org.Name)
+                .ToListAsync();
+
+            return new OrganizationLoadAllResponse()
+            {
+                Organizations = organizations.ToArray()
+            };
+        }
     }
 }
