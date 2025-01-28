@@ -4,25 +4,8 @@ import { FormattedDate } from '../../FormattedDate';
 import { useSiteDetailsContext } from './Provider';
 import { SiteActiveTabType } from './enums/SiteActiveTabType';
 
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridToolbarContainer,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-  GridToolbarExport,
-} from '@mui/x-data-grid';
-
-function QuickSearchToolbar() {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarQuickFilter />
-      <GridToolbarFilterButton />
-      <GridToolbarExport />
-    </GridToolbarContainer>
-  );
-}
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import QuickSearchToolbar from '../../QuickSearchToolbar';
 
 function getFormattedBeneficialUses(beneficialUses: string[]): string {
   return beneficialUses.join(', ');

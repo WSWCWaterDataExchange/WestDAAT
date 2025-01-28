@@ -32,8 +32,6 @@
   "dependencies": {
     "@azure/msal-browser": "^3.28.0",
     "@azure/msal-react": "^2.2.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-geocoder": "^5.0.0",
     "@mdi/js": "^6.5.95",

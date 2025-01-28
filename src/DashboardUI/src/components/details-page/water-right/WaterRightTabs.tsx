@@ -1,25 +1,9 @@
 import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridToolbarFilterButton,
-  GridToolbarExport,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ActiveTabType, useWaterRightDetailsContext } from './Provider';
 import OverlayDetailsTable from '../OverlayDetailsTable';
-
-function QuickSearchToolbar() {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarQuickFilter />
-      <GridToolbarFilterButton />
-      <GridToolbarExport />
-    </GridToolbarContainer>
-  );
-}
+import QuickSearchToolbar from '../../QuickSearchToolbar';
 
 export default function WaterRightTabs() {
   const {

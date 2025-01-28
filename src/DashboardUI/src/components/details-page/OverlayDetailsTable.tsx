@@ -1,24 +1,7 @@
 import React from 'react';
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridToolbarFilterButton,
-  GridToolbarExport,
-} from '@mui/x-data-grid';
+import QuickSearchToolbar from '../QuickSearchToolbar';
 import { WaterRightsInfoListItem } from '../../data-contracts';
-
-function QuickSearchToolbar() {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarQuickFilter />
-      <GridToolbarFilterButton />
-      <GridToolbarExport />
-    </GridToolbarContainer>
-  );
-}
-
+import { GridColDef, DataGrid } from '@mui/x-data-grid';
 interface OverlayDetailsTableProps {
   waterRightsInfoList: WaterRightsInfoListItem[] | undefined;
 }

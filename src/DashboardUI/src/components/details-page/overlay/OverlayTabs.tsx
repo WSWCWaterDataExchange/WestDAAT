@@ -2,29 +2,12 @@ import React from 'react';
 import { Tabs, Tab } from 'react-bootstrap';
 import { useOverlayDetailsContext } from './Provider';
 import OverlayDetailsTable from '../OverlayDetailsTable';
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridToolbarContainer,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import QuickSearchToolbar from '../../QuickSearchToolbar';
 
 export enum OverlayTab {
   Admin = 'overlay',
   WaterRight = 'right',
-}
-
-function QuickSearchToolbar() {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarQuickFilter />
-      <GridToolbarFilterButton />
-      <GridToolbarExport />
-    </GridToolbarContainer>
-  );
 }
 
 function OverlayTabs() {
