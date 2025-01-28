@@ -21,7 +21,7 @@ public class WaterConservationApplication
 
     public string WaterRightNativeId { get; set; }
 
-    public Guid OrganizationId { get; set; }
+    public Guid FundingOrganizationId { get; set; }
 
     public DateTimeOffset? AcceptedDate { get; set; }
 
@@ -29,5 +29,5 @@ public class WaterConservationApplication
 
     public virtual User ApplicantUser { get; set; }
 
-    public virtual Organization Organization { get; set; }
+    public virtual Organization FundingOrganization { get; set; }
 }

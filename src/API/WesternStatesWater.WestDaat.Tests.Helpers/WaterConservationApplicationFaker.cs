@@ -21,7 +21,7 @@ public class WaterConservationApplicationFaker : Faker<EFWD.WaterConservationApp
 
         if (organization != null)
         {
-            RuleFor(wca => wca.Organization, () => organization);
+            RuleFor(wca => wca.FundingOrganization, () => organization);
         }
     }
 }
