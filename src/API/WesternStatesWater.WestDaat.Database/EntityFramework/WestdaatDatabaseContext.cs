@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Database.EntityFramework
@@ -84,5 +84,7 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
         public virtual DbSet<UserOrganization> UserOrganizations { get; set; }
         public virtual DbSet<UserOrganizationRole> UserOrganizationRoles { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<WaterConservationApplication> WaterConservationApplications { get; set; }
+        public virtual DbSet<WaterConservationApplicationSubmission> WaterConservationApplicationSubmissions { get; set; }
     }
 }

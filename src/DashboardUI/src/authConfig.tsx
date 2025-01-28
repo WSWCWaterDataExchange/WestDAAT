@@ -15,7 +15,7 @@ export const msalConfig: Configuration = {
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest = {
-  scopes: ['openid'],
+  scopes: ['openid', 'offline_access', process.env.REACT_APP_AUTH_CLIENT_ID ?? ''],
 };
 
 // Add the endpoints here for Microsoft Graph API services you'd like to use.
