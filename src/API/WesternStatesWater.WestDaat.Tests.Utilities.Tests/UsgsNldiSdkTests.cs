@@ -10,7 +10,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 {
     [TestClass]
-    public class UsgsNldiSdkTests : UtilitiesTestBase
+    public class UsgsNldiSdkTests : UtilityTestBase
     {
         [DataTestMethod]
         [DataRow(38.4, 95.5, "coords=POINT%2895.5%2038.4%29")]
