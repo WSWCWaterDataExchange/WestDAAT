@@ -6,6 +6,7 @@ import { bearing } from '@turf/bearing';
 import { destination } from '@turf/destination';
 import { Marker } from 'mapbox-gl';
 import { handleDragRectangleRotationMarker } from './CustomDirectSelectModeDragHelpers';
+import { mdiRotateRight } from '@mdi/js';
 
 export const handleSetupCircle = (state: CustomDirectSelectModeState) => {
   state.customState.circleState.circleCenterPointLngLat = center(state.feature!).geometry.coordinates as [
@@ -47,7 +48,7 @@ const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, stat
 
   const rotationMarkers = rotationMarkerPositions.map((position) => {
     return new Marker({
-      color: 'red',
+      element: createMarkerHtmlElement(),
     })
       .setLngLat({ lng: position[0], lat: position[1] })
       .setDraggable(true)
@@ -65,6 +66,26 @@ const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, stat
     rotationMarkers,
     rotationMarkerPositions,
   };
+};
+
+const createMarkerHtmlElement = (): HTMLDivElement => {
+  const widthPx = 20,
+    heightPx = 20;
+
+  const svgTag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${widthPx} ${heightPx}"><path d="${mdiRotateRight}"/></svg>`;
+
+  const div = document.createElement('div');
+  div.className = 'marker';
+  div.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svgTag)}")`;
+  div.style.backgroundSize = '100%';
+  div.style.width = `${widthPx}px`;
+  div.style.height = `${heightPx}px`;
+  div.style.display = 'block';
+  div.style.border = 'none';
+  div.style.borderRadius = '50%';
+  div.style.cursor = 'pointer';
+  div.style.padding = '0';
+  return div;
 };
 
 const getAllMapGeoJsonFeatures = (map: mapboxgl.Map): Feature<Geometry, GeoJsonProperties>[] => {
