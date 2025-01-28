@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         {
             Configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
-                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration!)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddUserSecrets(Assembly.GetExecutingAssembly(), true)

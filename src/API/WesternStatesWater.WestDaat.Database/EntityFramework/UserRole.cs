@@ -6,7 +6,7 @@ public class UserRole
 
     public Guid UserId { get; set; }
 
-    public string Role { get; set; }
+    public string Role { get; set; } = null!;
 
-    public virtual User User { get; set; }
+    public virtual User User { get; set; } = null!;
 }
