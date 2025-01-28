@@ -14,7 +14,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests.Context;
 
 [TestClass]
-public class ContextUtilityTests : UtilitiesTestBase
+public class ContextUtilityTests : UtilityTestBase
 {
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 

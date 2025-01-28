@@ -6,7 +6,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
 
 [TestClass]
-public class SecurityUtilityTests : UtilitiesTestBase
+public class SecurityUtilityTests : UtilityTestBase
 {
     [TestMethod]
     public void Get_AnonymousContext_ShouldReceiveNoPermissions()

@@ -7,7 +7,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
 
 [TestClass]
-public class MessageBusUtilityTests : UtilitiesTestBase
+public class MessageBusUtilityTests : UtilityTestBase
 {
     [TestMethod]
     public async Task SendMessageAsyncTest_ShouldReceiveMessage()
