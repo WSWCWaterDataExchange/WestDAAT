@@ -11,21 +11,7 @@ public class WaterConservationApplication
 
     public Guid ApplicantUserId { get; set; }
 
-    public DateTimeOffset SubmittedDate { get; set; }
-
-    public int CompensationRateDollars { get; set; }
-
-    public Common.DataContracts.CompensationRateUnits CompensationRateUnits { get; set; }
-
-    public string ApplicationDisplayId { get; set; }
-
-    public string WaterRightNativeId { get; set; }
-
     public Guid FundingOrganizationId { get; set; }
-
-    public DateTimeOffset? AcceptedDate { get; set; }
-
-    public DateTimeOffset? RejectedDate { get; set; }
 
     public virtual User ApplicantUser { get; set; }
 
