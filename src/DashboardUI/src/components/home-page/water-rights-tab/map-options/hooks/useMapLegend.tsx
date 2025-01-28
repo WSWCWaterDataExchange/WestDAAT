@@ -25,6 +25,15 @@ export function useMapLegend() {
           </div>
         )}
 
+        {timeSeriesLegendItems && (
+          <div className="mb-3">
+            <h5>
+              <strong>Time Series</strong>
+            </h5>
+            {timeSeriesLegendItems}
+          </div>
+        )}
+
         {wadeLegendItems && (
           <div className="mb-3">
             <h5>
@@ -40,15 +49,6 @@ export function useMapLegend() {
               <strong>NLDI Legend</strong>
             </h5>
             {nldiLegendItems}
-          </div>
-        )}
-
-        {timeSeriesLegendItems && (
-          <div className="mb-3">
-            <h5>
-              <strong>Time Series</strong>
-            </h5>
-            {timeSeriesLegendItems}
           </div>
         )}
       </div>
