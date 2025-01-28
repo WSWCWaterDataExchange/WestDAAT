@@ -168,6 +168,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
 
             AddUserMappings();
+            AddOrganizationMappings();
         }
 
         private void AddUserMappings()
@@ -177,6 +178,13 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
                 .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
+        }
+
+        private void AddOrganizationMappings()
+        {
+            CreateMap<EFWD.Organization, OrganizationListItem>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
         }
     }
 }
