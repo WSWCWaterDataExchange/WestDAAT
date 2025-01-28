@@ -17,7 +17,7 @@ public class WaterConservationApplication
 
     public string ApplicationDisplayId { get; set; } = null!;
 
-    public virtual User ApplicantUser { get; set; }
+    public virtual User ApplicantUser { get; set; } = null!;
 
-    public virtual Organization FundingOrganization { get; set; }
+    public virtual Organization FundingOrganization { get; set; } = null!;
 }
