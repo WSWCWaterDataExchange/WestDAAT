@@ -1,6 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import * as urlParameters from '../../../../../hooks/url-parameters/useUrlParameters';
-import { NldiFilters, WaterRightsFilters, defaultWaterRightsFilters } from '../../sidebar-filtering/WaterRightsProvider';
+import {
+  NldiFilters,
+  WaterRightsFilters,
+  defaultWaterRightsFilters,
+} from '../../sidebar-filtering/WaterRightsProvider';
 import { useFiltersUrlParameters } from './useFiltersUrlParameters';
 import { Optional } from '../../../../../HelperTypes';
 import { BeneficialUseListItem, ConsumptionCategoryType } from '../../../../../data-contracts/BeneficialUseListItem';
@@ -28,6 +32,7 @@ const filtersWithUndefinedNldiActive: Optional<WaterRightsFilters, 'isNldiFilter
   maxPriorityDate: undefined,
   isNldiFilterActive: undefined,
   nldiFilterData: undefined,
+  isWaterRightsFilterActive: true,
 };
 
 const filtersWithDefinedNldiActive = {

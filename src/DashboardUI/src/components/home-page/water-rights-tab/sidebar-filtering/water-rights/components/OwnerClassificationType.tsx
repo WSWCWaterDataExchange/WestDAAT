@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import { useOwnerClassificationsFilter } from "../hooks/useOwnerClassificationsFilter";
+import { useOwnerClassificationsFilter } from '../hooks/useOwnerClassificationsFilter';
 import { useCallback } from 'react';
 import { useWaterRightsContext } from '../../WaterRightsProvider';
 

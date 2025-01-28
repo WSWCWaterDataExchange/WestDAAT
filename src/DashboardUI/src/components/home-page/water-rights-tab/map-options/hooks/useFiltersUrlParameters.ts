@@ -43,10 +43,14 @@ export function useFiltersUrlParameters() {
             : defaultWaterRightsFilters.ownerClassifications,
         polylines: (filters.polylines?.length ?? 0) > 0 ? filters.polylines : defaultWaterRightsFilters.polylines,
         riverBasinNames:
-          (filters.riverBasinNames?.length ?? 0) > 0 ? filters.riverBasinNames : defaultWaterRightsFilters.riverBasinNames,
+          (filters.riverBasinNames?.length ?? 0) > 0
+            ? filters.riverBasinNames
+            : defaultWaterRightsFilters.riverBasinNames,
         states: (filters.states?.length ?? 0) > 0 ? filters.states : defaultWaterRightsFilters.states,
         waterSourceTypes:
-          (filters.waterSourceTypes?.length ?? 0) > 0 ? filters.waterSourceTypes : defaultWaterRightsFilters.waterSourceTypes,
+          (filters.waterSourceTypes?.length ?? 0) > 0
+            ? filters.waterSourceTypes
+            : defaultWaterRightsFilters.waterSourceTypes,
       };
       setParameterOptionalNldi(slimmedFilters);
     },

@@ -60,6 +60,7 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public virtual DbSet<AggregationStatistic> AggregationStatistic { get; set; }
         public virtual DbSet<AllocationAmountsFact> AllocationAmountsFact { get; set; }
         public virtual DbSet<AllocationAmountsView> AllocationAmountsView { get; set; }
+        public virtual DbSet<TimeSeriesView> TimeSeriesView { get; set; }
         public virtual DbSet<AllocationBridgeBeneficialUsesFact> AllocationBridgeBeneficialUsesFact { get; set; }
         public virtual DbSet<AllocationBridgeSitesFact> AllocationBridgeSitesFact { get; set; }
         public virtual DbSet<ApplicableResourceType> ApplicableResourceType { get; set; }
@@ -586,6 +587,26 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
                 entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
                 entity.Property(e => e.Point).HasColumnType("point").HasColumnName("point");
             });
+            
+            modelBuilder.Entity<TimeSeriesView>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("TimeSeriesView");
+
+                entity.Property(e => e.SiteId).HasColumnName("SiteID");
+                entity.Property(e => e.SiteUuid).HasColumnName("uuid");
+                entity.Property(e => e.StartDate).HasColumnName("startDate");
+                entity.Property(e => e.EndDate).HasColumnName("endDate");
+                entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
+                entity.Property(e => e.Point).HasColumnType("point").HasColumnName("point");
+                entity.Property(e => e.State).HasColumnName("State");
+                entity.Property(e => e.PrimaryUseCategory).HasColumnName("PrimaryUseCategory");
+                entity.Property(e => e.VariableType).HasColumnName("VariableType");
+                entity.Property(e => e.SiteType).HasColumnName("SiteType");
+                entity.Property(e => e.WaterSourceType).HasColumnName("WaterSourceType");
+            });
+
+
 
             modelBuilder.Entity<AllocationBridgeBeneficialUsesFact>(entity =>
             {
