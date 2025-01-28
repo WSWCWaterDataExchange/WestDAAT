@@ -30,6 +30,7 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
+            ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -37,6 +38,13 @@ internal class ValidationEngine : IValidationEngine
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
+    }
+
+    private async Task<ErrorBase> ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
+    {
+        // TODO: add in RBAC, ReBAC validations here
+        await Task.CompletedTask;
+        throw new NotImplementedException("Need to add RBAC, ReBAC validations here");
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
