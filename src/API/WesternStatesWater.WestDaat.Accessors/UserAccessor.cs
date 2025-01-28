@@ -8,12 +8,12 @@ namespace WesternStatesWater.WestDaat.Accessors;
 
 internal class UserAccessor : AccessorBase, IUserAccessor
 {
+    private readonly EFWD.IWestDaatDatabaseContextFactory _westdaatDatabaseContextFactory;
+
     public UserAccessor(ILogger<UserAccessor> logger, EFWD.IWestDaatDatabaseContextFactory westdaatDatabaseContextFactory) : base(logger)
     {
         _westdaatDatabaseContextFactory = westdaatDatabaseContextFactory;
     }
-
-    private readonly EFWD.IWestDaatDatabaseContextFactory _westdaatDatabaseContextFactory;
 
     public async Task<UserLoadResponseBase> Load(UserLoadRequestBase request)
     {

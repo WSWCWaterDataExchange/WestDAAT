@@ -31,6 +31,6 @@ public class MessageBusUtilityTests : UtilitiesTestBase
 
     class SmokeTestRequest : RequestBase
     {
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
     }
 }

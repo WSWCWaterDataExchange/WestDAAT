@@ -1,5 +1,6 @@
 import { IMsalContext } from '@azure/msal-react';
 import axios, { AxiosInstance } from 'axios';
+import { loginRequest } from '../authConfig';
 
 const API_URL = process.env.REACT_APP_WEBAPI_URL;
 
@@ -14,7 +15,7 @@ const westDaatApi = async (msalContext?: IMsalContext): Promise<AxiosInstance> =
   }
 
   const tokenResponse = await msalContext.instance.acquireTokenSilent({
-    scopes: ['openid', 'offline_access', process.env.REACT_APP_AUTH_CLIENT_ID ?? ''],
+    scopes: loginRequest.scopes,
   });
 
   api.defaults.headers.common.Authorization = `Bearer ${tokenResponse.accessToken}`;
