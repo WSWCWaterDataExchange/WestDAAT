@@ -13,7 +13,7 @@ public class ApplicationFunction : FunctionBase
     private readonly IApplicationManager _applicationManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "conservation";
+    private const string RouteBase = "Application";
 
     public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger)
     {
@@ -25,7 +25,7 @@ public class ApplicationFunction : FunctionBase
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
     public async Task<HttpResponseData> EstimateConsumptiveUse(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/estimate")]
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
     {
         var calculateEtRequest = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
