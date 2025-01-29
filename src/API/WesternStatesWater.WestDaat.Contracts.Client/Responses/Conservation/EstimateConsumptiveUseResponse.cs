@@ -3,6 +3,10 @@
     public class EstimateConsumptiveUseResponse : ApplicationStoreResponseBase
     {
         public int AverageEtAcreFeet { get; set; }
-        public int? ConservationPayment { get; set; } // dollar amount
+
+        /// <summary>
+        /// The total estimated conservation payment in dollars.
+        /// </summary>
+        public int? ConservationPayment { get; set; }
     }
 }

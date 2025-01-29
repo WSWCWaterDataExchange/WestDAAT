@@ -8,15 +8,26 @@ public class EstimateConsumptiveUseRequest : ApplicationStoreRequestBase
 
     public Guid? WaterConservationApplicationId { get; set; }
 
-    public string[] Polygons { get; set; } // WKT format
+    /// <summary>
+    /// Polygon(s) in "Well-known text" (WKT) format.
+    /// <br />
+    /// <see href="https://libgeos.org/specifications/wkt/">WKT Format Specification</see>.
+    /// </summary>
+    public string[] Polygons { get; set; }
 
     public RasterTimeSeriesModel Model { get; set; }
 
-    public DateOnly DateRangeStart { get; set; } // inclusive
+    /// <summary>
+    /// The beginning year of the date range. Inclusive.
+    /// </summary>
+    public DateOnly DateRangeStart { get; set; }
 
-    public DateOnly DateRangeEnd { get; set; } // inclusive
+    /// <summary>
+    /// The ending year of the date range. Inclusive.
+    /// </summary>
+    public DateOnly DateRangeEnd { get; set; }
 
-    public int? CompensationRateDollars { get; set; } // dollar amount
+    public int? CompensationRateDollars { get; set; }
 
-    public CompensationRateUnits? Units { get; set; } // acre, acre-ft
+    public CompensationRateUnits? Units { get; set; }
 }
