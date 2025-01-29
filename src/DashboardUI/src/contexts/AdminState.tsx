@@ -5,7 +5,7 @@ export interface AdminState {
 }
 
 export const defaultState = (): AdminState => ({
-  organizations: [],
+  organizations: ["Don't Panic Labs"],
 });
 
 export type AdminAction = AdminOrganizationsLoadedAction;

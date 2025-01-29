@@ -2,6 +2,7 @@ import React from 'react';
 import SiteNavbar from '../../components/SiteNavbar';
 import { Outlet } from 'react-router-dom';
 import SiteFooter from '../../components/SiteFooter';
+import { AdminProvider } from '../../contexts/AdminProvider';
 
 export function AdminLayout() {
   return (
@@ -9,7 +10,9 @@ export function AdminLayout() {
       <SiteNavbar />
 
       <div className="flex-grow-1">
-        <Outlet />
+        <AdminProvider>
+          <Outlet />
+        </AdminProvider>
       </div>
 
       <SiteFooter />
