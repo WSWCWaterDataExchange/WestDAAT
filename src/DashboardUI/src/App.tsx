@@ -23,6 +23,8 @@ import { clarity } from 'clarity-js';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
+import { useAuthenticationContext } from './hooks/useAuthenticationContext';
+import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -86,8 +88,8 @@ function App({ msalInstance }: AppProps) {
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>
                   <Route element={<AdminLayout />}>
-                    <Route index element={<AdminOrganizationsPage />} />
                     <Route path="organizations" element={<AdminOrganizationsPage />} />
+                    <Route path="users" element={<AdminOrganizationsUsersPage />} />
                   </Route>
                 </Route>
               </Route>

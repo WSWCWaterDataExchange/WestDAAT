@@ -104,8 +104,13 @@ function SiteNavbar() {
             >
               Terms of Service
             </Nav.Link>
-            <AuthorizedTemplate roles={[Role.GlobalAdmin, Role.OrganizationAdmin]}>
-              <Nav.Link as={Link} to="/admin">
+            <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
+              <Nav.Link as={Link} to="/admin/organizations">
+                Admin
+              </Nav.Link>
+            </AuthorizedTemplate>
+            <AuthorizedTemplate roles={[Role.OrganizationAdmin]}>
+              <Nav.Link as={Link} to="/admin/users">
                 Admin
               </Nav.Link>
             </AuthorizedTemplate>
