@@ -79,11 +79,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
         private void AddApplicationDashboardMappings()
         {
             CreateMap<ClientContracts.Requests.Conservation.ApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>();
-            // TODO: add in specific property mappings here
 
             CreateMap<CommonContracts.ApplicationDashboardLoadResponse, ClientContracts.Responses.Conservation.ApplicationDashboardLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            // TODO: add in specific property mappings here
         }
     }
 }
