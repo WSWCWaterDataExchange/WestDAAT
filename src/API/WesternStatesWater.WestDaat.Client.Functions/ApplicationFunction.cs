@@ -25,7 +25,7 @@ public class ApplicationFunction : FunctionBase
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
     public async Task<HttpResponseData> EstimateConsumptiveUse(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/EstimateConsumptiveUse")]
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
     {
         var calculateEtRequest = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
