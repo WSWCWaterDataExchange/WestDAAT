@@ -59,19 +59,6 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
     {
-        if (request.DateRangeEnd < request.DateRangeStart)
-        {
-            var validationErrorMessage = "The end date must be greater than the start date.";
-            return new ValidationError(new Dictionary<string, string[]>()
-            {
-                {nameof(request.DateRangeStart), new[] { validationErrorMessage }},
-                {nameof(request.DateRangeEnd), new[] { validationErrorMessage }}
-            })
-            {
-                PublicMessage = validationErrorMessage
-            };
-        }
-
         // todo: validate model and year selections by comparing with the Funding Organization's allowed options.
         await Task.CompletedTask;
         return null;
