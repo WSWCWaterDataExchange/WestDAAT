@@ -50,6 +50,11 @@ on:
       react-app-ga-id:
         required: true
         type: string
+      # REACT_APP_FEATURE_CONSERVATION_ESTIMATION_TOOL
+      react-app-feature-conservation-estimation-tool:
+        required: false
+        type: string
+
     secrets:
       azure-cli-credentials:
         description: "The credentials for the Azure CLI"
@@ -79,6 +84,7 @@ jobs:
           echo "REACT_APP_AUTH_AUTHORITY=${{ inputs.react-app-auth-authority }}" >> $GITHUB_ENV
           echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
           echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
+          echo "REACT_APP_FEATURE_CONSERVATION_ESTIMATION_TOOL=${{ inputs.react-app-feature-conservation-estimation-tool }}" >> $GITHUB_ENV
 
       - run: npm ci
       - run: npm run build

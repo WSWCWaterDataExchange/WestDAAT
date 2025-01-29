@@ -45,5 +45,6 @@ jobs:
       react-app-auth-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com/b2c_1_signupsignin
       react-app-auth-known-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com
       react-app-ga-id: G-KFL0TGM4B8
+      react-app-feature-conservation-estimation-tool: disabled
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}
