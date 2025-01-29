@@ -6,6 +6,8 @@ public class EstimateEvapotranspirationRequest : ApplicationStoreRequestBase
 {
     public Guid FundingOrganizationId { get; set; }
 
+    public Guid? WaterConservationApplicationId { get; set; }
+
     public string[] Polygons { get; set; } // WKT format
 
     public RasterTimeSeriesModel Model { get; set; }
@@ -14,7 +16,7 @@ public class EstimateEvapotranspirationRequest : ApplicationStoreRequestBase
 
     public DateOnly DateRangeEnd { get; set; } // inclusive
 
-    public int? DesiredCompensation { get; set; } // dollar amount
+    public int? CompensationRateDollars { get; set; } // dollar amount
 
-    public DesiredCompensationUnits? Units { get; set; } // acre, acre-ft
+    public CompensationRateUnits? Units { get; set; } // acre, acre-ft
 }

@@ -20,7 +20,7 @@ public class EstimateEvapotranspirationRequestValidator : AbstractValidator<Esti
         RuleFor(x => x.DateRangeEnd).GreaterThanOrEqualTo(x => x.DateRangeStart);
 
         // if one property is non-null, then they both must be non-null
-        RuleFor(x => x.DesiredCompensation).NotEmpty().When(x => x.Units.HasValue);
-        RuleFor(x => x.Units).NotEmpty().When(x => x.DesiredCompensation.HasValue);
+        RuleFor(x => x.CompensationRateDollars).NotEmpty().When(x => x.Units.HasValue);
+        RuleFor(x => x.Units).NotEmpty().When(x => x.CompensationRateDollars.HasValue);
     }
 }
