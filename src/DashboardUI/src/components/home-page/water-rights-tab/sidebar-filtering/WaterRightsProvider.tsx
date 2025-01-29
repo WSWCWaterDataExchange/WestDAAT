@@ -1,18 +1,9 @@
 import React from 'react';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { BeneficialUseListItem } from '@data-contracts';
 import { DataPoints, Directions } from '../../../../data-contracts/nldi';
 import { useDisplayOptionsUrlParameters } from '../map-options/hooks/useDisplayOptionsUrlParameters';
-import {
-  defaultDisplayOptions,
-  DisplayOptions,
-} from '../map-options/components/DisplayOptions';
+import { defaultDisplayOptions, DisplayOptions } from '../map-options/components/DisplayOptions';
 import { useFiltersUrlParameters } from '../map-options/hooks/useFiltersUrlParameters';
 import { useDashboardFilters } from '../../../../hooks/queries';
 import { UseQueryResult } from 'react-query';
@@ -37,6 +28,7 @@ export interface WaterRightsFilters {
   maxPriorityDate: number | undefined;
   polylines?: GeoJSON.Feature<GeoJSON.Geometry>[];
   isNldiFilterActive: boolean;
+  isWaterRightsFilterActive: boolean;
   nldiFilterData?: NldiFilters;
 }
 
@@ -97,6 +89,7 @@ export const defaultWaterRightsFilters: WaterRightsFilters = {
   maxPriorityDate: undefined,
   polylines: undefined,
   isNldiFilterActive: false,
+  isWaterRightsFilterActive: true,
   nldiFilterData: undefined,
 };
 
@@ -135,16 +128,11 @@ interface WaterRightsProviderProps {
 }
 
 export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
-  const {
-    getParameter: getDisplayOptionsParameter,
-    setParameter: setDisplayOptionsParameter,
-  } = useDisplayOptionsUrlParameters();
-  const { getParameter: getFiltersParameter, setParameter: setFiltersParameter } =
-    useFiltersUrlParameters();
+  const { getParameter: getDisplayOptionsParameter, setParameter: setDisplayOptionsParameter } =
+    useDisplayOptionsUrlParameters();
+  const { getParameter: getFiltersParameter, setParameter: setFiltersParameter } = useFiltersUrlParameters();
 
-  const [filters, setFilters] = useState<WaterRightsFilters>(
-    getFiltersParameter() ?? defaultWaterRightsFilters,
-  );
+  const [filters, setFilters] = useState<WaterRightsFilters>(getFiltersParameter() ?? defaultWaterRightsFilters);
   const [displayOptions, setDisplayOptions] = useState<DisplayOptions>(
     getDisplayOptionsParameter() ?? defaultDisplayOptions,
   );
@@ -220,9 +208,5 @@ export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
     },
   };
 
-  return (
-    <WaterRightsContext.Provider value={filterContextProviderValue}>
-      {children}
-    </WaterRightsContext.Provider>
-  );
+  return <WaterRightsContext.Provider value={filterContextProviderValue}>{children}</WaterRightsContext.Provider>;
 };

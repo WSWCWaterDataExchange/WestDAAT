@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSiteTypesFilter } from "../hooks/useSiteTypesFilter";
+import { useSiteTypesFilter } from '../hooks/useSiteTypesFilter';
 import { useWaterRightsContext } from '../../WaterRightsProvider';
 import { useCallback, useMemo } from 'react';
 import Select, { MultiValue } from 'react-select';

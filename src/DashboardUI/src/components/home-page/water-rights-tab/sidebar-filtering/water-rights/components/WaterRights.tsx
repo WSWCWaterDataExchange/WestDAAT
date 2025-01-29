@@ -20,7 +20,8 @@ function WaterRights() {
         <a
           href="https://westernstateswater.org/wade/westdaat-filter-documentation/"
           target="_blank"
-          rel="noopener noreferrer">
+          rel="noopener noreferrer"
+        >
           Learn about WestDAAT filters
         </a>
       </div>

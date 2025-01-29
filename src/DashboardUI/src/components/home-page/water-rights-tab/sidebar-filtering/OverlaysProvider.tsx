@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useDashboardFilters } from '../../../../hooks/queries';
 
 export type MapboxFilterExpression = [string, ...any[]];
@@ -35,7 +28,7 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
   const overlaysData = dashboardFiltersQuery.data?.overlays ?? [];
 
   const [overlays, setOverlays] = useState<string[]>([]);
-  const [isOverlayFilterActive, setOverlayFilterActive] = useState<boolean>(true);
+  const [isOverlayFilterActive, setOverlayFilterActive] = useState<boolean>(false);
 
   useEffect(() => {
     if (overlaysData.length && overlays.length === 0) {
@@ -57,8 +50,8 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
     if (!isOverlayFilterActive || overlays.length === 0) {
       return null;
     }
-    const exprs = overlays.map((key) => ["in", key, ["get", "oType"]]);
-    return ["any", ...exprs];
+    const exprs = overlays.map((key) => ['in', key, ['get', 'oType']]);
+    return ['any', ...exprs];
   }, [isOverlayFilterActive, overlays]);
 
   const value: OverlaysContextValue = {

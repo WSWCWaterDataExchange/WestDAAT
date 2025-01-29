@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useOverlaysContext} from "../../OverlaysProvider";
+import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function useOverlaysFilter() {
-  const {
-    overlays,
-    isOverlayFilterActive,
-    setOverlayFilterActive,
-    toggleOverlay,
-    overlaysData,
-    mapFilters,
-  } = useOverlaysContext();
+  const { overlays, isOverlayFilterActive, setOverlayFilterActive, toggleOverlay, overlaysData, mapFilters } =
+    useOverlaysContext();
 
-
-  useEffect(() => {
-  }, [overlaysData, overlays]);
+  useEffect(() => {}, [overlaysData, overlays]);
 
   return {
     isOverlayFilterActive,

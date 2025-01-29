@@ -3,7 +3,7 @@ import ErrorCard from '../../components/map-popups/ErrorCard';
 import LoadingCard from '../../components/map-popups/LoadingCard';
 import OverlayDigestCard from '../../components/map-popups/OverlayDigestCard';
 import { useOverlayDigests } from '../queries';
-import useSiteClickedOnMap from "./useSiteClickedOnMap";
+import useSiteClickedOnMap from './useSiteClickedOnMap';
 
 function useOverlayDigestMapPopup() {
   const { updatePopup, siteUuid, oType } = useSiteClickedOnMap();
@@ -16,9 +16,7 @@ function useOverlayDigestMapPopup() {
       return undefined;
     }
     if (isFetching) {
-      return (
-        <LoadingCard onClosePopup={handleClosePopup} loadingText={`Retrieving overlay digest for ${siteUuid}`} />
-      );
+      return <LoadingCard onClosePopup={handleClosePopup} loadingText={`Retrieving overlay digest for ${siteUuid}`} />;
     }
     if (!overlayData || overlayData.length === 0) {
       return <ErrorCard onClosePopup={handleClosePopup} errorText={`No overlay digest found for ${siteUuid}`} />;
