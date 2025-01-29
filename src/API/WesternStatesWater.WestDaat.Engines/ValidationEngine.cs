@@ -59,19 +59,21 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateEstimateEvapotranspirationRequest(EstimateEvapotranspirationRequest request,
         ContextBase context)
     {
-        var permissionsRequest = new DTO.PermissionsGetRequest()
+        if (request.DateRangeEnd < request.DateRangeStart)
         {
-            Context = context
-        };
-
-        var permissions = _securityUtility.Get(permissionsRequest);
-
-        if (!permissions.Contains(Permissions.ConservationApplicationStore))
-        {
-            return CreateForbiddenError(request, context);
+            var validationErrorMessage = "The end date must be greater than the start date.";
+            return new ValidationError(new Dictionary<string, string[]>()
+            {
+                {nameof(request.DateRangeStart), new[] { validationErrorMessage }},
+                {nameof(request.DateRangeEnd), new[] { validationErrorMessage }}
+            })
+            {
+                PublicMessage = validationErrorMessage
+            };
         }
 
-
+        // todo: validate model and year selections by comparing with the Funding Organization's allowed options.
+        await Task.CompletedTask;
         return null;
     }
 
