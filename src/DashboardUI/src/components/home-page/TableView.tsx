@@ -5,8 +5,8 @@ import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import './tableView.scss';
 import Icon from '@mdi/react';
 import { DropdownOption } from '../../data-contracts/DropdownOption';
-import AnalyticsDataTable from "./water-rights-tab/map-options/components/AnalyticsDataTable";
-import Charts from "./water-rights-tab/map-options/components/Charts";
+import AnalyticsDataTable from './water-rights-tab/map-options/components/AnalyticsDataTable';
+import Charts from './water-rights-tab/map-options/components/Charts';
 
 function TableView() {
   const [show, setshow] = useState(false);
@@ -20,7 +20,8 @@ function TableView() {
       <Button
         type="button"
         className={`table-view-toggle-btn ${show ? 'toggle-on' : 'toggle-off'}`}
-        onClick={toggleShow}>
+        onClick={toggleShow}
+      >
         <span>ANALYTICS &amp; TABLE</span>
         <Icon path={show ? mdiChevronDown : mdiChevronUp} />
       </Button>

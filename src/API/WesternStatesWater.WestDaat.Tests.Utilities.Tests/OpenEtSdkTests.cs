@@ -10,7 +10,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
 
 [TestClass]
-public class OpenEtSdkTests : UtilitiesTestBase
+public class OpenEtSdkTests : UtilityTestBase
 {
     private MockHttpMessageHandler _mockHttp = null!;
 

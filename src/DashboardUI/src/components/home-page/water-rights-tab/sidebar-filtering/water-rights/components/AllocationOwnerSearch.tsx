@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChangeEvent } from 'react';
-import { useAllocationOwnerFilter } from "../hooks/useAllocationOwnerFilter";
+import { useAllocationOwnerFilter } from '../hooks/useAllocationOwnerFilter';
 
 export function AllocationOwnerSearch() {
   const { allocationOwner, setAllocationOwner } = useAllocationOwnerFilter();

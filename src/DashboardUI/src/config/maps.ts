@@ -12,11 +12,14 @@ export const mapLayerNames = {
   nldiFlowlinesLayer: 'nldi-flowlines',
   nldiUsgsPointsLayer: 'nldi-usgs-points',
   nldiUsgsLocationLayer: 'nldi-usgs-location',
+  timeSeriesPointsLayer: 'timeSeriesPoints',
+  timeSeriesPolygonsLayer: 'timeSeriesPolygons',
 };
 
 export const mapSourceNames = {
   waterRightsVectorTiles: 'water-rights-vector-tiles',
   overlayVectorTiles: 'overlay-vector-tiles',
+  timeSeriesVectorTiles: 'time-series-vector-tiles',
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
@@ -76,6 +79,12 @@ const mapsJson = {
       id: mapSourceNames.overlayVectorTiles,
       type: 'vector',
       url: process.env.REACT_APP_OVERLAY_VECTOR_TILE_URL,
+      volatile: true,
+    },
+    {
+      id: mapSourceNames.timeSeriesVectorTiles,
+      type: 'vector',
+      url: process.env.REACT_APP_TIME_SERIES_VECTOR_TILE_URL,
       volatile: true,
     },
     {
@@ -159,7 +168,7 @@ const mapsJson = {
         'fill-color': '#ff0000',
         'fill-opacity': 0.5,
       },
-      filter: ['has', 'podPou']
+      filter: ['has', 'podPou'],
     },
     {
       id: mapLayerNames.waterRightsPointsLayer,
@@ -257,6 +266,45 @@ const mapsJson = {
       },
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
+    },
+    /*    {
+      id: mapLayerNames.timeSeriesPolygonsLayer,
+      friendlyName: 'Time Series Polygons',
+      'source-layer': 'polygons',
+      source: mapSourceNames.timeSeriesVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'fill',
+      paint: {
+        'fill-color': '#008080',
+        'fill-opacity': 0.75,
+      },
+    },*/
+    {
+      id: mapLayerNames.timeSeriesPointsLayer,
+      friendlyName: 'Time Series Points',
+      'source-layer': 'points',
+      source: mapSourceNames.timeSeriesVectorTiles,
+      layout: {
+        visibility: 'visible',
+      },
+      type: 'circle',
+      paint: {
+        'circle-radius': defaultPointCircleRadius,
+        'circle-stroke-width': 1,
+        'circle-stroke-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          pointSizes.minPointSizeZoomLevel,
+          0,
+          pointSizes.maxPointSizeZoomLevel,
+          0.3,
+        ],
+        'circle-color': '#FF7F50',
+        'circle-opacity': 0.75,
+      },
     },
   ],
 };

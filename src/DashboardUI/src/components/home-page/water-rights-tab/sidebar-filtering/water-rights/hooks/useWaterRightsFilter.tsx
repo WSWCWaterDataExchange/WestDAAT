@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useWaterRightsContext } from '../../WaterRightsProvider';
 import { useLegalStatusesFilter } from './useLegalStatusesFilter';
 import { useAllocationOwnerFilter } from './useAllocationOwnerFilter';
 import { useBeneficialUsesFilter } from './useBeneficialUsesFilter';
@@ -16,6 +17,9 @@ import { useVolumeFilters } from './useVolumeFilters';
 import { useWaterSourceTypesFilter } from './useWaterSourceTypesFilter';
 
 export function useWaterRightsFilter() {
+  const { filters } = useWaterRightsContext();
+  const { isWaterRightsFilterActive } = filters;
+
   const { mapFilters: podPouMapFilters } = usePodPouFilter();
   const { mapFilters: includeExemptMapFilters } = useIncludeExemptFilter();
   const { mapFilters: beneficialUsesMapFilters } = useBeneficialUsesFilter();
@@ -33,6 +37,10 @@ export function useWaterRightsFilter() {
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
 
   return useMemo(() => {
+    if (!isWaterRightsFilterActive) {
+      return [];
+    }
+
     const rawFilters = [
       podPouMapFilters,
       includeExemptMapFilters,
@@ -53,6 +61,7 @@ export function useWaterRightsFilter() {
 
     return rawFilters.filter((filter) => Array.isArray(filter) && filter.length > 0);
   }, [
+    isWaterRightsFilterActive,
     podPouMapFilters,
     includeExemptMapFilters,
     beneficialUsesMapFilters,
