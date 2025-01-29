@@ -36,7 +36,8 @@ function SiteNavbar() {
   const handleShow = () => setShowHamburgerMenu(true);
 
   const userOrganizationId = getUserOrganization(user);
-  const isAdminFeatureEnabled = isFeatureEnabled('conservationEstimationTool');
+  const showAdmin = isFeatureEnabled('conservationEstimationTool');
+  const showDashboard = isFeatureEnabled('conservationEstimationTool');
 
   return (
     <div>
@@ -74,6 +75,11 @@ function SiteNavbar() {
             </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
+                {showDashboard && (
+                  <NavDropdown.Item as={Link} to="/dashboard">
+                    Dashboard
+                  </NavDropdown.Item>
+                )}
                 <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>
               </NavDropdown>
             </AuthenticatedTemplate>
@@ -108,7 +114,7 @@ function SiteNavbar() {
             >
               Terms of Service
             </Nav.Link>
-            {isAdminFeatureEnabled && (
+            {showAdmin && (
               <>
                 <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
                   <Nav.Link as={Link} to="/admin/organizations">
