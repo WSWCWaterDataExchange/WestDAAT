@@ -1,11 +1,9 @@
 import React from 'react';
-import AuthorizedTemplate from '../../components/AuthorizedTemplate';
-import { Role } from '../../config/role';
 
 export function AdminOrganizationsPage() {
   return (
-    <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
+    <div>
       <h1>Admin Organizations Page</h1>
-    </AuthorizedTemplate>
+    </div>
   );
 }
