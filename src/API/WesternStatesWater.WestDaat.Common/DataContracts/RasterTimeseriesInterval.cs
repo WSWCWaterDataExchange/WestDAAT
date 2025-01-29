@@ -3,5 +3,5 @@
 public enum RasterTimeSeriesInterval
 {
     None = 0,
-    Monthly = 1
+    Monthly = 1,
 }

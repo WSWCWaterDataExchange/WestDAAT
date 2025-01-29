@@ -1,22 +1,64 @@
 ﻿using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Engines;
 
 internal class CalculationEngine : ICalculationEngine
 {
+    private readonly IOpenEtSdk _openEtSdk;
+
+    public CalculationEngine(IOpenEtSdk openEtSdk)
+    {
+        _openEtSdk = openEtSdk;
+    }
+
     public async Task<CalculateResponseBase> Calculate(CalculateRequestBase request)
     {
         return request switch
         {
-            MultiPolygonSumEtRequest req => await CalculatePolygonsEt(req),
+            MultiPolygonYearlyEtRequest req => await CalculatePolygonsEt(req),
             _ => throw new NotImplementedException()
         };
     }
 
-    private async Task<MultiPolygonSumEtResponse> CalculatePolygonsEt(MultiPolygonSumEtRequest request)
+    private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        var results = new List<PolygonEtDataCollection>();
+        foreach (var polygonWkt in request.Polygons)
+        {
+            var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygonWkt);
+
+            var rasterRequest = new RasterTimeSeriesPolygonRequest
+            {
+                Geometry = polygonGeo,
+                DateRangeStart = request.DateRangeStart,
+                DateRangeEnd = request.DateRangeEnd,
+                Model = request.Model,
+                Interval = RasterTimeSeriesInterval.Monthly,
+                OutputExtension = RasterTimeSeriesFileFormat.JSON,
+                OutputUnits = RasterTimeSeriesOutputUnits.Inches,
+                PixelReducer = RasterTimeSeriesPixelReducer.Mean,
+                ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+                Variable = RasterTimeSeriesCollectionVariable.ET,
+            };
+            var rasterResponse = await _openEtSdk.RasterTimeseriesPolygon(rasterRequest);
+
+            var datapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
+                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, Et = grouping.Sum(datum => datum.Evapotranspiration) })
+                .ToArray();
+
+            var result = new PolygonEtDataCollection
+            {
+                PolygonWkt = polygonWkt,
+                Data = datapoints
+            };
+            results.Add(result);
+        }
+
+        return new MultiPolygonYearlyEtResponse
+        {
+            Data = results.ToArray()
+        };
     }
 
     public string TestMe(string input)

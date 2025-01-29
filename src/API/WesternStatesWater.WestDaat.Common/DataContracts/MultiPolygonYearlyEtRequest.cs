@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class MultiPolygonSumEtRequest : CalculateRequestBase
+public class MultiPolygonYearlyEtRequest : CalculateRequestBase
 {
     /// <summary>
     /// Array of polygons in WKT format.
