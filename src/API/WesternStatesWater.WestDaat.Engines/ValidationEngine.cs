@@ -65,7 +65,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // if the user isn't a global admin, they can only view their organizations' applications
-        if (!request.OrganizationId.HasValue)
+        if (request.OrganizationId == null)
         {
             return CreateForbiddenError(request, context);
         }
