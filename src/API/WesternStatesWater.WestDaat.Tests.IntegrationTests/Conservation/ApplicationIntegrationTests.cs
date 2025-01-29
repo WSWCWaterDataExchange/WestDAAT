@@ -24,7 +24,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _applicationManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task Load_CalculateEvapotranspiration_AsUser_Success()
+    public async Task Store_EstimateEvapotranspiration_AsUser_Success()
     {
         // Arrange
         const int monthsInYear = 12;

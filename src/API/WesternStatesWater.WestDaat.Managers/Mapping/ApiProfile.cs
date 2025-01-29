@@ -1,5 +1,4 @@
 using AutoMapper;
-using WesternStatesWater.WestDaat.Utilities;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
@@ -35,7 +34,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
-            AddConservationMappings();
         }
 
         private void AddUserMappings()
@@ -75,34 +73,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
-        }
-
-        private void AddConservationMappings()
-        {
-            CreateMap<(ClientContracts.Requests.Conservation.EstimateEvapotranspirationRequest Request, string PolygonWKT),
-                CommonContracts.RasterTimeSeriesPolygonRequest>()
-                .ForMember(dest => dest.Geometry, opt => opt.MapFrom(src => GeometryHelpers.GetGeometryByWkt(src.PolygonWKT)))
-                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Request.DateRangeStart))
-                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Request.DateRangeEnd))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Request.Model))
-                .ForMember(dest => dest.Interval, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesInterval.Monthly))
-                .ForMember(dest => dest.PixelReducer, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesPixelReducer.Mean))
-                .ForMember(dest => dest.ReferenceEt, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesReferenceEt.GridMET))
-                .ForMember(dest => dest.OutputUnits, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesOutputUnits.Inches))
-                .ForMember(dest => dest.Variable, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesCollectionVariable.ET))
-                .ForMember(dest => dest.OutputExtension, opt => opt.MapFrom(_ => CommonContracts.RasterTimeSeriesFileFormat.JSON));
-
-            CreateMap<CommonContracts.RasterTimeSeriesPolygonResponseDatapoint, CommonContracts.EvapotranspirationTimestampedDetails>()
-                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
-                .ForMember(dest => dest.Evapotranspiration, opt => opt.MapFrom(src => src.Evapotranspiration));
-
-            CreateMap<CommonContracts.RasterTimeSeriesPolygonResponse, CommonContracts.EvapotranspirationAggregateDetails>()
-                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data));
-
-            CreateMap<(ClientContracts.Requests.Conservation.EstimateEvapotranspirationRequest Request, CommonContracts.RasterTimeSeriesPolygonResponse[] RasterResponses),
-                CommonContracts.CalculateTotalAverageEvapotranspirationRequest>()
-                .ForMember(dest => dest.Details, opt => opt.MapFrom(src => src.RasterResponses))
-                .ForMember(dest => dest.DesiredCompensationUnits, opt => opt.MapFrom(src => src.Request.Units));
         }
     }
 }
