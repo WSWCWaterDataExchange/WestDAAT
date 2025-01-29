@@ -18,10 +18,8 @@ public class EstimateConsumptiveUseRequestValidator : AbstractValidator<Estimate
 
         RuleFor(x => x.Model).NotEmpty();
 
-        RuleFor(x => x.DateRangeStart).NotEmpty();
-        RuleFor(x => x.DateRangeEnd).NotEmpty();
-
-        RuleFor(x => x.DateRangeEnd).GreaterThanOrEqualTo(x => x.DateRangeStart);
+        RuleFor(x => x.DateRangeStart).NotEmpty().LessThanOrEqualTo(x => x.DateRangeEnd);
+        RuleFor(x => x.DateRangeEnd).NotEmpty().GreaterThanOrEqualTo(x => x.DateRangeStart);
 
         // if one property is non-null, then they both must be non-null
         RuleFor(x => x.CompensationRateDollars).NotEmpty().When(x => x.Units.HasValue);
