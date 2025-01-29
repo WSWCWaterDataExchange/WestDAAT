@@ -43,14 +43,17 @@ internal class CalculationEngine : ICalculationEngine
             };
             var rasterResponse = await _openEtSdk.RasterTimeseriesPolygon(rasterRequest);
 
-            var datapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
+            var yearlyDatapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
                 .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, EtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
+
+            var averageEt = yearlyDatapoints.Average(d => d.EtInInches);
 
             var result = new PolygonEtDataCollection
             {
                 PolygonWkt = polygonWkt,
-                Datapoints = datapoints
+                AverageEtInInches = averageEt,
+                Datapoints = yearlyDatapoints
             };
             results.Add(result);
         }
