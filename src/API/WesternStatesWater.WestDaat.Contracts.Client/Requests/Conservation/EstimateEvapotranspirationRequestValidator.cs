@@ -6,6 +6,10 @@ public class EstimateEvapotranspirationRequestValidator : AbstractValidator<Esti
 {
     public EstimateEvapotranspirationRequestValidator()
     {
+        RuleFor(x => x.FundingOrganizationId).NotEmpty();
+
+        RuleFor(x => x.WaterConservationApplicationId); // optional
+
         RuleFor(x => x.Polygons).NotEmpty();
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
         {
