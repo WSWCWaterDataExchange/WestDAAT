@@ -8,14 +8,14 @@ using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 namespace WesternStatesWater.WestDaat.Client.Functions;
 
-public class ConservationFunction : FunctionBase
+public class ApplicationFunction : FunctionBase
 {
     private readonly IApplicationManager _applicationManager;
     private readonly ILogger _logger;
 
     private const string RouteBase = "conservation";
 
-    public ConservationFunction(IApplicationManager applicationManager, ILogger<ConservationFunction> logger)
+    public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger)
     {
         _applicationManager = applicationManager;
         _logger = logger;
