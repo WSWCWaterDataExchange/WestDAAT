@@ -1,0 +1,19 @@
+ALTER TABLE WaterConservationApplicationEstimates
+DROP COLUMN TotalPolygonAreaAcres, TotalEtInches;
+
+exec sp_rename 'dbo.WaterConservationApplicationEstimatePolygons', 'WaterConservationApplicationEstimateLocations';
+
+exec sp_rename 'PK_WaterConservationApplicationEstimatePolygons_Id', 'PK_WaterConservationApplicationEstimateLocations_Id';
+
+exec sp_rename 'FK_WaterConservationApplicationEstimatePolygons_WaterConservationApplicationEstimates', 'FK_WaterConservationApplicationEstimateLocations_WaterConservationApplicationEstimates';
+
+ALTER TABLE WaterConservationApplicationEstimateLocations
+ADD PolygonAreaInAcres FLOAT NOT NULL;
+
+CREATE TABLE WaterConservationApplicationEstimateLocationConsumptiveUses
+(
+	Id			UNIQUEIDENTIFIER NOT NULL CONSTRAINT PK_WaterConservationApplicationEstimateLocationConsumptiveUses_Id PRIMARY KEY NONCLUSTERED,
+	WaterConservationApplicationEstimateLocationId UNIQUEIDENTIFIER NOT NULL,
+	[Year]		INT NOT NULL,
+	EtInInches	FLOAT NOT NULL,
+);
