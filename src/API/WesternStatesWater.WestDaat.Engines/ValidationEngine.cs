@@ -1,5 +1,6 @@
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.Extensions;
@@ -15,13 +16,17 @@ internal class ValidationEngine : IValidationEngine
 
     private readonly ISecurityUtility _securityUtility;
 
+    private readonly IOrganizationAccessor _organizationAccessor;
+
     public ValidationEngine(
         IContextUtility contextUtility,
-        ISecurityUtility securityUtility
+        ISecurityUtility securityUtility,
+        IOrganizationAccessor organizationAccessor
     )
     {
         _contextUtility = contextUtility;
         _securityUtility = securityUtility;
+        _organizationAccessor = organizationAccessor;
     }
 
     public async Task<ErrorBase> Validate(RequestBase request)
@@ -42,34 +47,30 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
         ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        return request switch
+        {
+            EstimateEvapotranspirationRequest req => await ValidateEstimateEvapotranspirationRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private async Task<ErrorBase> ValidateEstimateEvapotranspirationRequest(EstimateEvapotranspirationRequest request,
+        ContextBase context)
+    {
+        var permissionsRequest = new DTO.PermissionsGetRequest()
         {
             Context = context
-        });
+        };
+
+        var permissions = _securityUtility.Get(permissionsRequest);
+
         if (!permissions.Contains(Permissions.ConservationApplicationStore))
         {
             return CreateForbiddenError(request, context);
         }
 
-        // If the resources required to fulfill the request are not accessible to the user, or they do not exist.
-        var application = await Task.FromResult(1);
-        if (application is 2)
-        {
-            return CreateNotFoundError(
-                context,
-                "Conservation Application",
-                Guid.NewGuid()
-            );
-        }
-
-        // If there is additional business logic validation that the request doesn't pass.
-        if (permissions.Length == 3)
-        {
-            return new ValidationError(new Dictionary<string, string[]>
-            {
-                { "Notes", ["You must cross the T's and dot the lowercase J's."] }
-            });
-        }
 
         return null;
     }
