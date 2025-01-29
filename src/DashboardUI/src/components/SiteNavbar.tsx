@@ -76,7 +76,7 @@ function SiteNavbar() {
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
                 {showDashboard && (
-                  <NavDropdown.Item as={Link} to="/dashboard">
+                  <NavDropdown.Item as={Link} to="/application/dashboard">
                     Dashboard
                   </NavDropdown.Item>
                 )}

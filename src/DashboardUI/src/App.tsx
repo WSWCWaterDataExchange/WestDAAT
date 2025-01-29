@@ -25,6 +25,8 @@ import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { useAuthenticationContext } from './hooks/useAuthenticationContext';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
+import { ApplicationLayout } from './pages/application/ApplicationLayout';
+import { ApplicationDashboardPage } from './pages/application/dashboard/ApplicationDashboardPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -85,6 +87,11 @@ function App({ msalInstance }: AppProps) {
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
+                </Route>
+                <Route path="application">
+                  <Route element={<ApplicationLayout />}>
+                    <Route path="dashboard" element={<ApplicationDashboardPage />} />
+                  </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>
                   <Route element={<AdminLayout />}>
