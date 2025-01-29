@@ -59,7 +59,6 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
     {
-        // todo: validate model and year selections by comparing with the Funding Organization's allowed options.
         await Task.CompletedTask;
         return null;
     }
