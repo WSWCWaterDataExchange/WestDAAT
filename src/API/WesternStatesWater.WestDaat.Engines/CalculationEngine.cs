@@ -28,7 +28,6 @@ internal class CalculationEngine : ICalculationEngine
         {
             var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygonWkt);
 
-            // todo: dtomapper
             var rasterRequest = new RasterTimeSeriesPolygonRequest
             {
                 Geometry = polygonGeo,
