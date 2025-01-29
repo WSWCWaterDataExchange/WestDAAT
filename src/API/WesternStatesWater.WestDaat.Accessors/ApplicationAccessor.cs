@@ -6,10 +6,14 @@ namespace WesternStatesWater.WestDaat.Accessors;
 internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 {
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+    private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-    public ApplicationAccessor(ILogger<ApplicationAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
+    public ApplicationAccessor(ILogger<ApplicationAccessor> logger,
+        EF.IDatabaseContextFactory databaseContextFactory,
+        EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
     {
         _databaseContextFactory = databaseContextFactory;
+        _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
     }
 
     public async Task<ApplicationLoadResponseBase> Load(ApplicationLoadRequestBase request)

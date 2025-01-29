@@ -26,7 +26,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _applicationManager.Should().NotBeNull();
 
     [DataTestMethod]
-    [DataRow(Roles.GlobalAdmin, null)]
+    [DataRow(Roles.GlobalAdmin, "invalid role")]
     [DataRow(null, Roles.OrganizationAdmin)]
     [DataRow(null, Roles.TechnicalReviewer)]
     public async Task Load_ApplicationDashboardRequest_ValidUser_Success(string globalRole, string orgRole)
@@ -35,7 +35,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var organization = new OrganizationFaker().Generate();
         var user = new UserFaker().Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
-        var userOrgRole = new UserOrganizationRoleFaker(userOrg, orgRole).Generate();
+        var userOrgRole = new UserOrganizationRoleFaker(userOrg)
+            .RuleFor(uor => uor.Role, _ => orgRole).Generate();
 
         UseUserContext(new UserContext
         {
@@ -78,7 +79,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var organization = new OrganizationFaker().Generate();
         var user = new UserFaker().Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
-        var userOrgRole = new UserOrganizationRoleFaker(userOrg, "invalid role").Generate();
+        var userOrgRole = new UserOrganizationRoleFaker(userOrg)
+            .RuleFor(uor => uor.Role, _ => "invalid role").Generate();
 
         UseUserContext(new UserContext
         {

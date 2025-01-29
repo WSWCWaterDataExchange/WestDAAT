@@ -6,6 +6,5 @@ public class ApplicationDashboardLoadRequestValidator : AbstractValidator<Applic
 {
     public ApplicationDashboardLoadRequestValidator()
     {
-        // TODO: add input validation rules here
     }
 }

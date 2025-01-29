@@ -53,12 +53,30 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateApplicationDashboardLoadRequest(ApplicationDashboardLoadRequest request, ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        // check if user is a global admin first
+        var rolePermissions = _securityUtility.Get(new DTO.PermissionsGetRequest()
         {
             Context = context
         });
+
+        if (rolePermissions.Contains(Permissions.ApplicationDashboardLoad))
+        {
+            return null;
+        }
+
+        // if the user isn't a global admin, they can only view their organizations' applications
+        if (!request.OrganizationId.HasValue)
+        {
+            return CreateForbiddenError(request, context);
+        }
         
-        if (!permissions.Contains(Permissions.ApplicationDashboardLoad))
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId.Value,
+        });
+        
+        if (!orgPermissions.Contains(Permissions.ApplicationDashboardLoad))
         {
             return CreateForbiddenError(request, context);
         }
@@ -71,7 +89,8 @@ internal class ValidationEngine : IValidationEngine
     {
         var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
         {
-            Context = context
+            Context = context,
+            OrganizationId = request.OrganizationId
         });
         if (!permissions.Contains(Permissions.ConservationApplicationStore))
         {

@@ -2,5 +2,5 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public class OrganizationPermissionsGetRequest : PermissionsGetRequestBase
 {
-    public Guid OrganizationId { get; init; }
+    required public Guid OrganizationId { get; init; }
 }
