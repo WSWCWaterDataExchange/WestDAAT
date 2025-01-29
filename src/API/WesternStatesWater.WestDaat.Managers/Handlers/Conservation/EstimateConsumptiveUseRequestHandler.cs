@@ -6,19 +6,19 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class EstimateEvapotranspirationRequestHandler : IRequestHandler<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>
+public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
 
-    public EstimateEvapotranspirationRequestHandler(ICalculationEngine calculationEngine,
+    public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk)
     {
         CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
     }
 
-    public async Task<EstimateEvapotranspirationResponse> Handle(EstimateEvapotranspirationRequest request)
+    public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
     {
         await Task.CompletedTask;
         throw new NotImplementedException();

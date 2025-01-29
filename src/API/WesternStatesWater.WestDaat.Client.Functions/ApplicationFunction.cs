@@ -21,15 +21,15 @@ public class ApplicationFunction : FunctionBase
         _logger = logger;
     }
 
-    [Function(nameof(EstimateEvapotranspiration))]
-    [OpenApiOperation(nameof(EstimateEvapotranspiration))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateEvapotranspirationResponse))]
-    public async Task<HttpResponseData> EstimateEvapotranspiration(
+    [Function(nameof(EstimateConsumptiveUse))]
+    [OpenApiOperation(nameof(EstimateConsumptiveUse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
+    public async Task<HttpResponseData> EstimateConsumptiveUse(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/estimate")]
         HttpRequestData req)
     {
-        var calculateEtRequest = await ParseRequestBody<EstimateEvapotranspirationRequest>(req);
-        var results = await _applicationManager.Store<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>(calculateEtRequest);
+        var calculateEtRequest = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
+        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(calculateEtRequest);
         return await CreateResponse(req, results);
     }
 }

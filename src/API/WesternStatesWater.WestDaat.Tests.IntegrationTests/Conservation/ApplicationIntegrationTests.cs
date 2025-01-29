@@ -50,7 +50,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         // Act
-        var request = new CLI.Requests.Conservation.EstimateEvapotranspirationRequest
+        var request = new CLI.Requests.Conservation.EstimateConsumptiveUseRequest
         {
             FundingOrganizationId = Guid.NewGuid(),
             WaterConservationApplicationId = null,
@@ -62,8 +62,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = 1000,
         };
         var response = await _applicationManager.Store<
-            CLI.Requests.Conservation.EstimateEvapotranspirationRequest,
-            CLI.Responses.Conservation.EstimateEvapotranspirationResponse>(
+            CLI.Requests.Conservation.EstimateConsumptiveUseRequest,
+            CLI.Responses.Conservation.EstimateConsumptiveUseResponse>(
             request);
 
         // Assert
