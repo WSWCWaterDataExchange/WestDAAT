@@ -74,19 +74,22 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.Member,
             [
-                Permissions.UserLoad
+                Permissions.UserLoad,
+                Permissions.ApplicationDashboardLoad
             ]
         },
         {
             Roles.TechnicalReviewer,
             [
-                Permissions.UserLoad
+                Permissions.UserLoad,
+                Permissions.ApplicationDashboardLoad
             ]
         },
         {
             Roles.OrganizationAdmin,
             [
-                Permissions.UserLoad
+                Permissions.UserLoad,
+                Permissions.ApplicationDashboardLoad
             ]
         },
         {

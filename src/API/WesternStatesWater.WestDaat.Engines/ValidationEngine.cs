@@ -30,7 +30,7 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
-            ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
+            ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -40,11 +40,30 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private async Task<ErrorBase> ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
+    private ErrorBase ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
     {
-        // TODO: add in RBAC, ReBAC validations here
-        await Task.CompletedTask;
-        throw new NotImplementedException("Need to add RBAC, ReBAC validations here");
+        return request switch
+        {
+            ApplicationDashboardLoadRequest req => ValidateApplicationDashboardLoadRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateApplicationDashboardLoadRequest(ApplicationDashboardLoadRequest request, ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest()
+        {
+            Context = context
+        });
+        
+        if (!permissions.Contains(Permissions.ApplicationDashboardLoad))
+        {
+            return CreateForbiddenError(request, context);
+        }
+        
+        return null;
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,

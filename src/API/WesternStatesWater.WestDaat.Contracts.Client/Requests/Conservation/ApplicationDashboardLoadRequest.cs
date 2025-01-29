@@ -5,5 +5,11 @@ namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 /// </summary>
 public class ApplicationDashboardLoadRequest : ApplicationLoadRequestBase
 {
-    // TODO: add client request input properties here
+    public Guid? OrganizationId { get; set; }
+    
+    // TODO: Status (enum)
+    // TODO: ReviewerType (needs definition)
+    // TODO: SubmittedStartDate (needs definition)
+    // TODO: SubmittedEndDate (needs definition)
+    // TODO: Paging (needs definition)
 }
