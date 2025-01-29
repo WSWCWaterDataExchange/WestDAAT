@@ -28,8 +28,8 @@ public class ApplicationFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
     {
-        var calculateEtRequest = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
-        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(calculateEtRequest);
+        var request = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
+        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(request);
         return await CreateResponse(req, results);
     }
 }
