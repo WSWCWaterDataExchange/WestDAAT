@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { useColorMappings as useColorMappingsBase } from '../../../../../hooks/useColorMappings';
-import {useOverlaysContext} from "../../sidebar-filtering/OverlaysProvider";
+import { useOverlaysContext } from '../../sidebar-filtering/OverlaysProvider';
 
 export function useColorMappings() {
   const {

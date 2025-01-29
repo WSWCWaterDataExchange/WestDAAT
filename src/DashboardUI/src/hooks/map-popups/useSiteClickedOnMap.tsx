@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import {overlayProperties, waterRightsProperties} from '../../config/constants';
+import { overlayProperties, waterRightsProperties } from '../../config/constants';
 import useMapPopupOnClick from './useMapPopupOnClick';
 
 function useSiteClickedOnMap() {
@@ -13,7 +13,7 @@ function useSiteClickedOnMap() {
       (a) =>
         a.properties &&
         (a.properties[waterRightsProperties.siteUuid as string] ||
-          a.properties[overlayProperties.overlayType as string])
+          a.properties[overlayProperties.overlayType as string]),
     );
 
     if (!siteFeature || !siteFeature.properties) {

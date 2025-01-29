@@ -1,6 +1,6 @@
 import React from 'react';
 import { ButtonGroup, ToggleButton } from 'react-bootstrap';
-import { useIncludeExemptFilter} from "../hooks/useIncludeExemptFilter";
+import { useIncludeExemptFilter } from '../hooks/useIncludeExemptFilter';
 import { ChangeEvent } from 'react';
 import { InformationTooltip } from '../../../../../InfomationTooltip';
 

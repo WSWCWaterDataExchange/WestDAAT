@@ -1,13 +1,11 @@
 import React, {
   createContext,
-  FC,
   JSX,
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '@data-contracts';
@@ -283,7 +281,6 @@ const MapProvider = ({ children }: MapProviderProps) => {
     },
     [setFillColors],
   );
-
 
   const [iconImages, setIconImages] = useState<MapLayerIconImagesType>({});
   const setLayerIconImages = useCallback(

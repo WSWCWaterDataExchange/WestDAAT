@@ -43,7 +43,7 @@ export enum waterRightsProperties {
 }
 
 export enum overlayProperties {
-  overlayType = 'oType'
+  overlayType = 'oType',
 }
 
 export enum nldiSiteProperties {
@@ -92,3 +92,5 @@ export const overlaysColorList = [
   '#FFB380',
   '#C8A2C8',
 ];
+
+export const timeSeriesColor = '#FF7F50';

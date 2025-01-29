@@ -8,7 +8,8 @@ import {
   getSiteDigest,
   getSiteUsage,
   getSiteVariableInfoList,
-  getSiteMethodInfoList, getOverlayDigests,
+  getSiteMethodInfoList,
+  getOverlayDigests,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
