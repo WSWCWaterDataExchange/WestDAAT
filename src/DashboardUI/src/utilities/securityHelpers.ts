@@ -12,14 +12,6 @@ export const hasOrganizationRole = (user: User | null, role: Role): boolean => {
   );
 };
 
-export const canViewOrgList = (user: User | null): boolean => {
-  return hasUserRole(user, Role.GlobalAdmin);
-};
-
-export const canViewUsersList = (user: User | null): boolean => {
-  return hasUserRole(user, Role.OrganizationAdmin) || hasUserRole(user, Role.GlobalAdmin);
-};
-
 export const getUserOrganization = (user: User | null): string | null => {
   // Assumes user only has one organization
   return user?.organizationRoles?.[0]?.organizationId ?? null;
