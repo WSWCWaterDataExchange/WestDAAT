@@ -50,7 +50,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         // Act
-        var request = new CLI.Requests.Conservation.CalculateEvapotranspirationRequest
+        var request = new CLI.Requests.Conservation.EstimateEvapotranspirationRequest
         {
             FundingOrganizationId = Guid.NewGuid(),
             Polygons = ["POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))", "POLYGON ((0 0, 5 0, 5 5, 0 5, 0 0))"],
@@ -61,8 +61,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             DesiredCompensation = 1000,
         };
         var response = await _applicationManager.Load<
-            CLI.Requests.Conservation.CalculateEvapotranspirationRequest,
-            CLI.Responses.Conservation.CalculateEvapotranspirationResponse>(
+            CLI.Requests.Conservation.EstimateEvapotranspirationRequest,
+            CLI.Responses.Conservation.EstimateEvapotranspirationResponse>(
             request);
 
         // Assert

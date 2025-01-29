@@ -79,7 +79,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddConservationMappings()
         {
-            CreateMap<(ClientContracts.Requests.Conservation.CalculateEvapotranspirationRequest Request, string PolygonWKT),
+            CreateMap<(ClientContracts.Requests.Conservation.EstimateEvapotranspirationRequest Request, string PolygonWKT),
                 CommonContracts.RasterTimeSeriesPolygonRequest>()
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(src => GeometryHelpers.GetGeometryByWkt(src.PolygonWKT)))
                 .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Request.DateRangeStart))
@@ -99,7 +99,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.RasterTimeSeriesPolygonResponse, CommonContracts.EvapotranspirationAggregateDetails>()
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data));
 
-            CreateMap<(ClientContracts.Requests.Conservation.CalculateEvapotranspirationRequest Request, CommonContracts.RasterTimeSeriesPolygonResponse[] RasterResponses),
+            CreateMap<(ClientContracts.Requests.Conservation.EstimateEvapotranspirationRequest Request, CommonContracts.RasterTimeSeriesPolygonResponse[] RasterResponses),
                 CommonContracts.CalculateTotalAverageEvapotranspirationRequest>()
                 .ForMember(dest => dest.Details, opt => opt.MapFrom(src => src.RasterResponses))
                 .ForMember(dest => dest.DesiredCompensationUnits, opt => opt.MapFrom(src => src.Request.Units));

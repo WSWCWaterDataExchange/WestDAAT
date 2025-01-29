@@ -9,19 +9,19 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class CalculateEvapotranspirationRequestHandler : IRequestHandler<CalculateEvapotranspirationRequest, CalculateEvapotranspirationResponse>
+public class EstimateEvapotranspirationRequestHandler : IRequestHandler<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
 
-    public CalculateEvapotranspirationRequestHandler(ICalculationEngine calculationEngine,
+    public EstimateEvapotranspirationRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk)
     {
         CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
     }
 
-    public async Task<CalculateEvapotranspirationResponse> Handle(CalculateEvapotranspirationRequest request)
+    public async Task<EstimateEvapotranspirationResponse> Handle(EstimateEvapotranspirationRequest request)
     {
         var rasterTimeSeriesPolygonRequests = request.Polygons.Select(polygon =>
             DtoMapper.Map<CommonContracts.RasterTimeSeriesPolygonRequest>((request, polygon))
@@ -32,7 +32,7 @@ public class CalculateEvapotranspirationRequestHandler : IRequestHandler<Calcula
         var calulateTotalAverageEtResponse = CalculationEngine.CalculateTotalAverageEvapotranspiration(calculateTotalAverageEtRequest);
 
         // temp
-        return new CalculateEvapotranspirationResponse
+        return new EstimateEvapotranspirationResponse
         {
             AverageTotalEtInInches = calulateTotalAverageEtResponse.TotalAverageEvapotranspiration,
         };

@@ -21,15 +21,15 @@ public class ConservationFunction : FunctionBase
         _logger = logger;
     }
 
-    [Function(nameof(CalculateEvapotranspiration))]
-    [OpenApiOperation(nameof(CalculateEvapotranspiration))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(CalculateEvapotranspirationResponse))]
-    public async Task<HttpResponseData> CalculateEvapotranspiration(
+    [Function(nameof(EstimateEvapotranspiration))]
+    [OpenApiOperation(nameof(EstimateEvapotranspiration))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateEvapotranspirationResponse))]
+    public async Task<HttpResponseData> EstimateEvapotranspiration(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/estimate")]
         HttpRequestData req)
     {
-        var calculateEtRequest = await ParseRequestBody<CalculateEvapotranspirationRequest>(req);
-        var results = await _applicationManager.Load<CalculateEvapotranspirationRequest, CalculateEvapotranspirationResponse>(calculateEtRequest);
+        var calculateEtRequest = await ParseRequestBody<EstimateEvapotranspirationRequest>(req);
+        var results = await _applicationManager.Load<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>(calculateEtRequest);
         return await CreateResponse(req, results);
     }
 }

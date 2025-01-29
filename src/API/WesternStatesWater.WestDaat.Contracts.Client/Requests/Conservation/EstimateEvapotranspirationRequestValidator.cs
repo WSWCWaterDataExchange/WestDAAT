@@ -2,9 +2,9 @@
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-public class CalculateEvapotranspirationRequestValidator : AbstractValidator<CalculateEvapotranspirationRequest>
+public class EstimateEvapotranspirationRequestValidator : AbstractValidator<EstimateEvapotranspirationRequest>
 {
-    public CalculateEvapotranspirationRequestValidator()
+    public EstimateEvapotranspirationRequestValidator()
     {
         RuleFor(x => x.Polygons).NotEmpty();
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
