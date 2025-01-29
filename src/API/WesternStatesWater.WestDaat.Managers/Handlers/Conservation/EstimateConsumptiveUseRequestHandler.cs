@@ -20,6 +20,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
 
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
     {
+
         await Task.CompletedTask;
         throw new NotImplementedException();
     }

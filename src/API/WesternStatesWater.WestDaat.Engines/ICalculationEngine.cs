@@ -1,4 +1,5 @@
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Engines;
 
@@ -8,4 +9,5 @@ namespace WesternStatesWater.WestDaat.Engines;
 /// </summary>
 public interface ICalculationEngine : IServiceContractBase
 {
+    Task<CalculateResponseBase> Calculate(CalculateRequestBase request);
 }
