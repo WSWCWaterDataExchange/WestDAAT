@@ -36,6 +36,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+	<Folder Include="Handlers\Conservation\" />
     <Folder Include="Handlers\WaterResource\" />
   </ItemGroup>
 </Project>
