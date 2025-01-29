@@ -14,4 +14,6 @@ public class WaterConservationApplicationEstimateLocationConsumptiveUse
     public int Year { get; set; }
 
     public double EtInInches { get; set; }
+
+    public virtual WaterConservationApplicationEstimateLocation Location { get; set; } = null!;
 }

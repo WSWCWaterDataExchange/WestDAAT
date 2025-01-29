@@ -13,5 +13,9 @@ public class WaterConservationApplicationEstimateLocation
 
     public string PolygonWkt { get; set; } = null!;
 
-    public virtual WaterConservationApplicationEstimate WaterConservationApplicationEstimate { get; set; } = null!;
+    public double PolygonAreaInAcres { get; set; }
+
+    public virtual WaterConservationApplicationEstimate Estimate { get; set; } = null!;
+
+    public virtual ICollection<WaterConservationApplicationEstimateLocationConsumptiveUse> ConsumptiveUses { get; set; } = null!;
 }
