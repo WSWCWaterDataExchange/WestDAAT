@@ -29,7 +29,7 @@ public class ConservationFunction : FunctionBase
         HttpRequestData req)
     {
         var calculateEtRequest = await ParseRequestBody<EstimateEvapotranspirationRequest>(req);
-        var results = await _applicationManager.Load<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>(calculateEtRequest);
+        var results = await _applicationManager.Store<EstimateEvapotranspirationRequest, EstimateEvapotranspirationResponse>(calculateEtRequest);
         return await CreateResponse(req, results);
     }
 }

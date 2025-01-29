@@ -60,7 +60,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Units = Common.DataContracts.DesiredCompensationUnits.AcreFeet,
             DesiredCompensation = 1000,
         };
-        var response = await _applicationManager.Load<
+        var response = await _applicationManager.Store<
             CLI.Requests.Conservation.EstimateEvapotranspirationRequest,
             CLI.Responses.Conservation.EstimateEvapotranspirationResponse>(
             request);

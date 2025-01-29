@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation
 {
-    public class EstimateEvapotranspirationResponse : ApplicationLoadResponseBase
+    public class EstimateEvapotranspirationResponse : ApplicationStoreResponseBase
     {
         public double AverageTotalEtInInches { get; set; }
 
