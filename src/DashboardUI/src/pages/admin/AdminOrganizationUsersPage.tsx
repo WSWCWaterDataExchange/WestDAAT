@@ -6,8 +6,10 @@ export function AdminOrganizationsUsersPage() {
 
   return (
     <div>
-      <h1>Organization Users Page</h1>
       <pre>OrganizationId: {organizationId}</pre>
+
+      <h1>Organization Users Page</h1>
+      <h2>Users</h2>
     </div>
   );
 }

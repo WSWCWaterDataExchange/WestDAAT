@@ -74,11 +74,6 @@ export function useAuthenticationContext(): IAuthenticationContext {
         user: null,
       });
     }
-
-    setAuthContext((prev) => ({
-      ...prev,
-      authenticationComplete: inProgress === InteractionStatus.None,
-    }));
   }, [isAuthenticated, inProgress]);
 
   return authContext;
