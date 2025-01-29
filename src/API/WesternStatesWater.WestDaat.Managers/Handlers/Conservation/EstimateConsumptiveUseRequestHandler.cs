@@ -1,4 +1,5 @@
 ﻿using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 using WesternStatesWater.WestDaat.Engines;
@@ -20,6 +21,16 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
 
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
     {
+        // todo: dtomapper
+        var multiPolygonEtRequest = new MultiPolygonYearlyEtRequest
+        {
+            Polygons = request.Polygons,
+            DateRangeStart = request.DateRangeStart,
+            DateRangeEnd = request.DateRangeEnd,
+            Model = request.Model,
+        };
+        var multiPolygonYearlyEtResponse = await CalculationEngine.Calculate(multiPolygonEtRequest);
+
         await Task.CompletedTask;
         throw new NotImplementedException();
     }
