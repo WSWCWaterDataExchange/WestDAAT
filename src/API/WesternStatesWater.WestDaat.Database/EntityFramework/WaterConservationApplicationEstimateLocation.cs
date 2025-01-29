@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework;
 
-public class WaterConservationApplicationEstimatePolygon
+public class WaterConservationApplicationEstimateLocation
 {
-    public WaterConservationApplicationEstimatePolygon()
+    public WaterConservationApplicationEstimateLocation()
     {
 
     }

@@ -23,13 +23,9 @@ public class WaterConservationApplicationEstimate
 
     public CompensationRateUnits CompensationRateUnits { get; set; }
 
-    public double TotalPolygonAreaAcres { get; set; }
-
-    public double TotalEtInches { get; set; }
-
     public int EstimatedCompensationDollars { get; set; }
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 
-    public virtual ICollection<WaterConservationApplicationEstimatePolygon> Polygons { get; set; } = null!;
+    public virtual ICollection<WaterConservationApplicationEstimateLocation> Locations { get; set; } = null!;
 }

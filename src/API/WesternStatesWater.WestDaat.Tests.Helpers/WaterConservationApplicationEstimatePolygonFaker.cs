@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class WaterConservationApplicationEstimatePolygonFaker : Faker<EFWD.WaterConservationApplicationEstimatePolygon>
+public class WaterConservationApplicationEstimatePolygonFaker : Faker<EFWD.WaterConservationApplicationEstimateLocation>
 {
     public WaterConservationApplicationEstimatePolygonFaker(EFWD.WaterConservationApplicationEstimate estimate = null)
     {
