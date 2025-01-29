@@ -1,4 +1,3 @@
-import React from 'react';
 import { IPublicClientApplication } from '@azure/msal-browser';
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
 
@@ -19,6 +18,7 @@ import { Link } from 'react-router-dom';
 import AuthorizedTemplate from './AuthorizedTemplate';
 import { Role } from '../config/role';
 import { getUserOrganization } from '../utilities/securityHelpers';
+import { isFeatureEnabled } from '../config/features';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
   if (!msalContext) return;
@@ -36,6 +36,7 @@ function SiteNavbar() {
   const handleShow = () => setShowHamburgerMenu(true);
 
   const userOrganizationId = getUserOrganization(user);
+  const isAdminFeatureEnabled = isFeatureEnabled('conservationEstimationTool');
 
   return (
     <div>
@@ -107,18 +108,22 @@ function SiteNavbar() {
             >
               Terms of Service
             </Nav.Link>
-            <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
-              <Nav.Link as={Link} to="/admin/organizations">
-                Admin
-              </Nav.Link>
-            </AuthorizedTemplate>
-            <AuthorizedTemplate roles={[Role.OrganizationAdmin]}>
-              {userOrganizationId && (
-                <Nav.Link as={Link} to={`/admin/${userOrganizationId}/users`}>
-                  Admin
-                </Nav.Link>
-              )}
-            </AuthorizedTemplate>
+            {isAdminFeatureEnabled && (
+              <>
+                <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
+                  <Nav.Link as={Link} to="/admin/organizations">
+                    Admin
+                  </Nav.Link>
+                </AuthorizedTemplate>
+                <AuthorizedTemplate roles={[Role.OrganizationAdmin]}>
+                  {userOrganizationId && (
+                    <Nav.Link as={Link} to={`/admin/${userOrganizationId}/users`}>
+                      Admin
+                    </Nav.Link>
+                  )}
+                </AuthorizedTemplate>
+              </>
+            )}
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
