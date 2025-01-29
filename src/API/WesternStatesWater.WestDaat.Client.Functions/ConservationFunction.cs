@@ -13,7 +13,7 @@ public class ConservationFunction : FunctionBase
     private readonly IApplicationManager _applicationManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "Conservation";
+    private const string RouteBase = "conservation";
 
     public ConservationFunction(IApplicationManager applicationManager, ILogger<ConservationFunction> logger)
     {
@@ -25,7 +25,7 @@ public class ConservationFunction : FunctionBase
     [OpenApiOperation(nameof(CalculateEvapotranspiration))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(CalculateEvapotranspirationResponse))]
     public async Task<HttpResponseData> CalculateEvapotranspiration(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/calculateEt")]
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/estimate")]
         HttpRequestData req)
     {
         var calculateEtRequest = await ParseRequestBody<CalculateEvapotranspirationRequest>(req);
