@@ -140,7 +140,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 requestBody = await streamReader.ReadToEndAsync();
             }
 
-            return JsonSerializer.Deserialize<T>(requestBody);
+            return JsonSerializer.Deserialize<T>(requestBody, JsonSerializerOptions);
         }
     }
 }
