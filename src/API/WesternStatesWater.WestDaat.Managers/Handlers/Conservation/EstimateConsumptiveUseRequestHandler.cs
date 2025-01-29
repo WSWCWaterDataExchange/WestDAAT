@@ -23,7 +23,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
     {
         var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
-        var multiPolygonYearlyEtResponse = await CalculationEngine.Calculate(multiPolygonEtRequest);
+        var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
 
         throw new NotImplementedException();
     }

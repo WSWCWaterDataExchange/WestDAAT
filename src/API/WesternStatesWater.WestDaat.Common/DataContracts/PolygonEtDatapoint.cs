@@ -4,5 +4,5 @@ public class PolygonEtDatapoint
 {
     public int Year { get; set; }
 
-    public double Et { get; set; }
+    public double EtInInches { get; set; }
 }

@@ -34,6 +34,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
+            AddApplicationMappings();
         }
 
         private void AddUserMappings()
@@ -73,6 +74,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
+        }
+
+        private void AddApplicationMappings()
+        {
+            CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
         }
     }
 }

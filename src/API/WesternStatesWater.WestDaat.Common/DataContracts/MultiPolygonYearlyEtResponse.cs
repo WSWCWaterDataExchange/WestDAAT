@@ -2,5 +2,5 @@
 
 public class MultiPolygonYearlyEtResponse : CalculateResponseBase
 {
-    public PolygonEtDataCollection[] Data { get; set; }
+    public PolygonEtDataCollection[] DataCollections { get; set; }
 }

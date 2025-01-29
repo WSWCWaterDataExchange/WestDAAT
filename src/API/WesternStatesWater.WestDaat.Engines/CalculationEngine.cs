@@ -44,20 +44,20 @@ internal class CalculationEngine : ICalculationEngine
             var rasterResponse = await _openEtSdk.RasterTimeseriesPolygon(rasterRequest);
 
             var datapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
-                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, Et = grouping.Sum(datum => datum.Evapotranspiration) })
+                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, EtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
             var result = new PolygonEtDataCollection
             {
                 PolygonWkt = polygonWkt,
-                Data = datapoints
+                Datapoints = datapoints
             };
             results.Add(result);
         }
 
         return new MultiPolygonYearlyEtResponse
         {
-            Data = results.ToArray()
+            DataCollections = results.ToArray()
         };
     }
 
