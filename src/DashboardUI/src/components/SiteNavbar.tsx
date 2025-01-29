@@ -18,6 +18,7 @@ import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import { Link } from 'react-router-dom';
 import AuthorizedTemplate from './AuthorizedTemplate';
 import { Role } from '../config/role';
+import { getUserOrganization } from '../utilities/securityHelpers';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
   if (!msalContext) return;
@@ -33,6 +34,8 @@ function SiteNavbar() {
 
   const handleClose = () => setShowHamburgerMenu(false);
   const handleShow = () => setShowHamburgerMenu(true);
+
+  const userOrganizationId = getUserOrganization(user);
 
   return (
     <div>
@@ -110,9 +113,11 @@ function SiteNavbar() {
               </Nav.Link>
             </AuthorizedTemplate>
             <AuthorizedTemplate roles={[Role.OrganizationAdmin]}>
-              <Nav.Link as={Link} to="/admin/users">
-                Admin
-              </Nav.Link>
+              {userOrganizationId && (
+                <Nav.Link as={Link} to={`/admin/${userOrganizationId}/users`}>
+                  Admin
+                </Nav.Link>
+              )}
             </AuthorizedTemplate>
           </Nav>
         </Offcanvas.Body>

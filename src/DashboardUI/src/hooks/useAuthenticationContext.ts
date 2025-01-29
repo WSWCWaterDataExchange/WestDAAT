@@ -54,8 +54,16 @@ export function useAuthenticationContext(): IAuthenticationContext {
           user: {
             emailAddress: result?.account?.username ?? null,
             externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
-            roles: parseRoles(idTokenClaims),
-            organizationRoles: parseOrganizationRoles(idTokenClaims),
+            // TODO replace after testing
+            // roles: parseRoles(idTokenClaims),
+            // organizationRoles: parseOrganizationRoles(idTokenClaims),
+            roles: [],
+            organizationRoles: [
+              {
+                organizationId: '42',
+                roles: [Role.OrganizationAdmin],
+              },
+            ],
           },
         });
       });

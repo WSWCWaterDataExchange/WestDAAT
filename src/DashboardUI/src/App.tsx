@@ -89,7 +89,7 @@ function App({ msalInstance }: AppProps) {
                 <Route path="admin" element={<AdminGuard />}>
                   <Route element={<AdminLayout />}>
                     <Route path="organizations" element={<AdminOrganizationsPage />} />
-                    <Route path="users" element={<AdminOrganizationsUsersPage />} />
+                    <Route path=":organizationId/users" element={<AdminOrganizationsUsersPage />} />
                   </Route>
                 </Route>
               </Route>
