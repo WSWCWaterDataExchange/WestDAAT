@@ -1,11 +1,9 @@
 import React, {
   createContext,
-  FC,
   JSX,
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from 'react';

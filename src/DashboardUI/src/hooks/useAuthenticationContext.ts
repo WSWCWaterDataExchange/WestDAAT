@@ -1,5 +1,5 @@
-import { InteractionStatus, InteractionType } from '@azure/msal-browser';
-import { useAccount, useIsAuthenticated, useMsal, useMsalAuthentication } from '@azure/msal-react';
+import { InteractionStatus } from '@azure/msal-browser';
+import { useAccount, useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect, useState } from 'react';
 import { loginRequest } from '../authConfig';
 import { Role } from '../config/role';
@@ -66,11 +66,6 @@ export function useAuthenticationContext(): IAuthenticationContext {
         user: null,
       });
     }
-
-    setAuthContext((prev) => ({
-      ...prev,
-      authenticationComplete: inProgress === InteractionStatus.None,
-    }));
   }, [isAuthenticated, inProgress]);
 
   return authContext;

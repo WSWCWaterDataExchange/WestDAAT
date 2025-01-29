@@ -11,3 +11,8 @@ export const hasOrganizationRole = (user: User | null, role: Role): boolean => {
     false
   );
 };
+
+export const getUserOrganization = (user: User | null): string | null => {
+  // Assumes user only has one organization
+  return user?.organizationRoles?.[0]?.organizationId ?? null;
+};
