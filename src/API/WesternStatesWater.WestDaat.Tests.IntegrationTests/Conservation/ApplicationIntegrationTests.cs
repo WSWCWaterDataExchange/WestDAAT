@@ -67,16 +67,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             request);
 
         // Assert
-
-        // temp:
         response.Should().NotBeNull();
         response.Error.Should().NotBeNull();
-
-        // actual results once call chain is in place:
-        //response.Should().NotBeNull();
-        //response.Error.Should().BeNull();
-
-        //response.AverageTotalEtInInches.Should().BeGreaterThanOrEqualTo(yearRange * request.Polygons.Length);
-        //response.AverageTotalEtInInches.Should().BeLessThanOrEqualTo(yearRange * request.Polygons.Length * 10);
     }
 }
