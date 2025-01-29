@@ -49,14 +49,14 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            EstimateConsumptiveUseRequest req => await ValidateEstimateEvapotranspirationRequest(req, context),
+            EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private async Task<ErrorBase> ValidateEstimateEvapotranspirationRequest(EstimateConsumptiveUseRequest request,
+    private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
     {
         if (request.DateRangeEnd < request.DateRangeStart)
