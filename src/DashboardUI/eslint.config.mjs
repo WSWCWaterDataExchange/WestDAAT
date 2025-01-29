@@ -35,6 +35,9 @@ export default [
 
       // Remove this to get a handle of unescaped single quotes in template strings
       'react/no-unescaped-entities': 'off',
+
+      // Allow jsx to be used without importing React
+      'react/react-in-jsx-scope': 'off',
     },
   },
 ];
