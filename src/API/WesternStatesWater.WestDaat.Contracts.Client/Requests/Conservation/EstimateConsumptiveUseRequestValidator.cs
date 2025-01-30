@@ -8,7 +8,7 @@ public class EstimateConsumptiveUseRequestValidator : AbstractValidator<Estimate
     {
         RuleFor(x => x.FundingOrganizationId).NotEmpty();
 
-        RuleFor(x => x.WaterConservationApplicationId); // optional
+        RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
 
         RuleFor(x => x.Polygons).NotEmpty();
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
