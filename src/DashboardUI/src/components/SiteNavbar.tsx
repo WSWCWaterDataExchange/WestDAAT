@@ -45,6 +45,8 @@ function SiteNavbar() {
   const showWaterUserDashboard =
     isFeatureEnabled('conservationEstimationTool') && userOrganizationId == null && !isGlobalAdmin;
 
+  const showProfileEdit = isFeatureEnabled('conservationEstimationTool');
+
   return (
     <div>
       <Navbar variant="dark" expand={false}>
@@ -81,6 +83,11 @@ function SiteNavbar() {
             </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
+                {showProfileEdit && (
+                  <NavDropdown.Item as={Link} to="/account">
+                    My Account
+                  </NavDropdown.Item>
+                )}
                 {showOrganizationDashboard && (
                   <NavDropdown.Item as={Link} to="/application/organization/dashboard">
                     Application Dashboard
