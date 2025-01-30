@@ -2,6 +2,7 @@ import React from 'react';
 import SiteNavbar from '../../components/SiteNavbar';
 import { Outlet } from 'react-router-dom';
 import SiteFooter from '../../components/SiteFooter';
+import { ConservationApplicationProvider } from '../../contexts/ConservationApplicationProvider';
 
 export function ApplicationLayout() {
   return (
@@ -9,7 +10,9 @@ export function ApplicationLayout() {
       <SiteNavbar />
 
       <div className="flex-grow-1">
-        <Outlet />
+        <ConservationApplicationProvider>
+          <Outlet />
+        </ConservationApplicationProvider>
       </div>
 
       <SiteFooter />
