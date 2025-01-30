@@ -7,7 +7,7 @@ public class UserContext : ContextBase
     public string ExternalAuthId { get; init; } = null!;
 
     /// <summary>
-    /// Roles that are not specific to a particular organization.
+    /// Roles that apply to all organizations.
     /// </summary>
     public string[] Roles { get; init; } = [];
     
