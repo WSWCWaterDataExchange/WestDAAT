@@ -16,9 +16,12 @@ public class GeometryHelpersTests : UtilityTestBase
         "-96.69001188217317 40.81032882324605" +
         "))";
 
+    private const string ZeroAreaPolygon = "POLYGON ((0 0, 0 0, 0 0, 0 0))";
+
     [DataTestMethod]
     [DataRow(ZeroZeroSquarePolygon, 12_364_025_625.25)]
     [DataRow(DplBuildingPolygon, 2_238.06)]
+    [DataRow(ZeroAreaPolygon, 0)]
     // expected areas calculated using google earth
     public void GetGeometryAreaInSquareMeters_Success(string polygonWkt, double expectedAreaSquareMeters)
     {
