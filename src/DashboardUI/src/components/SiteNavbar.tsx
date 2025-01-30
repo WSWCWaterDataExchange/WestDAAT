@@ -77,7 +77,7 @@ function SiteNavbar() {
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
                 {showDashboard && (
                   <NavDropdown.Item as={Link} to="/application/dashboard">
-                    Dashboard
+                    Application Dashboard
                   </NavDropdown.Item>
                 )}
                 <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>
