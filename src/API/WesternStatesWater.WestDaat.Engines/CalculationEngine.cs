@@ -16,9 +16,32 @@ internal class CalculationEngine : ICalculationEngine
     {
         return request switch
         {
+            EstimateConservationPaymentRequest req => await EstimateConservationPayment(req),
             MultiPolygonYearlyEtRequest req => await CalculatePolygonsEt(req),
             _ => throw new NotImplementedException()
         };
+    }
+
+    private async Task<EstimateConservationPaymentResponse> EstimateConservationPayment(EstimateConservationPaymentRequest request)
+    {
+        return request.CompensationRateUnits switch
+        {
+            CompensationRateUnits.Acres => await EstimateConservationPaymentInAcres(request),
+            CompensationRateUnits.AcreFeet => await EstimateConservationPaymentInAcreFeet(request),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private async Task<EstimateConservationPaymentResponse> EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
+    {
+        await Task.CompletedTask;
+        throw new NotImplementedException();
+    }
+
+    private async Task<EstimateConservationPaymentResponse> EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
+    {
+        await Task.CompletedTask;
+        throw new NotImplementedException();
     }
 
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
