@@ -34,12 +34,11 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
     {
-        // todo: how do we verify that the area is in acres?
-        var totalArea = request.DataCollections
+        var totalAreaInSquareMeters = request.DataCollections
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(geometry => geometry.Area);
+            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
 
-        var estimatedCompensation = totalArea * request.CompensationRateDollars;
+        var estimatedCompensation = totalAreaInSquareMeters * request.CompensationRateDollars;
         return new EstimateConservationPaymentResponse
         {
             EstimatedCompensationDollars = (int)estimatedCompensation
@@ -48,16 +47,16 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
     {
-        var totalArea = request.DataCollections
+        var totalAreaInSquareMeters = request.DataCollections
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(geometry => geometry.Area);
+            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
 
         var totalAverageEtInInches = request.DataCollections
             .Sum(dc => dc.AverageEtInInches);
 
         var totalAverageEtInFeet = totalAverageEtInInches / 12;
 
-        var totalVolumeInAcreFeet = totalArea * totalAverageEtInFeet;
+        var totalVolumeInAcreFeet = totalAreaInSquareMeters * totalAverageEtInFeet;
 
         var estimatedCompensation = totalVolumeInAcreFeet * request.CompensationRateDollars;
 
