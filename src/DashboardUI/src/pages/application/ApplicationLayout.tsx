@@ -1,4 +1,3 @@
-import React from 'react';
 import SiteNavbar from '../../components/SiteNavbar';
 import { Outlet } from 'react-router-dom';
 import SiteFooter from '../../components/SiteFooter';
