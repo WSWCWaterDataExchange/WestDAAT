@@ -25,6 +25,12 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
         var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
 
+        if (request.CompensationRateDollars.HasValue)
+        {
+            var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
+            var estimateConservationPaymentResponse = await CalculationEngine.Calculate(estimateConservationPaymentRequest);
+        }
+
         throw new NotImplementedException();
     }
 }
