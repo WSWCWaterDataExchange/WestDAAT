@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -23,8 +22,10 @@ import { clarity } from 'clarity-js';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
-import { useAuthenticationContext } from './hooks/useAuthenticationContext';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
+import { ApplicationLayout } from './pages/application/ApplicationLayout';
+import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
+import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -85,6 +86,14 @@ function App({ msalInstance }: AppProps) {
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
+                </Route>
+                <Route path="application">
+                  <Route element={<ApplicationLayout />}>
+                    <Route path="dashboard" element={<WaterUserDashboardPage />} />
+                    <Route path="organization">
+                      <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                    </Route>
+                  </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>
                   <Route element={<AdminLayout />}>
