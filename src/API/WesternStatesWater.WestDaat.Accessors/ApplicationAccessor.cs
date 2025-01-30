@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -38,13 +39,31 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
-            _ => throw new NotImplementedException()
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
     }
 
     private async Task<ApplicationStoreResponseBase> StoreApplicationEstimate(ApplicationEstimateStoreRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingEntity = await db.WaterConservationApplicationEstimates
+            .Include(estimate => estimate.Locations)
+            .ThenInclude(location => location.ConsumptiveUses)
+            .FirstOrDefaultAsync(estimate => estimate.Id == request.WaterConservationApplicationId);
+
+        if (existingEntity != null)
+        {
+            db.WaterConservationApplicationEstimateLocationConsumptiveUses
+                .RemoveRange(existingEntity.Locations.SelectMany(location => location.ConsumptiveUses));
+
+            db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
+
+            db.WaterConservationApplicationEstimates.Remove(existingEntity);
+
+            await db.SaveChangesAsync();
+        }
 
         var entity = request.Map<EFWD.WaterConservationApplicationEstimate>();
 
