@@ -1,6 +1,6 @@
 using AutoMapper;
-using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {

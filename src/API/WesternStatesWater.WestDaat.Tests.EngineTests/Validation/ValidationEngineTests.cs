@@ -1,4 +1,5 @@
 using WesternStatesWater.Shared.DataContracts;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
@@ -15,13 +16,17 @@ public class ValidationEngineTests : EngineTestBase
 
     private Mock<ISecurityUtility> _securityUtilityMock = null!;
 
+    private Mock<IOrganizationAccessor> _organizationAccessorMock = null!;
+
     [TestInitialize]
     public void TestInitialize()
     {
         _contextUtilityMock = new Mock<IContextUtility>(MockBehavior.Strict);
         _securityUtilityMock = new Mock<ISecurityUtility>(MockBehavior.Strict);
 
-        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object);
+        _organizationAccessorMock = new Mock<IOrganizationAccessor>(MockBehavior.Strict);
+
+        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object, _organizationAccessorMock.Object);
     }
 
     [TestMethod]
@@ -30,7 +35,7 @@ public class ValidationEngineTests : EngineTestBase
         _contextUtilityMock
             .Setup(util => util.GetContext())
             .Returns(new UserContext());
-        
+
         _securityUtilityMock
             .Setup(util => util.Get(It.IsAny<PermissionsGetRequestBase>()))
             .Returns(["Permission_1"]);

@@ -1,7 +1,7 @@
-using System.Net;
-using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -35,5 +35,17 @@ public class ApplicationFunction : FunctionBase
             _ => throw new NotImplementedException($"Request type {applicationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(EstimateConsumptiveUse))]
+    [OpenApiOperation(nameof(EstimateConsumptiveUse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
+    public async Task<HttpResponseData> EstimateConsumptiveUse(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
+        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(request);
+        return await CreateResponse(req, results);
     }
 }

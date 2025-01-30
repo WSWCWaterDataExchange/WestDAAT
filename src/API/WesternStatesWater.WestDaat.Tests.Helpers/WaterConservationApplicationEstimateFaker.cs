@@ -18,10 +18,6 @@ public class WaterConservationApplicationEstimateFaker : Faker<EFWD.WaterConserv
 
         RuleFor(wcas => wcas.CompensationRateUnits, f => f.PickRandomWithout(CompensationRateUnits.None));
 
-        RuleFor(wcas => wcas.TotalPolygonAreaAcres, f => f.Random.Double(10, 1000));
-
-        RuleFor(wcas => wcas.TotalEtInches, f => f.Random.Double(10, 1000));
-
         RuleFor(wcas => wcas.EstimatedCompensationDollars, f => f.Random.Int(100, 1000));
 
         if (application != null)

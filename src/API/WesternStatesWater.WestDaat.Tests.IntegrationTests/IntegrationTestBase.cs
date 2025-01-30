@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Transactions;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
@@ -25,6 +25,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         protected IServiceProvider Services { get; private set; }
 
         protected Mock<IContextUtility> ContextUtilityMock { get; private set; }
+
+        protected Mock<IOpenEtSdk> OpenEtSdkMock { get; private set; }
 
         [TestInitialize]
         public void BaseTestInitialize()
@@ -101,6 +103,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private void RegisterEngineServices(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<ICalculationEngine, CalculationEngine>();
             serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
             serviceCollection.AddTransient<ITestEngine, TestEngine>();
@@ -130,6 +133,9 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             ContextUtilityMock = new Mock<IContextUtility>(MockBehavior.Strict);
             serviceCollection.AddScoped(_ => ContextUtilityMock.Object);
             serviceCollection.AddTransient<ISecurityUtility, SecurityUtility>();
+
+            OpenEtSdkMock = new Mock<IOpenEtSdk>(MockBehavior.Strict);
+            serviceCollection.AddScoped(_ => OpenEtSdkMock.Object);
         }
 
         [TestCleanup]
