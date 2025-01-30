@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors;
@@ -6,10 +7,15 @@ namespace WesternStatesWater.WestDaat.Accessors;
 internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 {
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+    private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-    public ApplicationAccessor(ILogger<ApplicationAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
+    public ApplicationAccessor(
+        ILogger<ApplicationAccessor> logger,
+        EF.IDatabaseContextFactory databaseContextFactory,
+        EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
     {
         _databaseContextFactory = databaseContextFactory;
+        _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
     }
 
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
@@ -23,7 +29,13 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicationStoreResponseBase> StoreApplicationEstimate(ApplicationEstimateStoreRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var entity = request.Map<EFWD.WaterConservationApplicationEstimate>();
+
+        await db.WaterConservationApplicationEstimates.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
     }
 }
