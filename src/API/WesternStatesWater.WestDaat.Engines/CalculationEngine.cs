@@ -38,7 +38,9 @@ internal class CalculationEngine : ICalculationEngine
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
             .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
 
-        var estimatedCompensation = totalAreaInSquareMeters * request.CompensationRateDollars;
+        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+
+        var estimatedCompensation = totalAreaInAcres * request.CompensationRateDollars;
         return new EstimateConservationPaymentResponse
         {
             EstimatedCompensationDollars = (int)estimatedCompensation
@@ -51,12 +53,14 @@ internal class CalculationEngine : ICalculationEngine
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
             .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
 
+        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+
         var totalAverageEtInInches = request.DataCollections
             .Sum(dc => dc.AverageEtInInches);
 
         var totalAverageEtInFeet = totalAverageEtInInches / 12;
 
-        var totalVolumeInAcreFeet = totalAreaInSquareMeters * totalAverageEtInFeet;
+        var totalVolumeInAcreFeet = totalAreaInAcres * totalAverageEtInFeet;
 
         var estimatedCompensation = totalVolumeInAcreFeet * request.CompensationRateDollars;
 
@@ -64,6 +68,12 @@ internal class CalculationEngine : ICalculationEngine
         {
             EstimatedCompensationDollars = (int)estimatedCompensation
         };
+    }
+
+    private double ConvertSquareMetersToAcres(double areaInSquareMeters)
+    {
+        double areaInAcres = areaInSquareMeters * 0.000247105;
+        return areaInAcres;
     }
 
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
