@@ -102,7 +102,7 @@ namespace WesternStatesWater.WestDaat.Utilities
         {
             var chars = new SqlChars(geometry.ToString());
             var sqlGeometry = SqlGeography.STGeomFromText(chars, geometry.SRID);
-            return sqlGeometry.MakeValid().ReorientObject();
+            return sqlGeometry.MakeValid();
         }
     }
 }
