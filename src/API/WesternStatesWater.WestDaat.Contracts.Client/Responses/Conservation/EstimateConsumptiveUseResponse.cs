@@ -5,7 +5,7 @@
         /// <summary>
         /// The average yearly estimated consumptive use in acre-feet for all polygons.
         /// </summary>
-        public int AverageEtAcreFeet { get; set; }
+        public int TotalAverageYearlyEtAcreFeet { get; set; }
 
         /// <summary>
         /// The total estimated conservation payment in dollars.
