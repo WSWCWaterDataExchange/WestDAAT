@@ -20,9 +20,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public void TestInitialize()
     {
         _applicationManager = Services.GetRequiredService<IApplicationManager>();
-
-        var dbContextFactory = Services.GetRequiredService<IWestDaatDatabaseContextFactory>();
-        _dbContext = dbContextFactory.Create();
+        _dbContext = Services.GetRequiredService<IWestDaatDatabaseContextFactory>().Create();
     }
 
     [TestMethod]
