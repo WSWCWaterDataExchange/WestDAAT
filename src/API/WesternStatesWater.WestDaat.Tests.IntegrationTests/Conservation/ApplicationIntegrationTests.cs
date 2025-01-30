@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Contracts.Client;
@@ -27,15 +28,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _applicationManager.Should().NotBeNull();
 
     [DataTestMethod]
-    [DataRow(Roles.GlobalAdmin, null, true, false, true, DisplayName = "ValidGlobalUser_AllOrgs_Success")]
-    [DataRow(Roles.GlobalAdmin, null, false, false, true, DisplayName = "ValidGlobalUser_SpecificOrgs_IsNotAMember_Success")]
-    [DataRow("invalid global role", null, null, null, false, DisplayName = "InvalidGlobalUser_ShouldThrow")]
-    [DataRow(null, "invalid org role", true, null, false, DisplayName = "InvalidOrgUser_AllOrgs_ShouldThrow")]
-    [DataRow(null, Roles.GlobalAdmin, true, null, false, DisplayName = "ValidOrgUser_AllOrgs_ShouldThrow")]
-    [DataRow(null, Roles.GlobalAdmin, false, true, true, DisplayName = "ValidOrgUser_SpecificOrg_IsAMember_ShouldThrow")]
-    [DataRow(null, Roles.GlobalAdmin, false, false, false, DisplayName = "ValidOrgUser_SpecificOrg_IsNotAMember_ShouldThrow")]
-    [DataRow(null, "invalid org role", false, true, false, DisplayName = "InvalidOrgUser_SpecificOrg_IsAMember_ShouldThrow")]
-    [DataRow(null, "invalid org role", false, false, false, DisplayName = "InvalidOrgUser_SpecificOrg_IsNotAMember_ShouldThrow")]
+    [DataRow(Roles.GlobalAdmin, null, true, false, true, DisplayName = "Global user requesting all organizations should succeed")]
+    [DataRow(Roles.GlobalAdmin, null, false, false, true, DisplayName = "Global user requesting a specific organization to which they are not a member should succeed")]
+    [DataRow("invalid global role", null, null, null, false, DisplayName = "A global user without required permissions should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", true, null, false, DisplayName = "An organization user without required permissions should throw a permission forbidden exception")]
+    [DataRow(null, Roles.GlobalAdmin, true, null, false, DisplayName = "An organization user requesting all organizations should throw a permission forbidden exception")]
+    [DataRow(null, Roles.GlobalAdmin, false, true, true, DisplayName = "An organization user requesting a specific organization to which they are a member should succeed")]
+    [DataRow(null, Roles.GlobalAdmin, false, false, false, DisplayName = "An organization user requesting a specific organization to which they are not a member should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", false, true, false, DisplayName = "An organization user without required permissions requesting an organization to which they are a member should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", false, false, false, DisplayName = "An organization user without required permissions requesting an organization to which they are not a member should throw a permission forbidden exception")]
     public async Task Load_ApplicationDashboardRequest_ValidatePermissions(string? globalRole, string? orgRole, bool? requestingAllOrgs, bool? isMemberOfOrg, bool shouldPass)
     {
         // Arrange
@@ -61,7 +62,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = user.ExternalAuthId
         });
 
-        Guid? requestedOrgId = requestingAllOrgs == true ? null : isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
+        Guid? requestedOrgId = null;
+        
+        if (requestingAllOrgs != true)
+        {
+            requestedOrgId = isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
+        }
 
         var request = new ApplicationDashboardLoadRequest
         {
@@ -82,7 +88,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         else
         {
             response.Error.Should().NotBeNull();
-            response.Error!.LogMessage.Should().Contain("attempted to make a request of type 'ApplicationDashboardLoadRequest', but did not have permission to do so.");
+            response.Error.Should().BeOfType<ForbiddenError>();
         }
     }
 }
