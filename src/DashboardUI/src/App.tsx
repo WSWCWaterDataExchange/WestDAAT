@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -23,10 +22,10 @@ import { clarity } from 'clarity-js';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
-import { useAuthenticationContext } from './hooks/useAuthenticationContext';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
-import { ApplicationDashboardPage } from './pages/application/dashboard/ApplicationDashboardPage';
+import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
+import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -90,7 +89,10 @@ function App({ msalInstance }: AppProps) {
                 </Route>
                 <Route path="application">
                   <Route element={<ApplicationLayout />}>
-                    <Route path="dashboard" element={<ApplicationDashboardPage />} />
+                    <Route path="dashboard" element={<WaterUserDashboardPage />} />
+                    <Route path="organization">
+                      <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                    </Route>
                   </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>

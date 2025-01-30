@@ -17,7 +17,7 @@ import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import { Link } from 'react-router-dom';
 import AuthorizedTemplate from './AuthorizedTemplate';
 import { Role } from '../config/role';
-import { getUserOrganization } from '../utilities/securityHelpers';
+import { getUserOrganization, hasUserRole } from '../utilities/securityHelpers';
 import { isFeatureEnabled } from '../config/features';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
@@ -37,7 +37,13 @@ function SiteNavbar() {
 
   const userOrganizationId = getUserOrganization(user);
   const showAdmin = isFeatureEnabled('conservationEstimationTool');
-  const showDashboard = isFeatureEnabled('conservationEstimationTool');
+  const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
+
+  const showOrganizationDashboard =
+    isFeatureEnabled('conservationEstimationTool') && (userOrganizationId != null || isGlobalAdmin);
+
+  const showWaterUserDashboard =
+    isFeatureEnabled('conservationEstimationTool') && userOrganizationId == null && !isGlobalAdmin;
 
   return (
     <div>
@@ -75,9 +81,14 @@ function SiteNavbar() {
             </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
-                {showDashboard && (
-                  <NavDropdown.Item as={Link} to="/application/dashboard">
+                {showOrganizationDashboard && (
+                  <NavDropdown.Item as={Link} to="/application/organization/dashboard">
                     Application Dashboard
+                  </NavDropdown.Item>
+                )}
+                {showWaterUserDashboard && (
+                  <NavDropdown.Item as={Link} to="/application/dashboard">
+                    My Applications
                   </NavDropdown.Item>
                 )}
                 <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>
