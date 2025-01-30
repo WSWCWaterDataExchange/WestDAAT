@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Contracts.Client;
@@ -14,14 +14,14 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 public class ApplicationIntegrationTests : IntegrationTestBase
 {
     private IApplicationManager _applicationManager;
-    private Database.EntityFramework.WestDaatDatabaseContext _dbContext;
+    private WestDaatDatabaseContext _dbContext;
 
     [TestInitialize]
     public void TestInitialize()
     {
         _applicationManager = Services.GetRequiredService<IApplicationManager>();
 
-        var dbContextFactory = Services.GetRequiredService<Database.EntityFramework.IWestDaatDatabaseContextFactory>();
+        var dbContextFactory = Services.GetRequiredService<IWestDaatDatabaseContextFactory>();
         _dbContext = dbContextFactory.Create();
     }
 
@@ -64,7 +64,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         Guid? requestedOrgId = null;
-        
+
         if (requestingAllOrgs != true)
         {
             requestedOrgId = isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
@@ -92,7 +92,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.Error.Should().BeOfType<ForbiddenError>();
         }
     }
-    
+
     [TestMethod]
     public async Task Store_EstimateConsumptiveUse_AsUser_Success()
     {
@@ -120,9 +120,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         // Act
-        var request = new CLI.Requests.Conservation.EstimateConsumptiveUseRequest
+        var request = new EstimateConsumptiveUseRequest
         {
             FundingOrganizationId = Guid.NewGuid(),
+            OrganizationId = Guid.NewGuid(),
             WaterConservationApplicationId = null,
             Polygons = ["POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))", "POLYGON ((0 0, 5 0, 5 5, 0 5, 0 0))"],
             DateRangeStart = DateOnly.FromDateTime(DateTime.Now.AddYears(-yearRange)),
@@ -132,8 +133,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = 1000,
         };
         var response = await _applicationManager.Store<
-            CLI.Requests.Conservation.EstimateConsumptiveUseRequest,
-            CLI.Responses.Conservation.EstimateConsumptiveUseResponse>(
+            EstimateConsumptiveUseRequest,
+            EstimateConsumptiveUseResponse>(
             request);
 
         // Assert
