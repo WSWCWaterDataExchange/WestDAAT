@@ -13,7 +13,7 @@ public class ApplicationFunction : FunctionBase
     private readonly IApplicationManager _applicationManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "Application";
+    private const string RouteBase = "applications";
 
     public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger)
     {
@@ -36,7 +36,7 @@ public class ApplicationFunction : FunctionBase
         };
         return await CreateResponse(req, result);
     }
-    
+
     [Function(nameof(EstimateConsumptiveUse))]
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
