@@ -26,16 +26,24 @@ internal class CalculationEngine : ICalculationEngine
     {
         return request.CompensationRateUnits switch
         {
-            CompensationRateUnits.Acres => await EstimateConservationPaymentInAcres(request),
+            CompensationRateUnits.Acres => EstimateConservationPaymentInAcres(request),
             CompensationRateUnits.AcreFeet => await EstimateConservationPaymentInAcreFeet(request),
             _ => throw new NotImplementedException()
         };
     }
 
-    private async Task<EstimateConservationPaymentResponse> EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
+    private EstimateConservationPaymentResponse EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        // todo: how do we verify that the area is in acres?
+        var totalArea = request.DataCollections
+            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
+            .Sum(geometry => geometry.Area);
+
+        var estimatedCompensation = totalArea * request.CompensationRateDollars;
+        return new EstimateConservationPaymentResponse
+        {
+            EstimatedCompensationDollars = (int)estimatedCompensation
+        };
     }
 
     private async Task<EstimateConservationPaymentResponse> EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
