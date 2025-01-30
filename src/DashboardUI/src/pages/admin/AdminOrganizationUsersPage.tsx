@@ -1,11 +1,13 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
+import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
 
   return (
     <div>
+      <NotImplementedPlaceholder />
+
       <pre>OrganizationId: {organizationId}</pre>
 
       <h1>Organization Users Page</h1>

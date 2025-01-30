@@ -26,6 +26,8 @@ import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUser
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
+import { AccountLayout } from './pages/account/AccountLayout';
+import { AccountInformationPage } from './pages/account/AccountInformationPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -86,6 +88,11 @@ function App({ msalInstance }: AppProps) {
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
+                </Route>
+                <Route path="account">
+                  <Route element={<AccountLayout />}>
+                    <Route index element={<AccountInformationPage />} />
+                  </Route>
                 </Route>
                 <Route path="application">
                   <Route element={<ApplicationLayout />}>
