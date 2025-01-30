@@ -21,6 +21,22 @@ public class ApplicationFunction : FunctionBase
         _logger = logger;
     }
 
+    [Function(nameof(ApplicationSearch))]
+    [OpenApiOperation(nameof(ApplicationSearch))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicationLoadResponseBase))]
+    public async Task<HttpResponseData> ApplicationSearch(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/search")]
+        HttpRequestData req)
+    {
+        var applicationLoadRequest = await ParseRequestBody<ApplicationLoadRequestBase>(req);
+        var result = applicationLoadRequest switch
+        {
+            OrganizationApplicationDashboardLoadRequest request => await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request),
+            _ => throw new NotImplementedException($"Request type {applicationLoadRequest.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
+    }
+    
     [Function(nameof(EstimateConsumptiveUse))]
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]

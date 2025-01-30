@@ -17,7 +17,7 @@ import { useAuthenticationContext } from '../hooks/useAuthenticationContext';
 import { Link } from 'react-router-dom';
 import AuthorizedTemplate from './AuthorizedTemplate';
 import { Role } from '../config/role';
-import { getUserOrganization } from '../utilities/securityHelpers';
+import { getUserOrganization, hasUserRole } from '../utilities/securityHelpers';
 import { isFeatureEnabled } from '../config/features';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
@@ -36,7 +36,16 @@ function SiteNavbar() {
   const handleShow = () => setShowHamburgerMenu(true);
 
   const userOrganizationId = getUserOrganization(user);
-  const isAdminFeatureEnabled = isFeatureEnabled('conservationEstimationTool');
+  const showAdmin = isFeatureEnabled('conservationEstimationTool');
+  const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
+
+  const showOrganizationDashboard =
+    isFeatureEnabled('conservationEstimationTool') && (userOrganizationId != null || isGlobalAdmin);
+
+  const showWaterUserDashboard =
+    isFeatureEnabled('conservationEstimationTool') && userOrganizationId == null && !isGlobalAdmin;
+
+  const showProfileEdit = isFeatureEnabled('conservationEstimationTool');
 
   return (
     <div>
@@ -74,6 +83,21 @@ function SiteNavbar() {
             </UnauthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavDropdown title={user?.emailAddress ?? 'My Account'}>
+                {showProfileEdit && (
+                  <NavDropdown.Item as={Link} to="/account">
+                    My Account
+                  </NavDropdown.Item>
+                )}
+                {showOrganizationDashboard && (
+                  <NavDropdown.Item as={Link} to="/application/organization/dashboard">
+                    Application Dashboard
+                  </NavDropdown.Item>
+                )}
+                {showWaterUserDashboard && (
+                  <NavDropdown.Item as={Link} to="/application/dashboard">
+                    My Applications
+                  </NavDropdown.Item>
+                )}
                 <NavDropdown.Item onClick={() => handleLogout(msalContext)}>Logout</NavDropdown.Item>
               </NavDropdown>
             </AuthenticatedTemplate>
@@ -108,7 +132,7 @@ function SiteNavbar() {
             >
               Terms of Service
             </Nav.Link>
-            {isAdminFeatureEnabled && (
+            {showAdmin && (
               <>
                 <AuthorizedTemplate roles={[Role.GlobalAdmin]}>
                   <Nav.Link as={Link} to="/admin/organizations">
