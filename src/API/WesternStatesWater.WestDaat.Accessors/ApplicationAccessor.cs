@@ -12,8 +12,18 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         _databaseContextFactory = databaseContextFactory;
     }
 
-    public Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
+    public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
+        return request switch
+        {
+            ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private async Task<ApplicationStoreResponseBase> StoreApplicationEstimate(ApplicationEstimateStoreRequest request)
+    {
+        await Task.CompletedTask;
         throw new NotImplementedException();
     }
 }
