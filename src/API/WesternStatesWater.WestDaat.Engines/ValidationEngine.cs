@@ -35,6 +35,7 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
+            ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -42,6 +43,50 @@ internal class ValidationEngine : IValidationEngine
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
+    }
+
+    private ErrorBase ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            OrganizationApplicationDashboardLoadRequest req => ValidateOrganizationApplicationDashboardLoadRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateOrganizationApplicationDashboardLoadRequest(OrganizationApplicationDashboardLoadRequest request, ContextBase context)
+    {
+        // check if user is a global admin first
+        var rolePermissions = _securityUtility.Get(new DTO.PermissionsGetRequest
+        {
+            Context = context
+        });
+
+        if (rolePermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
+        {
+            return null;
+        }
+
+        // if the user isn't a global admin, they can only view their organizations' applications
+        if (request.OrganizationIdFilter == null)
+        {
+            return CreateForbiddenError(request, context);
+        }
+        
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationIdFilter.Value,
+        });
+        
+        if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
+        {
+            return CreateForbiddenError(request, context);
+        }
+        
+        return null;
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,

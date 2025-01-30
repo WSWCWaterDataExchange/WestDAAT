@@ -9,8 +9,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     private readonly EF.IDatabaseContextFactory _databaseContextFactory;
     private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-    public ApplicationAccessor(
-        ILogger<ApplicationAccessor> logger,
+    public ApplicationAccessor(ILogger<ApplicationAccessor> logger,
         EF.IDatabaseContextFactory databaseContextFactory,
         EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
     {
@@ -18,6 +17,22 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
     }
 
+    public async Task<ApplicationLoadResponseBase> Load(ApplicationLoadRequestBase request)
+    {
+        return request switch
+        {
+            ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private async Task<ApplicationDashboardLoadResponse> GetDashboardApplications(ApplicationDashboardLoadRequest request)
+    {
+        await Task.CompletedTask;
+        throw new NotImplementedException("Jenny needs to add this in a second PR");
+    }
+    
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
