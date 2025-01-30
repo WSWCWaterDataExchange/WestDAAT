@@ -31,7 +31,7 @@ public class ApplicationFunction : FunctionBase
         var applicationLoadRequest = await ParseRequestBody<ApplicationLoadRequestBase>(req);
         var result = applicationLoadRequest switch
         {
-            ApplicationDashboardLoadRequest request => await _applicationManager.Load<ApplicationDashboardLoadRequest, ApplicationDashboardLoadResponse>(request),
+            OrganizationApplicationDashboardLoadRequest request => await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request),
             _ => throw new NotImplementedException($"Request type {applicationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);

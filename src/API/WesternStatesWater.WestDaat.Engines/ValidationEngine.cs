@@ -44,14 +44,14 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            ApplicationDashboardLoadRequest req => ValidateApplicationDashboardLoadRequest(req, context),
+            OrganizationApplicationDashboardLoadRequest req => ValidateOrganizationApplicationDashboardLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private ErrorBase ValidateApplicationDashboardLoadRequest(ApplicationDashboardLoadRequest request, ContextBase context)
+    private ErrorBase ValidateOrganizationApplicationDashboardLoadRequest(OrganizationApplicationDashboardLoadRequest request, ContextBase context)
     {
         // check if user is a global admin first
         var rolePermissions = _securityUtility.Get(new DTO.PermissionsGetRequest
@@ -59,7 +59,7 @@ internal class ValidationEngine : IValidationEngine
             Context = context
         });
 
-        if (rolePermissions.Contains(Permissions.ApplicationDashboardLoad))
+        if (rolePermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
         {
             return null;
         }
@@ -76,7 +76,7 @@ internal class ValidationEngine : IValidationEngine
             OrganizationId = request.OrganizationIdFilter.Value,
         });
         
-        if (!orgPermissions.Contains(Permissions.ApplicationDashboardLoad))
+        if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
         {
             return CreateForbiddenError(request, context);
         }

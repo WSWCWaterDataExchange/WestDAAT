@@ -3,7 +3,7 @@ using WesternStatesWater.Shared.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
-[JsonDerivedType(typeof(ApplicationDashboardLoadResponse), typeDiscriminator: nameof(ApplicationDashboardLoadResponse))]
+[JsonDerivedType(typeof(OrganizationApplicationDashboardLoadResponse), typeDiscriminator: nameof(OrganizationApplicationDashboardLoadResponse))]
 public class ApplicationLoadResponseBase : ResponseBase
 {
 }

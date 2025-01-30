@@ -7,19 +7,19 @@ using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class ApplicationDashboardLoadRequestHandler : IRequestHandler<ApplicationDashboardLoadRequest, ApplicationDashboardLoadResponse>
+public class OrganizationApplicationDashboardLoadRequestHandler : IRequestHandler<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>
 {
     public IApplicationAccessor ApplicationAccessor { get; }
 
-    public ApplicationDashboardLoadRequestHandler(IApplicationAccessor applicationAccessor)
+    public OrganizationApplicationDashboardLoadRequestHandler(IApplicationAccessor applicationAccessor)
     {
         ApplicationAccessor = applicationAccessor;
     }
 
-    public async Task<ApplicationDashboardLoadResponse> Handle(ApplicationDashboardLoadRequest request)
+    public async Task<OrganizationApplicationDashboardLoadResponse> Handle(OrganizationApplicationDashboardLoadRequest request)
     {
         var accessorRequest = request.Map<CommonContracts.ApplicationDashboardLoadRequest>();
         var accessorResponse = (CommonContracts.ApplicationDashboardLoadResponse)await ApplicationAccessor.Load(accessorRequest);
-        return accessorResponse.Map<ApplicationDashboardLoadResponse>();
+        return accessorResponse.Map<OrganizationApplicationDashboardLoadResponse>();
     }
 }

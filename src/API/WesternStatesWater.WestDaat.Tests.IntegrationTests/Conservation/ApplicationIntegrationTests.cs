@@ -28,8 +28,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _applicationManager.Should().NotBeNull();
 
     [DataTestMethod]
-    [DataRow(Roles.GlobalAdmin, null, true, false, true, DisplayName = "Global user requesting all organizations should succeed")]
-    [DataRow(Roles.GlobalAdmin, null, false, false, true, DisplayName = "Global user requesting a specific organization to which they are not a member should succeed")]
+    [DataRow(Roles.GlobalAdmin, null, true, false, true, DisplayName = "A global user requesting all organizations should succeed")]
+    [DataRow(Roles.GlobalAdmin, null, false, false, true, DisplayName = "A global user requesting a specific organization to which they are not a member should succeed")]
     [DataRow("invalid global role", null, null, null, false, DisplayName = "A global user without required permissions should throw a permission forbidden exception")]
     [DataRow(null, "invalid org role", true, null, false, DisplayName = "An organization user without required permissions should throw a permission forbidden exception")]
     [DataRow(null, Roles.GlobalAdmin, true, null, false, DisplayName = "An organization user requesting all organizations should throw a permission forbidden exception")]
@@ -37,7 +37,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataRow(null, Roles.GlobalAdmin, false, false, false, DisplayName = "An organization user requesting a specific organization to which they are not a member should throw a permission forbidden exception")]
     [DataRow(null, "invalid org role", false, true, false, DisplayName = "An organization user without required permissions requesting an organization to which they are a member should throw a permission forbidden exception")]
     [DataRow(null, "invalid org role", false, false, false, DisplayName = "An organization user without required permissions requesting an organization to which they are not a member should throw a permission forbidden exception")]
-    public async Task Load_ApplicationDashboardRequest_ValidatePermissions(string? globalRole, string? orgRole, bool? requestingAllOrgs, bool? isMemberOfOrg, bool shouldPass)
+    public async Task Load_OrganizationApplicationDashboardRequest_ValidatePermissions(string? globalRole, string? orgRole, bool? requestingAllOrgs, bool? isMemberOfOrg, bool shouldPass)
     {
         // Arrange
         var userOrganization = new OrganizationFaker().Generate();
@@ -69,16 +69,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             requestedOrgId = isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
         }
 
-        var request = new ApplicationDashboardLoadRequest
+        var request = new OrganizationApplicationDashboardLoadRequest
         {
             OrganizationIdFilter = requestedOrgId
         };
 
         // Act
-        var response = await _applicationManager.Load<ApplicationDashboardLoadRequest, ApplicationDashboardLoadResponse>(request);
+        var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request);
 
         // Assert
-        response.GetType().Should().Be<ApplicationDashboardLoadResponse>();
+        response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
         if (shouldPass)
         {
             // because accessor is throwing a NotImplementedException but it gets caught by ManagerBase
