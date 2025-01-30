@@ -16,18 +16,18 @@ internal class CalculationEngine : ICalculationEngine
     {
         return request switch
         {
-            EstimateConservationPaymentRequest req => await EstimateConservationPayment(req),
+            EstimateConservationPaymentRequest req => EstimateConservationPayment(req),
             MultiPolygonYearlyEtRequest req => await CalculatePolygonsEt(req),
             _ => throw new NotImplementedException()
         };
     }
 
-    private async Task<EstimateConservationPaymentResponse> EstimateConservationPayment(EstimateConservationPaymentRequest request)
+    private EstimateConservationPaymentResponse EstimateConservationPayment(EstimateConservationPaymentRequest request)
     {
         return request.CompensationRateUnits switch
         {
             CompensationRateUnits.Acres => EstimateConservationPaymentInAcres(request),
-            CompensationRateUnits.AcreFeet => await EstimateConservationPaymentInAcreFeet(request),
+            CompensationRateUnits.AcreFeet => EstimateConservationPaymentInAcreFeet(request),
             _ => throw new NotImplementedException()
         };
     }
@@ -46,10 +46,25 @@ internal class CalculationEngine : ICalculationEngine
         };
     }
 
-    private async Task<EstimateConservationPaymentResponse> EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
+    private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        var totalArea = request.DataCollections
+            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
+            .Sum(geometry => geometry.Area);
+
+        var totalAverageEtInInches = request.DataCollections
+            .Sum(dc => dc.AverageEtInInches);
+
+        var totalAverageEtInFeet = totalAverageEtInInches / 12;
+
+        var totalVolumeInAcreFeet = totalArea * totalAverageEtInFeet;
+
+        var estimatedCompensation = totalVolumeInAcreFeet * request.CompensationRateDollars;
+
+        return new EstimateConservationPaymentResponse
+        {
+            EstimatedCompensationDollars = (int)estimatedCompensation
+        };
     }
 
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
