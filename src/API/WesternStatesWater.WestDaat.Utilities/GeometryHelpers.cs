@@ -1,10 +1,11 @@
 ﻿using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
+using Microsoft.SqlServer.Types;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Geometries.Utilities;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
+using System.Data.SqlTypes;
 using System.IO;
 
 namespace WesternStatesWater.WestDaat.Utilities
@@ -18,12 +19,10 @@ namespace WesternStatesWater.WestDaat.Utilities
                 return null;
             }
             var serializer = GeoJsonSerializer.Create();
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                serializer.Serialize(jsonWriter, geometry);
-                return System.Text.Json.JsonSerializer.Deserialize<IGeometryObject>(stringWriter.ToString());
-            }
+            using var stringWriter = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(stringWriter);
+            serializer.Serialize(jsonWriter, geometry);
+            return System.Text.Json.JsonSerializer.Deserialize<IGeometryObject>(stringWriter.ToString());
         }
 
         //Json can start with lots of characters but I _believe_ GeoJson can only start with "{"
@@ -82,6 +81,28 @@ namespace WesternStatesWater.WestDaat.Utilities
         private static bool IsGeoJsonString(string geometry)
         {
             return GeoJsonStartingCharacters.Any(geometry.TrimStart().StartsWith);
+        }
+
+        public static double GetGeometryAreaInSquareMeters(Geometry geometry)
+        {
+            if (geometry == null)
+            {
+                throw new ArgumentException($"{nameof(geometry)} cannot be null");
+            }
+
+            if (geometry.SRID != 4326)
+            {
+                throw new ArgumentException($"Unsupported geometry SRID {geometry.SRID}");
+            }
+
+            return geometry.ToSqlGeography().STArea().Value;
+        }
+
+        private static SqlGeography ToSqlGeography(this Geometry geometry)
+        {
+            var chars = new SqlChars(geometry.ToString());
+            var sqlGeometry = SqlGeography.STGeomFromText(chars, geometry.SRID);
+            return sqlGeometry.MakeValid().ReorientObject();
         }
     }
 }
