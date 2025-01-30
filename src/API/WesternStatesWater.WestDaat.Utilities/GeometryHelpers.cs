@@ -90,6 +90,9 @@ namespace WesternStatesWater.WestDaat.Utilities
                 throw new ArgumentException($"{nameof(geometry)} cannot be null");
             }
 
+            // this is the only SRID that is certain to work as desired
+            // https://learn.microsoft.com/en-us/sql/t-sql/spatial-geography/starea-geography-data-type?view=sql-server-ver16
+            // "For example, if the SRID of the instance is 4326, STArea() returns results in square meters."
             if (geometry.SRID != 4326)
             {
                 throw new ArgumentException($"Unsupported geometry SRID {geometry.SRID}");
