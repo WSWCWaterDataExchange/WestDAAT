@@ -32,7 +32,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await Task.CompletedTask;
         throw new NotImplementedException("Jenny needs to add this in a second PR");
     }
-    
+
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
