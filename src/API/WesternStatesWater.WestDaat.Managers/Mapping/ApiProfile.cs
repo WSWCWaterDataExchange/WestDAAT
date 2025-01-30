@@ -34,7 +34,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
-            AddApplicationDashboardMappings();
+            AddApplicationMappings();
         }
 
         private void AddUserMappings()
@@ -76,7 +76,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
         }
 
-        private void AddApplicationDashboardMappings()
+        private void AddApplicationMappings()
         {
             CreateMap<ClientContracts.Requests.Conservation.ApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>();
 
