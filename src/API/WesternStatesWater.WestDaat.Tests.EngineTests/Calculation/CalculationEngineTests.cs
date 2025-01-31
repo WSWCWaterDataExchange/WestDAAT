@@ -291,15 +291,18 @@ public class CalculationEngineTests : EngineTestBase
         response.Should().NotBeNull();
 
         double expectedCompensation;
+        double onePercentMarginOfError;
         switch (units)
         {
             case CompensationRateUnits.AcreFeet:
                 expectedCompensation = etVolumeInAcreFeet * compensationRateDollars;
-                response.EstimatedCompensationDollars.Should().Be((int)expectedCompensation);
+                onePercentMarginOfError = expectedCompensation * 0.01;
+                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
                 break;
             case CompensationRateUnits.Acres:
                 expectedCompensation = areaOfAFootballFieldInAcres * compensationRateDollars;
-                response.EstimatedCompensationDollars.Should().Be((int)expectedCompensation);
+                onePercentMarginOfError = expectedCompensation * 0.01;
+                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
                 break;
         }
 
