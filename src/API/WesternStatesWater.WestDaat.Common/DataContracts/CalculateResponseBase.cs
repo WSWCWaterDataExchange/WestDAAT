@@ -1,7 +1,5 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RasterTimeSeriesInterval
+public class CalculateResponseBase
 {
-    None = 0,
-    Monthly = 1,
 }
