@@ -1,4 +1,5 @@
 using AutoMapper;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 
@@ -81,8 +82,51 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Conservation.OrganizationApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationIdFilter));
 
-            CreateMap<CommonContracts.ApplicationDashboardLoadResponse, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardLoadResponse>()
+            CreateMap<CommonContracts.ApplicationDashboardLoadResponse, OrganizationApplicationDashboardLoadResponse>()
+                .ForMember(dest => dest.Statistics.TotalObligationDollars, opt => opt.MapFrom(src => CalculateTotalObligationDollars(src.Applications)))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+            // TODO: would all of the statistics be calculated here or in the handler?
+
+            CreateMap<CommonContracts.ApplicationDashboardLoadDetails, OrganizationApplicationDashboardListItem>()
+                .ForMember(dest => dest.ApplicantFullName, opt => opt.MapFrom(src => $"{src.ApplicantFirstName} {src.ApplicantLastName}"))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
         }
+
+        // TODO: move this to its own file
+        private ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? accepted, DateTimeOffset? rejected)
+        {
+            if (accepted != null && rejected != null)
+            {
+                // TODO: throw exception here? what kind?
+                return ConservationApplicationStatus.InReview;
+            }
+            else if (accepted != null)
+            {
+                return ConservationApplicationStatus.Approved;
+            }
+            else if (rejected != null)
+            {
+                return ConservationApplicationStatus.Rejected;
+            }
+            else
+            {
+                return ConservationApplicationStatus.InReview;
+            }
+        }
+        
+        // TODO: move this to its own file
+        private int CalculateCompensationRateDollars(CommonContracts.ApplicationDashboardLoadDetails[] applications)
+        {
+            // TODO: figure this out
+            return 0;
+        }
+        
+        // TODO: move this to its own file
+        private int CalculateTotalObligationDollars(CommonContracts.ApplicationDashboardLoadDetails[] applications)
+        {
+            // TODO: figure this out
+            return 0;
+        }
+        
     }
 }
