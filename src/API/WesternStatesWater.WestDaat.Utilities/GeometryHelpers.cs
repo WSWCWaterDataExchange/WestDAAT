@@ -88,6 +88,11 @@ namespace WesternStatesWater.WestDaat.Utilities
                 throw new ArgumentException($"{nameof(geometry)} cannot be null");
             }
 
+            if (geometry is not NetTopologySuite.Geometries.Polygon)
+            {
+                throw new ArgumentException($"{nameof(geometry)} must be a Polygon");
+            }
+
             return CalculatePolygonAreaOnEarth(geometry as NetTopologySuite.Geometries.Polygon);
         }
 
