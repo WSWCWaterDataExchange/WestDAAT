@@ -2,7 +2,6 @@
 using GeoJSON.Text.Geometry;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Geometries.Utilities;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.IO;
@@ -18,12 +17,10 @@ namespace WesternStatesWater.WestDaat.Utilities
                 return null;
             }
             var serializer = GeoJsonSerializer.Create();
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                serializer.Serialize(jsonWriter, geometry);
-                return System.Text.Json.JsonSerializer.Deserialize<IGeometryObject>(stringWriter.ToString());
-            }
+            using var stringWriter = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(stringWriter);
+            serializer.Serialize(jsonWriter, geometry);
+            return System.Text.Json.JsonSerializer.Deserialize<IGeometryObject>(stringWriter.ToString());
         }
 
         //Json can start with lots of characters but I _believe_ GeoJson can only start with "{"
@@ -82,6 +79,47 @@ namespace WesternStatesWater.WestDaat.Utilities
         private static bool IsGeoJsonString(string geometry)
         {
             return GeoJsonStartingCharacters.Any(geometry.TrimStart().StartsWith);
+        }
+
+        public static double GetGeometryAreaInSquareMeters(Geometry geometry)
+        {
+            if (geometry == null)
+            {
+                throw new ArgumentException($"{nameof(geometry)} cannot be null");
+            }
+
+            if (geometry is not NetTopologySuite.Geometries.Polygon)
+            {
+                throw new ArgumentException($"{nameof(geometry)} must be a Polygon");
+            }
+
+            return CalculatePolygonAreaOnEarth(geometry as NetTopologySuite.Geometries.Polygon);
+        }
+
+        private static double CalculatePolygonAreaOnEarth(NetTopologySuite.Geometries.Polygon polygon)
+        {
+            const int earthRadius = 6378137;
+            double area = 0;
+
+            var coordinates = polygon.Coordinates.ToArray();
+            if (coordinates.Length > 2)
+            {
+                for (var i = 0; i < coordinates.Length - 1; i++)
+                {
+                    var p1 = coordinates[i];
+                    var p2 = coordinates[i + 1];
+                    area += ConvertToRadian(p2.X - p1.X) * (2 + Math.Sin(ConvertToRadian(p1.Y)) + Math.Sin(ConvertToRadian(p2.Y)));
+                }
+
+                area = area * earthRadius * earthRadius / 2;
+            }
+
+            return Math.Abs(area);
+        }
+
+        private static double ConvertToRadian(double input)
+        {
+            return input * Math.PI / 180;
         }
     }
 }
