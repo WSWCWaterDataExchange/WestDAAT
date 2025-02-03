@@ -261,7 +261,7 @@ public class CalculationEngineTests : EngineTestBase
             firstCorner +
             "))";
 
-        var areaOfAFootballFieldInAcres = 1.32; // actual computed area of polygon: 1.3200098063990129 acres
+        var areaOfAFootballFieldInAcres = 1.32;
 
         var etInInches = 60;
         var etInFeet = etInInches / 12; // 5 feet
