@@ -28,7 +28,7 @@ public class OpenEtSdkTests : UtilityTestBase
         {
             httpClient.BaseAddress = new Uri(baseAddress);
         }
-        
+
         return new(httpClient, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
     }
 
@@ -63,11 +63,11 @@ public class OpenEtSdkTests : UtilityTestBase
         var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
         var closedLinestringCoordinates = new[]
         {
-            new Coordinate(-119.7937, 35.58995),
             new Coordinate(-119.7937, 35.53326),
-            new Coordinate(-119.71268, 35.53326),
-            new Coordinate(-119.71268, 35.58995),
             new Coordinate(-119.7937, 35.58995),
+            new Coordinate(-119.71268, 35.58995),
+            new Coordinate(-119.71268, 35.53326),
+            new Coordinate(-119.7937, 35.53326),
         };
 
         var request = new RasterTimeSeriesPolygonRequest
@@ -91,8 +91,10 @@ public class OpenEtSdkTests : UtilityTestBase
         serializedRequest.Should().Be(expectedJson);
     }
 
-    [TestMethod]
-    public async Task RasterTimeseriesPolygon_MockedApi_Success()
+    [DataTestMethod]
+    [DataRow(RasterTimeSeriesOutputUnits.Millimeters)]
+    [DataRow(RasterTimeSeriesOutputUnits.Inches)]
+    public async Task RasterTimeseriesPolygon_MockedApi_Success(RasterTimeSeriesOutputUnits outputUnits)
     {
         // Arrange
         var responseContentString = """
@@ -171,10 +173,10 @@ public class OpenEtSdkTests : UtilityTestBase
             PixelReducer = RasterTimeSeriesPixelReducer.Mean,
             ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
             OutputExtension = RasterTimeSeriesFileFormat.JSON,
-            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            OutputUnits = outputUnits,
             Variable = RasterTimeSeriesCollectionVariable.ET,
         };
-        
+
         // Act
         var sdk = CreateOpenEtSdk(_mockHttp.ToHttpClient());
         var response = await sdk.RasterTimeseriesPolygon(request);

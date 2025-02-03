@@ -1,16 +1,16 @@
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Client.Functions;
 using WesternStatesWater.WestDaat.Common.Configuration;
-using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers;
 using WesternStatesWater.WestDaat.Utilities;
 using MGR = WesternStatesWater.WestDaat.Managers;
 
@@ -60,16 +60,17 @@ var host = new HostBuilder()
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
         services.AddTransient<IWaterResourceManager, WaterResourceManager>();
-        
+
         // Manager handlers
         services.AddScoped<
             MGR.Handlers.IManagerRequestHandlerResolver,
             MGR.Handlers.RequestHandlerResolver
         >();
-        
+
         MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(services);
 
         // Engines
+        services.AddTransient<ICalculationEngine, CalculationEngine>();
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
@@ -88,7 +89,7 @@ var host = new HostBuilder()
         // Database
         services.AddTransient<IDatabaseContextFactory, DatabaseContextFactory>();
         services.AddTransient<IWestDaatDatabaseContextFactory, WestDaatDatabaseContextFactory>();
-        
+
         // Utilities / Sdks
         services.AddScoped<IContextUtility, ContextUtility>();
         services.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
@@ -113,7 +114,7 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
-        
+
     })
     .Build();
 

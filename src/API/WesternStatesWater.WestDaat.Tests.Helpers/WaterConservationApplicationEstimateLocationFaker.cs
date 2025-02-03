@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class WaterConservationApplicationEstimatePolygonFaker : Faker<EFWD.WaterConservationApplicationEstimatePolygon>
+public class WaterConservationApplicationEstimateLocationFaker : Faker<EFWD.WaterConservationApplicationEstimateLocation>
 {
-    public WaterConservationApplicationEstimatePolygonFaker(EFWD.WaterConservationApplicationEstimate estimate = null)
+    public WaterConservationApplicationEstimateLocationFaker(EFWD.WaterConservationApplicationEstimate estimate = null)
     {
         var polygonWktExamples = new string[]
         {
@@ -13,9 +13,11 @@ public class WaterConservationApplicationEstimatePolygonFaker : Faker<EFWD.Water
 
         RuleFor(wcaep => wcaep.PolygonWkt, f => f.PickRandom(polygonWktExamples));
 
+        RuleFor(wcael => wcael.PolygonAreaInAcres, f => f.Random.Number(10, 1000));
+
         if (estimate != null)
         {
-            RuleFor(wcaep => wcaep.WaterConservationApplicationEstimate, () => estimate);
+            RuleFor(wcaep => wcaep.Estimate, () => estimate);
         }
     }
 }

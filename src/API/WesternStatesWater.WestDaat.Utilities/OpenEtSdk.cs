@@ -44,18 +44,4 @@ internal class OpenEtSdk : IOpenEtSdk
             Data = responseData
         };
     }
-
-    private double[] ConvertGeometryBoundingBoxCoordinatesToFlattenedArray(NetTopologySuite.Geometries.Geometry geometry)
-    {
-        return geometry.Envelope.Coordinates.Select(c => new double[] { c.X, c.Y }).SelectMany(x => x).ToArray();
-    }
-
-    private string ConvertRasterTimeseriesUnits(RasterTimeSeriesOutputUnits outputUnits)
-    {
-        return outputUnits switch
-        {
-            RasterTimeSeriesOutputUnits.Millimeters => "mm",
-            _ => throw new NotImplementedException($"Output units {outputUnits} not implemented"),
-        };
-    }
 }

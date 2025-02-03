@@ -90,6 +90,12 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationDashboardLoadDetails, OrganizationApplicationDashboardListItem>()
                 .ForMember(dest => dest.ApplicantFullName, opt => opt.MapFrom(src => $"{src.ApplicantFirstName} {src.ApplicantLastName}"))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
+
+            CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
+
+            CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
+
+            CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
         }
 
         // TODO: move this to its own file
