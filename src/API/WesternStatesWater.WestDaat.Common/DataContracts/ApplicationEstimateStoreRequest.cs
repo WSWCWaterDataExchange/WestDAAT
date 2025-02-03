@@ -16,11 +16,11 @@ public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
     /// </summary>
     public DateOnly DateRangeEnd { get; set; }
 
-    public int? DesiredCompensationDollars { get; set; }
+    public int DesiredCompensationDollars { get; set; }
 
-    public CompensationRateUnits? Units { get; set; }
+    public CompensationRateUnits Units { get; set; }
 
-    public int? EstimatedCompensation { get; set; }
+    public int EstimatedCompensation { get; set; }
 
     public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
 }

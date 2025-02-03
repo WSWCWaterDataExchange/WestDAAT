@@ -35,16 +35,16 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
             var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
             estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
 
-            // Store the estimate
+            // only store the estimate if a compensation estimate was requested
             var storeEstimateRequest = new ApplicationEstimateStoreRequest
             {
                 WaterConservationApplicationId = request.WaterConservationApplicationId,
                 Model = request.Model,
                 DateRangeStart = request.DateRangeStart,
                 DateRangeEnd = request.DateRangeEnd,
-                DesiredCompensationDollars = request.CompensationRateDollars,
-                Units = request.Units,
-                EstimatedCompensation = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
+                DesiredCompensationDollars = request.CompensationRateDollars.Value,
+                Units = request.Units.Value,
+                EstimatedCompensation = estimateConservationPaymentResponse.EstimatedCompensationDollars,
                 Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
                 {
                     var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
