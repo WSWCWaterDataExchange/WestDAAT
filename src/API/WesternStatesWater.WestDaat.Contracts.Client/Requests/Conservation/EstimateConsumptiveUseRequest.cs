@@ -6,7 +6,7 @@ public class EstimateConsumptiveUseRequest : ApplicationStoreRequestBase
 {
     public Guid FundingOrganizationId { get; set; }
 
-    public Guid? WaterConservationApplicationId { get; set; }
+    public Guid WaterConservationApplicationId { get; set; }
 
     /// <summary>
     /// Polygon(s) in "Well-known text" (WKT) format.
