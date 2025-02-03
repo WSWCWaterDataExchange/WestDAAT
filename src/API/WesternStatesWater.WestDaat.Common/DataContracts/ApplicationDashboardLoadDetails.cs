@@ -16,8 +16,6 @@ public class ApplicationDashboardLoadDetails
 
     public DateTimeOffset? RejectedDate { get; set; }
 
-    required public ConservationApplicationStatus Status { get; set; }
-
     required public DateTimeOffset SubmittedDate { get; set; }
 
     required public string WaterRightNativeId { get; set; }
