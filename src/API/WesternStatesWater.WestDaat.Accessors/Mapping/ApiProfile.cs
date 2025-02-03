@@ -199,6 +199,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<ApplicationEstimateStoreRequest, EFWD.WaterConservationApplicationEstimate>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
+                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Units))
+                .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.EstimatedCompensation))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations));
 
         }
