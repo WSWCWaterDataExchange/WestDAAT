@@ -1,4 +1,6 @@
-# Azure Resources Deployment Steps
+# Infrastructure REAMDE
+
+## Azure Resources Deployment Steps
 
 ### Login + Select Subscription
 ```
@@ -53,3 +55,15 @@ az storage blob service-properties update --account-name <account-name> --static
 > &nbsp;
 
 
+## B2C Custom Login Page
+
+Files prefixed with `b2c_` are used for custom B2C login pages. These are hosted in the `$web` container in a `b2c` folder. These files are publicly accessible and are used to customize the login experience for the user. The CDN endpoint is used to serve these files.
+
+### To update the B2C custom login page
+1. Locate the `b2c_signup_signin.html` file in the `infrastructure` folder
+1. Update the file and replace the `<Environment>` with the appropriate environment name (qa, staging, prod, etc)
+    - Note - Do not check in these changes to the repository
+1. Upload the files to the `$web` container in the `b2c` folder
+
+
+To learn more about customizing the B2C login page, visit the [Azure B2C UI Customization](https://learn.microsoft.com/en-us/azure/active-directory-b2c/customize-ui-with-html?pivots=b2c-user-flow) documentation.
