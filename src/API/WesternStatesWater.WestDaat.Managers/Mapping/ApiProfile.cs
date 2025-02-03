@@ -86,8 +86,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.ApplicationDashboardLoadDetails, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardListItem>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => FormatApplicationStatus(src.Status)))
-                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => FormatApplicationCompensationRateUnits(src.CompensationRateUnits)));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
@@ -102,31 +101,24 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
         }
 
-        // TODO: JN - also leave this as a public function here, or live with enum?
-        public static string FormatApplicationStatus(CommonContracts.ConservationApplicationStatus status)
+        public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            return status switch
+            if (acceptedDate == null && rejectedDate == null)
             {
-                CommonContracts.ConservationApplicationStatus.InReview => "In Review",
-                CommonContracts.ConservationApplicationStatus.Approved => "Approved",
-                CommonContracts.ConservationApplicationStatus.Rejected => "Rejected",
-                // TODO: JN - unknown / default cases?
-                CommonContracts.ConservationApplicationStatus.Unknown => "Unknown",
-                _ => "Unknown"
-            };
-        }
-        
-        // TODO: JN - also leave this as a public function here, or live with enum?
-        public static string FormatApplicationCompensationRateUnits(CommonContracts.CompensationRateUnits units)
-        {
-            return units switch
+                return CommonContracts.ConservationApplicationStatus.InReview;
+            }
+
+            if (acceptedDate != null && rejectedDate == null)
             {
-                CommonContracts.CompensationRateUnits.AcreFeet => "Acre-Feet",
-                CommonContracts.CompensationRateUnits.Acres => "Acres",
-                // TODO: JN - none / default cases?
-                CommonContracts.CompensationRateUnits.None => "None",
-                _ => "None"
-            };
+                return CommonContracts.ConservationApplicationStatus.Approved;
+            }
+
+            if (acceptedDate == null && rejectedDate != null)
+            {
+                return CommonContracts.ConservationApplicationStatus.Rejected;
+            }
+
+            return CommonContracts.ConservationApplicationStatus.Unknown;
         }
     }
 }

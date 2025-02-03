@@ -2,6 +2,8 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public class ApplicationDashboardLoadDetails
 {
+    public DateTimeOffset? AcceptedDate { get; set; }
+    
     required public string ApplicationDisplayId { get; set; }
 
     required public string ApplicantFullName { get; set; }
@@ -12,11 +14,11 @@ public class ApplicationDashboardLoadDetails
 
     required public string OrganizationName { get; set; }
 
+    public DateTimeOffset? RejectedDate { get; set; }
+
     required public ConservationApplicationStatus Status { get; set; }
 
     required public DateTimeOffset SubmittedDate { get; set; }
-
-    required public string State { get; set; }
 
     required public string WaterRightNativeId { get; set; }
 }
