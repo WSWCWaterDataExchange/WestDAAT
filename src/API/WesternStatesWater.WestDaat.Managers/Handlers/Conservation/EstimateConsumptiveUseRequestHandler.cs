@@ -1,4 +1,5 @@
 ﻿using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -12,12 +13,15 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
+    public IApplicationAccessor ApplicationAccessor { get; }
 
     public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
-        IOpenEtSdk openEtSdk)
+        IOpenEtSdk openEtSdk,
+        IApplicationAccessor applicationAccessor)
     {
         CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
+        ApplicationAccessor = applicationAccessor;
     }
 
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
@@ -25,11 +29,40 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
         var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
 
+        EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
         if (request.CompensationRateDollars.HasValue)
         {
             var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
-            var estimateConservationPaymentResponse = await CalculationEngine.Calculate(estimateConservationPaymentRequest);
+            estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
         }
+
+        var storeEstimateRequest = new ApplicationEstimateStoreRequest
+        {
+            WaterConservationApplicationId = request.WaterConservationApplicationId,
+            Model = request.Model,
+            DateRangeStart = request.DateRangeStart,
+            DateRangeEnd = request.DateRangeEnd,
+            DesiredCompensationDollars = request.CompensationRateDollars,
+            Units = request.Units,
+            EstimatedCompensation = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
+            Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
+            {
+                var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
+
+                return new ApplicationEstimateStoreLocationDetails
+                {
+                    PolygonWkt = x.PolygonWkt,
+                    PolygonAreaInAcres = polygonAreaInAcres,
+                    ConsumptiveUses = x.Datapoints.Select(y => new ApplicationEstimateStoreLocationConsumptiveUseDetails
+                    {
+                        Year = y.Year,
+                        EtInInches = y.EtInInches,
+                    }).ToArray()
+                };
+            }).ToArray()
+        };
+
+        await ApplicationAccessor.Store(storeEstimateRequest);
 
         throw new NotImplementedException();
     }
