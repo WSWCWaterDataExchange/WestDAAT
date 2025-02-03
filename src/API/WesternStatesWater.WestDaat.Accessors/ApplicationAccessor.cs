@@ -51,7 +51,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         var existingEntity = await db.WaterConservationApplicationEstimates
             .Include(estimate => estimate.Locations)
             .ThenInclude(location => location.ConsumptiveUses)
-            .FirstOrDefaultAsync(estimate => estimate.Id == request.WaterConservationApplicationId);
+            .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
 
         if (existingEntity != null)
         {
