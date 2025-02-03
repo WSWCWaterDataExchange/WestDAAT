@@ -81,7 +81,7 @@ namespace WesternStatesWater.WestDaat.Utilities
             return GeoJsonStartingCharacters.Any(geometry.TrimStart().StartsWith);
         }
 
-        public static double GetGeometryAreaInSquareMeters(Geometry geometry)
+        public static double GetGeometryAreaInAcres(Geometry geometry)
         {
             if (geometry == null)
             {
@@ -93,10 +93,11 @@ namespace WesternStatesWater.WestDaat.Utilities
                 throw new ArgumentException($"{nameof(geometry)} must be a Polygon");
             }
 
-            return CalculatePolygonAreaOnEarth(geometry as NetTopologySuite.Geometries.Polygon);
+            var areaInSquareMeters = CalculatePolygonAreaOnEarthInSquareMeters(geometry as NetTopologySuite.Geometries.Polygon);
+            return ConvertSquareMetersToAcres(areaInSquareMeters);
         }
 
-        private static double CalculatePolygonAreaOnEarth(NetTopologySuite.Geometries.Polygon polygon)
+        private static double CalculatePolygonAreaOnEarthInSquareMeters(NetTopologySuite.Geometries.Polygon polygon)
         {
             const int earthRadius = 6378137;
             double area = 0;
@@ -120,6 +121,12 @@ namespace WesternStatesWater.WestDaat.Utilities
         private static double ConvertToRadian(double input)
         {
             return input * Math.PI / 180;
+        }
+
+        private static double ConvertSquareMetersToAcres(double areaInSquareMeters)
+        {
+            double areaInAcres = areaInSquareMeters * 0.000247105;
+            return areaInAcres;
         }
     }
 }
