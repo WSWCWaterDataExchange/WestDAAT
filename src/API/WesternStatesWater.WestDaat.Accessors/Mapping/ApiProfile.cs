@@ -177,6 +177,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<UserStoreCreateRequest, EFWD.User>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserProfile, opt => opt.Ignore())
                 .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
                 .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
         }

@@ -70,7 +70,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         if (requestingAllOrgs != true)
         {
-            requestedOrgId = isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
+            requestedOrgId = isMemberOfOrg ? userOrganization.Id : diffOrganization.Id;
         }
 
         var request = new OrganizationApplicationDashboardLoadRequest
@@ -94,9 +94,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
     }
 
-    // TODO: JN - would this test belong here or be better suited in like an accessor test?
-    [TestMethod]
-    public async Task Load_OrganizationApplicationDashboardRequest_ReturnsExpectedApplications()
+    [DataTestMethod]
+    [DataRow(true, DisplayName = "A user with global admin role should be able to load all applications")]
+    [DataRow(false, DisplayName = "An organization user should be able to load only their organization's applications")]
+    public async Task Load_OrganizationApplicationDashboardRequest_ReturnsApplicationsNewestToOldest(bool isGlobalUser)
     {
         // Arrange
         var orgOne = new OrganizationFaker().Generate();
@@ -128,7 +129,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(subAppOne, subAppTwo, subAppFour);
         await _dbContext.SaveChangesAsync();
 
-        var appOneResponse = new OrganizationApplicationDashboardListItem()
+        var appOneResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
@@ -141,7 +142,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
         };
 
-        var appTwoResponse = new OrganizationApplicationDashboardListItem()
+        var appTwoResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileTwo.FirstName} {userProfileTwo.LastName}",
@@ -154,7 +155,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
         };
 
-        var appFourResponse = new OrganizationApplicationDashboardListItem()
+        var appFourResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appFour.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
@@ -167,23 +168,46 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appFour.WaterRightNativeId,
         };
 
+        var orgUserOrganizationRoles = new[]
+        {
+            new OrganizationRole
+            {
+                OrganizationId = orgOne.Id,
+                RoleNames = [Roles.OrganizationAdmin]
+            }
+        };
+
         UseUserContext(new UserContext
         {
             UserId = new Guid(),
-            Roles = [Roles.GlobalAdmin],
-            OrganizationRoles = [],
+            Roles = isGlobalUser ? [Roles.GlobalAdmin] : [],
+            OrganizationRoles = isGlobalUser ? [] : orgUserOrganizationRoles,
             ExternalAuthId = "some-external-auth-id"
         });
 
-        var request = new OrganizationApplicationDashboardLoadRequest();
+        var request = new OrganizationApplicationDashboardLoadRequest
+        {
+            OrganizationIdFilter = isGlobalUser ? null : orgOne.Id
+        };
 
         // Act
         var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request);
 
         // Assert
         response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
-        response.Applications.Should().HaveCount(3);
-        response.Applications.Should().BeEquivalentTo([appOneResponse, appTwoResponse, appFourResponse]);
+
+        var applications = new List<OrganizationApplicationDashboardListItem> { appOneResponse, appFourResponse };
+
+        if (isGlobalUser)
+        {
+            applications = applications.Append(appTwoResponse).ToList();
+        }
+
+        response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse
+        {
+            Applications = applications.OrderByDescending(x => x.SubmittedDate).ToArray(),
+            Statistics = null
+        });
     }
 
     [TestMethod]

@@ -33,11 +33,15 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
-        // TODO: JN - add in logic for pulling all organization ids also
-        var organizationIds = request.OrganizationId;
+        var applicationsQuery = db.WaterConservationApplications.AsQueryable();
 
-        var applications = await db.WaterConservationApplications
-            .Where(app => app.FundingOrganizationId == request.OrganizationId && app.Submission != null)
+        if (request.OrganizationId != null)
+        {
+            applicationsQuery = applicationsQuery.Where(app => app.FundingOrganizationId == request.OrganizationId);
+        }
+
+        var applications = await applicationsQuery
+            .Where(app => app.Submission != null)
             .ProjectTo<ApplicationDashboardLoadDetails>(DtoMapper.Configuration)
             .OrderByDescending(app => app.SubmittedDate)
             .ToListAsync();
