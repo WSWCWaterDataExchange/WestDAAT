@@ -19,16 +19,16 @@ public class GeometryHelpersTests : UtilityTestBase
     private const string ZeroAreaPolygon = "POLYGON ((0 0, 0 0, 0 0, 0 0))";
 
     [DataTestMethod]
-    [DataRow(ZeroZeroSquarePolygon, 12_364_025_625.25)]
-    [DataRow(DplBuildingPolygon, 2_238.06)]
+    [DataRow(ZeroZeroSquarePolygon, 3055217.2685972084)]
+    [DataRow(DplBuildingPolygon, 0.55303667)]
     [DataRow(ZeroAreaPolygon, 0)]
     // expected areas calculated using google earth
-    public void GetGeometryAreaInSquareMeters_Success(string polygonWkt, double expectedAreaSquareMeters)
+    public void GetGeometryAreaInAcres_Success(string polygonWkt, double expectedAreaInAcres)
     {
         var geometry = GeometryHelpers.GetGeometryByWkt(polygonWkt);
-        var area = GeometryHelpers.GetGeometryAreaInSquareMeters(geometry);
+        var areaInAcres = GeometryHelpers.GetGeometryAreaInAcres(geometry);
 
-        var onePercentMarginOfError = expectedAreaSquareMeters * 0.01;
-        area.Should().BeApproximately(expectedAreaSquareMeters, onePercentMarginOfError);
+        var onePercentMarginOfError = expectedAreaInAcres * 0.01;
+        areaInAcres.Should().BeApproximately(areaInAcres, expectedAreaInAcres);
     }
 }
