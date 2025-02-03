@@ -104,16 +104,21 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.SaveChangesAsync();
 
         const int monthsInYear = 12;
+        const int startYear = 2024;
         const int yearRange = 1;
-        var rng = new Random();
         OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
-                Data = Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
                 {
-                    Time = DateOnly.FromDateTime(DateTime.Now),
-                    Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
+                    var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                    return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                    {
+                        Time = time,
+                        Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                    });
                 })
+                .SelectMany(monthlyData => monthlyData)
                 .ToArray()
             });
 
@@ -125,25 +130,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        var firstCorner = "-96.70537000 40.82014318";
-        var memorialStadium = "POLYGON ((" +
-            firstCorner + ", " +
-            "-96.70537429129318 40.82112749428667, " +
-            "-96.70595069212823 40.82113037830751, " +
-            "-96.70595263797125 40.82014685607426, " +
-            firstCorner +
-            "))";
+        var memorialStadiumFootballField = GetMemorialStadiumPolygonWkt();
+        const double memorialStadiumApproximateAreaInAcres = 1.32;
 
+        var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
         {
-            FundingOrganizationId = Guid.NewGuid(),
-            OrganizationId = Guid.NewGuid(),
+            FundingOrganizationId = organization.Id,
+            OrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
-            Polygons = [memorialStadium],
-            DateRangeStart = DateOnly.FromDateTime(DateTime.Now.AddYears(-yearRange)),
-            DateRangeEnd = DateOnly.FromDateTime(DateTime.Now),
+            Polygons = [memorialStadiumFootballField],
+            DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+            DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + yearRange, 1, 1)),
             Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
-            CompensationRateDollars = 1000,
+            CompensationRateDollars = requestedCompensationPerAcreFoot,
             Units = Common.DataContracts.CompensationRateUnits.AcreFeet,
         };
 
@@ -157,14 +157,59 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Should().NotBeNull();
         response.Error.Should().BeNull();
 
+        // verify response calculations are correct
+        const int knownAvgYearlyEtInches = 60;
+        var knownAvgYearlyEtFeet = knownAvgYearlyEtInches / 12;
+        var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
+        response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+
+        var expectedConservationPayment = requestedCompensationPerAcreFoot * response.TotalAverageYearlyEtAcreFeet;
+        response.ConservationPayment.Should().NotBeNull();
+        response.ConservationPayment.Should().Be((int)expectedConservationPayment);
+
+        // verify db entries were created successfully
         var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
             .Include(estimate => estimate.Locations)
             .ThenInclude(location => location.ConsumptiveUses)
             .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
         dbEstimate.Should().NotBeNull();
-
         dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
+        dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
 
-        dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(monthsInYear * yearRange);
+        var dbEstimateLocation = dbEstimate.Locations.First();
+        var dbEstimateLocationConsumptiveUses = dbEstimateLocation.ConsumptiveUses;
+
+        // verify db fields all match expectations
+        dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
+        dbEstimate.Model.Should().Be(request.Model);
+        dbEstimate.DateRangeStart.Should().Be(request.DateRangeStart);
+        dbEstimate.DateRangeEnd.Should().Be(request.DateRangeEnd);
+        dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
+        dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
+        dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
+
+        dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
+        dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
+
+        dbEstimateLocationConsumptiveUses.All(consumptiveUse =>
+        {
+            var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
+            return yearMatches;
+        }).Should().BeTrue();
+        dbEstimateLocationConsumptiveUses.Select(cu => cu.EtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
+    }
+
+    private string GetMemorialStadiumPolygonWkt()
+    {
+        var firstCorner = "-96.70537000 40.82014318";
+        var memorialStadiumFootballField = "POLYGON ((" +
+            firstCorner + ", " +
+            "-96.70537429129318 40.82112749428667, " +
+            "-96.70595069212823 40.82113037830751, " +
+            "-96.70595263797125 40.82014685607426, " +
+            firstCorner +
+            "))";
+
+        return memorialStadiumFootballField;
     }
 }

@@ -93,9 +93,9 @@ internal class CalculationEngine : ICalculationEngine
                 .ToArray();
 
             var averageEtInInches = yearlyDatapoints.Average(d => d.EtInInches);
+            var averageEtInFeet = averageEtInInches / 12;
 
             var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(polygonGeo);
-            var averageEtInFeet = averageEtInInches / 12;
             var averageEtInAcreFeet = averageEtInFeet * polygonAreaInAcres;
 
             var result = new PolygonEtDataCollection
