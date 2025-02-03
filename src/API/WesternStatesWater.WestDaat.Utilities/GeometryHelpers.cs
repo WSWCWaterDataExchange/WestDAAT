@@ -1,11 +1,9 @@
 ﻿using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
-using Microsoft.SqlServer.Types;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
-using System.Data.SqlTypes;
 using System.IO;
 
 namespace WesternStatesWater.WestDaat.Utilities
@@ -90,22 +88,38 @@ namespace WesternStatesWater.WestDaat.Utilities
                 throw new ArgumentException($"{nameof(geometry)} cannot be null");
             }
 
-            // this is the only SRID that is certain to work as desired
-            // https://learn.microsoft.com/en-us/sql/t-sql/spatial-geography/starea-geography-data-type?view=sql-server-ver16
-            // "For example, if the SRID of the instance is 4326, STArea() returns results in square meters."
-            if (geometry.SRID != 4326)
+            if (geometry is not NetTopologySuite.Geometries.Polygon)
             {
-                throw new ArgumentException($"Unsupported geometry SRID {geometry.SRID}");
+                throw new ArgumentException($"{nameof(geometry)} must be a Polygon");
             }
 
-            return geometry.ToSqlGeography().STArea().Value;
+            return CalculatePolygonAreaOnEarth(geometry as NetTopologySuite.Geometries.Polygon);
         }
 
-        private static SqlGeography ToSqlGeography(this Geometry geometry)
+        private static double CalculatePolygonAreaOnEarth(NetTopologySuite.Geometries.Polygon polygon)
         {
-            var chars = new SqlChars(geometry.ToString());
-            var sqlGeometry = SqlGeography.STGeomFromText(chars, geometry.SRID);
-            return sqlGeometry.MakeValid();
+            const int earthRadius = 6378137;
+            double area = 0;
+
+            var coordinates = polygon.Coordinates.ToArray();
+            if (coordinates.Length > 2)
+            {
+                for (var i = 0; i < coordinates.Length - 1; i++)
+                {
+                    var p1 = coordinates[i];
+                    var p2 = coordinates[i + 1];
+                    area += ConvertToRadian(p2.X - p1.X) * (2 + Math.Sin(ConvertToRadian(p1.Y)) + Math.Sin(ConvertToRadian(p2.Y)));
+                }
+
+                area = area * earthRadius * earthRadius / 2;
+            }
+
+            return Math.Abs(area);
+        }
+
+        private static double ConvertToRadian(double input)
+        {
+            return input * Math.PI / 180;
         }
     }
 }
