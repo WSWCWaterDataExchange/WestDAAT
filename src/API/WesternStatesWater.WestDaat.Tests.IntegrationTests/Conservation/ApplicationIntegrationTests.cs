@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
@@ -155,5 +156,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Should().NotBeNull();
         response.Error.Should().BeNull();
+
+        var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
+            .Include(estimate => estimate.Locations)
+            .ThenInclude(location => location.ConsumptiveUses)
+            .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
+        dbEstimate.Should().NotBeNull();
+
+        dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
+
+        dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(monthsInYear * yearRange);
     }
 }
