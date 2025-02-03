@@ -64,6 +64,11 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
 
         await ApplicationAccessor.Store(storeEstimateRequest);
 
-        throw new NotImplementedException();
+        return new EstimateConsumptiveUseResponse
+        {
+            ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
+            TotalAverageYearlyEtAcreFeet = (int)multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet),
+            DataCollections = multiPolygonYearlyEtResponse.DataCollections.Map<Contracts.Client.PolygonEtDataCollection[]>(),
+        };
     }
 }
