@@ -1,0 +1,62 @@
+<!-- This template originates from Microsoft Ocean Blue example  -->
+<!-- https://learn.microsoft.com/en-us/azure/active-directory-b2c/customize-ui-with-html?pivots=b2c-user-flow -->
+<!-- CSS and Images are loaded externally and are co-located in blob storage container -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign up or sign in!</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.5/css/bootstrap.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link
+      href="https://westdaat<Environment>.azureedge.net/b2c/b2c_signup_template.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+
+  <body>
+    <div
+      id="background_branding_container"
+      data-tenant-branding-background-color="true"
+    >
+      <img
+        data-tenant-branding-background="true"
+        src="https://westdaat<Environment>.azureedge.net/b2c/b2c_login_background.jpeg"
+        alt="Background Image"
+      />
+    </div>
+    <div class="container unified_container" role="presentation">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <img
+                class="companyLogo"
+                data-tenant-branding-logo="true"
+                src="https://westdaat<Environment>.azureedge.net/b2c/b2c_banner_logo.png"
+                alt="Company Logo"
+              />
+              <div id="api" role="main"></div>
+              <div class="text-center" style="margin-top: 16px">
+                <a
+                  href="https://westernstateswater.org/wade/westdaat-terms-of-service/"
+                  target="_blank"
+                  >Terms of Service</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
