@@ -95,6 +95,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_EstimateConsumptiveUse_AsUser_Success()
     {
         // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.SaveChangesAsync();
+
         const int monthsInYear = 12;
         const int yearRange = 1;
         var rng = new Random();
@@ -117,19 +124,29 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        // Act
+        var firstCorner = "-96.70537000 40.82014318";
+        var memorialStadium = "POLYGON ((" +
+            firstCorner + ", " +
+            "-96.70537429129318 40.82112749428667, " +
+            "-96.70595069212823 40.82113037830751, " +
+            "-96.70595263797125 40.82014685607426, " +
+            firstCorner +
+            "))";
+
         var request = new EstimateConsumptiveUseRequest
         {
             FundingOrganizationId = Guid.NewGuid(),
             OrganizationId = Guid.NewGuid(),
-            WaterConservationApplicationId = null,
-            Polygons = ["POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))", "POLYGON ((0 0, 5 0, 5 5, 0 5, 0 0))"],
+            WaterConservationApplicationId = application.Id,
+            Polygons = [memorialStadium, memorialStadium],
             DateRangeStart = DateOnly.FromDateTime(DateTime.Now.AddYears(-yearRange)),
             DateRangeEnd = DateOnly.FromDateTime(DateTime.Now),
             Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
-            Units = Common.DataContracts.CompensationRateUnits.AcreFeet,
             CompensationRateDollars = 1000,
+            Units = Common.DataContracts.CompensationRateUnits.AcreFeet,
         };
+
+        // Act
         var response = await _applicationManager.Store<
             EstimateConsumptiveUseRequest,
             EstimateConsumptiveUseResponse>(
