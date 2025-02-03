@@ -306,5 +306,7 @@ public class CalculationEngineTests : EngineTestBase
                 break;
         }
 
+        response.TotalAreaInAcres.Should().BeApproximately(areaOfAFootballFieldInAcres, areaOfAFootballFieldInAcres * 0.01);
+        response.PolygonSurfaceAreaData.Length.Should().Be(1);
     }
 }

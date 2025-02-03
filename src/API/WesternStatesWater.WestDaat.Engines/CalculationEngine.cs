@@ -34,26 +34,24 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
     {
-        var totalAreaInSquareMeters = request.DataCollections
-            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
+        var polygonSurfaceAreas = GetPolygonSurfaceAreas(request.DataCollections);
 
-        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+        var totalAreaInAcres = polygonSurfaceAreas.Sum(psa => psa.PolygonAreaInAcres);
 
         var estimatedCompensation = totalAreaInAcres * request.CompensationRateDollars;
         return new EstimateConservationPaymentResponse
         {
-            EstimatedCompensationDollars = (int)estimatedCompensation
+            EstimatedCompensationDollars = (int)estimatedCompensation,
+            TotalAreaInAcres = totalAreaInAcres,
+            PolygonSurfaceAreaData = polygonSurfaceAreas,
         };
     }
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
     {
-        var totalAreaInSquareMeters = request.DataCollections
-            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
+        var polygonSurfaceAreas = GetPolygonSurfaceAreas(request.DataCollections);
 
-        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+        var totalAreaInAcres = polygonSurfaceAreas.Sum(psa => psa.PolygonAreaInAcres);
 
         var totalAverageEtInInches = request.DataCollections
             .Sum(dc => dc.AverageEtInInches);
@@ -66,8 +64,27 @@ internal class CalculationEngine : ICalculationEngine
 
         return new EstimateConservationPaymentResponse
         {
-            EstimatedCompensationDollars = (int)estimatedCompensation
+            EstimatedCompensationDollars = (int)estimatedCompensation,
+            TotalAreaInAcres = totalAreaInAcres,
+            PolygonSurfaceAreaData = polygonSurfaceAreas,
         };
+    }
+
+    private PolygonSurfaceAreaDetails[] GetPolygonSurfaceAreas(PolygonEtDataCollection[] dataCollections)
+    {
+        return dataCollections.Select(dc => new PolygonSurfaceAreaDetails
+        {
+            PolygonWkt = dc.PolygonWkt,
+            PolygonAreaInAcres = GetPolygonSurfaceAreaInAcres(dc.PolygonWkt)
+        }).ToArray();
+    }
+
+    private double GetPolygonSurfaceAreaInAcres(string polygonWkt)
+    {
+        var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygonWkt);
+        var areaInSquareMeters = GeometryHelpers.GetGeometryAreaInSquareMeters(polygonGeo);
+        var areaInAcres = ConvertSquareMetersToAcres(areaInSquareMeters);
+        return areaInAcres;
     }
 
     private double ConvertSquareMetersToAcres(double areaInSquareMeters)
