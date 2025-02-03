@@ -92,7 +92,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task Store_EstimateConsumptiveUse_AsUser_Success()
+    public async Task Store_EstimateConsumptiveUse_AsUser_ShouldCreateNewEstimate()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -138,7 +138,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             FundingOrganizationId = Guid.NewGuid(),
             OrganizationId = Guid.NewGuid(),
             WaterConservationApplicationId = application.Id,
-            Polygons = [memorialStadium, memorialStadium],
+            Polygons = [memorialStadium],
             DateRangeStart = DateOnly.FromDateTime(DateTime.Now.AddYears(-yearRange)),
             DateRangeEnd = DateOnly.FromDateTime(DateTime.Now),
             Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
@@ -154,6 +154,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Should().NotBeNull();
-        response.Error.Should().NotBeNull();
+        response.Error.Should().BeNull();
     }
 }
