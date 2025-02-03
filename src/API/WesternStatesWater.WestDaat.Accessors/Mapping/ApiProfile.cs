@@ -192,10 +192,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         {
             CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.Ignore())
                 .ForMember(dest => dest.Location, opt => opt.Ignore());
 
             CreateMap<ApplicationEstimateStoreLocationDetails, EFWD.WaterConservationApplicationEstimateLocation>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
                 .ForMember(dest => dest.ConsumptiveUses, opt => opt.MapFrom(src => src.ConsumptiveUses));
 
