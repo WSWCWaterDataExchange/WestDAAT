@@ -218,11 +218,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
                 Data = Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
-                    {
-                        Time = DateOnly.FromDateTime(DateTime.Now),
-                        Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
-                    })
-                    .ToArray()
+                {
+                    Time = DateOnly.FromDateTime(DateTime.Now),
+                    Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
+                })
+                .ToArray()
             });
 
         UseUserContext(new UserContext
