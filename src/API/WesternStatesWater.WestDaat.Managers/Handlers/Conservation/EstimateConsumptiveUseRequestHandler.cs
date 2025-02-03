@@ -34,35 +34,36 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         {
             var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
             estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
-        }
 
-        var storeEstimateRequest = new ApplicationEstimateStoreRequest
-        {
-            WaterConservationApplicationId = request.WaterConservationApplicationId,
-            Model = request.Model,
-            DateRangeStart = request.DateRangeStart,
-            DateRangeEnd = request.DateRangeEnd,
-            DesiredCompensationDollars = request.CompensationRateDollars,
-            Units = request.Units,
-            EstimatedCompensation = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
-            Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
+            // Store the estimate
+            var storeEstimateRequest = new ApplicationEstimateStoreRequest
             {
-                var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
-
-                return new ApplicationEstimateStoreLocationDetails
+                WaterConservationApplicationId = request.WaterConservationApplicationId,
+                Model = request.Model,
+                DateRangeStart = request.DateRangeStart,
+                DateRangeEnd = request.DateRangeEnd,
+                DesiredCompensationDollars = request.CompensationRateDollars,
+                Units = request.Units,
+                EstimatedCompensation = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
+                Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
                 {
-                    PolygonWkt = x.PolygonWkt,
-                    PolygonAreaInAcres = polygonAreaInAcres,
-                    ConsumptiveUses = x.Datapoints.Select(y => new ApplicationEstimateStoreLocationConsumptiveUseDetails
-                    {
-                        Year = y.Year,
-                        EtInInches = y.EtInInches,
-                    }).ToArray()
-                };
-            }).ToArray()
-        };
+                    var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
 
-        await ApplicationAccessor.Store(storeEstimateRequest);
+                    return new ApplicationEstimateStoreLocationDetails
+                    {
+                        PolygonWkt = x.PolygonWkt,
+                        PolygonAreaInAcres = polygonAreaInAcres,
+                        ConsumptiveUses = x.Datapoints.Select(y => new ApplicationEstimateStoreLocationConsumptiveUseDetails
+                        {
+                            Year = y.Year,
+                            EtInInches = y.EtInInches,
+                        }).ToArray()
+                    };
+                }).ToArray()
+            };
+
+            await ApplicationAccessor.Store(storeEstimateRequest);
+        }
 
         return new EstimateConsumptiveUseResponse
         {
