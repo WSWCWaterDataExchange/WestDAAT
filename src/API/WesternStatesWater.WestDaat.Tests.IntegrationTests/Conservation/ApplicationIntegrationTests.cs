@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -84,9 +85,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
         if (shouldPass)
         {
-            // because accessor is throwing a NotImplementedException but it gets caught by ManagerBase
-            response.Error.Should().NotBeNull();
-            response.Error!.LogMessage.Should().BeNull();
+            response.Error.Should().BeNull();
         }
         else
         {
@@ -94,8 +93,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.Error.Should().BeOfType<ForbiddenError>();
         }
     }
-    
-        // TODO: would this test belong here or be better suited in like an accessor test?
+
+    // TODO: JN - would this test belong here or be better suited in like an accessor test?
     [TestMethod]
     public async Task Load_OrganizationApplicationDashboardRequest_ReturnsExpectedApplications()
     {
@@ -114,10 +113,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
         var subAppOne = new WaterConservationApplicationSubmissionFaker(appOne)
-            .RuleFor(app => app.AcceptedDate, _ => new DateTimeOffset()).Generate();
+            .RuleFor(app => app.AcceptedDate, _ => new DateTimeOffset())
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
         var subAppTwo = new WaterConservationApplicationSubmissionFaker(appTwo)
-            .RuleFor(app => app.RejectedDate, _ => new DateTimeOffset()).Generate();
-        var subAppFour = new WaterConservationApplicationSubmissionFaker(appFour).Generate();
+            .RuleFor(app => app.RejectedDate, _ => new DateTimeOffset())
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
+        var subAppFour = new WaterConservationApplicationSubmissionFaker(appFour)
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
@@ -125,38 +127,44 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(subAppOne, subAppTwo, subAppFour);
         await _dbContext.SaveChangesAsync();
-        
+
         var appOneResponse = new OrganizationApplicationDashboardListItem()
         {
-            ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
+            CompensationRateDollars = subAppOne.CompensationRateDollars,
+            CompensationRateUnits = "Acre-Feet",
             OrganizationName = orgOne.Name,
-            WaterRightNativeId = appOne.WaterRightNativeId,
+            State = "TBD",
+            Status = "Approved",
             SubmittedDate = subAppOne.SubmittedDate,
-            Status = ConservationApplicationStatus.Approved
+            WaterRightNativeId = appOne.WaterRightNativeId,
         };
-        
+
         var appTwoResponse = new OrganizationApplicationDashboardListItem()
         {
-            ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileTwo.FirstName} {userProfileTwo.LastName}",
+            CompensationRateDollars = subAppTwo.CompensationRateDollars,
+            CompensationRateUnits = "Acres",
             OrganizationName = orgTwo.Name,
-            WaterRightNativeId = appTwo.WaterRightNativeId,
+            State = "TBD",
+            Status = "Rejected",
             SubmittedDate = subAppTwo.SubmittedDate,
-            Status = ConservationApplicationStatus.Rejected
+            WaterRightNativeId = appTwo.WaterRightNativeId,
         };
-        
+
         var appFourResponse = new OrganizationApplicationDashboardListItem()
         {
-            ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
             ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
+            CompensationRateDollars = subAppFour.CompensationRateDollars,
+            CompensationRateUnits = "None",
             OrganizationName = orgOne.Name,
-            WaterRightNativeId = appFour.WaterRightNativeId,
+            State = "TBD",
+            Status = "In Review",
             SubmittedDate = subAppFour.SubmittedDate,
-            Status = ConservationApplicationStatus.InReview
+            WaterRightNativeId = appFour.WaterRightNativeId,
         };
 
         UseUserContext(new UserContext
@@ -175,7 +183,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
         response.Applications.Should().HaveCount(3);
-        response.Applications.Should().BeEquivalentTo([appOneResponse,appTwoResponse,appFourResponse]);
+        response.Applications.Should().BeEquivalentTo([appOneResponse, appTwoResponse, appFourResponse]);
     }
 
     [TestMethod]
@@ -189,11 +197,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
                 Data = Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
-                {
-                    Time = DateOnly.FromDateTime(DateTime.Now),
-                    Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
-                })
-                .ToArray()
+                    {
+                        Time = DateOnly.FromDateTime(DateTime.Now),
+                        Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
+                    })
+                    .ToArray()
             });
 
         UseUserContext(new UserContext

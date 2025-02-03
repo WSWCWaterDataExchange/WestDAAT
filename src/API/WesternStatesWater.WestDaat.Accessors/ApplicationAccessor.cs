@@ -1,5 +1,7 @@
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors;
@@ -29,74 +31,16 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicationDashboardLoadResponse> GetDashboardApplications(ApplicationDashboardLoadRequest request)
     {
-        // Figure out how we need to get applications
-        // 1A. is it by organization id
-        //     - is it for all organizations or specific ones?
-        // 1B. is it by applicant user id
-        //
-        // Then get all apps for the specified organizations
-        // but only ones who have submitted applications
-        //
-        // and then go get all the other data
-
-
         await using var db = _westDaatDatabaseContextFactory.Create();
 
+        // TODO: JN - add in logic for pulling all organization ids also
         var organizationIds = request.OrganizationId;
+
         var applications = await db.WaterConservationApplications
-            .Join(db.WaterConservationApplicationSubmissions,
-                app => app.Id,
-                sub => sub.WaterConservationApplicationId,
-                (app, sub) => new 
-                {
-                    ApplicationId = app.Id,
-                    ApplicationDisplayId = app.ApplicationDisplayId,
-                    ApplicantUserId = app.ApplicantUserId,
-                    OrganizationId = app.FundingOrganizationId,
-                    WaterRightNativeId = app.WaterRightNativeId,
-                    SubmittedDate = sub.SubmittedDate,
-                    AcceptedDate = sub.AcceptedDate,
-                    RejectedDate = sub.RejectedDate,
-                    // CompensationRateDollars = sub.CompensationRateDollars,
-                    // CompensationRateUnits = sub.CompensationRateUnits
-                })
-            // .Where((app, sub) => app.OrganizationId == request.OrganizationId)
-            .Join(db.UserProfiles,
-                info => info.ApplicantUserId,
-                profile => profile.UserId,
-                (info, profile) => new
-                {
-            info.ApplicationId,
-            info.ApplicationDisplayId,
-            info.OrganizationId,
-            info.WaterRightNativeId,
-            info.SubmittedDate,
-            info.AcceptedDate,
-            info.RejectedDate,
-            //         info.CompensationRateDollars,
-            //         info.CompensationRateUnits,
-                ApplicantFirstName = profile.FirstName,
-                ApplicantLastName = profile.LastName,
-            })
-            .Join(db.Organizations,
-                info => info.OrganizationId,
-                org => org.Id,
-                (info, org) => new ApplicationDashboardLoadDetails
-                {
-            ApplicationId = info.ApplicationId,
-            ApplicationDisplayId = info.ApplicationDisplayId,
-            WaterRightNativeId = info.WaterRightNativeId,
-            SubmittedDate = info.SubmittedDate,
-            AcceptedDate = info.AcceptedDate,
-            RejectedDate = info.RejectedDate,
-            //         CompensationRateDollars = info.CompensationRateDollars,
-            //         CompensationRateUnits = info.CompensationRateUnits,
-            ApplicantFirstName = info.ApplicantFirstName,
-            ApplicantLastName = info.ApplicantLastName,
-            OrganizationName = org.Name
-            }).ToListAsync();
-        
-        // TODO: should there be a default sort order?
+            .Where(app => app.FundingOrganizationId == request.OrganizationId && app.Submission != null)
+            .ProjectTo<ApplicationDashboardLoadDetails>(DtoMapper.Configuration)
+            .OrderByDescending(app => app.SubmittedDate)
+            .ToListAsync();
 
         return new ApplicationDashboardLoadResponse
         {

@@ -169,6 +169,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
+            AddApplicationMappings();
         }
 
         private void AddUserMappings()
@@ -185,6 +186,67 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+        }
+
+        private void AddApplicationMappings()
+        {
+            CreateMap<EFWD.WaterConservationApplication, ApplicationDashboardLoadDetails>()
+                .ForMember(dest => dest.ApplicantFullName, opt =>
+                {
+                    opt.PreCondition(src => src.ApplicantUser.UserProfile != null);
+                    opt.MapFrom(src => $"{src.ApplicantUser.UserProfile.FirstName} {src.ApplicantUser.UserProfile.LastName}");
+                })
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.FundingOrganization.Name))
+                .ForMember(dest => dest.CompensationRateDollars, opt =>
+                {
+                    // TODO: JN - should I use this PreCondition here? already checking in .Where in Accessor
+                    // opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => src.Submission.CompensationRateDollars);
+                })
+                .ForMember(dest => dest.CompensationRateUnits, opt =>
+                {
+                    // TODO: JN - same as above
+                    // opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => src.Submission.CompensationRateUnits);
+                })
+                .ForMember(dest => dest.SubmittedDate, opt =>
+                {
+                    // TODO: JN - same as above
+                    // opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => src.Submission.SubmittedDate);
+                })
+                .ForMember(dest => dest.Status, opt =>
+                {
+                    // TODO: JN - same as above
+                    // opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => EvaluateApplicationStatus(src.Submission));
+                })
+                // TODO: JN - how to pull in state? need to link water native right id to WaDE?
+                .ForMember(dest => dest.State, opt => opt.MapFrom(src => "TBD"));
+        }
+        
+        // TODO: JN - was getting this error when function wasn't static. Is this okay to make static?
+        /**
+         * Exception: System.InvalidOperationException: The client projection contains a reference to a constant expression of 'WesternStatesWater.WestDaat.Accessors.Mapping.ApiProfile' through the instance method 'EvaluateApplicationStatus'. This could potentially cause a memory leak; consider making the method static so that it does not capture constant in the instance. See https://go.microsoft.com/fwlink/?linkid=2103067 for more information and examples.
+         */
+        public static ConservationApplicationStatus EvaluateApplicationStatus(EFWD.WaterConservationApplicationSubmission app)
+        {
+            if (app.AcceptedDate == null && app.RejectedDate == null)
+            {
+                return ConservationApplicationStatus.InReview;
+            }
+
+            if (app.AcceptedDate != null && app.RejectedDate == null)
+            {
+                return ConservationApplicationStatus.Approved;
+            }
+
+            if (app.AcceptedDate == null && app.RejectedDate != null)
+            {
+                return ConservationApplicationStatus.Rejected;
+            }
+
+            return ConservationApplicationStatus.Unknown;
         }
     }
 }

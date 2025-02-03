@@ -1,5 +1,4 @@
 using AutoMapper;
-using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 
@@ -82,64 +81,51 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Conservation.OrganizationApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationIdFilter));
 
-            CreateMap<CommonContracts.ApplicationDashboardLoadResponse, OrganizationApplicationDashboardLoadResponse>()
-                .ForMember(dest => dest.Statistics.TotalObligationDollars, opt => opt.MapFrom(src => CalculateTotalObligationDollars(src.Applications)))
+            CreateMap<CommonContracts.ApplicationDashboardLoadResponse, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            // TODO: would all of the statistics be calculated here or in the handler?
 
-            CreateMap<CommonContracts.ApplicationDashboardLoadDetails, OrganizationApplicationDashboardListItem>()
-                .ForMember(dest => dest.ApplicantFullName, opt => opt.MapFrom(src => $"{src.ApplicantFirstName} {src.ApplicantLastName}"))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
+            CreateMap<CommonContracts.ApplicationDashboardLoadDetails, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardListItem>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => FormatApplicationStatus(src.Status)))
+                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => FormatApplicationCompensationRateUnits(src.CompensationRateUnits)));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
             CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
-                CommonContracts.EstimateConservationPaymentRequest>()
+                    CommonContracts.EstimateConservationPaymentRequest>()
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
 
-        
             CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
         }
 
-        // TODO: move this to its own file
-        private ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? accepted, DateTimeOffset? rejected)
+        // TODO: JN - also leave this as a public function here, or live with enum?
+        public static string FormatApplicationStatus(CommonContracts.ConservationApplicationStatus status)
         {
-            if (accepted != null && rejected != null)
+            return status switch
             {
-                // TODO: throw exception here? what kind?
-                return ConservationApplicationStatus.InReview;
-            }
-            else if (accepted != null)
-            {
-                return ConservationApplicationStatus.Approved;
-            }
-            else if (rejected != null)
-            {
-                return ConservationApplicationStatus.Rejected;
-            }
-            else
-            {
-                return ConservationApplicationStatus.InReview;
-            }
+                CommonContracts.ConservationApplicationStatus.InReview => "In Review",
+                CommonContracts.ConservationApplicationStatus.Approved => "Approved",
+                CommonContracts.ConservationApplicationStatus.Rejected => "Rejected",
+                // TODO: JN - unknown / default cases?
+                CommonContracts.ConservationApplicationStatus.Unknown => "Unknown",
+                _ => "Unknown"
+            };
         }
         
-        // TODO: move this to its own file
-        private int CalculateCompensationRateDollars(CommonContracts.ApplicationDashboardLoadDetails[] applications)
+        // TODO: JN - also leave this as a public function here, or live with enum?
+        public static string FormatApplicationCompensationRateUnits(CommonContracts.CompensationRateUnits units)
         {
-            // TODO: figure this out
-            return 0;
+            return units switch
+            {
+                CommonContracts.CompensationRateUnits.AcreFeet => "Acre-Feet",
+                CommonContracts.CompensationRateUnits.Acres => "Acres",
+                // TODO: JN - none / default cases?
+                CommonContracts.CompensationRateUnits.None => "None",
+                _ => "None"
+            };
         }
-        
-        // TODO: move this to its own file
-        private int CalculateTotalObligationDollars(CommonContracts.ApplicationDashboardLoadDetails[] applications)
-        {
-            // TODO: figure this out
-            return 0;
-        }
-        
     }
 }
