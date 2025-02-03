@@ -2,9 +2,7 @@
 
 public class ApplicationEstimateStoreLocationConsumptiveUseDetails
 {
-    public Guid WaterConservationApplicationEstimateLocationId { get; set; }
+    required public int Year { get; set; }
 
-    public int Year { get; set; }
-
-    public double EtInInches { get; set; }
+    required public double EtInInches { get; set; }
 }

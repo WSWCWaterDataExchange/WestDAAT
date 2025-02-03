@@ -2,25 +2,25 @@
 
 public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
 {
-    public Guid WaterConservationApplicationId { get; set; }
+    required public Guid WaterConservationApplicationId { get; set; }
 
-    public RasterTimeSeriesModel Model { get; set; }
-
-    /// <summary>
-    /// Inclusive.
-    /// </summary>
-    public DateOnly DateRangeStart { get; set; }
+    required public RasterTimeSeriesModel Model { get; set; }
 
     /// <summary>
     /// Inclusive.
     /// </summary>
-    public DateOnly DateRangeEnd { get; set; }
+    required public DateOnly DateRangeStart { get; set; }
 
-    public int DesiredCompensationDollars { get; set; }
+    /// <summary>
+    /// Inclusive.
+    /// </summary>
+    required public DateOnly DateRangeEnd { get; set; }
 
-    public CompensationRateUnits Units { get; set; }
+    required public int DesiredCompensationDollars { get; set; }
 
-    public int EstimatedCompensation { get; set; }
+    required public CompensationRateUnits Units { get; set; }
 
-    public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
+    required public int EstimatedCompensation { get; set; }
+
+    required public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
 }
