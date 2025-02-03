@@ -294,6 +294,75 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .Should().BeFalse();
     }
 
+    [TestMethod]
+    public async Task Store_EstimateConsumptiveUse_AsUser_WithoutCompensation_ShouldNotSaveEstimate()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.SaveChangesAsync();
+
+        const int monthsInYear = 12;
+        const int startYear = 2024;
+        const int yearRange = 1;
+        OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
+            .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
+            {
+                Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
+                {
+                    var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                    return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                    {
+                        Time = time,
+                        Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                    });
+                })
+                .SelectMany(monthlyData => monthlyData)
+                .ToArray()
+            });
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        var memorialStadiumFootballField = GetMemorialStadiumPolygonWkt();
+        const double memorialStadiumApproximateAreaInAcres = 1.32;
+
+        var requestedCompensationPerAcreFoot = 1000;
+        var request = new EstimateConsumptiveUseRequest
+        {
+            FundingOrganizationId = organization.Id,
+            OrganizationId = organization.Id,
+            WaterConservationApplicationId = application.Id,
+            Polygons = [memorialStadiumFootballField],
+            DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+            DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + yearRange, 1, 1)),
+            Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            EstimateConsumptiveUseRequest,
+            EstimateConsumptiveUseResponse>(
+            request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().BeNull();
+
+        // verify db entries were not created
+        var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
+            .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
+        dbEstimate.Should().BeNull();
+    }
+
     private string GetMemorialStadiumPolygonWkt()
     {
         var firstCorner = "-96.70537000 40.82014318";
