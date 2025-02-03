@@ -245,4 +245,66 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections[1].AverageEtInInches.Should().Be(15.07);
         response.DataCollections[1].Datapoints.Length.Should().Be(3); // three years of data
     }
+
+    [DataTestMethod]
+    [DataRow(CompensationRateUnits.AcreFeet)]
+    [DataRow(CompensationRateUnits.Acres)]
+    public async Task Calculate_EstimateConservationPayment_Success(CompensationRateUnits units)
+    {
+        // Arrange
+        var firstCorner = "-96.70537000 40.82014318";
+        var memorialStadium = "POLYGON ((" +
+            firstCorner + ", " +
+            "-96.70537429129318 40.82112749428667, " +
+            "-96.70595069212823 40.82113037830751, " +
+            "-96.70595263797125 40.82014685607426, " +
+            firstCorner +
+            "))";
+
+        var areaOfAFootballFieldInAcres = 1.32;
+
+        var etInInches = 60;
+        var etInFeet = etInInches / 12; // 5 feet
+
+        var etVolumeInAcreFeet = areaOfAFootballFieldInAcres * etInFeet;
+
+        var compensationRateDollars = 1000;
+
+        var request = new EstimateConservationPaymentRequest
+        {
+            CompensationRateDollars = compensationRateDollars,
+            CompensationRateUnits = units,
+            DataCollections = [
+                new()
+                {
+                    PolygonWkt = memorialStadium,
+                    AverageEtInInches = etInInches,
+                    Datapoints = []
+                },
+            ]
+        };
+
+        // Act
+        var response = (EstimateConservationPaymentResponse)await _calculationEngine.Calculate(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        double expectedCompensation;
+        double onePercentMarginOfError;
+        switch (units)
+        {
+            case CompensationRateUnits.AcreFeet:
+                expectedCompensation = etVolumeInAcreFeet * compensationRateDollars;
+                onePercentMarginOfError = expectedCompensation * 0.01;
+                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
+                break;
+            case CompensationRateUnits.Acres:
+                expectedCompensation = areaOfAFootballFieldInAcres * compensationRateDollars;
+                onePercentMarginOfError = expectedCompensation * 0.01;
+                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
+                break;
+        }
+
+    }
 }
