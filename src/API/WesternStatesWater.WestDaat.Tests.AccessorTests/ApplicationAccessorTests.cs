@@ -29,6 +29,80 @@ public class ApplicationAccessorTests : AccessorTestBase
     }
 
     [TestMethod]
+    public async Task Load_CheckInProgressApplicationExists_ApplicationExistsWithNoSubmissions_ShouldReturnInProgressApplicationId()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+
+        await _westDaatDb.WaterConservationApplications.AddAsync(application);
+        await _westDaatDb.SaveChangesAsync();
+
+        var request = new InProgressApplicationExistsLoadRequest
+        {
+            ApplicantUserId = user.Id,
+            WaterRightNativeId = application.WaterRightNativeId
+        };
+
+        // Act
+        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.InProgressApplicationId.Should().Be(application.Id);
+    }
+
+    [TestMethod]
+    public async Task Load_CheckInProgressApplicationExists_ApplicationExistsWithSubmissions_ShouldReturnNullId()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        await _westDaatDb.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _westDaatDb.SaveChangesAsync();
+
+        var request = new InProgressApplicationExistsLoadRequest
+        {
+            ApplicantUserId = user.Id,
+            WaterRightNativeId = application.WaterRightNativeId
+        };
+
+        // Act
+        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.InProgressApplicationId.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Load_CheckInProgressApplicationExists_ApplicationDoesNotExist_ShouldReturnNullId()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+
+        await _westDaatDb.Users.AddAsync(user);
+        await _westDaatDb.SaveChangesAsync();
+
+        var request = new InProgressApplicationExistsLoadRequest
+        {
+            ApplicantUserId = user.Id,
+            WaterRightNativeId = "1234",
+        };
+
+        // Act
+        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.InProgressApplicationId.Should().BeNull();
+    }
+
+    [TestMethod]
     public async Task Store_CreateWaterConservationApplication_ShouldCreateApplication()
     {
         // Arrange
