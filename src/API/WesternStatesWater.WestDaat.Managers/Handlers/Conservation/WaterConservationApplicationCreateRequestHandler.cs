@@ -1,16 +1,18 @@
 ﻿using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
+using WesternStatesWater.WestDaat.Engines;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationCreateRequestHandler :
     IRequestHandler<WaterConservationApplicationCreateRequest, WaterConservationApplicationCreateResponse>
 {
-    public WaterConservationApplicationCreateRequestHandler(
+    private readonly IApplicationFormattingEngine _applicationFormattingEngine;
 
-        )
+    public WaterConservationApplicationCreateRequestHandler(IApplicationFormattingEngine applicationFormattingEngine)
     {
+        _applicationFormattingEngine = applicationFormattingEngine;
     }
 
     public Task<WaterConservationApplicationCreateResponse> Handle(WaterConservationApplicationCreateRequest request)
