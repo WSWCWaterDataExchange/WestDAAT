@@ -115,7 +115,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         var applications = Enumerable.Range(0, numberOfApplicationsToGenerate)
             .Select(index =>
                 new WaterConservationApplicationFaker(user, organization)
-                    .RuleFor(app => app.ApplicationDisplayId, (f, app) => $"2025-{organization.AgencyId}-{index + 1:D4}")
+                    .RuleFor(app => app.ApplicationDisplayId, () => $"2025-{organization.AgencyId}-{index + 1:D4}")
                     .Generate()
             )
             .ToArray();
