@@ -376,4 +376,41 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         return memorialStadiumFootballField;
     }
+
+    [TestMethod]
+    public async Task Store_CreateWaterConservationApplication_Success()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        var request = new WaterConservationApplicationCreateRequest
+        {
+            OrganizationId = organization.Id,
+            WaterRightNativeId = "1234",
+        };
+
+        // Act
+        var response = await _applicationManager.Store<WaterConservationApplicationCreateRequest, WaterConservationApplicationCreateResponse>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.WaterConservationApplicationId.Should().NotBeEmpty();
+
+        var dbApplication = await _dbContext.WaterConservationApplications
+            .SingleOrDefaultAsync(application => application.Id == response.WaterConservationApplicationId);
+        dbApplication.Should().NotBeNull();
+    }
 }
