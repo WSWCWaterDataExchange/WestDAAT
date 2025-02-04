@@ -42,6 +42,15 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
         displayIdFormattedString.Append(organizationDetailsResponse.Organization.AgencyId);
         displayIdFormattedString.Append("-");
 
+        var sequentialLookupRequest = new ApplicationFindSequentialIdLoadRequest
+        {
+            ApplicationDisplayIdStub = displayIdFormattedString.ToString(),
+        };
+        var sequentialLookupResponse = (ApplicationFindSequentialIdLoadResponse)await _applicationAccessor.Load(sequentialLookupRequest);
+
+        var nextSequentialNumber = sequentialLookupResponse.LastDisplayIdSequentialNumber + 1;
+        var paddedNextSequentialNumber = $"{nextSequentialNumber:D4}";
+        displayIdFormattedString.Append(paddedNextSequentialNumber);
 
         request.ApplicationDisplayId = displayIdFormattedString.ToString();
     }
