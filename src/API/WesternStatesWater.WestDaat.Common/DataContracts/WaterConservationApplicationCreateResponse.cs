@@ -2,5 +2,5 @@
 
 public class WaterConservationApplicationCreateResponse : ApplicationStoreResponseBase
 {
-    public Guid WaterConservationApplicationid { get; set; }
+    public Guid WaterConservationApplicationId { get; set; }
 }

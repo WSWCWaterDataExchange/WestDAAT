@@ -160,10 +160,10 @@ public class ApplicationAccessorTests : AccessorTestBase
 
         // Assert
         response.Should().NotBeNull();
-        response.WaterConservationApplicationid.Should().NotBeEmpty();
+        response.WaterConservationApplicationId.Should().NotBeEmpty();
 
         var application = await _westDaatDb.WaterConservationApplications
-            .SingleOrDefaultAsync(wca => wca.Id == response.WaterConservationApplicationid);
+            .SingleOrDefaultAsync(wca => wca.Id == response.WaterConservationApplicationId);
         application.Should().NotBeNull();
         application.ApplicantUserId.Should().Be(user.Id);
         application.FundingOrganizationId.Should().Be(organization.Id);
