@@ -22,7 +22,7 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
     /// <code>{Year}-{AgencyIdentifier}-{SequentialNumber}</code> 
     /// * Year is the current year.<br />
     /// * AgencyIdentifier is the AgencyId field of the corresponding Organization.<br />
-    /// * SequentialNumber is the nth Application created in the current year for this Organization.
+    /// * SequentialNumber is the nth Application created in the current year for this Organization, left-padded to display 4 digits.
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
