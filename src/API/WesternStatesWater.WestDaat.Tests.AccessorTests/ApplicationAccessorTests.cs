@@ -102,6 +102,40 @@ public class ApplicationAccessorTests : AccessorTestBase
         response.InProgressApplicationId.Should().BeNull();
     }
 
+    [DataTestMethod]
+    [DataRow(0, 0)]
+    [DataRow(1, 1)]
+    [DataRow(2, 2)]
+    [DataRow(5, 5)]
+    public async Task Load_FindSequentialDisplayId_Success(int numberOfApplicationsToGenerate, int expectedSequentialNumber)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var applications = Enumerable.Range(0, numberOfApplicationsToGenerate)
+            .Select(index =>
+                new WaterConservationApplicationFaker(user, organization)
+                    .RuleFor(app => app.ApplicationDisplayId, (f, app) => $"2025-{organization.AgencyId}-{index + 1:D4}")
+                    .Generate()
+            )
+            .ToArray();
+
+        await _westDaatDb.WaterConservationApplications.AddRangeAsync(applications);
+        await _westDaatDb.SaveChangesAsync();
+
+        var request = new ApplicationFindSequentialIdLoadRequest
+        {
+            ApplicationDisplayIdStub = $"2025-{organization.AgencyId}"
+        };
+
+        // Act
+        var response = (ApplicationFindSequentialIdLoadResponse)await _accessor.Load(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.LastDisplayIdSequentialNumber.Should().Be(expectedSequentialNumber);
+    }
+
     [TestMethod]
     public async Task Store_CreateWaterConservationApplication_ShouldCreateApplication()
     {
