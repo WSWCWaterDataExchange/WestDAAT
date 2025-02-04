@@ -103,6 +103,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private void RegisterEngineServices(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<IApplicationFormattingEngine, FormattingEngine>();
             serviceCollection.AddTransient<ICalculationEngine, CalculationEngine>();
             serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
