@@ -74,18 +74,18 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationIdFilter.Value,
         });
-        
+
         if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         return null;
     }
 
@@ -95,6 +95,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
+            WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -103,6 +104,12 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
+    {
+        await Task.CompletedTask;
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request, ContextBase context)
     {
         await Task.CompletedTask;
         return null;
