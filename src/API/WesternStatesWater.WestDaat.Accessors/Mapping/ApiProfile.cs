@@ -186,6 +186,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+
+            CreateMap<EFWD.Organization, OrganizationDetails>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
         }
 
         private void AddApplicationMappings()
@@ -214,6 +218,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.OrganizationId));
+
         }
     }
 }

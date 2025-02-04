@@ -78,6 +78,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddApplicationMappings()
         {
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationCreateRequest, CommonContracts.WaterConservationApplicationCreateRequest>()
+                .ForMember(dest => dest.ApplicantUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicationDisplayId, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.InProgressApplicationExistsLoadRequest>();
+
+            CreateMap<CommonContracts.WaterConservationApplicationCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationCreateResponse>();
+
             CreateMap<ClientContracts.Requests.Conservation.OrganizationApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationIdFilter));
 
@@ -92,7 +100,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
 
-        
+
             CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
