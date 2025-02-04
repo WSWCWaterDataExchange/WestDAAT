@@ -26,13 +26,21 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    private Task FormatWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request)
+    private async Task FormatWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request)
     {
         var displayIdFormattedString = new StringBuilder();
 
         displayIdFormattedString.Append(DateTimeOffset.UtcNow.Year.ToString());
         displayIdFormattedString.Append("-");
 
+        var organizationDetailsRequest = new OrganizationLoadDetailsRequest
+        {
+            OrganizationId = request.OrganizationId,
+        };
+        var organizationDetailsResponse = (OrganizationLoadDetailsResponse)await _organizationAccessor.Load(organizationDetailsRequest);
+
+        displayIdFormattedString.Append(organizationDetailsResponse.Organization.AgencyId);
+        displayIdFormattedString.Append("-");
 
 
         request.ApplicationDisplayId = displayIdFormattedString.ToString();
