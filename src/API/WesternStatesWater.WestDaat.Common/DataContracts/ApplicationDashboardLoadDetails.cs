@@ -4,9 +4,11 @@ public class ApplicationDashboardLoadDetails
 {
     public DateTimeOffset? AcceptedDate { get; set; }
     
-    required public string ApplicationDisplayId { get; set; }
-
     required public string ApplicantFullName { get; set; }
+
+    required public string ApplicationDisplayId { get; set; }
+    
+    required public Guid ApplicationId { get; set; }
 
     required public int CompensationRateDollars { get; set; }
 

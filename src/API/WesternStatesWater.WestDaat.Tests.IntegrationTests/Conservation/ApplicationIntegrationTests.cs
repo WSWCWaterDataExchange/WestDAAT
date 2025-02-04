@@ -116,17 +116,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
             .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
-        var subAppFour = new WaterConservationApplicationSubmissionFaker(appFour)
+        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
-        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, subAppFour);
+        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
-        var appOneResponse = new OrganizationApplicationDashboardListItem
+        var acceptedAppResponse = new OrganizationApplicationDashboardListItem
         {
+            ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
             CompensationRateDollars = acceptedApp.CompensationRateDollars,
@@ -137,8 +138,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
         };
 
-        var appTwoResponse = new OrganizationApplicationDashboardListItem
+        var rejectedAppResponse = new OrganizationApplicationDashboardListItem
         {
+            ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
             CompensationRateDollars = rejectedApp.CompensationRateDollars,
@@ -149,15 +151,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
         };
 
-        var appFourResponse = new OrganizationApplicationDashboardListItem
+        var inReviewAppResponse = new OrganizationApplicationDashboardListItem
         {
+            ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = subAppFour.CompensationRateDollars,
-            CompensationRateUnits = subAppFour.CompensationRateUnits,
+            CompensationRateDollars = inReviewApp.CompensationRateDollars,
+            CompensationRateUnits = inReviewApp.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.InReview,
-            SubmittedDate = subAppFour.SubmittedDate,
+            SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
         };
 
@@ -189,11 +192,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeNull();
 
-        var expectedApplications = new List<OrganizationApplicationDashboardListItem> { appOneResponse, appFourResponse };
+        var expectedApplications = new List<OrganizationApplicationDashboardListItem> { acceptedAppResponse, inReviewAppResponse };
 
         if (isGlobalUser)
         {
-            expectedApplications = expectedApplications.Append(appTwoResponse).ToList();
+            expectedApplications = expectedApplications.Append(rejectedAppResponse).ToList();
         }
 
         response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse

@@ -196,6 +196,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt.PreCondition(src => src.ApplicantUser.UserProfile != null);
                     opt.MapFrom(src => $"{src.ApplicantUser.UserProfile.FirstName} {src.ApplicantUser.UserProfile.LastName}");
                 })
+                .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.FundingOrganization.Name))
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Submission.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Submission.CompensationRateUnits))

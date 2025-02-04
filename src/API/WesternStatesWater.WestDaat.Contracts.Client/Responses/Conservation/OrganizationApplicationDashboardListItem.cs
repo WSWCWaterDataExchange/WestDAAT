@@ -4,10 +4,12 @@ namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 public class OrganizationApplicationDashboardListItem
 {
-    required public string ApplicationDisplayId { get; set; }
-
     required public string ApplicantFullName { get; set; }
 
+    required public string ApplicationDisplayId { get; set; }
+
+    required public Guid ApplicationId { get; set; }
+    
     required public int CompensationRateDollars { get; set; }
 
     required public CompensationRateUnits CompensationRateUnits { get; set; }
