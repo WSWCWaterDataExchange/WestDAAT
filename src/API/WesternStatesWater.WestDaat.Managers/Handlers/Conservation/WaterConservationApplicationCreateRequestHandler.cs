@@ -48,8 +48,8 @@ public class WaterConservationApplicationCreateRequestHandler :
         await _applicationFormattingEngine.FormatStoreRequest(dtoRequest);
 
         // save to db
-        await _applicationAccessor.Store(dtoRequest);
+        var dtoResponse = (Common.DataContracts.WaterConservationApplicationCreateResponse)await _applicationAccessor.Store(dtoRequest);
 
-        throw new NotImplementedException();
+        return dtoResponse.Map<WaterConservationApplicationCreateResponse>();
     }
 }
