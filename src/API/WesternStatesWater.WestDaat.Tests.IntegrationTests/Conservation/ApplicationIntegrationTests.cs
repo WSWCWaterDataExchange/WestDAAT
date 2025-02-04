@@ -202,7 +202,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse
         {
             Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
-            Statistics = null
         });
     }
 
