@@ -24,6 +24,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
             InProgressApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
+            ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -48,6 +49,29 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new InProgressApplicationExistsLoadResponse
         {
             InProgressApplicationId = existingInProgressApplication?.Id
+        };
+    }
+
+    private async Task<ApplicationFindSequentialIdLoadResponse> FindSequentialDisplayId(ApplicationFindSequentialIdLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var entity = await db.WaterConservationApplications
+            .Where(app => app.ApplicationDisplayId.StartsWith(request.ApplicationDisplayIdStub))
+            .OrderByDescending(app => app.ApplicationDisplayId)
+            .FirstOrDefaultAsync();
+
+        int lastId = 0;
+
+        if (entity != null)
+        {
+            var lastIdString = entity.ApplicationDisplayId.Split('-').Last();
+            lastId = int.Parse(lastIdString);
+        }
+
+        return new ApplicationFindSequentialIdLoadResponse
+        {
+            LastDisplayIdSequentialNumber = lastId,
         };
     }
 
