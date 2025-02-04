@@ -44,10 +44,11 @@ public class WaterConservationApplicationCreateRequestHandler :
             };
         }
 
-        // hydrate request (display id)
+        // hydrate request
         await _applicationFormattingEngine.FormatStoreRequest(dtoRequest);
 
         // save to db
+        await _applicationAccessor.Store(dtoRequest);
 
         throw new NotImplementedException();
     }
