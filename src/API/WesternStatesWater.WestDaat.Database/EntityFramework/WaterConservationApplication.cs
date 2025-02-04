@@ -21,5 +21,7 @@ public class WaterConservationApplication
 
     public virtual Organization FundingOrganization { get; set; } = null!;
 
+    public virtual ICollection<WaterConservationApplicationEstimate> Estimates { get; set; } = null!;
+
     public virtual ICollection<WaterConservationApplicationSubmission> Submissions { get; set; } = null!;
 }
