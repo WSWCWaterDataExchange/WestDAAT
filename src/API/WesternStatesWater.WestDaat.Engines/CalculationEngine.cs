@@ -16,9 +16,64 @@ internal class CalculationEngine : ICalculationEngine
     {
         return request switch
         {
+            EstimateConservationPaymentRequest req => EstimateConservationPayment(req),
             MultiPolygonYearlyEtRequest req => await CalculatePolygonsEt(req),
             _ => throw new NotImplementedException()
         };
+    }
+
+    private EstimateConservationPaymentResponse EstimateConservationPayment(EstimateConservationPaymentRequest request)
+    {
+        return request.CompensationRateUnits switch
+        {
+            CompensationRateUnits.Acres => EstimateConservationPaymentInAcres(request),
+            CompensationRateUnits.AcreFeet => EstimateConservationPaymentInAcreFeet(request),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private EstimateConservationPaymentResponse EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
+    {
+        var totalAreaInSquareMeters = request.DataCollections
+            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
+            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
+
+        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+
+        var estimatedCompensation = totalAreaInAcres * request.CompensationRateDollars;
+        return new EstimateConservationPaymentResponse
+        {
+            EstimatedCompensationDollars = (int)estimatedCompensation
+        };
+    }
+
+    private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
+    {
+        var totalAreaInSquareMeters = request.DataCollections
+            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
+            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
+
+        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+
+        var totalAverageEtInInches = request.DataCollections
+            .Sum(dc => dc.AverageEtInInches);
+
+        var totalAverageEtInFeet = totalAverageEtInInches / 12;
+
+        var totalVolumeInAcreFeet = totalAreaInAcres * totalAverageEtInFeet;
+
+        var estimatedCompensation = totalVolumeInAcreFeet * request.CompensationRateDollars;
+
+        return new EstimateConservationPaymentResponse
+        {
+            EstimatedCompensationDollars = (int)estimatedCompensation
+        };
+    }
+
+    private double ConvertSquareMetersToAcres(double areaInSquareMeters)
+    {
+        double areaInAcres = areaInSquareMeters * 0.000247105;
+        return areaInAcres;
     }
 
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
