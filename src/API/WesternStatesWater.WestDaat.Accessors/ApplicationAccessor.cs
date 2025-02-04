@@ -42,7 +42,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         var applications = await applicationsQuery
             .Where(app => app.Submission != null)
-            .ProjectTo<ApplicationDashboardLoadDetails>(DtoMapper.Configuration)
+            .ProjectTo<ApplicationListItemDetails>(DtoMapper.Configuration)
             .OrderByDescending(app => app.SubmittedDate)
             .ToListAsync();
 

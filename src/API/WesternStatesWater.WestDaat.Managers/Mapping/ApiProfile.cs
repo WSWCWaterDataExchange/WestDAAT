@@ -85,7 +85,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Statistics, opt => opt.Ignore())
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
-            CreateMap<CommonContracts.ApplicationDashboardLoadDetails, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardListItem>()
+            CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardLIstItem>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();

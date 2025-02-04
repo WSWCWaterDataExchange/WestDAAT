@@ -190,7 +190,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
         private void AddApplicationMappings()
         {
-            CreateMap<EFWD.WaterConservationApplication, ApplicationDashboardLoadDetails>()
+            CreateMap<EFWD.WaterConservationApplication, ApplicationListItemDetails>()
                 .ForMember(dest => dest.ApplicantFullName, opt =>
                 {
                     opt.PreCondition(src => src.ApplicantUser.UserProfile != null);

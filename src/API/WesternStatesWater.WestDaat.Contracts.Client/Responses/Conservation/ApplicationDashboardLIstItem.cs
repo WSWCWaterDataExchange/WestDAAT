@@ -2,7 +2,7 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
-public class OrganizationApplicationDashboardListItem
+public class ApplicationDashboardLIstItem
 {
     required public string ApplicantFullName { get; set; }
 

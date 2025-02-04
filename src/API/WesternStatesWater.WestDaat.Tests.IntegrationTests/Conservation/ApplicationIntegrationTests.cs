@@ -125,7 +125,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
-        var acceptedAppResponse = new OrganizationApplicationDashboardListItem
+        var acceptedAppResponse = new ApplicationDashboardLIstItem
         {
             ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
@@ -138,7 +138,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
         };
 
-        var rejectedAppResponse = new OrganizationApplicationDashboardListItem
+        var rejectedAppResponse = new ApplicationDashboardLIstItem
         {
             ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
@@ -151,7 +151,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
         };
 
-        var inReviewAppResponse = new OrganizationApplicationDashboardListItem
+        var inReviewAppResponse = new ApplicationDashboardLIstItem
         {
             ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
@@ -192,7 +192,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeNull();
 
-        var expectedApplications = new List<OrganizationApplicationDashboardListItem> { acceptedAppResponse, inReviewAppResponse };
+        var expectedApplications = new List<ApplicationDashboardLIstItem> { acceptedAppResponse, inReviewAppResponse };
 
         if (isGlobalUser)
         {

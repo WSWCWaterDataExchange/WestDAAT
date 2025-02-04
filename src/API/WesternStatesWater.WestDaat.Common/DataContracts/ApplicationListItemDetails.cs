@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class ApplicationDashboardLoadDetails
+public class ApplicationListItemDetails
 {
     public DateTimeOffset? AcceptedDate { get; set; }
     
