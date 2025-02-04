@@ -208,6 +208,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Units))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.EstimatedCompensation))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations));
+
+            CreateMap<WaterConservationApplicationCreateRequest, EFWD.WaterConservationApplication>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
+                .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
+                .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.OrganizationId));
         }
     }
 }
