@@ -10,6 +10,7 @@ public class WaterConservationApplicationCreateRequestHandler :
     public WaterConservationApplicationCreateRequestHandler()
     {
     }
+
     public Task<WaterConservationApplicationCreateResponse> Handle(WaterConservationApplicationCreateRequest request)
     {
         throw new NotImplementedException();
