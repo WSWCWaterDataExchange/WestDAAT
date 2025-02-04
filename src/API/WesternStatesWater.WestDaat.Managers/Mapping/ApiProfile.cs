@@ -101,22 +101,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            if (acceptedDate == null && rejectedDate == null)
+            return (acceptedDate, rejectedDate) switch
             {
-                return CommonContracts.ConservationApplicationStatus.InReview;
-            }
-
-            if (acceptedDate != null && rejectedDate == null)
-            {
-                return CommonContracts.ConservationApplicationStatus.Approved;
-            }
-
-            if (acceptedDate == null && rejectedDate != null)
-            {
-                return CommonContracts.ConservationApplicationStatus.Rejected;
-            }
-
-            return CommonContracts.ConservationApplicationStatus.Unknown;
+                (null, null) => CommonContracts.ConservationApplicationStatus.InReview,
+                (not null, null) => CommonContracts.ConservationApplicationStatus.Approved,
+                (null, not null) => CommonContracts.ConservationApplicationStatus.Rejected,
+                _ => CommonContracts.ConservationApplicationStatus.Unknown
+            };
         }
     }
 }
