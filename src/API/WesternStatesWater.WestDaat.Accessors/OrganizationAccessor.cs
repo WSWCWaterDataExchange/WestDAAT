@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -48,6 +49,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             var organization = await db.Organizations
                 .ProjectTo<OrganizationDetails>(DtoMapper.Configuration)
                 .FirstOrDefaultAsync(org => org.OrganizationId == request.OrganizationId);
+
+            if (organization == null)
+            {
+                throw new WestDaatException($"Organization with ID '{request.OrganizationId}' not found.");
+            }
 
             return new OrganizationLoadDetailsResponse
             {
