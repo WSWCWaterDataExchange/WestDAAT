@@ -84,7 +84,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.InProgressApplicationExistsLoadRequest>();
 
-            CreateMap<CommonContracts.WaterConservationApplicationCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationCreateResponse>();
+            CreateMap<CommonContracts.WaterConservationApplicationCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationCreateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Conservation.OrganizationApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationIdFilter));

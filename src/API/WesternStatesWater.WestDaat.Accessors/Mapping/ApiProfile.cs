@@ -217,6 +217,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
+                .ForMember(dest => dest.Submissions, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.OrganizationId));
 
         }
