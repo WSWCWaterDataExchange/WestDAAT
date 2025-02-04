@@ -165,9 +165,9 @@ public class ApplicationAccessorTests : AccessorTestBase
         var application = await _westDaatDb.WaterConservationApplications
             .SingleOrDefaultAsync(wca => wca.Id == response.WaterConservationApplicationId);
         application.Should().NotBeNull();
-        application.ApplicantUserId.Should().Be(user.Id);
-        application.FundingOrganizationId.Should().Be(organization.Id);
-        application.WaterRightNativeId.Should().Be("1234");
-        application.ApplicationDisplayId.Should().Be("1234");
+        application.ApplicantUserId.Should().Be(request.ApplicantUserId);
+        application.FundingOrganizationId.Should().Be(request.OrganizationId);
+        application.WaterRightNativeId.Should().Be(request.WaterRightNativeId);
+        application.ApplicationDisplayId.Should().Be(request.ApplicationDisplayId);
     }
 }
