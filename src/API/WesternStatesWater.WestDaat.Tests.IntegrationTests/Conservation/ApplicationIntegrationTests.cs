@@ -106,9 +106,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var userOne = new UserFaker().Generate();
         var userTwo = new UserFaker().Generate();
         var userThree = new UserFaker().Generate();
-        var userProfileOne = new UserProfileFaker(userOne).Generate();
-        var userProfileTwo = new UserProfileFaker(userTwo).Generate();
-        var userProfileThree = new UserProfileFaker(userThree).Generate();
         var appOne = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
@@ -124,7 +121,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
-        await _dbContext.UserProfiles.AddRangeAsync(userProfileOne, userProfileTwo, userProfileThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(subAppOne, subAppTwo, subAppFour);
         await _dbContext.SaveChangesAsync();
@@ -132,7 +128,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appOneResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appOne.ApplicationDisplayId,
-            ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
+            ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
             CompensationRateDollars = subAppOne.CompensationRateDollars,
             CompensationRateUnits = subAppOne.CompensationRateUnits,
             OrganizationName = orgOne.Name,
@@ -144,7 +140,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appTwoResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
-            ApplicantFullName = $"{userProfileTwo.FirstName} {userProfileTwo.LastName}",
+            ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
             CompensationRateDollars = subAppTwo.CompensationRateDollars,
             CompensationRateUnits = subAppTwo.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
@@ -156,7 +152,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appFourResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appFour.ApplicationDisplayId,
-            ApplicantFullName = $"{userProfileOne.FirstName} {userProfileOne.LastName}",
+            ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
             CompensationRateDollars = subAppFour.CompensationRateDollars,
             CompensationRateUnits = subAppFour.CompensationRateUnits,
             OrganizationName = orgOne.Name,
@@ -176,7 +172,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         UseUserContext(new UserContext
         {
-            UserId = new Guid(),
+            UserId = Guid.Empty,
             Roles = isGlobalUser ? [Roles.GlobalAdmin] : [],
             OrganizationRoles = isGlobalUser ? [] : orgUserOrganizationRoles,
             ExternalAuthId = "some-external-auth-id"
@@ -218,11 +214,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
                 Data = Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
-                {
-                    Time = DateOnly.FromDateTime(DateTime.Now),
-                    Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
-                })
-                .ToArray()
+                    {
+                        Time = DateOnly.FromDateTime(DateTime.Now),
+                        Evapotranspiration = rng.NextDouble() * 10, // 0-10 inches each month - average ~5 inches
+                    })
+                    .ToArray()
             });
 
         UseUserContext(new UserContext
