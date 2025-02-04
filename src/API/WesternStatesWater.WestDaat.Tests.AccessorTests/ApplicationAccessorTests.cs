@@ -1,6 +1,65 @@
+using Microsoft.EntityFrameworkCore;
+using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Tests.Helpers;
+
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests;
 
 [TestClass]
 public class ApplicationAccessorTests : AccessorTestBase
 {
+    private IApplicationAccessor _accessor;
+
+    private WestDaatDatabaseContext _westDaatDb;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        var dbContextFactory = CreateDatabaseContextFactory();
+        var westDaatDbContextFactory = CreateWestDaatDatabaseContextFactory();
+
+        _accessor = new ApplicationAccessor(
+            CreateLogger<ApplicationAccessor>(),
+            dbContextFactory,
+            westDaatDbContextFactory
+        );
+
+        _westDaatDb = westDaatDbContextFactory.Create();
+    }
+
+    [TestMethod]
+    public async Task Store_CreateWaterConservationApplication_ShouldCreateApplication()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        await _westDaatDb.Users.AddAsync(user);
+        await _westDaatDb.Organizations.AddAsync(organization);
+        await _westDaatDb.SaveChangesAsync();
+
+        var request = new WaterConservationApplicationCreateRequest
+        {
+            ApplicantUserId = user.Id,
+            OrganizationId = organization.Id,
+            WaterRightNativeId = "1234",
+            ApplicationDisplayId = "1234",
+        };
+
+        // Act
+        var response = (WaterConservationApplicationCreateResponse)await _accessor.Store(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.WaterConservationApplicationid.Should().NotBeEmpty();
+
+        var application = await _westDaatDb.WaterConservationApplications
+            .SingleOrDefaultAsync(wca => wca.Id == response.WaterConservationApplicationid);
+        application.Should().NotBeNull();
+        application.ApplicantUserId.Should().Be(user.Id);
+        application.FundingOrganizationId.Should().Be(organization.Id);
+        application.WaterRightNativeId.Should().Be("1234");
+        application.ApplicationDisplayId.Should().Be("1234");
+    }
 }
