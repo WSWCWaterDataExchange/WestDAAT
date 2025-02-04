@@ -110,11 +110,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
-        var subAppOne = new WaterConservationApplicationSubmissionFaker(appOne)
-            .RuleFor(app => app.AcceptedDate, _ => new DateTimeOffset())
+        var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
+            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
-        var subAppTwo = new WaterConservationApplicationSubmissionFaker(appTwo)
-            .RuleFor(app => app.RejectedDate, _ => new DateTimeOffset())
+        var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
+            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
         var subAppFour = new WaterConservationApplicationSubmissionFaker(appFour)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
@@ -122,18 +122,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
-        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(subAppOne, subAppTwo, subAppFour);
+        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, subAppFour);
         await _dbContext.SaveChangesAsync();
 
         var appOneResponse = new OrganizationApplicationDashboardListItem
         {
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = subAppOne.CompensationRateDollars,
-            CompensationRateUnits = subAppOne.CompensationRateUnits,
+            CompensationRateDollars = acceptedApp.CompensationRateDollars,
+            CompensationRateUnits = acceptedApp.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.Approved,
-            SubmittedDate = subAppOne.SubmittedDate,
+            SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
         };
 
@@ -141,11 +141,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
-            CompensationRateDollars = subAppTwo.CompensationRateDollars,
-            CompensationRateUnits = subAppTwo.CompensationRateUnits,
+            CompensationRateDollars = rejectedApp.CompensationRateDollars,
+            CompensationRateUnits = rejectedApp.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
             Status = ConservationApplicationStatus.Rejected,
-            SubmittedDate = subAppTwo.SubmittedDate,
+            SubmittedDate = rejectedApp.SubmittedDate,
             WaterRightNativeId = appTwo.WaterRightNativeId,
         };
 
@@ -187,18 +187,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request);
 
         // Assert
-        response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
+        response.Error.Should().BeNull();
 
-        var applications = new List<OrganizationApplicationDashboardListItem> { appOneResponse, appFourResponse };
+        var expectedApplications = new List<OrganizationApplicationDashboardListItem> { appOneResponse, appFourResponse };
 
         if (isGlobalUser)
         {
-            applications = applications.Append(appTwoResponse).ToList();
+            expectedApplications = expectedApplications.Append(appTwoResponse).ToList();
         }
 
         response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse
         {
-            Applications = applications.OrderByDescending(x => x.SubmittedDate).ToArray(),
+            Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
             Statistics = null
         });
     }
