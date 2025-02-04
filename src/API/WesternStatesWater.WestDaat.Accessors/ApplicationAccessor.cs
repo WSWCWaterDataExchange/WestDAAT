@@ -23,6 +23,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
+            InProgressApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -32,6 +33,22 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     {
         await Task.CompletedTask;
         throw new NotImplementedException("Jenny needs to add this in a second PR");
+    }
+
+    private async Task<InProgressApplicationExistsLoadResponse> CheckInProgressApplicationExists(InProgressApplicationExistsLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingInProgressApplication = await db.WaterConservationApplications
+            .Include(wca => wca.Submissions)
+            .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
+                                         wca.WaterRightNativeId == request.WaterRightNativeId &&
+                                         !wca.Submissions.Any());
+
+        return new InProgressApplicationExistsLoadResponse
+        {
+            InProgressApplicationId = existingInProgressApplication?.Id
+        };
     }
 
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)

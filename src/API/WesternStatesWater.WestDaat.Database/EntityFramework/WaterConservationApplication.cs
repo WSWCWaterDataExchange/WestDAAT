@@ -20,4 +20,6 @@ public class WaterConservationApplication
     public virtual User ApplicantUser { get; set; } = null!;
 
     public virtual Organization FundingOrganization { get; set; } = null!;
+
+    public virtual ICollection<WaterConservationApplicationSubmission> Submissions { get; set; } = null!;
 }
