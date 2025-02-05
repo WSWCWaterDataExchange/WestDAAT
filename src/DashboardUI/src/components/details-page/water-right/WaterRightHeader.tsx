@@ -1,14 +1,9 @@
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { OverlayTriggerRenderProps } from 'react-bootstrap/esm/OverlayTrigger';
 
 function WaterRightHeader() {
-  const renderTooltip = (props: OverlayTriggerRenderProps) => (
-    <Tooltip id="consumptive-use-btn-tooltip" {...props}>
-      tooltip test
-    </Tooltip>
-  );
+  const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">tooltip test</Tooltip>;
 
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
@@ -19,7 +14,7 @@ function WaterRightHeader() {
       <div className="d-flex flex-column align-items-end gap-1">
         <div className="d-flex flex-row gap-3 align-items-center">
           <div>
-            <OverlayTrigger placement="left" delay={{ show: 250, hide: 400 }} overlay={renderTooltip}>
+            <OverlayTrigger placement="left" delay={{ show: 250, hide: 400 }} overlay={overlayTooltip}>
               <Icon path={mdiHelpCircleOutline} size="1.5em" />
             </OverlayTrigger>
           </div>
