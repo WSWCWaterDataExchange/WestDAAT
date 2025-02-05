@@ -20,7 +20,8 @@ function WaterRightHeader() {
         </div>
         <div>
           <span>
-            By clicking this button, you are agreeing to WestDAAT’s <a href="#">Terms & Conditions</a>
+            By clicking this button, you are agreeing to WestDAAT’s{' '}
+            <a href="https://westernstateswater.org/wade/westdaat-terms-of-service/">Terms & Conditions</a>
           </span>
         </div>
       </div>
