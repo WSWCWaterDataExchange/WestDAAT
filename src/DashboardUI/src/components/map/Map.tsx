@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig from '../../config/maps';
-import { mdiMapMarker } from '@mdi/js';
+import { mdiAlert, mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -31,10 +31,12 @@ import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
-
-import './map.scss';
 import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
+import { Alert } from 'react-bootstrap';
+import Icon from '@mdi/react';
+
+import './map.scss';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -501,14 +503,34 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     }[mapStyle];
   }, [mapStyle]);
 
+  const consumptiveUseAlert = (
+    <div>
+      <div className="consumptive-use-alert-container">
+        <Alert variant="success" className="m-0" dismissible>
+          <div className="d-flex gap-3 align-items-center">
+            <div>
+              <Icon path={mdiAlert} size="1.25em" />
+            </div>
+            <div>
+              Find and click on your Water Right to see more detailed information and estimate consumptive use using
+              OpenET
+            </div>
+          </div>
+        </Alert>
+      </div>
+    </div>
+  );
+
   return (
     <div className="position-relative h-100">
+      {consumptiveUseAlert}
       {coords && map && (
         <div className="map-coordinates">
           {coords.lat.toFixed(4)} {coords.lng.toFixed(4)}
         </div>
       )}
       {legend && map && <div className={`legend ${legendClass}`}>{legend}</div>}
+
       {map && mapAlert}
       <div
         id="map"
