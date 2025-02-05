@@ -202,7 +202,21 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Submission.CompensationRateUnits))
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
-                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate));
+                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate))
+                .ForMember(dest => dest.EstimatedCompensationDollars, opt => 
+                {
+                    // TODO: JN - could Estimates ever be null?
+                    opt.PreCondition(src => src.Estimate != null);
+                    opt.MapFrom(src => src.Estimate.EstimatedCompensationDollars);
+                })
+                .ForMember(dest => dest.LocationsConsumptiveUses, opt =>
+                {
+                    opt.MapFrom(src => src.Estimate.Locations.Select(loc => new ConsumptiveUseByLocation
+                    {
+                        AreaInAcres = loc.PolygonAreaInAcres,
+                        AllEtInInches = loc.ConsumptiveUses.Select(use => use.EtInInches).ToArray()
+                    }));
+                });
         }
     }
 }

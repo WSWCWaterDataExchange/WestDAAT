@@ -39,9 +39,12 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             applicationsQuery = applicationsQuery.Where(app => app.FundingOrganizationId == request.OrganizationId);
         }
-
+    // WaterConservationApplicationEstimate.EstimatedCompensationDollars = Total obligation
+        // application's estimate >> then find that estimate's locations >> then for each location, find all consumptive uses
+        // WaterConservationApplicationEstimateLocationConsumptiveUse.EtInInches
         var applications = await applicationsQuery
-            .Where(app => app.Submission != null)
+            // TODO: JN - could Estimates ever be null?
+            .Where(app => app.Submission != null && app.Estimate != null)
             .ProjectTo<ApplicationListItemDetails>(DtoMapper.Configuration)
             .OrderByDescending(app => app.SubmittedDate)
             .ToListAsync();

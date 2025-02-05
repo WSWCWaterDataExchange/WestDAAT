@@ -20,5 +20,11 @@ public class ApplicationDashboardLIstItem
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
+    // TODO: JN - name seem okay?
+    public int TotalObligationDollars { get; set; }
+
+    // TODO: JN - should this be a double or int?
+    required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 
+
     required public string WaterRightNativeId { get; set; }
 }

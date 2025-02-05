@@ -85,7 +85,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardLIstItem>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)))
+                .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
+                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => CalculateTotalConsumptiveUsage(src.LocationsConsumptiveUses)));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
@@ -108,6 +110,12 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 (null, not null) => CommonContracts.ConservationApplicationStatus.Rejected,
                 _ => CommonContracts.ConservationApplicationStatus.Unknown
             };
+        }
+        
+        public static double CalculateTotalConsumptiveUsage(CommonContracts.ConsumptiveUseByLocation[] locations)
+        {
+            // TODO: JN - is this how to calculate?
+            return locations.Select(loc =>loc.AreaInAcres * (loc.AllEtInInches.Sum() / 12)).Sum();
         }
     }
 }
