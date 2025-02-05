@@ -250,7 +250,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         var memorialStadiumFootballField = GetMemorialStadiumPolygonWkt();
-        const double memorialStadiumApproximateAreaInAcres = 1.32;
 
         var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
@@ -333,9 +332,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         var memorialStadiumFootballField = GetMemorialStadiumPolygonWkt();
-        const double memorialStadiumApproximateAreaInAcres = 1.32;
 
-        var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
         {
             FundingOrganizationId = organization.Id,
