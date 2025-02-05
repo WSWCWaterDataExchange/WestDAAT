@@ -3,7 +3,7 @@ import Icon from '@mdi/react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 function WaterRightHeader() {
-  const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">tooltip test</Tooltip>;
+  const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">lorem ipsum dolor sit amet</Tooltip>;
 
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
