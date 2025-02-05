@@ -27,7 +27,7 @@ export default function SiteTabs() {
   const waterSourceRows = React.useMemo(() => {
     if (!sourceInfoList) return [];
     return sourceInfoList.map((src) => ({
-      id: src.waterSourceUuid,
+      id: `source-${src.waterSourceUuid}`,
       ...src,
     }));
   }, [sourceInfoList]);
@@ -42,7 +42,7 @@ export default function SiteTabs() {
   const timeSeriesRows = React.useMemo(() => {
     if (!timeSeriesInfoList) return [];
     return timeSeriesInfoList.map((ts) => ({
-      id: ts.waDEVariableUuid,
+      id: `timeSeries-${ts.waDEVariableUuid}`,
       ...ts,
     }));
   }, [timeSeriesInfoList]);
@@ -76,7 +76,7 @@ export default function SiteTabs() {
   const waterRightRows = React.useMemo(() => {
     if (!waterRightInfoList) return [];
     return waterRightInfoList.map((right) => ({
-      id: right.allocationUuid,
+      id: `right-${right.allocationUuid}`,
       ...right,
     }));
   }, [waterRightInfoList]);
@@ -180,7 +180,7 @@ export default function SiteTabs() {
   const variableRows = React.useMemo(() => {
     if (!variableInfoList) return [];
     return variableInfoList.map((v) => ({
-      id: v.waDEVariableUuid,
+      id: `variable-${v.waDEVariableUuid}`,
       ...v,
     }));
   }, [variableInfoList]);
@@ -252,19 +252,17 @@ export default function SiteTabs() {
           </div>
         </Tab>
 
-        {timeSeriesRows.length > 0 && (
-          <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
-            <div style={{ width: '100%', height: 600 }}>
-              <DataGrid
-                rows={timeSeriesRows}
-                columns={timeSeriesColumns}
-                disableRowSelectionOnClick
-                pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
-                slots={{ toolbar: QuickSearchToolbar }}
-              />
-            </div>
-          </Tab>
-        )}
+        <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={timeSeriesRows}
+              columns={timeSeriesColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
+        </Tab>
       </Tabs>
     </>
   );
