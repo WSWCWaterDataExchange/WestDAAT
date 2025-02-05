@@ -17,6 +17,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     private IApplicationManager _applicationManager;
     private WestDaatDatabaseContext _dbContext;
 
+    private const string memorialStadiumFootballField = "POLYGON ((" +
+            "-96.70537000 40.82014318, " +
+            "-96.70537429129318 40.82112749428667, " +
+            "-96.70595069212823 40.82113037830751, " +
+            "-96.70595263797125 40.82014685607426, " +
+            "-96.70537000 40.82014318" +
+            "))";
     private const double memorialStadiumApproximateAreaInAcres = 1.32;
 
     [TestInitialize]
@@ -159,9 +166,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        var memorialStadiumFootballField = GetMemorialStadiumPolygonWkt();
-
-
         var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
         {
@@ -261,21 +265,5 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // verify db entries were not created
             dbEstimate.Should().BeNull();
         }
-
-
-    }
-
-    private string GetMemorialStadiumPolygonWkt()
-    {
-        var firstCorner = "-96.70537000 40.82014318";
-        var memorialStadiumFootballField = "POLYGON ((" +
-            firstCorner + ", " +
-            "-96.70537429129318 40.82112749428667, " +
-            "-96.70595069212823 40.82113037830751, " +
-            "-96.70595263797125 40.82014685607426, " +
-            firstCorner +
-            "))";
-
-        return memorialStadiumFootballField;
     }
 }
