@@ -36,31 +36,11 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
             estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
 
             // only store the estimate if a compensation estimate was requested
-            var storeEstimateRequest = new ApplicationEstimateStoreRequest
-            {
-                WaterConservationApplicationId = request.WaterConservationApplicationId,
-                Model = request.Model,
-                DateRangeStart = request.DateRangeStart,
-                DateRangeEnd = request.DateRangeEnd,
-                DesiredCompensationDollars = request.CompensationRateDollars.Value,
-                CompensationRateUnits = request.Units.Value,
-                EstimatedCompensationDollars = estimateConservationPaymentResponse.EstimatedCompensationDollars,
-                Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
-                {
-                    var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
-
-                    return new ApplicationEstimateStoreLocationDetails
-                    {
-                        PolygonWkt = x.PolygonWkt,
-                        PolygonAreaInAcres = polygonAreaInAcres,
-                        ConsumptiveUses = x.Datapoints.Select(y => new ApplicationEstimateStoreLocationConsumptiveUseDetails
-                        {
-                            Year = y.Year,
-                            EtInInches = y.EtInInches,
-                        }).ToArray()
-                    };
-                }).ToArray()
-            };
+            var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
+                request,
+                multiPolygonYearlyEtResponse,
+                estimateConservationPaymentResponse
+            ));
 
             await ApplicationAccessor.Store(storeEstimateRequest);
         }
