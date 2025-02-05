@@ -44,7 +44,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
                 DateRangeEnd = request.DateRangeEnd,
                 DesiredCompensationDollars = request.CompensationRateDollars.Value,
                 CompensationRateUnits = request.Units.Value,
-                EstimatedCompensation = estimateConservationPaymentResponse.EstimatedCompensationDollars,
+                EstimatedCompensationDollars = estimateConservationPaymentResponse.EstimatedCompensationDollars,
                 Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
                 {
                     var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(x.PolygonWkt));
