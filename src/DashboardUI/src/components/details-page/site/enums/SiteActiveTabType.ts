@@ -3,4 +3,5 @@ export enum SiteActiveTabType {
   source = 'source',
   variable = 'variable',
   method = 'method',
+  timeSeries = 'timeSeries',
 }

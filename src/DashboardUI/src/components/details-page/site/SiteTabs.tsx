@@ -20,6 +20,7 @@ export default function SiteTabs() {
       waterRightInfoListQuery: { data: waterRightInfoList },
       variableInfoListQuery: { data: variableInfoList },
       methodInfoListQuery: { data: methodInfoList },
+      timeSeriesInfoListQuery: { data: timeSeriesInfoList },
     },
   } = useSiteDetailsContext();
 
@@ -36,6 +37,40 @@ export default function SiteTabs() {
     { field: 'waterSourceNativeId', headerName: 'Water Source Native ID', flex: 1, sortable: true },
     { field: 'waterSourceName', headerName: 'Water Source Name', flex: 1, sortable: true },
     { field: 'waterSourceType', headerName: 'Water Source Type', flex: 1, sortable: true },
+  ];
+
+  const timeSeriesRows = React.useMemo(() => {
+    if (!timeSeriesInfoList) return [];
+    return timeSeriesInfoList.map((ts) => ({
+      id: ts.waDEVariableUuid,
+      ...ts,
+    }));
+  }, [timeSeriesInfoList]);
+
+  const timeSeriesColumns: GridColDef[] = [
+    { field: 'waDEVariableUuid', headerName: 'WaDE Variable UUID', flex: 1, sortable: true },
+    { field: 'waDEMethodUuid', headerName: 'WaDE Method UUID', flex: 1, sortable: true },
+    { field: 'waDEWaterSourceUuid', headerName: 'WaDE Water Source UUID', flex: 1, sortable: true },
+    {
+      field: 'timeframeStart',
+      headerName: 'Timeframe Start',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
+    },
+    {
+      field: 'timeframeEnd',
+      headerName: 'Timeframe End',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
+    },
+    { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
+    { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
+    { field: 'beneficialUse', headerName: 'Beneficial Use', flex: 1, sortable: true },
+    { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
+    { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
+    { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },
   ];
 
   const waterRightRows = React.useMemo(() => {
@@ -210,6 +245,18 @@ export default function SiteTabs() {
             <DataGrid
               rows={variableRows}
               columns={variableColumns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
+        </Tab>
+
+        <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={timeSeriesRows}
+              columns={timeSeriesColumns}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
