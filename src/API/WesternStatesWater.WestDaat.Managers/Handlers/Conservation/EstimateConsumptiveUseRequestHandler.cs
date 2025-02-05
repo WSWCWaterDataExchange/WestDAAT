@@ -43,7 +43,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
                 DateRangeStart = request.DateRangeStart,
                 DateRangeEnd = request.DateRangeEnd,
                 DesiredCompensationDollars = request.CompensationRateDollars.Value,
-                Units = request.Units.Value,
+                CompensationRateUnits = request.Units.Value,
                 EstimatedCompensation = estimateConservationPaymentResponse.EstimatedCompensationDollars,
                 Locations = multiPolygonYearlyEtResponse.DataCollections.Select(x =>
                 {
