@@ -252,17 +252,19 @@ export default function SiteTabs() {
           </div>
         </Tab>
 
-        <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
-          <div style={{ width: '100%', height: 600 }}>
-            <DataGrid
-              rows={timeSeriesRows}
-              columns={timeSeriesColumns}
-              disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
-              slots={{ toolbar: QuickSearchToolbar }}
-            />
-          </div>
-        </Tab>
+        {timeSeriesRows.length > 0 && (
+          <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
+            <div style={{ width: '100%', height: 600 }}>
+              <DataGrid
+                rows={timeSeriesRows}
+                columns={timeSeriesColumns}
+                disableRowSelectionOnClick
+                pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+                slots={{ toolbar: QuickSearchToolbar }}
+              />
+            </div>
+          </Tab>
+        )}
       </Tabs>
     </>
   );
