@@ -127,7 +127,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Request.DateRangeEnd))
                 .ForMember(dest => dest.DesiredCompensationDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars.Value))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
-                .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections));
         }
     }
