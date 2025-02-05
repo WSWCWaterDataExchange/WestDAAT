@@ -1,4 +1,5 @@
-﻿using WesternStatesWater.WestDaat.Utilities;
+﻿using WesternStatesWater.WestDaat.Tests.Helpers;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
 
@@ -28,7 +29,6 @@ public class GeometryHelpersTests : UtilityTestBase
         var geometry = GeometryHelpers.GetGeometryByWkt(polygonWkt);
         var areaInAcres = GeometryHelpers.GetGeometryAreaInAcres(geometry);
 
-        var onePercentMarginOfError = expectedAreaInAcres * 0.01;
-        areaInAcres.Should().BeApproximately(areaInAcres, expectedAreaInAcres);
+        areaInAcres.Should().BeWithinPercentOf(expectedAreaInAcres, 1.0);
     }
 }

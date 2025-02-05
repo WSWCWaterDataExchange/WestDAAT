@@ -18,9 +18,9 @@ public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
 
     required public int DesiredCompensationDollars { get; set; }
 
-    required public CompensationRateUnits Units { get; set; }
+    required public CompensationRateUnits CompensationRateUnits { get; set; }
 
-    required public int EstimatedCompensation { get; set; }
+    required public int EstimatedCompensationDollars { get; set; }
 
     required public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
 }
