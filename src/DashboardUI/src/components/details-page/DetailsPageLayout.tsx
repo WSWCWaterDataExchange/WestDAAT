@@ -64,11 +64,7 @@ type DetailsTypeProps = {
 };
 
 const Header = function DetailsHeader({ children }: PropsWithChildren<DetailsTypeProps>) {
-  return (
-    <div className="d-flex flex-row align-items-center justify-content-center title-header">
-      <h3 className="d-flex fw-bold">{children}</h3>
-    </div>
-  );
+  return <>{children}</>;
 };
 Header.displayName = 'DetailsHeader';
 

@@ -6,12 +6,15 @@ import WaterRightTabs from './WaterRightTabs';
 import { useAlerts } from './hooks/useAlerts';
 
 import './water-right.scss';
+import WaterRightHeader from './WaterRightHeader';
 
 export function Layout() {
   useAlerts();
   return (
     <DetailsPage>
-      <DetailsPage.Header>WaDE Water Right Landing Page</DetailsPage.Header>
+      <DetailsPage.Header>
+        <WaterRightHeader />
+      </DetailsPage.Header>
       <DetailsPage.Properties>
         <WaterRightProperties />
       </DetailsPage.Properties>
