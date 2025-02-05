@@ -10,7 +10,7 @@ import {
   getSiteVariableInfoList,
   getSiteMethodInfoList,
   getOverlayDigests,
-  getTimeSeriesInfoList,
+  getTimeSeriesSiteInfoList,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
@@ -73,14 +73,14 @@ export function useWaterRightInfoList(siteUuid: string | undefined, options?: Wa
 
 type TimeSeriesInfoListOptionsType = UseQueryOptionsParameter<undefined, TimeSeriesListItem[]>;
 
-export function useTimeSeriesInfoList(siteUuid: string | undefined, options?: TimeSeriesInfoListOptionsType) {
+export function useTimeSeriesSiteInfoList(siteUuid: string | undefined, options?: TimeSeriesInfoListOptionsType) {
   const setOptions = {
     ...options,
     enabled: options?.enabled && !!siteUuid,
   };
   return useQuery(
     ['site.TimeSeriesInfoList', siteUuid],
-    async () => await getTimeSeriesInfoList(siteUuid!),
+    async () => await getTimeSeriesSiteInfoList(siteUuid!),
     setOptions,
   );
 }

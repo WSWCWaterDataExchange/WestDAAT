@@ -6,7 +6,7 @@ import {
   useSiteMethodInfoList,
   useSiteUsage,
   useSiteVariableInfoList,
-  useTimeSeriesInfoList,
+  useTimeSeriesSiteInfoList,
   useWaterRightInfoList,
   useWaterSiteLocation,
   useWaterSiteSourceInfoList,
@@ -76,7 +76,7 @@ export const SiteDetailsProvider = ({ children }: SiteDetailsProviderProps) => {
     enabled: activeTab === SiteActiveTabType.right,
   });
 
-  const timeSeriesInfoListQuery = useTimeSeriesInfoList(siteUuid, {
+  const timeSeriesInfoListQuery = useTimeSeriesSiteInfoList(siteUuid, {
     enabled: activeTab === SiteActiveTabType.timeSeries,
   });
   const sourceInfoListQuery = useWaterSiteSourceInfoList(siteUuid, {

@@ -50,6 +50,8 @@ public interface IWaterResourceManager : IServiceContractBase
     Task<FeatureCollection> GetWaterRightSiteLocations(string allocationUuid);
 
     Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoList(string allocationUuid);
+    
+    Task<List<SiteUsageListItem>> GetRightUsageInfoListByAllocationUuid(string allocationUuid);
 
     Task<Feature> GetWaterSiteLocation(string siteUuid);
 

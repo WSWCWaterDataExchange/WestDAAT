@@ -77,6 +77,20 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
         
+        
+        [Function(nameof(GetRightUsageInfoBySiteUuid))]
+        [OpenApiOperation(nameof(GetRightUsageInfoBySiteUuid))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteUsageListItem[]))]
+        public async Task<HttpResponseData> GetRightUsageInfoBySiteUuid(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "WaterRights/{allocationUuid}/UsageTable")] 
+            HttpRequestData request, 
+            string allocationUuid)
+        {
+            var result = await _waterResourceManager.GetRightUsageInfoListByAllocationUuid(allocationUuid);
+            return await CreateOkResponse(request, result);
+        }
+
+        
         [Function(nameof(GetWaterRightSourceInfoList))]
         [OpenApiOperation(nameof(GetWaterRightSourceInfoList))]
         [OpenApiParameter("allocationUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]

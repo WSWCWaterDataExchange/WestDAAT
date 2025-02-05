@@ -45,9 +45,15 @@ export const getWaterRightInfoList = async (siteUuid: string) => {
   return data;
 };
 
-export const getTimeSeriesInfoList = async (siteUuid: string) => {
+export const getTimeSeriesSiteInfoList = async (siteUuid: string) => {
   const api = await westDaatApi();
   const { data } = await api.get<TimeSeriesListItem[]>(`Sites/${siteUuid}/UsageTable`);
+  return data;
+};
+
+export const getTimeSeriesRightInfoList = async (allocationUuid: string) => {
+  const api = await westDaatApi();
+  const { data } = await api.get<TimeSeriesListItem[]>(`WaterRights/${allocationUuid}/UsageTable`);
   return data;
 };
 
