@@ -1,9 +1,18 @@
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function WaterRightHeader() {
+  const navigate = useNavigate();
+  const routeParams = useParams();
+
   const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">lorem ipsum dolor sit amet</Tooltip>;
+
+  const consumptiveUseBtnClickHandler = () => {
+    const { id } = routeParams;
+    navigate(`/application/new/${id}`);
+  };
 
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
@@ -19,7 +28,9 @@ function WaterRightHeader() {
             </OverlayTrigger>
           </div>
           <div>
-            <Button variant="primary">Estimate Consumptive Use</Button>
+            <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>
+              Estimate Consumptive Use
+            </Button>
           </div>
         </div>
         <div>
