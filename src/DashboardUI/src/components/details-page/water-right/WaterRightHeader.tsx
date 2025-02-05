@@ -1,15 +1,27 @@
+import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
+import { loginRequest } from '../../../authConfig';
 
 function WaterRightHeader() {
   const navigate = useNavigate();
   const routeParams = useParams();
+  const isAuthenticated = useIsAuthenticated();
+  const { instance } = useMsal();
 
   const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">lorem ipsum dolor sit amet</Tooltip>;
 
   const consumptiveUseBtnClickHandler = () => {
+    if (!isAuthenticated) {
+      instance.loginRedirect(loginRequest).then(() => navigateToEstimationTool());
+    } else {
+      navigateToEstimationTool();
+    }
+  };
+
+  const navigateToEstimationTool = () => {
     const { id } = routeParams;
     navigate(`/application/new/${id}`);
   };
