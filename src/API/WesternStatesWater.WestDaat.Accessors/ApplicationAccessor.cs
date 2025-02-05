@@ -61,8 +61,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
 
             db.WaterConservationApplicationEstimates.Remove(existingEntity);
-
-            await db.SaveChangesAsync();
         }
 
         var entity = request.Map<EFWD.WaterConservationApplicationEstimate>();
