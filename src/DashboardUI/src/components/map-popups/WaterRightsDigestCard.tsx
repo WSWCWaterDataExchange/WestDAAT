@@ -5,6 +5,7 @@ import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
 import WaterRightDigest from '../../data-contracts/WaterRightsDigest';
 import { FormattedDate } from '../FormattedDate';
+import { isFeatureEnabled } from '../../config/features';
 
 interface WaterRightsMapPopupToggleProps {
   count: number;
@@ -41,6 +42,9 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
   const currWaterRight = useMemo(() => {
     return waterRights[currentIndex];
   }, [waterRights, currentIndex]);
+
+  const shouldDisplayConsumptiveUseMessage = isFeatureEnabled('conservationEstimationTool');
+
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
@@ -71,11 +75,13 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
               </div>
             </div>
 
-            <div className="mb-2">
-              <span className="text-muted">
-                View more detailed information and estimate consumptive use through OpenET
-              </span>
-            </div>
+            {shouldDisplayConsumptiveUseMessage && (
+              <div className="mb-2">
+                <span className="text-muted">
+                  View more detailed information and estimate consumptive use through OpenET
+                </span>
+              </div>
+            )}
 
             <div className="mb-2">
               <div>

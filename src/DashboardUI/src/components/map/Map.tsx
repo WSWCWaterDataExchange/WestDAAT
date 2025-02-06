@@ -37,6 +37,7 @@ import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 
 import './map.scss';
+import { isFeatureEnabled } from '../../config/features';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -503,6 +504,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     }[mapStyle];
   }, [mapStyle]);
 
+  const shouldDisplayConsumptiveUseAlert = isFeatureEnabled('conservationEstimationTool');
   const consumptiveUseAlert = (
     <div>
       <div className="consumptive-use-alert-container">
@@ -523,7 +525,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
 
   return (
     <div className="position-relative h-100">
-      {consumptiveUseAlert}
+      {shouldDisplayConsumptiveUseAlert && consumptiveUseAlert}
       {coords && map && (
         <div className="map-coordinates">
           {coords.lat.toFixed(4)} {coords.lng.toFixed(4)}
