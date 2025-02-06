@@ -189,7 +189,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.Organization, OrganizationSlim>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+                .ForMember(dest => dest.AbbreviatedName, opt => opt.MapFrom(src => src.AgencyId));
         }
 
         private void AddApplicationMappings()
