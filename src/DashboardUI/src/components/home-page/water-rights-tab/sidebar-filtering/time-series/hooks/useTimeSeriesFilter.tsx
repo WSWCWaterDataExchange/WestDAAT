@@ -7,7 +7,7 @@ export function useTimeSeriesFilter() {
 
   const siteTypeFilters = useMemo(() => {
     if (!selectedSiteTypes || selectedSiteTypes.length === 0) return null;
-    return ['in', ['get', 'siteType'], ...selectedSiteTypes];
+    return ['in', 'siteType', ...selectedSiteTypes];
   }, [selectedSiteTypes]);
 
   const dateFilters = useMemo(() => {
@@ -45,6 +45,8 @@ export function useTimeSeriesFilter() {
 
     return filters.length > 1 ? filters : null;
   }, [timeSeries, isTimeSeriesFilterActive, siteTypeFilters, dateFilters]);
+
+  console.log('combinedFilters', combinedFilters);
 
   return {
     timeSeries,
