@@ -18,6 +18,8 @@ import {
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
+import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
+import { getTimeSeriesRightInfoList } from '../../accessors/siteAccessor';
 
 export function useWaterRightDetails(allocationUuid: string | undefined) {
   return useQuery(['waterRight.Details', allocationUuid], async () => await getWaterRightDetails(allocationUuid!), {
@@ -91,6 +93,23 @@ export function useWaterRightSourceInfoList(
   return useQuery(
     ['waterRight.SourceInfoList', allocationUuid],
     async () => await getWaterRightSourceInfoList(allocationUuid!),
+    setOptions,
+  );
+}
+
+type TimeSeriesInfoListOptionsType = UseQueryOptionsParameter<undefined, TimeSeriesListItem[]>;
+
+export function useTimeSeriesRightsInfoList(
+  allocationUuid: string | undefined,
+  options?: TimeSeriesInfoListOptionsType,
+) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!allocationUuid,
+  };
+  return useQuery(
+    ['site.TimeSeriesInfoList', allocationUuid],
+    async () => await getTimeSeriesRightInfoList(allocationUuid!),
     setOptions,
   );
 }

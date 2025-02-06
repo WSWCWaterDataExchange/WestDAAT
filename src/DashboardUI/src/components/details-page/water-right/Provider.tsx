@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { createContext, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
+  useTimeSeriesRightsInfoList,
   useWaterRightDetails,
   useWaterRightsInfoListByAllocationUuid,
   useWaterRightSiteInfoList,
@@ -11,6 +12,7 @@ import {
 } from '../../../hooks/queries';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, WaterRightsInfoListItem } from '@data-contracts';
+import { TimeSeriesListItem } from '../../../data-contracts/TimeSeriesListItem';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -22,9 +24,10 @@ export interface HostData {
   siteInfoListQuery: Query<SiteInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
   waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
+  timeSeriesInfoListQuery: Query<TimeSeriesListItem[]>;
 }
 
-export type ActiveTabType = 'site' | 'source' | 'rights';
+export type ActiveTabType = 'site' | 'source' | 'rights' | 'timeSeries';
 
 interface WaterRightDetailsPageContextState {
   allocationUuid: string | undefined;
@@ -43,6 +46,7 @@ const defaultState: WaterRightDetailsPageContextState = {
     siteInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
     waterRightsInfoListQuery: defaultQuery,
+    timeSeriesInfoListQuery: defaultQuery,
   },
 };
 
@@ -68,6 +72,9 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
   const waterRightsInfoListQuery = useWaterRightsInfoListByAllocationUuid(allocationUuid, {
     enabled: activeTab === 'rights',
   });
+  const timeSeriesInfoListQuery = useTimeSeriesRightsInfoList(allocationUuid, {
+    enabled: activeTab === 'timeSeries',
+  });
 
   const filterContextProviderValue: WaterRightDetailsPageContextState = {
     allocationUuid,
@@ -79,6 +86,7 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
       siteInfoListQuery,
       sourceInfoListQuery,
       waterRightsInfoListQuery,
+      timeSeriesInfoListQuery,
     },
   };
 
