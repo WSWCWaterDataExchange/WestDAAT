@@ -59,10 +59,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var existingInProgressApplication = await db.WaterConservationApplications
-            .Include(wca => wca.Submissions)
+            .Include(wca => wca.Submission)
             .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
                                          wca.WaterRightNativeId == request.WaterRightNativeId &&
-                                         !wca.Submissions.Any());
+                                         wca.Submission == null);
 
         return new InProgressApplicationExistsLoadResponse
         {

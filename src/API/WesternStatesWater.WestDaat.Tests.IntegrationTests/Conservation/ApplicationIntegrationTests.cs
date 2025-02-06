@@ -400,14 +400,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        var request = new WaterConservationApplicationCreateRequest
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationCreateRequest
         {
             FundingOrganizationId = organization.Id,
             WaterRightNativeId = "1234",
         };
 
         // Act
-        var response = await _applicationManager.Store<WaterConservationApplicationCreateRequest, WaterConservationApplicationCreateResponse>(request);
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationCreateRequest,
+            CLI.Responses.Conservation.WaterConservationApplicationCreateResponse>(request);
 
         // Assert
         response.Should().NotBeNull();
