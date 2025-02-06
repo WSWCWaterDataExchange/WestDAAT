@@ -1,3 +1,4 @@
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
@@ -30,8 +31,25 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicationDashboardLoadResponse> GetDashboardApplications(ApplicationDashboardLoadRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("Jenny needs to add this in a second PR");
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var applicationsQuery = db.WaterConservationApplications.AsQueryable();
+
+        if (request.OrganizationId != null)
+        {
+            applicationsQuery = applicationsQuery.Where(app => app.FundingOrganizationId == request.OrganizationId);
+        }
+
+        var applications = await applicationsQuery
+            .Where(app => app.Submission != null)
+            .ProjectTo<ApplicationListItemDetails>(DtoMapper.Configuration)
+            .OrderByDescending(app => app.SubmittedDate)
+            .ToListAsync();
+
+        return new ApplicationDashboardLoadResponse
+        {
+            Applications = applications.ToArray()
+        };
     }
 
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)

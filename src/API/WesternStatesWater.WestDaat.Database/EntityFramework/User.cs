@@ -16,6 +16,8 @@ public class User
 
     public DateTimeOffset CreatedAt { get; set; }
 
+    public virtual UserProfile? UserProfile { get; set; } = null!;
+
     public virtual ICollection<UserRole> UserRoles { get; set; }
 
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
