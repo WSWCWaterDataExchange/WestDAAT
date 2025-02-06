@@ -9,5 +9,5 @@ namespace WesternStatesWater.WestDaat.Engines;
 /// </summary>
 public interface IApplicationFormattingEngine : IServiceContractBase
 {
-    Task FormatStoreRequest(ApplicationStoreRequestBase request);
+    Task<ApplicationFormatResponseBase> Format(ApplicationFormatRequestBase request);
 }

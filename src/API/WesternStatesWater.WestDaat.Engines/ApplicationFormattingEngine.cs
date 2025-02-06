@@ -4,22 +4,16 @@ namespace WesternStatesWater.WestDaat.Engines;
 
 public sealed partial class FormattingEngine : IApplicationFormattingEngine
 {
-    public async Task FormatStoreRequest(ApplicationStoreRequestBase request)
+    public async Task<ApplicationFormatResponseBase> Format(ApplicationFormatRequestBase request)
     {
-        switch (request)
+        return request switch
         {
-            case WaterConservationApplicationCreateRequest req:
-                await FormatWaterConservationApplicationCreateRequest(req);
-                break;
-            default:
-                throw new NotImplementedException();
-        }
+            ApplicationFormatDisplayIdRequest req => await FormatDisplayId(req),
+            _ => throw new NotImplementedException(),
+        };
     }
 
-    /// <summary>
-    /// Generates a user-friendly id to be displayed on the frontend.
-    /// </summary>
-    private async Task FormatWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request)
+    private async Task<ApplicationFormatDisplayIdResponse> FormatDisplayId(ApplicationFormatDisplayIdRequest request)
     {
         var year = DateTimeOffset.UtcNow.Year.ToString();
 
@@ -38,6 +32,9 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
         var nextSequentialNumber = sequentialLookupResponse.LastDisplayIdSequentialNumber + 1;
         var paddedNextSequentialNumber = $"{nextSequentialNumber:D4}";
 
-        request.ApplicationDisplayId = $"{year}-{organizationDetailsResponse.Organization.AbbreviatedName}-{paddedNextSequentialNumber}";
+        return new ApplicationFormatDisplayIdResponse
+        {
+            DisplayId = $"{year}-{organizationDetailsResponse.Organization.AbbreviatedName}-{paddedNextSequentialNumber}",
+        };
     }
 }
