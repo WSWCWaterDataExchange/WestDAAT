@@ -47,7 +47,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _westDaatDatabaseContextFactory.Create();
 
             var organization = await db.Organizations
-                .ProjectTo<OrganizationDetails>(DtoMapper.Configuration)
+                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
                 .FirstOrDefaultAsync(org => org.OrganizationId == request.OrganizationId);
 
             if (organization == null)

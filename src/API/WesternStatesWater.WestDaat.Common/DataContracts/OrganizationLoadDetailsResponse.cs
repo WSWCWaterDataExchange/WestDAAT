@@ -2,5 +2,5 @@
 
 public class OrganizationLoadDetailsResponse : OrganizationLoadResponseBase
 {
-    public OrganizationDetails Organization { get; set; }
+    public OrganizationSlim Organization { get; set; }
 }
