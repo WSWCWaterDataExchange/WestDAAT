@@ -20,8 +20,8 @@ export default function WaterRightTabs() {
 
   const siteRows = React.useMemo(() => {
     if (!siteInfoList) return [];
-    return siteInfoList.map((site) => ({
-      id: site.siteUuid,
+    return siteInfoList.map((site, index) => ({
+      id: `site-${site.siteUuid}-${index}`,
       ...site,
     }));
   }, [siteInfoList]);
@@ -48,8 +48,8 @@ export default function WaterRightTabs() {
 
   const sourceRows = React.useMemo(() => {
     if (!sourceInfoList) return [];
-    return sourceInfoList.map((src) => ({
-      id: src.waterSourceUuid,
+    return sourceInfoList.map((src, index) => ({
+      id: `source-${src.waterSourceUuid}-${index}`,
       ...src,
     }));
   }, [sourceInfoList]);
@@ -64,8 +64,8 @@ export default function WaterRightTabs() {
 
   const timeSeriesRows = React.useMemo(() => {
     if (!timeSeriesInfoList) return [];
-    return timeSeriesInfoList.map((ts) => ({
-      id: ts.waDEVariableUuid,
+    return timeSeriesInfoList.map((ts, index) => ({
+      id: `timeSeries-${ts.waDEVariableUuid}-${index}`,
       ...ts,
     }));
   }, [timeSeriesInfoList]);
@@ -103,6 +103,7 @@ export default function WaterRightTabs() {
           <DataGrid
             rows={siteRows}
             columns={siteColumns}
+            getRowId={(row) => row.id}
             disableRowSelectionOnClick
             pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
             slots={{
@@ -116,6 +117,7 @@ export default function WaterRightTabs() {
           <DataGrid
             rows={sourceRows}
             columns={sourceColumns}
+            getRowId={(row) => row.id}
             disableRowSelectionOnClick
             pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
             slots={{
@@ -132,6 +134,7 @@ export default function WaterRightTabs() {
           <DataGrid
             rows={timeSeriesRows}
             columns={timeSeriesColumns}
+            getRowId={(row) => row.id}
             disableRowSelectionOnClick
             pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
             slots={{

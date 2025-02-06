@@ -26,8 +26,8 @@ export default function SiteTabs() {
 
   const waterSourceRows = React.useMemo(() => {
     if (!sourceInfoList) return [];
-    return sourceInfoList.map((src) => ({
-      id: `source-${src.waterSourceUuid}`,
+    return sourceInfoList.map((src, index) => ({
+      id: `source-${src.waterSourceUuid}-${index}`,
       ...src,
     }));
   }, [sourceInfoList]);
@@ -41,8 +41,9 @@ export default function SiteTabs() {
 
   const timeSeriesRows = React.useMemo(() => {
     if (!timeSeriesInfoList) return [];
-    return timeSeriesInfoList.map((ts) => ({
-      id: `timeSeries-${ts.waDEVariableUuid}`,
+
+    return timeSeriesInfoList.map((ts, index) => ({
+      id: `timeSeries-${ts.waDEVariableUuid}-${ts.reportYear}-${index}`,
       ...ts,
     }));
   }, [timeSeriesInfoList]);
@@ -75,8 +76,8 @@ export default function SiteTabs() {
 
   const waterRightRows = React.useMemo(() => {
     if (!waterRightInfoList) return [];
-    return waterRightInfoList.map((right) => ({
-      id: `right-${right.allocationUuid}`,
+    return waterRightInfoList.map((right, index) => ({
+      id: `right-${right.allocationUuid}-${index}`,
       ...right,
     }));
   }, [waterRightInfoList]);
@@ -136,8 +137,8 @@ export default function SiteTabs() {
 
   const methodRows = React.useMemo(() => {
     if (!methodInfoList) return [];
-    return methodInfoList.map((m) => ({
-      id: m.waDEMethodUuid,
+    return methodInfoList.map((m, index) => ({
+      id: `method-${m.waDEMethodUuid}-${index}`,
       ...m,
     }));
   }, [methodInfoList]);
@@ -179,8 +180,8 @@ export default function SiteTabs() {
 
   const variableRows = React.useMemo(() => {
     if (!variableInfoList) return [];
-    return variableInfoList.map((v) => ({
-      id: `variable-${v.waDEVariableUuid}`,
+    return variableInfoList.map((v, index) => ({
+      id: `variable-${v.waDEVariableUuid}-${index}`,
       ...v,
     }));
   }, [variableInfoList]);
@@ -209,6 +210,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={waterSourceRows}
               columns={waterSourceColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -221,6 +223,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={waterRightRows}
               columns={waterRightColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -233,6 +236,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={methodRows}
               columns={methodColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -245,6 +249,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={variableRows}
               columns={variableColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -257,6 +262,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={timeSeriesRows}
               columns={timeSeriesColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
