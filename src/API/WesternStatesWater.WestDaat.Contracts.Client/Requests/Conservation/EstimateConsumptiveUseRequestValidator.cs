@@ -6,7 +6,7 @@ public class EstimateConsumptiveUseRequestValidator : AbstractValidator<Estimate
 {
     public EstimateConsumptiveUseRequestValidator()
     {
-        RuleFor(x => x.OrganizationId).NotEmpty();
+        RuleFor(x => x.FundingOrganizationId).NotEmpty();
 
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
 

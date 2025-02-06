@@ -169,7 +169,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
         {
-            OrganizationId = organization.Id,
+            FundingOrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
             Polygons = [memorialStadiumFootballField],
             DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
