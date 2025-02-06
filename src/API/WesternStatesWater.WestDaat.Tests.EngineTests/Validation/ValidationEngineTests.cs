@@ -72,14 +72,16 @@ public class ValidationEngineTests : EngineTestBase
             });
 
         var userId = Guid.NewGuid();
-        _contextUtilityMock.Setup(x => x.GetContext())
-            .Returns(new UserContext()
-            {
-                UserId = userId,
-                ExternalAuthId = "",
-                Roles = [],
-                OrganizationRoles = [],
-            });
+        var userContext = new UserContext()
+        {
+            UserId = userId,
+            ExternalAuthId = "",
+            Roles = [],
+            OrganizationRoles = [],
+        };
+
+        _contextUtilityMock.Setup(x => x.GetContext()).Returns(userContext);
+        _contextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>()).Returns(userContext);
 
 
         // Act
