@@ -10,5 +10,5 @@ public class OrganizationDetails
 
     public string EmailDomain { get; set; }
 
-    public string AgencyId { get; set; }
+    public string AbbreviatedName { get; set; }
 }

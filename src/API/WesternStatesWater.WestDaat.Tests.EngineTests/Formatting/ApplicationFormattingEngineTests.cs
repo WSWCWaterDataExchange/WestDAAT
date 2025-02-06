@@ -40,7 +40,7 @@ public class ApplicationFormattingEngineTests : EngineTestBase
                 Organization = new OrganizationDetails
                 {
                     OrganizationId = organizationId,
-                    AgencyId = organizationAgencyId,
+                    AbbreviatedName = organizationAgencyId,
                 }
             });
 

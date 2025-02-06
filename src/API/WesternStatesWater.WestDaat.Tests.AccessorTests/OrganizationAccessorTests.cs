@@ -57,7 +57,7 @@ public class OrganizationAccessorTests : AccessorTestBase
         response.Should().NotBeNull();
         response.Organization.Should().NotBeNull();
         response.Organization.OrganizationId.Should().Be(organization.Id);
-        response.Organization.AgencyId.Should().Be(organization.AgencyId);
+        response.Organization.AbbreviatedName.Should().Be(organization.AgencyId);
     }
 
     [TestMethod]

@@ -39,7 +39,7 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
         };
         var organizationDetailsResponse = (OrganizationLoadDetailsResponse)await _organizationAccessor.Load(organizationDetailsRequest);
 
-        displayIdFormattedString.Append(organizationDetailsResponse.Organization.AgencyId);
+        displayIdFormattedString.Append(organizationDetailsResponse.Organization.AbbreviatedName);
         displayIdFormattedString.Append("-");
 
         var sequentialLookupRequest = new ApplicationFindSequentialIdLoadRequest
