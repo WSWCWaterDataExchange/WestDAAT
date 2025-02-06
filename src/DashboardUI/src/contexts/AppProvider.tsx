@@ -2,8 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useSearchParams } from 'react-router-dom';
 import * as compress from 'lz-string';
 import { IAuthenticationContext, useAuthenticationContext } from '../hooks/useAuthenticationContext';
-import deepEqual from 'fast-deep-equal/es6';
 import { useDebounce } from '@react-hook/debounce';
+import deepEqual from 'fast-deep-equal/es6';
 
 interface AppContextState {
   authenticationContext: IAuthenticationContext;
@@ -74,7 +74,12 @@ const AppProvider = ({ children }: AppProviderProps) => {
         { replace: true },
       );
     } else {
-      setUrlParams({}, { replace: true });
+      // Wait for MSAL to complete authentication before clearing the state.
+      // On login redirect, state is sent as a query parameter which gets
+      // cleared after authentication automatically.
+      if (authenticationContext.authenticationComplete) {
+        setUrlParams({}, { replace: true });
+      }
     }
   }, [debouncedStateUrlParams, setUrlParams]);
 

@@ -22,7 +22,7 @@ import { isFeatureEnabled } from '../config/features';
 
 function handleLogout(msalContext: IPublicClientApplication | null) {
   if (!msalContext) return;
-  msalContext.logoutPopup().catch((e) => {
+  msalContext.logoutRedirect().catch((e) => {
     console.error(e);
   });
 }
