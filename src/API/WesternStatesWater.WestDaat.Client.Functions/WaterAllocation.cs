@@ -80,6 +80,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         
         [Function(nameof(GetRightUsageInfoByAllocationUuid))]
         [OpenApiOperation(nameof(GetRightUsageInfoByAllocationUuid))]
+        [OpenApiParameter("allocationUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(SiteUsageListItem[]))]
         public async Task<HttpResponseData> GetRightUsageInfoByAllocationUuid(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "WaterRights/{allocationUuid}/UsageTable")] 
