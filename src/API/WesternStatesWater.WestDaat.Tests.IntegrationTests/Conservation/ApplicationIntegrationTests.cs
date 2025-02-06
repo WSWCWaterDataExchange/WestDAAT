@@ -169,7 +169,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var requestedCompensationPerAcreFoot = 1000;
         var request = new EstimateConsumptiveUseRequest
         {
-            FundingOrganizationId = organization.Id,
             OrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
             Polygons = [memorialStadiumFootballField],
