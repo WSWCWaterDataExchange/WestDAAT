@@ -6,7 +6,7 @@ public class WaterConservationApplicationCreateRequestValidator : AbstractValida
 {
     public WaterConservationApplicationCreateRequestValidator()
     {
-        RuleFor(x => x.OrganizationId).NotEmpty();
+        RuleFor(x => x.FundingOrganizationId).NotEmpty();
 
         RuleFor(x => x.WaterRightNativeId).NotEmpty();
     }
