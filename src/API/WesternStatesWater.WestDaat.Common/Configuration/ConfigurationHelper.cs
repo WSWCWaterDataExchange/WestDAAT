@@ -11,7 +11,7 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
             {
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}",
-                "Server=localhost;Initial Catalog=WaDE2;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd1!;Encrypt=False;"
+                "Server=localhost;Initial Catalog=WaDE2;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
             {
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
