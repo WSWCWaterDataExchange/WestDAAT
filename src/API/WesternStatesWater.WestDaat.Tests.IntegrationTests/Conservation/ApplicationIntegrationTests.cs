@@ -170,7 +170,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new EstimateConsumptiveUseRequest
         {
             FundingOrganizationId = organization.Id,
-            OrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
             Polygons = [memorialStadiumFootballField],
             DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
