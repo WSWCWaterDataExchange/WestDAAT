@@ -1,7 +1,7 @@
 using AutoMapper;
 using WesternStatesWater.WestDaat.Utilities;
-using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
@@ -94,14 +94,15 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationDashboardLoadResponse, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
+            CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardLIstItem>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
+
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
-            CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
-                CommonContracts.EstimateConservationPaymentRequest>()
+            CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData), CommonContracts.EstimateConservationPaymentRequest>()
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
-
 
             CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
 
@@ -138,6 +139,17 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections));
+        }
+
+        public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        {
+            return (acceptedDate, rejectedDate) switch
+            {
+                (null, null) => CommonContracts.ConservationApplicationStatus.InReview,
+                (not null, null) => CommonContracts.ConservationApplicationStatus.Approved,
+                (null, not null) => CommonContracts.ConservationApplicationStatus.Rejected,
+                _ => CommonContracts.ConservationApplicationStatus.Unknown
+            };
         }
     }
 }

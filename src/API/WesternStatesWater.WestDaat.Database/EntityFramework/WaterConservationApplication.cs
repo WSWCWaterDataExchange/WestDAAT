@@ -4,7 +4,6 @@ public class WaterConservationApplication
 {
     public WaterConservationApplication()
     {
-
     }
 
     public Guid Id { get; set; }
@@ -24,4 +23,6 @@ public class WaterConservationApplication
     public virtual ICollection<WaterConservationApplicationEstimate> Estimates { get; set; } = null!;
 
     public virtual ICollection<WaterConservationApplicationSubmission> Submissions { get; set; } = null!;
+
+    public virtual WaterConservationApplicationSubmission? Submission { get; set; } = null!;
 }

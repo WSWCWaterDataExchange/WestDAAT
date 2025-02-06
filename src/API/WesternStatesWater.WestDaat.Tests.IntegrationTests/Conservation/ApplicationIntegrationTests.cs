@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -39,14 +40,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(Roles.GlobalAdmin, null, true, false, true, DisplayName = "A global user requesting all organizations should succeed")]
     [DataRow(Roles.GlobalAdmin, null, false, false, true, DisplayName = "A global user requesting a specific organization to which they are not a member should succeed")]
-    [DataRow("invalid global role", null, null, null, false, DisplayName = "A global user without required permissions should throw a permission forbidden exception")]
-    [DataRow(null, "invalid org role", true, null, false, DisplayName = "An organization user without required permissions should throw a permission forbidden exception")]
-    [DataRow(null, Roles.GlobalAdmin, true, null, false, DisplayName = "An organization user requesting all organizations should throw a permission forbidden exception")]
+    [DataRow("invalid global role", null, false, false, false, DisplayName = "A global user without required permissions should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", true, false, false, DisplayName = "An organization user without required permissions should throw a permission forbidden exception")]
+    [DataRow(null, Roles.GlobalAdmin, true, false, false, DisplayName = "An organization user requesting all organizations should throw a permission forbidden exception")]
     [DataRow(null, Roles.GlobalAdmin, false, true, true, DisplayName = "An organization user requesting a specific organization to which they are a member should succeed")]
-    [DataRow(null, Roles.GlobalAdmin, false, false, false, DisplayName = "An organization user requesting a specific organization to which they are not a member should throw a permission forbidden exception")]
-    [DataRow(null, "invalid org role", false, true, false, DisplayName = "An organization user without required permissions requesting an organization to which they are a member should throw a permission forbidden exception")]
-    [DataRow(null, "invalid org role", false, false, false, DisplayName = "An organization user without required permissions requesting an organization to which they are not a member should throw a permission forbidden exception")]
-    public async Task Load_OrganizationApplicationDashboardRequest_ValidatePermissions(string? globalRole, string? orgRole, bool? requestingAllOrgs, bool? isMemberOfOrg, bool shouldPass)
+    [DataRow(null, Roles.GlobalAdmin, false, false, false,
+        DisplayName = "An organization user requesting a specific organization to which they are not a member should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", false, true, false,
+        DisplayName = "An organization user without required permissions requesting an organization to which they are a member should throw a permission forbidden exception")]
+    [DataRow(null, "invalid org role", false, false, false,
+        DisplayName = "An organization user without required permissions requesting an organization to which they are not a member should throw a permission forbidden exception")]
+    public async Task Load_OrganizationApplicationDashboardRequest_ValidatePermissions(string globalRole, string orgRole, bool requestingAllOrgs, bool isMemberOfOrg,
+        bool shouldPass)
     {
         // Arrange
         var userOrganization = new OrganizationFaker().Generate();
@@ -75,7 +80,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         if (requestingAllOrgs != true)
         {
-            requestedOrgId = isMemberOfOrg == true ? userOrganization.Id : diffOrganization.Id;
+            requestedOrgId = isMemberOfOrg ? userOrganization.Id : diffOrganization.Id;
         }
 
         var request = new OrganizationApplicationDashboardLoadRequest
@@ -90,9 +95,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.GetType().Should().Be<OrganizationApplicationDashboardLoadResponse>();
         if (shouldPass)
         {
-            // because accessor is throwing a NotImplementedException but it gets caught by ManagerBase
-            response.Error.Should().NotBeNull();
-            response.Error!.LogMessage.Should().BeNull();
+            response.Error.Should().BeNull();
         }
         else
         {
@@ -102,6 +105,117 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
+    [DataRow(true, DisplayName = "A user with global admin role should be able to load all applications")]
+    [DataRow(false, DisplayName = "An organization user should be able to load only their organization's applications")]
+    public async Task Load_OrganizationApplicationDashboardRequest_ReturnsApplicationsNewestToOldest(bool isGlobalUser)
+    {
+        // Arrange
+        var orgOne = new OrganizationFaker().Generate();
+        var orgTwo = new OrganizationFaker().Generate();
+        var orgThree = new OrganizationFaker().Generate();
+        var userOne = new UserFaker().Generate();
+        var userTwo = new UserFaker().Generate();
+        var userThree = new UserFaker().Generate();
+        var appOne = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
+        var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
+        var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
+        var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
+        var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
+            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now)
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
+        var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
+            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now)
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
+        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour)
+            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
+
+        await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
+        await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
+        await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
+        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
+        await _dbContext.SaveChangesAsync();
+
+        var acceptedAppResponse = new ApplicationDashboardLIstItem
+        {
+            ApplicationId = appOne.Id,
+            ApplicationDisplayId = appOne.ApplicationDisplayId,
+            ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
+            CompensationRateDollars = acceptedApp.CompensationRateDollars,
+            CompensationRateUnits = acceptedApp.CompensationRateUnits,
+            OrganizationName = orgOne.Name,
+            Status = ConservationApplicationStatus.Approved,
+            SubmittedDate = acceptedApp.SubmittedDate,
+            WaterRightNativeId = appOne.WaterRightNativeId,
+        };
+
+        var rejectedAppResponse = new ApplicationDashboardLIstItem
+        {
+            ApplicationId = appTwo.Id,
+            ApplicationDisplayId = appTwo.ApplicationDisplayId,
+            ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
+            CompensationRateDollars = rejectedApp.CompensationRateDollars,
+            CompensationRateUnits = rejectedApp.CompensationRateUnits,
+            OrganizationName = orgTwo.Name,
+            Status = ConservationApplicationStatus.Rejected,
+            SubmittedDate = rejectedApp.SubmittedDate,
+            WaterRightNativeId = appTwo.WaterRightNativeId,
+        };
+
+        var inReviewAppResponse = new ApplicationDashboardLIstItem
+        {
+            ApplicationId = appFour.Id,
+            ApplicationDisplayId = appFour.ApplicationDisplayId,
+            ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
+            CompensationRateDollars = inReviewApp.CompensationRateDollars,
+            CompensationRateUnits = inReviewApp.CompensationRateUnits,
+            OrganizationName = orgOne.Name,
+            Status = ConservationApplicationStatus.InReview,
+            SubmittedDate = inReviewApp.SubmittedDate,
+            WaterRightNativeId = appFour.WaterRightNativeId,
+        };
+
+        var orgUserOrganizationRoles = new[]
+        {
+            new OrganizationRole
+            {
+                OrganizationId = orgOne.Id,
+                RoleNames = [Roles.OrganizationAdmin]
+            }
+        };
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.Empty,
+            Roles = isGlobalUser ? [Roles.GlobalAdmin] : [],
+            OrganizationRoles = isGlobalUser ? [] : orgUserOrganizationRoles,
+            ExternalAuthId = "some-external-auth-id"
+        });
+
+        var request = new OrganizationApplicationDashboardLoadRequest
+        {
+            OrganizationIdFilter = isGlobalUser ? null : orgOne.Id
+        };
+
+        // Act
+        var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request);
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        var expectedApplications = new List<ApplicationDashboardLIstItem> { acceptedAppResponse, inReviewAppResponse };
+
+        if (isGlobalUser)
+        {
+            expectedApplications = expectedApplications.Append(rejectedAppResponse).ToList();
+        }
+
+        response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse
+        {
+            Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
+        });
+    }
+
+
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
     [DataRow(false, false, DisplayName = "Request without compensation should not save estimate")]
