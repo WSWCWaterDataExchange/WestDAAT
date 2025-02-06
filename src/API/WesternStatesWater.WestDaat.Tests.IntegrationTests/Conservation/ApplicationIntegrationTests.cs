@@ -446,7 +446,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.SaveChangesAsync();
 
-        UseUserContext(new UserContext
+        UseRequiredUserContext(new UserContext
         {
             UserId = user.Id,
             Roles = [],

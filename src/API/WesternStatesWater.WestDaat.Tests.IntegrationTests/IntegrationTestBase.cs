@@ -178,5 +178,15 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .Setup(mock => mock.GetContext())
                 .Returns(context ?? new UserContext());
         }
+
+        protected void UseRequiredUserContext(UserContext context = null)
+        {
+            var userContext = context ?? new UserContext();
+            ContextUtilityMock
+                .Setup(mock => mock.GetRequiredContext<UserContext>())
+                .Returns(userContext);
+
+            UseUserContext(userContext);
+        }
     }
 }
