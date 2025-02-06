@@ -287,7 +287,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         var request = new WaterConservationApplicationCreateRequest
         {
-            OrganizationId = organization.Id,
+            FundingOrganizationId = organization.Id,
             WaterRightNativeId = "1234",
         };
 
