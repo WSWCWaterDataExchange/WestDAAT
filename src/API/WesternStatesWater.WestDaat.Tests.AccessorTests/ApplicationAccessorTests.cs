@@ -150,7 +150,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         var request = new WaterConservationApplicationCreateRequest
         {
             ApplicantUserId = user.Id,
-            OrganizationId = organization.Id,
+            FundingOrganizationId = organization.Id,
             WaterRightNativeId = "1234",
             ApplicationDisplayId = "1234",
         };
@@ -166,7 +166,7 @@ public class ApplicationAccessorTests : AccessorTestBase
             .SingleOrDefaultAsync(wca => wca.Id == response.WaterConservationApplicationId);
         application.Should().NotBeNull();
         application.ApplicantUserId.Should().Be(request.ApplicantUserId);
-        application.FundingOrganizationId.Should().Be(request.OrganizationId);
+        application.FundingOrganizationId.Should().Be(request.FundingOrganizationId);
         application.WaterRightNativeId.Should().Be(request.WaterRightNativeId);
         application.ApplicationDisplayId.Should().Be(request.ApplicationDisplayId);
     }

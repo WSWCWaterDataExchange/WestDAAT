@@ -2,7 +2,7 @@
 
 public class WaterConservationApplicationCreateRequest : ApplicationStoreRequestBase
 {
-    public Guid OrganizationId { get; set; }
+    public Guid FundingOrganizationId { get; set; }
 
     public Guid ApplicantUserId { get; set; }
 

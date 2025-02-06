@@ -35,7 +35,7 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
 
         var organizationDetailsRequest = new OrganizationLoadDetailsRequest
         {
-            OrganizationId = request.OrganizationId,
+            OrganizationId = request.FundingOrganizationId,
         };
         var organizationDetailsResponse = (OrganizationLoadDetailsResponse)await _organizationAccessor.Load(organizationDetailsRequest);
 

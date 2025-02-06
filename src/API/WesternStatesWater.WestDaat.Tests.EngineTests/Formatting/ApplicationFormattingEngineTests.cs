@@ -53,7 +53,7 @@ public class ApplicationFormattingEngineTests : EngineTestBase
         var request = new WaterConservationApplicationCreateRequest
         {
             ApplicantUserId = userId,
-            OrganizationId = organizationId,
+            FundingOrganizationId = organizationId,
             ApplicationDisplayId = null,
         };
 
