@@ -2,6 +2,7 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
+// TODO: JN - rename to not have double upper case
 public class ApplicationDashboardLIstItem
 {
     required public string ApplicantFullName { get; set; }
@@ -23,7 +24,6 @@ public class ApplicationDashboardLIstItem
     // TODO: JN - name seem okay?
     public int TotalObligationDollars { get; set; }
 
-    // TODO: JN - should this be a double or int?
     required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 
 
     required public string WaterRightNativeId { get; set; }

@@ -88,7 +88,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardLIstItem>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)))
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
-                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => CalculateTotalConsumptiveUsage(src.LocationsConsumptiveUses)));
+                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
@@ -120,7 +120,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<(
                 ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
                 CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
-                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
+                CommonContracts.EstimateConservationPaymentResponse PaymentResponse,
+                double TotalAverageYearlyEtAcreFeet
                 ),
                 CommonContracts.ApplicationEstimateStoreRequest
                 >()
@@ -131,7 +132,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.DesiredCompensationDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars.Value))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
-                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections));
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
+                .ForMember(dest => dest.TotalAverageYearlyEtAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyEtAcreFeet));
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
@@ -143,12 +145,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 (null, not null) => CommonContracts.ConservationApplicationStatus.Rejected,
                 _ => CommonContracts.ConservationApplicationStatus.Unknown
             };
-        }
-        
-        public static double CalculateTotalConsumptiveUsage(CommonContracts.ConsumptiveUseByLocation[] locations)
-        {
-            // TODO: JN - is this how to calculate?
-            return locations.Select(loc =>loc.AreaInAcres * (loc.AllEtInInches.Sum() / 12)).Sum();
         }
     }
 }

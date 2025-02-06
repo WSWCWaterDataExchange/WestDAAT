@@ -28,6 +28,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
     {
         var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
         var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
+        var totalAverageYearlyEtAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet);
 
         EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
         if (request.CompensationRateDollars.HasValue)
@@ -39,7 +40,8 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
             var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
                 request,
                 multiPolygonYearlyEtResponse,
-                estimateConservationPaymentResponse
+                estimateConservationPaymentResponse,
+                totalAverageYearlyEtAcreFeet
             ));
 
             await ApplicationAccessor.Store(storeEstimateRequest);
@@ -48,7 +50,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         return new EstimateConsumptiveUseResponse
         {
             ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
-            TotalAverageYearlyEtAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet),
+            TotalAverageYearlyEtAcreFeet = totalAverageYearlyEtAcreFeet,
             DataCollections = multiPolygonYearlyEtResponse.DataCollections.Map<Contracts.Client.PolygonEtDataCollection[]>(),
         };
     }

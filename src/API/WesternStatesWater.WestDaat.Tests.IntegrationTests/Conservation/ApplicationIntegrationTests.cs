@@ -120,6 +120,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
+        var acceptedEstimate = new WaterConservationApplicationEstimateFaker(appOne).Generate();
+        var rejectedEstimate = new WaterConservationApplicationEstimateFaker(appTwo).Generate();
+        var inReviewEstimate = new WaterConservationApplicationEstimateFaker(appFour).Generate();
         var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
             .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now)
             .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
@@ -132,6 +135,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
+        await _dbContext.WaterConservationApplicationEstimates.AddRangeAsync(acceptedEstimate, rejectedEstimate, inReviewEstimate);
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
@@ -146,6 +150,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.Approved,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
+            TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
+            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
 
         var rejectedAppResponse = new ApplicationDashboardLIstItem
@@ -159,6 +165,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.Rejected,
             SubmittedDate = rejectedApp.SubmittedDate,
             WaterRightNativeId = appTwo.WaterRightNativeId,
+            TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
+            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
 
         var inReviewAppResponse = new ApplicationDashboardLIstItem
@@ -172,6 +180,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.InReview,
             SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
+            TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
+            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
 
         var orgUserOrganizationRoles = new[]
@@ -215,7 +225,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
     }
 
-
+    [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
     [DataRow(false, false, DisplayName = "Request without compensation should not save estimate")]
@@ -350,7 +360,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
             dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
             dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-
+            dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            
             dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
             dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
