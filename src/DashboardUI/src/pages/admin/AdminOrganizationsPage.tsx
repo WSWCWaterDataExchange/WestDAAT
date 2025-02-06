@@ -1,13 +1,35 @@
+import React from 'react';
 import { useQuery } from 'react-query';
-import { getAllOrganizations } from '../../accessors/adminAccessor';
+import { getAllOrganizations } from '../../accessors/organizationAccessor';
 import { useMsal } from '@azure/msal-react';
+import { Alert, Spinner } from 'react-bootstrap';
 
 export function AdminOrganizationsPage() {
   const msalContext = useMsal();
 
-  // TODO loading state
-  // TODO error handling
-  const { data: organizationsResponse } = useQuery('admin-organizations', () => getAllOrganizations(msalContext));
+  const {
+    data: organizationsResponse,
+    isLoading,
+    isError,
+    error,
+  } = useQuery('admin-organizations', () => getAllOrganizations(msalContext));
+
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert variant="danger">
+        <Alert.Heading>Error loading organizations</Alert.Heading>
+        <p>{(error as Error).message}</p>
+      </Alert>
+    );
+  }
 
   return (
     <div>
