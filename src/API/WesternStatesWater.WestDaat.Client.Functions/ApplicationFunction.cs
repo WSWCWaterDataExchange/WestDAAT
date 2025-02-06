@@ -53,7 +53,7 @@ public class ApplicationFunction : FunctionBase
     [OpenApiOperation(nameof(CreateWaterConservationApplication))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterConservationApplicationCreateResponse))]
     public async Task<HttpResponseData> CreateWaterConservationApplication(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Create")]
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}")]
         HttpRequestData req)
     {
         var request = await ParseRequestBody<WaterConservationApplicationCreateRequest>(req);
