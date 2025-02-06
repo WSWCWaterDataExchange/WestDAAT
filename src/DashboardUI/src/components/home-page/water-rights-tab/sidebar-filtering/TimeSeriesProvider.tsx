@@ -1,14 +1,17 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useDashboardFilters } from '../../../../hooks/queries';
 
 export type MapboxFilterExpression = [string, ...any[]];
 
 interface TimeSeriesContextValue {
   timeSeries: string[];
   isTimeSeriesFilterActive: boolean;
-  timeSeriesData?: string[];
+  siteTypes: string[];
+  selectedSiteTypes?: string[];
 
   toggleTimeSeries: (seriesKey: string, enable: boolean) => void;
   setTimeSeriesFilterActive: (active: boolean) => void;
+  setSiteTypes: (siteTypes: string[] | undefined) => void;
 
   mapFilters: MapboxFilterExpression | null;
 }
@@ -16,14 +19,20 @@ interface TimeSeriesContextValue {
 const TimeSeriesContext = createContext<TimeSeriesContextValue>({
   timeSeries: [],
   isTimeSeriesFilterActive: false,
-  timeSeriesData: [], //might not need this when we add the filters
+  siteTypes: [],
+  selectedSiteTypes: [],
   toggleTimeSeries: () => {},
   setTimeSeriesFilterActive: () => {},
+  setSiteTypes: () => {},
   mapFilters: null,
 });
 
 export function TimeSeriesProvider({ children }: { children: React.ReactNode }) {
+  const dashboardFiltersQuery = useDashboardFilters();
+  const siteTypes = dashboardFiltersQuery.data?.siteTypes ?? [];
+
   const [timeSeries, setTimeSeries] = useState<string[]>([]);
+  const [selectedSiteTypes, setSelectedSiteTypes] = useState<string[] | undefined>(undefined);
   const [isTimeSeriesFilterActive, setTimeSeriesFilterActive] = useState<boolean>(false);
 
   useEffect(() => {}, [timeSeries]);
@@ -32,8 +41,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
     setTimeSeries((prev) => {
       const current = prev ?? [];
       if (enable) {
-        if (current.includes(seriesKey)) return current;
-        return [...current, seriesKey];
+        return current.includes(seriesKey) ? current : [...current, seriesKey];
       }
       return current.filter((o) => o !== seriesKey);
     });
@@ -50,8 +58,11 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
   const value: TimeSeriesContextValue = {
     timeSeries,
     isTimeSeriesFilterActive,
+    siteTypes,
+    selectedSiteTypes,
     toggleTimeSeries,
     setTimeSeriesFilterActive,
+    setSiteTypes: setSelectedSiteTypes,
     mapFilters,
   };
 
