@@ -27,12 +27,11 @@ public class ApplicationFormattingEngineTests : EngineTestBase
     }
 
     [TestMethod]
-    public async Task FormatStoreRequest_FormatWaterConservationApplicationCreateRequest_Success()
+    public async Task Format_FormatDisplayId_Success()
     {
         // Arrange
         var organizationId = Guid.NewGuid();
         var organizationAgencyId = "123";
-        var userId = Guid.NewGuid();
 
         _organizationAccessorMock.Setup(x => x.Load(It.IsAny<OrganizationLoadDetailsRequest>()))
             .ReturnsAsync(new OrganizationLoadDetailsResponse
@@ -50,17 +49,14 @@ public class ApplicationFormattingEngineTests : EngineTestBase
                 LastDisplayIdSequentialNumber = 3,
             });
 
-        var request = new WaterConservationApplicationCreateRequest
-        {
-            ApplicantUserId = userId,
-            FundingOrganizationId = organizationId,
-            ApplicationDisplayId = null,
-        };
-
         // Act
-        await _applicationFormattingEngine.FormatStoreRequest(request);
+        var request = new ApplicationFormatDisplayIdRequest
+        {
+            FundingOrganizationId = organizationId,
+        };
+        var response = (ApplicationFormatDisplayIdResponse)await _applicationFormattingEngine.Format(request);
 
         // Assert
-        request.ApplicationDisplayId.Should().Be($"{DateTimeOffset.UtcNow.Year}-{organizationAgencyId}-0004");
+        response.DisplayId.Should().Be($"{DateTimeOffset.UtcNow.Year}-{organizationAgencyId}-0004");
     }
 }
