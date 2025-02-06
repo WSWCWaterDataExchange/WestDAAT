@@ -1,7 +1,7 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 
@@ -11,7 +11,12 @@ function WaterRightHeader() {
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
 
-  const overlayTooltip = <Tooltip id="consumptive-use-btn-tooltip">lorem ipsum dolor sit amet</Tooltip>;
+  const overlayElement = (props: any) => (
+    <Popover id="consumptive-use-btn-tooltip" {...props}>
+      <Popover.Header as="h3">Lorem Ipsum</Popover.Header>
+      <Popover.Body>Lorem ipsum dolor sit amet</Popover.Body>
+    </Popover>
+  );
 
   const consumptiveUseBtnClickHandler = () => {
     if (!isAuthenticated) {
@@ -35,7 +40,7 @@ function WaterRightHeader() {
       <div className="d-flex flex-column align-items-end gap-1">
         <div className="d-flex flex-row gap-3 align-items-center">
           <div>
-            <OverlayTrigger placement="left" delay={{ show: 250, hide: 400 }} overlay={overlayTooltip}>
+            <OverlayTrigger trigger="hover" placement="left" delay={{ show: 0, hide: 0 }} overlay={overlayElement}>
               <Icon path={mdiHelpCircleOutline} size="1.5em" />
             </OverlayTrigger>
           </div>
