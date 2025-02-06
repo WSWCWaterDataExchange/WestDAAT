@@ -30,7 +30,7 @@ public class WaterConservationApplicationCreateRequestHandler :
     public async Task<WaterConservationApplicationCreateResponse> Handle(WaterConservationApplicationCreateRequest request)
     {
         var dtoRequest = request.Map<Common.DataContracts.WaterConservationApplicationCreateRequest>();
-        dtoRequest.ApplicantUserId = ((UserContext)_contextUtility.GetContext()).UserId;
+        dtoRequest.ApplicantUserId = _contextUtility.GetRequiredContext<UserContext>().UserId;
 
         // verify in-progress wca does not already exist; if it does, return the id
         var inProgressWcaRequest = dtoRequest.Map<Common.DataContracts.UnsubmittedApplicationExistsLoadRequest>();
