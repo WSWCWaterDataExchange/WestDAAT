@@ -122,7 +122,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         if (!string.IsNullOrEmpty(lastSequentialNumber))
         {
             var application = new WaterConservationApplicationFaker(user, organization)
-                .RuleFor(app => app.ApplicationDisplayId, () => $"2025-{organization.AgencyId}-{lastSequentialNumber}")
+                .RuleFor(app => app.ApplicationDisplayId, () => $"2025-{organization.AbbreviatedName}-{lastSequentialNumber}")
                 .Generate();
             await _westDaatDb.WaterConservationApplications.AddRangeAsync(application);
         }
@@ -131,7 +131,7 @@ public class ApplicationAccessorTests : AccessorTestBase
 
         var request = new ApplicationFindSequentialIdLoadRequest
         {
-            ApplicationDisplayIdStub = $"2025-{organization.AgencyId}"
+            ApplicationDisplayIdStub = $"2025-{organization.AbbreviatedName}"
         };
 
         // Act
