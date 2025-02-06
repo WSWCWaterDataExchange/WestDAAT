@@ -4,5 +4,5 @@ namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 public class ApplicationStoreRequestBase : RequestBase
 {
-    required public Guid OrganizationId { get; init; }
+    required public Guid FundingOrganizationId { get; init; }
 }

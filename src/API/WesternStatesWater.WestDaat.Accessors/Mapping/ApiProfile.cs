@@ -83,14 +83,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.BeneficialUsesCV, BeneficialUseItem>()
                 .ForMember(dest => dest.BeneficialUseName, opt => opt.MapFrom(source => source.WaDEName.Length > 0 ? source.WaDEName : source.Name))
                 .ForMember(dest => dest.ConsumptionCategory, opt => opt.MapFrom(source => source.ConsumptionCategoryType == null ? Common.ConsumptionCategory.Unspecified : source.ConsumptionCategoryType));
-            
+
             CreateMap<EF.SiteVariableAmountsFact, SiteUsagePoint>()
                 .ForMember(dest => dest.Amount, opt => opt.MapFrom(source => source.Amount))
                 .ForMember(dest => dest.TimeFrameStartDate, opt => opt.MapFrom(source => source.TimeframeStartNavigation.Date))
                 .ForMember(dest => dest.VariableUuid, opt => opt.MapFrom(source => source.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.VariableSpecific.AmountUnitCv))
                 ;
-            
+
             CreateMap<EF.SiteVariableAmountsFact, SiteUsageListItem>()
                 .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(src => src.VariableSpecific.VariableSpecificUuid))
                 .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(src => src.Method.MethodUuid))
@@ -99,7 +99,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.TimeframeEnd, opt => opt.MapFrom(src => src.TimeframeEndNavigation.Date))
                 .ForMember(dest => dest.ReportYear, opt => opt.MapFrom(src => src.ReportYearCv))
                 .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
-                .ForMember(dest => dest.BeneficialUse, opt => opt.MapFrom(src => src.PrimaryBeneficialUse.WaDEName))
+                .ForMember(dest => dest.PrimaryUse, opt => opt.MapFrom(src => src.PrimaryBeneficialUse.WaDEName))
                 .ForMember(dest => dest.PopulationServed, opt => opt.MapFrom(src => src.PopulationServed))
                 .ForMember(dest => dest.CropDutyAmount, opt => opt.MapFrom(src => src.AllocationCropDutyAmount))
                 .ForMember(dest => dest.CommunityWaterSupplySystem, opt => opt.MapFrom(src => src.CommunityWaterSupplySystem));
@@ -115,7 +115,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.ReportYearStartMonth))
                 .ForMember(dest => dest.ReportYearType, opt => opt.MapFrom(source => source.ReportYearTypeCvNavigation.WaDEName.Length > 0 ? source.ReportYearTypeCvNavigation.WaDEName : source.ReportYearTypeCv))
                 ;
-            
+
             CreateMap<EF.ReportingUnitsDim, OverlayDetails>()
                 .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
@@ -134,7 +134,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     .Select(rr => rr.Organization.OrganizationWebsite).FirstOrDefault()))
                 .ForMember(dest => dest.Geometry, opt => opt.MapFrom(source => source.Geometry));
 
-
             CreateMap<EF.MethodsDim, MethodInfoListItem>()
                 .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(source => source.MethodUuid))
                 .ForMember(dest => dest.ApplicationResourceType, opt => opt.MapFrom(source => source.ApplicableResourceTypeCvNavigation.WaDEName.Length > 0 ? source.ApplicableResourceTypeCvNavigation.WaDEName : source.ApplicableResourceTypeCv))
@@ -142,7 +141,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.MethodUrl, opt => opt.MapFrom(source => source.MethodNemilink))
                 .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
-            
+
             CreateMap<EF.RegulatoryOverlayDim, OverlayTableEntry>()
                 .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
                 .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
@@ -155,7 +154,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.StatutoryEffectiveDate, opt => opt.MapFrom(source => source.StatutoryEffectiveDate))
                 .ForMember(dest => dest.StatutoryEndDate, opt => opt.MapFrom(source => source.StatutoryEndDate))
                 .ForMember(dest => dest.OverlayStatusDesc, opt => opt.MapFrom(source => source.RegulatoryDescription));
-            
+
             CreateMap<EF.ReportingUnitsDim, OverlayDigest>()
                 .ForMember(dest => dest.WaDeAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeId, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
@@ -169,6 +168,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             AddUserMappings();
             AddOrganizationMappings();
+            AddApplicationMappings();
         }
 
         private void AddUserMappings()
@@ -176,6 +176,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<UserStoreCreateRequest, EFWD.User>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserProfile, opt => opt.Ignore())
                 .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
                 .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
         }
@@ -185,6 +186,40 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+        }
+
+        private void AddApplicationMappings()
+        {
+            CreateMap<EFWD.WaterConservationApplication, ApplicationListItemDetails>()
+                .ForMember(dest => dest.ApplicantFullName, opt =>
+                {
+                    opt.PreCondition(src => src.ApplicantUser.UserProfile != null);
+                    opt.MapFrom(src => $"{src.ApplicantUser.UserProfile.FirstName} {src.ApplicantUser.UserProfile.LastName}");
+                })
+                .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.FundingOrganization.Name))
+                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Submission.CompensationRateDollars))
+                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Submission.CompensationRateUnits))
+                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
+                .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
+                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate));
+                
+            CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.Ignore())
+                .ForMember(dest => dest.Location, opt => opt.Ignore());
+
+            CreateMap<ApplicationEstimateStoreLocationDetails, EFWD.WaterConservationApplicationEstimateLocation>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.Ignore())
+                .ForMember(dest => dest.Estimate, opt => opt.Ignore())
+                .ForMember(dest => dest.ConsumptiveUses, opt => opt.MapFrom(src => src.ConsumptiveUses));
+
+            CreateMap<ApplicationEstimateStoreRequest, EFWD.WaterConservationApplicationEstimate>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
+                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations));
         }
     }
 }

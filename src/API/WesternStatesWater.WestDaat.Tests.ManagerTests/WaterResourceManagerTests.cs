@@ -793,7 +793,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
                     TimeframeEnd = DateTime.Now,
                     ReportYear = "2023",
                     Amount = 123.45,
-                    BeneficialUse = "Agriculture",
+                    PrimaryUse = "Agriculture",
                     PopulationServed = 1000,
                     CropDutyAmount = 1.2,
                     CommunityWaterSupplySystem = "Community A"
@@ -813,7 +813,7 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             var entry = result.First();
             entry.WaDEVariableUuid.Should().Be("var-uuid");
             entry.Amount.Should().Be(123.45);
-            entry.BeneficialUse.Should().Be("Agriculture");
+            entry.PrimaryUse.Should().Be("Agriculture");
             _siteAccessorMock.Verify();
         }
 

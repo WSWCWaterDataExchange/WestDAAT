@@ -398,6 +398,28 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
                 .ToListAsync();
         }
+        
+        public async Task<IEnumerable<SiteUsageListItem>> GetRightUsageInfoListByAllocationUuid(string allocationUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+
+            var siteIds = await db.AllocationBridgeSitesFact
+                .Where(absf => absf.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(absf => absf.SiteId)
+                .ToListAsync();
+
+            if (!siteIds.Any())
+            {
+                return new List<SiteUsageListItem>();
+            }
+
+            var usageInfo = await db.SiteVariableAmountsFact
+                .Where(sva => siteIds.Contains(sva.SiteId))
+                .ProjectTo<SiteUsageListItem>(DtoMapper.Configuration)
+                .ToListAsync();
+
+            return usageInfo;
+        }
 
         public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(string allocationUuid)
         {

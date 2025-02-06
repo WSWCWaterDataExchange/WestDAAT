@@ -5,6 +5,7 @@ import { SiteUsage } from '../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../data-contracts/VariableInfoListItem';
 import { MethodInfoListItem } from '../data-contracts/MethodInfoListItem';
 import westDaatApi from './westDaatApi';
+import { TimeSeriesListItem } from '../data-contracts/TimeSeriesListItem';
 
 export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {
   const api = await westDaatApi();
@@ -41,6 +42,18 @@ export const getWaterSiteSourceInfoList = async (siteUuid: string) => {
 export const getWaterRightInfoList = async (siteUuid: string) => {
   const api = await westDaatApi();
   const { data } = await api.get<WaterRightInfoListItem[]>(`Sites/${siteUuid}/Rights`);
+  return data;
+};
+
+export const getTimeSeriesSiteInfoList = async (siteUuid: string) => {
+  const api = await westDaatApi();
+  const { data } = await api.get<TimeSeriesListItem[]>(`Sites/${siteUuid}/UsageTable`);
+  return data;
+};
+
+export const getTimeSeriesRightInfoList = async (allocationUuid: string) => {
+  const api = await westDaatApi();
+  const { data } = await api.get<TimeSeriesListItem[]>(`WaterRights/${allocationUuid}/UsageTable`);
   return data;
 };
 

@@ -9,8 +9,8 @@ interface OverlayDetailsTableProps {
 export default function OverlayDetailsTable(props: OverlayDetailsTableProps) {
   const { waterRightsInfoList } = props;
 
-  const rows = (waterRightsInfoList ?? []).map((entry) => ({
-    id: entry.waDEOverlayUuid,
+  const rows = (waterRightsInfoList ?? []).map((entry, index) => ({
+    id: `waterRights-${entry.waDEOverlayUuid}-${index}`,
     ...entry,
   }));
 
@@ -70,6 +70,7 @@ export default function OverlayDetailsTable(props: OverlayDetailsTableProps) {
       <DataGrid
         rows={rows}
         columns={columns}
+        getRowId={(row) => row.id}
         disableRowSelectionOnClick
         pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
         slots={{
