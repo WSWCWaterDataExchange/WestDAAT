@@ -48,7 +48,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         return new InProgressApplicationExistsLoadResponse
         {
-            InProgressApplicationId = existingInProgressApplication?.Id
+            InProgressApplicationId = existingInProgressApplication?.Id,
+            FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
         };
     }
 
