@@ -18,14 +18,8 @@ public sealed partial class FormattingEngine : IApplicationFormattingEngine
     }
 
     /// <summary>
-    /// Sets the display Id field in the following format.
-    /// <code>{Year}-{AgencyIdentifier}-{SequentialNumber}</code> 
-    /// * Year is the current year.<br />
-    /// * AgencyIdentifier is the AgencyId field of the corresponding Organization.<br />
-    /// * SequentialNumber is the nth Application created in the current year for this Organization, left-padded to display 4 digits.
+    /// Generates a user-friendly id to be displayed on the frontend.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
     private async Task FormatWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request)
     {
         var displayIdFormattedString = new StringBuilder();
