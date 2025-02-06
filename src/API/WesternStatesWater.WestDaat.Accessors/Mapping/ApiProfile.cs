@@ -114,7 +114,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.TimeframeEnd, opt => opt.MapFrom(src => src.TimeframeEndNavigation.Date))
                 .ForMember(dest => dest.ReportYear, opt => opt.MapFrom(src => src.ReportYearCv))
                 .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
-                .ForMember(dest => dest.BeneficialUse, opt => opt.MapFrom(src => src.PrimaryBeneficialUse.WaDEName))
+                .ForMember(dest => dest.PrimaryUse, opt => opt.MapFrom(src => src.PrimaryBeneficialUse.WaDEName))
                 .ForMember(dest => dest.PopulationServed, opt => opt.MapFrom(src => src.PopulationServed))
                 .ForMember(dest => dest.CropDutyAmount, opt => opt.MapFrom(src => src.AllocationCropDutyAmount))
                 .ForMember(dest => dest.CommunityWaterSupplySystem, opt => opt.MapFrom(src => src.CommunityWaterSupplySystem));
