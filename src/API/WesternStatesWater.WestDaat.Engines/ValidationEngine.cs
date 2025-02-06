@@ -74,37 +74,49 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationIdFilter.Value,
         });
-        
+
         if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         return null;
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
         ContextBase context)
     {
+        await Task.CompletedTask;
         return request switch
         {
-            EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
+            EstimateConsumptiveUseRequest req => ValidateEstimateConsumptiveUseRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
+    private ErrorBase ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
     {
-        await Task.CompletedTask;
+        var permissionsRequest = new DTO.PermissionsGetRequest()
+        {
+            Context = context
+        };
+
+        var permissions = _securityUtility.Get(permissionsRequest);
+
+        if (!permissions.Contains(Permissions.ConservationApplicationStore))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
         return null;
     }
 
