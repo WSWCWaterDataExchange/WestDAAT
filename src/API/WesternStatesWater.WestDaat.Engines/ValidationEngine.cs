@@ -18,15 +18,19 @@ internal class ValidationEngine : IValidationEngine
 
     private readonly IOrganizationAccessor _organizationAccessor;
 
+    private readonly IApplicationAccessor _applicationAccessor;
+
     public ValidationEngine(
         IContextUtility contextUtility,
         ISecurityUtility securityUtility,
-        IOrganizationAccessor organizationAccessor
+        IOrganizationAccessor organizationAccessor,
+        IApplicationAccessor applicationAccessor
     )
     {
         _contextUtility = contextUtility;
         _securityUtility = securityUtility;
         _organizationAccessor = organizationAccessor;
+        _applicationAccessor = applicationAccessor;
     }
 
     public async Task<ErrorBase> Validate(RequestBase request)
@@ -95,28 +99,17 @@ internal class ValidationEngine : IValidationEngine
         await Task.CompletedTask;
         return request switch
         {
-            EstimateConsumptiveUseRequest req => ValidateEstimateConsumptiveUseRequest(req, context),
+            EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
     }
 
-    private ErrorBase ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
+    private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
     {
-        var permissionsRequest = new DTO.PermissionsGetRequest()
-        {
-            Context = context
-        };
-
-        var permissions = _securityUtility.Get(permissionsRequest);
-
-        if (!permissions.Contains(Permissions.ConservationApplicationStore))
-        {
-            return CreateForbiddenError(request, context);
-        }
-
+        await Task.CompletedTask;
         return null;
     }
 
