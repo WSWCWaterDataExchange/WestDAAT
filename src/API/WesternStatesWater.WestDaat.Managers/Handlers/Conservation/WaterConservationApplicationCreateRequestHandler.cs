@@ -45,7 +45,10 @@ public class WaterConservationApplicationCreateRequestHandler :
         }
 
         // hydrate request
-        await _applicationFormattingEngine.FormatStoreRequest(dtoRequest);
+        var formatDisplayIdRequest = dtoRequest.Map<Common.DataContracts.ApplicationFormatDisplayIdRequest>();
+        var formatDisplayIdResponse = (Common.DataContracts.ApplicationFormatDisplayIdResponse)await _applicationFormattingEngine.Format(formatDisplayIdRequest);
+
+        dtoRequest.ApplicationDisplayId = formatDisplayIdResponse.DisplayId;
 
         // save to db
         var dtoResponse = (Common.DataContracts.WaterConservationApplicationCreateResponse)await _applicationAccessor.Store(dtoRequest);
