@@ -10,12 +10,14 @@ import {
   getSiteVariableInfoList,
   getSiteMethodInfoList,
   getOverlayDigests,
+  getTimeSeriesSiteInfoList,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 import { WaterRightInfoListItem } from '../../data-contracts/WaterRightInfoListItem';
 import { WaterSourceInfoListItem } from '../../data-contracts/WaterSourceInfoListItem';
 import { VariableInfoListItem } from '../../data-contracts/VariableInfoListItem';
 import { MethodInfoListItem } from '../../data-contracts/MethodInfoListItem';
+import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
 
 export function useWaterRightsDigests(siteUuid: string) {
   return useQuery(['site.waterRightsDigests', siteUuid], async () => await getWaterRightsDigests(siteUuid), {
@@ -65,6 +67,20 @@ export function useWaterRightInfoList(siteUuid: string | undefined, options?: Wa
   return useQuery(
     ['site.WaterRightInfoList', siteUuid],
     async () => await getWaterRightInfoList(siteUuid!),
+    setOptions,
+  );
+}
+
+type TimeSeriesInfoListOptionsType = UseQueryOptionsParameter<undefined, TimeSeriesListItem[]>;
+
+export function useTimeSeriesSiteInfoList(siteUuid: string | undefined, options?: TimeSeriesInfoListOptionsType) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!siteUuid,
+  };
+  return useQuery(
+    ['site.TimeSeriesInfoList', siteUuid],
+    async () => await getTimeSeriesSiteInfoList(siteUuid!),
     setOptions,
   );
 }
