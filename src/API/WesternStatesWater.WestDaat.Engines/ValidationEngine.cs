@@ -18,15 +18,19 @@ internal class ValidationEngine : IValidationEngine
 
     private readonly IOrganizationAccessor _organizationAccessor;
 
+    private readonly IApplicationAccessor _applicationAccessor;
+
     public ValidationEngine(
         IContextUtility contextUtility,
         ISecurityUtility securityUtility,
-        IOrganizationAccessor organizationAccessor
+        IOrganizationAccessor organizationAccessor,
+        IApplicationAccessor applicationAccessor
     )
     {
         _contextUtility = contextUtility;
         _securityUtility = securityUtility;
         _organizationAccessor = organizationAccessor;
+        _applicationAccessor = applicationAccessor;
     }
 
     public async Task<ErrorBase> Validate(RequestBase request)
@@ -74,24 +78,25 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationIdFilter.Value,
         });
-        
+
         if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
         {
             return CreateForbiddenError(request, context);
         }
-        
+
         return null;
     }
 
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
         ContextBase context)
     {
+        await Task.CompletedTask;
         return request switch
         {
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
