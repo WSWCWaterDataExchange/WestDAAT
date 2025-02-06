@@ -6,7 +6,7 @@ export interface TimeSeriesListItem {
   timeframeEnd: Date;
   reportYear: string;
   amount: number;
-  beneficialUse: string;
+  primaryUse: string;
   populationServed?: number;
   cropDutyAmount?: number;
   communityWaterSupplySystem: string;

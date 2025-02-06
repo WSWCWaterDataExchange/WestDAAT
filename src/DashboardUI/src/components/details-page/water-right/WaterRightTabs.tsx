@@ -90,7 +90,7 @@ export default function WaterRightTabs() {
     },
     { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
     { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
-    { field: 'beneficialUse', headerName: 'Beneficial Use', flex: 1, sortable: true },
+    { field: 'primaryUse', headerName: 'Primary Use', flex: 1, sortable: true },
     { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
     { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
     { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },

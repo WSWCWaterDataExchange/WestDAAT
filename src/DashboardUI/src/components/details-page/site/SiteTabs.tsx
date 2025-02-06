@@ -7,8 +7,8 @@ import { SiteActiveTabType } from './enums/SiteActiveTabType';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import QuickSearchToolbar from '../../QuickSearchToolbar';
 
-function getFormattedBeneficialUses(beneficialUses: string[]): string {
-  return beneficialUses.join(', ');
+function getFormattedPrimaryUses(primaryUses: string[]): string {
+  return primaryUses.join(', ');
 }
 
 export default function SiteTabs() {
@@ -68,7 +68,7 @@ export default function SiteTabs() {
     },
     { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
     { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
-    { field: 'beneficialUse', headerName: 'Beneficial Use', flex: 1, sortable: true },
+    { field: 'primaryUse', headerName: 'Primary Use', flex: 1, sortable: true },
     { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
     { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
     { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },
@@ -123,14 +123,14 @@ export default function SiteTabs() {
     { field: 'flow', headerName: 'Flow (CFS)', flex: 1, sortable: true },
     { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
     {
-      field: 'beneficialUses',
-      headerName: 'Beneficial Use',
+      field: 'primaryUses',
+      headerName: 'Primary Use',
       flex: 2,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const uses = params.value as string[] | undefined;
         if (!uses || uses.length === 0) return '-';
-        return getFormattedBeneficialUses(uses);
+        return getFormattedPrimaryUses(uses);
       },
     },
   ];
