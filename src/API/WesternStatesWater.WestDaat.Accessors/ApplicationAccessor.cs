@@ -75,17 +75,26 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
-        var entity = await db.WaterConservationApplications
+        var entities = await db.WaterConservationApplications
             .Where(app => app.ApplicationDisplayId.StartsWith(request.ApplicationDisplayIdStub))
-            .OrderByDescending(app => app.ApplicationDisplayId)
-            .FirstOrDefaultAsync();
+            .ToArrayAsync();
 
         int lastId = 0;
 
-        if (entity != null)
+        if (entities.Length > 0)
         {
-            var lastIdString = entity.ApplicationDisplayId.Split('-').Last();
-            lastId = int.Parse(lastIdString);
+            var displayIdDelimiter = '-';
+
+            var lastEntity = entities
+                .OrderByDescending(app =>
+                {
+                    var idStringLastSection = app.ApplicationDisplayId.Split(displayIdDelimiter).Last();
+                    return int.Parse(idStringLastSection);
+                })
+                .First();
+
+            var idStringLastSection = lastEntity.ApplicationDisplayId.Split(displayIdDelimiter).Last();
+            lastId = int.Parse(idStringLastSection);
         }
 
         return new ApplicationFindSequentialIdLoadResponse

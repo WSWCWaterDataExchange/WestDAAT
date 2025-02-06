@@ -103,24 +103,30 @@ public class ApplicationAccessorTests : AccessorTestBase
     }
 
     [DataTestMethod]
-    [DataRow(0, 0)]
-    [DataRow(1, 1)]
-    [DataRow(2, 2)]
-    [DataRow(5, 5)]
-    public async Task Load_FindSequentialDisplayId_Success(int numberOfApplicationsToGenerate, int expectedSequentialNumber)
+    [DataRow(null, 0, DisplayName = "Zero Applications exist -> return index 0")]
+    // Application should not exist with id "<year>-<agencyId>-0000"
+    [DataRow("0001", 1, DisplayName = "One Application exists -> return index 1")]
+    [DataRow("0002", 2, DisplayName = "Two Applications exist -> return index 2")]
+    [DataRow("9999", 9_999, DisplayName = "9,999 Applications -> return index 9,999")]
+    [DataRow("10000", 10_000, DisplayName = "10,000 Applications -> return index 10,000")]
+    [DataRow("999999", 999_999, DisplayName = "999,999 Applications -> return index 999,999")]
+    [DataRow("1000000", 1_000_000, DisplayName = "1,000,000 Applications -> return index 1,000,000")]
+    public async Task Load_FindSequentialDisplayId_Success(string lastSequentialNumber, int expectedSequentialNumber)
     {
         // Arrange
         var user = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
-        var applications = Enumerable.Range(0, numberOfApplicationsToGenerate)
-            .Select(index =>
-                new WaterConservationApplicationFaker(user, organization)
-                    .RuleFor(app => app.ApplicationDisplayId, () => $"2025-{organization.AgencyId}-{index + 1:D4}")
-                    .Generate()
-            )
-            .ToArray();
+        await _westDaatDb.Users.AddAsync(user);
+        await _westDaatDb.Organizations.AddAsync(organization);
 
-        await _westDaatDb.WaterConservationApplications.AddRangeAsync(applications);
+        if (!string.IsNullOrEmpty(lastSequentialNumber))
+        {
+            var application = new WaterConservationApplicationFaker(user, organization)
+                .RuleFor(app => app.ApplicationDisplayId, () => $"2025-{organization.AgencyId}-{lastSequentialNumber}")
+                .Generate();
+            await _westDaatDb.WaterConservationApplications.AddRangeAsync(application);
+        }
+
         await _westDaatDb.SaveChangesAsync();
 
         var request = new ApplicationFindSequentialIdLoadRequest
