@@ -57,7 +57,7 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections[0].PolygonWkt.Should().Be(request.Polygons[0]);
         // 2025: 1 inch
         // avg: 1 inch / 1 year = 1 inch
-        response.DataCollections[0].AverageEtInInches.Should().Be(1.0);
+        response.DataCollections[0].AverageYearlyEtInInches.Should().Be(1.0);
 
         response.DataCollections[0].Datapoints.Length.Should().Be(1);
         response.DataCollections[0].Datapoints[0].Year.Should().Be(twentyTwentyFive.Year);
@@ -142,13 +142,13 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections[0].PolygonWkt.Should().Be(request.Polygons[0]);
         // 2025: 1 inch + 2 inches + 3 inches = 6 inches
         // avg: 6 inches / 1 year = 6 inches
-        response.DataCollections[0].AverageEtInInches.Should().Be(6);
+        response.DataCollections[0].AverageYearlyEtInInches.Should().Be(6);
         response.DataCollections[0].Datapoints.Length.Should().Be(1); // only one year of data
 
         response.DataCollections[1].PolygonWkt.Should().Be(request.Polygons[1]);
         // 2025: 0.33 + 1.65 + 12.73 + 0 + 30.5 = 45.21 inches
         // avg: 45.21 inches / 1 year = 45.21 inches
-        response.DataCollections[1].AverageEtInInches.Should().Be(45.21);
+        response.DataCollections[1].AverageYearlyEtInInches.Should().Be(45.21);
         response.DataCollections[1].Datapoints.Length.Should().Be(1); // only one year of data
     }
 
@@ -234,7 +234,7 @@ public class CalculationEngineTests : EngineTestBase
         // 2024: 2 inches
         // 2025: 3 inches
         // avg: (1 + 2 + 3) / 3 years = 2 inches
-        response.DataCollections[0].AverageEtInInches.Should().Be(2);
+        response.DataCollections[0].AverageYearlyEtInInches.Should().Be(2);
         response.DataCollections[0].Datapoints.Length.Should().Be(3); // three years of data
 
         response.DataCollections[1].PolygonWkt.Should().Be(request.Polygons[1]);
@@ -242,7 +242,7 @@ public class CalculationEngineTests : EngineTestBase
         // 2024: 12.73 + 0 = 12.73 inches
         // 2025: 30.5 inches
         // avg: (1.98 + 12.73 + 30.5) / 3 years = 15.07 inches
-        response.DataCollections[1].AverageEtInInches.Should().Be(15.07);
+        response.DataCollections[1].AverageYearlyEtInInches.Should().Be(15.07);
         response.DataCollections[1].Datapoints.Length.Should().Be(3); // three years of data
     }
 
@@ -278,7 +278,7 @@ public class CalculationEngineTests : EngineTestBase
                 new()
                 {
                     PolygonWkt = memorialStadium,
-                    AverageEtInInches = etInInches,
+                    AverageYearlyEtInInches = etInInches,
                     Datapoints = []
                 },
             ]

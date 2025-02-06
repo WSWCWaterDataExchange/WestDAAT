@@ -34,11 +34,9 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcres(EstimateConservationPaymentRequest request)
     {
-        var totalAreaInSquareMeters = request.DataCollections
+        var totalAreaInAcres = request.DataCollections
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
-
-        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+            .Sum(GeometryHelpers.GetGeometryAreaInAcres);
 
         var estimatedCompensation = totalAreaInAcres * request.CompensationRateDollars;
         return new EstimateConservationPaymentResponse
@@ -49,14 +47,12 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
     {
-        var totalAreaInSquareMeters = request.DataCollections
+        var totalAreaInAcres = request.DataCollections
             .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(GeometryHelpers.GetGeometryAreaInSquareMeters);
-
-        var totalAreaInAcres = ConvertSquareMetersToAcres(totalAreaInSquareMeters);
+            .Sum(GeometryHelpers.GetGeometryAreaInAcres);
 
         var totalAverageEtInInches = request.DataCollections
-            .Sum(dc => dc.AverageEtInInches);
+            .Sum(dc => dc.AverageYearlyEtInInches);
 
         var totalAverageEtInFeet = totalAverageEtInInches / 12;
 
@@ -68,12 +64,6 @@ internal class CalculationEngine : ICalculationEngine
         {
             EstimatedCompensationDollars = (int)estimatedCompensation
         };
-    }
-
-    private double ConvertSquareMetersToAcres(double areaInSquareMeters)
-    {
-        double areaInAcres = areaInSquareMeters * 0.000247105;
-        return areaInAcres;
     }
 
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
@@ -102,12 +92,17 @@ internal class CalculationEngine : ICalculationEngine
                 .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, EtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
-            var averageEt = yearlyDatapoints.Average(d => d.EtInInches);
+            var averageEtInInches = yearlyDatapoints.Average(d => d.EtInInches);
+            var averageEtInFeet = averageEtInInches / 12;
+
+            var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(polygonGeo);
+            var averageEtInAcreFeet = averageEtInFeet * polygonAreaInAcres;
 
             var result = new PolygonEtDataCollection
             {
                 PolygonWkt = polygonWkt,
-                AverageEtInInches = averageEt,
+                AverageYearlyEtInInches = averageEtInInches,
+                AverageYearlyEtInAcreFeet = averageEtInAcreFeet,
                 Datapoints = yearlyDatapoints
             };
             results.Add(result);
