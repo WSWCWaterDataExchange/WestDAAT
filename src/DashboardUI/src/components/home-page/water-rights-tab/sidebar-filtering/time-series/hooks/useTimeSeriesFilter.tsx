@@ -46,8 +46,6 @@ export function useTimeSeriesFilter() {
     return filters.length > 1 ? filters : null;
   }, [timeSeries, isTimeSeriesFilterActive, siteTypeFilters, dateFilters]);
 
-  console.log('combinedFilters', combinedFilters);
-
   return {
     timeSeries,
     isTimeSeriesFilterActive,
