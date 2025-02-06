@@ -39,14 +39,14 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.WaterConservationApplications.AddAsync(application);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new InProgressApplicationExistsLoadRequest
+        var request = new UnsubmittedApplicationExistsLoadRequest
         {
             ApplicantUserId = user.Id,
             WaterRightNativeId = application.WaterRightNativeId
         };
 
         // Act
-        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();
@@ -65,14 +65,14 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new InProgressApplicationExistsLoadRequest
+        var request = new UnsubmittedApplicationExistsLoadRequest
         {
             ApplicantUserId = user.Id,
             WaterRightNativeId = application.WaterRightNativeId
         };
 
         // Act
-        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();
@@ -88,14 +88,14 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.Users.AddAsync(user);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new InProgressApplicationExistsLoadRequest
+        var request = new UnsubmittedApplicationExistsLoadRequest
         {
             ApplicantUserId = user.Id,
             WaterRightNativeId = "1234",
         };
 
         // Act
-        var response = (InProgressApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();

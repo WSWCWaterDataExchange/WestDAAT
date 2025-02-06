@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class InProgressApplicationExistsLoadResponse : ApplicationLoadResponseBase
+public class UnsubmittedApplicationExistsLoadResponse : ApplicationLoadResponseBase
 {
     public Guid? InProgressApplicationId { get; set; }
 

@@ -110,8 +110,8 @@ internal class ValidationEngine : IValidationEngine
         ContextBase context)
     {
         // verify user requesting an estimate is linking it to an application they own
-        var userContext = context as UserContext;
-        var inProgressApplicationExistsResponse = (DTO.InProgressApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.InProgressApplicationExistsLoadRequest
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
         {
             ApplicantUserId = userContext.UserId,
             WaterRightNativeId = request.WaterRightNativeId

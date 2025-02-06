@@ -64,8 +64,8 @@ public class ValidationEngineTests : EngineTestBase
         Guid? organizationId = Guid.NewGuid();
 
         // Arrange
-        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<InProgressApplicationExistsLoadRequest>()))
-            .ReturnsAsync(new InProgressApplicationExistsLoadResponse
+        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<UnsubmittedApplicationExistsLoadRequest>()))
+            .ReturnsAsync(new UnsubmittedApplicationExistsLoadResponse
             {
                 InProgressApplicationId = applicationId,
                 FundingOrganizationId = organizationId,

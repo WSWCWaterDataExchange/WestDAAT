@@ -24,7 +24,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
-            InProgressApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
+            UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -54,7 +54,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<InProgressApplicationExistsLoadResponse> CheckInProgressApplicationExists(InProgressApplicationExistsLoadRequest request)
+    private async Task<UnsubmittedApplicationExistsLoadResponse> CheckInProgressApplicationExists(UnsubmittedApplicationExistsLoadRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
@@ -64,7 +64,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
                                          wca.WaterRightNativeId == request.WaterRightNativeId &&
                                          wca.Submission == null);
 
-        return new InProgressApplicationExistsLoadResponse
+        return new UnsubmittedApplicationExistsLoadResponse
         {
             InProgressApplicationId = existingInProgressApplication?.Id,
             FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
