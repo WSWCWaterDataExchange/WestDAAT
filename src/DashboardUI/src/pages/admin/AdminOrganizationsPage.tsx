@@ -1,17 +1,22 @@
-import React from 'react';
+import { useQuery } from 'react-query';
 import { useAdminContext } from '../../contexts/AdminProvider';
-import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
+import { getAllOrganizations } from '../../accessors/adminAccessor';
+import { useMsal } from '@azure/msal-react';
 
 export function AdminOrganizationsPage() {
   const adminContext = useAdminContext();
+  const msalContext = useMsal();
+
+  // TODO loading state
+  // TODO error handling
+  const { data: organizations } = useQuery('admin-organizations', () => getAllOrganizations(msalContext));
 
   return (
     <div>
-      <NotImplementedPlaceholder />
-      
       <h1>All Organizations</h1>
 
-      <pre>{JSON.stringify(adminContext.state.organizations, null, 2)}</pre>
+      <pre>{JSON.stringify(organizations, null, 2)}</pre>
+      <pre>{JSON.stringify(adminContext, null, 2)}</pre>
     </div>
   );
 }
