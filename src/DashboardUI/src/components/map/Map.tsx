@@ -35,9 +35,9 @@ import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
+import { isFeatureEnabled } from '../../config/features';
 
 import './map.scss';
-import { isFeatureEnabled } from '../../config/features';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
