@@ -2,8 +2,7 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
-// TODO: JN - rename to not have double upper case
-public class ApplicationDashboardLIstItem
+public class ApplicationDashboardListItem
 {
     required public string ApplicantFullName { get; set; }
 
@@ -21,7 +20,6 @@ public class ApplicationDashboardLIstItem
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
-    // TODO: JN - name seem okay?
     public int TotalObligationDollars { get; set; }
 
     required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 

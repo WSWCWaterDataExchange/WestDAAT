@@ -139,7 +139,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
-        var acceptedAppResponse = new ApplicationDashboardLIstItem
+        var acceptedAppResponse = new ApplicationDashboardListItem
         {
             ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
@@ -154,7 +154,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
 
-        var rejectedAppResponse = new ApplicationDashboardLIstItem
+        var rejectedAppResponse = new ApplicationDashboardListItem
         {
             ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
@@ -169,7 +169,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
 
-        var inReviewAppResponse = new ApplicationDashboardLIstItem
+        var inReviewAppResponse = new ApplicationDashboardListItem
         {
             ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
@@ -212,7 +212,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeNull();
 
-        var expectedApplications = new List<ApplicationDashboardLIstItem> { acceptedAppResponse, inReviewAppResponse };
+        var expectedApplications = new List<ApplicationDashboardListItem> { acceptedAppResponse, inReviewAppResponse };
 
         if (isGlobalUser)
         {

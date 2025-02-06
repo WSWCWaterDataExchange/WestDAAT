@@ -20,7 +20,6 @@ public class WaterConservationApplication
 
     public virtual Organization FundingOrganization { get; set; } = null!;
     
-    // TODO: JN - could Estimates ever be null?
     public virtual WaterConservationApplicationEstimate? Estimate { get; set; } = null!;
 
     public virtual WaterConservationApplicationSubmission? Submission { get; set; } = null!;
