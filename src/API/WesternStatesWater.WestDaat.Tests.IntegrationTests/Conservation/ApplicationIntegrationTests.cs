@@ -160,7 +160,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         UseUserContext(new UserContext
         {
-            UserId = Guid.NewGuid(),
+            UserId = user.Id,
             Roles = [Roles.GlobalAdmin],
             OrganizationRoles = [],
             ExternalAuthId = ""
@@ -171,6 +171,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             FundingOrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
+            WaterRightNativeId = application.WaterRightNativeId,
             Polygons = [memorialStadiumFootballField],
             DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
             DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + yearRange, 1, 1)),
