@@ -150,6 +150,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.Approved,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
+            WaterRightState = appOne.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
             TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
@@ -165,6 +166,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.Rejected,
             SubmittedDate = rejectedApp.SubmittedDate,
             WaterRightNativeId = appTwo.WaterRightNativeId,
+            WaterRightState = appTwo.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
             TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };
@@ -180,6 +182,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Status = ConservationApplicationStatus.InReview,
             SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
+            WaterRightState = appFour.WaterRightState,
             TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
             TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.TotalAverageYearlyConsumptionEtAcreFeet
         };

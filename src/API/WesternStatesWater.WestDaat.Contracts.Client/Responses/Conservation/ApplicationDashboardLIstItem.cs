@@ -25,4 +25,6 @@ public class ApplicationDashboardListItem
     required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 
 
     required public string WaterRightNativeId { get; set; }
+    
+    required public string WaterRightState { get; set; }
 }
