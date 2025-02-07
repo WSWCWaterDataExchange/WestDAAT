@@ -70,6 +70,7 @@ var host = new HostBuilder()
         MGR.Extensions.ServiceCollectionExtensions.RegisterRequestHandlers(services);
 
         // Engines
+        services.AddTransient<IApplicationFormattingEngine, FormattingEngine>();
         services.AddTransient<ICalculationEngine, CalculationEngine>();
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
