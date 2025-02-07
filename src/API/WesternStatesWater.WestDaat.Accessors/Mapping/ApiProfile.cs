@@ -119,7 +119,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.ReportingUnitsDim, OverlayDetails>()
                 .ForMember(dest => dest.WaDEAreaReportingUuid, opt => opt.MapFrom(source => source.ReportingUnitUuid))
                 .ForMember(dest => dest.ReportingAreaNativeID, opt => opt.MapFrom(source => source.ReportingUnitNativeId))
-                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source => 
+                .ForMember(dest => dest.WaDEOverlayAreaType, opt => opt.MapFrom(source =>
                     source.RegulatoryReportingUnitsFact
                         .Select(rr => rr.RegulatoryOverlay.RegulatoryOverlayTypeCV)
                         .Distinct().ToList()))
@@ -186,6 +186,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+
+            CreateMap<EFWD.Organization, OrganizationSlim>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id));
         }
 
         private void AddApplicationMappings()
@@ -223,6 +226,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
                 .ForMember(dest => dest.TotalAverageYearlyConsumptionEtAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyEtAcreFeet));
+
+            CreateMap<WaterConservationApplicationCreateRequest, EFWD.WaterConservationApplication>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
+                .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
+                .ForMember(dest => dest.Estimate, opt => opt.Ignore())
+                .ForMember(dest => dest.Submission, opt => opt.Ignore());
+
         }
     }
 }

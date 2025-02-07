@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -20,6 +21,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return request switch
             {
                 OrganizationLoadAllRequest => await GetAllOrganizations(),
+                OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
             };
@@ -37,6 +39,25 @@ namespace WesternStatesWater.WestDaat.Accessors
             return new OrganizationLoadAllResponse()
             {
                 Organizations = organizations.ToArray()
+            };
+        }
+
+        private async Task<OrganizationLoadDetailsResponse> GetOrganizationDetails(OrganizationLoadDetailsRequest request)
+        {
+            await using var db = _westDaatDatabaseContextFactory.Create();
+
+            var organization = await db.Organizations
+                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .FirstOrDefaultAsync(org => org.OrganizationId == request.OrganizationId);
+
+            if (organization == null)
+            {
+                throw new WestDaatException($"Organization with ID '{request.OrganizationId}' not found.");
+            }
+
+            return new OrganizationLoadDetailsResponse
+            {
+                Organization = organization,
             };
         }
     }
