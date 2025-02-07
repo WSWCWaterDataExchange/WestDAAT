@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import { useDashboardFilters } from '../../../../hooks/queries';
 
 interface TimeSeriesContextValue {
@@ -14,6 +14,7 @@ interface TimeSeriesContextValue {
   toggleTimeSeries: (seriesKey: string, enable: boolean) => void;
   setTimeSeriesFilterActive: (active: boolean) => void;
   setSiteTypes: (siteTypes: string[] | undefined) => void;
+  resetTimeSeriesOptions: () => void;
 }
 
 const TimeSeriesContext = createContext<TimeSeriesContextValue>({
@@ -28,6 +29,7 @@ const TimeSeriesContext = createContext<TimeSeriesContextValue>({
   toggleTimeSeries: () => {},
   setTimeSeriesFilterActive: () => {},
   setSiteTypes: () => {},
+  resetTimeSeriesOptions: () => {},
 });
 
 export function TimeSeriesProvider({ children }: { children: React.ReactNode }) {
@@ -39,6 +41,13 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
   const [isTimeSeriesFilterActive, setTimeSeriesFilterActive] = useState<boolean>(false);
   const [minDate, setMinDate] = useState<number | undefined>(undefined);
   const [maxDate, setMaxDate] = useState<number | undefined>(undefined);
+  const resetTimeSeriesOptions = useCallback(() => {
+    setTimeSeries([]);
+    setSelectedSiteTypes(undefined);
+    setMinDate(undefined);
+    setMaxDate(undefined);
+    setTimeSeriesFilterActive(false);
+  }, []);
 
   const toggleTimeSeries = useCallback((seriesKey: string, enable: boolean) => {
     setTimeSeries((prev) => {
@@ -59,6 +68,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
     toggleTimeSeries,
     setTimeSeriesFilterActive,
     setSiteTypes: setSelectedSiteTypes,
+    resetTimeSeriesOptions,
   };
 
   return <TimeSeriesContext.Provider value={value}>{children}</TimeSeriesContext.Provider>;
