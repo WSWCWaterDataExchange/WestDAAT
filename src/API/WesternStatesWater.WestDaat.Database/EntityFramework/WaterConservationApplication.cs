@@ -14,8 +14,6 @@ public class WaterConservationApplication
 
     public string WaterRightNativeId { get; set; } = null!;
 
-    public string WaterRightState { get; set; } = null!;
-
     public string ApplicationDisplayId { get; set; } = null!;
 
     public virtual User ApplicantUser { get; set; } = null!;

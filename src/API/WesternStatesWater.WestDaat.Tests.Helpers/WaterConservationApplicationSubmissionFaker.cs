@@ -10,6 +10,8 @@ public class WaterConservationApplicationSubmissionFaker : Faker<EFWD.WaterConse
 
         RuleFor(wcas => wcas.CompensationRateUnits, f => f.PickRandomWithout(Common.DataContracts.CompensationRateUnits.None));
 
+        RuleFor(wcas => wcas.WaterRightState, f => f.Address.StateAbbr());
+        
         if (application != null)
         {
             RuleFor(wcas => wcas.WaterConservationApplication, () => application);

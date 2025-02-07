@@ -21,5 +21,7 @@ public class WaterConservationApplicationSubmission
 
     public DateTimeOffset? RejectedDate { get; set; }
 
+    public string WaterRightState { get; set; } = null!;
+
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 }

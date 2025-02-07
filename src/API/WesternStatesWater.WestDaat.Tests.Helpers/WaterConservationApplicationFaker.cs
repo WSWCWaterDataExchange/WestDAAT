@@ -6,8 +6,6 @@ public class WaterConservationApplicationFaker : Faker<EFWD.WaterConservationApp
     {
         RuleFor(wcas => wcas.WaterRightNativeId, f => f.Random.String(11, 'A', 'z'));
         
-        RuleFor(wcas => wcas.WaterRightState, f => f.Address.StateAbbr());
-
         RuleFor(wcas => wcas.ApplicationDisplayId, f => f.Random.String2(10));
 
         if (user != null)
