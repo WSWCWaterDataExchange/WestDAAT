@@ -18,7 +18,7 @@ import TimeSeriesFilter from './time-series/components/TimeSeriesFilter';
 import { NldiFilters } from './nldi/components/NldiFilters';
 
 function SideBar() {
-  const { filters, setFilters, resetUserOptions } = useWaterRightsContext();
+  const { filters, setFilters, resetWaterRightsOptions } = useWaterRightsContext();
   const { isWaterRightsFilterActive } = filters;
   const toggleWaterRightFilters = useCallback(() => {
     setFilters((prev) => ({
@@ -27,7 +27,7 @@ function SideBar() {
     }));
   }, [setFilters]);
 
-  const { isOverlayFilterActive, setOverlayFilterActive } = useOverlaysFilter();
+  const { isOverlayFilterActive, setOverlayFilterActive, resetOverlaysOptions } = useOverlaysFilter();
   const toggleOverlayFilter = useCallback(() => {
     setOverlayFilterActive(!isOverlayFilterActive);
   }, [isOverlayFilterActive, setOverlayFilterActive]);
@@ -37,7 +37,7 @@ function SideBar() {
     setNldiMapActiveStatus(!isNldiFilterActive);
   }, [isNldiFilterActive, setNldiMapActiveStatus]);
 
-  const { isTimeSeriesFilterActive, setTimeSeriesFilterActive } = useTimeSeriesFilter();
+  const { isTimeSeriesFilterActive, setTimeSeriesFilterActive, resetTimeSeriesOptions } = useTimeSeriesFilter();
   const toggleTimeSeriesFilter = useCallback(() => {
     setTimeSeriesFilterActive(!isTimeSeriesFilterActive);
   }, [isTimeSeriesFilterActive, setTimeSeriesFilterActive]);
@@ -45,6 +45,12 @@ function SideBar() {
   const [activeKeys, setActiveKeys] = useState<string[]>(
     isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
   );
+
+  const handleResetAllFilters = useCallback(() => {
+    resetWaterRightsOptions();
+    resetOverlaysOptions();
+    resetTimeSeriesOptions();
+  }, [resetWaterRightsOptions, resetOverlaysOptions, resetTimeSeriesOptions]);
 
   const setOpenAccordionKeys = useCallback(
     (keys: AccordionEventKey) => {
@@ -83,7 +89,7 @@ function SideBar() {
   return (
     <>
       <div className="m-3">
-        <Button variant="outline-danger" className="w-100" onClick={resetUserOptions}>
+        <Button variant="outline-danger" className="w-100" onClick={handleResetAllFilters}>
           Reset All Filters
         </Button>
       </div>

@@ -2,8 +2,15 @@ import { useMemo } from 'react';
 import { useTimeSeriesContext } from '../../TimeSeriesProvider';
 
 export function useTimeSeriesFilter() {
-  const { timeSeries, isTimeSeriesFilterActive, selectedSiteTypes, minDate, maxDate, setTimeSeriesFilterActive } =
-    useTimeSeriesContext();
+  const {
+    timeSeries,
+    isTimeSeriesFilterActive,
+    selectedSiteTypes,
+    minDate,
+    maxDate,
+    setTimeSeriesFilterActive,
+    resetTimeSeriesOptions,
+  } = useTimeSeriesContext();
 
   const siteTypeFilters = useMemo(() => {
     if (!selectedSiteTypes || selectedSiteTypes.length === 0) return null;
@@ -54,5 +61,6 @@ export function useTimeSeriesFilter() {
     maxDate,
     mapFilters: combinedFilters,
     setTimeSeriesFilterActive,
+    resetTimeSeriesOptions,
   };
 }
