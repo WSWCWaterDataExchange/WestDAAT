@@ -1,16 +1,18 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, Modal, OverlayTrigger, Popover } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';
+import { useState } from 'react';
 
 function WaterRightHeader() {
   const navigate = useNavigate();
   const routeParams = useParams();
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
+  const [showLoginPromptModal, setShowLoginPromptModal] = useState(false);
 
   const overlayElement = (props: any) => (
     <Popover id="consumptive-use-btn-tooltip" {...props}>
@@ -21,7 +23,7 @@ function WaterRightHeader() {
 
   const consumptiveUseBtnClickHandler = () => {
     if (!isAuthenticated) {
-      instance.loginRedirect(loginRequest).then(() => navigateToEstimationTool());
+      setShowLoginPromptModal(true);
     } else {
       navigateToEstimationTool();
     }
@@ -41,29 +43,55 @@ function WaterRightHeader() {
       </div>
 
       {shouldShowConsumptiveUseButton && (
-        <div className="d-flex flex-column align-items-end gap-1">
-          <div className="d-flex flex-row gap-3 align-items-center">
-            <div>
-              <OverlayTrigger trigger="hover" placement="left" delay={{ show: 0, hide: 0 }} overlay={overlayElement}>
-                <Icon path={mdiHelpCircleOutline} size="1.5em" />
-              </OverlayTrigger>
+        <>
+          <div className="d-flex flex-column align-items-end gap-1">
+            <div className="d-flex flex-row gap-3 align-items-center">
+              <div>
+                <OverlayTrigger trigger="hover" placement="left" delay={{ show: 0, hide: 0 }} overlay={overlayElement}>
+                  <Icon path={mdiHelpCircleOutline} size="1.5em" />
+                </OverlayTrigger>
+              </div>
+              <div>
+                <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>
+                  Estimate Consumptive Use
+                </Button>
+              </div>
             </div>
             <div>
-              <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>
-                Estimate Consumptive Use
-              </Button>
-            </div>
-          </div>
-          <div>
-            <span>
-              <span className="me-1">By clicking this button, you are agreeing to WestDAAT’s</span>
+              <span>
+                <span className="me-1">By clicking this button, you are agreeing to WestDAAT’s</span>
 
-              <a href="https://westernstateswater.org/wade/westdaat-terms-of-service/" target="_blank" rel="noreferrer">
-                Terms & Conditions
-              </a>
-            </span>
+                <a
+                  href="https://westernstateswater.org/wade/westdaat-terms-of-service/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Terms & Conditions
+                </a>
+              </span>
+            </div>
           </div>
-        </div>
+
+          <Modal show={showLoginPromptModal} centered>
+            <Modal.Header closeButton onClick={() => setShowLoginPromptModal(false)}>
+              <Modal.Title>Login for Access to the Estimator</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              <p>
+                Sign up for a <strong>completely free</strong> account to access the consumptive use estimation tool or
+                apply for funding.
+              </p>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowLoginPromptModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => alert('sign up!')}>Sign up</Button>
+            </Modal.Footer>
+          </Modal>
+        </>
       )}
     </div>
   );
