@@ -201,8 +201,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 })
                 .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.FundingOrganization.Name))
-                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Submission.CompensationRateDollars))
-                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Submission.CompensationRateUnits))
+                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Estimate.CompensationRateDollars))
+                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Estimate.CompensationRateUnits))
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate));
