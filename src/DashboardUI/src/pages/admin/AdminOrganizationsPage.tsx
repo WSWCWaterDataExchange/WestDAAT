@@ -2,6 +2,7 @@ import { useQuery } from 'react-query';
 import { getAllOrganizations } from '../../accessors/organizationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { TableLoading } from '../../components/TableLoading';
+import { NavLink } from 'react-router-dom';
 
 export function AdminOrganizationsPage() {
   const msalContext = useMsal();
@@ -17,7 +18,6 @@ export function AdminOrganizationsPage() {
       <h1 className="fs-3">All Organizations</h1>
 
       <TableLoading isLoading={isLoading} isErrored={isError}>
-        {/* TODO style this */}
         <table className="table">
           <thead>
             <tr>
@@ -29,7 +29,9 @@ export function AdminOrganizationsPage() {
           <tbody>
             {organizationsResponse?.organizations?.map((organization) => (
               <tr key={organization.organizationId}>
-                <td>{organization.name}</td>
+                <td>
+                  <NavLink to={`/admin/${organization.organizationId}/users`}>{organization.name}</NavLink>
+                </td>
                 <td>{organization.userCount}</td>
                 <td>{organization.emailDomain}</td>
               </tr>
