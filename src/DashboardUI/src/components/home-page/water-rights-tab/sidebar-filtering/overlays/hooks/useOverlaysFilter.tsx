@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function useOverlaysFilter() {
