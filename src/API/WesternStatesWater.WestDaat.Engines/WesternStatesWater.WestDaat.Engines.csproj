@@ -24,6 +24,9 @@
     <Compile Update="NotificationFilteringEngine.cs">
       <DependentUpon>FilteringEngine.cs</DependentUpon>
     </Compile>
+    <Compile Update="ApplicationFormattingEngine.cs">
+      <DependentUpon>FormattingEngine.cs</DependentUpon>
+    </Compile>
     <Compile Update="NotificationFormattingEngine.cs">
       <DependentUpon>FormattingEngine.cs</DependentUpon>
     </Compile>

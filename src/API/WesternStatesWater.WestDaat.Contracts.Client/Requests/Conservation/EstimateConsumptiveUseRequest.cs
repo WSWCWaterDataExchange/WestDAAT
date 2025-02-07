@@ -6,6 +6,8 @@ public class EstimateConsumptiveUseRequest : ApplicationStoreRequestBase
 {
     public Guid WaterConservationApplicationId { get; set; }
 
+    public string WaterRightNativeId { get; set; } = null!;
+
     /// <summary>
     /// Polygon(s) in "Well-known text" (WKT) format.
     /// <br />

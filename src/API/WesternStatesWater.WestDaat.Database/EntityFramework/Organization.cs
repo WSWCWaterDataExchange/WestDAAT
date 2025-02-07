@@ -13,5 +13,7 @@ public class Organization
 
     public string EmailDomain { get; set; } = null!;
 
+    public string AbbreviatedName { get; set; } = null!;
+
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }
