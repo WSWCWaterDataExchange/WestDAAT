@@ -282,7 +282,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             });
 
 
-        UseUserContext(new UserContext
+        UseRequiredUserContext(new UserContext
         {
             UserId = user.Id,
             Roles = [Roles.GlobalAdmin],
