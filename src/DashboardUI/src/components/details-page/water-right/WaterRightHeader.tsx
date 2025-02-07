@@ -29,6 +29,10 @@ function WaterRightHeader() {
     }
   };
 
+  const activateLogin = () => {
+    instance.loginRedirect(loginRequest);
+  };
+
   const navigateToEstimationTool = () => {
     const { id } = routeParams;
     navigate(`/application/new/${id}`);
@@ -88,7 +92,7 @@ function WaterRightHeader() {
               <Button variant="secondary" onClick={() => setShowLoginPromptModal(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => alert('sign up!')}>Sign up</Button>
+              <Button onClick={activateLogin}>Sign up</Button>
             </Modal.Footer>
           </Modal>
         </>
