@@ -10,7 +10,7 @@ interface OverlaysContextValue {
 
   toggleOverlay: (overlayKey: string, enable: boolean) => void;
   setOverlayFilterActive: (active: boolean) => void;
-
+  resetOverlaysOptions: () => void;
   mapFilters: MapboxFilterExpression | null;
 }
 
@@ -20,6 +20,7 @@ const OverlaysContext = createContext<OverlaysContextValue>({
   overlaysData: [],
   toggleOverlay: () => {},
   setOverlayFilterActive: () => {},
+  resetOverlaysOptions: () => {},
   mapFilters: null,
 });
 
@@ -46,6 +47,11 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const resetOverlaysOptions = useCallback(() => {
+    setOverlays([]);
+    setOverlayFilterActive(false);
+  }, []);
+
   const mapFilters = useMemo<MapboxFilterExpression | null>(() => {
     if (!isOverlayFilterActive || overlays.length === 0) {
       return null;
@@ -60,6 +66,7 @@ export function OverlaysProvider({ children }: { children: React.ReactNode }) {
     overlaysData,
     toggleOverlay,
     setOverlayFilterActive,
+    resetOverlaysOptions,
     mapFilters,
   };
 
