@@ -131,8 +131,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<(
                 ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
                 CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
-                CommonContracts.EstimateConservationPaymentResponse PaymentResponse,
-                double TotalAverageYearlyEtAcreFeet
+                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
                 ),
                 CommonContracts.ApplicationEstimateStoreRequest
                 >()
