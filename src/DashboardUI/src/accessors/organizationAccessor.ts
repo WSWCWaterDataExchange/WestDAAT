@@ -10,7 +10,6 @@ export const getAllOrganizations = async (msalContext: IMsalContext): Promise<Or
     $type: 'OrganizationLoadAllRequest',
   };
 
-  throw new Error('Not implemented');
   const { data } = await api.post('Organizations/Search', request);
   return data;
 };
