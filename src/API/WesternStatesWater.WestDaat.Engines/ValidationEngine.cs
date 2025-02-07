@@ -96,10 +96,10 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
         ContextBase context)
     {
-        await Task.CompletedTask;
         return request switch
         {
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
+            WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -108,6 +108,42 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
         ContextBase context)
+    {
+        // verify user requesting an estimate is linking it to an application they own
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        {
+            ApplicantUserId = userContext.UserId,
+            WaterRightNativeId = request.WaterRightNativeId
+        });
+
+        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
+        if (applicationNotFound)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // user has an in-progress application for the requested water right
+        // BUT user is attempting to link the estimate to a different application
+        var estimateLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        if (estimateLinkedToIncorrectApplication)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // user has an in-progress application for the requested water right
+        // BUT user is attempting to request an estimate using an organization that may not control this water right
+        var estimateRequestedOfIncorrectOrganization = inProgressApplicationExistsResponse.FundingOrganizationId.HasValue &&
+            inProgressApplicationExistsResponse.FundingOrganizationId.Value != request.FundingOrganizationId;
+        if (estimateRequestedOfIncorrectOrganization)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request, ContextBase context)
     {
         await Task.CompletedTask;
         return null;
