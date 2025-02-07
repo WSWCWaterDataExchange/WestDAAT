@@ -20,7 +20,7 @@ public class ApplicationDashboardListItem
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
-    public int TotalObligationDollars { get; set; }
+    required public int TotalObligationDollars { get; set; }
 
     required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 
 

@@ -103,6 +103,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
         private void RegisterEngineServices(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<IApplicationFormattingEngine, FormattingEngine>();
             serviceCollection.AddTransient<ICalculationEngine, CalculationEngine>();
             serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
@@ -176,6 +177,16 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())
                 .Returns(context ?? new UserContext());
+        }
+
+        protected void UseRequiredUserContext(UserContext context = null)
+        {
+            var userContext = context ?? new UserContext();
+            ContextUtilityMock
+                .Setup(mock => mock.GetRequiredContext<UserContext>())
+                .Returns(userContext);
+
+            UseUserContext(userContext);
         }
     }
 }

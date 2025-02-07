@@ -1,7 +1,7 @@
 using AutoMapper;
 using WesternStatesWater.WestDaat.Utilities;
-using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 using ClientContracts = WesternStatesWater.WestDaat.Contracts.Client;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Mapping
 {
@@ -79,6 +79,17 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddApplicationMappings()
         {
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationCreateRequest, CommonContracts.WaterConservationApplicationCreateRequest>()
+                .ForMember(dest => dest.ApplicantUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicationDisplayId, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.UnsubmittedApplicationExistsLoadRequest>();
+
+            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.ApplicationFormatDisplayIdRequest>();
+
+            CreateMap<CommonContracts.WaterConservationApplicationCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationCreateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
             CreateMap<ClientContracts.Requests.Conservation.OrganizationApplicationDashboardLoadRequest, CommonContracts.ApplicationDashboardLoadRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationIdFilter));
 
@@ -120,8 +131,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<(
                 ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
                 CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
-                CommonContracts.EstimateConservationPaymentResponse PaymentResponse,
-                double TotalAverageYearlyEtAcreFeet
+                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
                 ),
                 CommonContracts.ApplicationEstimateStoreRequest
                 >()
@@ -133,7 +143,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
-                .ForMember(dest => dest.TotalAverageYearlyEtAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyEtAcreFeet));
+                .ForMember(dest => dest.TotalAverageYearlyEtAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet)));
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
