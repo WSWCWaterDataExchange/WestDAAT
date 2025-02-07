@@ -18,6 +18,8 @@ public class ValidationEngineTests : EngineTestBase
 
     private Mock<IOrganizationAccessor> _organizationAccessorMock = null!;
 
+    private Mock<IApplicationAccessor> _applicationAccessorMock = null!;
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -25,8 +27,9 @@ public class ValidationEngineTests : EngineTestBase
         _securityUtilityMock = new Mock<ISecurityUtility>(MockBehavior.Strict);
 
         _organizationAccessorMock = new Mock<IOrganizationAccessor>(MockBehavior.Strict);
+        _applicationAccessorMock = new Mock<IApplicationAccessor>(MockBehavior.Strict);
 
-        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object, _organizationAccessorMock.Object);
+        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object, _organizationAccessorMock.Object, _applicationAccessorMock.Object);
     }
 
     [TestMethod]

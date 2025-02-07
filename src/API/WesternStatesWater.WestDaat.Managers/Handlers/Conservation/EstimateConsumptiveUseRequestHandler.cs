@@ -1,4 +1,5 @@
 ﻿using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
@@ -12,12 +13,15 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
+    public IApplicationAccessor ApplicationAccessor { get; }
 
     public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
-        IOpenEtSdk openEtSdk)
+        IOpenEtSdk openEtSdk,
+        IApplicationAccessor applicationAccessor)
     {
         CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
+        ApplicationAccessor = applicationAccessor;
     }
 
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
@@ -25,12 +29,27 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
         var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
 
+        EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
         if (request.CompensationRateDollars.HasValue)
         {
             var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
-            var estimateConservationPaymentResponse = await CalculationEngine.Calculate(estimateConservationPaymentRequest);
+            estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
+
+            // only store the estimate if a compensation estimate was requested
+            var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
+                request,
+                multiPolygonYearlyEtResponse,
+                estimateConservationPaymentResponse
+            ));
+
+            await ApplicationAccessor.Store(storeEstimateRequest);
         }
 
-        throw new NotImplementedException();
+        return new EstimateConsumptiveUseResponse
+        {
+            ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
+            TotalAverageYearlyEtAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet),
+            DataCollections = multiPolygonYearlyEtResponse.DataCollections.Map<Contracts.Client.PolygonEtDataCollection[]>(),
+        };
     }
 }

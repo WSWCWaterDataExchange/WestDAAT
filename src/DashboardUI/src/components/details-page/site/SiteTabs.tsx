@@ -7,8 +7,8 @@ import { SiteActiveTabType } from './enums/SiteActiveTabType';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import QuickSearchToolbar from '../../QuickSearchToolbar';
 
-function getFormattedBeneficialUses(beneficialUses: string[]): string {
-  return beneficialUses.join(', ');
+function getFormattedPrimaryUses(primaryUses: string[]): string {
+  return primaryUses.join(', ');
 }
 
 export default function SiteTabs() {
@@ -20,13 +20,14 @@ export default function SiteTabs() {
       waterRightInfoListQuery: { data: waterRightInfoList },
       variableInfoListQuery: { data: variableInfoList },
       methodInfoListQuery: { data: methodInfoList },
+      timeSeriesInfoListQuery: { data: timeSeriesInfoList },
     },
   } = useSiteDetailsContext();
 
   const waterSourceRows = React.useMemo(() => {
     if (!sourceInfoList) return [];
-    return sourceInfoList.map((src) => ({
-      id: src.waterSourceUuid,
+    return sourceInfoList.map((src, index) => ({
+      id: `source-${src.waterSourceUuid}-${index}`,
       ...src,
     }));
   }, [sourceInfoList]);
@@ -38,10 +39,45 @@ export default function SiteTabs() {
     { field: 'waterSourceType', headerName: 'Water Source Type', flex: 1, sortable: true },
   ];
 
+  const timeSeriesRows = React.useMemo(() => {
+    if (!timeSeriesInfoList) return [];
+
+    return timeSeriesInfoList.map((ts, index) => ({
+      id: `timeSeries-${ts.waDEVariableUuid}-${ts.reportYear}-${index}`,
+      ...ts,
+    }));
+  }, [timeSeriesInfoList]);
+
+  const timeSeriesColumns: GridColDef[] = [
+    { field: 'waDEVariableUuid', headerName: 'WaDE Variable UUID', flex: 1, sortable: true },
+    { field: 'waDEMethodUuid', headerName: 'WaDE Method UUID', flex: 1, sortable: true },
+    { field: 'waDEWaterSourceUuid', headerName: 'WaDE Water Source UUID', flex: 1, sortable: true },
+    {
+      field: 'timeframeStart',
+      headerName: 'Timeframe Start',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
+    },
+    {
+      field: 'timeframeEnd',
+      headerName: 'Timeframe End',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
+    },
+    { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
+    { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
+    { field: 'primaryUse', headerName: 'Primary Use', flex: 1, sortable: true },
+    { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
+    { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
+    { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },
+  ];
+
   const waterRightRows = React.useMemo(() => {
     if (!waterRightInfoList) return [];
-    return waterRightInfoList.map((right) => ({
-      id: right.allocationUuid,
+    return waterRightInfoList.map((right, index) => ({
+      id: `right-${right.allocationUuid}-${index}`,
       ...right,
     }));
   }, [waterRightInfoList]);
@@ -87,22 +123,22 @@ export default function SiteTabs() {
     { field: 'flow', headerName: 'Flow (CFS)', flex: 1, sortable: true },
     { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
     {
-      field: 'beneficialUses',
-      headerName: 'Beneficial Use',
+      field: 'primaryUses',
+      headerName: 'Primary Use',
       flex: 2,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const uses = params.value as string[] | undefined;
         if (!uses || uses.length === 0) return '-';
-        return getFormattedBeneficialUses(uses);
+        return getFormattedPrimaryUses(uses);
       },
     },
   ];
 
   const methodRows = React.useMemo(() => {
     if (!methodInfoList) return [];
-    return methodInfoList.map((m) => ({
-      id: m.waDEMethodUuid,
+    return methodInfoList.map((m, index) => ({
+      id: `method-${m.waDEMethodUuid}-${index}`,
       ...m,
     }));
   }, [methodInfoList]);
@@ -144,8 +180,8 @@ export default function SiteTabs() {
 
   const variableRows = React.useMemo(() => {
     if (!variableInfoList) return [];
-    return variableInfoList.map((v) => ({
-      id: v.waDEVariableUuid,
+    return variableInfoList.map((v, index) => ({
+      id: `variable-${v.waDEVariableUuid}-${index}`,
       ...v,
     }));
   }, [variableInfoList]);
@@ -174,6 +210,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={waterSourceRows}
               columns={waterSourceColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -186,6 +223,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={waterRightRows}
               columns={waterRightColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -198,6 +236,7 @@ export default function SiteTabs() {
             <DataGrid
               rows={methodRows}
               columns={methodColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}
@@ -210,6 +249,20 @@ export default function SiteTabs() {
             <DataGrid
               rows={variableRows}
               columns={variableColumns}
+              getRowId={(row) => row.id}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+              slots={{ toolbar: QuickSearchToolbar }}
+            />
+          </div>
+        </Tab>
+
+        <Tab eventKey={SiteActiveTabType.timeSeries} title="Time Series Information">
+          <div style={{ width: '100%', height: 600 }}>
+            <DataGrid
+              rows={timeSeriesRows}
+              columns={timeSeriesColumns}
+              getRowId={(row) => row.id}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
               slots={{ toolbar: QuickSearchToolbar }}

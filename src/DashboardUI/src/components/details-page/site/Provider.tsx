@@ -1,4 +1,4 @@
-import React, { createContext, FC, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { UseQueryResult } from 'react-query';
 import {
@@ -6,6 +6,7 @@ import {
   useSiteMethodInfoList,
   useSiteUsage,
   useSiteVariableInfoList,
+  useTimeSeriesSiteInfoList,
   useWaterRightInfoList,
   useWaterSiteLocation,
   useWaterSiteSourceInfoList,
@@ -16,6 +17,7 @@ import { SiteUsage } from '../../../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../../../data-contracts/VariableInfoListItem';
 import { SiteActiveTabType } from './enums/SiteActiveTabType';
 import { MethodInfoListItem } from '../../../data-contracts/MethodInfoListItem';
+import { TimeSeriesListItem } from '../../../data-contracts/TimeSeriesListItem';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -29,6 +31,7 @@ export interface HostData {
   siteUsageQuery: Query<SiteUsage>;
   variableInfoListQuery: Query<VariableInfoListItem[]>;
   methodInfoListQuery: Query<MethodInfoListItem[]>;
+  timeSeriesInfoListQuery: Query<TimeSeriesListItem[]>;
 }
 
 interface SiteDetailsPageContextState {
@@ -50,6 +53,7 @@ const defaultState: SiteDetailsPageContextState = {
     siteUsageQuery: defaultQuery,
     variableInfoListQuery: defaultQuery,
     methodInfoListQuery: defaultQuery,
+    timeSeriesInfoListQuery: defaultQuery,
   },
 };
 
@@ -67,8 +71,13 @@ export const SiteDetailsProvider = ({ children }: SiteDetailsProviderProps) => {
   const detailsQuery = useSiteDetails(siteUuid);
   const locationsQuery = useWaterSiteLocation(siteUuid);
   const siteUsageQuery = useSiteUsage(siteUuid);
+
   const waterRightInfoListQuery = useWaterRightInfoList(siteUuid, {
     enabled: activeTab === SiteActiveTabType.right,
+  });
+
+  const timeSeriesInfoListQuery = useTimeSeriesSiteInfoList(siteUuid, {
+    enabled: activeTab === SiteActiveTabType.timeSeries,
   });
   const sourceInfoListQuery = useWaterSiteSourceInfoList(siteUuid, {
     enabled: activeTab === SiteActiveTabType.source,
@@ -92,6 +101,7 @@ export const SiteDetailsProvider = ({ children }: SiteDetailsProviderProps) => {
       siteUsageQuery,
       variableInfoListQuery,
       methodInfoListQuery,
+      timeSeriesInfoListQuery,
     },
   };
 

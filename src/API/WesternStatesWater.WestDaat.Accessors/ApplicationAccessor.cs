@@ -1,4 +1,7 @@
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Accessors;
@@ -28,7 +31,61 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicationDashboardLoadResponse> GetDashboardApplications(ApplicationDashboardLoadRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("Jenny needs to add this in a second PR");
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var applicationsQuery = db.WaterConservationApplications.AsQueryable();
+
+        if (request.OrganizationId != null)
+        {
+            applicationsQuery = applicationsQuery.Where(app => app.FundingOrganizationId == request.OrganizationId);
+        }
+
+        var applications = await applicationsQuery
+            .Where(app => app.Submission != null)
+            .ProjectTo<ApplicationListItemDetails>(DtoMapper.Configuration)
+            .OrderByDescending(app => app.SubmittedDate)
+            .ToListAsync();
+
+        return new ApplicationDashboardLoadResponse
+        {
+            Applications = applications.ToArray()
+        };
+    }
+
+    public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
+    {
+        return request switch
+        {
+            ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
+            _ => throw new NotImplementedException(
+                $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private async Task<ApplicationStoreResponseBase> StoreApplicationEstimate(ApplicationEstimateStoreRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingEntity = await db.WaterConservationApplicationEstimates
+            .Include(estimate => estimate.Locations)
+            .ThenInclude(location => location.ConsumptiveUses)
+            .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
+
+        if (existingEntity != null)
+        {
+            db.WaterConservationApplicationEstimateLocationConsumptiveUses
+                .RemoveRange(existingEntity.Locations.SelectMany(location => location.ConsumptiveUses));
+
+            db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
+
+            db.WaterConservationApplicationEstimates.Remove(existingEntity);
+        }
+
+        var entity = request.Map<EFWD.WaterConservationApplicationEstimate>();
+
+        await db.WaterConservationApplicationEstimates.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
     }
 }
