@@ -5,6 +5,7 @@ import { mdiChevronRightBox, mdiChevronLeftBox, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
 import WaterRightDigest from '../../data-contracts/WaterRightsDigest';
 import { FormattedDate } from '../FormattedDate';
+import { isFeatureEnabled } from '../../config/features';
 
 interface WaterRightsMapPopupToggleProps {
   count: number;
@@ -41,6 +42,9 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
   const currWaterRight = useMemo(() => {
     return waterRights[currentIndex];
   }, [waterRights, currentIndex]);
+
+  const shouldDisplayConsumptiveUseMessage = isFeatureEnabled('conservationEstimationTool');
+
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
@@ -54,7 +58,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
         ),
         body: (
           <div className="map-popup-card-water-rights-body">
-            <div className="mb-2">
+            <div>
               <div className="map-popup-card-water-rights-native-id-row">
                 <strong>Water Right Native ID:</strong>{' '}
                 <WaterRightsMapPopupToggle
@@ -70,6 +74,15 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
                 </a>
               </div>
             </div>
+
+            {shouldDisplayConsumptiveUseMessage && (
+              <div className="mb-2">
+                <span className="text-muted">
+                  View more detailed information and estimate consumptive use through OpenET
+                </span>
+              </div>
+            )}
+
             <div className="mb-2">
               <div>
                 <strong>Beneficial Use:</strong>
@@ -78,6 +91,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
                 <div key={a}>{a}</div>
               ))}
             </div>
+
             <div className="mb-0">
               <div>
                 <strong>Priority Date:</strong>
@@ -86,6 +100,7 @@ function WaterRightsDigestCard(props: WaterRightsMapPopupProps) {
                 <FormattedDate>{currWaterRight.priorityDate}</FormattedDate>
               </div>
             </div>
+
             {currWaterRight.hasTimeSeriesData && (
               <div className="mt-2">
                 <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
