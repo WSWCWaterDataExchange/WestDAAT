@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import SidePanel from '../../../components/home-page/SidePanel';
 import { EstimationToolSidebar } from './EstimationToolSidebar';
 import MainPanel from '../../../components/home-page/MainPanel';
