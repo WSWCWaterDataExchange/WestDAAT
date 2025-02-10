@@ -339,7 +339,12 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     });
   }, [map, visibleLayers, setMapRenderedFeatures]);
 
-  const [debouncedStyleFlag] = useDebounce(styleFlag, 100);
+  const [debouncedStyleFlag, setDebouncedStyleFlag] = useDebounce(styleFlag, 100);
+
+  useEffect(() => {
+    setDebouncedStyleFlag(styleFlag);
+  }, [styleFlag]);
+
   useEffect(() => {
     if (!map) return;
     const setStyleData = async (map: mapboxgl.Map, style: MapStyle) => {
