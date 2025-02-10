@@ -109,16 +109,6 @@ export default function SiteTabs() {
         return dateValue ? <FormattedDate>{dateValue}</FormattedDate> : '-';
       },
     },
-    {
-      field: 'expirationDate',
-      headerName: 'Expiration Date',
-      flex: 1,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        const dateValue = params.value as string | undefined;
-        return dateValue ? <FormattedDate>{dateValue}</FormattedDate> : '-';
-      },
-    },
     { field: 'legalStatus', headerName: 'Legal Status', flex: 1, sortable: true },
     { field: 'flow', headerName: 'Flow (CFS)', flex: 1, sortable: true },
     { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
