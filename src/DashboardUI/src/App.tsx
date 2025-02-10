@@ -101,7 +101,7 @@ function App({ msalInstance }: AppProps) {
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>
-                    <Route path="new/:waterRightNativeId" element={<EstimationToolPage />} />
+                    <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>

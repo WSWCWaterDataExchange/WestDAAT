@@ -35,7 +35,7 @@ function WaterRightHeader() {
 
   const navigateToEstimationTool = () => {
     const { id } = routeParams;
-    navigate(`/application/new/${id}`);
+    navigate(`/application/${id}/estimation`);
   };
 
   const shouldShowConsumptiveUseButton = isFeatureEnabled('conservationEstimationTool');
