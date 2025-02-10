@@ -42,13 +42,14 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
+  consumptiveUseAlertEnabled?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
 
-function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
+function Map({ handleMapDrawnPolygonChange, handleMapFitChange, consumptiveUseAlertEnabled }: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -504,7 +505,8 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
     }[mapStyle];
   }, [mapStyle]);
 
-  const shouldDisplayConsumptiveUseAlert = isFeatureEnabled('conservationEstimationTool');
+  const shouldDisplayConsumptiveUseAlert =
+    isFeatureEnabled('conservationEstimationTool') && consumptiveUseAlertEnabled === true;
   const consumptiveUseAlert = (
     <div>
       <div className="consumptive-use-alert-container">

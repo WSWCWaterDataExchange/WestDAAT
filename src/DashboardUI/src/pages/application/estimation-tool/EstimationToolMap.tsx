@@ -1,5 +1,5 @@
 import Map from '../../../components/map/Map';
 
 export function EstimationToolMap() {
-  return <Map />;
+  return <Map consumptiveUseAlertEnabled={false} />;
 }

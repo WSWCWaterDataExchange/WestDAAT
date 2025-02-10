@@ -46,7 +46,11 @@ function WaterRightsLayout() {
         <SideBar />
       </SidePanel>
       <MainPanel>
-        <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
+        <Map
+          handleMapDrawnPolygonChange={polylinesOnMapUpdated}
+          handleMapFitChange={handleMapFitRequested}
+          consumptiveUseAlertEnabled={true}
+        />
         <TableView />
       </MainPanel>
     </>
