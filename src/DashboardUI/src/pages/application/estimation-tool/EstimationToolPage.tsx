@@ -7,14 +7,18 @@ import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 
+import './estimation-tool-page.scss';
+
 export function EstimationToolPage() {
   const routeParams = useParams();
   const { waterRightNativeId } = routeParams;
 
   return (
-    <MapProvider>
-      <EstimationToolLayout />
-    </MapProvider>
+    <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
+      <MapProvider>
+        <EstimationToolLayout />
+      </MapProvider>
+    </div>
   );
 }
 
