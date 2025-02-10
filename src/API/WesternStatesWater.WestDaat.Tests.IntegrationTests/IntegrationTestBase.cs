@@ -163,12 +163,20 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())
                 .Returns(new AnonymousContext());
+
+            ContextUtilityMock
+                .Setup(mock => mock.GetRequiredContext<ContextBase>())
+                .Returns(new AnonymousContext());
         }
 
         protected void UseIdentityProviderContext()
         {
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())
+                .Returns(new IdentityProviderContext());
+
+            ContextUtilityMock
+                .Setup(mock => mock.GetRequiredContext<ContextBase>())
                 .Returns(new IdentityProviderContext());
         }
 
@@ -177,16 +185,10 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             ContextUtilityMock
                 .Setup(mock => mock.GetContext())
                 .Returns(context ?? new UserContext());
-        }
 
-        protected void UseRequiredUserContext(UserContext context = null)
-        {
-            var userContext = context ?? new UserContext();
             ContextUtilityMock
-                .Setup(mock => mock.GetRequiredContext<UserContext>())
-                .Returns(userContext);
-
-            UseUserContext(userContext);
+                .Setup(mock => mock.GetRequiredContext<ContextBase>())
+                .Returns(context ?? new UserContext());
         }
     }
 }
