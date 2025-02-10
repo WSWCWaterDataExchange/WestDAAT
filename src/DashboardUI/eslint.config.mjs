@@ -38,6 +38,9 @@ export default [
 
       // Allow jsx to be used without importing React
       'react/react-in-jsx-scope': 'off',
+
+      // Allow interfaces to be empty (no properties)
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
 ];
