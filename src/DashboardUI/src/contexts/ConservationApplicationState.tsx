@@ -5,7 +5,7 @@ export interface ConservationApplicationState {
 }
 
 export const defaultState = (): ConservationApplicationState => ({
-  dashboardApplications: ['Application 1', 'Application 2'],
+  dashboardApplications: [],
 });
 
 export type ApplicationAction = DashboardApplicationsLoadedAction;
