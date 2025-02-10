@@ -186,6 +186,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+
+            CreateMap<EFWD.Organization, OrganizationSlim>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id));
         }
 
         private void AddApplicationMappings()
@@ -203,7 +206,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate));
-                
+
             CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.Ignore())
@@ -220,6 +223,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations));
+
+            CreateMap<WaterConservationApplicationCreateRequest, EFWD.WaterConservationApplication>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
+                .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
+                .ForMember(dest => dest.Estimate, opt => opt.Ignore())
+                .ForMember(dest => dest.Submission, opt => opt.Ignore());
+
         }
     }
 }
