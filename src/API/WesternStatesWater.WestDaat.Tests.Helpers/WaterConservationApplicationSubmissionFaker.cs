@@ -5,7 +5,9 @@ public class WaterConservationApplicationSubmissionFaker : Faker<EFWD.WaterConse
     public WaterConservationApplicationSubmissionFaker(EFWD.WaterConservationApplication application = null)
     {
         RuleFor(wcas => wcas.SubmittedDate, f => f.Date.PastOffset(1, DateTimeOffset.UtcNow));
-
+        
+        RuleFor(wcas => wcas.WaterRightState, f => f.Address.StateAbbr());
+        
         if (application != null)
         {
             RuleFor(wcas => wcas.WaterConservationApplication, () => application);

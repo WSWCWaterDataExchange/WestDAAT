@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';
 import { useState } from 'react';
+import { OverlayTooltip } from '../../OverlayTooltip';
 
 function WaterRightHeader() {
   const navigate = useNavigate();
@@ -13,13 +14,6 @@ function WaterRightHeader() {
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
   const [showLoginPromptModal, setShowLoginPromptModal] = useState(false);
-
-  const overlayElement = (props: any) => (
-    <Popover id="consumptive-use-btn-tooltip" {...props}>
-      <Popover.Header as="h3">Lorem Ipsum</Popover.Header>
-      <Popover.Body>Lorem ipsum dolor sit amet</Popover.Body>
-    </Popover>
-  );
 
   const consumptiveUseBtnClickHandler = () => {
     if (!isAuthenticated) {
@@ -43,7 +37,7 @@ function WaterRightHeader() {
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
       <div>
-        <h3 className="d-flex fw-bold">WaDE Water Right Landing Page</h3>
+        <span className="fs-3 fw-bold">WaDE Water Right Landing Page</span>
       </div>
 
       {shouldShowConsumptiveUseButton && (
@@ -51,9 +45,10 @@ function WaterRightHeader() {
           <div className="d-flex flex-column align-items-end gap-1">
             <div className="d-flex flex-row gap-3 align-items-center">
               <div>
-                <OverlayTrigger trigger="hover" placement="left" delay={{ show: 0, hide: 0 }} overlay={overlayElement}>
-                  <Icon path={mdiHelpCircleOutline} size="1.5em" />
-                </OverlayTrigger>
+                <OverlayTooltip
+                  text="Estimate the amount of water consumed (not returned) based on available data, including water rights, use
+        records, and supply inputs."
+                />
               </div>
               <div>
                 <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>

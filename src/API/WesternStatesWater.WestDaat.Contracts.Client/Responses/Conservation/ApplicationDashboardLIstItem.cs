@@ -2,7 +2,7 @@ using WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
-public class ApplicationDashboardLIstItem
+public class ApplicationDashboardListItem
 {
     required public string ApplicantFullName { get; set; }
 
@@ -20,5 +20,11 @@ public class ApplicationDashboardLIstItem
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
+    required public int TotalObligationDollars { get; set; }
+
+    required public double TotalWaterVolumeSavingsAcreFeet { get; set; } 
+
     required public string WaterRightNativeId { get; set; }
+    
+    required public string WaterRightState { get; set; }
 }

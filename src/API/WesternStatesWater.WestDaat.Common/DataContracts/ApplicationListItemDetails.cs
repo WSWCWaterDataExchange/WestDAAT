@@ -13,12 +13,18 @@ public class ApplicationListItemDetails
     required public int CompensationRateDollars { get; set; }
 
     required public CompensationRateUnits CompensationRateUnits { get; set; }
-
+    
+    required public int EstimatedCompensationDollars { get; set; }
+    
     required public string OrganizationName { get; set; }
 
     public DateTimeOffset? RejectedDate { get; set; }
 
     required public DateTimeOffset SubmittedDate { get; set; }
-
+    
+    required public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
+    
     required public string WaterRightNativeId { get; set; }
+    
+    required public string WaterRightState { get; set; }
 }
