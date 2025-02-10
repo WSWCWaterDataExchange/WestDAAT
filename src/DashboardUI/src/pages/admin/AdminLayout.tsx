@@ -9,7 +9,7 @@ export function AdminLayout() {
     <div className="d-flex flex-column h-100">
       <SiteNavbar />
 
-      <div className="flex-grow-1">
+      <div className="flex-grow-1 mx-4 mt-4">
         <AdminProvider>
           <Outlet />
         </AdminProvider>

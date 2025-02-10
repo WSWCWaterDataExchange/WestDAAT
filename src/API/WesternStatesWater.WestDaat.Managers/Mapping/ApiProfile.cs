@@ -96,8 +96,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationDashboardLoadResponse, ClientContracts.Responses.Conservation.OrganizationApplicationDashboardLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
-            CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardLIstItem>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)));
+            CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardListItem>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)))
+                .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
+                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
@@ -140,7 +142,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.DesiredCompensationDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars.Value))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
-                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections));
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
+                .ForMember(dest => dest.TotalAverageYearlyEtAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet)));
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
