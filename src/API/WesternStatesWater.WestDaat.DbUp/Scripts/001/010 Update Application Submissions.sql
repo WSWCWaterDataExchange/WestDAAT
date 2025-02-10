@@ -1,0 +1,2 @@
+ALTER TABLE WaterConservationApplicationSubmissions
+	DROP COLUMN CompensationRateDollars, CompensationRateUnits;
