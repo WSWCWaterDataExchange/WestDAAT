@@ -21,7 +21,9 @@ export function EstimationToolMapHeader() {
           <div>
             <span className="me-2">Or, you can upload a file from your device.</span>
 
-            <Button variant="primary">Upload File</Button>
+            <Button variant="primary" onClick={() => alert('not implemented')}>
+              Upload File
+            </Button>
           </div>
         </Col>
       </Row>
