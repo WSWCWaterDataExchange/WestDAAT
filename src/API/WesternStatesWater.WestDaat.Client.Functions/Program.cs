@@ -116,10 +116,16 @@ var host = new HostBuilder()
         var openEtConfig = ConfigurationHelper.GetOpenEtConfiguration(configuration);
         services.AddSingleton<RateLimiter>(new SlidingWindowRateLimiter(new SlidingWindowRateLimiterOptions
         {
+            // docs: https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-9.0#slide
             PermitLimit = openEtConfig.MaximumPermissibleRequestsPerMinute,
-            Window = TimeSpan.FromMinutes(1),
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = openEtConfig.MaximumQueueableRequestsPerMinute,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            Window = TimeSpan.FromMinutes(1),
+
+            // how often requests replenish.
+            // lower values -> more requests will be processed at once.
+            // higher values -> requests will be processed more evenly over the window.
+            SegmentsPerWindow = openEtConfig.MaximumQueueableRequestsPerMinute,
         }));
 
         services.AddLogging(logging =>
