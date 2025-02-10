@@ -205,7 +205,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Estimate.CompensationRateUnits))
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
-                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate));
+                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate))
+                .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.Estimate.EstimatedCompensationDollars))
+                .ForMember(dest => dest.TotalAverageYearlyConsumptionEtAcreFeet, opt => opt.MapFrom(src => src.Estimate.TotalAverageYearlyConsumptionEtAcreFeet));
 
             CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -222,7 +224,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
-                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations));
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
+                .ForMember(dest => dest.TotalAverageYearlyConsumptionEtAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyEtAcreFeet));
 
             CreateMap<WaterConservationApplicationCreateRequest, EFWD.WaterConservationApplication>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
