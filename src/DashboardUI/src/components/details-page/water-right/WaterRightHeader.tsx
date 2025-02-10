@@ -16,8 +16,10 @@ function WaterRightHeader() {
 
   const overlayElement = (props: any) => (
     <Popover id="consumptive-use-btn-tooltip" {...props}>
-      <Popover.Header as="h3">Lorem Ipsum</Popover.Header>
-      <Popover.Body>Lorem ipsum dolor sit amet</Popover.Body>
+      <Popover.Body>
+        Estimate the amount of water consumed (not returned) based on available data, including water rights, use
+        records, and supply inputs.
+      </Popover.Body>
     </Popover>
   );
 
