@@ -113,25 +113,40 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var orgOne = new OrganizationFaker().Generate();
         var orgTwo = new OrganizationFaker().Generate();
         var orgThree = new OrganizationFaker().Generate();
+
         var userOne = new UserFaker().Generate();
         var userTwo = new UserFaker().Generate();
         var userThree = new UserFaker().Generate();
+
         var appOne = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
+
+        var appOneEstimate = new WaterConservationApplicationEstimateFaker(appOne)
+            .RuleFor(est => est.CompensationRateDollars, _ => 1000)
+            .Generate();
+
+        var appTwoEstimate = new WaterConservationApplicationEstimateFaker(appTwo)
+            .RuleFor(est => est.CompensationRateDollars, _ => 500)
+            .Generate();
+
+        // skip estimate for app 3
+
+        var appFourEstimate = new WaterConservationApplicationEstimateFaker(appFour)
+            .RuleFor(est => est.CompensationRateDollars, _ => 2000)
+            .Generate();
+
         var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
-            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
+            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now).Generate();
         var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
-            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
-        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
+            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now).Generate();
+        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
+        await _dbContext.WaterConservationApplicationEstimates.AddRangeAsync(appOneEstimate, appTwoEstimate, appFourEstimate);
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
@@ -140,8 +155,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = acceptedApp.CompensationRateDollars,
-            CompensationRateUnits = acceptedApp.CompensationRateUnits,
+            CompensationRateDollars = appOneEstimate.CompensationRateDollars,
+            CompensationRateUnits = appOneEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.Approved,
             SubmittedDate = acceptedApp.SubmittedDate,
@@ -153,8 +168,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
-            CompensationRateDollars = rejectedApp.CompensationRateDollars,
-            CompensationRateUnits = rejectedApp.CompensationRateUnits,
+            CompensationRateDollars = appTwoEstimate.CompensationRateDollars,
+            CompensationRateUnits = appTwoEstimate.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
             Status = ConservationApplicationStatus.Rejected,
             SubmittedDate = rejectedApp.SubmittedDate,
@@ -166,8 +181,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = inReviewApp.CompensationRateDollars,
-            CompensationRateUnits = inReviewApp.CompensationRateUnits,
+            CompensationRateDollars = appFourEstimate.CompensationRateDollars,
+            CompensationRateUnits = appFourEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.InReview,
             SubmittedDate = inReviewApp.SubmittedDate,
