@@ -15,7 +15,7 @@ export function EstimationToolPage() {
   const { waterRightNativeId } = routeParams;
 
   const navigateToWaterRightLandingPage = () => {
-    navigate(-1);
+    navigate(`/details/right/${waterRightNativeId}`);
   };
 
   return (
