@@ -25,4 +25,6 @@ public class ApplicationListItemDetails
     required public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
     
     required public string WaterRightNativeId { get; set; }
+    
+    required public string WaterRightState { get; set; }
 }
