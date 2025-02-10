@@ -13,7 +13,13 @@ export function EstimationToolMapHeader() {
           left to review estimates and potential compensation as part of a voluntary and temporary measure.
         </span>
 
-        <a href="#">How does this work?</a>
+        <a
+          href="https://user-images.githubusercontent.com/31244917/134665652-0bf2cacd-0f3a-43b4-a61a-c8dc3d557d24.gif"
+          target="_blank"
+          rel="noreferrer"
+        >
+          How does this work?
+        </a>
       </div>
 
       <div>
