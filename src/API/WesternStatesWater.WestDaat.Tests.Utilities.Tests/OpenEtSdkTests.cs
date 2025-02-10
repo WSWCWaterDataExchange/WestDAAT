@@ -3,6 +3,7 @@ using RichardSzalay.MockHttp;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.RateLimiting;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
@@ -14,12 +15,15 @@ public class OpenEtSdkTests : UtilityTestBase
 {
     private MockHttpMessageHandler _mockHttp = null!;
 
+    private Mock<RateLimiter> _mockRateLimiter = null!;
+
     private const string baseAddress = "https://fakeserver/path/";
 
     [TestInitialize]
     public void TestInitialize()
     {
         _mockHttp = new MockHttpMessageHandler();
+        _mockRateLimiter = new Mock<RateLimiter>();
     }
 
     private OpenEtSdk CreateOpenEtSdk(HttpClient httpClient)
@@ -29,7 +33,7 @@ public class OpenEtSdkTests : UtilityTestBase
             httpClient.BaseAddress = new Uri(baseAddress);
         }
 
-        return new(httpClient, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
+        return new(httpClient, _mockRateLimiter.Object, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
     }
 
     [TestMethod]

@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using System.Threading.RateLimiting;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Client.Functions;
@@ -110,6 +112,15 @@ var host = new HostBuilder()
         {
             a.BaseAddress = new Uri(configuration.GetOpenEtConfiguration().BaseAddress);
         });
+
+        var openEtConfig = ConfigurationHelper.GetOpenEtConfiguration(configuration);
+        services.AddSingleton<RateLimiter>(new SlidingWindowRateLimiter(new SlidingWindowRateLimiterOptions
+        {
+            PermitLimit = openEtConfig.MaximumPermissibleRequestsPerMinute,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = openEtConfig.MaximumQueueableRequestsPerMinute,
+        }));
 
         services.AddLogging(logging =>
         {
