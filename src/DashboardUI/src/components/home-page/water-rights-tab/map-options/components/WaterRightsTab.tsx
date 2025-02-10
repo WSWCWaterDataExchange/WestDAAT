@@ -17,14 +17,20 @@ import { useHomePageContext } from '../../../Provider';
 import { useMapFitRequested } from '../hooks/useMapFitRequested';
 import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
 import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
+import SiteActionbar from '../../../../SiteActionbar';
 
-export function WaterRightsTab() {
+interface WaterRightsTabProps {
+  showDownloadModal?: (show: boolean) => void;
+  showUploadModal?: (show: boolean) => void;
+}
+
+export function WaterRightsTab({ showDownloadModal, showUploadModal }: WaterRightsTabProps) {
   return (
     <MapProvider>
       <WaterRightsProvider>
         <OverlaysProvider>
           <TimeSeriesProvider>
-            <WaterRightsLayout />
+            <WaterRightsLayout showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
           </TimeSeriesProvider>
         </OverlaysProvider>
       </WaterRightsProvider>
@@ -32,20 +38,28 @@ export function WaterRightsTab() {
   );
 }
 
-function WaterRightsLayout() {
+interface WaterRightsLayoutProps {
+  showDownloadModal?: (show: boolean) => void;
+  showUploadModal?: (show: boolean) => void;
+}
+
+function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLayoutProps) {
   useDisplayOptions();
   useFilters();
   useMapUrlParameters();
   useDownloadModal();
   useUploadModal();
+
   const { polylinesOnMapUpdated } = usePolylinesFilter();
   const { handleMapFitRequested } = useMapFitRequested();
+
   return (
     <>
       <SidePanel>
         <SideBar />
       </SidePanel>
       <MainPanel>
+        <SiteActionbar showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
         <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
         <TableView />
       </MainPanel>
