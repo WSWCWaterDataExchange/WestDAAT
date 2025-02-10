@@ -43,13 +43,19 @@ interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
   consumptiveUseAlertEnabled?: boolean;
+  geocoderEnabled?: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
   return `<svg viewBox="0 0 24 24" role="presentation" style="width: 40px; height: 40px;"><path d="${mdiMapMarker}" style="fill: ${color};"></path></svg>`;
 };
 
-function Map({ handleMapDrawnPolygonChange, handleMapFitChange, consumptiveUseAlertEnabled }: mapProps) {
+function Map({
+  handleMapDrawnPolygonChange,
+  handleMapFitChange,
+  consumptiveUseAlertEnabled,
+  geocoderEnabled,
+}: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
   } = useAppContext();
@@ -111,9 +117,12 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange, consumptiveUseAl
   };
 
   const updateMapControls = (map: mapboxgl.Map, isAuthenticated: boolean) => {
+    console.log('update controls');
+    console.log('has control', map.hasControl(geocoderControl.current), 'isAuthenticated', isAuthenticated);
     if (map.hasControl(geocoderControl.current) && !isAuthenticated) {
+      console.log('remove geocoder');
       map.removeControl(geocoderControl.current);
-    } else if (isAuthenticated) {
+    } else if (isAuthenticated && geocoderEnabled === true) {
       geocoderControl.current = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         // Lots of missing properties here. Adding ESLint highlights the problem.
@@ -121,6 +130,7 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange, consumptiveUseAl
         mapboxgl: map as any,
       });
       map.addControl(geocoderControl.current);
+      console.log('add geocoder');
     }
   };
 

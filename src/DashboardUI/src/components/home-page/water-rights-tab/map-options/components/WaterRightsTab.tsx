@@ -50,6 +50,7 @@ function WaterRightsLayout() {
           handleMapDrawnPolygonChange={polylinesOnMapUpdated}
           handleMapFitChange={handleMapFitRequested}
           consumptiveUseAlertEnabled={true}
+          geocoderEnabled={true}
         />
         <TableView />
       </MainPanel>
