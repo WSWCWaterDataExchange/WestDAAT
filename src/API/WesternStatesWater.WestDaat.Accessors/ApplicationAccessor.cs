@@ -24,6 +24,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
+            UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
+            ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -52,11 +54,61 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
+    private async Task<UnsubmittedApplicationExistsLoadResponse> CheckInProgressApplicationExists(UnsubmittedApplicationExistsLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingInProgressApplication = await db.WaterConservationApplications
+            .Include(wca => wca.Submission)
+            .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
+                                         wca.WaterRightNativeId == request.WaterRightNativeId &&
+                                         wca.Submission == null);
+
+        return new UnsubmittedApplicationExistsLoadResponse
+        {
+            InProgressApplicationId = existingInProgressApplication?.Id,
+            FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
+        };
+    }
+
+    private async Task<ApplicationFindSequentialIdLoadResponse> FindSequentialDisplayId(ApplicationFindSequentialIdLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var entities = await db.WaterConservationApplications
+            .Where(app => app.ApplicationDisplayId.StartsWith(request.ApplicationDisplayIdStub))
+            .ToArrayAsync();
+
+        int lastId = 0;
+
+        if (entities.Length > 0)
+        {
+            var displayIdDelimiter = '-';
+
+            var lastEntity = entities
+                .OrderByDescending(app =>
+                {
+                    var idStringLastSection = app.ApplicationDisplayId.Split(displayIdDelimiter).Last();
+                    return int.Parse(idStringLastSection);
+                })
+                .First();
+
+            var idStringLastSection = lastEntity.ApplicationDisplayId.Split(displayIdDelimiter).Last();
+            lastId = int.Parse(idStringLastSection);
+        }
+
+        return new ApplicationFindSequentialIdLoadResponse
+        {
+            LastDisplayIdSequentialNumber = lastId,
+        };
+    }
+
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
         {
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
+            WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -87,5 +139,20 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var entity = request.Map<EFWD.WaterConservationApplication>();
+
+        await db.WaterConservationApplications.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new WaterConservationApplicationCreateResponse
+        {
+            WaterConservationApplicationId = entity.Id,
+        };
     }
 }

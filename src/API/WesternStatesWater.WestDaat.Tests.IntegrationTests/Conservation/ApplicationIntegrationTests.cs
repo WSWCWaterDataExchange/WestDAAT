@@ -113,25 +113,40 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var orgOne = new OrganizationFaker().Generate();
         var orgTwo = new OrganizationFaker().Generate();
         var orgThree = new OrganizationFaker().Generate();
+
         var userOne = new UserFaker().Generate();
         var userTwo = new UserFaker().Generate();
         var userThree = new UserFaker().Generate();
+
         var appOne = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
+
+        var appOneEstimate = new WaterConservationApplicationEstimateFaker(appOne)
+            .RuleFor(est => est.CompensationRateDollars, _ => 1000)
+            .Generate();
+
+        var appTwoEstimate = new WaterConservationApplicationEstimateFaker(appTwo)
+            .RuleFor(est => est.CompensationRateDollars, _ => 500)
+            .Generate();
+
+        // skip estimate for app 3
+
+        var appFourEstimate = new WaterConservationApplicationEstimateFaker(appFour)
+            .RuleFor(est => est.CompensationRateDollars, _ => 2000)
+            .Generate();
+
         var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
-            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.AcreFeet).Generate();
+            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now).Generate();
         var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
-            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.Acres).Generate();
-        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour)
-            .RuleFor(app => app.CompensationRateUnits, _ => CompensationRateUnits.None).Generate();
+            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now).Generate();
+        var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
+        await _dbContext.WaterConservationApplicationEstimates.AddRangeAsync(appOneEstimate, appTwoEstimate, appFourEstimate);
         await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
@@ -140,8 +155,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = acceptedApp.CompensationRateDollars,
-            CompensationRateUnits = acceptedApp.CompensationRateUnits,
+            CompensationRateDollars = appOneEstimate.CompensationRateDollars,
+            CompensationRateUnits = appOneEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.Approved,
             SubmittedDate = acceptedApp.SubmittedDate,
@@ -153,8 +168,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
             ApplicantFullName = $"{userTwo.UserProfile.FirstName} {userTwo.UserProfile.LastName}",
-            CompensationRateDollars = rejectedApp.CompensationRateDollars,
-            CompensationRateUnits = rejectedApp.CompensationRateUnits,
+            CompensationRateDollars = appTwoEstimate.CompensationRateDollars,
+            CompensationRateUnits = appTwoEstimate.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
             Status = ConservationApplicationStatus.Rejected,
             SubmittedDate = rejectedApp.SubmittedDate,
@@ -166,8 +181,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ApplicationId = appFour.Id,
             ApplicationDisplayId = appFour.ApplicationDisplayId,
             ApplicantFullName = $"{userOne.UserProfile.FirstName} {userOne.UserProfile.LastName}",
-            CompensationRateDollars = inReviewApp.CompensationRateDollars,
-            CompensationRateUnits = inReviewApp.CompensationRateUnits,
+            CompensationRateDollars = appFourEstimate.CompensationRateDollars,
+            CompensationRateUnits = appFourEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.InReview,
             SubmittedDate = inReviewApp.SubmittedDate,
@@ -274,7 +289,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         UseUserContext(new UserContext
         {
-            UserId = Guid.NewGuid(),
+            UserId = user.Id,
             Roles = [Roles.GlobalAdmin],
             OrganizationRoles = [],
             ExternalAuthId = ""
@@ -285,6 +300,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             FundingOrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
+            WaterRightNativeId = application.WaterRightNativeId,
             Polygons = [memorialStadiumFootballField],
             DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
             DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + yearRange, 1, 1)),
@@ -378,5 +394,98 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // verify db entries were not created
             dbEstimate.Should().BeNull();
         }
+    }
+
+    [TestMethod]
+    public async Task Store_EstimateConsumptiveUse_AsAnonymous_Failure()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        await _dbContext.SaveChangesAsync();
+
+        const int startYear = 2024;
+        OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
+            .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
+            {
+                Data = [
+                    new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                    {
+                        Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+                        Evapotranspiration = 5,
+                    }
+                ]
+            });
+
+        ContextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>())
+            .Throws(new InvalidOperationException("User context is required for this operation"));
+
+        UseAnonymousContext();
+
+        var request = new EstimateConsumptiveUseRequest
+        {
+            FundingOrganizationId = organization.Id,
+            WaterConservationApplicationId = application.Id,
+            WaterRightNativeId = application.WaterRightNativeId,
+            Polygons = [memorialStadiumFootballField],
+            DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+            DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + 1, 1, 1)),
+            Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            EstimateConsumptiveUseRequest,
+            EstimateConsumptiveUseResponse>(
+            request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+
+        ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task Store_CreateWaterConservationApplication_Success()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.SaveChangesAsync();
+
+        UseRequiredUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationCreateRequest
+        {
+            FundingOrganizationId = organization.Id,
+            WaterRightNativeId = "1234",
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationCreateRequest,
+            CLI.Responses.Conservation.WaterConservationApplicationCreateResponse>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.WaterConservationApplicationId.Should().NotBeEmpty();
+
+        var dbApplication = await _dbContext.WaterConservationApplications
+            .SingleOrDefaultAsync(application => application.Id == response.WaterConservationApplicationId);
+        dbApplication.Should().NotBeNull();
     }
 }

@@ -65,7 +65,7 @@ export interface WaterRightsContextState {
   setNldiIds: React.Dispatch<React.SetStateAction<string[]>>;
   displayOptions: DisplayOptions;
   setDisplayOptions: React.Dispatch<React.SetStateAction<DisplayOptions>>;
-  resetUserOptions: () => void;
+  resetWaterRightsOptions: () => void;
   hostData: HostData;
 }
 
@@ -107,7 +107,7 @@ export const defaultState: WaterRightsContextState = {
   setNldiIds: () => {},
   displayOptions: defaultDisplayOptions,
   setDisplayOptions: () => {},
-  resetUserOptions: () => {},
+  resetWaterRightsOptions: () => {},
   hostData: {
     beneficialUsesQuery: defaultQuery,
     waterSourcesQuery: defaultQuery,
@@ -150,7 +150,7 @@ export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
     setFiltersParameter(filters);
   }, [filters, setFiltersParameter]);
 
-  const resetUserOptions = useCallback(() => {
+  const resetWaterRightsOptions = useCallback(() => {
     setFilters(defaultWaterRightsFilters);
     setDisplayOptions(defaultDisplayOptions);
     setNldiIds([]);
@@ -163,7 +163,7 @@ export const WaterRightsProvider = ({ children }: WaterRightsProviderProps) => {
     setNldiIds,
     displayOptions,
     setDisplayOptions,
-    resetUserOptions,
+    resetWaterRightsOptions,
     hostData: {
       beneficialUsesQuery: {
         data: dashboardFiltersQuery.data?.beneficialUses,
