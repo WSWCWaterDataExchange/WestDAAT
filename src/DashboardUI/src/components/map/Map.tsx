@@ -117,10 +117,7 @@ function Map({
   };
 
   const updateMapControls = (map: mapboxgl.Map, isAuthenticated: boolean) => {
-    console.log('update controls');
-    console.log('has control', map.hasControl(geocoderControl.current), 'isAuthenticated', isAuthenticated);
     if (map.hasControl(geocoderControl.current) && !isAuthenticated) {
-      console.log('remove geocoder');
       map.removeControl(geocoderControl.current);
     } else if (isAuthenticated && geocoderEnabled === true) {
       geocoderControl.current = new MapboxGeocoder({
@@ -130,7 +127,6 @@ function Map({
         mapboxgl: map as any,
       });
       map.addControl(geocoderControl.current);
-      console.log('add geocoder');
     }
   };
 
