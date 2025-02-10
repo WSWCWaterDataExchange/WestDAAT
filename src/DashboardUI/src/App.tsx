@@ -8,8 +8,6 @@ import AppProvider from './contexts/AppProvider';
 import { ToastContainer } from 'react-toastify';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend'; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
-
-import './App.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { IPublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
@@ -28,6 +26,9 @@ import { OrganizationDashboardPage } from './pages/application/dashboard/Organiz
 import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import { AccountLayout } from './pages/account/AccountLayout';
 import { AccountInformationPage } from './pages/account/AccountInformationPage';
+import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+
+import './App.scss';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -100,6 +101,7 @@ function App({ msalInstance }: AppProps) {
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>
+                    <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>
