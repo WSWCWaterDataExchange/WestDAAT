@@ -45,7 +45,7 @@ function WaterRightHeader() {
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
       <div>
-        <h3 className="d-flex fw-bold">WaDE Water Right Landing Page</h3>
+        <span className="fs-3 fw-bold">WaDE Water Right Landing Page</span>
       </div>
 
       {shouldShowConsumptiveUseButton && (
