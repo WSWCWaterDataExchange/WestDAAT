@@ -1,6 +1,11 @@
 @import '../../../styles/_colors.scss';
 @import '../../../styles/sizes.scss';
 
+.estimation-tool-page {
+  position: relative;
+  height: 100%;
+}
+
 .side-panel {
   width: 425px;
   background-color: $bs-gray-100;
