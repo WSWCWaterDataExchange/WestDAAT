@@ -13,10 +13,6 @@ public class WaterConservationApplicationSubmission
 
     public DateTimeOffset SubmittedDate { get; set; }
 
-    public int CompensationRateDollars { get; set; }
-
-    public Common.DataContracts.CompensationRateUnits CompensationRateUnits { get; set; }
-
     public DateTimeOffset? AcceptedDate { get; set; }
 
     public DateTimeOffset? RejectedDate { get; set; }

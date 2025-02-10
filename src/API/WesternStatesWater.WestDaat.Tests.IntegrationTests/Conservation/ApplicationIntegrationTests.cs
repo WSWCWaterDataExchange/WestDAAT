@@ -113,16 +113,30 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var orgOne = new OrganizationFaker().Generate();
         var orgTwo = new OrganizationFaker().Generate();
         var orgThree = new OrganizationFaker().Generate();
+
         var userOne = new UserFaker().Generate();
         var userTwo = new UserFaker().Generate();
         var userThree = new UserFaker().Generate();
+
         var appOne = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
         var appTwo = new WaterConservationApplicationFaker(userTwo, orgTwo).Generate();
         var appThree = new WaterConservationApplicationFaker(userThree, orgThree).Generate();
         var appFour = new WaterConservationApplicationFaker(userOne, orgOne).Generate();
-        var acceptedEstimate = new WaterConservationApplicationEstimateFaker(appOne).Generate();
-        var rejectedEstimate = new WaterConservationApplicationEstimateFaker(appTwo).Generate();
-        var inReviewEstimate = new WaterConservationApplicationEstimateFaker(appFour).Generate();
+
+        var acceptedEstimate = new WaterConservationApplicationEstimateFaker(appOne)
+            .RuleFor(est => est.CompensationRateDollars, _ => 1000)
+            .Generate();
+
+        var rejectedEstimate = new WaterConservationApplicationEstimateFaker(appTwo)
+            .RuleFor(est => est.CompensationRateDollars, _ => 500)
+            .Generate();
+
+        // skip estimate for app 3
+
+        var inReviewEstimate = new WaterConservationApplicationEstimateFaker(appFour)
+            .RuleFor(est => est.CompensationRateDollars, _ => 2000)
+            .Generate();
+
         var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
             .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now).Generate();
         var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
