@@ -25,6 +25,8 @@ public class WaterConservationApplicationEstimate
 
     public int EstimatedCompensationDollars { get; set; }
 
+    public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
+
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 
     public virtual ICollection<WaterConservationApplicationEstimateLocation> Locations { get; set; } = null!;
