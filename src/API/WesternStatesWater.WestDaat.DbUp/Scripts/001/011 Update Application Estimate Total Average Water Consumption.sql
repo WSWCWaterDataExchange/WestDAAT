@@ -1,0 +1,3 @@
+ALTER TABLE WaterConservationApplicationEstimates
+
+ADD TotalAverageYearlyConsumptionEtAcreFeet FLOAT NOT NULL;
