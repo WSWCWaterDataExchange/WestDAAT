@@ -28,7 +28,7 @@ import { OrganizationDashboardPage } from './pages/application/dashboard/Organiz
 import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import { AccountLayout } from './pages/account/AccountLayout';
 import { AccountInformationPage } from './pages/account/AccountInformationPage';
-import { ConservationEstimationToolPage } from './pages/application/estimation-tool/ConservationEstimationToolPage';
+import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -101,7 +101,7 @@ function App({ msalInstance }: AppProps) {
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>
-                    <Route path="new/:waterRightNativeId" element={<ConservationEstimationToolPage />} />
+                    <Route path="new/:waterRightNativeId" element={<EstimationToolPage />} />
                   </Route>
                 </Route>
                 <Route path="admin" element={<AdminGuard />}>

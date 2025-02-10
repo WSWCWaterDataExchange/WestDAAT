@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 
-export function ConservationEstimationToolPage() {
+export function EstimationToolPage() {
   const routeParams = useParams();
   const { waterRightNativeId } = routeParams;
 
