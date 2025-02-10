@@ -13,7 +13,7 @@ public class OrganizationFunction : FunctionBase
     private readonly IOrganizationManager _organizationManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "organizations";
+    private const string RouteBase = "Organizations";
 
     public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger)
     {
@@ -25,7 +25,7 @@ public class OrganizationFunction : FunctionBase
     [OpenApiOperation(nameof(OrganizationSearch))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OrganizationLoadResponseBase))]
     public async Task<HttpResponseData> OrganizationSearch(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/search")]
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Search")]
         HttpRequestData req)
     {
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
