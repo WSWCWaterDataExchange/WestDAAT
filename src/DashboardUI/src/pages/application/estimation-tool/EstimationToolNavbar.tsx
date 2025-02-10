@@ -6,7 +6,7 @@ interface EstimationToolNavbarProps {
 
 export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
   return (
-    <Navbar bg="light" className="p-0 second-nav">
+    <Navbar className="p-0 second-nav estimate-tool-navbar">
       <Container fluid className="p-0">
         <Nav>
           <Nav.Link onClick={props.navigateToWaterRightLandingPage}>Back to Water Right Landing Page</Nav.Link>
