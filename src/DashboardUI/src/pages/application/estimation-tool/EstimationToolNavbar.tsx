@@ -1,6 +1,6 @@
 import { mdiArrowLeft, mdiWater } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Button, Container, Nav, Navbar } from 'react-bootstrap';
+import { Nav, Navbar } from 'react-bootstrap';
 
 interface EstimationToolNavbarProps {
   navigateToWaterRightLandingPage: () => void;
@@ -9,7 +9,7 @@ interface EstimationToolNavbarProps {
 export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
   return (
     <Navbar className="p-0 second-nav estimate-tool-navbar">
-      <Container fluid>
+      <div className="container-fluid">
         <Nav>
           <Nav.Item onClick={props.navigateToWaterRightLandingPage}>
             {/* render as <button> instead of <a role="button"> */}
@@ -30,7 +30,7 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
         </Navbar.Brand>
 
         <Nav>{/* placeholder element for flexbox alignment */}</Nav>
-      </Container>
+      </div>
     </Navbar>
   );
 }
