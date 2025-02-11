@@ -11,7 +11,7 @@ export const OverlayTooltip = (props: OverlayTooltipProps) => {
   const { text } = props;
 
   const overlayElement = (props: any) => (
-    <Popover id="consumptive-use-btn-tooltip" {...props}>
+    <Popover {...props}>
       <Popover.Body>{text}</Popover.Body>
     </Popover>
   );
@@ -23,7 +23,7 @@ export const OverlayTooltip = (props: OverlayTooltipProps) => {
       delay={{ show: 0, hide: 0 }}
       overlay={overlayElement}
     >
-      <Icon path={mdiHelpCircleOutline} size="1.5em" />
+      <Icon path={mdiHelpCircleOutline} size="1.5em" className="overlay-tooltip-icon" />
     </OverlayTrigger>
   );
 };
