@@ -31,7 +31,7 @@ internal class OpenEtSdk : IOpenEtSdk
         using var lease = await _rateLimiter.AcquireAsync();
         if (!lease.IsAcquired)
         {
-            throw new HttpRequestException("Rate limit exceeded");
+            throw new ServiceUnavailableException("Rate limit exceeded");
         }
 
         var jsonString = JsonSerializer.Serialize(request);
