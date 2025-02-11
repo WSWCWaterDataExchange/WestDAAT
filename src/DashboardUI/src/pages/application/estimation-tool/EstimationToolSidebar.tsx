@@ -3,7 +3,7 @@ import { NotImplementedPlaceholder } from '../../../components/NotImplementedAle
 
 export function EstimationToolSidebar() {
   return (
-    <div className="position-relative flex-grow-1 panel-content">
+    <div className="flex-grow-1 panel-content">
       <div className="container-fluid">
         <NotImplementedPlaceholder />
 
