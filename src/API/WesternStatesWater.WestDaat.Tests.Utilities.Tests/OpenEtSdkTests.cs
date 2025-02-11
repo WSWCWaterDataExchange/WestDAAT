@@ -15,7 +15,7 @@ public class OpenEtSdkTests : UtilityTestBase
 {
     private MockHttpMessageHandler _mockHttp = null!;
 
-    private Mock<RateLimiter> _mockRateLimiter = null!;
+    private SlidingWindowRateLimiter RateLimiter = null!;
 
     private const string baseAddress = "https://fakeserver/path/";
 
@@ -23,7 +23,14 @@ public class OpenEtSdkTests : UtilityTestBase
     public void TestInitialize()
     {
         _mockHttp = new MockHttpMessageHandler();
-        _mockRateLimiter = new Mock<RateLimiter>();
+        RateLimiter = new SlidingWindowRateLimiter(new SlidingWindowRateLimiterOptions
+        {
+            PermitLimit = 1,
+            QueueLimit = 1,
+            SegmentsPerWindow = 1,
+            Window = TimeSpan.FromSeconds(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+        });
     }
 
     private OpenEtSdk CreateOpenEtSdk(HttpClient httpClient)
@@ -33,7 +40,7 @@ public class OpenEtSdkTests : UtilityTestBase
             httpClient.BaseAddress = new Uri(baseAddress);
         }
 
-        return new(httpClient, _mockRateLimiter.Object, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
+        return new(httpClient, RateLimiter, Configuration.GetOpenEtConfiguration(), CreateLogger<OpenEtSdk>());
     }
 
     [TestMethod]
