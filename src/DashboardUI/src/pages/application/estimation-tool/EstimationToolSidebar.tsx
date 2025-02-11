@@ -25,7 +25,7 @@ export function EstimationToolSidebar() {
 
         <SidebarElement
           title="OpenET Model"
-          tooltip="OpenET uses open-source models and Google Earth Engine to provide satellite-based information on water consumption in areas as small as a quarter of an acre at daily, monthly and yearly intervals."
+          tooltip="OpenET uses open-source models and Google Earth Engine to provide satellite-based information on water consumption in areas as small as a quarter of an acre at daily, monthly and yearly intervals."
         >
           placeholder
         </SidebarElement>
