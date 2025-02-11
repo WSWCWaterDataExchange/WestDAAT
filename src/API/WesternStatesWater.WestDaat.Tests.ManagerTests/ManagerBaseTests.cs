@@ -116,6 +116,10 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         {
             var request = new TestRequest { Id = 42 };
 
+            _validationEngineMock
+                .Setup(engine => engine.Validate(request))
+                .ReturnsAsync(default(ErrorBase));
+
             _requestHandlerMock
                 .Setup(handler => handler.Handle(request))
                 .ThrowsAsync(new ServiceUnavailableException("Service is down"));
