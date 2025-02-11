@@ -18,10 +18,7 @@ export const applicationSearch = async (
   const { data } = await api.post('Applications/Search', request);
 
   data.applications.forEach((app: ApplicationDashboardListItem) => {
-    return {
-      ...app,
-      submittedDate: new Date(app.submittedDate),
-    };
+    app.submittedDate = new Date(app.submittedDate);
   });
 
   return data;

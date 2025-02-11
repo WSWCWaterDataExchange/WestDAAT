@@ -1,7 +1,8 @@
 import { produce } from 'immer';
+import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 
 export interface ConservationApplicationState {
-  dashboardApplications: string[];
+  dashboardApplications: ApplicationDashboardListItem[];
 }
 
 export const defaultState = (): ConservationApplicationState => ({
@@ -12,7 +13,7 @@ export type ApplicationAction = DashboardApplicationsLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
-  dashboardApplications: string[];
+  dashboardApplications: ApplicationDashboardListItem[];
 }
 
 export const reducer = (

@@ -14,7 +14,6 @@ export function formatConservationApplicationStatusText(status: ConservationAppl
     case ConservationApplicationStatus.Rejected:
       return 'Rejected';
     case ConservationApplicationStatus.Unknown:
-    default:
       return 'Unknown';
   }
 }

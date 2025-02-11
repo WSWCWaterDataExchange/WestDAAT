@@ -7,11 +7,10 @@ export enum CompensationRateUnits {
 export function formatCompensationRateUnitsText(units: CompensationRateUnits): string {
   switch (units) {
     case CompensationRateUnits.AcreFeet:
-      return 'Acre-feet';
+      return 'Acre-Feet';
     case CompensationRateUnits.Acres:
       return 'Acre';
     case CompensationRateUnits.None:
-    default:
       return 'None';
   }
 }

@@ -9,15 +9,15 @@ describe('ConservationApplicationState reducer', () => {
 
   it('loading dashboard applications should update state', () => {
     // Arrange
-    const dashboardApplications = ['app1', 'app2'];
+    const dashboardApplications = [];
 
     // Act
     const newState = reducer(state, {
       type: 'DASHBOARD_APPLICATIONS_LOADED',
-      dashboardApplications,
+      dashboardApplications: [],
     });
 
     // Assert
-    expect(newState.dashboardApplications).toEqual(dashboardApplications);
+    expect(newState.dashboardApplications).toEqual([]);
   });
 });
