@@ -143,7 +143,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
                     }
                 ]
                 : [],
-            ExternalAuthId = ""
         });
 
         // Act
@@ -167,9 +166,119 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         }
     }
 
-    // TODO test that you can't assign someone to global admin
+    [DataTestMethod]
+    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user memeber role")]
+    [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Should be able to assign a user technical reviewer role")]
+    [DataRow(Roles.OrganizationAdmin, true, DisplayName = "Should be able to assign a user organization admin role")]
+    [DataRow(Roles.GlobalAdmin, false, DisplayName = "Should not be able to assign a user global admin role")]
+    public async Task Store_OrganizationMemberAddRequest_ShouldNotAllowPrivilegedRoles(string role, bool isAllowed)
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var user = new UserFaker().Generate();
+        var userToBeAdded = new UserFaker().Generate();
+        var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
-    // TODO test that you can't add yourself
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddRangeAsync(user, userToBeAdded);
+        await _dbContext.UserOrganizations.AddAsync(userOrg);
+        await _dbContext.SaveChangesAsync();
 
-    // TODO test that you can't add a user to an organization twice
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            // Even global admin cannot make another global admin.
+            // This is only possible via the database.
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organization.Id,
+            UserId = userToBeAdded.Id,
+            Role = role
+        });
+
+        // Assert
+        if (isAllowed)
+        {
+            response.Error.Should().BeOfType<InternalError>(); // Due to temp NotImplementedException
+        }
+        else
+        {
+            response.Error.Should().NotBeNull();
+            response.Error.Should().BeOfType<ValidationError>();
+        }
+    }
+
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberAddRequest_ShouldNotAllowAddingSelf()
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var user = new UserFaker().Generate();
+        var userOrg = new UserOrganizationFaker(user, organization).Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.UserOrganizations.AddAsync(userOrg);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organization.Id,
+            UserId = user.Id,
+            Role = Roles.Member
+        });
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+    }
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberAddRequest_AddingMemeberToSecondOrganization_ShouldNotAllow()
+    {
+        // Arrange
+        var organizationOne = new OrganizationFaker().Generate();
+        var organizationTwo = new OrganizationFaker().Generate();
+        var user = new UserFaker().Generate();
+        var userToBeAdded = new UserFaker().Generate();
+        var userOrgTwo = new UserOrganizationFaker(userToBeAdded, organizationTwo).Generate();
+
+        await _dbContext.Organizations.AddRangeAsync(organizationOne, organizationTwo);
+        await _dbContext.Users.AddRangeAsync(user, userToBeAdded);
+        await _dbContext.UserOrganizations.AddRangeAsync(userOrgTwo);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organizationOne.Id,
+            UserId = userToBeAdded.Id,
+            Role = Roles.Member
+        });
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ConflictError>();
+    }
 }
