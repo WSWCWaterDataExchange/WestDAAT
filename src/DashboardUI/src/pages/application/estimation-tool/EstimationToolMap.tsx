@@ -6,10 +6,12 @@ export function EstimationToolMap() {
   };
 
   return (
-    <Map
-      handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-      isConsumptiveUseAlertEnabled={false}
-      isGeocoderInputFeatureEnabled={false}
-    />
+    <div className="flex-grow-1">
+      <Map
+        handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
+        isConsumptiveUseAlertEnabled={false}
+        isGeocoderInputFeatureEnabled={false}
+      />
+    </div>
   );
 }
