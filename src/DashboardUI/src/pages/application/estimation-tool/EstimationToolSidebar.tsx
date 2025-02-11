@@ -1,4 +1,4 @@
-import MapTheme from '../../../components/home-page/water-rights-tab/map-options/components/MapTheme';
+import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 
 export function EstimationToolSidebar() {
@@ -30,7 +30,9 @@ export function EstimationToolSidebar() {
           placeholder
         </SidebarElement>
 
-        <MapTheme />
+        <SidebarElement title="MAP LAYER">
+          <MapThemeSelector />
+        </SidebarElement>
 
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"
