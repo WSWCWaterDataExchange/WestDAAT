@@ -8,4 +8,9 @@ public sealed partial class AdminManager : IOrganizationManager
     {
         return await ExecuteAsync<TRequest, TResponse>(request);
     }
+
+    async Task<TResponse> IOrganizationManager.Store<TRequest, TResponse>(TRequest request)
+    {
+        return await ExecuteAsync<TRequest, TResponse>(request);
+    }
 }
