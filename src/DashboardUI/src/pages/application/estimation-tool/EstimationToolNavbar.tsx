@@ -8,7 +8,7 @@ interface EstimationToolNavbarProps {
 
 export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
   return (
-    <Navbar className="p-0 second-nav estimate-tool-navbar">
+    <Navbar className="estimate-tool-navbar p-0">
       <div className="container-fluid">
         <Nav>
           <Nav.Item onClick={props.navigateToWaterRightLandingPage}>
