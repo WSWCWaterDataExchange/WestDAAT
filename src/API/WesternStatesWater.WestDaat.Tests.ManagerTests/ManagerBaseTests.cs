@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Clients;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers;
@@ -108,6 +109,21 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             _validationEngineMock.Verify();
 
             response.Message.Should().Be("Success");
+        }
+
+        [TestMethod]
+        public async Task ExecuteAsync_ServiceUnavailableException_ShouldReturnServiceUnavailableError()
+        {
+            var request = new TestRequest { Id = 42 };
+
+            _requestHandlerMock
+                .Setup(handler => handler.Handle(request))
+                .ThrowsAsync(new ServiceUnavailableException("Service is down"));
+
+            var response = await _manager.ExecuteAsync<TestRequest, TestResponse>(request);
+
+            response.Should().NotBeNull();
+            response.Error.Should().BeOfType<ServiceUnavailableError>();
         }
 
         [TestMethod]
