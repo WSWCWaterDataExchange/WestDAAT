@@ -68,6 +68,7 @@ export function EstimationToolSidebar() {
 
 interface SidebarElementProps {
   title: string;
+  isLoading?: boolean;
   tooltip?: string;
   children?: React.ReactNode;
 }
@@ -83,7 +84,15 @@ function SidebarElement(props: SidebarElementProps) {
         {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
       </div>
 
-      <div>{props.children}</div>
+      {props.isLoading ? (
+        <div>
+          <div className="placeholder-wave">
+            <span className="placeholder col-8 me-2"></span>
+          </div>
+        </div>
+      ) : (
+        <div>{props.children}</div>
+      )}
     </div>
   );
 }
