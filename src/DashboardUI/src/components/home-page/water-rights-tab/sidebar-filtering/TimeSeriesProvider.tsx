@@ -53,7 +53,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
   const dashboardFiltersQuery = useDashboardFilters();
 
   const siteTypes = dashboardFiltersQuery.data?.siteTypes ?? [];
-  const primaryUseCategories = dashboardFiltersQuery.data?.primaryUseCategories ?? [];
+  const primaryUseCategories = dashboardFiltersQuery.data?.beneficialUses.map((use) => use.beneficialUseName) ?? [];
   const variableTypes = dashboardFiltersQuery.data?.variableTypes ?? [];
   const waterSourceTypes = dashboardFiltersQuery.data?.waterSources ?? [];
 
