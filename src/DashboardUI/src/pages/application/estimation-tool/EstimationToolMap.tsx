@@ -8,8 +8,8 @@ export function EstimationToolMap() {
   return (
     <Map
       handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-      consumptiveUseAlertEnabled={false}
-      geocoderEnabled={false}
+      isConsumptiveUseAlertEnabled={false}
+      isGeocoderInputFeatureEnabled={false}
     />
   );
 }

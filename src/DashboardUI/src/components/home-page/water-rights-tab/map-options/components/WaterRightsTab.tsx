@@ -49,8 +49,8 @@ function WaterRightsLayout() {
         <Map
           handleMapDrawnPolygonChange={polylinesOnMapUpdated}
           handleMapFitChange={handleMapFitRequested}
-          consumptiveUseAlertEnabled={true}
-          geocoderEnabled={true}
+          isConsumptiveUseAlertEnabled={true}
+          isGeocoderInputFeatureEnabled={true}
         />
         <TableView />
       </MainPanel>

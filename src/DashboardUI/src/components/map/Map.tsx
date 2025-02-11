@@ -42,8 +42,8 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  consumptiveUseAlertEnabled?: boolean;
-  geocoderEnabled?: boolean;
+  isConsumptiveUseAlertEnabled: boolean;
+  isGeocoderInputFeatureEnabled: boolean;
 }
 
 const createMapMarkerIcon = (color: string) => {
@@ -53,8 +53,8 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  consumptiveUseAlertEnabled,
-  geocoderEnabled,
+  isConsumptiveUseAlertEnabled,
+  isGeocoderInputFeatureEnabled,
 }: mapProps) {
   const {
     authenticationContext: { isAuthenticated },
@@ -119,7 +119,7 @@ function Map({
   const updateMapControls = (map: mapboxgl.Map, isAuthenticated: boolean) => {
     if (map.hasControl(geocoderControl.current) && !isAuthenticated) {
       map.removeControl(geocoderControl.current);
-    } else if (isAuthenticated && geocoderEnabled === true) {
+    } else if (isAuthenticated && isGeocoderInputFeatureEnabled) {
       geocoderControl.current = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         // Lots of missing properties here. Adding ESLint highlights the problem.
@@ -512,7 +512,7 @@ function Map({
   }, [mapStyle]);
 
   const shouldDisplayConsumptiveUseAlert =
-    isFeatureEnabled('conservationEstimationTool') && consumptiveUseAlertEnabled === true;
+    isFeatureEnabled('conservationEstimationTool') && isConsumptiveUseAlertEnabled;
   const consumptiveUseAlert = (
     <div>
       <div className="consumptive-use-alert-container">
