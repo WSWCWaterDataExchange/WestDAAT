@@ -27,7 +27,7 @@ export function EstimationToolPage() {
               <EstimationToolSidebar />
             </div>
 
-            <div className="flex-grow-1 position-relative d-flex flex-column">
+            <div className="flex-grow-1 d-flex flex-column">
               <EstimationToolMapHeader />
               <EstimationToolMap />
             </div>
