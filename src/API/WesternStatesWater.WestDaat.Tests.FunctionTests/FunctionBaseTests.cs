@@ -90,20 +90,20 @@ public class FunctionBaseTests
     }
 
     [TestMethod]
-    public async Task CreateResponse_TooManyRequestsError_ShouldReturn429()
+    public async Task CreateResponse_ServiceUnavailableError_ShouldReturn503()
     {
-        var response = new TestDto { Error = new TooManyRequestsError() };
+        var response = new TestDto { Error = new ServiceUnavailableError() };
 
         var result = await _function.CreateResponse(new HttpRequestDataFake(), response);
 
-        result.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        result.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
 
         var body = await GetJson(result);
 
         body.Should().Be("{\"" +
-                         "type\":\"https://tools.ietf.org/html/rfc6585#section-4\",\"" +
-                         "title\":\"Too many requests\",\"" +
-                         "status\":429" +
+                         "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.4\",\"" +
+                         "title\":\"Service Unavailable\",\"" +
+                         "status\":503" +
                          "}");
     }
 

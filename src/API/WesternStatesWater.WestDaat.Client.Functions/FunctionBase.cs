@@ -62,7 +62,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 InternalError => await CreateInternalServerErrorResponse(request),
                 NotFoundError err => await CreateNotFoundResponse(request, err),
                 ValidationError err => await CreateBadRequestResponse(request, err),
-                TooManyRequestsError err => await CreateTooManyRequestsResponse(request, err),
+                ServiceUnavailableError err => await CreateServiceUnavailableResponse(request, err),
                 _ => await CreateInternalServerErrorResponse(request)
             };
         }
@@ -117,16 +117,16 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return CreateProblemDetailsResponse(request, details, HttpStatusCode.BadRequest);
         }
 
-        private static Task<HttpResponseData> CreateTooManyRequestsResponse(HttpRequestData request, TooManyRequestsError error)
+        private static Task<HttpResponseData> CreateServiceUnavailableResponse(HttpRequestData request, ServiceUnavailableError error)
         {
             var details = new ProblemDetails
             {
-                Status = (int)HttpStatusCode.TooManyRequests,
-                Title = "Too many requests",
-                Type = "https://tools.ietf.org/html/rfc6585#section-4",
+                Status = (int)HttpStatusCode.ServiceUnavailable,
+                Title = "Service Unavailable",
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.4",
             };
 
-            return CreateProblemDetailsResponse(request, details, HttpStatusCode.TooManyRequests);
+            return CreateProblemDetailsResponse(request, details, HttpStatusCode.ServiceUnavailable);
         }
 
         private static async Task<HttpResponseData> CreateProblemDetailsResponse(
