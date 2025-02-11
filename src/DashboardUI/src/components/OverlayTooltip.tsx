@@ -4,6 +4,7 @@ import { OverlayTrigger, Popover } from 'react-bootstrap';
 
 interface OverlayTooltipProps {
   text: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
 }
 
 export const OverlayTooltip = (props: OverlayTooltipProps) => {
@@ -16,7 +17,12 @@ export const OverlayTooltip = (props: OverlayTooltipProps) => {
   );
 
   return (
-    <OverlayTrigger trigger="hover" placement="left" delay={{ show: 0, hide: 0 }} overlay={overlayElement}>
+    <OverlayTrigger
+      trigger="hover"
+      placement={props.placement ?? 'left'}
+      delay={{ show: 0, hide: 0 }}
+      overlay={overlayElement}
+    >
       <Icon path={mdiHelpCircleOutline} size="1.5em" />
     </OverlayTrigger>
   );
