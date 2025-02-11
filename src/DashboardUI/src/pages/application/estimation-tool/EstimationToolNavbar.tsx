@@ -14,7 +14,7 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
           <Nav.Item onClick={props.navigateToWaterRightLandingPage}>
             {/* render as <button> instead of <a role="button"> */}
             <Nav.Link as="button" className="text-dark">
-              <div className="d-flex flex-row align-items-center gap-2">
+              <div className="d-flex align-items-center gap-2">
                 <Icon path={mdiArrowLeft} size="1em" />
                 <span>Back to Water Right Landing Page</span>
               </div>
@@ -23,7 +23,7 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
         </Nav>
 
         <Navbar.Brand>
-          <div className="d-flex flex-row align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2">
             <Icon path={mdiWater} size="1.25em" className="water-icon" />
             <span>Water Conservation Estimation Tool</span>
           </div>
