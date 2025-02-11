@@ -23,7 +23,7 @@ export function EstimationToolPage() {
 
         <div className="flex-grow-1">
           <div className="h-100 d-flex overflow-hidden align-items-stretch">
-            <div className="side-panel d-flex flex-column">
+            <div className="estimation-tool-side-panel d-flex flex-column">
               <EstimationToolSidebar />
             </div>
 
