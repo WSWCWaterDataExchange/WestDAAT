@@ -12,14 +12,6 @@ export function EstimationToolMapHeader() {
           Click once to begin drawing a polygon around your land by using the shape tool. Then, use the panel on the
           left to review estimates and potential compensation as part of a voluntary and temporary measure.
         </span>
-
-        <a
-          href="https://user-images.githubusercontent.com/31244917/134665652-0bf2cacd-0f3a-43b4-a61a-c8dc3d557d24.gif"
-          target="_blank"
-          rel="noreferrer"
-        >
-          How does this work?
-        </a>
       </div>
 
       <div>
