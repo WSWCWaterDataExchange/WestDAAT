@@ -6,6 +6,15 @@ export function EstimationToolSidebar() {
     <div className="position-relative flex-grow-1 panel-content">
       <div className="container-fluid">
         <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
+        <NotImplementedPlaceholder />
 
         <MapTheme />
       </div>
