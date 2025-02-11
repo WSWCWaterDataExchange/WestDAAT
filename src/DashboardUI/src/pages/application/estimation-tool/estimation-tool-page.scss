@@ -59,10 +59,10 @@
 }
 
 .estimate-tool-navbar {
-  background-color: #e1f3fc;
+  background-color: $estimate-tool-navbar-bg-color;
 
   .water-icon {
-    color: #b4e3f9; // fill color
-    stroke: #37a4dc; // outline color
+    color: $estimate-tool-water-icon-fill-color;
+    stroke: $estimate-tool-water-icon-outline-color;
   }
 }
