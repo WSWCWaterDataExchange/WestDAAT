@@ -21,9 +21,9 @@ export function EstimationToolPage() {
       <div className="estimation-tool-page d-flex flex-column">
         <EstimationToolNavbar navigateToWaterRightLandingPage={navigateToWaterRightLandingPage} />
 
-        <div className="flex-grow-1 overflow-y-scroll">
+        <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-hidden align-items-stretch">
-            <div className="estimation-tool-side-panel d-flex flex-column overflow-y-scroll">
+            <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
               <EstimationToolSidebar />
             </div>
 
