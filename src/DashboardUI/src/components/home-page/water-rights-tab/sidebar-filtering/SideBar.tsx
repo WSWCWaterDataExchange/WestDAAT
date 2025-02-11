@@ -106,13 +106,16 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="overlayFilters">
-            <Accordion.Header>
+            <Accordion.Header onClick={toggleOverlayFilter}>
               <Form.Check
                 type="switch"
                 id="overlayFilters"
                 label=""
                 checked={isOverlayFilterActive}
-                onChange={toggleOverlayFilter}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleOverlayFilter();
+                }}
               />
               <label className="fw-bold ms-2">OVERLAY FILTER</label>
             </Accordion.Header>
@@ -121,13 +124,16 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="siteSelectionFilters">
-            <Accordion.Header>
+            <Accordion.Header onClick={toggleWaterRightFilters}>
               <Form.Check
                 type="switch"
                 id="waterRightSelection"
                 label=""
                 checked={isWaterRightsFilterActive}
-                onChange={toggleWaterRightFilters}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWaterRightFilters();
+                }}
               />
               <label className="fw-bold ms-2">WATER RIGHT SELECTION</label>
             </Accordion.Header>
@@ -136,13 +142,16 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="timeSeriesFilters">
-            <Accordion.Header>
+            <Accordion.Header onClick={toggleTimeSeriesFilter}>
               <Form.Check
                 type="switch"
                 id="timeSeriesToggle"
                 label=""
                 checked={isTimeSeriesFilterActive}
-                onChange={toggleTimeSeriesFilter}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTimeSeriesFilter();
+                }}
               />
               <label className="fw-bold ms-2">TIME SERIES FILTER</label>
             </Accordion.Header>
@@ -151,13 +160,16 @@ function SideBar() {
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="nldi">
-            <Accordion.Header>
+            <Accordion.Header onClick={toggleNldiFilterStatus}>
               <Form.Check
                 type="switch"
                 id="nldi"
                 label=""
                 checked={isNldiFilterActive}
-                onChange={toggleNldiFilterStatus}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleNldiFilterStatus();
+                }}
               />
               <label className="fw-bold ms-2">NLDI FILTER</label>
             </Accordion.Header>
