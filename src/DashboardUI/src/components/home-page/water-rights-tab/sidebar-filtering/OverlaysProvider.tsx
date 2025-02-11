@@ -1,73 +1,74 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDashboardFilters } from '../../../../hooks/queries';
 
-export type MapboxFilterExpression = [string, ...any[]];
-
 interface OverlaysContextValue {
-  overlays: string[];
+  overlayTypes: string[];
+  selectedOverlayTypes: string[];
+  states: string[];
+  selectedStates?: string[];
+  waterSourceTypes: string[];
+  selectedWaterSourceTypes?: string[];
   isOverlayFilterActive: boolean;
-  overlaysData?: string[];
-
-  toggleOverlay: (overlayKey: string, enable: boolean) => void;
   setOverlayFilterActive: (active: boolean) => void;
+  setOverlayTypes: (types: string[]) => void;
+  setStates: (states: string[] | undefined) => void;
+  setWaterSourceTypes: (types: string[] | undefined) => void;
   resetOverlaysOptions: () => void;
-  mapFilters: MapboxFilterExpression | null;
 }
 
 const OverlaysContext = createContext<OverlaysContextValue>({
-  overlays: [],
+  overlayTypes: [],
+  selectedOverlayTypes: [],
+  states: [],
+  selectedStates: [],
+  waterSourceTypes: [],
+  selectedWaterSourceTypes: [],
   isOverlayFilterActive: false,
-  overlaysData: [],
-  toggleOverlay: () => {},
   setOverlayFilterActive: () => {},
+  setOverlayTypes: () => {},
+  setStates: () => {},
+  setWaterSourceTypes: () => {},
   resetOverlaysOptions: () => {},
-  mapFilters: null,
 });
 
 export function OverlaysProvider({ children }: { children: React.ReactNode }) {
   const dashboardFiltersQuery = useDashboardFilters();
-  const overlaysData = dashboardFiltersQuery.data?.overlays ?? [];
 
-  const [overlays, setOverlays] = useState<string[]>([]);
+  const overlayTypes = dashboardFiltersQuery.data?.overlays ?? [];
+  const states = dashboardFiltersQuery.data?.states ?? [];
+  const waterSourceTypes = dashboardFiltersQuery.data?.waterSources ?? [];
+
+  const [selectedOverlayTypes, setSelectedOverlayTypes] = useState<string[]>(overlayTypes);
+  const [selectedStates, setSelectedStates] = useState<string[] | undefined>(undefined);
+  const [selectedWaterSourceTypes, setSelectedWaterSourceTypes] = useState<string[] | undefined>(undefined);
   const [isOverlayFilterActive, setOverlayFilterActive] = useState<boolean>(false);
 
   useEffect(() => {
-    if (overlaysData.length && overlays.length === 0) {
-      setOverlays(overlaysData.slice());
+    if (selectedOverlayTypes.length === 0 && overlayTypes.length > 0) {
+      setSelectedOverlayTypes(overlayTypes);
     }
-  }, [overlaysData, overlays]);
-
-  const toggleOverlay = useCallback((overlayKey: string, enable: boolean) => {
-    setOverlays((prev) => {
-      const current = prev ?? [];
-      if (enable) {
-        return current.includes(overlayKey) ? current : [...current, overlayKey];
-      }
-      return current.filter((o) => o !== overlayKey);
-    });
-  }, []);
+  }, [overlayTypes, selectedOverlayTypes]);
 
   const resetOverlaysOptions = useCallback(() => {
-    setOverlays([]);
+    setSelectedOverlayTypes([]);
+    setSelectedStates(undefined);
+    setSelectedWaterSourceTypes(undefined);
     setOverlayFilterActive(false);
   }, []);
 
-  const mapFilters = useMemo<MapboxFilterExpression | null>(() => {
-    if (!isOverlayFilterActive || overlays.length === 0) {
-      return null;
-    }
-    const exprs = overlays.map((key) => ['in', key, ['get', 'oType']]);
-    return ['any', ...exprs];
-  }, [isOverlayFilterActive, overlays]);
-
   const value: OverlaysContextValue = {
-    overlays,
+    overlayTypes,
+    selectedOverlayTypes,
+    states,
+    selectedStates,
+    waterSourceTypes,
+    selectedWaterSourceTypes,
     isOverlayFilterActive,
-    overlaysData,
-    toggleOverlay,
     setOverlayFilterActive,
+    setOverlayTypes: setSelectedOverlayTypes,
+    setStates: setSelectedStates,
+    setWaterSourceTypes: setSelectedWaterSourceTypes,
     resetOverlaysOptions,
-    mapFilters,
   };
 
   return <OverlaysContext.Provider value={value}>{children}</OverlaysContext.Provider>;
