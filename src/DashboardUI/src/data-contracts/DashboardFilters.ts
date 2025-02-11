@@ -5,9 +5,11 @@ export interface DashboardFilters {
   waterSources: string[];
   overlays: string[];
   ownerClassifications: string[];
+  primaryUseCategories: string[];
   states: string[];
   allocationTypes: string[];
   legalStatuses: string[];
   siteTypes: string[];
   riverBasins: string[];
+  variableTypes: string[];
 }
