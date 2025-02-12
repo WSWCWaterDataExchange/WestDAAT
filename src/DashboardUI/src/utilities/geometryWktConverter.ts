@@ -32,19 +32,28 @@ export const convertGeometryToWkt = (geometry: Geometry): string => {
   switch (geometry.type) {
     case 'Point': {
       const point = geometry as Point;
+      if (point.coordinates.length === 0) {
+        return 'POINT EMPTY';
+      }
       return `POINT (${pairWKT(point.coordinates)})`;
     }
     case 'LineString': {
       const lineString = geometry as LineString;
+      if (lineString.coordinates.length === 0) {
+        return 'LINESTRING EMPTY';
+      }
       return `LINESTRING (${linearRingWKT(lineString.coordinates)})`;
     }
     case 'Polygon': {
       const polygon = geometry as Polygon;
+      if (polygon.coordinates.length === 0) {
+        return 'POLYGON EMPTY';
+      }
       return `POLYGON (${polygonRingsWKT(polygon.coordinates)})`;
     }
     case 'MultiPoint': {
       const multiPoint = geometry as MultiPoint;
-      return `MULTIPOINT (${linearRingWKT(multiPoint.coordinates)})`;
+      return `MULTIPOINT (${multiPoint.coordinates.map(pairWKT).map(wrapParens).join(', ')})`;
     }
     case 'MultiLineString': {
       const multiLineString = geometry as MultiLineString;
