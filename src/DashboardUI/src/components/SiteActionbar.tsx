@@ -9,10 +9,10 @@ interface SiteActionbarProps {
   showUploadModal?: (show: boolean) => void;
 }
 
-export function SiteActionbar({ showDownloadModal, showUploadModal }: SiteActionbarProps) {
+export function SiteActionbar({ showDownloadModal, showUploadModal }: SiteActionbarProps = {}) {
   return (
     <Navbar bg="light" className="p-0 second-nav">
-      <Container className="p-0">
+      <Container fluid className="p-0">
         <Nav></Nav>
         <div className="d-flex">
           <div className="p-2">
@@ -34,5 +34,3 @@ export function SiteActionbar({ showDownloadModal, showUploadModal }: SiteAction
     </Navbar>
   );
 }
-
-export default SiteActionbar;
