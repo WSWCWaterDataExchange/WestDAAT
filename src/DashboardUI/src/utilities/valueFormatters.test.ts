@@ -1,4 +1,4 @@
-import { formatNumber } from './valueFormatters';
+import { formatDateString, formatNumber } from './valueFormatters';
 
 describe('formatNumber', () => {
   test.each([
@@ -59,4 +59,31 @@ describe('formatNumber', () => {
   ])('value: %s, decimals: %s', (value, decimals, expected) => {
     expect(formatNumber(value, decimals)).toBe(expected);
   });
+});
+
+describe('formatDateString', () => {
+  describe('should return the formatted date string', () => {
+    it('in MM/DD/YYYY format', () => {
+      // Arrange
+      const date = new Date('2021-01-01T00:00:00.000Z');
+
+      // Act
+      const result = formatDateString(date, 'MM/DD/YYYY');
+
+      // Assert
+      expect(result).toStrictEqual('01/01/2021');
+    })
+
+    it('as MM/DD/YYYY format when provided an invalid date format', () => {
+      // Arrange
+      const date = new Date('2021-01-01T00:00:00.000Z');
+
+      // Act
+      const result = formatDateString(date, 'invalid-format');
+
+      // Assert
+      expect(result).toStrictEqual('01/01/2021');
+    })
+  });
+
 });

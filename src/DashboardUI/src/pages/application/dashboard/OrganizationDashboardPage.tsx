@@ -1,9 +1,8 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
-import Icon from '@mdi/react';
+import { Icon } from '@mdi/react';
 import { DataGrid, GridColDef, GridColumnHeaderParams, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
-import moment from 'moment';
-import { Card } from 'react-bootstrap';
+import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { applicationSearch } from '../../../accessors/applicationAccessor';
 import { TableLoading } from '../../../components/TableLoading';
@@ -17,7 +16,7 @@ import {
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
-
+import { formatDateString } from '../../../utilities/valueFormatters';
 import './organization-dashboard-page.scss';
 
 export function OrganizationDashboardPage() {
@@ -34,11 +33,55 @@ export function OrganizationDashboardPage() {
     },
   });
 
+  const dateFormatter = (date: Date) => {
+    return formatDateString(date, 'MM/DD/YYYY');
+  };
+
+  const getApplicationStatusIconClass = (status: ConservationApplicationStatus): string => {
+    switch (status) {
+      case ConservationApplicationStatus.Approved:
+        return 'application-status-icon-approved';
+      case ConservationApplicationStatus.Rejected:
+        return 'application-status-icon-rejected';
+      case ConservationApplicationStatus.InReview:
+        return 'application-status-icon-inReview';
+      case ConservationApplicationStatus.Unknown:
+        return 'application-status-icon-unknown';
+    }
+  };
+
+  const renderHeader = (params: GridColumnHeaderParams) => (
+    <div className="header-column-text">{params.colDef.headerName}</div>
+  );
+
+  const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => (
+    <>
+      <Icon
+        size={1}
+        path={mdiCircleMedium}
+        className={getApplicationStatusIconClass(params.value!)}
+        title={formatConservationApplicationStatusText(params.value!)}
+      ></Icon>
+      {formatConservationApplicationStatusText(params.value!)}
+    </>
+  );
+
+  const renderStatisticsCard = (description: string, value: number) => {
+    return (
+      <div className="col-md-2 col-sm-4 col-6 my-1">
+        <Card className="rounded-3 shadow-sm text-center">
+          <Card.Title className="mt-3 fs-1">{value}</Card.Title>
+          <Card.Text className="mb-3 fs-6">{description}</Card.Text>
+        </Card>
+      </div>
+    );
+  };
+
   const columns: GridColDef[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     { field: 'waterRightNativeId', headerName: 'Water Right Native ID', width: 200, renderHeader },
     { field: 'applicationDisplayId', headerName: 'Application ID', width: 200, renderHeader },
-    { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: formatDate },
+    { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: dateFormatter },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
@@ -65,12 +108,12 @@ export function OrganizationDashboardPage() {
       <div className="m-3">
         <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
         <div className="row my-4">
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Submitted Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Accepted Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Rejected Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Applications In Review', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Cumulative Est. Savings', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Total Obligation', 42)}</div>
+          {renderStatisticsCard('Submitted Applications', 42)}
+          {renderStatisticsCard('Accepted Applications', 42)}
+          {renderStatisticsCard('Rejected Applications', 42)}
+          {renderStatisticsCard('Applications In Review', 42)}
+          {renderStatisticsCard('Cumulative Est. Savings', 42)}
+          {renderStatisticsCard('Total Obligation', 42)}
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={isLoading} isErrored={isError}>
@@ -79,46 +122,4 @@ export function OrganizationDashboardPage() {
       </div>
     </div>
   );
-}
-
-const formatDate = (date: Date) => {
-  return moment(date).format('MM/DD/YYYY');
-};
-
-const renderHeader = (params: GridColumnHeaderParams) => (
-  <div className="header-column-text">{params.colDef.headerName}</div>
-);
-
-const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => (
-  <>
-    <Icon
-      size={1}
-      path={mdiCircleMedium}
-      className={getApplicationStatusIconClass(params.value!)}
-      title={formatConservationApplicationStatusText(params.value!)}
-    ></Icon>
-    {formatConservationApplicationStatusText(params.value!)}
-  </>
-);
-
-const renderStatisticsCard = (description: string, value: number) => {
-  return (
-    <Card className="rounded-3 shadow-sm text-center">
-      <Card.Title className="mt-3 fs-1">{value}</Card.Title>
-      <Card.Text className="mb-3 fs-6">{description}</Card.Text>
-    </Card>
-  );
-};
-
-function getApplicationStatusIconClass(status: ConservationApplicationStatus): string {
-  switch (status) {
-    case ConservationApplicationStatus.Approved:
-      return 'application-status-icon-approved';
-    case ConservationApplicationStatus.Rejected:
-      return 'application-status-icon-rejected';
-    case ConservationApplicationStatus.InReview:
-      return 'application-status-icon-inReview';
-    case ConservationApplicationStatus.Unknown:
-      return 'application-status-icon-unknown';
-  }
 }
