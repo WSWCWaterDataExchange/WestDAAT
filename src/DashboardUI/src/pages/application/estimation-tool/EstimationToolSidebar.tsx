@@ -8,19 +8,18 @@ import {
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
+import { useQuery } from 'react-query';
+import { getFundingOrganizationDetails } from '../../../accessors/applicationAccessor';
 
-export function EstimationToolSidebar() {
-  // temporary loading state for testing
-  const [isLoadingFundingOrganization, setIsLoadingFundingOrganization] = useState(true);
+interface EstimationToolSidebarProps {
+  waterRightNativeId: string;
+}
 
-  // emulate loading state for testing
-  useEffect(() => {
-    if (isLoadingFundingOrganization) {
-      setTimeout(() => {
-        setIsLoadingFundingOrganization(false);
-      }, 3000);
-    }
-  }, [isLoadingFundingOrganization]);
+export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
+  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useQuery(
+    ['fundingOrganizationDetails', props.waterRightNativeId],
+    () => getFundingOrganizationDetails(props.waterRightNativeId),
+  );
 
   const acreageSum = 0;
   const evapotranspiration = 0;
@@ -44,7 +43,7 @@ export function EstimationToolSidebar() {
           tooltip="Funding organizations provide financial incentives to water rights holders in exchange for modifying their water use. These entities—governmental, nonprofit, or private—support water conservation programs, water markets, and voluntary agreements to balance water availability for agriculture, ecosystems, and urban needs."
           isLoading={isLoadingFundingOrganization}
         >
-          <span>Selected Funding Organization</span>
+          <span>{fundingOrganizationDetails?.fundingOrganizationName}</span>
         </SidebarElement>
 
         <SidebarElement
@@ -52,7 +51,7 @@ export function EstimationToolSidebar() {
           tooltip="OpenET uses open-source models and Google Earth Engine to provide satellite-based information on water consumption in areas as small as a quarter of an acre at daily, monthly and yearly intervals."
           isLoading={isLoadingFundingOrganization}
         >
-          <span>Selected OpenET Model</span>
+          <span>{fundingOrganizationDetails?.openEtModel}</span>
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">
@@ -64,7 +63,10 @@ export function EstimationToolSidebar() {
           tooltip="Estimated Consumptive Use refers to the portion of diverted water that is consumed and not returned to the source, typically through evapotranspiration, plant uptake, or incorporation into products. It represents the actual water loss from the system and helps determine water availability for other uses."
           isLoading={isLoadingFundingOrganization}
         >
-          <span>Selected date range</span>
+          <span>
+            {fundingOrganizationDetails?.dateRangeStart.toString()} to{' '}
+            {fundingOrganizationDetails?.dateRangeEnd.toString()}
+          </span>
         </SidebarElement>
 
         <SidebarElement
@@ -90,7 +92,7 @@ export function EstimationToolSidebar() {
           tooltip="Conservation Organization Compensation Rate refers to the rate at which a conservation organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management."
           isLoading={isLoadingFundingOrganization}
         >
-          <span className="text-muted">selected Funding Organization's compensation rate model description</span>
+          <span className="text-muted">{fundingOrganizationDetails?.compensationRateModel}</span>
         </SidebarElement>
 
         <SidebarElement title="DESIRED COMPENSATION ($)" isLoading={isLoadingFundingOrganization}>

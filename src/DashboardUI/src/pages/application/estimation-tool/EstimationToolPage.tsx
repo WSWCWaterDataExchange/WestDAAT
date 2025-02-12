@@ -24,7 +24,7 @@ export function EstimationToolPage() {
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-hidden align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar />
+              <EstimationToolSidebar waterRightNativeId={waterRightNativeId!} />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
