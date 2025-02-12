@@ -5,7 +5,7 @@ import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import westDaatApi from './westDaatApi';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
-import { waterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
+import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 
 export const getFundingOrganizationDetails = (waterRightNativeId: string): Promise<FundingOrganizationDetails> => {
   return new Promise((resolve) => {
@@ -25,14 +25,14 @@ export const getFundingOrganizationDetails = (waterRightNativeId: string): Promi
 export const createWaterConservationApplication = async (fields: {
   fundingOrganizationId: string;
   waterRightNativeId: string;
-}): Promise<waterConservationApplicationCreateResponse> => {
+}): Promise<WaterConservationApplicationCreateResponse> => {
   const request: WaterConservationApplicationCreateRequest = {
     fundingOrganizationId: fields.fundingOrganizationId,
     waterRightNativeId: fields.waterRightNativeId,
   };
 
   const api = await westDaatApi();
-  const { data } = await api.post<waterConservationApplicationCreateResponse>('applications', request);
+  const { data } = await api.post<WaterConservationApplicationCreateResponse>('applications', request);
   return data;
 };
 

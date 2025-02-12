@@ -1,3 +1,3 @@
-export interface waterConservationApplicationCreateResponse {
+export interface WaterConservationApplicationCreateResponse {
   waterConservationApplicationId: string;
 }
