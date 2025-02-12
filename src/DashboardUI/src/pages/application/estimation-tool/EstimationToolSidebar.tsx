@@ -70,6 +70,7 @@ export function EstimationToolSidebar() {
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
           tooltip="Average Historic Total Consumptive Use (Depletion) refers to the long-term average amount of water consumed and not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
+          isLoading={isLoadingFundingOrganization}
         >
           <div>
             <span className="text-muted">Across one or many fields</span>
@@ -87,11 +88,12 @@ export function EstimationToolSidebar() {
         <SidebarElement
           title="CONSERVATION ORGANIZATION COMPENSATION RATE"
           tooltip="Conservation Organization Compensation Rate refers to the rate at which a conservation organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management."
+          isLoading={isLoadingFundingOrganization}
         >
           <span className="text-muted">selected Funding Organization's compensation rate model description</span>
         </SidebarElement>
 
-        <SidebarElement title="DESIRED COMPENSATION ($)">
+        <SidebarElement title="DESIRED COMPENSATION ($)" isLoading={isLoadingFundingOrganization}>
           <span className="text-muted">
             Input values below to estimate the amount of savings you may be eligible for
           </span>
@@ -114,6 +116,7 @@ export function EstimationToolSidebar() {
         <SidebarElement
           title="CONSERVATION ESTIMATE"
           tooltip="Conservation Estimate refers to the projected reduction in water use resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing. This estimate helps assess potential water savings and informs compensation programs."
+          isLoading={isLoadingFundingOrganization}
         >
           <div>
             <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
@@ -127,6 +130,15 @@ export function EstimationToolSidebar() {
 
               <span>in {new Date().getFullYear()}</span>
             </span>
+          </div>
+
+          <div>
+            <div>
+              <span className="text-muted">This estimate is not legally binding to WSWC.</span>
+            </div>
+            <div>
+              <a href="#">Learn more</a>
+            </div>
           </div>
         </SidebarElement>
       </div>
