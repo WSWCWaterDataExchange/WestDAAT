@@ -18,7 +18,8 @@ export const OverlayTooltip = (props: OverlayTooltipProps) => {
 
   return (
     <OverlayTrigger
-      trigger="hover"
+      // `focus` allows keyboard / mobile users to see the tooltip
+      trigger={['hover', 'focus']}
       placement={props.placement ?? 'left'}
       delay={{ show: 0, hide: 0 }}
       overlay={overlayElement}
