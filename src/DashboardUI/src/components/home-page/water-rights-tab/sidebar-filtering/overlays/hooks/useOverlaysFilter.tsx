@@ -3,21 +3,21 @@ import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function useOverlaysFilter() {
   const {
-    selectedOverlayTypes,
+    visibleOverlayTypes,
     selectedStates,
     selectedWaterSourceTypes,
     isOverlayFilterActive,
     setOverlayFilterActive,
-    setOverlayTypes,
+    setSelectedOverlayTypes,
     setStates,
     setWaterSourceTypes,
     resetOverlaysOptions,
   } = useOverlaysContext();
 
   const overlayTypeFilters = useMemo(() => {
-    if (!selectedOverlayTypes || selectedOverlayTypes.length === 0) return null;
-    return ['any', ...selectedOverlayTypes.map((type) => ['in', type, ['get', 'oType']])];
-  }, [selectedOverlayTypes]);
+    if (!visibleOverlayTypes || visibleOverlayTypes.length === 0) return null;
+    return ['any', ...visibleOverlayTypes.map((type) => ['in', type, ['get', 'oType']])];
+  }, [visibleOverlayTypes]);
 
   const stateFilters = useMemo(() => {
     if (!selectedStates || selectedStates.length === 0) return null;
@@ -26,7 +26,7 @@ export function useOverlaysFilter() {
 
   const waterSourceFilters = useMemo(() => {
     if (!selectedWaterSourceTypes || selectedWaterSourceTypes.length === 0) return null;
-    return ['any', ...selectedWaterSourceTypes.map((type) => ['in', type, ['get', 'wsType']])];
+    return ['any', ...selectedWaterSourceTypes.map((type) => ['in', type, ['get', 'wsType']])]
   }, [selectedWaterSourceTypes]);
 
   const combinedFilters = useMemo(() => {
@@ -43,10 +43,10 @@ export function useOverlaysFilter() {
   return {
     isOverlayFilterActive,
     setOverlayFilterActive,
-    selectedOverlayTypes,
+    visibleOverlayTypes,
     selectedStates,
     selectedWaterSourceTypes,
-    setOverlayTypes,
+    setSelectedOverlayTypes,
     setStates,
     setWaterSourceTypes,
     resetOverlaysOptions,

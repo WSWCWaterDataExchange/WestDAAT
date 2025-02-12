@@ -3,13 +3,14 @@ import Select, { MultiValue } from 'react-select';
 import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function OverlayTypeSelect() {
-  const { overlayTypes, selectedOverlayTypes, setOverlayTypes } = useOverlaysContext();
+  const { overlayTypes, selectedOverlayTypes, setSelectedOverlayTypes } = useOverlaysContext();
 
   const handleOverlayTypeChange = useCallback(
     (values: MultiValue<{ value: string }>) => {
-      setOverlayTypes(values.map((option) => option.value));
+      const selectedValues = values.map((option) => option.value);
+      setSelectedOverlayTypes(selectedValues.length > 0 ? selectedValues : undefined);
     },
-    [setOverlayTypes],
+    [setSelectedOverlayTypes],
   );
 
   const options = useMemo(() => {
@@ -17,7 +18,7 @@ export function OverlayTypeSelect() {
   }, [overlayTypes]);
 
   const selectedValues = useMemo(() => {
-    return selectedOverlayTypes.map((type) => ({ value: type, label: type }));
+    return selectedOverlayTypes ? selectedOverlayTypes.map((type) => ({ value: type, label: type })) : [];
   }, [selectedOverlayTypes]);
 
   return (
