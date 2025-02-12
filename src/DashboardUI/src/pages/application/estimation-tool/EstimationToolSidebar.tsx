@@ -68,6 +68,7 @@ export function EstimationToolSidebar() {
             <span className="text-muted">Across one or many fields</span>
           </div>
 
+          {/* todo empty state */}
           <div className="d-flex align-items-center">
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
