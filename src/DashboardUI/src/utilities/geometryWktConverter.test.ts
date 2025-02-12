@@ -1,4 +1,4 @@
-import { LineString, MultiPoint, Point, Polygon } from 'geojson';
+import { LineString, MultiLineString, MultiPoint, Point, Polygon } from 'geojson';
 import { convertGeometryToWkt } from './geometryWktConverter';
 
 describe('geometryWktConverter', () => {
@@ -75,6 +75,20 @@ describe('geometryWktConverter', () => {
       ],
     };
 
+    const multiLineString: MultiLineString = {
+      type: 'MultiLineString',
+      coordinates: [
+        [
+          [0, 0],
+          [1, 1],
+        ],
+        [
+          [2, 2],
+          [3, 3],
+        ],
+      ],
+    };
+
     test('converts point to WKT', () => {
       expect(convertGeometryToWkt(point)).toBe('POINT (0 0)');
     });
@@ -107,6 +121,10 @@ describe('geometryWktConverter', () => {
 
     test('converts multi point to WKT', () => {
       expect(convertGeometryToWkt(multiPoint)).toBe('MULTIPOINT ((0 0), (0 1), (1 2))');
+    });
+
+    test('converts multi line string to WKT', () => {
+      expect(convertGeometryToWkt(multiLineString)).toBe('MULTILINESTRING ((0 0, 1 1), (2 2, 3 3))');
     });
   });
 });
