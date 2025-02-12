@@ -27,7 +27,7 @@ export function OrganizationDashboardPage() {
 
   let organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
-  const { isLoading, isError } = useQuery('organization-dashboard-load', {
+  const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
     onSuccess(data) {
       dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', dashboardApplications: data.applications });
