@@ -5,11 +5,11 @@ import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useFundingOrganization } from './hooks/useFundingOrganization';
-
-import './estimation-tool-page.scss';
 import { UseCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
+
+import './estimation-tool-page.scss';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
