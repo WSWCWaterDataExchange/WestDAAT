@@ -6,6 +6,8 @@ import MapProvider from '../../../contexts/MapProvider';
 
 import './estimation-tool-page.scss';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
+import { getFundingOrganizationDetails } from '../../../accessors/applicationAccessor';
+import { useQuery } from 'react-query';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
@@ -16,6 +18,14 @@ export function EstimationToolPage() {
     navigate(`/details/right/${waterRightNativeId}`);
   };
 
+  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useQuery(
+    ['fundingOrganizationDetails', waterRightNativeId],
+    () => getFundingOrganizationDetails(waterRightNativeId!),
+    {
+      enabled: !!waterRightNativeId,
+    },
+  );
+
   return (
     <MapProvider>
       <div className="estimation-tool-page d-flex flex-column">
@@ -24,7 +34,10 @@ export function EstimationToolPage() {
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-hidden align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar waterRightNativeId={waterRightNativeId!} />
+              <EstimationToolSidebar
+                fundingOrganizationDetails={fundingOrganizationDetails}
+                isLoadingFundingOrganization={isLoadingFundingOrganization}
+              />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
