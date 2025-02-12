@@ -13,7 +13,9 @@ export type ApplicationAction = DashboardApplicationsLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
-  dashboardApplications: ApplicationDashboardListItem[];
+  payload: {
+    dashboardApplications: ApplicationDashboardListItem[];
+  };
 }
 
 export const reducer = (
@@ -39,6 +41,6 @@ const onDashboardApplicationsLoaded = (
   draftState: ConservationApplicationState,
   action: DashboardApplicationsLoadedAction,
 ): ConservationApplicationState => {
-  draftState.dashboardApplications = action.dashboardApplications;
+  draftState.dashboardApplications = action.payload.dashboardApplications;
   return draftState;
 };

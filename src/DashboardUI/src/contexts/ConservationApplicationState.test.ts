@@ -18,7 +18,7 @@ describe('ConservationApplicationState reducer', () => {
     // Act
     const newState = reducer(state, {
       type: 'DASHBOARD_APPLICATIONS_LOADED',
-      dashboardApplications,
+      payload: { dashboardApplications },
     });
 
     // Assert

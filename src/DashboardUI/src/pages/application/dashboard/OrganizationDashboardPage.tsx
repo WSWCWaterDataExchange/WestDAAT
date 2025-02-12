@@ -41,7 +41,7 @@ export function OrganizationDashboardPage() {
   const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
     onSuccess(data) {
-      dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', dashboardApplications: data.applications });
+      dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
     },
   });
 
