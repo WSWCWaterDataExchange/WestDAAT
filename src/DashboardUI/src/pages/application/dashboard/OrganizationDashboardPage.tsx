@@ -1,7 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColDef, GridColumnHeaderParams, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
+import { DataGrid, GridColumnHeaderParams, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { applicationSearch } from '../../../accessors/applicationAccessor';
@@ -18,6 +18,18 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
 import './organization-dashboard-page.scss';
+import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGridCol';
+
+interface ApplicationDataGridColumns {
+  applicant: string; // or whatever type
+  waterRightNativeId: string;
+  applicationDisplayId: string;
+  submittedDate: Date;
+  requestedFunding: string;
+  waterRightState: string;
+  fundingOrganization: string;
+  applicationStatus: ConservationApplicationStatus;
+}
 
 export function OrganizationDashboardPage() {
   const { user } = useAuthenticationContext();
@@ -77,7 +89,7 @@ export function OrganizationDashboardPage() {
     );
   };
 
-  const columns: GridColDef[] = [
+  const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     { field: 'waterRightNativeId', headerName: 'Water Right Native ID', width: 200, renderHeader },
     { field: 'applicationDisplayId', headerName: 'Application ID', width: 200, renderHeader },
@@ -88,7 +100,7 @@ export function OrganizationDashboardPage() {
     { field: 'applicationStatus', headerName: 'Status', width: 200, renderCell: renderAppStatusCell, renderHeader },
   ];
 
-  const rows: GridRowsProp =
+  const rows: DataGridRows<ApplicationDataGridColumns> =
     state.dashboardApplications.map((app: ApplicationDashboardListItem) => {
       return {
         id: app.applicationId,
