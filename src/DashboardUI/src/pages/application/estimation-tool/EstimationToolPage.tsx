@@ -3,11 +3,10 @@ import { EstimationToolSidebar } from './EstimationToolSidebar';
 import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
+import { EstimationToolNavbar } from './EstimationToolNavbar';
+import { useFundingOrganization } from './hooks/useFundingOrganization';
 
 import './estimation-tool-page.scss';
-import { EstimationToolNavbar } from './EstimationToolNavbar';
-import { getFundingOrganizationDetails } from '../../../accessors/applicationAccessor';
-import { useQuery } from 'react-query';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
@@ -18,13 +17,8 @@ export function EstimationToolPage() {
     navigate(`/details/right/${waterRightNativeId}`);
   };
 
-  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useQuery(
-    ['fundingOrganizationDetails', waterRightNativeId],
-    () => getFundingOrganizationDetails(waterRightNativeId!),
-    {
-      enabled: !!waterRightNativeId,
-    },
-  );
+  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } =
+    useFundingOrganization(waterRightNativeId);
 
   return (
     <MapProvider>
