@@ -128,9 +128,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
               <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
 
-              <span className="fs-5 fw-bold me-1">${conservationEstimate.toLocaleString()}</span>
-
-              <span>in {new Date().getFullYear()}</span>
+              <span className="fs-5 fw-bold">${conservationEstimate.toLocaleString()}</span>
             </span>
           </div>
 
