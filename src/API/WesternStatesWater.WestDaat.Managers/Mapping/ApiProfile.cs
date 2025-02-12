@@ -75,6 +75,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
+
+            CreateMap<ClientContracts.Requests.Admin.OrganizationMemberAddRequest, CommonContracts.OrganizationMemberAddRequest>();
+
+            CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         private void AddApplicationMappings()
@@ -103,7 +108,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
 
-            CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData), CommonContracts.EstimateConservationPaymentRequest>()
+            CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
+                    CommonContracts.EstimateConservationPaymentRequest>()
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
@@ -129,11 +135,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 });
 
             CreateMap<(
-                ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
-                CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
-                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
-                ),
-                CommonContracts.ApplicationEstimateStoreRequest
+                    ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
+                    CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
+                    CommonContracts.EstimateConservationPaymentResponse PaymentResponse
+                    ),
+                    CommonContracts.ApplicationEstimateStoreRequest
                 >()
                 .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.MapFrom(src => src.Request.WaterConservationApplicationId))
                 .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Request.Model))
