@@ -7,6 +7,7 @@ import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useFundingOrganization } from './hooks/useFundingOrganization';
 
 import './estimation-tool-page.scss';
+import { UseCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
@@ -19,6 +20,11 @@ export function EstimationToolPage() {
 
   const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } =
     useFundingOrganization(waterRightNativeId);
+
+  const { data: applicationDetails, isLoading: isLoadingApplication } = UseCreateWaterConservationApplication({
+    waterRightNativeId: waterRightNativeId,
+    fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
+  });
 
   return (
     <MapProvider>

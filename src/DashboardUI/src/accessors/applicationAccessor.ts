@@ -11,6 +11,7 @@ export const getFundingOrganizationDetails = (waterRightNativeId: string): Promi
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
+        fundingOrganizationId: 'F3D1124F-9387-4C11-915E-32E9C3CF0156',
         fundingOrganizationName: 'Colorado River Basin',
         openEtModel: 'eeMETRIC',
         dateRangeStart: new Date(2024, 0, 1),
