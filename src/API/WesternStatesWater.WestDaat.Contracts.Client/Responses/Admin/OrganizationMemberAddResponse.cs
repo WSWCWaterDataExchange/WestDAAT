@@ -1,4 +1,4 @@
-namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
+namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
 
 public class OrganizationMemberAddResponse : OrganizationStoreResponseBase
 {
