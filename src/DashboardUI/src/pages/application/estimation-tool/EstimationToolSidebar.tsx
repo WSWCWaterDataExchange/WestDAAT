@@ -94,7 +94,7 @@ export function EstimationToolSidebar() {
             Input values below to estimate the amount of savings you may be eligible for
           </span>
 
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center gap-3">
             <InputGroup>
               <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
               <Form.Control type="number" placeholder="600" min={1} aria-describedby="dollar-sign-addon"></Form.Control>
