@@ -14,7 +14,18 @@ export function useEstimateConsumptiveUse(fields: {
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }) {
   return useQuery(
-    ['estimateConsumptiveUse'],
+    [
+      'estimateConsumptiveUse',
+      fields.waterConservationApplicationId,
+      fields.waterRightNativeId,
+      fields.model,
+      fields.dateRangeStart,
+      fields.dateRangeEnd,
+      fields.polygons,
+      ...(fields.polygons ?? []),
+      fields.compensationRateDollars,
+      fields.units,
+    ],
     async () =>
       estimateConsumptiveUse({
         waterConservationApplicationId: fields.waterConservationApplicationId!,
