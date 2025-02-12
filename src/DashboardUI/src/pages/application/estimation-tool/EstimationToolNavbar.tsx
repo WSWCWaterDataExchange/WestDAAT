@@ -24,7 +24,7 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
 
         <Navbar.Brand>
           <div className="d-flex align-items-center gap-2">
-            <Icon path={mdiWater} size="1.25em" className="water-icon" />
+            <Icon path={mdiWater} size="1.25em" className="estimate-tool-water-icon" />
             <span>Water Conservation Estimation Tool</span>
           </div>
         </Navbar.Brand>

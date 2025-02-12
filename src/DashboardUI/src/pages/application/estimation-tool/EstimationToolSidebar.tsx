@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
+import Icon from '@mdi/react';
+import { mdiWater } from '@mdi/js';
 
 export function EstimationToolSidebar() {
   // temporary loading state for testing
@@ -16,6 +18,7 @@ export function EstimationToolSidebar() {
   }, [isLoadingFundingOrganization]);
 
   const acreageSum = 0;
+  const evapotranspiration = 0;
   return (
     <div className="flex-grow-1 panel-content">
       <div className="container-fluid">
@@ -61,7 +64,16 @@ export function EstimationToolSidebar() {
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
           tooltip="Average Historic Total Consumptive Use (Depletion) refers to the long-term average amount of water consumed and not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
         >
-          placeholder
+          <div>
+            <span className="text-muted">Across one or many fields</span>
+          </div>
+
+          <div className="d-flex align-items-center">
+            <span className="me-1">
+              <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
+            </span>
+            <span className="fs-5 fw-bold text-primary">{evapotranspiration} Acre-Feet</span>
+          </div>
         </SidebarElement>
 
         <SidebarElement
