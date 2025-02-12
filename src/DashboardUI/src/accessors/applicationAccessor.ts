@@ -6,6 +6,7 @@ import westDaatApi from './westDaatApi';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
+import { convertGeometryToWkt } from '../utilities/geometryWktConverter';
 
 export const getFundingOrganizationDetails = (waterRightNativeId: string): Promise<FundingOrganizationDetails> => {
   return new Promise((resolve) => {
@@ -52,7 +53,7 @@ export const estimateConsumptiveUse = async (fields: {
     model: fields.model,
     dateRangeStart: fields.dateRangeStart,
     dateRangeEnd: fields.dateRangeEnd,
-    polygons: fields.polygons.map((p) => JSON.stringify(p.geometry)), // todo: verify
+    polygons: fields.polygons.map((polygon) => convertGeometryToWkt(polygon.geometry)),
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
   };
