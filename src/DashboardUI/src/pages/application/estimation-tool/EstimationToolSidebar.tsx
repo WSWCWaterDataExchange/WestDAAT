@@ -64,8 +64,8 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           isLoading={isLoadingFundingOrganization}
         >
           <span>
-            {fundingOrganizationDetails?.dateRangeStart.toString()} to{' '}
-            {fundingOrganizationDetails?.dateRangeEnd.toString()}
+            {fundingOrganizationDetails?.dateRangeStart.toLocaleDateString()} to{' '}
+            {fundingOrganizationDetails?.dateRangeEnd.toLocaleDateString()}
           </span>
         </SidebarElement>
 
