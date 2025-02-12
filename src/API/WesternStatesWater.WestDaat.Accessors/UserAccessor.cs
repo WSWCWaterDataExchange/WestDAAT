@@ -21,6 +21,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         {
             UserExistsRequest req => await GetUserExists(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
+            UserSearchRequest req => await SearchUsers(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -33,7 +34,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         var user = await db.Users
             .Include(u => u.UserRoles)
             .Include(u => u.UserOrganizations)
-                .ThenInclude(uor => uor.UserOrganizationRoles)
+            .ThenInclude(uor => uor.UserOrganizationRoles)
             .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
 
         NotFoundException.ThrowIfNull(user, $"User not found for auth id {request.ExternalAuthId}");
@@ -60,6 +61,16 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         {
             UserExists = userExists
         };
+    }
+
+    private async Task<UserSearchResponse> SearchUsers(UserSearchRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var query = db.Users.Where(user =>
+            user.UserProfile.FirstName.Contains(request.SearchTerm) ||
+            user.UserProfile.LastName.Contains(request.SearchTerm) ||
+            user.UserProfile.UserName.Contains(request.SearchTerm));
     }
 
     public async Task<UserStoreResponseBase> Store(UserStoreRequestBase request)
