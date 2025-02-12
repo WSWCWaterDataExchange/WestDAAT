@@ -76,5 +76,38 @@ namespace WesternStatesWater.WestDaat.Accessors
                 Organizations = organizations
             };
         }
+
+        public async Task<OrganizationStoreResponseBase> Store(OrganizationStoreRequestBase request)
+        {
+            return request switch
+            {
+                OrganizationMemberAddRequest req => await AddOrganizationMember(req),
+                _ => throw new NotImplementedException(
+                    $"Handling of request type '{request.GetType().Name}' is not implemented.")
+            };
+        }
+
+        private async Task<OrganizationMemberAddResponse> AddOrganizationMember(OrganizationMemberAddRequest request)
+        {
+            await using var db = _westDaatDatabaseContextFactory.Create();
+
+            var userOrganization = new EFWD.UserOrganization
+            {
+                OrganizationId = request.OrganizationId,
+                UserId = request.UserId,
+                UserOrganizationRoles =
+                [
+                    new EFWD.UserOrganizationRole
+                    {
+                        Role = request.Role
+                    }
+                ]
+            };
+
+            await db.UserOrganizations.AddAsync(userOrganization);
+            await db.SaveChangesAsync();
+
+            return new OrganizationMemberAddResponse();
+        }
     }
 }
