@@ -8,7 +8,7 @@ export function ApplicationLayout() {
     <div className="d-flex flex-column h-100">
       <SiteNavbar />
 
-      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
+      <div className="d-inline-flex flex-grow-1">
         <ConservationApplicationProvider>
           <Outlet />
         </ConservationApplicationProvider>
