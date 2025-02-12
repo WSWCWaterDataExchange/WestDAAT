@@ -22,6 +22,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 OrganizationLoadAllRequest => await GetAllOrganizations(),
                 OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
+                UserOrganizationLoadRequest req => await GetUserOrganizations(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
             };
@@ -34,11 +35,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             var organizations = await db.Organizations
                 .ProjectTo<OrganizationListItem>(DtoMapper.Configuration)
                 .OrderBy(org => org.Name)
-                .ToListAsync();
+                .ToArrayAsync();
 
-            return new OrganizationLoadAllResponse()
+            return new OrganizationLoadAllResponse
             {
-                Organizations = organizations.ToArray()
+                Organizations = organizations
             };
         }
 
@@ -58,6 +59,21 @@ namespace WesternStatesWater.WestDaat.Accessors
             return new OrganizationLoadDetailsResponse
             {
                 Organization = organization,
+            };
+        }
+
+        private async Task<UserOrganizationLoadResponse> GetUserOrganizations(UserOrganizationLoadRequest request)
+        {
+            await using var db = _westDaatDatabaseContextFactory.Create();
+
+            var organizations = await db.Organizations
+                .Where(org => org.UserOrganizations.Any(uo => uo.UserId == request.UserId))
+                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .ToArrayAsync();
+
+            return new UserOrganizationLoadResponse
+            {
+                Organizations = organizations
             };
         }
     }

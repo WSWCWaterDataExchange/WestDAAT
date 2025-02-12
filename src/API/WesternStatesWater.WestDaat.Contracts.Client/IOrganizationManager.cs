@@ -12,4 +12,8 @@ public interface IOrganizationManager : IServiceContractBase
     Task<TResponse> Load<TRequest, TResponse>(TRequest request)
         where TRequest : OrganizationLoadRequestBase
         where TResponse : OrganizationLoadResponseBase;
+
+    Task<TResponse> Store<TRequest, TResponse>(TRequest request)
+        where TRequest : OrganizationStoreRequestBase
+        where TResponse : OrganizationStoreResponseBase;
 }
