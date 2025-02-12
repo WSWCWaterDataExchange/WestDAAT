@@ -17,7 +17,7 @@ import { useHomePageContext } from '../../../Provider';
 import { useMapFitRequested } from '../hooks/useMapFitRequested';
 import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
 import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
-import SiteActionbar from '../../../../SiteActionbar';
+import { SiteActionbar } from "../../../../SiteActionbar";
 
 interface WaterRightsTabProps {
   showDownloadModal?: (show: boolean) => void;
