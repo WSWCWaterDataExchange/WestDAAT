@@ -8,6 +8,8 @@ import { useFundingOrganization } from './hooks/useFundingOrganization';
 
 import './estimation-tool-page.scss';
 import { UseCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
+import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
+import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
@@ -24,6 +26,18 @@ export function EstimationToolPage() {
   const { data: applicationDetails, isLoading: isLoadingApplication } = UseCreateWaterConservationApplication({
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
+  });
+
+  const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse({
+    waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
+    waterRightNativeId: waterRightNativeId,
+    // todo: update
+    model: 0,
+    dateRangeStart: new Date(),
+    dateRangeEnd: new Date(),
+    polygons: [],
+    compensationRateDollars: 0,
+    units: CompensationRateUnits.AcreFeet,
   });
 
   return (
