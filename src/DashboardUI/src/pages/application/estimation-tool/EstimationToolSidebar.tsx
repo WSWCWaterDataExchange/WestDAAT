@@ -1,7 +1,20 @@
+import { useEffect, useState } from 'react';
 import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 
 export function EstimationToolSidebar() {
+  // temporary loading state for testing
+  const [isLoadingFundingOrganization, setIsLoadingFundingOrganization] = useState(true);
+
+  // emulate loading state for testing
+  useEffect(() => {
+    if (isLoadingFundingOrganization) {
+      setTimeout(() => {
+        setIsLoadingFundingOrganization(false);
+      }, 3000);
+    }
+  }, [isLoadingFundingOrganization]);
+
   const acreageSum = 0;
   return (
     <div className="flex-grow-1 panel-content">
@@ -19,15 +32,17 @@ export function EstimationToolSidebar() {
         <SidebarElement
           title="FUNDING ORGANIZATION"
           tooltip="Funding organizations provide financial incentives to water rights holders in exchange for modifying their water use. These entities—governmental, nonprofit, or private—support water conservation programs, water markets, and voluntary agreements to balance water availability for agriculture, ecosystems, and urban needs."
+          isLoading={isLoadingFundingOrganization}
         >
-          placeholder
+          <span>Selected Funding Organization</span>
         </SidebarElement>
 
         <SidebarElement
           title="OpenET Model"
           tooltip="OpenET uses open-source models and Google Earth Engine to provide satellite-based information on water consumption in areas as small as a quarter of an acre at daily, monthly and yearly intervals."
+          isLoading={isLoadingFundingOrganization}
         >
-          placeholder
+          <span>Selected OpenET Model</span>
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">
@@ -37,8 +52,9 @@ export function EstimationToolSidebar() {
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"
           tooltip="Estimated Consumptive Use refers to the portion of diverted water that is consumed and not returned to the source, typically through evapotranspiration, plant uptake, or incorporation into products. It represents the actual water loss from the system and helps determine water availability for other uses."
+          isLoading={isLoadingFundingOrganization}
         >
-          placeholder
+          <span>Selected date range</span>
         </SidebarElement>
 
         <SidebarElement
