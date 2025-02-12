@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
-import { mdiWater } from '@mdi/js';
+import { mdiPiggyBank, mdiWater } from '@mdi/js';
 import { Form, InputGroup } from 'react-bootstrap';
 import {
   CompensationRateUnitsLabels,
@@ -24,6 +24,8 @@ export function EstimationToolSidebar() {
 
   const acreageSum = 0;
   const evapotranspiration = 0;
+  const conservationEstimate = 0;
+
   return (
     <div className="flex-grow-1 panel-content">
       <div className="container-fluid">
@@ -113,7 +115,19 @@ export function EstimationToolSidebar() {
           title="CONSERVATION ESTIMATE"
           tooltip="Conservation Estimate refers to the projected reduction in water use resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing. This estimate helps assess potential water savings and informs compensation programs."
         >
-          placeholder
+          <div>
+            <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
+          </div>
+
+          <div>
+            <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
+              <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
+
+              <span className="fs-5 fw-bold me-1">${conservationEstimate}</span>
+
+              <span>in {new Date().getFullYear()}</span>
+            </span>
+          </div>
         </SidebarElement>
       </div>
     </div>
