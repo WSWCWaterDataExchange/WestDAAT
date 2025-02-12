@@ -3,6 +3,11 @@ import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
 import { mdiWater } from '@mdi/js';
+import { Form, InputGroup } from 'react-bootstrap';
+import {
+  CompensationRateUnitsLabels,
+  CompensationRateUnitsOptions,
+} from '../../../data-contracts/CompensationRateUnits';
 
 export function EstimationToolSidebar() {
   // temporary loading state for testing
@@ -81,10 +86,28 @@ export function EstimationToolSidebar() {
           title="CONSERVATION ORGANIZATION COMPENSATION RATE"
           tooltip="Conservation Organization Compensation Rate refers to the rate at which a conservation organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management."
         >
-          placeholder
+          <span className="text-muted">selected Funding Organization's compensation rate model description</span>
         </SidebarElement>
 
-        <SidebarElement title="DESIRED COMPENSATION">placeholder</SidebarElement>
+        <SidebarElement title="DESIRED COMPENSATION ($)">
+          <span className="text-muted">
+            Input values below to estimate the amount of savings you may be eligible for
+          </span>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <InputGroup>
+              <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
+              <Form.Control type="number" placeholder="600" min={1} aria-describedby="dollar-sign-addon"></Form.Control>
+            </InputGroup>
+
+            <Form.Select aria-label="Desired compensation units">
+              <option>Select an option</option>
+              {CompensationRateUnitsOptions.map((value) => (
+                <option value={value}>{CompensationRateUnitsLabels[value]}</option>
+              ))}
+            </Form.Select>
+          </div>
+        </SidebarElement>
 
         <SidebarElement
           title="CONSERVATION ESTIMATE"
