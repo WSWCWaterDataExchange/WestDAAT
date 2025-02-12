@@ -6,7 +6,7 @@ import westDaatApi from './westDaatApi';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
-  organizationId?: string,
+  organizationId: string | null,
 ): Promise<OrganizationApplicationDashboardLoadResponse> => {
   const api = await westDaatApi(msalContext);
 

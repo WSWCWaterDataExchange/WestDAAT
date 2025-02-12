@@ -16,7 +16,7 @@ import {
   formatConservationApplicationStatusText,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
-import { hasUserRole } from '../../../utilities/securityHelpers';
+import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 
 import './organization-dashboard-page.scss';
 
@@ -25,16 +25,7 @@ export function OrganizationDashboardPage() {
   const { state, dispatch } = useConservationApplicationContext();
   const msalContext = useMsal();
 
-  let organizationIdFilter = undefined;
-
-  // TODO: JN - why is my user null
-  if (!hasUserRole(user, Role.GlobalAdmin)) {
-    const organizationIds = [...new Set(user?.organizationRoles?.map((orgRole) => orgRole.organizationId))];
-    if (organizationIds.length !== 1) {
-      // TODO: JN - throw an error?
-    }
-    organizationIdFilter = organizationIds[0];
-  }
+  let organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
   const { isLoading, isError } = useQuery('organization-dashboard-load', {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
@@ -69,27 +60,17 @@ export function OrganizationDashboardPage() {
       };
     }) ?? [];
 
-  let pageTitle = '';
-
-  let uniqueOrgs = [...new Set(state.dashboardApplications.map((app) => app.organizationName))];
-
-  if (hasUserRole(user, Role.GlobalAdmin) || uniqueOrgs.length > 1) {
-    pageTitle = 'Organization Dashboard';
-  } else {
-    pageTitle = uniqueOrgs[0];
-  }
-
   return (
     <div>
       <div className="m-3">
-        <h1 className="fs-3 fw-bolder">{pageTitle}</h1>
+        <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
         <div className="row my-4">
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Submitted Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Accepted Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Rejected Applications', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Applications In Review', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Cumulative Est. Savings', 42)}</div>
-          <div className="col-md-2 col-sm-4 col-6 my-1">{renderCard('Total Obligation', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Submitted Applications', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Accepted Applications', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Rejected Applications', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Applications In Review', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Cumulative Est. Savings', 42)}</div>
+          <div className="col-md-2 col-sm-4 col-6 my-1">{renderStatisticsCard('Total Obligation', 42)}</div>
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={isLoading} isErrored={isError}>
@@ -120,7 +101,7 @@ const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationAppli
   </>
 );
 
-const renderCard = (description: string, value: number) => {
+const renderStatisticsCard = (description: string, value: number) => {
   return (
     <Card className="rounded-3 shadow-sm text-center">
       <Card.Title className="mt-3 fs-1">{value}</Card.Title>

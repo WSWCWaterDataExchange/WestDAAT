@@ -3,15 +3,19 @@
 .application-status-icon-approved {
   color: $app-review-status-approved;
 }
-.application-status-icon-rejected {
-  color: $app-review-status-rejected;
-}
+
 .application-status-icon-inReview {
   color: $app-review-status-inReview;
 }
+
+.application-status-icon-rejected {
+  color: $app-review-status-rejected;
+}
+
 .application-status-icon-unknown {
   color: $text-color-grey;
 }
+
 .header-column-text {
   font-weight: 700;
 }
