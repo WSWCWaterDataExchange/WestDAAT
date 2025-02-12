@@ -32,8 +32,6 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
   switch (action.type) {
     case 'DASHBOARD_APPLICATIONS_LOADED':
       return onDashboardApplicationsLoaded(draftState, action);
-    default:
-      return draftState;
   }
 };
 
