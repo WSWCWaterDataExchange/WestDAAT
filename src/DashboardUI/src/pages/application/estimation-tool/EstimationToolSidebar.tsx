@@ -21,16 +21,16 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
     () => getFundingOrganizationDetails(props.waterRightNativeId),
   );
 
-  const acreageSum = 0;
-  const evapotranspiration = 0;
-  const conservationEstimate = 0;
+  const acreageSum = 4681;
+  const evapotranspiration = 1000;
+  const conservationEstimate = 15000;
 
   return (
     <div className="flex-grow-1 panel-content">
       <div className="container-fluid">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold text-primary">{acreageSum} Acres</span>
+            <span className="fs-5 fw-bold text-primary">{acreageSum.toLocaleString()} Acres</span>
           </div>
 
           <div>
@@ -83,7 +83,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
-            <span className="fs-5 fw-bold text-primary">{evapotranspiration} Acre-Feet</span>
+            <span className="fs-5 fw-bold text-primary">{evapotranspiration.toLocaleString()} Acre-Feet</span>
           </div>
         </SidebarElement>
 
@@ -128,7 +128,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
               <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
 
-              <span className="fs-5 fw-bold me-1">${conservationEstimate}</span>
+              <span className="fs-5 fw-bold me-1">${conservationEstimate.toLocaleString()}</span>
 
               <span>in {new Date().getFullYear()}</span>
             </span>
