@@ -1,13 +1,18 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
   conservationApplication: {
-    fundingOrganization: FundingOrganizationDetails | undefined;
+    waterRightNativeId: string | undefined;
+    fundingOrganizationId: string | undefined;
+    fundingOrganizationName: string | undefined;
+    openEtModel: string | undefined;
+    dateRangeStart: Date | undefined;
+    dateRangeEnd: Date | undefined;
+    compensationRateModel: string | undefined;
     application: WaterConservationApplicationCreateResponse | undefined;
     consumptiveUse: EstimateConsumptiveUseResponse | undefined;
   };
@@ -16,7 +21,13 @@ export interface ConservationApplicationState {
 export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   conservationApplication: {
-    fundingOrganization: undefined,
+    waterRightNativeId: undefined,
+    fundingOrganizationId: undefined,
+    fundingOrganizationName: undefined,
+    openEtModel: undefined,
+    dateRangeStart: undefined,
+    dateRangeEnd: undefined,
+    compensationRateModel: undefined,
     application: undefined,
     consumptiveUse: undefined,
   },
@@ -38,7 +49,12 @@ export interface DashboardApplicationsLoadedAction {
 export interface FundingOrganizationLoadedAction {
   type: 'FUNDING_ORGANIZATION_LOADED';
   payload: {
-    fundingOrganization: FundingOrganizationDetails;
+    fundingOrganizationId: string;
+    fundingOrganizationName: string;
+    openEtModel: string;
+    dateRangeStart: Date;
+    dateRangeEnd: Date;
+    compensationRateModel: string;
   };
 }
 
@@ -91,9 +107,16 @@ const onDashboardApplicationsLoaded = (
 
 const onFundingOrganizationLoaded = (
   draftState: ConservationApplicationState,
-  action: FundingOrganizationLoadedAction,
+  { payload }: FundingOrganizationLoadedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.fundingOrganization = action.payload.fundingOrganization;
+  const application = draftState.conservationApplication;
+
+  application.fundingOrganizationId = payload.fundingOrganizationId;
+  application.fundingOrganizationName = payload.fundingOrganizationName;
+  application.openEtModel = payload.openEtModel;
+  application.dateRangeStart = payload.dateRangeStart;
+  application.dateRangeEnd = payload.dateRangeEnd;
+  application.compensationRateModel = payload.compensationRateModel;
   return draftState;
 };
 

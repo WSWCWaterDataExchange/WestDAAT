@@ -35,7 +35,12 @@ export function EstimationToolPage() {
       dispatch({
         type: 'FUNDING_ORGANIZATION_LOADED',
         payload: {
-          fundingOrganization: fundingOrganizationDetails,
+          fundingOrganizationId: fundingOrganizationDetails.fundingOrganizationId,
+          fundingOrganizationName: fundingOrganizationDetails.fundingOrganizationName,
+          openEtModel: fundingOrganizationDetails.openEtModel,
+          dateRangeStart: fundingOrganizationDetails.dateRangeStart,
+          dateRangeEnd: fundingOrganizationDetails.dateRangeEnd,
+          compensationRateModel: fundingOrganizationDetails.compensationRateModel,
         },
       });
     }
@@ -43,7 +48,7 @@ export function EstimationToolPage() {
 
   const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication(context, {
     waterRightNativeId: waterRightNativeId,
-    fundingOrganizationId: state.conservationApplication.fundingOrganization?.fundingOrganizationId,
+    fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
   });
 
   useEffect(() => {
@@ -58,7 +63,7 @@ export function EstimationToolPage() {
   }, [applicationDetails]);
 
   const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
-    waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
+    waterConservationApplicationId: state.conservationApplication.application?.waterConservationApplicationId,
     waterRightNativeId: waterRightNativeId,
     // todo: update
     model: 0,
