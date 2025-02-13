@@ -26,7 +26,12 @@ export function useRiverBasinFilter() {
     return riverBasinNames.length > 0;
   }, [riverBasinNames.length]);
 
-  const [debouncedRiverBasinNames] = useDebounce(riverBasinNames, 500);
+  const [debouncedRiverBasinNames, setDebouncedRiverBasinNames] = useDebounce(riverBasinNames, 500);
+
+  useEffect(() => {
+    setDebouncedRiverBasinNames(riverBasinNames);
+  }, [riverBasinNames]);
+
   const riverBasinPolygonsQuery = useRiverBasinPolygons(debouncedRiverBasinNames);
   const riverBasinPolygons = useMemo(() => {
     if (!hasRiverBasinNames) return emptyGeoJsonData;

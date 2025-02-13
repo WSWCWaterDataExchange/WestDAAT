@@ -1,32 +1,33 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import Layout from './pages/Layout';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
-import DetailLayout from './pages/DetailLayout';
-import AppProvider from './contexts/AppProvider';
-import { ToastContainer } from 'react-toastify';
-import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend'; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
-import 'react-toastify/dist/ReactToastify.css';
 import { IPublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
-import { useEffect, useState } from 'react';
-import ReactGA from 'react-ga4';
-import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
-import SiteDetailsPage from './pages/SiteDetailsPage';
-import OverlayDetailsPage from './pages/OverlayDetailsPage';
 import { clarity } from 'clarity-js';
-import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
+import { useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend'; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
+import ReactGA from 'react-ga4';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import AppProvider from './contexts/AppProvider';
+import { AccountInformationPage } from './pages/account/AccountInformationPage';
+import { AccountLayout } from './pages/account/AccountLayout';
 import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
+import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
-import { AccountLayout } from './pages/account/AccountLayout';
-import { AccountInformationPage } from './pages/account/AccountInformationPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+import DetailLayout from './pages/DetailLayout';
+import HomePage from './pages/HomePage';
+import Layout from './pages/Layout';
+import OverlayDetailsPage from './pages/OverlayDetailsPage';
+import SiteDetailsPage from './pages/SiteDetailsPage';
+import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
 
@@ -100,6 +101,9 @@ function App({ msalInstance }: AppProps) {
                     <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                    </Route>
+                    <Route path=":applicationId">
+                      <Route path="review" element={<ApplicationReviewPage />}></Route>
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>
