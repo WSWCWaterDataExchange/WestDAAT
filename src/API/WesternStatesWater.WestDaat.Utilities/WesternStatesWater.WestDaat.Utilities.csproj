@@ -23,7 +23,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.1" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Contracts.Client\WesternStatesWater.WestDaat.Contracts.Client.csproj" />
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj" />
   </ItemGroup>
