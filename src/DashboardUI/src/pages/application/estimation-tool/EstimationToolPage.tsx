@@ -8,11 +8,11 @@ import { useFundingOrganization } from './hooks/useFundingOrganization';
 import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
-
-import './estimation-tool-page.scss';
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
+
+import './estimation-tool-page.scss';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
