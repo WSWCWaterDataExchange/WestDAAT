@@ -14,7 +14,7 @@ describe('AdminState reducer', () => {
     // Act
     const newState = reducer(state, {
       type: 'ADMIN_ORGANIZATIONS_LOADED',
-      organizations,
+      payload: { organizations },
     });
 
     // Assert
