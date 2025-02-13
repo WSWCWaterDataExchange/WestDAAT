@@ -59,7 +59,6 @@ function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLa
         <SideBar />
       </SidePanel>
       <MainPanel>
-        <TableView />
         <SiteActionbar showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
         <div style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
           <Map
