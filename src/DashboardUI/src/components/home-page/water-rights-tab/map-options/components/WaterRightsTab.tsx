@@ -17,7 +17,7 @@ import { useHomePageContext } from '../../../Provider';
 import { useMapFitRequested } from '../hooks/useMapFitRequested';
 import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
 import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
-import { SiteActionbar } from "../../../../SiteActionbar";
+import { SiteActionbar } from '../../../../SiteActionbar';
 
 interface WaterRightsTabProps {
   showDownloadModal?: (show: boolean) => void;
@@ -60,7 +60,10 @@ function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLa
       </SidePanel>
       <MainPanel>
         <SiteActionbar showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
-        <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
+        <div style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
+          <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
+          <TableView />
+        </div>
       </MainPanel>
     </>
   );

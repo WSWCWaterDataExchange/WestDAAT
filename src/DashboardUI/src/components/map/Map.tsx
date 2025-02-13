@@ -38,7 +38,6 @@ import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 
 import './map.scss';
-import TableView from "../home-page/TableView";
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -547,8 +546,6 @@ function Map({ handleMapDrawnPolygonChange, handleMapFitChange }: mapProps) {
           dropRef(el);
         }}
       ></div>
-      <TableView />
-
       <ToastContainer />
     </div>
   );
