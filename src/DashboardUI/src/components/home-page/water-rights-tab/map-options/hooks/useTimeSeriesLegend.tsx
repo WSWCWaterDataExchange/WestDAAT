@@ -16,7 +16,7 @@ export function useTimeSeriesLegend() {
 
     return (
       <MapLegendCircleItem key="timeSeries" color={timeSeriesColor}>
-        Time Series Data
+        Time Series Site
       </MapLegendCircleItem>
     );
   }, [isTimeSeriesVisible, timeSeriesColor]);
