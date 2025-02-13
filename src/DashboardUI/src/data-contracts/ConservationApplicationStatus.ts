@@ -4,3 +4,16 @@ export enum ConservationApplicationStatus {
   Approved = 2,
   Rejected = 3
 }
+
+export function formatConservationApplicationStatusText(status: ConservationApplicationStatus): string {
+  switch (status) {
+    case ConservationApplicationStatus.InReview:
+      return 'In Review';
+    case ConservationApplicationStatus.Approved:
+      return 'Approved';
+    case ConservationApplicationStatus.Rejected:
+      return 'Rejected';
+    case ConservationApplicationStatus.Unknown:
+      return 'Unknown';
+  }
+}
