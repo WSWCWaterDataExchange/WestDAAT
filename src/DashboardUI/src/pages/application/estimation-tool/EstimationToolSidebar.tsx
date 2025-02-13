@@ -24,7 +24,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
   const onEstimationFormChanged = () => {
     const desiredDollars = Number(desiredDollarsRef.current?.value);
-    const desiredUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
+    const desiredUnitsAsEnum: CompensationRateUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
+    const desiredUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined =
+      desiredUnitsAsEnum === CompensationRateUnits.None ? undefined : desiredUnitsAsEnum;
 
     dispatch({
       type: 'ESTIMATION_FORM_UPDATED',

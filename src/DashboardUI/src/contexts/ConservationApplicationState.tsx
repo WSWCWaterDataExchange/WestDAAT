@@ -16,7 +16,7 @@ export interface ConservationApplicationState {
     dateRangeEnd: Date | undefined;
     compensationRateModel: string | undefined;
     desiredCompensationDollars: number | undefined;
-    desiredCompensationUnits: CompensationRateUnits | undefined;
+    desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     selectedMapPolygons: EstimationFormMapPolygon[];
@@ -90,7 +90,7 @@ export interface EstimationFormUpdatedAction {
   type: 'ESTIMATION_FORM_UPDATED';
   payload: {
     desiredCompensationDollars: number | undefined;
-    desiredCompensationUnits: CompensationRateUnits | undefined;
+    desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   };
 }
 

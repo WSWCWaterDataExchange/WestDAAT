@@ -78,8 +78,8 @@ export function EstimationToolPage() {
     dateRangeStart: state.conservationApplication.dateRangeStart,
     dateRangeEnd: state.conservationApplication.dateRangeEnd,
     polygons: [], // user input
-    compensationRateDollars: 0, // user input
-    units: CompensationRateUnits.AcreFeet, // user input
+    compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
+    units: state.conservationApplication.desiredCompensationUnits,
   });
 
   useEffect(() => {
