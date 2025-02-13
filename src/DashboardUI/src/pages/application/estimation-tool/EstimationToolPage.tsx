@@ -79,7 +79,9 @@ export function EstimationToolPage() {
       dispatch({
         type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED',
         payload: {
-          consumptiveUse: consumptiveUse,
+          totalAverageYearlyEtAcreFeet: consumptiveUse.totalAverageYearlyEtAcreFeet,
+          conservationPayment: consumptiveUse.conservationPayment,
+          dataCollections: consumptiveUse.dataCollections,
         },
       });
     }

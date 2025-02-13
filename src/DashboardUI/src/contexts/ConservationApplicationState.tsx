@@ -1,20 +1,22 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
+import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
   conservationApplication: {
     waterRightNativeId: string | undefined;
+    waterConservationApplicationId: string | undefined;
     fundingOrganizationId: string | undefined;
     fundingOrganizationName: string | undefined;
     openEtModel: string | undefined;
     dateRangeStart: Date | undefined;
     dateRangeEnd: Date | undefined;
     compensationRateModel: string | undefined;
-    waterConservationApplicationId: string | undefined;
-
-    consumptiveUse: EstimateConsumptiveUseResponse | undefined;
+    totalAverageYearlyEtAcreFeet: number | undefined;
+    conservationPayment: number | undefined;
+    dataCollections: PolygonEtDataCollection[] | undefined;
   };
 }
 
@@ -22,14 +24,16 @@ export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   conservationApplication: {
     waterRightNativeId: undefined,
+    waterConservationApplicationId: undefined,
     fundingOrganizationId: undefined,
     fundingOrganizationName: undefined,
     openEtModel: undefined,
     dateRangeStart: undefined,
     dateRangeEnd: undefined,
     compensationRateModel: undefined,
-    waterConservationApplicationId: undefined,
-    consumptiveUse: undefined,
+    totalAverageYearlyEtAcreFeet: undefined,
+    conservationPayment: undefined,
+    dataCollections: undefined,
   },
 });
 
@@ -68,7 +72,9 @@ export interface WaterConservationApplicationCreatedAction {
 export interface EstimateConsumptiveUseLoadedAction {
   type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED';
   payload: {
-    consumptiveUse: EstimateConsumptiveUseResponse;
+    totalAverageYearlyEtAcreFeet: number;
+    conservationPayment: number | undefined;
+    dataCollections: PolygonEtDataCollection[];
   };
 }
 
@@ -132,6 +138,10 @@ const onEstimateConsumptiveUseLoaded = (
   draftState: ConservationApplicationState,
   { payload }: EstimateConsumptiveUseLoadedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.consumptiveUse = payload.consumptiveUse;
+  const application = draftState.conservationApplication;
+
+  application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
+  application.conservationPayment = payload.conservationPayment;
+  application.dataCollections = payload.dataCollections;
   return draftState;
 };
