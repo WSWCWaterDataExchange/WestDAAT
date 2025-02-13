@@ -18,7 +18,7 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
 import './organization-dashboard-page.scss';
-import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGridCol';
+import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 
 interface ApplicationDataGridColumns {
   applicant: string; // or whatever type
