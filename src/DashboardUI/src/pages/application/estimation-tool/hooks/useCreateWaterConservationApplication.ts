@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import { createWaterConservationApplication } from '../../../../accessors/applicationAccessor';
 import { IMsalContext } from '@azure/msal-react';
 
-export function UseCreateWaterConservationApplication(
+export function useCreateWaterConservationApplication(
   context: IMsalContext,
   fields: {
     waterRightNativeId: string | undefined;

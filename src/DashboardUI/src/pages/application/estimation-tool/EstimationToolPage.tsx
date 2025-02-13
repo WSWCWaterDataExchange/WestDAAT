@@ -5,7 +5,7 @@ import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useFundingOrganization } from './hooks/useFundingOrganization';
-import { UseCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
+import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 
@@ -27,7 +27,7 @@ export function EstimationToolPage() {
     waterRightNativeId,
   );
 
-  const { data: applicationDetails, isLoading: isLoadingApplication } = UseCreateWaterConservationApplication(context, {
+  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication(context, {
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
   });
