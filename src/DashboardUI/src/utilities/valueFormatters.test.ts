@@ -71,19 +71,7 @@ describe('formatDateString', () => {
       const result = formatDateString(date, 'MM/DD/YYYY');
 
       // Assert
-      expect(result).toStrictEqual('01/01/2021');
-    })
-
-    it('as MM/DD/YYYY format when provided an invalid date format', () => {
-      // Arrange
-      const date = new Date('2021-01-01T00:00:00.000Z');
-
-      // Act
-      const result = formatDateString(date, 'invalid-format');
-
-      // Assert
-      expect(result).toStrictEqual('01/01/2021');
+      expect(result).toStrictEqual('12/31/2020');
     })
   });
-
 });

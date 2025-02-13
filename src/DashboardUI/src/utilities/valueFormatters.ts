@@ -14,15 +14,6 @@ export function formatNumber(value: number | null | undefined, decimals?: number
   return value.toLocaleString(undefined, opts);
 }
 
-// TODO: JN - review with Beebs
 export function formatDateString(date: Date, dateFormat: string): string {
-  const validMomentFormats = ['M', 'D', 'Y', 'Mo'];
-
-  const formatComponents = dateFormat.split(/[^A-z]/);
-
-  if (formatComponents.some(format => !validMomentFormats.includes(format))) {
-    return moment(date).format('MM/DD/YYYY');
-  }
-
   return moment(date).format(dateFormat);
 }
