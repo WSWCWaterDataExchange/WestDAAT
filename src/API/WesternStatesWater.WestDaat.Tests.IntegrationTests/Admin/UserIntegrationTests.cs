@@ -3,6 +3,7 @@ using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common.Context;
 using System.Data.Entity;
+using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -117,4 +118,63 @@ public class UserIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeOfType<ForbiddenError>();
     }
+
+
+    [DataTestMethod]
+    [DataRow(Roles.GlobalAdmin, true)]
+    [DataRow(Roles.OrganizationAdmin, true)]
+    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.TechnicalReviewer, false)]
+    public async Task Load_UserSearchRequest_InvalidRole_ShouldThrow(string role, bool isAllowed)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
+        var userRoles = new UserRoleFaker(user).Generate(1);
+        userRoles[0].Role = role;
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
+        await _dbContext.UserRoles.AddRangeAsync(userRoles);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = user.Id,
+                Roles = role == Roles.GlobalAdmin ? [role] : [],
+                OrganizationRoles = role != Roles.GlobalAdmin
+                    ?
+                    [
+                        new OrganizationRole
+                        {
+                            OrganizationId = userOrgnization.OrganizationId,
+                            RoleNames = [role]
+                        }
+                    ]
+                    : []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserSearchRequest, CLI.Responses.Admin.UserSearchResponse>(
+            new CLI.Requests.Admin.UserSearchRequest
+            {
+                SearchTerm = "chad"
+            });
+
+        // Assert
+        if (isAllowed)
+        {
+            result.Error.Should().BeNull();
+        }
+        else
+        {
+            result.Error.Should().BeOfType<ForbiddenError>();
+        }
+    }
+
+    // TODO Test that search strings must be valid length or null 
 }

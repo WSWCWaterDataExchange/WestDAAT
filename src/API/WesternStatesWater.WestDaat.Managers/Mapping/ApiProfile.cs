@@ -64,6 +64,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Admin.EnrichJwtRequest, CommonContracts.UserStoreCreateRequest>()
                 .ForMember(dest => dest.ExternalAuthId, opt => opt.MapFrom(src => src.ObjectId));
+
+            CreateMap<ClientContracts.Requests.Admin.UserSearchRequest, CommonContracts.UserSearchRequest>();
+
+            CreateMap<CommonContracts.UserSearchResponse, ClientContracts.Responses.Admin.UserSearchResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         private void AddOrganizationMappings()
