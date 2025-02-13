@@ -27,7 +27,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public void SmokeTest() => _organizationManager.Should().NotBeNull();
 
     [TestMethod]
-    public async Task Load_OrganizationListDetailsRequest_GlobalAdminUser_ShouldReturnAscendingOrder()
+    public async Task Load_OrganizationDetailsListRequest_GlobalAdminUser_ShouldReturnAscendingOrder()
     {
         // Arrange
         UseUserContext(new UserContext
@@ -50,7 +50,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         await _dbContext.SaveChangesAsync();
 
         // Act 
-        var response = await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(new OrganizationListDetailsRequest() { });
+        var response = await _organizationManager.Load<OrganizationDetailsListRequest, OrganizationDetailsListResponse>(new OrganizationDetailsListRequest() { });
 
         // Assert
         var expected = new List<CLI.OrganizationListItem>()
@@ -78,7 +78,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             }
         }.OrderBy(org => org.Name);
 
-        response.GetType().Should().Be<OrganizationListDetailsResponse>();
+        response.GetType().Should().Be<OrganizationDetailsListResponse>();
         response.Error.Should().BeNull();
         response.Organizations.Should().HaveCount(3);
         response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));
@@ -91,7 +91,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     [DataRow(Roles.TechnicalReviewer)]
     [DataRow(Roles.OrganizationAdmin)]
     [DataRow("Fake role")]
-    public async Task Load_OrganizationListDetailsRequest_NotGlobalAdminUser_ShouldReturnError(string role)
+    public async Task Load_OrganizationDetailsListRequest_NotGlobalAdminUser_ShouldReturnError(string role)
     {
         // Arrange
         UseUserContext(new UserContext
@@ -103,10 +103,10 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         });
 
         // Act 
-        var response = await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(new OrganizationListDetailsRequest() { });
+        var response = await _organizationManager.Load<OrganizationDetailsListRequest, OrganizationDetailsListResponse>(new OrganizationDetailsListRequest() { });
 
         // Assert
-        response.GetType().Should().Be<OrganizationListDetailsResponse>();
+        response.GetType().Should().Be<OrganizationDetailsListResponse>();
         response.Organizations.Should().BeNull();
         response.Error.Should().NotBeNull();
         response.Error!.LogMessage.Should().Contain("but did not have permission to do so.");
@@ -114,7 +114,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
 
     [TestMethod]
-    public async Task Load_OrganizationListSummaryRequest_ShouldReturnAscendingOrder()
+    public async Task Load_OrganizationSummaryListRequest_ShouldReturnAscendingOrder()
     {
         // Arrange
         UseUserContext(new UserContext
@@ -130,7 +130,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         await _dbContext.SaveChangesAsync();
 
         // Act 
-        var response = await _organizationManager.Load<OrganizationListSummaryRequest, OrganizationListSummaryResponse>(new OrganizationListSummaryRequest());
+        var response = await _organizationManager.Load<OrganizationSummaryListRequest, OrganizationSummaryListResponse>(new OrganizationSummaryListRequest());
 
         // Assert
         var expected = new List<CLI.OrganizationSummaryItem>
@@ -152,7 +152,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             }
         }.OrderBy(org => org.Name);
 
-        response.GetType().Should().Be<OrganizationListSummaryResponse>();
+        response.GetType().Should().Be<OrganizationSummaryListResponse>();
         response.Error.Should().BeNull();
         response.Organizations.Should().HaveCount(3);
         response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));

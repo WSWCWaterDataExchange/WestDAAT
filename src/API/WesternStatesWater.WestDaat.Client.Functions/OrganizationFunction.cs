@@ -32,8 +32,8 @@ public class OrganizationFunction : FunctionBase
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
         OrganizationLoadResponseBase result = organizationLoadRequest switch
         {
-            OrganizationListDetailsRequest request => await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(request),
-            OrganizationListSummaryRequest request => await _organizationManager.Load<OrganizationListSummaryRequest, OrganizationListSummaryResponse>(request),
+            OrganizationDetailsListRequest request => await _organizationManager.Load<OrganizationDetailsListRequest, OrganizationDetailsListResponse>(request),
+            OrganizationSummaryListRequest request => await _organizationManager.Load<OrganizationSummaryListRequest, OrganizationSummaryListResponse>(request),
             _ => throw new NotImplementedException($"Request type {organizationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);

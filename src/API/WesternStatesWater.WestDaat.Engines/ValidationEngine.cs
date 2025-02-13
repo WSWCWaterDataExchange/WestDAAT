@@ -155,14 +155,14 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            OrganizationListDetailsRequest req => ValidateOrganizationListDetailsRequest(req, context),
-            OrganizationListSummaryRequest req => ValidateOrganizationListSummaryRequest(req, context),
+            OrganizationDetailsListRequest req => ValidateOrganizationDetailsListRequest(req, context),
+            OrganizationSummaryListRequest req => ValidateOrganizationSummaryListRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented.")
         };
     }
 
-    private ErrorBase ValidateOrganizationListDetailsRequest(OrganizationListDetailsRequest request, ContextBase context)
+    private ErrorBase ValidateOrganizationDetailsListRequest(OrganizationDetailsListRequest request, ContextBase context)
     {
         var permissionsRequest = new DTO.PermissionsGetRequest()
         {
@@ -171,7 +171,7 @@ internal class ValidationEngine : IValidationEngine
 
         var permissions = _securityUtility.Get(permissionsRequest);
 
-        if (!permissions.Contains(Permissions.OrganizationListDetails))
+        if (!permissions.Contains(Permissions.OrganizationDetailsList))
         {
             return CreateForbiddenError(request, context);
         }
@@ -179,7 +179,7 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private ErrorBase ValidateOrganizationListSummaryRequest(OrganizationListSummaryRequest request, ContextBase context)
+    private ErrorBase ValidateOrganizationSummaryListRequest(OrganizationSummaryListRequest request, ContextBase context)
     {
         // Must be logged in
         _contextUtility.GetRequiredContext<UserContext>();
