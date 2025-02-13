@@ -1,18 +1,21 @@
 import { produce } from 'immer';
+import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 
 export interface ConservationApplicationState {
-  dashboardApplications: string[];
+  dashboardApplications: ApplicationDashboardListItem[];
 }
 
 export const defaultState = (): ConservationApplicationState => ({
-  dashboardApplications: ['Application 1', 'Application 2'],
+  dashboardApplications: [],
 });
 
 export type ApplicationAction = DashboardApplicationsLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
-  dashboardApplications: string[];
+  payload: {
+    dashboardApplications: ApplicationDashboardListItem[];
+  };
 }
 
 export const reducer = (
@@ -31,8 +34,6 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
   switch (action.type) {
     case 'DASHBOARD_APPLICATIONS_LOADED':
       return onDashboardApplicationsLoaded(draftState, action);
-    default:
-      return draftState;
   }
 };
 
@@ -40,6 +41,6 @@ const onDashboardApplicationsLoaded = (
   draftState: ConservationApplicationState,
   action: DashboardApplicationsLoadedAction,
 ): ConservationApplicationState => {
-  draftState.dashboardApplications = action.dashboardApplications;
+  draftState.dashboardApplications = action.payload.dashboardApplications;
   return draftState;
 };

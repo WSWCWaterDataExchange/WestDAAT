@@ -20,30 +20,118 @@ import { NldiFilters } from './nldi/components/NldiFilters';
 function SideBar() {
   const { filters, setFilters, resetWaterRightsOptions } = useWaterRightsContext();
   const { isWaterRightsFilterActive } = filters;
-  const toggleWaterRightFilters = useCallback(() => {
-    setFilters((prev) => ({
-      ...prev,
-      isWaterRightsFilterActive: !prev.isWaterRightsFilterActive,
-    }));
-  }, [setFilters]);
 
   const { isOverlayFilterActive, setOverlayFilterActive, resetOverlaysOptions } = useOverlaysFilter();
-  const toggleOverlayFilter = useCallback(() => {
-    setOverlayFilterActive(!isOverlayFilterActive);
-  }, [isOverlayFilterActive, setOverlayFilterActive]);
 
   const { isNldiFilterActive, setNldiMapActiveStatus } = useNldiFilter();
-  const toggleNldiFilterStatus = useCallback(() => {
-    setNldiMapActiveStatus(!isNldiFilterActive);
-  }, [isNldiFilterActive, setNldiMapActiveStatus]);
 
   const { isTimeSeriesFilterActive, setTimeSeriesFilterActive, resetTimeSeriesOptions } = useTimeSeriesFilter();
-  const toggleTimeSeriesFilter = useCallback(() => {
-    setTimeSeriesFilterActive(!isTimeSeriesFilterActive);
-  }, [isTimeSeriesFilterActive, setTimeSeriesFilterActive]);
 
-  const [activeKeys, setActiveKeys] = useState<string[]>(
-    isNldiFilterActive ? ['nldi'] : ['colorSizeTools', 'siteSelectionFilters'],
+  const [activeKeys, setActiveKeys] = useState<string[]>(() => {
+    const keys = ['colorSizeTools'];
+    if (isWaterRightsFilterActive) keys.push('siteSelectionFilters');
+    if (isOverlayFilterActive) keys.push('overlayFilters');
+    if (isTimeSeriesFilterActive) keys.push('timeSeriesFilters');
+    if (isNldiFilterActive) keys.push('nldi');
+    return keys;
+  });
+
+  const handleWaterRightsSwitchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setFilters((prev) => ({ ...prev, isWaterRightsFilterActive: newValue }));
+      setActiveKeys((prevKeys) => {
+        if (newValue) {
+          return [...new Set([...prevKeys, 'siteSelectionFilters'])];
+        } else {
+          return prevKeys.filter((key) => key !== 'siteSelectionFilters');
+        }
+      });
+    },
+    [setFilters],
+  );
+
+  const handleOverlaySwitchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setOverlayFilterActive(newValue);
+      setActiveKeys((prevKeys) => {
+        if (newValue) {
+          return [...new Set([...prevKeys, 'overlayFilters'])];
+        } else {
+          return prevKeys.filter((key) => key !== 'overlayFilters');
+        }
+      });
+    },
+    [setOverlayFilterActive],
+  );
+
+  const handleTimeSeriesSwitchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setTimeSeriesFilterActive(newValue);
+      setActiveKeys((prevKeys) => {
+        if (newValue) {
+          return [...new Set([...prevKeys, 'timeSeriesFilters'])];
+        } else {
+          return prevKeys.filter((key) => key !== 'timeSeriesFilters');
+        }
+      });
+    },
+    [setTimeSeriesFilterActive],
+  );
+
+  const handleNldiSwitchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setNldiMapActiveStatus(newValue);
+      setActiveKeys((prevKeys) => {
+        if (newValue) {
+          return [...new Set([...prevKeys, 'nldi'])];
+        } else {
+          return prevKeys.filter((key) => key !== 'nldi');
+        }
+      });
+    },
+    [setNldiMapActiveStatus],
+  );
+
+  const setOpenAccordionKeys = useCallback(
+    (keys: AccordionEventKey) => {
+      let newKeys: string[];
+      if (keys === null || keys === undefined) {
+        newKeys = [];
+      } else if (Array.isArray(keys)) {
+        newKeys = keys;
+      } else {
+        newKeys = [keys];
+      }
+      setActiveKeys(newKeys);
+
+      if (newKeys.includes('overlayFilters') && !isOverlayFilterActive) {
+        setOverlayFilterActive(true);
+      }
+      if (newKeys.includes('siteSelectionFilters') && !isWaterRightsFilterActive) {
+        setFilters((prev) => ({ ...prev, isWaterRightsFilterActive: true }));
+      }
+      if (newKeys.includes('timeSeriesFilters') && !isTimeSeriesFilterActive) {
+        setTimeSeriesFilterActive(true);
+      }
+      if (newKeys.includes('nldi') && !isNldiFilterActive) {
+        setNldiMapActiveStatus(true);
+      }
+    },
+    [
+      setActiveKeys,
+      isOverlayFilterActive,
+      setOverlayFilterActive,
+      isWaterRightsFilterActive,
+      setFilters,
+      isTimeSeriesFilterActive,
+      setTimeSeriesFilterActive,
+      isNldiFilterActive,
+      setNldiMapActiveStatus,
+    ],
   );
 
   const handleResetAllFilters = useCallback(() => {
@@ -52,39 +140,7 @@ function SideBar() {
     resetTimeSeriesOptions();
   }, [resetWaterRightsOptions, resetOverlaysOptions, resetTimeSeriesOptions]);
 
-  const setOpenAccordionKeys = useCallback(
-    (keys: AccordionEventKey) => {
-      if (keys === null || keys === undefined) {
-        setActiveKeys([]);
-      } else if (Array.isArray(keys)) {
-        setActiveKeys(keys);
-      } else {
-        setActiveKeys([keys]);
-      }
-    },
-    [setActiveKeys],
-  );
-
-  const openAccordionKeys = useMemo(() => {
-    const keys = [...activeKeys].filter(
-      (key) =>
-        key !== 'nldi' && key !== 'siteSelectionFilters' && key !== 'overlayFilters' && key !== 'timeSeriesFilters',
-    );
-
-    if (isTimeSeriesFilterActive) {
-      keys.push('timeSeriesFilters');
-    }
-    if (isNldiFilterActive) {
-      keys.push('nldi');
-    }
-    if (isWaterRightsFilterActive) {
-      keys.push('siteSelectionFilters');
-    }
-    if (isOverlayFilterActive) {
-      keys.push('overlayFilters');
-    }
-    return keys;
-  }, [activeKeys, isTimeSeriesFilterActive, isNldiFilterActive, isWaterRightsFilterActive, isOverlayFilterActive]);
+  const openAccordionKeys = useMemo(() => activeKeys, [activeKeys]);
 
   return (
     <>
@@ -112,7 +168,7 @@ function SideBar() {
                 id="overlayFilters"
                 label=""
                 checked={isOverlayFilterActive}
-                onChange={toggleOverlayFilter}
+                onChange={handleOverlaySwitchChange}
               />
               <label className="fw-bold ms-2">OVERLAY FILTER</label>
             </Accordion.Header>
@@ -127,7 +183,7 @@ function SideBar() {
                 id="waterRightSelection"
                 label=""
                 checked={isWaterRightsFilterActive}
-                onChange={toggleWaterRightFilters}
+                onChange={handleWaterRightsSwitchChange}
               />
               <label className="fw-bold ms-2">WATER RIGHT SELECTION</label>
             </Accordion.Header>
@@ -142,7 +198,7 @@ function SideBar() {
                 id="timeSeriesToggle"
                 label=""
                 checked={isTimeSeriesFilterActive}
-                onChange={toggleTimeSeriesFilter}
+                onChange={handleTimeSeriesSwitchChange}
               />
               <label className="fw-bold ms-2">TIME SERIES FILTER</label>
             </Accordion.Header>
@@ -157,7 +213,7 @@ function SideBar() {
                 id="nldi"
                 label=""
                 checked={isNldiFilterActive}
-                onChange={toggleNldiFilterStatus}
+                onChange={handleNldiSwitchChange}
               />
               <label className="fw-bold ms-2">NLDI FILTER</label>
             </Accordion.Header>

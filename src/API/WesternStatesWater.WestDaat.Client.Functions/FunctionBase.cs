@@ -1,10 +1,10 @@
-﻿using System.IO;
-using System.Net;
-using System.Text.Json;
-using Azure.Core.Serialization;
+﻿using Azure.Core.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker.Http;
+using System.IO;
+using System.Net;
+using System.Text.Json;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 
@@ -62,6 +62,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 InternalError => await CreateInternalServerErrorResponse(request),
                 NotFoundError err => await CreateNotFoundResponse(request, err),
                 ValidationError err => await CreateBadRequestResponse(request, err),
+                ServiceUnavailableError err => await CreateServiceUnavailableResponse(request, err),
                 _ => await CreateInternalServerErrorResponse(request)
             };
         }
@@ -114,6 +115,18 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             };
 
             return CreateProblemDetailsResponse(request, details, HttpStatusCode.BadRequest);
+        }
+
+        private static Task<HttpResponseData> CreateServiceUnavailableResponse(HttpRequestData request, ServiceUnavailableError error)
+        {
+            var details = new ProblemDetails
+            {
+                Status = (int)HttpStatusCode.ServiceUnavailable,
+                Title = "Service Unavailable",
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.4",
+            };
+
+            return CreateProblemDetailsResponse(request, details, HttpStatusCode.ServiceUnavailable);
         }
 
         private static async Task<HttpResponseData> CreateProblemDetailsResponse(

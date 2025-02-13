@@ -1,8 +1,8 @@
 import React from 'react';
-import Button from 'react-bootstrap/esm/Button';
-import Container from 'react-bootstrap/esm/Container';
-import Nav from 'react-bootstrap/esm/Nav';
-import Navbar from 'react-bootstrap/esm/Navbar';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
 
 interface SiteActionbarProps {
   showDownloadModal?: (show: boolean) => void;
@@ -14,7 +14,6 @@ export function SiteActionbar({ showDownloadModal, showUploadModal }: SiteAction
     <Navbar bg="light" className="p-0 second-nav">
       <Container fluid className="p-0">
         <Nav></Nav>
-
         <div className="d-flex">
           <div className="p-2">
             {showDownloadModal && (

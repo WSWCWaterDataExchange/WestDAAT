@@ -12,7 +12,7 @@ export type AdminAction = AdminOrganizationsLoadedAction;
 
 export interface AdminOrganizationsLoadedAction {
   type: 'ADMIN_ORGANIZATIONS_LOADED';
-  organizations: string[];
+  payload: { organizations: string[] };
 }
 
 export const reducer = (state: AdminState, action: AdminAction): AdminState => {
@@ -34,6 +34,6 @@ const reduce = (draftState: AdminState, action: AdminAction): AdminState => {
 };
 
 const onAdminOrganizationsLoaded = (draftState: AdminState, action: AdminOrganizationsLoadedAction): AdminState => {
-  draftState.organizations = action.organizations;
+  draftState.organizations = action.payload.organizations;
   return draftState;
 };

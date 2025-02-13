@@ -3,6 +3,7 @@ using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.Shared.Extensions;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Client.SmokeTest;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Handlers;
@@ -124,6 +125,12 @@ namespace WesternStatesWater.WestDaat.Managers
                     .Handle(request);
 
                 return response;
+            }
+            catch (ServiceUnavailableException ex)
+            {
+                Logger.LogError(ex, "An error occurred while processing the request");
+
+                return CreateErrorResponse<TRequest, TResponse>(new ServiceUnavailableError());
             }
             catch (Exception ex)
             {

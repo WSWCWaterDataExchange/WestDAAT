@@ -35,10 +35,16 @@ export function useNldiFilter() {
     setNldiIds,
   } = useWaterRightsContext();
 
-  const [[debouncedLatitude, debouncedLongitude]] = useDebounce(
+  const [debouncedCoords, setDebouncedCoords] = useDebounce(
     [nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null],
     400,
   );
+  const debouncedLatitude = debouncedCoords[0];
+  const debouncedLongitude = debouncedCoords[1];
+
+  useEffect(() => {
+    setDebouncedCoords([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null]);
+  }, [nldiFilterData?.latitude, nldiFilterData?.longitude]);
   const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);
   const { data: nldiGeoJsonData } = nldiFeaturesQuery;
 
