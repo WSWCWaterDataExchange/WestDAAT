@@ -10,35 +10,42 @@ import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 
 import './estimation-tool-page.scss';
+import { useMsal } from '@azure/msal-react';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
   const routeParams = useParams();
   const { waterRightNativeId } = routeParams;
+  const context = useMsal();
 
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
   };
 
-  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } =
-    useFundingOrganization(waterRightNativeId);
+  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useFundingOrganization(
+    context,
+    waterRightNativeId,
+  );
 
-  const { data: applicationDetails, isLoading: isLoadingApplication } = UseCreateWaterConservationApplication({
+  const { data: applicationDetails, isLoading: isLoadingApplication } = UseCreateWaterConservationApplication(context, {
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
   });
 
-  const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse({
-    waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
-    waterRightNativeId: waterRightNativeId,
-    // todo: update
-    model: 0,
-    dateRangeStart: new Date(),
-    dateRangeEnd: new Date(),
-    polygons: [],
-    compensationRateDollars: 0,
-    units: CompensationRateUnits.AcreFeet,
-  });
+  const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse(
+    context,
+    {
+      waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
+      waterRightNativeId: waterRightNativeId,
+      // todo: update
+      model: 0,
+      dateRangeStart: new Date(),
+      dateRangeEnd: new Date(),
+      polygons: [],
+      compensationRateDollars: 0,
+      units: CompensationRateUnits.AcreFeet,
+    },
+  );
 
   return (
     <MapProvider>

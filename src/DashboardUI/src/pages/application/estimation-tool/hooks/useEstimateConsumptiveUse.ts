@@ -2,17 +2,21 @@ import { useQuery } from 'react-query';
 import { estimateConsumptiveUse } from '../../../../accessors/applicationAccessor';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { CompensationRateUnits } from '../../../../data-contracts/CompensationRateUnits';
+import { IMsalContext } from '@azure/msal-react';
 
-export function useEstimateConsumptiveUse(fields: {
-  waterConservationApplicationId: string | undefined;
-  waterRightNativeId: string | undefined;
-  model: number | undefined;
-  dateRangeStart: Date | undefined;
-  dateRangeEnd: Date | undefined;
-  polygons: Feature<Geometry, GeoJsonProperties>[] | undefined;
-  compensationRateDollars: number | undefined;
-  units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
-}) {
+export function useEstimateConsumptiveUse(
+  context: IMsalContext,
+  fields: {
+    waterConservationApplicationId: string | undefined;
+    waterRightNativeId: string | undefined;
+    model: number | undefined;
+    dateRangeStart: Date | undefined;
+    dateRangeEnd: Date | undefined;
+    polygons: Feature<Geometry, GeoJsonProperties>[] | undefined;
+    compensationRateDollars: number | undefined;
+    units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
+  },
+) {
   return useQuery(
     [
       'estimateConsumptiveUse',
@@ -27,7 +31,7 @@ export function useEstimateConsumptiveUse(fields: {
       fields.units,
     ],
     async () =>
-      estimateConsumptiveUse({
+      estimateConsumptiveUse(context, {
         waterConservationApplicationId: fields.waterConservationApplicationId!,
         waterRightNativeId: fields.waterRightNativeId!,
         model: fields.model!,

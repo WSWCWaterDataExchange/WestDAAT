@@ -32,7 +32,10 @@ export const applicationSearch = async (
   return data;
 };
 
-export const getFundingOrganizationDetails = (waterRightNativeId: string): Promise<FundingOrganizationDetails> => {
+export const getFundingOrganizationDetails = (
+  context: IMsalContext,
+  waterRightNativeId: string,
+): Promise<FundingOrganizationDetails> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -47,30 +50,36 @@ export const getFundingOrganizationDetails = (waterRightNativeId: string): Promi
   });
 };
 
-export const createWaterConservationApplication = async (fields: {
-  fundingOrganizationId: string;
-  waterRightNativeId: string;
-}): Promise<WaterConservationApplicationCreateResponse> => {
+export const createWaterConservationApplication = async (
+  context: IMsalContext,
+  fields: {
+    fundingOrganizationId: string;
+    waterRightNativeId: string;
+  },
+): Promise<WaterConservationApplicationCreateResponse> => {
   const request: WaterConservationApplicationCreateRequest = {
     fundingOrganizationId: fields.fundingOrganizationId,
     waterRightNativeId: fields.waterRightNativeId,
   };
 
-  const api = await westDaatApi();
+  const api = await westDaatApi(context);
   const { data } = await api.post<WaterConservationApplicationCreateResponse>('applications', request);
   return data;
 };
 
-export const estimateConsumptiveUse = async (fields: {
-  waterConservationApplicationId: string;
-  waterRightNativeId: string;
-  model: number;
-  dateRangeStart: Date;
-  dateRangeEnd: Date;
-  polygons: Feature<Geometry, GeoJsonProperties>[];
-  compensationRateDollars: number | undefined;
-  units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
-}): Promise<EstimateConsumptiveUseResponse> => {
+export const estimateConsumptiveUse = async (
+  context: IMsalContext,
+  fields: {
+    waterConservationApplicationId: string;
+    waterRightNativeId: string;
+    model: number;
+    dateRangeStart: Date;
+    dateRangeEnd: Date;
+    polygons: Feature<Geometry, GeoJsonProperties>[];
+    compensationRateDollars: number | undefined;
+    units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
+  },
+): Promise<EstimateConsumptiveUseResponse> => {
   const request: EstimateConsumptiveUseRequest = {
     waterConservationApplicationId: fields.waterConservationApplicationId,
     waterRightNativeId: fields.waterRightNativeId,
@@ -82,7 +91,7 @@ export const estimateConsumptiveUse = async (fields: {
     units: fields.units,
   };
 
-  const api = await westDaatApi();
+  const api = await westDaatApi(context);
   const { data } = await api.post<EstimateConsumptiveUseResponse>('applications/EstimateConsumptiveUse', request);
 
   return data;

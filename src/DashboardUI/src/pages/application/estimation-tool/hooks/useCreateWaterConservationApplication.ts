@@ -1,14 +1,18 @@
 import { useQuery } from 'react-query';
 import { createWaterConservationApplication } from '../../../../accessors/applicationAccessor';
+import { IMsalContext } from '@azure/msal-react';
 
-export function UseCreateWaterConservationApplication(fields: {
-  waterRightNativeId: string | undefined;
-  fundingOrganizationId: string | undefined;
-}) {
+export function UseCreateWaterConservationApplication(
+  context: IMsalContext,
+  fields: {
+    waterRightNativeId: string | undefined;
+    fundingOrganizationId: string | undefined;
+  },
+) {
   return useQuery(
     ['createWaterConservationApplication', fields.waterRightNativeId, fields.fundingOrganizationId],
     () =>
-      createWaterConservationApplication({
+      createWaterConservationApplication(context, {
         waterRightNativeId: fields.waterRightNativeId!,
         fundingOrganizationId: fields.fundingOrganizationId!,
       }),
