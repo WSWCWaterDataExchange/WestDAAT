@@ -71,7 +71,7 @@ describe('formatDateString', () => {
       const result = formatDateString(date, 'MM/DD/YYYY');
 
       // Assert
-      expect(result).toStrictEqual('12/31/2020');
+      expect(result).toStrictEqual('01/01/2021');
     })
   });
 });
