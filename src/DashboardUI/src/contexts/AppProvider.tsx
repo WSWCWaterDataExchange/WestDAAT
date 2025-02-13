@@ -64,7 +64,12 @@ const AppProvider = ({ children }: AppProviderProps) => {
     }
   }, []);
 
-  const [debouncedStateUrlParams] = useDebounce(stateUrlParams, 1000);
+  const [debouncedStateUrlParams, setDebouncedStateUrlParams] = useDebounce(stateUrlParams, 1000);
+
+  useEffect(() => {
+    setDebouncedStateUrlParams(stateUrlParams);
+  }, [stateUrlParams]);
+
   useEffect(() => {
     if ((Object.keys(debouncedStateUrlParams).length ?? 0) > 0) {
       setUrlParams(

@@ -299,6 +299,9 @@ function SeriesChart(props: {
       xAxis: {
         categories: xAxisCategories,
       },
+      legend: {
+        enabled: false,
+      },
       series: [
         {
           data: sortedData,
