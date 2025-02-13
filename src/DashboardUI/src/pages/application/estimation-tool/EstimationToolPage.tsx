@@ -56,14 +56,14 @@ export function EstimationToolPage() {
       dispatch({
         type: 'APPLICATION_CREATED',
         payload: {
-          application: applicationDetails,
+          waterConservationApplicationId: applicationDetails.waterConservationApplicationId,
         },
       });
     }
   }, [applicationDetails]);
 
   const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
-    waterConservationApplicationId: state.conservationApplication.application?.waterConservationApplicationId,
+    waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
     waterRightNativeId: waterRightNativeId,
     // todo: update
     model: 0,

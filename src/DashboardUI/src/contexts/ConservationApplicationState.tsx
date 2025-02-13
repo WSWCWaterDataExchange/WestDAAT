@@ -1,7 +1,6 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
-import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -13,7 +12,8 @@ export interface ConservationApplicationState {
     dateRangeStart: Date | undefined;
     dateRangeEnd: Date | undefined;
     compensationRateModel: string | undefined;
-    application: WaterConservationApplicationCreateResponse | undefined;
+    waterConservationApplicationId: string | undefined;
+
     consumptiveUse: EstimateConsumptiveUseResponse | undefined;
   };
 }
@@ -28,7 +28,7 @@ export const defaultState = (): ConservationApplicationState => ({
     dateRangeStart: undefined,
     dateRangeEnd: undefined,
     compensationRateModel: undefined,
-    application: undefined,
+    waterConservationApplicationId: undefined,
     consumptiveUse: undefined,
   },
 });
@@ -61,7 +61,7 @@ export interface FundingOrganizationLoadedAction {
 export interface WaterConservationApplicationCreatedAction {
   type: 'APPLICATION_CREATED';
   payload: {
-    application: WaterConservationApplicationCreateResponse;
+    waterConservationApplicationId: string;
   };
 }
 
@@ -124,7 +124,7 @@ const onWaterConservationApplicationCreated = (
   draftState: ConservationApplicationState,
   { payload }: WaterConservationApplicationCreatedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.application = payload.application;
+  draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
   return draftState;
 };
 
