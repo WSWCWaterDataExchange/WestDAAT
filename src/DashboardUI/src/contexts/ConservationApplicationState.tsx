@@ -39,6 +39,7 @@ export const defaultState = (): ConservationApplicationState => ({
 
 export type ApplicationAction =
   | DashboardApplicationsLoadedAction
+  | WaterRightLoadedAction
   | FundingOrganizationLoadedAction
   | WaterConservationApplicationCreatedAction
   | EstimateConsumptiveUseLoadedAction;
@@ -47,6 +48,13 @@ export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
   payload: {
     dashboardApplications: ApplicationDashboardListItem[];
+  };
+}
+
+export interface WaterRightLoadedAction {
+  type: 'WATER_RIGHT_LOADED';
+  payload: {
+    waterRightNativeId: string;
   };
 }
 
@@ -94,6 +102,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
   switch (action.type) {
     case 'DASHBOARD_APPLICATIONS_LOADED':
       return onDashboardApplicationsLoaded(draftState, action);
+    case 'WATER_RIGHT_LOADED':
+      return onWaterRightLoaded(draftState, action);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
     case 'APPLICATION_CREATED':
@@ -108,6 +118,14 @@ const onDashboardApplicationsLoaded = (
   action: DashboardApplicationsLoadedAction,
 ): ConservationApplicationState => {
   draftState.dashboardApplications = action.payload.dashboardApplications;
+  return draftState;
+};
+
+const onWaterRightLoaded = (
+  draftState: ConservationApplicationState,
+  { payload }: WaterRightLoadedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.waterRightNativeId = payload.waterRightNativeId;
   return draftState;
 };
 

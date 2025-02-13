@@ -17,17 +17,25 @@ import { useEffect } from 'react';
 export function EstimationToolPage() {
   const navigate = useNavigate();
   const routeParams = useParams();
-  const { waterRightNativeId } = routeParams;
   const context = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
 
-  const navigateToWaterRightLandingPage = () => {
-    navigate(`/details/right/${waterRightNativeId}`);
-  };
+  const { waterRightNativeId } = routeParams;
+
+  useEffect(() => {
+    if (waterRightNativeId) {
+      dispatch({
+        type: 'WATER_RIGHT_LOADED',
+        payload: {
+          waterRightNativeId: waterRightNativeId,
+        },
+      });
+    }
+  }, [waterRightNativeId]);
 
   const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useFundingOrganization(
     context,
-    waterRightNativeId,
+    state.conservationApplication.waterRightNativeId,
   );
 
   useEffect(() => {
@@ -64,14 +72,14 @@ export function EstimationToolPage() {
 
   const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
     waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-    waterRightNativeId: waterRightNativeId,
+    waterRightNativeId: state.conservationApplication.waterRightNativeId,
     // todo: update
-    model: 0,
-    dateRangeStart: new Date(),
-    dateRangeEnd: new Date(),
-    polygons: [],
-    compensationRateDollars: 0,
-    units: CompensationRateUnits.AcreFeet,
+    model: 0, // state (need to update)
+    dateRangeStart: state.conservationApplication.dateRangeStart,
+    dateRangeEnd: state.conservationApplication.dateRangeEnd,
+    polygons: [], // user input
+    compensationRateDollars: 0, // user input
+    units: CompensationRateUnits.AcreFeet, // user input
   });
 
   useEffect(() => {
@@ -86,6 +94,10 @@ export function EstimationToolPage() {
       });
     }
   }, [consumptiveUse]);
+
+  const navigateToWaterRightLandingPage = () => {
+    navigate(`/details/right/${waterRightNativeId}`);
+  };
 
   return (
     <MapProvider>
