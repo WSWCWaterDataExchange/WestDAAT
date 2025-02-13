@@ -20,7 +20,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             return request switch
             {
-                OrganizationListDetailsRequest => await GetAllOrganizations(),
+                OrganizationListDetailsRequest => await GetOrganizationListDetails(),
                 OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
                 UserOrganizationLoadRequest req => await GetUserOrganizations(req),
                 _ => throw new NotImplementedException(
@@ -28,7 +28,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private async Task<OrganizationListDetailsResponse> GetAllOrganizations()
+        private async Task<OrganizationListDetailsResponse> GetOrganizationListDetails()
         {
             await using var db = _westDaatDatabaseContextFactory.Create();
 

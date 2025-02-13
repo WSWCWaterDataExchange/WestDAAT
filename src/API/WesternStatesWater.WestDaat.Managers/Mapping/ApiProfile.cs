@@ -80,6 +80,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationSummaryItem>();
         }
 
         private void AddApplicationMappings()

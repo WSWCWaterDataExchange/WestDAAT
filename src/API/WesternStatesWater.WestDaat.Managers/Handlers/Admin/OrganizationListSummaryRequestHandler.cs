@@ -17,8 +17,8 @@ public class OrganizationListSummaryRequestHandler : IRequestHandler<Organizatio
 
     public async Task<OrganizationListSummaryResponse> Handle(OrganizationListSummaryRequest request)
     {
-        var accessorRequest = request.Map<Common.DataContracts.OrganizationListSummaryRequest>();
-        var accessorResponse = (Common.DataContracts.OrganizationListSummaryResponse)await OrganizationAccessor.Load(accessorRequest);
+        var accessorRequest = request.Map<Common.DataContracts.OrganizationListDetailsRequest>();
+        var accessorResponse = (Common.DataContracts.OrganizationListDetailsResponse)await OrganizationAccessor.Load(accessorRequest);
         return accessorResponse.Map<OrganizationListSummaryResponse>();
     }
 }

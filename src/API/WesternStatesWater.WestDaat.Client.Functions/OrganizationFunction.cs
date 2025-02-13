@@ -30,7 +30,7 @@ public class OrganizationFunction : FunctionBase
         HttpRequestData req)
     {
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
-        var result = organizationLoadRequest switch
+        OrganizationLoadResponseBase result = organizationLoadRequest switch
         {
             OrganizationListDetailsRequest request => await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(request),
             OrganizationListSummaryRequest request => await _organizationManager.Load<OrganizationListSummaryRequest, OrganizationListSummaryResponse>(request),
