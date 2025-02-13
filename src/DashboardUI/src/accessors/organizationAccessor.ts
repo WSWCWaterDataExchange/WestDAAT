@@ -1,13 +1,13 @@
 import { IMsalContext } from '@azure/msal-react';
-import { OrganizationLoadAllRequest } from '../data-contracts/OrganizationLoadAllRequest';
+import { OrganizationDetailsListRequest } from '../data-contracts/OrganizationDetailsListRequest';
 import westDaatApi from './westDaatApi';
-import { OrganizationLoadAllResponse } from '../data-contracts/OrganizationLoadAllResponse';
+import { OrganizationDetailsListResponse } from '../data-contracts/OrganizationDetailsListResponse';
 
-export const getAllOrganizations = async (msalContext: IMsalContext): Promise<OrganizationLoadAllResponse> => {
+export const getAllOrganizations = async (msalContext: IMsalContext): Promise<OrganizationDetailsListResponse> => {
   const api = await westDaatApi(msalContext);
 
-  const request: OrganizationLoadAllRequest = {
-    $type: 'OrganizationLoadAllRequest',
+  const request: OrganizationDetailsListRequest = {
+    $type: 'OrganizationDetailsListRequest',
   };
 
   const { data } = await api.post('Organizations/Search', request);
