@@ -72,8 +72,7 @@ export function EstimationToolPage() {
   const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
     waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
     waterRightNativeId: state.conservationApplication.waterRightNativeId,
-    // todo: update
-    model: 0, // state (need to update)
+    model: 1, // this field will probably get stripped out since we'll look up the model from the funding org in the backend
     dateRangeStart: state.conservationApplication.dateRangeStart,
     dateRangeEnd: state.conservationApplication.dateRangeEnd,
     polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
