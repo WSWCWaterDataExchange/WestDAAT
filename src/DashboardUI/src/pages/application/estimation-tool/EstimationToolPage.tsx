@@ -76,7 +76,7 @@ export function EstimationToolPage() {
     model: 0, // state (need to update)
     dateRangeStart: state.conservationApplication.dateRangeStart,
     dateRangeEnd: state.conservationApplication.dateRangeEnd,
-    polygons: [], // user input
+    polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
     compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
     units: state.conservationApplication.desiredCompensationUnits,
   });

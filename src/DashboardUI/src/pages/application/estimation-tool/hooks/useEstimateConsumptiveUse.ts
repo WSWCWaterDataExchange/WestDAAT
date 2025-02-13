@@ -1,6 +1,5 @@
 import { useQuery } from 'react-query';
 import { estimateConsumptiveUse } from '../../../../accessors/applicationAccessor';
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { CompensationRateUnits } from '../../../../data-contracts/CompensationRateUnits';
 import { IMsalContext } from '@azure/msal-react';
 
@@ -12,7 +11,7 @@ export function useEstimateConsumptiveUse(
     model: number | undefined;
     dateRangeStart: Date | undefined;
     dateRangeEnd: Date | undefined;
-    polygons: Feature<Geometry, GeoJsonProperties>[] | undefined;
+    polygonWkts: string[] | undefined;
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },
@@ -25,8 +24,8 @@ export function useEstimateConsumptiveUse(
       fields.model,
       fields.dateRangeStart,
       fields.dateRangeEnd,
-      fields.polygons,
-      ...(fields.polygons ?? []),
+      fields.polygonWkts,
+      ...(fields.polygonWkts ?? []),
       fields.compensationRateDollars,
       fields.units,
     ],
@@ -37,7 +36,7 @@ export function useEstimateConsumptiveUse(
         model: fields.model!,
         dateRangeStart: fields.dateRangeStart!,
         dateRangeEnd: fields.dateRangeEnd!,
-        polygons: fields.polygons!,
+        polygonWkts: fields.polygonWkts!,
         compensationRateDollars: fields.compensationRateDollars,
         units: fields.units,
       }),
@@ -48,8 +47,8 @@ export function useEstimateConsumptiveUse(
         !!fields.model &&
         !!fields.dateRangeStart &&
         !!fields.dateRangeEnd &&
-        !!fields.polygons &&
-        fields.polygons.length > 0,
+        !!fields.polygonWkts &&
+        fields.polygonWkts.length > 0,
       // compensation rate is optional
     },
   );

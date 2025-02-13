@@ -11,6 +11,7 @@ import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -75,7 +76,7 @@ export const estimateConsumptiveUse = async (
     model: number;
     dateRangeStart: Date;
     dateRangeEnd: Date;
-    polygons: Feature<Geometry, GeoJsonProperties>[];
+    polygonWkts: string[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },
@@ -86,7 +87,7 @@ export const estimateConsumptiveUse = async (
     model: fields.model,
     dateRangeStart: fields.dateRangeStart,
     dateRangeEnd: fields.dateRangeEnd,
-    polygons: fields.polygons.map((polygon) => convertGeometryToWkt(polygon.geometry)),
+    polygons: fields.polygonWkts,
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
   };
