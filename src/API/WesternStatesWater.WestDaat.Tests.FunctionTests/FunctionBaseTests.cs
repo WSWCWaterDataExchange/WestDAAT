@@ -1,9 +1,9 @@
-using System.Net;
-using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Moq;
+using System.Net;
+using System.Security.Claims;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Client.Functions;
@@ -86,6 +86,24 @@ public class FunctionBaseTests
                          "type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.4\",\"" +
                          "title\":\"Resource not found\",\"" +
                          "status\":404" +
+                         "}");
+    }
+
+    [TestMethod]
+    public async Task CreateResponse_ServiceUnavailableError_ShouldReturn503()
+    {
+        var response = new TestDto { Error = new ServiceUnavailableError() };
+
+        var result = await _function.CreateResponse(new HttpRequestDataFake(), response);
+
+        result.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+
+        var body = await GetJson(result);
+
+        body.Should().Be("{\"" +
+                         "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.4\",\"" +
+                         "title\":\"Service Unavailable\",\"" +
+                         "status\":503" +
                          "}");
     }
 
