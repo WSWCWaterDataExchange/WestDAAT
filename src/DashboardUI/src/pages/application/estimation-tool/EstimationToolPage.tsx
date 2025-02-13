@@ -7,7 +7,6 @@ import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useFundingOrganization } from './hooks/useFundingOrganization';
 import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
-import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
