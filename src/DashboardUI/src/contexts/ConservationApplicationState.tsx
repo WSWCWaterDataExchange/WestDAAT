@@ -2,11 +2,13 @@ import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
+import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
   conservationApplication: {
     fundingOrganization: FundingOrganizationDetails | undefined;
+    application: WaterConservationApplicationCreateResponse | undefined;
     consumptiveUse: EstimateConsumptiveUseResponse | undefined;
   };
 }
@@ -15,6 +17,7 @@ export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   conservationApplication: {
     fundingOrganization: undefined,
+    application: undefined,
     consumptiveUse: undefined,
   },
 });
@@ -22,6 +25,7 @@ export const defaultState = (): ConservationApplicationState => ({
 export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | FundingOrganizationLoadedAction
+  | WaterConservationApplicationCreatedAction
   | EstimateConsumptiveUseLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -35,6 +39,13 @@ export interface FundingOrganizationLoadedAction {
   type: 'FUNDING_ORGANIZATION_LOADED';
   payload: {
     fundingOrganization: FundingOrganizationDetails;
+  };
+}
+
+export interface WaterConservationApplicationCreatedAction {
+  type: 'APPLICATION_CREATED';
+  payload: {
+    application: WaterConservationApplicationCreateResponse;
   };
 }
 
@@ -63,6 +74,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onDashboardApplicationsLoaded(draftState, action);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
+    case 'APPLICATION_CREATED':
+      return onWaterConservationApplicationCreated(draftState, action);
     case 'ESTIMATE_CONSUMPTIVE_USE_LOADED':
       return onEstimateConsumptiveUseLoaded(draftState, action);
   }
@@ -81,6 +94,14 @@ const onFundingOrganizationLoaded = (
   action: FundingOrganizationLoadedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.fundingOrganization = action.payload.fundingOrganization;
+  return draftState;
+};
+
+const onWaterConservationApplicationCreated = (
+  draftState: ConservationApplicationState,
+  action: WaterConservationApplicationCreatedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.application = action.payload.application;
   return draftState;
 };
 

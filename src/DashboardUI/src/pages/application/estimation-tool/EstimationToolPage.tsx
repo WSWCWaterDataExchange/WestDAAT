@@ -29,6 +29,7 @@ export function EstimationToolPage() {
     context,
     waterRightNativeId,
   );
+
   useEffect(() => {
     if (fundingOrganizationDetails) {
       dispatch({
@@ -44,6 +45,17 @@ export function EstimationToolPage() {
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: state.conservationApplication.fundingOrganization?.fundingOrganizationId,
   });
+
+  useEffect(() => {
+    if (applicationDetails) {
+      dispatch({
+        type: 'APPLICATION_CREATED',
+        payload: {
+          application: applicationDetails,
+        },
+      });
+    }
+  }, [applicationDetails]);
 
   const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
     waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
