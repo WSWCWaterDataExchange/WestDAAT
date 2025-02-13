@@ -4,10 +4,13 @@ import Icon from '@mdi/react';
 import { mdiPiggyBank, mdiWater } from '@mdi/js';
 import { Form, InputGroup } from 'react-bootstrap';
 import {
+  CompensationRateUnits,
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { FundingOrganizationDetails } from '../../../data-contracts/FundingOrganizationDetails';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useRef } from 'react';
 
 interface EstimationToolSidebarProps {
   fundingOrganizationDetails: FundingOrganizationDetails | undefined;
@@ -15,6 +18,23 @@ interface EstimationToolSidebarProps {
 }
 
 export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
+  const { state, dispatch } = useConservationApplicationContext();
+  const desiredDollarsRef = useRef<HTMLInputElement>(null);
+  const desiredUnitsRef = useRef<HTMLSelectElement>(null);
+
+  const onEstimationFormChanged = () => {
+    const desiredDollars = Number(desiredDollarsRef.current?.value);
+    const desiredUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
+
+    dispatch({
+      type: 'ESTIMATION_FORM_UPDATED',
+      payload: {
+        desiredCompensationDollars: desiredDollars,
+        desiredCompensationUnits: desiredUnits,
+      },
+    });
+  };
+
   const acreageSum = 4681;
   const evapotranspiration = 1000;
   const conservationEstimate = 15000;
@@ -96,19 +116,32 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             Input values below to estimate the amount of savings you may be eligible for
           </span>
 
-          <div className="d-flex justify-content-between align-items-center gap-3">
-            <InputGroup>
-              <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
-              <Form.Control type="number" placeholder="600" min={1} aria-describedby="dollar-sign-addon"></Form.Control>
-            </InputGroup>
+          <Form onChange={onEstimationFormChanged} noValidate>
+            <div className="d-flex justify-content-between align-items-center gap-3">
+              <InputGroup>
+                <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
+                <Form.Control
+                  type="number"
+                  placeholder="600"
+                  min={1}
+                  aria-describedby="dollar-sign-addon"
+                  value={state.conservationApplication.desiredCompensationDollars}
+                  ref={desiredDollarsRef}
+                ></Form.Control>
+              </InputGroup>
 
-            <Form.Select aria-label="Desired compensation units">
-              <option>Select an option</option>
-              {CompensationRateUnitsOptions.map((value) => (
-                <option value={value}>{CompensationRateUnitsLabels[value]}</option>
-              ))}
-            </Form.Select>
-          </div>
+              <Form.Select
+                aria-label="Desired compensation units"
+                value={state.conservationApplication.desiredCompensationUnits}
+                ref={desiredUnitsRef}
+              >
+                <option value={0}>Select an option</option>
+                {CompensationRateUnitsOptions.map((value) => (
+                  <option value={value}>{CompensationRateUnitsLabels[value]}</option>
+                ))}
+              </Form.Select>
+            </div>
+          </Form>
         </SidebarElement>
 
         <SidebarElement
