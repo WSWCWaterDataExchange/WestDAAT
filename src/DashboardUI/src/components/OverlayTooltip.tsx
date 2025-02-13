@@ -2,6 +2,8 @@ import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 
+import './OverlayTooltip.scss';
+
 interface OverlayTooltipProps {
   text: string;
   placement?: 'top' | 'right' | 'bottom' | 'left';
