@@ -1,3 +1,4 @@
+using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -67,10 +68,20 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 
-        var query = db.Users.Where(user =>
-            user.UserProfile.FirstName.Contains(request.SearchTerm) ||
-            user.UserProfile.LastName.Contains(request.SearchTerm) ||
-            user.UserProfile.UserName.Contains(request.SearchTerm));
+        var searchResults = await db.Users
+            .Where(user => user.UserProfile != null)
+            .Where(user =>
+                user.UserProfile.FirstName.Contains(request.SearchTerm) ||
+                user.UserProfile.LastName.Contains(request.SearchTerm) ||
+                user.UserProfile.UserName.Contains(request.SearchTerm)
+            )
+            .ProjectTo<UserSearchResult>(DtoMapper.Configuration)
+            .ToArrayAsync();
+
+        return new UserSearchResponse
+        {
+            SearchResults = searchResults
+        };
     }
 
     public async Task<UserStoreResponseBase> Store(UserStoreRequestBase request)
