@@ -18,16 +18,16 @@ export function EstimationToolPage() {
 
   return (
     <MapProvider>
-      <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden align-items-stretch h-100">
+      <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
         <EstimationToolNavbar navigateToWaterRightLandingPage={navigateToWaterRightLandingPage} />
 
-        <div className="flex-grow-1 overflow-y-auto h-100">
-          <div className="h-100 d-flex overflow-y-auto align-items-stretch h-100">
-            <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto h-100">
+        <div className="flex-grow-1 overflow-y-auto">
+          <div className="h-100 d-flex overflow-y-auto align-items-stretch">
+            <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
               <EstimationToolSidebar />
             </div>
 
-            <div className="flex-grow-1 d-flex flex-column overflow-y-auto h-100">
+            <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
               <EstimationToolMapHeader />
               <EstimationToolMap />
             </div>
