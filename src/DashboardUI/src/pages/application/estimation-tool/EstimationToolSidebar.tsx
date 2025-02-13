@@ -34,7 +34,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="FUNDING ORGANIZATION"
-          tooltip="Funding organizations provide financial incentives to water rights holders in exchange for modifying their water use. These entities—governmental, nonprofit, or private—support water conservation programs, water markets, and voluntary agreements to balance water availability for agriculture, ecosystems, and urban needs."
+          tooltip="The Conservation Organization (or program sponsor) is the entity (governmental, nonprofit, or private) with a voluntary program to conserve or reduce water use with funding to compensate water users for relinquishing or abstaining from the use of their state water right. Conservation Organization decide on the following parameters: (a) the OpenET consumptive use model(s) or ensemble to use; (b) the time period (i.e., number of years and start and end months) used to evaluate historical consumptive use; and (c) the compensation in U.S. dollars per acre or per acre-foot of conserved water offered a user."
           isLoading={props.isLoadingFundingOrganization}
         >
           <span>{props.fundingOrganizationDetails?.fundingOrganizationName}</span>
@@ -42,7 +42,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="OpenET Model"
-          tooltip="OpenET uses open-source models and Google Earth Engine to provide satellite-based information on water consumption in areas as small as a quarter of an acre at daily, monthly and yearly intervals."
+          tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
           isLoading={props.isLoadingFundingOrganization}
         >
           <span>{props.fundingOrganizationDetails?.openEtModel}</span>
@@ -54,7 +54,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"
-          tooltip="Estimated Consumptive Use refers to the portion of diverted water that is consumed and not returned to the source, typically through evapotranspiration, plant uptake, or incorporation into products. It represents the actual water loss from the system and helps determine water availability for other uses."
+          tooltip="Estimated Consumptive Use refers to the portion of diverted water that is consumed and not returned to the source, typically through evapotranspiration (ET), which is determined by the selected OpenET Model."
           isLoading={props.isLoadingFundingOrganization}
         >
           <span>
@@ -65,7 +65,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
-          tooltip="Average Historic Total Consumptive Use (Depletion) refers to the long-term average amount of water consumed and not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
+          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water nott returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
           isLoading={props.isLoadingFundingOrganization}
         >
           <div>
@@ -83,7 +83,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="CONSERVATION ORGANIZATION COMPENSATION RATE"
-          tooltip="Conservation Organization Compensation Rate refers to the rate at which a conservation organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management."
+          tooltip="Conservation Organization Compensation Rate refers to the rate at which a Conservation Organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management.
+Conservation Estimate: Conservation Estimate refers to the projected monetary ($) value offered by the Funding Organization(s) to applicants as compensation for their voluntary efforts in water use reduction resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing.
+"
           isLoading={props.isLoadingFundingOrganization}
         >
           <span className="text-muted">{props.fundingOrganizationDetails?.compensationRateModel}</span>

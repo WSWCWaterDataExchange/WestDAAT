@@ -1,7 +1,5 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
-import { mdiHelpCircleOutline } from '@mdi/js';
-import Icon from '@mdi/react';
-import { Button, Modal, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';
@@ -45,10 +43,7 @@ function WaterRightHeader() {
           <div className="d-flex flex-column align-items-end gap-1">
             <div className="d-flex flex-row gap-3 align-items-center">
               <div>
-                <OverlayTooltip
-                  text="Estimate the amount of water consumed (not returned) based on available data, including water rights, use
-        records, and supply inputs."
-                />
+                <OverlayTooltip text="Only available to those water rights approved to take part in a Funding Organization’s available water use reduction program. Uses OpenET’s consumptive use estimate to help determine potential water savings and monetary compensation for voluntary efforts towards water savings." />
               </div>
               <div>
                 <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>
