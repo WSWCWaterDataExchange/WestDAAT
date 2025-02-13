@@ -33,6 +33,7 @@ public class OrganizationFunction : FunctionBase
         var result = organizationLoadRequest switch
         {
             OrganizationListDetailsRequest request => await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(request),
+            OrganizationListSummaryRequest request => await _organizationManager.Load<OrganizationListSummaryRequest, OrganizationListSummaryResponse>(request),
             _ => throw new NotImplementedException($"Request type {organizationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
