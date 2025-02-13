@@ -11,12 +11,15 @@ import { CompensationRateUnits } from '../../../data-contracts/CompensationRateU
 
 import './estimation-tool-page.scss';
 import { useMsal } from '@azure/msal-react';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useEffect } from 'react';
 
 export function EstimationToolPage() {
   const navigate = useNavigate();
   const routeParams = useParams();
   const { waterRightNativeId } = routeParams;
   const context = useMsal();
+  const { state, dispatch } = useConservationApplicationContext();
 
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
@@ -26,10 +29,20 @@ export function EstimationToolPage() {
     context,
     waterRightNativeId,
   );
+  useEffect(() => {
+    if (fundingOrganizationDetails) {
+      dispatch({
+        type: 'FUNDING_ORGANIZATION_LOADED',
+        payload: {
+          fundingOrganization: fundingOrganizationDetails,
+        },
+      });
+    }
+  }, [fundingOrganizationDetails]);
 
   const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication(context, {
     waterRightNativeId: waterRightNativeId,
-    fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
+    fundingOrganizationId: state.conservationApplication.fundingOrganization?.fundingOrganizationId,
   });
 
   const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse(

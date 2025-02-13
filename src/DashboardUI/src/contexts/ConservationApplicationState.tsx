@@ -1,20 +1,34 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
+  conservationApplication: {
+    fundingOrganization: FundingOrganizationDetails | undefined;
+  };
 }
 
 export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
+  conservationApplication: {
+    fundingOrganization: undefined,
+  },
 });
 
-export type ApplicationAction = DashboardApplicationsLoadedAction;
+export type ApplicationAction = DashboardApplicationsLoadedAction | FundingOrganizationLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
   payload: {
     dashboardApplications: ApplicationDashboardListItem[];
+  };
+}
+
+export interface FundingOrganizationLoadedAction {
+  type: 'FUNDING_ORGANIZATION_LOADED';
+  payload: {
+    fundingOrganization: FundingOrganizationDetails;
   };
 }
 
@@ -34,6 +48,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
   switch (action.type) {
     case 'DASHBOARD_APPLICATIONS_LOADED':
       return onDashboardApplicationsLoaded(draftState, action);
+    case 'FUNDING_ORGANIZATION_LOADED':
+      return onFundingOrganizationLoaded(draftState, action);
   }
 };
 
@@ -42,5 +58,13 @@ const onDashboardApplicationsLoaded = (
   action: DashboardApplicationsLoadedAction,
 ): ConservationApplicationState => {
   draftState.dashboardApplications = action.payload.dashboardApplications;
+  return draftState;
+};
+
+const onFundingOrganizationLoaded = (
+  draftState: ConservationApplicationState,
+  action: FundingOrganizationLoadedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.fundingOrganization = action.payload.fundingOrganization;
   return draftState;
 };
