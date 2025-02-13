@@ -8,7 +8,6 @@ import { useFundingOrganization } from './hooks/useFundingOrganization';
 import { UseCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 import './estimation-tool-page.scss';
 
@@ -16,7 +15,6 @@ export function EstimationToolPage() {
   const navigate = useNavigate();
   const routeParams = useParams();
   const { waterRightNativeId } = routeParams;
-  const { state, dispatch } = useConservationApplicationContext();
 
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
