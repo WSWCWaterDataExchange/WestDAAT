@@ -122,16 +122,16 @@ const onFundingOrganizationLoaded = (
 
 const onWaterConservationApplicationCreated = (
   draftState: ConservationApplicationState,
-  action: WaterConservationApplicationCreatedAction,
+  { payload }: WaterConservationApplicationCreatedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.application = action.payload.application;
+  draftState.conservationApplication.application = payload.application;
   return draftState;
 };
 
 const onEstimateConsumptiveUseLoaded = (
   draftState: ConservationApplicationState,
-  action: EstimateConsumptiveUseLoadedAction,
+  { payload }: EstimateConsumptiveUseLoadedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.consumptiveUse = action.payload.consumptiveUse;
+  draftState.conservationApplication.consumptiveUse = payload.consumptiveUse;
   return draftState;
 };
