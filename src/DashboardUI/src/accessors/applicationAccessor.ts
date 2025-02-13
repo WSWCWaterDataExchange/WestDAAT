@@ -7,6 +7,30 @@ import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsum
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 import { convertGeometryToWkt } from '../utilities/geometryWktConverter';
+import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
+import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
+import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
+import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+
+export const applicationSearch = async (
+  msalContext: IMsalContext,
+  organizationId: string | null,
+): Promise<OrganizationApplicationDashboardLoadResponse> => {
+  const api = await westDaatApi(msalContext);
+
+  const request: OrganizationApplicationDashboardLoadRequest = {
+    $type: 'OrganizationApplicationDashboardLoadRequest',
+    organizationIdFilter: organizationId,
+  };
+
+  const { data } = await api.post('Applications/Search', request);
+
+  data.applications.forEach((app: ApplicationDashboardListItem) => {
+    app.submittedDate = new Date(app.submittedDate);
+  });
+
+  return data;
+};
 
 export const getFundingOrganizationDetails = (waterRightNativeId: string): Promise<FundingOrganizationDetails> => {
   return new Promise((resolve) => {
