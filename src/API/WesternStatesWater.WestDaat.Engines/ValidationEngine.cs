@@ -155,13 +155,13 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            OrganizationLoadAllRequest req => ValidateOrganizationLoadAllRequest(req, context),
+            OrganizationListDetailsRequest req => ValidateOrganizationListDetailsRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented.")
         };
     }
 
-    private ErrorBase ValidateOrganizationLoadAllRequest(OrganizationLoadAllRequest request, ContextBase context)
+    private ErrorBase ValidateOrganizationListDetailsRequest(OrganizationListDetailsRequest request, ContextBase context)
     {
         var permissionsRequest = new DTO.PermissionsGetRequest()
         {
@@ -170,7 +170,7 @@ internal class ValidationEngine : IValidationEngine
 
         var permissions = _securityUtility.Get(permissionsRequest);
 
-        if (!permissions.Contains(Permissions.OrganizationLoadAll))
+        if (!permissions.Contains(Permissions.OrganizationListDetails))
         {
             return CreateForbiddenError(request, context);
         }

@@ -68,9 +68,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddOrganizationMappings()
         {
-            CreateMap<ClientContracts.Requests.Admin.OrganizationLoadAllRequest, CommonContracts.OrganizationLoadAllRequest>();
+            CreateMap<ClientContracts.Requests.Admin.OrganizationListDetailsRequest, CommonContracts.OrganizationListDetailsRequest>();
 
-            CreateMap<CommonContracts.OrganizationLoadAllResponse, ClientContracts.Responses.Admin.OrganizationLoadAllResponse>()
+            CreateMap<CommonContracts.OrganizationListDetailsResponse, ClientContracts.Responses.Admin.OrganizationListDetailsResponse>()
                 .ForMember(dest => dest.Organizations, opt => opt.MapFrom(src => src.Organizations))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 

@@ -32,7 +32,7 @@ public class OrganizationFunction : FunctionBase
         var organizationLoadRequest = await ParseRequestBody<OrganizationLoadRequestBase>(req);
         var result = organizationLoadRequest switch
         {
-            OrganizationLoadAllRequest request => await _organizationManager.Load<OrganizationLoadAllRequest, OrganizationLoadAllResponse>(request),
+            OrganizationListDetailsRequest request => await _organizationManager.Load<OrganizationListDetailsRequest, OrganizationListDetailsResponse>(request),
             _ => throw new NotImplementedException($"Request type {organizationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
