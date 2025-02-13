@@ -8,11 +8,6 @@ export function EstimationToolSidebar() {
         <NotImplementedPlaceholder />
 
         <MapTheme />
-        <NotImplementedPlaceholder />
-        <NotImplementedPlaceholder />
-        <NotImplementedPlaceholder />
-        <NotImplementedPlaceholder />
-        <NotImplementedPlaceholder />
       </div>
     </div>
   );
