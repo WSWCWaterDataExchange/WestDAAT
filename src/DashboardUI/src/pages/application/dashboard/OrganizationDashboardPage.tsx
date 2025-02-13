@@ -1,7 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColumnHeaderParams, GridFilterOperator, GridRenderCellParams } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
@@ -21,6 +21,7 @@ import { getUserOrganization, hasUserRole } from '../../../utilities/securityHel
 import { formatDateString } from '../../../utilities/valueFormatters';
 
 import './organization-dashboard-page.scss';
+import { dateRangeFilter } from './DateRangeFilter';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -116,7 +117,15 @@ export function OrganizationDashboardPage() {
       renderHeader,
       renderCell: renderAppIdCell,
     },
-    { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: dateFormatter },
+    {
+      field: 'submittedDate',
+      headerName: 'Date Submitted',
+      width: 150,
+      renderHeader,
+      valueFormatter: dateFormatter,
+
+      filterOperators: [dateRangeFilter],
+    },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
