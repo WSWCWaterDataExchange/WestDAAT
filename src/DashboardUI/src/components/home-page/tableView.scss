@@ -6,7 +6,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 55vh;
+  height: 60vh;
   z-index: 4;
   transform: translateY(100%);
   transition: transform 0.3s ease-in-out;
@@ -46,10 +46,6 @@
   }
 }
 
-.table-view-container.expanded .table-view-toggle-btn {
-  top: -2.5rem;
-}
-
 .table-view-slide-content {
   flex-grow: 1;
   background-color: $white;
@@ -57,20 +53,27 @@
   display: flex;
   flex-direction: column;
   pointer-events: auto;
+  min-height: 0;
 }
 
 .analytics-and-table-tabs {
-  flex-grow: 1;
-  overflow: auto;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
 
   .nav-tabs {
     padding: 0.5rem 1rem;
   }
 
   .tab-content {
-    padding: 1rem;
+    flex-grow: 1;
+    min-height: 0;
     overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .tab-pane {
+    height: 100%;
   }
 }
