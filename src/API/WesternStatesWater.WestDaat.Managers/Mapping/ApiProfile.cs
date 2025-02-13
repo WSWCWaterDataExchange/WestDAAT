@@ -69,6 +69,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.UserSearchResponse, ClientContracts.Responses.Admin.UserSearchResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+            
+            CreateMap<CommonContracts.UserSearchResult, ClientContracts.UserSearchResult>();
         }
 
         private void AddOrganizationMappings()

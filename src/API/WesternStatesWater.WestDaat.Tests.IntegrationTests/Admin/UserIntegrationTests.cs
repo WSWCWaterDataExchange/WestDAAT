@@ -162,13 +162,18 @@ public class UserIntegrationTests : IntegrationTestBase
         var result = await _userManager.Load<CLI.Requests.Admin.UserSearchRequest, CLI.Responses.Admin.UserSearchResponse>(
             new CLI.Requests.Admin.UserSearchRequest
             {
-                SearchTerm = "chad"
+                SearchTerm = user.UserProfile.FirstName
             });
 
         // Assert
         if (isAllowed)
         {
             result.Error.Should().BeNull();
+            result.SearchResults.Should().HaveCount(1);
+            result.SearchResults.First().UserId.Should().Be(user.Id);
+            result.SearchResults.First().FirstName.Should().Be(user.UserProfile.FirstName);
+            result.SearchResults.First().LastName.Should().Be(user.UserProfile.LastName);
+            result.SearchResults.First().UserName.Should().Be(user.UserProfile.UserName);
         }
         else
         {
@@ -176,5 +181,86 @@ public class UserIntegrationTests : IntegrationTestBase
         }
     }
 
-    // TODO Test that search strings must be valid length or null 
+    [DataTestMethod]
+    [DataRow(null, false, DisplayName = "Null SearchTerm")]
+    [DataRow("", false, DisplayName = "Empty SearchTerm")]
+    [DataRow("a", false, DisplayName = "001 character SearchTerm")]
+    [DataRow("ab", false, DisplayName = "002 character SearchTerm")]
+    [DataRow("abc", true, DisplayName = "003 character SearchTerm")]
+    [DataRow("100+ characters test test test test test test test test test test test test test test test test test test", false, DisplayName = "100+ character SearchTerm")]
+    public async Task Load_UserSearchRequest_InvalidSearchTerm_ShouldThrow(string searchTerm, bool isValid)
+    {
+        // Arrange
+        UseUserContext(
+            new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserSearchRequest, CLI.Responses.Admin.UserSearchResponse>(
+            new CLI.Requests.Admin.UserSearchRequest
+            {
+                SearchTerm = searchTerm
+            });
+
+        // Assert
+        if (isValid)
+        {
+            result.Error.Should().BeNull();
+        }
+        else
+        {
+            result.Error.Should().BeOfType<ValidationError>();
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow("FirstName", 3, DisplayName = "Exact match - by FirstName")]
+    [DataRow("LastName", 3, DisplayName = "Exact match - by LastName")]
+    [DataRow("UserName", 3, DisplayName = "Exact match - by UserName")]
+    [DataRow("FirstName LastName", 3, DisplayName = "Exact match - by FirstName LastName")]
+    [DataRow("First", 3, DisplayName = "Partial match - by FirstName")]
+    [DataRow("Last", 3, DisplayName = "Partial match - by LastName")]
+    [DataRow("User", 3, DisplayName = "Partial match - by UserName")]
+    [DataRow("FirstName Last", 3, DisplayName = "Partial match - by FirstName LastName")]
+    [DataRow("name", 3, DisplayName = "Partial match - by FirstName, LastName, UserName")]
+    [DataRow("No Match", 0, DisplayName = "No match")]
+    public async Task Load_UserSearchRequest_Success(string searchTerm, int resultCount)
+    {
+        // Arrange
+        var users = new UserFaker()
+            .RuleFor(u => u.UserProfile, _ => new UserProfileFaker()
+                .RuleFor(up => up.FirstName, _ => "FirstName")
+                .RuleFor(up => up.LastName, _ => "LastName")
+                .RuleFor(up => up.UserName, f => "UserName" + f.Random.String(24))
+                .Generate())
+            .Generate(3);
+
+        await _dbContext.Users.AddRangeAsync(users);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserSearchRequest, CLI.Responses.Admin.UserSearchResponse>(
+            new CLI.Requests.Admin.UserSearchRequest
+            {
+                SearchTerm = searchTerm
+            });
+
+        // Assert
+        result.Error.Should().BeNull();
+        result.SearchResults.Should().HaveCount(resultCount);
+    }
 }

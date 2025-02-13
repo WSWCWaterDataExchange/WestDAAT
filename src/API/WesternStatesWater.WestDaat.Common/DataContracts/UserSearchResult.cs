@@ -2,7 +2,7 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public class UserSearchResult
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
     
     public string UserName { get; set; }
     

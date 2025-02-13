@@ -73,7 +73,8 @@ internal class UserAccessor : AccessorBase, IUserAccessor
             .Where(user =>
                 user.UserProfile.FirstName.Contains(request.SearchTerm) ||
                 user.UserProfile.LastName.Contains(request.SearchTerm) ||
-                user.UserProfile.UserName.Contains(request.SearchTerm)
+                user.UserProfile.UserName.Contains(request.SearchTerm) ||
+                (user.UserProfile.FirstName + " " + user.UserProfile.LastName).Contains(request.SearchTerm)
             )
             .ProjectTo<UserSearchResult>(DtoMapper.Configuration)
             .ToArrayAsync();
