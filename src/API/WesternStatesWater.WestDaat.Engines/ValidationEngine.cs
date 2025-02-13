@@ -6,6 +6,7 @@ using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.Extensions;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Engines;
@@ -42,6 +43,7 @@ internal class ValidationEngine : IValidationEngine
             ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
+            OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -134,7 +136,7 @@ internal class ValidationEngine : IValidationEngine
         // user has an in-progress application for the requested water right
         // BUT user is attempting to request an estimate using an organization that may not control this water right
         var estimateRequestedOfIncorrectOrganization = inProgressApplicationExistsResponse.FundingOrganizationId.HasValue &&
-            inProgressApplicationExistsResponse.FundingOrganizationId.Value != request.FundingOrganizationId;
+                                                       inProgressApplicationExistsResponse.FundingOrganizationId.Value != request.FundingOrganizationId;
         if (estimateRequestedOfIncorrectOrganization)
         {
             return CreateForbiddenError(request, context);
@@ -176,6 +178,55 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateOrganizationStoreRequest(OrganizationStoreRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            OrganizationMemberAddRequest req => await ValidateOrganizationMemberAddRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private async Task<ErrorBase> ValidateOrganizationMemberAddRequest(OrganizationMemberAddRequest request, ContextBase context)
+    {
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // Cannot add yourself to an organization since a user can only be in a single organization.
+        if (request.UserId == userContext.UserId)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+
+
+        if (!permissions.Contains(Permissions.OrganizationMemberAdd) &&
+            !orgPermissions.Contains(Permissions.OrganizationMemberAdd))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // Verify the user is not already in an organization
+        var userOrganizationResponse = (DTO.UserOrganizationLoadResponse)await _organizationAccessor.Load(new DTO.UserOrganizationLoadRequest
+        {
+            UserId = request.UserId
+        });
+
+        if (userOrganizationResponse.Organizations.Any())
+        {
+            return CreateConflictError(request, context, nameof(UserOrganization), request.UserId, request.OrganizationId);
+        }
+
+        return null;
+    }
+
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
     {
         return request switch
@@ -195,6 +246,21 @@ internal class ValidationEngine : IValidationEngine
         }
 
         return null;
+    }
+
+    private ConflictError CreateConflictError(
+        RequestBase request,
+        ContextBase context,
+        string resourceName,
+        params Guid[] resourceIds
+    )
+    {
+        var logMessage =
+            $"'{context.ToLogString()}' attempted to make a request of type '{request.GetType().Name}', " +
+            $"but the resource '{resourceName}' with ID(s) '{string.Join(", ", resourceIds)}' already exists.";
+
+
+        return new ConflictError { LogMessage = logMessage };
     }
 
     private ForbiddenError CreateForbiddenError(

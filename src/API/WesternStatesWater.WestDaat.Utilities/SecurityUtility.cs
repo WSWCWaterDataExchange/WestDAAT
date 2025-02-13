@@ -89,7 +89,8 @@ internal class SecurityUtility : ISecurityUtility
             Roles.OrganizationAdmin,
             [
                 Permissions.UserLoad,
-                Permissions.OrganizationApplicationDashboardLoad
+                Permissions.OrganizationApplicationDashboardLoad,
+                Permissions.OrganizationMemberAdd,
             ]
         },
         {
