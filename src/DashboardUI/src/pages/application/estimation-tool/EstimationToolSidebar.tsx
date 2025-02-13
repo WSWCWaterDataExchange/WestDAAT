@@ -45,7 +45,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span>{props.fundingOrganizationDetails?.openEtModel}</span>
+          <span>{props.fundingOrganizationDetails?.openEtModelName}</span>
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">

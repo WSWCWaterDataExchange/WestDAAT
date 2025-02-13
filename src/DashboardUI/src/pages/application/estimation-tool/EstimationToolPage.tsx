@@ -45,7 +45,7 @@ export function EstimationToolPage() {
         payload: {
           fundingOrganizationId: fundingOrganizationDetails.fundingOrganizationId,
           fundingOrganizationName: fundingOrganizationDetails.fundingOrganizationName,
-          openEtModel: fundingOrganizationDetails.openEtModel,
+          openEtModelName: fundingOrganizationDetails.openEtModelName,
           dateRangeStart: fundingOrganizationDetails.dateRangeStart,
           dateRangeEnd: fundingOrganizationDetails.dateRangeEnd,
           compensationRateModel: fundingOrganizationDetails.compensationRateModel,

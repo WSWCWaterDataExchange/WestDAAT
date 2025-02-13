@@ -1,6 +1,8 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
+import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
+import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -9,13 +11,16 @@ export interface ConservationApplicationState {
     waterConservationApplicationId: string | undefined;
     fundingOrganizationId: string | undefined;
     fundingOrganizationName: string | undefined;
-    openEtModel: string | undefined;
+    openEtModelName: string | undefined;
     dateRangeStart: Date | undefined;
     dateRangeEnd: Date | undefined;
     compensationRateModel: string | undefined;
+    desiredCompensationDollars: number | undefined;
+    desiredCompensationUnits: CompensationRateUnits | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
-    dataCollections: PolygonEtDataCollection[] | undefined;
+    selectedMapPolygons: EstimationFormMapPolygon[];
+    polygonEtData: PolygonEtDataCollection[];
   };
 }
 
@@ -26,13 +31,16 @@ export const defaultState = (): ConservationApplicationState => ({
     waterConservationApplicationId: undefined,
     fundingOrganizationId: undefined,
     fundingOrganizationName: undefined,
-    openEtModel: undefined,
+    openEtModelName: undefined,
     dateRangeStart: undefined,
     dateRangeEnd: undefined,
     compensationRateModel: undefined,
+    desiredCompensationDollars: undefined,
+    desiredCompensationUnits: undefined,
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
-    dataCollections: undefined,
+    selectedMapPolygons: [],
+    polygonEtData: [],
   },
 });
 
@@ -40,6 +48,8 @@ export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | WaterRightLoadedAction
   | FundingOrganizationLoadedAction
+  | MapSelectedPolygonsUpdatedAction
+  | EstimationFormUpdatedAction
   | WaterConservationApplicationCreatedAction
   | EstimateConsumptiveUseLoadedAction;
 
@@ -62,10 +72,25 @@ export interface FundingOrganizationLoadedAction {
   payload: {
     fundingOrganizationId: string;
     fundingOrganizationName: string;
-    openEtModel: string;
+    openEtModelName: string;
     dateRangeStart: Date;
     dateRangeEnd: Date;
     compensationRateModel: string;
+  };
+}
+
+export interface MapSelectedPolygonsUpdatedAction {
+  type: 'MAP_SELECTED_POLYGONS_UPDATED';
+  payload: {
+    polygons: EstimationFormMapPolygon[];
+  };
+}
+
+export interface EstimationFormUpdatedAction {
+  type: 'ESTIMATION_FORM_UPDATED';
+  payload: {
+    desiredCompensationDollars: number | undefined;
+    desiredCompensationUnits: CompensationRateUnits | undefined;
   };
 }
 
@@ -107,6 +132,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onFundingOrganizationLoaded(draftState, action);
     case 'APPLICATION_CREATED':
       return onWaterConservationApplicationCreated(draftState, action);
+    case 'MAP_SELECTED_POLYGONS_UPDATED':
+      return onMapSelectedPolygonsUpdated(draftState, action);
+    case 'ESTIMATION_FORM_UPDATED':
+      return onEstimationFormUpdated(draftState, action);
     case 'ESTIMATE_CONSUMPTIVE_USE_LOADED':
       return onEstimateConsumptiveUseLoaded(draftState, action);
   }
@@ -136,7 +165,7 @@ const onFundingOrganizationLoaded = (
 
   application.fundingOrganizationId = payload.fundingOrganizationId;
   application.fundingOrganizationName = payload.fundingOrganizationName;
-  application.openEtModel = payload.openEtModel;
+  application.openEtModelName = payload.openEtModelName;
   application.dateRangeStart = payload.dateRangeStart;
   application.dateRangeEnd = payload.dateRangeEnd;
   application.compensationRateModel = payload.compensationRateModel;
@@ -151,6 +180,25 @@ const onWaterConservationApplicationCreated = (
   return draftState;
 };
 
+const onMapSelectedPolygonsUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: MapSelectedPolygonsUpdatedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.selectedMapPolygons = payload.polygons;
+  return draftState;
+};
+
+const onEstimationFormUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: EstimationFormUpdatedAction,
+): ConservationApplicationState => {
+  const application = draftState.conservationApplication;
+
+  application.desiredCompensationDollars = payload.desiredCompensationDollars;
+  application.desiredCompensationUnits = payload.desiredCompensationUnits;
+  return draftState;
+};
+
 const onEstimateConsumptiveUseLoaded = (
   draftState: ConservationApplicationState,
   { payload }: EstimateConsumptiveUseLoadedAction,
@@ -159,6 +207,6 @@ const onEstimateConsumptiveUseLoaded = (
 
   application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
   application.conservationPayment = payload.conservationPayment;
-  application.dataCollections = payload.dataCollections;
+  application.polygonEtData = payload.dataCollections;
   return draftState;
 };

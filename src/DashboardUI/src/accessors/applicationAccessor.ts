@@ -41,7 +41,7 @@ export const getFundingOrganizationDetails = (
       resolve({
         fundingOrganizationId: 'F3D1124F-9387-4C11-915E-32E9C3CF0156',
         fundingOrganizationName: 'Colorado River Basin',
-        openEtModel: 'eeMETRIC',
+        openEtModelName: 'eeMETRIC',
         dateRangeStart: new Date(2024, 0, 1),
         dateRangeEnd: new Date(2024, 11, 31),
         compensationRateModel: 'You will be paid $300 per acre-foot. The commission will pay [Lorem ipsum...]',
