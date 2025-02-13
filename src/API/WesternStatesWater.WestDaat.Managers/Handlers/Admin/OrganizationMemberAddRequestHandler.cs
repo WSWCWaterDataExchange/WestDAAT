@@ -2,6 +2,8 @@ using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
+using WesternStatesWater.WestDaat.Managers.Mapping;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Admin;
 
@@ -16,7 +18,8 @@ public class OrganizationMemberAddRequestHandler : IRequestHandler<OrganizationM
 
     public async Task<OrganizationMemberAddResponse> Handle(OrganizationMemberAddRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        var accessorRequest = request.Map<CommonContracts.OrganizationMemberAddRequest>();
+        var accessorResponse = (CommonContracts.OrganizationMemberAddResponse)await OrganizationAccessor.Store(accessorRequest);
+        return accessorResponse.Map<OrganizationMemberAddResponse>();
     }
 }

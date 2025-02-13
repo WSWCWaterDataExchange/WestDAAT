@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common;
@@ -156,7 +157,15 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         if (isAllowed)
         {
-            response.Error.Should().BeOfType<InternalError>(); // Due to temp NotImplementedException
+            response.Error.Should().BeNull();
+            var insertedUserOrg = await _dbContext.UserOrganizations.Include(uo => uo.UserOrganizationRoles)
+                .FirstOrDefaultAsync(uo =>
+                    uo.UserId == userToBeAdded.Id &&
+                    uo.OrganizationId == organization.Id
+                );
+            insertedUserOrg.Should().NotBeNull();
+            insertedUserOrg!.UserOrganizationRoles.Should().HaveCount(1);
+            insertedUserOrg.UserOrganizationRoles.First().Role.Should().Be(Roles.Member);
         }
         else
         {
@@ -204,7 +213,15 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         if (isAllowed)
         {
-            response.Error.Should().BeOfType<InternalError>(); // Due to temp NotImplementedException
+            response.Error.Should().BeNull();
+            var insertedUserOrg = await _dbContext.UserOrganizations.Include(uo => uo.UserOrganizationRoles)
+                .FirstOrDefaultAsync(uo =>
+                    uo.UserId == userToBeAdded.Id &&
+                    uo.OrganizationId == organization.Id
+                );
+            insertedUserOrg.Should().NotBeNull();
+            insertedUserOrg!.UserOrganizationRoles.Should().HaveCount(1);
+            insertedUserOrg.UserOrganizationRoles.First().Role.Should().Be(role);
         }
         else
         {
