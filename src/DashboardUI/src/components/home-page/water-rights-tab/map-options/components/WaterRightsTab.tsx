@@ -18,6 +18,8 @@ import { useMapFitRequested } from '../hooks/useMapFitRequested';
 import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
 import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
 import { SiteActionbar } from '../../../../SiteActionbar';
+import { useOverlaysUrlParameters } from '../../../../../hooks/url-parameters/useOverlaysUrlParameters';
+import { useTimeSeriesUrlParameters } from '../../../../../hooks/url-parameters/useTimeseriesUrlParameters';
 
 interface WaterRightsTabProps {
   showDownloadModal?: (show: boolean) => void;
@@ -47,6 +49,9 @@ function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLa
   useDisplayOptions();
   useFilters();
   useMapUrlParameters();
+  useOverlaysUrlParameters();
+  useTimeSeriesUrlParameters();
+
   useDownloadModal();
   useUploadModal();
 
