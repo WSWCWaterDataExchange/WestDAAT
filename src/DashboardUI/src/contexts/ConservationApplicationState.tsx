@@ -1,6 +1,5 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
 
 export interface ConservationApplicationState {
