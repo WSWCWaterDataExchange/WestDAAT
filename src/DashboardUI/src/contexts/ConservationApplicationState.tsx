@@ -1,11 +1,13 @@
 import { produce } from 'immer';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
+import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
   conservationApplication: {
     fundingOrganization: FundingOrganizationDetails | undefined;
+    consumptiveUse: EstimateConsumptiveUseResponse | undefined;
   };
 }
 
@@ -13,10 +15,14 @@ export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   conservationApplication: {
     fundingOrganization: undefined,
+    consumptiveUse: undefined,
   },
 });
 
-export type ApplicationAction = DashboardApplicationsLoadedAction | FundingOrganizationLoadedAction;
+export type ApplicationAction =
+  | DashboardApplicationsLoadedAction
+  | FundingOrganizationLoadedAction
+  | EstimateConsumptiveUseLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -29,6 +35,13 @@ export interface FundingOrganizationLoadedAction {
   type: 'FUNDING_ORGANIZATION_LOADED';
   payload: {
     fundingOrganization: FundingOrganizationDetails;
+  };
+}
+
+export interface EstimateConsumptiveUseLoadedAction {
+  type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED';
+  payload: {
+    consumptiveUse: EstimateConsumptiveUseResponse;
   };
 }
 
@@ -50,6 +63,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onDashboardApplicationsLoaded(draftState, action);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
+    case 'ESTIMATE_CONSUMPTIVE_USE_LOADED':
+      return onEstimateConsumptiveUseLoaded(draftState, action);
   }
 };
 
@@ -66,5 +81,13 @@ const onFundingOrganizationLoaded = (
   action: FundingOrganizationLoadedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.fundingOrganization = action.payload.fundingOrganization;
+  return draftState;
+};
+
+const onEstimateConsumptiveUseLoaded = (
+  draftState: ConservationApplicationState,
+  action: EstimateConsumptiveUseLoadedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.consumptiveUse = action.payload.consumptiveUse;
   return draftState;
 };

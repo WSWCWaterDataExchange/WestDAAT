@@ -45,20 +45,28 @@ export function EstimationToolPage() {
     fundingOrganizationId: state.conservationApplication.fundingOrganization?.fundingOrganizationId,
   });
 
-  const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse(
-    context,
-    {
-      waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
-      waterRightNativeId: waterRightNativeId,
-      // todo: update
-      model: 0,
-      dateRangeStart: new Date(),
-      dateRangeEnd: new Date(),
-      polygons: [],
-      compensationRateDollars: 0,
-      units: CompensationRateUnits.AcreFeet,
-    },
-  );
+  const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
+    waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
+    waterRightNativeId: waterRightNativeId,
+    // todo: update
+    model: 0,
+    dateRangeStart: new Date(),
+    dateRangeEnd: new Date(),
+    polygons: [],
+    compensationRateDollars: 0,
+    units: CompensationRateUnits.AcreFeet,
+  });
+
+  useEffect(() => {
+    if (consumptiveUse) {
+      dispatch({
+        type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED',
+        payload: {
+          consumptiveUse: consumptiveUse,
+        },
+      });
+    }
+  }, [consumptiveUse]);
 
   return (
     <MapProvider>
