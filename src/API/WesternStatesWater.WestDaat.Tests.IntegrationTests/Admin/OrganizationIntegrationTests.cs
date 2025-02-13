@@ -112,6 +112,55 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Error!.LogMessage.Should().Contain("but did not have permission to do so.");
     }
 
+
+    [TestMethod]
+    public async Task Load_OrganizationListSummaryRequest_ShouldReturnAscendingOrder()
+    {
+        // Arrange
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        var organizations = new OrganizationFaker().Generate(3);
+        await _dbContext.Organizations.AddRangeAsync(organizations);
+        await _dbContext.SaveChangesAsync();
+
+        // Act 
+        var response = await _organizationManager.Load<OrganizationListSummaryRequest, OrganizationListSummaryResponse>(new OrganizationListSummaryRequest());
+
+        // Assert
+        var expected = new List<CLI.OrganizationSummaryItem>
+        {
+            new()
+            {
+                OrganizationId = organizations[0].Id,
+                Name = organizations[0].Name
+            },
+            new()
+            {
+                OrganizationId = organizations[1].Id,
+                Name = organizations[1].Name
+            },
+            new()
+            {
+                OrganizationId = organizations[2].Id,
+                Name = organizations[2].Name
+            }
+        }.OrderBy(org => org.Name);
+
+        response.GetType().Should().Be<OrganizationListSummaryResponse>();
+        response.Error.Should().BeNull();
+        response.Organizations.Should().HaveCount(3);
+        response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));
+        response.Organizations[1].Should().BeEquivalentTo(expected.ElementAt(1));
+        response.Organizations[2].Should().BeEquivalentTo(expected.ElementAt(2));
+    }
+
+
     [DataTestMethod]
     [DataRow(true, Roles.Member, false, DisplayName = "Member should not be allowed to add members")]
     [DataRow(true, Roles.TechnicalReviewer, false, DisplayName = "Technical reviewer should not be allowed to add members")]
