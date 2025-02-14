@@ -11,6 +11,7 @@ export function AdminOrganizationsUsersPage() {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
+  const organization = organizationListResponse?.organizations.find((org) => org.organizationId === organizationId);
 
   const pageTitle = () => {
     if (organizationListLoading) {
@@ -23,8 +24,6 @@ export function AdminOrganizationsUsersPage() {
 
     let titleText = '';
     if (organizationId) {
-      const organization = organizationListResponse?.organizations.find((org) => org.organizationId === organizationId);
-
       if (organization) {
         titleText = organization.name;
       }
@@ -51,7 +50,7 @@ export function AdminOrganizationsUsersPage() {
       <pre>OrganizationId: {organizationId}</pre>
       <pre>{showAddUserModal ? 'true' : 'false'}</pre>
 
-      <AddUserModal show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
+      <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
     </div>
   );
 }
