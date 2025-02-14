@@ -75,9 +75,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
         private void AddOrganizationMappings()
         {
-            CreateMap<ClientContracts.Requests.Admin.OrganizationLoadAllRequest, CommonContracts.OrganizationLoadAllRequest>();
+            CreateMap<ClientContracts.Requests.Admin.OrganizationDetailsListRequest, CommonContracts.OrganizationDetailsListRequest>();
 
-            CreateMap<CommonContracts.OrganizationLoadAllResponse, ClientContracts.Responses.Admin.OrganizationLoadAllResponse>()
+            CreateMap<CommonContracts.OrganizationDetailsListResponse, ClientContracts.Responses.Admin.OrganizationDetailsListResponse>()
                 .ForMember(dest => dest.Organizations, opt => opt.MapFrom(src => src.Organizations))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
@@ -85,6 +85,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationMemberAddRequest, CommonContracts.OrganizationMemberAddRequest>();
 
+            CreateMap<ClientContracts.Requests.Admin.OrganizationSummaryListRequest, CommonContracts.OrganizationDetailsListRequest>();
+
+            CreateMap<CommonContracts.OrganizationDetailsListResponse, ClientContracts.Responses.Admin.OrganizationSummaryListResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+            
+            CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationSummaryItem>();
+            
             CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
         }

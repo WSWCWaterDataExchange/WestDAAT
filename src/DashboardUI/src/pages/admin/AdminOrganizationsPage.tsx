@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { getAllOrganizations } from '../../accessors/organizationAccessor';
+import { getOrganizationDetailsList } from '../../accessors/organizationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { TableLoading } from '../../components/TableLoading';
 import { NavLink } from 'react-router-dom';
@@ -11,7 +11,7 @@ export function AdminOrganizationsPage() {
     data: organizationsResponse,
     isLoading,
     isError,
-  } = useQuery('admin-organizations', () => getAllOrganizations(msalContext));
+  } = useQuery('admin-organizations', () => getOrganizationDetailsList(msalContext));
 
   return (
     <div>
