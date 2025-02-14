@@ -1,7 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColumnHeaderParams, GridFilterOperator, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
@@ -19,9 +19,9 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
+import { dateRangeFilter } from './DateRangeFilter';
 
 import './organization-dashboard-page.scss';
-import { dateRangeFilter } from './DateRangeFilter';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -123,7 +123,6 @@ export function OrganizationDashboardPage() {
       width: 150,
       renderHeader,
       valueFormatter: dateFormatter,
-
       filterOperators: [dateRangeFilter],
     },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },

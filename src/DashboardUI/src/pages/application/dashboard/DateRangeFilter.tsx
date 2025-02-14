@@ -1,27 +1,27 @@
 import { TextField, TextFieldProps } from '@mui/material';
 import { GridFilterInputValueProps } from '@mui/x-data-grid/components/panel/filterPanel/GridFilterInputValueProps';
 import { GridFilterOperator } from '@mui/x-data-grid/models/gridFilterOperator';
-import { useState } from 'react';
-import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { useEffect, useState } from 'react';
 
-export const dateRangeFilter: GridFilterOperator<any, Date> = {
+export const dateRangeFilter: GridFilterOperator<any, string> = {
   label: 'Between',
   value: 'between',
   getApplyFilterFn: (filterItem) => {
-    console.log(`value = ${JSON.stringify(filterItem)}`);
+    const startDateExists = filterItem.value && filterItem.value[0] !== null && filterItem.value[0].trim().length > 0;
+    const endDateExists = filterItem.value && filterItem.value[1] !== null && filterItem.value[1].trim().length > 0;
 
-    if (!filterItem.value || filterItem.value.length !== 2) {
-      return null;
-    }
-    if (filterItem.value[0] === null || filterItem.value[1] === null) {
+    if (!startDateExists || !endDateExists) {
       return null;
     }
 
-    const filterFn = (value: Date) => {
-      console.log(
-        `value in filterFn = ${JSON.stringify(value)}, startDate = ${filterItem.value[0]}, endDate = ${filterItem.value[1]}`,
+    const filterFn = (value: string) => {
+      return (
+        value !== null &&
+        startDateExists &&
+        endDateExists &&
+        new Date(filterItem.value[0]) <= new Date(value) &&
+        new Date(value) <= new Date(filterItem.value[1])
       );
-      return value !== null && filterItem.value[0] <= value && value <= filterItem.value[1];
     };
 
     return filterFn;
@@ -32,10 +32,13 @@ export const dateRangeFilter: GridFilterOperator<any, Date> = {
 export function DateRangeFilter(props: GridFilterInputValueProps) {
   const { item, applyValue, focusElementRef = null } = props;
   const [filterValueState, setFilterValueState] = useState<[string, string]>(['', '']);
-  console.log(`DateRangeFilter - starting values: ${filterValueState[0]} - ${filterValueState[1]}`);
+
+  useEffect(() => {
+    const itemValue = item.value ?? ['', ''];
+    setFilterValueState(itemValue);
+  }, [item.value]);
 
   const updateFilterValue = (startDate: string, endDate: string) => {
-    console.log(`updating filter range to: ${startDate} - ${endDate}`);
     applyValue({ ...item, value: [startDate, endDate] });
     setFilterValueState([startDate, endDate]);
   };
@@ -58,6 +61,7 @@ export function DateRangeFilter(props: GridFilterInputValueProps) {
         type="date"
         onChange={handleStartDateFilter}
         value={filterValueState[0]}
+        inputRef={focusElementRef}
       ></TextField>
       <TextField
         name="upper-bound-input"
@@ -65,6 +69,7 @@ export function DateRangeFilter(props: GridFilterInputValueProps) {
         type="date"
         onChange={handleEndDateFilter}
         value={filterValueState[1]}
+        inputRef={focusElementRef}
       ></TextField>
     </div>
   );
