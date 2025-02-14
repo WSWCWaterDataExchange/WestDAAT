@@ -2,7 +2,7 @@ import Button from 'react-bootstrap/esm/Button';
 import Modal, { ModalProps } from 'react-bootstrap/esm/Modal';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import Select from 'react-select';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Role, RoleDisplayNames } from '../../config/role';
 
 interface AddUserModalProps extends ModalProps {
@@ -19,6 +19,13 @@ function AddUserModal(props: AddUserModalProps) {
   const [selectedRole, setSelectedRole] = useState<Role | undefined>();
 
   const handleRoleChange = (option: Role | undefined) => setSelectedRole(option);
+
+  useEffect(() => {
+    // When the modal is closed, reset state
+    if (!props.show) {
+      setSelectedRole(undefined);
+    }
+  }, [props.show]);
 
   return (
     <Modal show={props.show} centered>
