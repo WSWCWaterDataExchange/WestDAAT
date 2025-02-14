@@ -58,6 +58,7 @@ const setupRectangleRotationMarkers = (_this: DirectSelectDrawModeInstance, stat
   rotationMarkers.forEach((marker) => {
     marker.on('drag', (e) => handleDragRectangleRotationMarker(state, e));
     marker.on('dragend', () => {
+      _this.map.fire('draw.update', { features: [_this.getFeature(state.featureId) as GeoJSON] });
       _this.changeMode('simple_select');
     });
   });
