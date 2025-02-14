@@ -1,24 +1,75 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUrlParameters } from './useUrlParameters';
-import { useOverlaysContext } from '../../components/home-page/water-rights-tab/sidebar-filtering/OverlaysProvider';
+import { useOverlaysFilter } from '../../components/home-page/water-rights-tab/sidebar-filtering/overlays/hooks/useOverlaysFilter';
+
+interface OverlaysUrlParams {
+  selectedOverlayTypes?: string[];
+  selectedStates?: string[];
+  selectedWaterSourceTypes?: string[];
+  isActive?: boolean;
+}
 
 export function useOverlaysUrlParameters() {
-  const { overlays, toggleOverlay, isOverlayFilterActive, setOverlayFilterActive } = useOverlaysContext();
-  const { getParameter, setParameter } = useUrlParameters<string[]>('overlays', []);
+  const {
+    selectedOverlayTypes,
+    selectedStates,
+    selectedWaterSourceTypes,
+    isOverlayFilterActive,
+    setSelectedOverlayTypes,
+    setStates,
+    setWaterSourceTypes,
+    setOverlayFilterActive,
+  } = useOverlaysFilter();
+
+  const { getParameter, setParameter } = useUrlParameters<OverlaysUrlParams | undefined>('overlayFilters', undefined);
+
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    const urlOverlays = getParameter() ?? [];
-    if (urlOverlays.length > 0) {
-      urlOverlays.forEach((overlay) => toggleOverlay(overlay, true));
-      setOverlayFilterActive(true);
+    const urlParams = getParameter();
+    if (!urlParams) {
+      setHasInitialized(true);
+      return;
     }
-  }, [getParameter, toggleOverlay, setOverlayFilterActive]);
+
+    setSelectedOverlayTypes(urlParams.selectedOverlayTypes);
+    setStates(urlParams.selectedStates);
+    setWaterSourceTypes(urlParams.selectedWaterSourceTypes);
+
+    setOverlayFilterActive(urlParams.isActive ?? false);
+
+    setHasInitialized(true);
+  }, [getParameter, setSelectedOverlayTypes, setStates, setWaterSourceTypes, setOverlayFilterActive]);
 
   useEffect(() => {
-    if (isOverlayFilterActive) {
-      setParameter(overlays);
-    } else {
+    if (!hasInitialized) return;
+
+    const hasFilters =
+      (selectedOverlayTypes && selectedOverlayTypes.length > 0) ||
+      (selectedStates && selectedStates.length > 0) ||
+      (selectedWaterSourceTypes && selectedWaterSourceTypes.length > 0);
+
+    const shouldPersist = isOverlayFilterActive || hasFilters;
+
+    if (!shouldPersist) {
       setParameter(undefined);
+      return;
     }
-  }, [overlays, isOverlayFilterActive, setParameter]);
+
+    const paramValue: OverlaysUrlParams = {
+      selectedOverlayTypes,
+      selectedStates,
+      selectedWaterSourceTypes,
+      isActive: isOverlayFilterActive || undefined,
+    };
+
+    setParameter(paramValue);
+  }, [
+    selectedOverlayTypes,
+    selectedStates,
+    selectedWaterSourceTypes,
+    isOverlayFilterActive,
+    setParameter,
+    hasInitialized,
+  ]);
 }

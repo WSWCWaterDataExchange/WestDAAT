@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useOverlaysContext } from '../../OverlaysProvider';
 
 export function useOverlaysFilter() {
   const {
     visibleOverlayTypes,
+    selectedOverlayTypes,
     selectedStates,
     selectedWaterSourceTypes,
     isOverlayFilterActive,
@@ -14,20 +15,26 @@ export function useOverlaysFilter() {
     resetOverlaysOptions,
   } = useOverlaysContext();
 
+  useEffect(() => {
+    if (!isOverlayFilterActive) {
+      return;
+    }
+  }, [isOverlayFilterActive]);
+
   const overlayTypeFilters = useMemo(() => {
-    if (!visibleOverlayTypes || visibleOverlayTypes.length === 0) return null;
+    if (!isOverlayFilterActive || !visibleOverlayTypes || visibleOverlayTypes.length === 0) return null;
     return ['any', ...visibleOverlayTypes.map((type) => ['in', type, ['get', 'oType']])];
-  }, [visibleOverlayTypes]);
+  }, [isOverlayFilterActive, visibleOverlayTypes]);
 
   const stateFilters = useMemo(() => {
-    if (!selectedStates || selectedStates.length === 0) return null;
+    if (!isOverlayFilterActive || !selectedStates || selectedStates.length === 0) return null;
     return ['any', ...selectedStates.map((state) => ['==', ['get', 'state'], state])];
-  }, [selectedStates]);
+  }, [isOverlayFilterActive, selectedStates]);
 
   const waterSourceFilters = useMemo(() => {
-    if (!selectedWaterSourceTypes || selectedWaterSourceTypes.length === 0) return null;
-    return ['any', ...selectedWaterSourceTypes.map((type) => ['in', type, ['get', 'wsType']])]
-  }, [selectedWaterSourceTypes]);
+    if (!isOverlayFilterActive || !selectedWaterSourceTypes || selectedWaterSourceTypes.length === 0) return null;
+    return ['any', ...selectedWaterSourceTypes.map((type) => ['in', type, ['get', 'wsType']])];
+  }, [isOverlayFilterActive, selectedWaterSourceTypes]);
 
   const combinedFilters = useMemo(() => {
     if (!isOverlayFilterActive) return null;
@@ -44,6 +51,7 @@ export function useOverlaysFilter() {
     isOverlayFilterActive,
     setOverlayFilterActive,
     visibleOverlayTypes,
+    selectedOverlayTypes,
     selectedStates,
     selectedWaterSourceTypes,
     setSelectedOverlayTypes,
