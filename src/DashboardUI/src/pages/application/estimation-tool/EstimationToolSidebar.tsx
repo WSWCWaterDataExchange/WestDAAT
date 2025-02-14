@@ -35,7 +35,11 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
     });
   };
 
-  const acreageSum = 4681;
+  // assumes all polygons are not intersecting
+  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
+    (sum, polygon) => sum + polygon.acreage,
+    0,
+  );
   const evapotranspiration = 1000;
   const conservationEstimate = 15000;
 
