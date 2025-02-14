@@ -24,7 +24,10 @@ function OverlayDigestCard({ overlay, onClosePopup }: OverlayDigestCardProps) {
         header: (
           <div>
             <strong> Overlay ID: </strong>
-            {waDeAreaReportingUuid}
+            <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
+              {waDeAreaReportingUuid}
+              <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+            </a>
           </div>
         ),
         body: (
@@ -40,12 +43,6 @@ function OverlayDigestCard({ overlay, onClosePopup }: OverlayDigestCardProps) {
             </div>
             <div className="mb-2">
               <strong>Native Overlay Area Type:</strong> {nativeOverlayAreaType}
-            </div>
-            <div className="mt-2">
-              <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
-                Overlay Landing Page
-                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
-              </a>
             </div>
           </div>
         ),

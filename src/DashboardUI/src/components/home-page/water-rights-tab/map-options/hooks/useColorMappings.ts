@@ -12,7 +12,7 @@ export function useColorMappings() {
     },
   } = useWaterRightsContext();
 
-  const { overlaysData: allOverlays } = useOverlaysContext();
+  const { overlayTypes: allOverlays } = useOverlaysContext();
 
   const { fallbackColor, getColorByIndex, getOverlayColorByIndex } = useColorMappingsBase();
 
