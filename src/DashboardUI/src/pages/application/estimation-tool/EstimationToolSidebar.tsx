@@ -23,7 +23,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
   return (
     <div className="flex-grow-1 panel-content">
-      <div className="container-fluid pt-3">
+      <div className="container-fluid pt-3 px-3">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
             <span className="fs-5 fw-bold text-primary">{formatNumber(acreageSum, 2)} Acres</span>
