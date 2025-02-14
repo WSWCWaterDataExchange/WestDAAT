@@ -7,7 +7,6 @@ import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useFundingOrganization } from './hooks/useFundingOrganization';
 import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
 import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
-import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
 
@@ -16,7 +15,6 @@ import './estimation-tool-page.scss';
 export function EstimationToolPage() {
   const navigate = useNavigate();
   const routeParams = useParams();
-  const context = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
 
   const { waterRightNativeId } = routeParams;
@@ -43,6 +41,19 @@ export function EstimationToolPage() {
 
   const estimateConsumptiveUseMutation = useEstimateConsumptiveUse();
 
+  const handleEstimateConsumptiveUseClicked = async () => {
+    await estimateConsumptiveUseMutation.mutateAsync({
+      waterRightNativeId: state.conservationApplication.waterRightNativeId,
+      waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
+      model: 0,
+      dateRangeStart: state.conservationApplication.dateRangeStart,
+      dateRangeEnd: state.conservationApplication.dateRangeEnd,
+      polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
+      compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
+      units: state.conservationApplication.desiredCompensationUnits,
+    });
+  };
+
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
   };
@@ -60,7 +71,7 @@ export function EstimationToolPage() {
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
               <EstimationToolMapHeader />
-              <EstimationToolMap />
+              <EstimationToolMap handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked} />
             </div>
           </div>
         </div>
