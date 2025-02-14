@@ -2,7 +2,9 @@ import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
 import { mdiPiggyBank, mdiWater } from '@mdi/js';
-import { Form, InputGroup, Placeholder } from 'react-bootstrap';
+import Form from 'react-bootstrap/esm/Form';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import {
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
@@ -163,7 +165,7 @@ function SidebarElement(props: SidebarElementProps) {
       {props.isLoading ? (
         <div>
           <Placeholder as="div" animation="wave">
-            <Placeholder xs={8} className="me-2"></Placeholder>
+            <Placeholder xs={8} className="me-2 rounded"></Placeholder>
           </Placeholder>
         </div>
       ) : (
