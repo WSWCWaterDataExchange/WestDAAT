@@ -35,7 +35,8 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     !!state.conservationApplication.dateRangeStart &&
     !!state.conservationApplication.dateRangeEnd &&
     !!state.conservationApplication.selectedMapPolygons &&
-    state.conservationApplication.selectedMapPolygons.length > 0;
+    state.conservationApplication.selectedMapPolygons.length > 0 &&
+    state.conservationApplication.selectedMapPolygons.every((p) => p.acreage <= 50000);
 
   return (
     <div className="flex-grow-1 position-relative">
