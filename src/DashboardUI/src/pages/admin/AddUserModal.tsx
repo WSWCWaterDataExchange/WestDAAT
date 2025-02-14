@@ -1,12 +1,25 @@
 import Button from 'react-bootstrap/esm/Button';
 import Modal, { ModalProps } from 'react-bootstrap/esm/Modal';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
+import Select from 'react-select';
+import { useState } from 'react';
+import { Role, RoleDisplayNames } from '../../config/role';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
 }
 
 function AddUserModal(props: AddUserModalProps) {
+  const roleOptions = [
+    { value: Role.Member, label: RoleDisplayNames[Role.Member] },
+    { value: Role.TechnicalReviewer, label: RoleDisplayNames[Role.TechnicalReviewer] },
+    { value: Role.OrganizationAdmin, label: RoleDisplayNames[Role.OrganizationAdmin] },
+  ];
+
+  const [selectedRole, setSelectedRole] = useState<Role | undefined>();
+
+  const handleRoleChange = (option: Role | undefined) => setSelectedRole(option);
+
   return (
     <Modal show={props.show} centered>
       <Modal.Header>
@@ -16,7 +29,14 @@ function AddUserModal(props: AddUserModalProps) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Modal Body</p>
+        <Select
+          options={roleOptions}
+          onChange={(r) => handleRoleChange(r?.value)}
+          placeholder="Select Role"
+          name="role"
+          getOptionLabel={(value) => RoleDisplayNames[value.value]}
+          value={roleOptions.find((x) => x.value === selectedRole)}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={props.onHide}>
