@@ -1,16 +1,15 @@
 import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
-import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
 import { mdiPiggyBank, mdiWater } from '@mdi/js';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
 import {
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { FundingOrganizationDetails } from '../../../data-contracts/FundingOrganizationDetails';
 import { formatNumber } from '../../../utilities/valueFormatters';
+import { SidebarElement } from './SidebarElement';
 
 interface EstimationToolSidebarProps {
   fundingOrganizationDetails: FundingOrganizationDetails | undefined;
@@ -75,7 +74,6 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="text-muted">Across one or many fields</span>
           </div>
 
-          {/* todo empty state */}
           <div className="d-flex align-items-center">
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
@@ -141,37 +139,6 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           </div>
         </SidebarElement>
       </div>
-    </div>
-  );
-}
-
-interface SidebarElementProps {
-  title: string;
-  isLoading?: boolean;
-  tooltip?: string;
-  children?: React.ReactNode;
-}
-
-function SidebarElement(props: SidebarElementProps) {
-  return (
-    <div className="sidebar-element mb-4">
-      <div className="d-flex align-items-center gap-3">
-        {/* limit width so the tooltips align properly */}
-        <div className="w-75">
-          <span className="fs-5 fw-bold">{props.title}</span>
-        </div>
-        {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
-      </div>
-
-      {props.isLoading ? (
-        <div>
-          <Placeholder as="div" animation="wave">
-            <Placeholder xs={8} className="me-2 rounded"></Placeholder>
-          </Placeholder>
-        </div>
-      ) : (
-        <div>{props.children}</div>
-      )}
     </div>
   );
 }
