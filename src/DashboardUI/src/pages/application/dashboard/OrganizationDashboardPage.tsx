@@ -38,7 +38,7 @@ export function OrganizationDashboardPage() {
   const { state, dispatch } = useConservationApplicationContext();
   const msalContext = useMsal();
 
-  let organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+  const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
   const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
@@ -139,7 +139,7 @@ export function OrganizationDashboardPage() {
     }) ?? [];
 
   return (
-    <div>
+    <div className="overflow-y-auto h-100">
       <div className="m-3">
         <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
         <div className="row my-4">
