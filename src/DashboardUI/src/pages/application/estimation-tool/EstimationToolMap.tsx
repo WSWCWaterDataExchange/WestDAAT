@@ -4,6 +4,7 @@ import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationForm
 import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { Button } from 'react-bootstrap';
 
 export function EstimationToolMap() {
   const { dispatch } = useConservationApplicationContext();
@@ -23,7 +24,13 @@ export function EstimationToolMap() {
   };
 
   return (
-    <div className="flex-grow-1">
+    <div className="flex-grow-1 position-relative">
+      <div className="w-100 position-absolute d-flex justify-content-center p-1">
+        <div className="estimate-tool-map-dimmed-overlay"></div>
+        <Button variant="success" style={{ zIndex: 1000 }}>
+          Estimate Consumptive Use for the Drawn Polygon(s)
+        </Button>
+      </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
         isConsumptiveUseAlertEnabled={false}
