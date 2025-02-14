@@ -33,41 +33,13 @@ export function EstimationToolPage() {
   }, [waterRightNativeId]);
 
   const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useFundingOrganization(
-    context,
     state.conservationApplication.waterRightNativeId,
   );
 
-  useEffect(() => {
-    if (fundingOrganizationDetails) {
-      dispatch({
-        type: 'FUNDING_ORGANIZATION_LOADED',
-        payload: {
-          fundingOrganizationId: fundingOrganizationDetails.fundingOrganizationId,
-          fundingOrganizationName: fundingOrganizationDetails.fundingOrganizationName,
-          openEtModelName: fundingOrganizationDetails.openEtModelName,
-          dateRangeStart: fundingOrganizationDetails.dateRangeStart,
-          dateRangeEnd: fundingOrganizationDetails.dateRangeEnd,
-          compensationRateModel: fundingOrganizationDetails.compensationRateModel,
-        },
-      });
-    }
-  }, [fundingOrganizationDetails]);
-
-  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication(context, {
+  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication({
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
   });
-
-  useEffect(() => {
-    if (applicationDetails) {
-      dispatch({
-        type: 'APPLICATION_CREATED',
-        payload: {
-          waterConservationApplicationId: applicationDetails.waterConservationApplicationId,
-        },
-      });
-    }
-  }, [applicationDetails]);
 
   const estimateConsumptiveUseMutation = useEstimateConsumptiveUse();
 

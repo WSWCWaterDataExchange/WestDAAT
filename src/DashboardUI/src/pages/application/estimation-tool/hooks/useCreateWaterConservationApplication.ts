@@ -1,14 +1,15 @@
 import { useQuery } from 'react-query';
 import { createWaterConservationApplication } from '../../../../accessors/applicationAccessor';
-import { IMsalContext } from '@azure/msal-react';
+import { useMsal } from '@azure/msal-react';
+import { WaterConservationApplicationCreateResponse } from '../../../../data-contracts/WaterConservationApplicationCreateResponse';
+import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 
-export function useCreateWaterConservationApplication(
-  context: IMsalContext,
-  fields: {
-    waterRightNativeId: string | undefined;
-    fundingOrganizationId: string | undefined;
-  },
-) {
+export function useCreateWaterConservationApplication(fields: {
+  waterRightNativeId: string | undefined;
+  fundingOrganizationId: string | undefined;
+}) {
+  const context = useMsal();
+  const { dispatch } = useConservationApplicationContext();
   return useQuery(
     ['createWaterConservationApplication', fields.waterRightNativeId, fields.fundingOrganizationId],
     () =>
@@ -18,6 +19,16 @@ export function useCreateWaterConservationApplication(
       }),
     {
       enabled: !!fields.waterRightNativeId && !!fields.fundingOrganizationId,
+      onSuccess: (result: WaterConservationApplicationCreateResponse) => {
+        if (result) {
+          dispatch({
+            type: 'APPLICATION_CREATED',
+            payload: {
+              waterConservationApplicationId: result.waterConservationApplicationId,
+            },
+          });
+        }
+      },
     },
   );
 }
