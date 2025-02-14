@@ -11,6 +11,7 @@ import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { RasterTimeSeriesModel } from '../data-contracts/RasterTimeSeriesModel';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -72,7 +73,7 @@ export const estimateConsumptiveUse = async (
   fields: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    model: number;
+    model: RasterTimeSeriesModel;
     dateRangeStart: Date;
     dateRangeEnd: Date;
     polygons: Feature<Geometry, GeoJsonProperties>[];
