@@ -1,4 +1,4 @@
-import { TextField, TextFieldProps } from '@mui/material';
+import { InputLabelProps, TextField, TextFieldProps } from '@mui/material';
 import { GridFilterInputValueProps } from '@mui/x-data-grid/components/panel/filterPanel/GridFilterInputValueProps';
 import { GridFilterOperator } from '@mui/x-data-grid/models/gridFilterOperator';
 import { useEffect, useState } from 'react';
@@ -26,6 +26,7 @@ export const dateRangeFilter: GridFilterOperator<any, string> = {
 
     return filterFn;
   },
+
   InputComponent: DateRangeFilter,
 };
 
@@ -53,24 +54,35 @@ export function DateRangeFilter(props: GridFilterInputValueProps) {
     updateFilterValue(filterValueState[0], newEndDate);
   };
 
+  const inputProps: InputLabelProps = {
+    shrink: true,
+  };
+
   return (
-    <div className="inline-flex">
+    <div className="d-inline-flex">
       <TextField
+        className="w-100"
         name="lower-bound-input"
-        placeholder="From"
+        label="From"
         type="date"
+        placeholder="date"
+        variant="standard"
         onChange={handleStartDateFilter}
         value={filterValueState[0]}
         inputRef={focusElementRef}
-      ></TextField>
+        slotProps={{ inputLabel: inputProps }}
+      />
       <TextField
+        className="w-100"
         name="upper-bound-input"
-        placeholder="To"
+        label="To"
         type="date"
+        placeholder="date"
+        variant="standard"
         onChange={handleEndDateFilter}
         value={filterValueState[1]}
-        inputRef={focusElementRef}
-      ></TextField>
+        slotProps={{ inputLabel: inputProps }}
+      />
     </div>
   );
 }

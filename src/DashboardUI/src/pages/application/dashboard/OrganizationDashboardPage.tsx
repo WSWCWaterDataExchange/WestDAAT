@@ -160,7 +160,21 @@ export function OrganizationDashboardPage() {
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={isLoading} isErrored={isError}>
-          <DataGrid rows={rows} columns={columns}></DataGrid>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            slotProps={{
+              filterPanel: {
+                filterFormProps: {
+                  valueInputProps: {
+                    sx: {
+                      width: 'auto', // This is to ensure the date range filter input field is wide enough for both date selection inputs
+                    },
+                  },
+                },
+              },
+            }}
+          ></DataGrid>
         </TableLoading>
       </div>
     </div>
