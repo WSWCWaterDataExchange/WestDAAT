@@ -37,7 +37,6 @@ export function EstimationToolPage() {
     {
       waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
       waterRightNativeId: waterRightNativeId,
-      // todo: update
       model: 0,
       dateRangeStart: new Date(),
       dateRangeEnd: new Date(),
