@@ -10,6 +10,7 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { FundingOrganizationDetails } from '../../../data-contracts/FundingOrganizationDetails';
+import { formatNumber } from '../../../utilities/valueFormatters';
 
 interface EstimationToolSidebarProps {
   fundingOrganizationDetails: FundingOrganizationDetails | undefined;
@@ -26,7 +27,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
       <div className="container-fluid">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold text-primary">{acreageSum.toLocaleString()} Acres</span>
+            <span className="fs-5 fw-bold text-primary">{formatNumber(acreageSum, 2)} Acres</span>
           </div>
 
           <div>
@@ -79,7 +80,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
-            <span className="fs-5 fw-bold text-primary">{evapotranspiration.toLocaleString()} Acre-Feet</span>
+            <span className="fs-5 fw-bold text-primary">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
           </div>
         </SidebarElement>
 
@@ -126,7 +127,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
               <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
 
-              <span className="fs-5 fw-bold">${conservationEstimate.toLocaleString()}</span>
+              <span className="fs-5 fw-bold">${formatNumber(conservationEstimate, 2)}</span>
             </span>
           </div>
 
