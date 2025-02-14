@@ -13,7 +13,7 @@ export function SidebarElement(props: SidebarElementProps) {
     <div className="sidebar-element mb-4">
       <div className="d-flex align-items-center gap-3">
         {/* limit width so the tooltips align properly */}
-        <div className="w-75">
+        <div>
           <span className="fs-5 fw-bold">{props.title}</span>
         </div>
         {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
