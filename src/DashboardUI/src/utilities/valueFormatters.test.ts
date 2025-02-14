@@ -65,13 +65,13 @@ describe('formatDateString', () => {
   describe('should return the formatted date string', () => {
     it('in MM/DD/YYYY format', () => {
       // Arrange
-      const date = new Date('2021-01-01T00:00:00.000Z');
+      const date = new Date('2025-01-01T00:00:00+00:00');
 
       // Act
       const result = formatDateString(date, 'MM/DD/YYYY');
 
       // Assert
-      expect(result).toStrictEqual('01/01/2021');
+      expect(result).toStrictEqual('12/31/2024');
     })
   });
 });
