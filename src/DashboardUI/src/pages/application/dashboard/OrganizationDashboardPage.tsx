@@ -1,9 +1,10 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColumnHeaderParams, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
+import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
+import { NavLink } from 'react-router-dom';
 import { applicationSearch } from '../../../accessors/applicationAccessor';
 import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
@@ -15,13 +16,14 @@ import {
   formatConservationApplicationStatusText,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
+import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
+
 import './organization-dashboard-page.scss';
-import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 
 interface ApplicationDataGridColumns {
-  applicant: string; // or whatever type
+  applicant: string;
   waterRightNativeId: string;
   applicationDisplayId: string;
   submittedDate: Date;
@@ -36,7 +38,7 @@ export function OrganizationDashboardPage() {
   const { state, dispatch } = useConservationApplicationContext();
   const msalContext = useMsal();
 
-  let organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+  const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
   const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
@@ -78,6 +80,15 @@ export function OrganizationDashboardPage() {
     </>
   );
 
+  const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
+    return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
+  };
+
+  const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
+    const waterRightId = `${params.row.waterRightState}wr_WR${params.row.waterRightNativeId}`;
+    return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
+  };
+
   const renderStatisticsCard = (description: string, value: number) => {
     return (
       <div className="col-md-2 col-sm-4 col-6 my-1">
@@ -91,8 +102,20 @@ export function OrganizationDashboardPage() {
 
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
-    { field: 'waterRightNativeId', headerName: 'Water Right Native ID', width: 200, renderHeader },
-    { field: 'applicationDisplayId', headerName: 'Application ID', width: 200, renderHeader },
+    {
+      field: 'waterRightNativeId',
+      headerName: 'Water Right Native ID',
+      width: 200,
+      renderHeader,
+      renderCell: renderWaterRightCell,
+    },
+    {
+      field: 'applicationDisplayId',
+      headerName: 'Application ID',
+      width: 200,
+      renderHeader,
+      renderCell: renderAppIdCell,
+    },
     { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: dateFormatter },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
@@ -116,7 +139,7 @@ export function OrganizationDashboardPage() {
     }) ?? [];
 
   return (
-    <div>
+    <div className="overflow-y-auto h-100">
       <div className="m-3">
         <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
         <div className="row my-4">

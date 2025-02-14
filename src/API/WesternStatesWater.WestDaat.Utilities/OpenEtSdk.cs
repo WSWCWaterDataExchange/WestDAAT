@@ -25,23 +25,30 @@ internal class OpenEtSdk : IOpenEtSdk
 
     public async Task<RasterTimeSeriesPolygonResponse> RasterTimeseriesPolygon(RasterTimeSeriesPolygonRequest request)
     {
-        var jsonString = JsonSerializer.Serialize(request);
-        var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-
-        var uri = new Uri("raster/timeseries/polygon", UriKind.Relative);
-        var response = await _httpClient.PostAsync(uri, httpContent);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            throw new WestDaatException($"OpenET API returned status code {response.StatusCode}");
+            var jsonString = JsonSerializer.Serialize(request);
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            var uri = new Uri("raster/timeseries/polygon", UriKind.Relative);
+            var response = await _httpClient.PostAsync(uri, httpContent);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ServiceUnavailableException($"OpenET API returned status code {response.StatusCode}");
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var responseData = JsonSerializer.Deserialize<RasterTimeSeriesPolygonResponseDatapoint[]>(responseContent);
+
+            return new RasterTimeSeriesPolygonResponse
+            {
+                Data = responseData
+            };
         }
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var responseData = JsonSerializer.Deserialize<RasterTimeSeriesPolygonResponseDatapoint[]>(responseContent);
-
-        return new RasterTimeSeriesPolygonResponse
+        catch (Exception e)
         {
-            Data = responseData
-        };
+            throw new ServiceUnavailableException("Error occurred while calling OpenET API", e);
+        }
     }
 }

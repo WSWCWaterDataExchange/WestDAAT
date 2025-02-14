@@ -39,7 +39,11 @@ function DetailsMap(props: detailsMapProps) {
   return (
     <div className="map-group h-100">
       <div className="map-container">
-        <Map handleMapFitChange={handleMapFitChange} />
+        <Map
+          handleMapFitChange={handleMapFitChange}
+          isConsumptiveUseAlertEnabled={false}
+          isGeocoderInputFeatureEnabled={true}
+        />
       </div>
       <div className="theme-selector-container pt-3 ps-3">
         <MapThemeSelector />

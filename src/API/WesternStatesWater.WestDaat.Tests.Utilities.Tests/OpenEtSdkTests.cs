@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
@@ -188,6 +189,46 @@ public class OpenEtSdkTests : UtilityTestBase
         response.Data.Should().HaveCount(monthsInYear);
         response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
         response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task RasterTimeSeriesPolygon_MockedApi_ApiError_ShouldThrow()
+    {
+        // Arrange
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var closedLinestringCoordinates = new[]
+        {
+            new Coordinate(-119.7937, 35.58995),
+            new Coordinate(-119.7937, 35.53326),
+            new Coordinate(-119.71268, 35.53326),
+            new Coordinate(-119.71268, 35.58995),
+            new Coordinate(-119.7937, 35.58995),
+        };
+
+        _mockHttp.When(HttpMethod.Post, baseAddress + "raster/timeseries/polygon")
+            .Respond(System.Net.HttpStatusCode.InternalServerError);
+
+        var request = new RasterTimeSeriesPolygonRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePolygon(closedLinestringCoordinates),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            PixelReducer = RasterTimeSeriesPixelReducer.Mean,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var sdk = CreateOpenEtSdk(_mockHttp.ToHttpClient());
+        var call = async () => await sdk.RasterTimeseriesPolygon(request);
+
+        // Assert
+        await call.Should().ThrowAsync<ServiceUnavailableException>();
     }
 
     [TestMethod]
