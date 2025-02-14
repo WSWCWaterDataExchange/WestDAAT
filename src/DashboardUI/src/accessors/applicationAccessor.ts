@@ -1,4 +1,3 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
 import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
@@ -6,12 +5,10 @@ import westDaatApi from './westDaatApi';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
-import { convertGeometryToWkt } from '../utilities/geometryWktConverter';
 import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
