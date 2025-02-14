@@ -69,29 +69,7 @@ export function EstimationToolPage() {
     }
   }, [applicationDetails]);
 
-  const { data: consumptiveUse, isLoading: isLoadingConsumptiveUse } = useEstimateConsumptiveUse(context, {
-    waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-    waterRightNativeId: state.conservationApplication.waterRightNativeId,
-    model: 1, // this field will probably get stripped out since we'll look up the model from the funding org in the backend
-    dateRangeStart: state.conservationApplication.dateRangeStart,
-    dateRangeEnd: state.conservationApplication.dateRangeEnd,
-    polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
-    compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
-    units: state.conservationApplication.desiredCompensationUnits,
-  });
-
-  useEffect(() => {
-    if (consumptiveUse) {
-      dispatch({
-        type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED',
-        payload: {
-          totalAverageYearlyEtAcreFeet: consumptiveUse.totalAverageYearlyEtAcreFeet,
-          conservationPayment: consumptiveUse.conservationPayment,
-          dataCollections: consumptiveUse.dataCollections,
-        },
-      });
-    }
-  }, [consumptiveUse]);
+  const estimateConsumptiveUseMutation = useEstimateConsumptiveUse();
 
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
