@@ -2,7 +2,7 @@ import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
 import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
 import { mdiPiggyBank, mdiWater } from '@mdi/js';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup, Placeholder } from 'react-bootstrap';
 import {
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
@@ -162,9 +162,9 @@ function SidebarElement(props: SidebarElementProps) {
 
       {props.isLoading ? (
         <div>
-          <div className="placeholder-wave">
-            <span className="placeholder col-8 me-2"></span>
-          </div>
+          <Placeholder as="div" animation="wave">
+            <Placeholder xs={8} className="me-2"></Placeholder>
+          </Placeholder>
         </div>
       ) : (
         <div>{props.children}</div>
