@@ -10,21 +10,18 @@ export function useOverlayTypeLegend() {
   const { overlayTypeColors, fallbackColor } = useColorMappings();
   const { visibleOverlayTypes } = useOverlaysContext();
 
-  const tryParseJsonArray = (value: any) => {
-    try {
-      return JSON.parse(value ?? '[]');
-    } catch {
-      return [];
-    }
-  };
-
   const renderedOverlayTypes = useMemo(() => {
+    const tryParseJsonArray = (value: any) => {
+      try {
+        return JSON.parse(value ?? '[]');
+      } catch {
+        return [];
+      }
+    };
     return overlayTypeColors.filter(
       (colorItem) =>
         visibleOverlayTypes.includes(colorItem.key) &&
-        renderedFeatures.some((feature) =>
-          tryParseJsonArray(feature.properties?.['oType']).includes(colorItem.key),
-        ),
+        renderedFeatures.some((feature) => tryParseJsonArray(feature.properties?.['oType']).includes(colorItem.key)),
     );
   }, [renderedFeatures, overlayTypeColors, visibleOverlayTypes]);
 
