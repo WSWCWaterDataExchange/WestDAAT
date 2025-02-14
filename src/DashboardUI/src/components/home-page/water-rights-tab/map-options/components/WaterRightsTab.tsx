@@ -66,7 +66,12 @@ function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLa
       <MainPanel>
         <SiteActionbar showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
         <div style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
-          <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
+          <Map
+            handleMapDrawnPolygonChange={polylinesOnMapUpdated}
+            handleMapFitChange={handleMapFitRequested}
+            isConsumptiveUseAlertEnabled={true}
+            isGeocoderInputFeatureEnabled={true}
+          />
           <TableView />
         </div>
       </MainPanel>
