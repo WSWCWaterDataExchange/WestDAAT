@@ -33,6 +33,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 SiteTypes = await db.SiteType.GetControlledVocabularyNames(),
                 States = await db.State.GetControlledVocabularyNames(),
                 WaterSources = await db.WaterSourceType.GetControlledVocabularyNames(),
+                VariableTypes = await db.Variable.GetControlledVocabularyNames(),
             };
         }
 
