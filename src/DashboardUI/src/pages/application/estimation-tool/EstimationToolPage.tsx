@@ -32,7 +32,7 @@ export function EstimationToolPage() {
     }
   }, [waterRightNativeId]);
 
-  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useFundingOrganization(
+  const { isLoading: isLoadingFundingOrganization } = useFundingOrganization(
     state.conservationApplication.waterRightNativeId,
   );
 
@@ -55,10 +55,7 @@ export function EstimationToolPage() {
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar
-                fundingOrganizationDetails={fundingOrganizationDetails}
-                isLoadingFundingOrganization={isLoadingFundingOrganization}
-              />
+              <EstimationToolSidebar isLoadingFundingOrganization={isLoadingFundingOrganization} />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">

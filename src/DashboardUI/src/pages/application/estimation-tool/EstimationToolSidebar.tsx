@@ -8,12 +8,10 @@ import {
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { FundingOrganizationDetails } from '../../../data-contracts/FundingOrganizationDetails';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useRef } from 'react';
 
 interface EstimationToolSidebarProps {
-  fundingOrganizationDetails: FundingOrganizationDetails | undefined;
   isLoadingFundingOrganization: boolean;
 }
 
@@ -59,7 +57,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="The Conservation Organization (or program sponsor) is the entity (governmental, nonprofit, or private) with a voluntary program to conserve or reduce water use with funding to compensate water users for relinquishing or abstaining from the use of their state water right. Conservation Organization decide on the following parameters: (a) the OpenET consumptive use model(s) or ensemble to use; (b) the time period (i.e., number of years and start and end months) used to evaluate historical consumptive use; and (c) the compensation in U.S. dollars per acre or per acre-foot of conserved water offered a user."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span>{props.fundingOrganizationDetails?.fundingOrganizationName}</span>
+          <span>{state.conservationApplication.fundingOrganizationName}</span>
         </SidebarElement>
 
         <SidebarElement
@@ -67,7 +65,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span>{props.fundingOrganizationDetails?.openEtModelName}</span>
+          <span>{state.conservationApplication.openEtModelName}</span>
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">
@@ -80,8 +78,8 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           isLoading={props.isLoadingFundingOrganization}
         >
           <span>
-            {props.fundingOrganizationDetails?.dateRangeStart.toLocaleDateString()} to{' '}
-            {props.fundingOrganizationDetails?.dateRangeEnd.toLocaleDateString()}
+            {state.conservationApplication.dateRangeStart?.toLocaleDateString()} to{' '}
+            {state.conservationApplication.dateRangeEnd?.toLocaleDateString()}
           </span>
         </SidebarElement>
 
@@ -110,7 +108,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
 "
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span className="text-muted">{props.fundingOrganizationDetails?.compensationRateModel}</span>
+          <span className="text-muted">{state.conservationApplication.compensationRateModel}</span>
         </SidebarElement>
 
         <SidebarElement title="DESIRED COMPENSATION ($)" isLoading={props.isLoadingFundingOrganization}>
