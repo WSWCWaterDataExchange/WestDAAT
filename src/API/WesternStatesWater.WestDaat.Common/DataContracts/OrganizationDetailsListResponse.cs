@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class OrganizationLoadAllResponse : OrganizationLoadResponseBase
+public class OrganizationDetailsListResponse : OrganizationLoadResponseBase
 {
     public OrganizationListItem[] Organizations { get; set; }
 }

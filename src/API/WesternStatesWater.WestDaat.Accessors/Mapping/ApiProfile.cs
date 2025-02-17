@@ -12,7 +12,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         public ApiProfile()
         {
             CreateMap<EF.AllocationAmountsFact, AllocationAmount>()
-                .ForMember(a => a.BeneficialUses, b => b.MapFrom(c => c.AllocationBridgeBeneficialUsesFact.Select(d => d.BeneficialUse.WaDEName.Length > 0 ? d.BeneficialUse.WaDEName : d.BeneficialUseCV)))
+                .ForMember(a => a.BeneficialUses,
+                    b => b.MapFrom(c => c.AllocationBridgeBeneficialUsesFact.Select(d => d.BeneficialUse.WaDEName.Length > 0 ? d.BeneficialUse.WaDEName : d.BeneficialUseCV)))
                 .ForMember(a => a.SiteIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(d => d.SiteId)))
                 .ForMember(a => a.OwnerClassification, b => b.MapFrom(c => c.OwnerClassification.WaDEName.Length > 0 ? c.OwnerClassification.WaDEName : c.OwnerClassificationCV))
                 .ForMember(a => a.CustomerType, b => b.MapFrom(c => c.CustomerType.WaDEName.Length > 0 ? c.CustomerType.WaDEName : c.CustomerTypeCV))
@@ -56,18 +57,31 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(source => source.AllocationPriorityDateNavigation.Date))
                 .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(source => source.AllocationExpirationDateNavigation.Date));
             CreateMap<EF.AllocationAmountsFact, WaterRightsSearchDetail>()
-                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(source => source.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()))
-                .ForMember(dest => dest.OwnerClassification, opt => opt.MapFrom(source => source.OwnerClassification.WaDEName.Length > 0 ? source.OwnerClassification.WaDEName : source.OwnerClassification.Name))
+                .ForMember(dest => dest.BeneficialUses,
+                    opt => opt.MapFrom(source =>
+                        source.AllocationBridgeBeneficialUsesFact.Select(b => b.BeneficialUse.WaDEName.Length > 0 ? b.BeneficialUse.WaDEName : b.BeneficialUse.Name).ToArray()))
+                .ForMember(dest => dest.OwnerClassification,
+                    opt => opt.MapFrom(source => source.OwnerClassification.WaDEName.Length > 0 ? source.OwnerClassification.WaDEName : source.OwnerClassification.Name))
                 .ForMember(dest => dest.AllocationFlowCfs, opt => opt.MapFrom(source => source.AllocationFlow_CFS))
                 .ForMember(dest => dest.AllocationVolumeAf, opt => opt.MapFrom(source => source.AllocationVolume_AF))
-                .ForMember(dest => dest.AllocationPriorityDate, opt => opt.MapFrom(source => (source.AllocationPriorityDateID != null && source.AllocationPriorityDateNavigation.Date != default) ? source.AllocationPriorityDateNavigation.Date : (DateTime?)null))
-                .ForMember(dest => dest.AllocationLegalStatus, opt => opt.MapFrom(source => source.AllocationLegalStatusCvNavigation.WaDEName.Length > 0 ? source.AllocationLegalStatusCvNavigation.WaDEName : source.AllocationLegalStatusCvNavigation.Name));
+                .ForMember(dest => dest.AllocationPriorityDate,
+                    opt => opt.MapFrom(source =>
+                        (source.AllocationPriorityDateID != null && source.AllocationPriorityDateNavigation.Date != default)
+                            ? source.AllocationPriorityDateNavigation.Date
+                            : (DateTime?)null))
+                .ForMember(dest => dest.AllocationLegalStatus,
+                    opt => opt.MapFrom(source =>
+                        source.AllocationLegalStatusCvNavigation.WaDEName.Length > 0
+                            ? source.AllocationLegalStatusCvNavigation.WaDEName
+                            : source.AllocationLegalStatusCvNavigation.Name));
             CreateMap<EF.SitesDim, Site>()
                 .ForMember(a => a.AllocationIds, b => b.MapFrom(c => c.AllocationBridgeSitesFact.Select(allocation => allocation.AllocationBridgeId)))
                 .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCvNavigation.WaDEName.Length > 0 ? c.SiteTypeCvNavigation.WaDEName : c.SiteTypeCv))
                 .ForMember(a => a.Geometry, b => b.MapFrom(c => c.Geometry ?? c.SitePoint))
                 .ForMember(a => a.PodPou, b => b.MapFrom(c => c.PODorPOUSite))
-                .ForMember(a => a.WaterSourceTypes, b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d => d.WaterSource.WaterSourceTypeCvNavigation.WaDEName.Length > 0 ? d.WaterSource.WaterSourceTypeCvNavigation.WaDEName : d.WaterSource.WaterSourceTypeCv)));
+                .ForMember(a => a.WaterSourceTypes,
+                    b => b.MapFrom(c => c.WaterSourceBridgeSitesFact.Select(d =>
+                        d.WaterSource.WaterSourceTypeCvNavigation.WaDEName.Length > 0 ? d.WaterSource.WaterSourceTypeCvNavigation.WaDEName : d.WaterSource.WaterSourceTypeCv)));
             CreateMap<EF.SitesDim, SiteInfoListItem>()
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(source => source.SiteTypeCv));
             CreateMap<EF.SitesDim, SiteLocation>();
@@ -82,7 +96,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.GnisfeatureName, opt => opt.MapFrom(source => source.GnisfeatureNameCv));
             CreateMap<EF.BeneficialUsesCV, BeneficialUseItem>()
                 .ForMember(dest => dest.BeneficialUseName, opt => opt.MapFrom(source => source.WaDEName.Length > 0 ? source.WaDEName : source.Name))
-                .ForMember(dest => dest.ConsumptionCategory, opt => opt.MapFrom(source => source.ConsumptionCategoryType == null ? Common.ConsumptionCategory.Unspecified : source.ConsumptionCategoryType));
+                .ForMember(dest => dest.ConsumptionCategory,
+                    opt => opt.MapFrom(source => source.ConsumptionCategoryType == null ? Common.ConsumptionCategory.Unspecified : source.ConsumptionCategoryType));
 
             CreateMap<EF.SiteVariableAmountsFact, SiteUsagePoint>()
                 .ForMember(dest => dest.Amount, opt => opt.MapFrom(source => source.Amount))
@@ -106,14 +121,22 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EF.VariablesDim, VariableInfoListItem>()
                 .ForMember(dest => dest.WaDEVariableUuid, opt => opt.MapFrom(source => source.VariableSpecificUuid))
-                .ForMember(dest => dest.Variable, opt => opt.MapFrom(source => source.VariableCvNavigation.WaDEName.Length > 0 ? source.VariableCvNavigation.WaDEName : source.VariableCv))
-                .ForMember(dest => dest.VariableSpecificType, opt => opt.MapFrom(source => source.VariableSpecificCvNavigation.WaDEName.Length > 0 ? source.VariableSpecificCvNavigation.Term : source.VariableSpecificCv))
-                .ForMember(dest => dest.AmountUnit, opt => opt.MapFrom(source => source.AmountUnitCvNavigation.WaDEName.Length > 0 ? source.AmountUnitCvNavigation.WaDEName : source.AmountUnitCv))
-                .ForMember(dest => dest.AggregationStatistic, opt => opt.MapFrom(source => source.AggregationStatisticCvNavigation.WaDEName.Length > 0 ? source.AggregationStatisticCvNavigation.WaDEName : source.AggregationStatisticCv))
+                .ForMember(dest => dest.Variable,
+                    opt => opt.MapFrom(source => source.VariableCvNavigation.WaDEName.Length > 0 ? source.VariableCvNavigation.WaDEName : source.VariableCv))
+                .ForMember(dest => dest.VariableSpecificType,
+                    opt => opt.MapFrom(source => source.VariableSpecificCvNavigation.WaDEName.Length > 0 ? source.VariableSpecificCvNavigation.Term : source.VariableSpecificCv))
+                .ForMember(dest => dest.AmountUnit,
+                    opt => opt.MapFrom(source => source.AmountUnitCvNavigation.WaDEName.Length > 0 ? source.AmountUnitCvNavigation.WaDEName : source.AmountUnitCv))
+                .ForMember(dest => dest.AggregationStatistic,
+                    opt => opt.MapFrom(source =>
+                        source.AggregationStatisticCvNavigation.WaDEName.Length > 0 ? source.AggregationStatisticCvNavigation.WaDEName : source.AggregationStatisticCv))
                 .ForMember(dest => dest.AggregationInterval, opt => opt.MapFrom(source => source.AggregationInterval))
-                .ForMember(dest => dest.AggregationIntervalUnit, opt => opt.MapFrom(source => source.AggregationIntervalUnitCvNavigation.WaDEName.Length > 0 ? source.AggregationIntervalUnitCvNavigation.WaDEName : source.AggregationIntervalUnitCv))
+                .ForMember(dest => dest.AggregationIntervalUnit,
+                    opt => opt.MapFrom(source =>
+                        source.AggregationIntervalUnitCvNavigation.WaDEName.Length > 0 ? source.AggregationIntervalUnitCvNavigation.WaDEName : source.AggregationIntervalUnitCv))
                 .ForMember(dest => dest.ReportYearStartMonth, opt => opt.MapFrom(source => source.ReportYearStartMonth))
-                .ForMember(dest => dest.ReportYearType, opt => opt.MapFrom(source => source.ReportYearTypeCvNavigation.WaDEName.Length > 0 ? source.ReportYearTypeCvNavigation.WaDEName : source.ReportYearTypeCv))
+                .ForMember(dest => dest.ReportYearType,
+                    opt => opt.MapFrom(source => source.ReportYearTypeCvNavigation.WaDEName.Length > 0 ? source.ReportYearTypeCvNavigation.WaDEName : source.ReportYearTypeCv))
                 ;
 
             CreateMap<EF.ReportingUnitsDim, OverlayDetails>()
@@ -136,8 +159,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EF.MethodsDim, MethodInfoListItem>()
                 .ForMember(dest => dest.WaDEMethodUuid, opt => opt.MapFrom(source => source.MethodUuid))
-                .ForMember(dest => dest.ApplicationResourceType, opt => opt.MapFrom(source => source.ApplicableResourceTypeCvNavigation.WaDEName.Length > 0 ? source.ApplicableResourceTypeCvNavigation.WaDEName : source.ApplicableResourceTypeCv))
-                .ForMember(dest => dest.MethodType, opt => opt.MapFrom(source => source.MethodTypeCvNavigation.WaDEName.Length > 0 ? source.MethodTypeCvNavigation.WaDEName : source.MethodTypeCv))
+                .ForMember(dest => dest.ApplicationResourceType,
+                    opt => opt.MapFrom(source =>
+                        source.ApplicableResourceTypeCvNavigation.WaDEName.Length > 0 ? source.ApplicableResourceTypeCvNavigation.WaDEName : source.ApplicableResourceTypeCv))
+                .ForMember(dest => dest.MethodType,
+                    opt => opt.MapFrom(source => source.MethodTypeCvNavigation.WaDEName.Length > 0 ? source.MethodTypeCvNavigation.WaDEName : source.MethodTypeCv))
                 .ForMember(dest => dest.MethodUrl, opt => opt.MapFrom(source => source.MethodNemilink))
                 .ForMember(dest => dest.WaDEDataMappingProcessUrl, opt => opt.MapFrom(source => source.WaDEDataMappingUrl))
                 .ForMember(dest => dest.MethodDescription, opt => opt.MapFrom(source => source.MethodDescription));
@@ -146,8 +172,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaDEOverlayUuid, opt => opt.MapFrom(source => source.RegulatoryOverlayUuid))
                 .ForMember(dest => dest.OverlayNativeID, opt => opt.MapFrom(source => source.RegulatoryOverlayNativeId))
                 .ForMember(dest => dest.OverlayName, opt => opt.MapFrom(source => source.RegulatoryName))
-                .ForMember(dest => dest.OverlayType, opt => opt.MapFrom(source => source.RegulatoryOverlayType.WaDEName.Length > 0 ? source.RegulatoryOverlayType.WaDEName : source.RegulatoryOverlayTypeCV))
-                .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceType.WaDEName.Length > 0 ? source.WaterSourceType.WaDEName : source.WaterSourceTypeCV))
+                .ForMember(dest => dest.OverlayType,
+                    opt => opt.MapFrom(source => source.RegulatoryOverlayType.WaDEName.Length > 0 ? source.RegulatoryOverlayType.WaDEName : source.RegulatoryOverlayTypeCV))
+                .ForMember(dest => dest.WaterSourceType,
+                    opt => opt.MapFrom(source => source.WaterSourceType.WaDEName.Length > 0 ? source.WaterSourceType.WaDEName : source.WaterSourceTypeCV))
                 .ForMember(dest => dest.OverlayStatus, opt => opt.MapFrom(source => source.RegulatoryStatusCv))
                 .ForMember(dest => dest.OverlayStatute, opt => opt.MapFrom(source => source.RegulatoryStatute))
                 .ForMember(dest => dest.StatuteLink, opt => opt.MapFrom(source => source.RegulatoryStatuteLink))
@@ -240,7 +268,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
                 .ForMember(dest => dest.Submission, opt => opt.Ignore());
-
         }
     }
 }
