@@ -17,6 +17,7 @@ import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
+import { ApplicationGuard } from './pages/application/ApplicationGuard';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
 import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
@@ -96,7 +97,7 @@ function App({ msalInstance }: AppProps) {
                     <Route index element={<AccountInformationPage />} />
                   </Route>
                 </Route>
-                <Route path="application">
+                <Route path="application" element={<ApplicationGuard />}>
                   <Route element={<ApplicationLayout />}>
                     <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">
