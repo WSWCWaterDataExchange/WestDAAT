@@ -129,20 +129,6 @@ export default function WaterRightTabs() {
       <Tab eventKey="rights" title="Administrative/Regulatory Overlay Info">
         <OverlayDetailsTable waterRightsInfoList={waterRightsInfoList} />
       </Tab>
-      <Tab eventKey="timeSeries" title="Time Series Info">
-        <div style={{ width: '100%', height: 600 }}>
-          <DataGrid
-            rows={timeSeriesRows}
-            columns={timeSeriesColumns}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
-            slots={{
-              toolbar: QuickSearchToolbar,
-            }}
-          />
-        </div>
-      </Tab>
     </Tabs>
   );
 }

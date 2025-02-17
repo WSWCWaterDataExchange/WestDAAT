@@ -155,9 +155,6 @@ function SideBar() {
           <Accordion.Item eventKey="colorSizeTools">
             <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
             <Accordion.Body>
-              <MapGrouping />
-              <PointSize />
-              <PodPou />
               <MapTheme />
             </Accordion.Body>
           </Accordion.Item>
