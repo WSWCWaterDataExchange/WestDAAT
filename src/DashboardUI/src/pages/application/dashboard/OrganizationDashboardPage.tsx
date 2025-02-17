@@ -168,7 +168,7 @@ export function OrganizationDashboardPage() {
                 filterFormProps: {
                   valueInputProps: {
                     sx: {
-                      width: 'auto', // This is to ensure the date range filter input field is wide enough for both date selection inputs
+                      width: 'auto', // This prevents the filter from having a horizontal scrollbar
                     },
                   },
                 },
