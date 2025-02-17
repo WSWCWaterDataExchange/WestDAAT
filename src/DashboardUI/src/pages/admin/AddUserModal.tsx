@@ -5,11 +5,12 @@ import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { Role, RoleDisplayNames } from '../../config/role';
-import { useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
 import Alert from 'react-bootstrap/esm/Alert';
+import { addOrganizationMemeber } from '../../accessors/organizationAccessor';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -28,6 +29,11 @@ function AddUserModal(props: AddUserModalProps) {
   const [maxResultsReturned, setMaxResultsReturned] = useState(false);
   const queryClient = useQueryClient();
   const msalContext = useMsal();
+
+  const addOrganizationMemeberMutation = useMutation({
+    mutationFn: async (organizationId: string, userId: string, role: string) =>
+      addOrganizationMemeber(msalContext, organizationId, userId, role),
+  });
 
   interface UserSelectOption {
     value: string;
@@ -69,6 +75,19 @@ function AddUserModal(props: AddUserModalProps) {
         callback(options || []);
       });
   }, 200);
+
+  const handleAddUserClick = () => {
+    if (!selectedUser || !selectedRole) {
+      return;
+    }
+
+    console.log('Adding user to organization', selectedUser, selectedRole);
+    addOrganizationMemeberMutation.mutate({
+      organizationId: props.organization?.organizationId,
+      userId: selectedUser.value,
+      role: selectedRole,
+    });
+  };
 
   return (
     <Modal show={props.show} centered onHide={props.onHide} className="add-user-modal">
@@ -122,7 +141,7 @@ function AddUserModal(props: AddUserModalProps) {
         <Button variant="secondary" onClick={props.onHide}>
           Cancel
         </Button>
-        <Button onClick={() => alert('This feature will be implemented in a future release.')}>Add User</Button>
+        <Button onClick={handleAddUserClick}>Add User</Button>
       </Modal.Footer>
     </Modal>
   );

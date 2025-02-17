@@ -30,3 +30,21 @@ export const getOrganizationSummaryList = async (
   const { data } = await api.post('Organizations/Search', request);
   return data;
 };
+
+export const addOrganizationMemeber = async (
+  msalContext: IMsalContext,
+  organizationId: string,
+  userId: string,
+  role: string,
+): Promise<void> => {
+  console.log(`Adding user ${userId} to organization ${organizationId} with role ${role}`);
+
+  // Simulate a call to an API
+  const promise = new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 3000);
+  });
+
+  return promise;
+};
