@@ -48,7 +48,6 @@ export function AdminOrganizationsUsersPage() {
       <NotImplementedPlaceholder />
 
       <pre>OrganizationId: {organizationId}</pre>
-      <pre>{showAddUserModal ? 'true' : 'false'}</pre>
 
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
     </div>
