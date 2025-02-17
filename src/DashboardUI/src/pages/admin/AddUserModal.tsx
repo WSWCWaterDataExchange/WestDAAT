@@ -1,9 +1,14 @@
-import Button from 'react-bootstrap/esm/Button';
-import Modal, { ModalProps } from 'react-bootstrap/esm/Modal';
-import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
+import React, { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import Select from 'react-select';
-import { useEffect, useState } from 'react';
+import AsyncSelect from 'react-select/async';
+import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { Role, RoleDisplayNames } from '../../config/role';
+import { useUserSearchQuery } from '../../hooks/queries';
+import { useQueryClient } from 'react-query';
+import { searchUsers } from '../../accessors/userAccessor';
+import { useMsal } from '@azure/msal-react';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -17,32 +22,67 @@ function AddUserModal(props: AddUserModalProps) {
   ];
 
   const [selectedRole, setSelectedRole] = useState<Role | undefined>();
+  const [selectedUser, setSelectedUser] = useState<{ value: string; label: string } | null>(null);
+  const queryClient = useQueryClient();
+  const msalContext = useMsal();
 
-  const handleRoleChange = (option: Role | undefined) => setSelectedRole(option);
+  const handleRoleChange = (option: { value: Role } | null) => setSelectedRole(option?.value);
+  const handleUserChange = (option: { value: string; label: string } | null) => setSelectedUser(option);
 
   useEffect(() => {
-    // When the modal is closed, reset state
     if (!props.show) {
       setSelectedRole(undefined);
+      setSelectedUser(null);
     }
   }, [props.show]);
 
+  // TODO debounce
+  // TODO style the search results
+
+  const loadUserOptions = (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
+    const trimmedSearchTerm = inputValue.trim();
+    if (trimmedSearchTerm.length < 3) {
+      callback([]);
+      return;
+    }
+
+    // Cannot use hook within a function, so we use the queryClient directly
+    queryClient
+      .fetchQuery(['searchUsers', trimmedSearchTerm], () => searchUsers(msalContext, trimmedSearchTerm))
+      .then((searchResults) => {
+        const options = searchResults?.searchResults?.map((result) => ({
+          value: result.UserId,
+          label: `${result.firstName} ${result.lastName}    ${result.userName}`,
+        }));
+
+        callback(options || []);
+      });
+  };
+
   return (
-    <Modal show={props.show} centered>
-      <Modal.Header>
+    <Modal show={props.show} centered onHide={props.onHide}>
+      <Modal.Header closeButton>
         <Modal.Title>
           Add a User
           <p className="fs-6 m-0 mt-2">{props.organization?.name}</p>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <AsyncSelect
+          cacheOptions
+          loadOptions={loadUserOptions}
+          onChange={handleUserChange}
+          placeholder="Search User to Add"
+          value={selectedUser}
+        />
         <Select
           options={roleOptions}
-          onChange={(r) => handleRoleChange(r?.value)}
+          onChange={handleRoleChange}
           placeholder="Select Role"
           name="role"
           getOptionLabel={(value) => RoleDisplayNames[value.value]}
           value={roleOptions.find((x) => x.value === selectedRole)}
+          className="mt-3"
         />
       </Modal.Body>
       <Modal.Footer>
