@@ -21,6 +21,7 @@ import { getUserOrganization, hasUserRole } from '../../../utilities/securityHel
 import { formatDateString } from '../../../utilities/valueFormatters';
 
 import './organization-dashboard-page.scss';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -150,6 +151,11 @@ export function OrganizationDashboardPage() {
           {renderStatisticsCard('Cumulative Est. Savings', 42)}
           {renderStatisticsCard('Total Obligation', 42)}
         </div>
+        {isLoading && (
+          <Placeholder animation="glow">
+            <Placeholder className="fs-5 mt-5"></Placeholder>
+          </Placeholder>
+        )}
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={isLoading} isErrored={isError}>
           <DataGrid rows={rows} columns={columns}></DataGrid>
