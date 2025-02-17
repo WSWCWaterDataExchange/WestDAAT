@@ -12,12 +12,11 @@ const maxControlProps = {
 };
 
 export function TimeSeriesDateRange() {
-  const { minDate, maxDate, setMinDate, setMaxDate, setTimeSeriesFilterActive } = useTimeSeriesContext();
+  const { minDate, maxDate, setMinDate, setMaxDate } = useTimeSeriesContext();
 
   const handleDateRangeChange = useDebounceCallback((min: number | undefined, max: number | undefined) => {
     setMinDate(min);
     setMaxDate(max);
-    setTimeSeriesFilterActive(min !== undefined || max !== undefined);
   }, 400);
 
   return (

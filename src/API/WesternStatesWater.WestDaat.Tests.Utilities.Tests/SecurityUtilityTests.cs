@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -43,7 +44,7 @@ public class SecurityUtilityTests : UtilityTestBase
         // Assert
         permissions.Should().BeEquivalentTo(Permissions.AllPermissions());
     }
-    
+
     [TestMethod]
     public void Get_UserContext_FakeRole_ShouldHaveNoPermissions()
     {
@@ -64,8 +65,10 @@ public class SecurityUtilityTests : UtilityTestBase
         permissions.Should().BeEmpty();
     }
 
-    [TestMethod]
-    public void Get_UserContext_ShouldReceiveOrganizationPermissions()
+    [DataTestMethod]
+    [DataRow(true, DisplayName = "Should return permissions for a specific organiztion.")]
+    [DataRow(false, DisplayName = "Should return no permissions for an unrelated organization.")]
+    public void Get_UserContext_ShouldReceiveOrganizationPermissions(bool forSpecificOrganization)
     {
         // Arrange
         var securityUtility = new SecurityUtility();
@@ -86,11 +89,11 @@ public class SecurityUtilityTests : UtilityTestBase
         var permissions = securityUtility.Get(new OrganizationPermissionsGetRequest
         {
             Context = userContext,
-            OrganizationId = organizationId
+            OrganizationId = forSpecificOrganization ? organizationId : null
         });
 
         // Assert
-        permissions.Should().Contain(Permissions.UserLoad);
+        permissions.Should().Contain(Permissions.OrganizationApplicationDashboardLoad);
     }
 
     [TestMethod]
