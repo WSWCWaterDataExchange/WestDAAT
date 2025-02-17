@@ -19,6 +19,7 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
+import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
 import { useOrganizationQuery } from '../../../hooks/queries';
@@ -147,7 +148,14 @@ export function OrganizationDashboardPage() {
       renderHeader,
       renderCell: renderAppIdCell,
     },
-    { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: dateFormatter },
+    {
+      field: 'submittedDate',
+      headerName: 'Date Submitted',
+      width: 150,
+      renderHeader,
+      valueFormatter: dateFormatter,
+      filterOperators: [dataGridDateRangeFilter],
+    },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
@@ -183,7 +191,21 @@ export function OrganizationDashboardPage() {
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={isLoading} isErrored={isError}>
-          <DataGrid rows={rows} columns={columns}></DataGrid>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            slotProps={{
+              filterPanel: {
+                filterFormProps: {
+                  valueInputProps: {
+                    sx: {
+                      width: 'auto', // This prevents the filter from having a horizontal scrollbar
+                    },
+                  },
+                },
+              },
+            }}
+          ></DataGrid>
         </TableLoading>
       </div>
     </div>
