@@ -1,5 +1,5 @@
 import { OrganizationListItem } from './OrganizationListItem';
 
-export interface OrganizationLoadAllResponse {
+export interface OrganizationDetailsListResponse {
   organizations: OrganizationListItem[];
 }
