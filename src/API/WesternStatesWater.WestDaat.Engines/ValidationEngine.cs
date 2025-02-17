@@ -241,6 +241,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EnrichJwtRequest => ValidateEnrichJwtRequest(context),
+            UserSearchRequest => ValidateUserSearchRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -252,6 +253,25 @@ internal class ValidationEngine : IValidationEngine
         if (context is not IdentityProviderContext)
         {
             return CreateForbiddenError(new EnrichJwtRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserSearchRequest(ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = null // Any organization
+        });
+
+        if (!permissions.Contains(Permissions.UserSearch) &&
+            !orgPermissions.Contains(Permissions.UserSearch))
+        {
+            return CreateForbiddenError(new UserSearchRequest(), context);
         }
 
         return null;

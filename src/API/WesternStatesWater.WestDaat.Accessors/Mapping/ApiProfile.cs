@@ -207,6 +207,12 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.UserProfile, opt => opt.Ignore())
                 .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
                 .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
+
+            CreateProjection<EFWD.User, UserSearchResult>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserProfile.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserProfile.LastName))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName));
         }
 
         private void AddOrganizationMappings()
