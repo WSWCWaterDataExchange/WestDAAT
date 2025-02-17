@@ -78,6 +78,9 @@ internal class UserAccessor : AccessorBase, IUserAccessor
                 user.UserProfile.UserName.Contains(trimmedSearchTerm) ||
                 (user.UserProfile.FirstName + " " + user.UserProfile.LastName).Contains(trimmedSearchTerm)
             )
+            .OrderBy(u => u.UserProfile.FirstName)
+            .ThenBy(u => u.UserProfile.LastName)
+            .Take(20)
             .ProjectTo<UserSearchResult>(DtoMapper.Configuration)
             .ToArrayAsync();
 

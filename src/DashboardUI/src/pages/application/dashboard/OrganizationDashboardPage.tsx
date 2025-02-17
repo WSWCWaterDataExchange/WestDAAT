@@ -43,11 +43,7 @@ export function OrganizationDashboardPage() {
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
-  const {
-    data: organizationListResponse,
-    isLoading: organizationListLoading,
-    isError: organizationListErrored,
-  } = useOrganizationQuery();
+  const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
   const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
