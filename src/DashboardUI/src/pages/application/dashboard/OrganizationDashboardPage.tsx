@@ -21,6 +21,8 @@ import { getUserOrganization, hasUserRole } from '../../../utilities/securityHel
 import { formatDateString } from '../../../utilities/valueFormatters';
 
 import './organization-dashboard-page.scss';
+import { useOrganizationQuery } from '../../../hooks/queries';
+import { Placeholder } from 'react-bootstrap';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -39,6 +41,12 @@ export function OrganizationDashboardPage() {
   const msalContext = useMsal();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+
+  const {
+    data: organizationListResponse,
+    isLoading: organizationListLoading,
+    isError: organizationListErrored,
+  } = useOrganizationQuery();
 
   const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
@@ -100,6 +108,29 @@ export function OrganizationDashboardPage() {
     );
   };
 
+  const dashboardTitle = () => {
+    if (organizationListLoading) {
+      return (
+        <Placeholder as="h1" animation="glow" className="fs-3 fw-bolder">
+          <Placeholder xs={4} className="rounded" />
+        </Placeholder>
+      );
+    }
+
+    let titleText = 'Application Dashboard';
+    if (organizationIdFilter) {
+      const organization = organizationListResponse?.organizations.find(
+        (org) => org.organizationId === organizationIdFilter,
+      );
+
+      if (organization) {
+        titleText = `${organization.name} Dashboard`;
+      }
+    }
+
+    return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
+  };
+
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -141,7 +172,7 @@ export function OrganizationDashboardPage() {
   return (
     <div className="overflow-y-auto h-100">
       <div className="m-3">
-        <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
+        {dashboardTitle()}
         <div className="row my-4">
           {renderStatisticsCard('Submitted Applications', 42)}
           {renderStatisticsCard('Accepted Applications', 42)}
