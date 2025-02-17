@@ -57,7 +57,7 @@ function AddUserModal(props: AddUserModalProps) {
       .then((searchResults) => {
         const options = searchResults?.searchResults?.map(
           (result): UserSelectOption => ({
-            value: result.UserId,
+            value: result.userId,
             label: `${result.firstName} ${result.lastName}, ${result.userName}`,
             fullName: `${result.firstName} ${result.lastName}`,
             userName: result.userName,

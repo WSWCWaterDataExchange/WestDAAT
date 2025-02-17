@@ -1,6 +1,6 @@
 
 export interface UserSearchResult {
-  UserId: string;
+  userId: string;
   userName: string;
   firstName: string;
   lastName: string;
