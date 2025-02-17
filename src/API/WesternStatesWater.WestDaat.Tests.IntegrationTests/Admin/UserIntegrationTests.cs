@@ -228,6 +228,8 @@ public class UserIntegrationTests : IntegrationTestBase
     [DataRow("User", 3, DisplayName = "Partial match - by UserName")]
     [DataRow("FirstName Last", 3, DisplayName = "Partial match - by FirstName LastName")]
     [DataRow("name", 3, DisplayName = "Partial match - by FirstName, LastName, UserName")]
+    [DataRow("First ", 3, DisplayName = "Trimmed partial match - FirstName (trailing space)")]
+    [DataRow(" First", 3, DisplayName = "Trimmed partial match - FirstName (leading space)")]
     [DataRow("No Match", 0, DisplayName = "No match")]
     public async Task Load_UserSearchRequest_Success(string searchTerm, int resultCount)
     {

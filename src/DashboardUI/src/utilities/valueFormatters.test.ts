@@ -65,13 +65,21 @@ describe('formatDateString', () => {
   describe('should return the formatted date string', () => {
     it('in MM/DD/YYYY format', () => {
       // Arrange
-      const date = new Date('2021-01-01T00:00:00.000Z');
+      const date = new Date('2021-01-01T00:00:00+00:00');
 
       // Act
       const result = formatDateString(date, 'MM/DD/YYYY');
 
       // Assert
-      expect(result).toStrictEqual('01/01/2021');
-    })
+      // Checking the timezone offset to determine the expected result
+      // The only timezone that should be expecting the date to be 01/01/2021 is UTC
+      // All other timezones should expect the date to be 12/31/2020
+      const timezoneOffset = new Date().getTimezoneOffset();
+      if (timezoneOffset === 0) {
+        expect(result).toStrictEqual('01/01/2021');
+      } else {
+        expect(result).toStrictEqual('12/31/2020');
+      }
+    });
   });
 });
