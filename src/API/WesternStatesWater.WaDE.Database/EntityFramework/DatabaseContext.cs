@@ -1185,7 +1185,10 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
                 entity.HasNoKey();
                 entity.ToView("OverlaysView");
                 entity.Property(e => e.Geometry).HasColumnType("geometry").HasColumnName("geometry");
+                entity.Property(e => e.State).HasColumnName("State");
+                entity.Property(e => e.WaterSourceTypeWaDEName).HasColumnName("WaterSourceTypeWaDEName");
             });
+
 
             modelBuilder.Entity<OwnerClassificationCv>(entity =>
             {

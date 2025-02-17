@@ -60,16 +60,6 @@ function OverlayTabs() {
     { field: 'volume', headerName: 'Volume (AF)', flex: 1, sortable: true },
     { field: 'legalStatus', headerName: 'Legal Status', flex: 1, sortable: true },
     {
-      field: 'expirationDate',
-      headerName: 'Expiration Date',
-      flex: 1,
-      sortable: true,
-      valueFormatter: (value) => {
-        if (!value) return '-';
-        return new Date(value as string).toLocaleDateString();
-      },
-    },
-    {
       field: 'beneficialUses',
       headerName: 'Beneficial Uses',
       flex: 2,

@@ -23,7 +23,7 @@ export function TimeSeriesSiteTypeSelect() {
 
   return (
     <div className="mb-3">
-      <label htmlFor="time-series-site-type-filter">Time Series Site Type</label>
+      <label htmlFor="time-series-site-type-filter">Site Type</label>
       <Select
         id="time-series-site-type-filter"
         isMulti

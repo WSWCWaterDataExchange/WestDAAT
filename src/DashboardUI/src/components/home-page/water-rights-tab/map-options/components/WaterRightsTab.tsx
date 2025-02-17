@@ -17,14 +17,22 @@ import { useHomePageContext } from '../../../Provider';
 import { useMapFitRequested } from '../hooks/useMapFitRequested';
 import { OverlaysProvider } from '../../sidebar-filtering/OverlaysProvider';
 import { TimeSeriesProvider } from '../../sidebar-filtering/TimeSeriesProvider';
+import { SiteActionbar } from '../../../../SiteActionbar';
+import { useOverlaysUrlParameters } from '../../../../../hooks/url-parameters/useOverlaysUrlParameters';
+import { useTimeSeriesUrlParameters } from '../../../../../hooks/url-parameters/useTimeseriesUrlParameters';
 
-export function WaterRightsTab() {
+interface WaterRightsTabProps {
+  showDownloadModal?: (show: boolean) => void;
+  showUploadModal?: (show: boolean) => void;
+}
+
+export function WaterRightsTab({ showDownloadModal, showUploadModal }: WaterRightsTabProps) {
   return (
     <MapProvider>
       <WaterRightsProvider>
         <OverlaysProvider>
           <TimeSeriesProvider>
-            <WaterRightsLayout />
+            <WaterRightsLayout showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
           </TimeSeriesProvider>
         </OverlaysProvider>
       </WaterRightsProvider>
@@ -32,22 +40,40 @@ export function WaterRightsTab() {
   );
 }
 
-function WaterRightsLayout() {
+interface WaterRightsLayoutProps {
+  showDownloadModal?: (show: boolean) => void;
+  showUploadModal?: (show: boolean) => void;
+}
+
+function WaterRightsLayout({ showDownloadModal, showUploadModal }: WaterRightsLayoutProps) {
   useDisplayOptions();
   useFilters();
   useMapUrlParameters();
+  useOverlaysUrlParameters();
+  useTimeSeriesUrlParameters();
+
   useDownloadModal();
   useUploadModal();
+
   const { polylinesOnMapUpdated } = usePolylinesFilter();
   const { handleMapFitRequested } = useMapFitRequested();
+
   return (
     <>
       <SidePanel>
         <SideBar />
       </SidePanel>
       <MainPanel>
-        <Map handleMapDrawnPolygonChange={polylinesOnMapUpdated} handleMapFitChange={handleMapFitRequested} />
-        <TableView />
+        <SiteActionbar showDownloadModal={showDownloadModal} showUploadModal={showUploadModal} />
+        <div style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
+          <Map
+            handleMapDrawnPolygonChange={polylinesOnMapUpdated}
+            handleMapFitChange={handleMapFitRequested}
+            isConsumptiveUseAlertEnabled={true}
+            isGeocoderInputFeatureEnabled={true}
+          />
+          <TableView />
+        </div>
       </MainPanel>
     </>
   );

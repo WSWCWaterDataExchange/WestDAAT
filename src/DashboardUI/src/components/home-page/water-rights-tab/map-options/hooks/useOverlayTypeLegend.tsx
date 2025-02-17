@@ -3,10 +3,12 @@ import { useMapContext } from '../../../../../contexts/MapProvider';
 import { mapLayerNames } from '../../../../../config/maps';
 import { useColorMappings } from './useColorMappings';
 import { MapLegendCircleItem } from '../../../../map/MapLegendItem';
+import { useOverlaysContext } from '../../sidebar-filtering/OverlaysProvider';
 
 export function useOverlayTypeLegend() {
   const { renderedFeatures, setLayerFillColors } = useMapContext();
   const { overlayTypeColors, fallbackColor } = useColorMappings();
+  const { visibleOverlayTypes } = useOverlaysContext();
 
   const renderedOverlayTypes = useMemo(() => {
     const tryParseJsonArray = (value: any) => {
@@ -16,15 +18,14 @@ export function useOverlayTypeLegend() {
         return [];
       }
     };
-    return overlayTypeColors.filter((a) =>
-      renderedFeatures.some(
-        (b) => b.properties && tryParseJsonArray(b.properties['oType']).some((c: string) => c === a.key),
-      ),
+    return overlayTypeColors.filter(
+      (colorItem) =>
+        visibleOverlayTypes.includes(colorItem.key) &&
+        renderedFeatures.some((feature) => tryParseJsonArray(feature.properties?.['oType']).includes(colorItem.key)),
     );
-  }, [renderedFeatures, overlayTypeColors]);
+  }, [renderedFeatures, overlayTypeColors, visibleOverlayTypes]);
 
   const legendItems = useMemo(() => {
-    if (renderedOverlayTypes.length === 0) return undefined;
     return renderedOverlayTypes.map((colorObj) => (
       <MapLegendCircleItem key={colorObj.key} color={colorObj.color}>
         {colorObj.key}
@@ -33,19 +34,23 @@ export function useOverlayTypeLegend() {
   }, [renderedOverlayTypes]);
 
   useEffect(() => {
-    let colorArray: any = ['case'];
+    const colorArray: any = ['case'];
 
-    overlayTypeColors.forEach((a) => {
-      colorArray.push(['in', a.key, ['get', 'oType']]);
-      colorArray.push(a.color);
+    visibleOverlayTypes.forEach((overlayKey) => {
+      const overlayColor = overlayTypeColors.find((item) => item.key === overlayKey)?.color;
+      if (overlayColor) {
+        colorArray.push(['in', overlayKey, ['get', 'oType']]);
+        colorArray.push(overlayColor);
+      }
     });
+
     colorArray.push(fallbackColor);
 
     setLayerFillColors({
       layer: mapLayerNames.overlayTypesPolygonsLayer,
       fillColor: colorArray,
     });
-  }, [overlayTypeColors, fallbackColor, setLayerFillColors]);
+  }, [visibleOverlayTypes, overlayTypeColors, fallbackColor, setLayerFillColors]);
 
   return { legendItems };
 }
