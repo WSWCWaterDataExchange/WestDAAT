@@ -11,4 +11,5 @@ public class DashboardFilters
     public string[] LegalStatuses { get; set; }
     public string[] SiteTypes { get; set; }
     public string[] RiverBasins { get; set; }
+    public string[] VariableTypes { get; set; }
 }

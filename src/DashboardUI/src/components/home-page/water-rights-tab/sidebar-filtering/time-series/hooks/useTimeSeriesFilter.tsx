@@ -6,6 +6,9 @@ export function useTimeSeriesFilter() {
     timeSeries,
     isTimeSeriesFilterActive,
     selectedSiteTypes,
+    selectedPrimaryUseCategories,
+    selectedVariableTypes,
+    selectedWaterSourceTypes,
     minDate,
     maxDate,
     setTimeSeriesFilterActive,
@@ -16,6 +19,21 @@ export function useTimeSeriesFilter() {
     if (!selectedSiteTypes || selectedSiteTypes.length === 0) return null;
     return ['any', ...selectedSiteTypes.map((type) => ['==', ['get', 'siteType'], type])];
   }, [selectedSiteTypes]);
+
+  const primaryUseCategoryFilters = useMemo(() => {
+    if (!selectedPrimaryUseCategories || selectedPrimaryUseCategories.length === 0) return null;
+    return ['any', ...selectedPrimaryUseCategories.map((category) => ['==', ['get', 'primaryUseCategory'], category])];
+  }, [selectedPrimaryUseCategories]);
+
+  const variableTypeFilters = useMemo(() => {
+    if (!selectedVariableTypes || selectedVariableTypes.length === 0) return null;
+    return ['any', ...selectedVariableTypes.map((type) => ['==', ['get', 'variableType'], type])];
+  }, [selectedVariableTypes]);
+
+  const waterSourceTypeFilters = useMemo(() => {
+    if (!selectedWaterSourceTypes || selectedWaterSourceTypes.length === 0) return null;
+    return ['any', ...selectedWaterSourceTypes.map((type) => ['==', ['get', 'waterSourceType'], type])];
+  }, [selectedWaterSourceTypes]);
 
   const dateFilters = useMemo(() => {
     if (minDate === undefined && maxDate === undefined) return null;
@@ -42,21 +60,30 @@ export function useTimeSeriesFilter() {
       filters.push(['in', ['get', 'uuid'], ...timeSeries]);
     }
 
-    if (siteTypeFilters) {
-      filters.push(siteTypeFilters);
-    }
-
-    if (dateFilters) {
-      filters.push(dateFilters);
-    }
+    if (siteTypeFilters) filters.push(siteTypeFilters);
+    if (primaryUseCategoryFilters) filters.push(primaryUseCategoryFilters);
+    if (variableTypeFilters) filters.push(variableTypeFilters);
+    if (waterSourceTypeFilters) filters.push(waterSourceTypeFilters);
+    if (dateFilters) filters.push(dateFilters);
 
     return filters.length > 1 ? filters : null;
-  }, [timeSeries, isTimeSeriesFilterActive, siteTypeFilters, dateFilters]);
+  }, [
+    timeSeries,
+    isTimeSeriesFilterActive,
+    siteTypeFilters,
+    primaryUseCategoryFilters,
+    variableTypeFilters,
+    waterSourceTypeFilters,
+    dateFilters,
+  ]);
 
   return {
     timeSeries,
     isTimeSeriesFilterActive,
     selectedSiteTypes,
+    selectedPrimaryUseCategories,
+    selectedVariableTypes,
+    selectedWaterSourceTypes,
     minDate,
     maxDate,
     mapFilters: combinedFilters,

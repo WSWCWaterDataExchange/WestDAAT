@@ -51,7 +51,7 @@ internal class SecurityUtility : ISecurityUtility
     {
         var userContext = (UserContext)request.Context;
         var organizationRoles = userContext.OrganizationRoles.FirstOrDefault(or =>
-            or.OrganizationId == request.OrganizationId
+            or.OrganizationId == request.OrganizationId || request.OrganizationId == null
         );
 
         // If the user is not a member of the organization, they have no roles
@@ -74,23 +74,21 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.Member,
             [
-                Permissions.UserLoad,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
         {
             Roles.TechnicalReviewer,
             [
-                Permissions.UserLoad,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
         {
             Roles.OrganizationAdmin,
             [
-                Permissions.UserLoad,
                 Permissions.OrganizationApplicationDashboardLoad,
                 Permissions.OrganizationMemberAdd,
+                Permissions.UserSearch
             ]
         },
         {

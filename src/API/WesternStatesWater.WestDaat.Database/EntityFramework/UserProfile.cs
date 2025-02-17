@@ -10,5 +10,7 @@ public class UserProfile
     
     public string LastName { get; set; } = null!;
     
+    public string UserName { get; set; } = null!;
+    
     public virtual User User { get; set; } = null!;
 }

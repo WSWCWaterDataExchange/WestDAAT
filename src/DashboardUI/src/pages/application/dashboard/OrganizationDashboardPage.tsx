@@ -170,7 +170,7 @@ export function OrganizationDashboardPage() {
     }) ?? [];
 
   return (
-    <div>
+    <div className="overflow-y-auto h-100">
       <div className="m-3">
         {dashboardTitle()}
         <div className="row my-4">

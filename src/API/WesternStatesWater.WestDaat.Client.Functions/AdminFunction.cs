@@ -35,5 +35,4 @@ public class AdminFunction : FunctionBase
         var results = await _userManager.Load<EnrichJwtRequest, EnrichJwtResponse>(enrichJwtRequest);
         return await CreateResponse(req, results);
     }
-
 }

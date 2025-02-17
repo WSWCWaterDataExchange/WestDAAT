@@ -1,3 +1,4 @@
+using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -21,6 +22,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         {
             UserExistsRequest req => await GetUserExists(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
+            UserSearchRequest req => await SearchUsers(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -33,7 +35,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         var user = await db.Users
             .Include(u => u.UserRoles)
             .Include(u => u.UserOrganizations)
-                .ThenInclude(uor => uor.UserOrganizationRoles)
+            .ThenInclude(uor => uor.UserOrganizationRoles)
             .FirstOrDefaultAsync(u => u.ExternalAuthId == request.ExternalAuthId);
 
         NotFoundException.ThrowIfNull(user, $"User not found for auth id {request.ExternalAuthId}");
@@ -59,6 +61,29 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return new UserExistsResponse
         {
             UserExists = userExists
+        };
+    }
+
+    private async Task<UserSearchResponse> SearchUsers(UserSearchRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var trimmedSearchTerm = request.SearchTerm.Trim();
+
+        var searchResults = await db.Users
+            .Where(user => user.UserProfile != null)
+            .Where(user =>
+                user.UserProfile.FirstName.Contains(trimmedSearchTerm) ||
+                user.UserProfile.LastName.Contains(trimmedSearchTerm) ||
+                user.UserProfile.UserName.Contains(trimmedSearchTerm) ||
+                (user.UserProfile.FirstName + " " + user.UserProfile.LastName).Contains(trimmedSearchTerm)
+            )
+            .ProjectTo<UserSearchResult>(DtoMapper.Configuration)
+            .ToArrayAsync();
+
+        return new UserSearchResponse
+        {
+            SearchResults = searchResults
         };
     }
 
