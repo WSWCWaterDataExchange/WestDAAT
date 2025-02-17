@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
 using WesternStatesWater.Shared.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 
+[JsonDerivedType(typeof(UserSearchRequest), typeDiscriminator: nameof(UserSearchRequest))]
 public class UserLoadRequestBase : RequestBase
 {
 }
