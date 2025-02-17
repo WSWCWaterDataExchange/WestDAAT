@@ -3,7 +3,7 @@ import { GridFilterInputValueProps } from '@mui/x-data-grid/components/panel/fil
 import { GridFilterOperator } from '@mui/x-data-grid/models/gridFilterOperator';
 import { useEffect, useState } from 'react';
 
-export const dateRangeFilter: GridFilterOperator<any, string> = {
+export const dataGridDateRangeFilter: GridFilterOperator<any, string> = {
   label: 'Between',
   value: 'between',
   getApplyFilterFn: (filterItem) => {
@@ -27,10 +27,10 @@ export const dateRangeFilter: GridFilterOperator<any, string> = {
     return filterFn;
   },
 
-  InputComponent: DateRangeFilter,
+  InputComponent: DataGridDateRangeFilter,
 };
 
-export function DateRangeFilter(props: GridFilterInputValueProps) {
+export function DataGridDateRangeFilter(props: GridFilterInputValueProps) {
   const { item, applyValue, focusElementRef = null } = props;
   const [filterValueState, setFilterValueState] = useState<[string, string]>(['', '']);
 

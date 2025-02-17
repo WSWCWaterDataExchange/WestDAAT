@@ -19,7 +19,7 @@ import { useAuthenticationContext } from '../../../hooks/useAuthenticationContex
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
-import { dateRangeFilter } from './DateRangeFilter';
+import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
 
@@ -123,7 +123,7 @@ export function OrganizationDashboardPage() {
       width: 150,
       renderHeader,
       valueFormatter: dateFormatter,
-      filterOperators: [dateRangeFilter],
+      filterOperators: [dataGridDateRangeFilter],
     },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
