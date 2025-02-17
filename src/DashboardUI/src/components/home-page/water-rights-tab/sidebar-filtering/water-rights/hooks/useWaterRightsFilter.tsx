@@ -15,6 +15,7 @@ import { useSiteTypesFilter } from './useSiteTypesFilter';
 import { useStatesFilter } from './useStatesFilter';
 import { useVolumeFilters } from './useVolumeFilters';
 import { useWaterSourceTypesFilter } from './useWaterSourceTypesFilter';
+import { useAllocationTypesFilter } from './useAllocationTypesFilter';
 
 export function useWaterRightsFilter() {
   const { filters } = useWaterRightsContext();
@@ -28,6 +29,7 @@ export function useWaterRightsFilter() {
   const { mapFilters: riverBasinMapFilters } = useRiverBasinFilter();
   const { mapFilters: statesMapFilters } = useStatesFilter();
   const { mapFilters: allocationOwnerMapFilters } = useAllocationOwnerFilter();
+  const { mapFilters: allocationTypesMapFilters } = useAllocationTypesFilter();
   const { mapFilters: flowMapFilters } = useFlowFilters();
   const { mapFilters: volumeMapFilters } = useVolumeFilters();
   const { mapFilters: priorityDateMapFilters } = usePriorityDateFilters();
@@ -50,6 +52,7 @@ export function useWaterRightsFilter() {
       riverBasinMapFilters,
       statesMapFilters,
       allocationOwnerMapFilters,
+      allocationTypesMapFilters,
       flowMapFilters,
       volumeMapFilters,
       priorityDateMapFilters,
@@ -70,6 +73,7 @@ export function useWaterRightsFilter() {
     riverBasinMapFilters,
     statesMapFilters,
     allocationOwnerMapFilters,
+    allocationTypesMapFilters,
     flowMapFilters,
     volumeMapFilters,
     priorityDateMapFilters,
