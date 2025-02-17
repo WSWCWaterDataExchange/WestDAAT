@@ -68,13 +68,15 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 
+        var trimmedSearchTerm = request.SearchTerm.Trim();
+
         var searchResults = await db.Users
             .Where(user => user.UserProfile != null)
             .Where(user =>
-                user.UserProfile.FirstName.Contains(request.SearchTerm) ||
-                user.UserProfile.LastName.Contains(request.SearchTerm) ||
-                user.UserProfile.UserName.Contains(request.SearchTerm) ||
-                (user.UserProfile.FirstName + " " + user.UserProfile.LastName).Contains(request.SearchTerm)
+                user.UserProfile.FirstName.Contains(trimmedSearchTerm) ||
+                user.UserProfile.LastName.Contains(trimmedSearchTerm) ||
+                user.UserProfile.UserName.Contains(trimmedSearchTerm) ||
+                (user.UserProfile.FirstName + " " + user.UserProfile.LastName).Contains(trimmedSearchTerm)
             )
             .ProjectTo<UserSearchResult>(DtoMapper.Configuration)
             .ToArrayAsync();
