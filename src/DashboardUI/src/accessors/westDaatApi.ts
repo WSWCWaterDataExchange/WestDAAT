@@ -14,9 +14,22 @@ const westDaatApi = async (msalContext?: IMsalContext): Promise<AxiosInstance> =
     return api;
   }
 
-  const tokenResponse = await msalContext.instance.acquireTokenSilent({
-    scopes: loginRequest.scopes,
-  });
+  let tokenResponse;
+  try {
+    // Attempt silent token acquisition. If the refresh token is expired, this will throw an error.
+    // In that case, we'll catch the error and use acquireTokenPopup to get a new token.
+    tokenResponse = await msalContext.instance.acquireTokenSilent({
+      scopes: loginRequest.scopes,
+    });
+  } catch (error: any) {
+    if (error && error.name === 'InteractionRequiredAuthError') {
+      tokenResponse = await msalContext.instance.acquireTokenPopup({
+        scopes: loginRequest.scopes,
+      });
+    } else {
+      throw error;
+    }
+  }
 
   api.defaults.headers.common.Authorization = `Bearer ${tokenResponse.accessToken}`;
 
