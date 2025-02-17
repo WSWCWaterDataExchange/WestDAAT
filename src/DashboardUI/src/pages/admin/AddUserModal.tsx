@@ -5,10 +5,10 @@ import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { Role, RoleDisplayNames } from '../../config/role';
-import { useUserSearchQuery } from '../../hooks/queries';
 import { useQueryClient } from 'react-query';
 import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
+import { useDebounceCallback } from '@react-hook/debounce';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -36,28 +36,26 @@ function AddUserModal(props: AddUserModalProps) {
     }
   }, [props.show]);
 
-  // TODO debounce
-  // TODO style the search results
+  const loadUserOptions = useDebounceCallback(
+    (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
+      if (inputValue.trim().length < 3) {
+        callback([]);
+        return;
+      }
 
-  const loadUserOptions = (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
-    const trimmedSearchTerm = inputValue.trim();
-    if (trimmedSearchTerm.length < 3) {
-      callback([]);
-      return;
-    }
+      queryClient
+        .fetchQuery(['searchUsers', inputValue], () => searchUsers(msalContext, inputValue))
+        .then((searchResults) => {
+          const options = searchResults?.searchResults?.map((result) => ({
+            value: result.UserId,
+            label: `${result.firstName} ${result.lastName}    ${result.userName}`,
+          }));
 
-    // Cannot use hook within a function, so we use the queryClient directly
-    queryClient
-      .fetchQuery(['searchUsers', trimmedSearchTerm], () => searchUsers(msalContext, trimmedSearchTerm))
-      .then((searchResults) => {
-        const options = searchResults?.searchResults?.map((result) => ({
-          value: result.UserId,
-          label: `${result.firstName} ${result.lastName}    ${result.userName}`,
-        }));
-
-        callback(options || []);
-      });
-  };
+          callback(options || []);
+        });
+    },
+    200,
+  );
 
   return (
     <Modal show={props.show} centered onHide={props.onHide}>
@@ -74,6 +72,13 @@ function AddUserModal(props: AddUserModalProps) {
           onChange={handleUserChange}
           placeholder="Search User to Add"
           value={selectedUser}
+          components={{
+            NoOptionsMessage: (a) => (
+              <p className="text-muted text-center py-2 m-0">
+                {a.selectProps.inputValue.length < 3 ? 'Enter at least 3 characters' : 'No results found'}
+              </p>
+            ),
+          }}
         />
         <Select
           options={roleOptions}
