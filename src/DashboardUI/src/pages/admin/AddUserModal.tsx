@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import Select from 'react-select';
@@ -9,6 +9,7 @@ import { useQueryClient } from 'react-query';
 import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
+import Alert from 'react-bootstrap/esm/Alert';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -21,13 +22,22 @@ function AddUserModal(props: AddUserModalProps) {
     { value: Role.OrganizationAdmin, label: RoleDisplayNames[Role.OrganizationAdmin] },
   ];
 
+  const maxUserSearchResults = 20;
   const [selectedRole, setSelectedRole] = useState<Role | undefined>();
-  const [selectedUser, setSelectedUser] = useState<{ value: string; label: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserSelectOption | null>(null);
+  const [maxResultsReturned, setMaxResultsReturned] = useState(false);
   const queryClient = useQueryClient();
   const msalContext = useMsal();
 
+  interface UserSelectOption {
+    value: string;
+    label: string;
+    fullName: string;
+    userName: string;
+  }
+
   const handleRoleChange = (option: { value: Role } | null) => setSelectedRole(option?.value);
-  const handleUserChange = (option: { value: string; label: string } | null) => setSelectedUser(option);
+  const handleUserChange = (option: UserSelectOption | null) => setSelectedUser(option);
 
   useEffect(() => {
     if (!props.show) {
@@ -36,29 +46,32 @@ function AddUserModal(props: AddUserModalProps) {
     }
   }, [props.show]);
 
-  const loadUserOptions = useDebounceCallback(
-    (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
-      if (inputValue.trim().length < 3) {
-        callback([]);
-        return;
-      }
+  const loadUserOptions = useDebounceCallback((inputValue: string, callback: (options: UserSelectOption[]) => void) => {
+    if (inputValue.trim().length < 3) {
+      callback([]);
+      return;
+    }
 
-      queryClient
-        .fetchQuery(['searchUsers', inputValue], () => searchUsers(msalContext, inputValue))
-        .then((searchResults) => {
-          const options = searchResults?.searchResults?.map((result) => ({
+    queryClient
+      .fetchQuery(['searchUsers', inputValue], () => searchUsers(msalContext, inputValue))
+      .then((searchResults) => {
+        const options = searchResults?.searchResults?.map(
+          (result): UserSelectOption => ({
             value: result.UserId,
-            label: `${result.firstName} ${result.lastName}    ${result.userName}`,
-          }));
+            label: `${result.firstName} ${result.lastName}, ${result.userName}`,
+            fullName: `${result.firstName} ${result.lastName}`,
+            userName: result.userName,
+          }),
+        );
 
-          callback(options || []);
-        });
-    },
-    200,
-  );
+        setMaxResultsReturned(options.length >= maxUserSearchResults);
+
+        callback(options || []);
+      });
+  }, 200);
 
   return (
-    <Modal show={props.show} centered onHide={props.onHide}>
+    <Modal show={props.show} centered onHide={props.onHide} className="add-user-modal">
       <Modal.Header closeButton>
         <Modal.Title>
           Add a User
@@ -66,6 +79,11 @@ function AddUserModal(props: AddUserModalProps) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {maxResultsReturned && (
+          <Alert variant="warning" className="mb-3">
+            Showing first {maxUserSearchResults} results. Narrow your search to find more users.
+          </Alert>
+        )}
         <AsyncSelect
           cacheOptions
           loadOptions={loadUserOptions}
@@ -77,6 +95,16 @@ function AddUserModal(props: AddUserModalProps) {
               <p className="text-muted text-center py-2 m-0">
                 {a.selectProps.inputValue.length < 3 ? 'Enter at least 3 characters' : 'No results found'}
               </p>
+            ),
+            Option: (props) => (
+              <div
+                className="d-flex justify-content-between p-2 user-select-none user-select-option"
+                onClick={() => props.selectOption(props.data)}
+                role="option"
+              >
+                <div className="fw-bold">{props.data.fullName}</div>
+                <div>{props.data.userName}</div>
+              </div>
             ),
           }}
         />
