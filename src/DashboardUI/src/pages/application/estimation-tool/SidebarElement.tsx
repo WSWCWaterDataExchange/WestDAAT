@@ -2,7 +2,7 @@ import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 interface SidebarElementProps {
-  title: string;
+  title?: string;
   isLoading?: boolean;
   tooltip?: string;
   children?: React.ReactNode;

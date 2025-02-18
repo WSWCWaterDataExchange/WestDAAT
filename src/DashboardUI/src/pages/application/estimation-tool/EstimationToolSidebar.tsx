@@ -12,6 +12,7 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { useRef } from 'react';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
+import { Button } from 'react-bootstrap';
 
 interface EstimationToolSidebarProps {
   isLoadingFundingOrganization: boolean;
@@ -177,6 +178,27 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             <div>
               <a href="#">Learn more</a>
             </div>
+          </div>
+        </SidebarElement>
+
+        <SidebarElement>
+          <div className="mb-3">
+            <Button
+              variant="primary"
+              className="w-100"
+              onClick={() => {
+                alert('not implemented');
+              }}
+            >
+              Continue to Application
+            </Button>
+          </div>
+          <div>
+            <span className="text-muted">
+              If you own this water right or have legal authority over the use of its water, you may apply to a water
+              conservation program for compensated, temporary, and voluntary measure. Pending verification and approval
+              by appropriate parties.
+            </span>
           </div>
         </SidebarElement>
       </div>
