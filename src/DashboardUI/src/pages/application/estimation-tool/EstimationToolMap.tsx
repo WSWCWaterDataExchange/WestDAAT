@@ -4,7 +4,8 @@ import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationForm
 import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { Button, Spinner } from 'react-bootstrap';
+import Button from 'react-bootstrap/esm/Button';
+import Spinner from 'react-bootstrap/esm/Spinner';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
