@@ -1,8 +1,8 @@
 import { MapThemeSelector } from '../../../components/map/MapThemeSelector';
-import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Icon from '@mdi/react';
 import { mdiPiggyBank, mdiWater } from '@mdi/js';
-import { Form, InputGroup } from 'react-bootstrap';
+import Form from 'react-bootstrap/esm/Form';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabels,
@@ -10,6 +10,8 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useRef } from 'react';
+import { formatNumber } from '../../../utilities/valueFormatters';
+import { SidebarElement } from './SidebarElement';
 
 interface EstimationToolSidebarProps {
   isLoadingFundingOrganization: boolean;
@@ -45,10 +47,10 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
   return (
     <div className="flex-grow-1 panel-content">
-      <div className="container-fluid">
+      <div className="container-fluid pt-3 px-3">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold text-primary">{acreageSum.toLocaleString()} Acres</span>
+            <span className="fs-5 fw-bold et-blue-text">{formatNumber(acreageSum, 2)} Acres</span>
           </div>
 
           <div>
@@ -65,7 +67,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         </SidebarElement>
 
         <SidebarElement
-          title="OpenET Model"
+          title="OpenET MODEL"
           tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
           isLoading={props.isLoadingFundingOrganization}
         >
@@ -96,12 +98,11 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="text-muted">Across one or many fields</span>
           </div>
 
-          {/* todo empty state */}
           <div className="d-flex align-items-center">
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
-            <span className="fs-5 fw-bold text-primary">{evapotranspiration.toLocaleString()} Acre-Feet</span>
+            <span className="fs-5 fw-bold et-blue-text">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
           </div>
         </SidebarElement>
 
@@ -161,7 +162,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
               <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
 
-              <span className="fs-5 fw-bold">${conservationEstimate.toLocaleString()}</span>
+              <span className="fs-5 fw-bold">${formatNumber(conservationEstimate, 2)}</span>
             </span>
           </div>
 
@@ -175,37 +176,6 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           </div>
         </SidebarElement>
       </div>
-    </div>
-  );
-}
-
-interface SidebarElementProps {
-  title: string;
-  isLoading?: boolean;
-  tooltip?: string;
-  children?: React.ReactNode;
-}
-
-function SidebarElement(props: SidebarElementProps) {
-  return (
-    <div className="sidebar-element mb-4">
-      <div className="d-flex align-items-center gap-3">
-        {/* limit width so the tooltips align properly */}
-        <div className="w-75">
-          <span className="fs-5 fw-bold">{props.title}</span>
-        </div>
-        {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
-      </div>
-
-      {props.isLoading ? (
-        <div>
-          <div className="placeholder-wave">
-            <span className="placeholder col-8 me-2"></span>
-          </div>
-        </div>
-      ) : (
-        <div>{props.children}</div>
-      )}
     </div>
   );
 }

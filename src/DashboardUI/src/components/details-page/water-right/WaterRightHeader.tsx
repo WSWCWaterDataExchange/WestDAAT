@@ -1,5 +1,6 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
-import { Button, Modal } from 'react-bootstrap';
+import Button from 'react-bootstrap/esm/Button';
+import Modal from 'react-bootstrap/esm/Modal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';

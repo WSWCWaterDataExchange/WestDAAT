@@ -12,6 +12,9 @@ import { SiteContent } from './SiteContent';
 import { PriorityDateRange } from './PriorityDateRange';
 import { FlowRange } from '../../nldi/components/FlowRange';
 import { VolumeRange } from './VolumeRange';
+import { PodPou } from '../../../map-options/components/PodPou';
+import MapGrouping from '../../../map-options/components/MapGrouping';
+import PointSize from '../../../map-options/components/PointSize';
 
 function WaterRights() {
   return (
@@ -25,6 +28,9 @@ function WaterRights() {
           Learn about WestDAAT filters
         </a>
       </div>
+      <MapGrouping />
+      <PointSize />
+      <PodPou />
       <StatesSelect />
       <BeneficialUseSelect />
       <WaterSourceTypesSelect />

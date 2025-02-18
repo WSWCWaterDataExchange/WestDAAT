@@ -1,10 +1,9 @@
 import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ActiveTabType, useWaterRightDetailsContext } from './Provider';
 import OverlayDetailsTable from '../OverlayDetailsTable';
 import QuickSearchToolbar from '../../QuickSearchToolbar';
-import { FormattedDate } from '../../FormattedDate';
 
 export default function WaterRightTabs() {
   const {
@@ -14,7 +13,6 @@ export default function WaterRightTabs() {
       siteInfoListQuery: { data: siteInfoList },
       sourceInfoListQuery: { data: sourceInfoList },
       waterRightsInfoListQuery: { data: waterRightsInfoList },
-      timeSeriesInfoListQuery: { data: timeSeriesInfoList },
     },
   } = useWaterRightDetailsContext();
 
@@ -62,40 +60,6 @@ export default function WaterRightTabs() {
     { field: 'gnisfeatureNameCv', headerName: 'GNIS ID', flex: 1 },
   ];
 
-  const timeSeriesRows = React.useMemo(() => {
-    if (!timeSeriesInfoList) return [];
-    return timeSeriesInfoList.map((ts, index) => ({
-      id: `timeSeries-${ts.waDEVariableUuid}-${index}`,
-      ...ts,
-    }));
-  }, [timeSeriesInfoList]);
-
-  const timeSeriesColumns: GridColDef[] = [
-    { field: 'waDEVariableUuid', headerName: 'WaDE Variable UUID', flex: 1, sortable: true },
-    { field: 'waDEMethodUuid', headerName: 'WaDE Method UUID', flex: 1, sortable: true },
-    { field: 'waDEWaterSourceUuid', headerName: 'WaDE Water Source UUID', flex: 1, sortable: true },
-    {
-      field: 'timeframeStart',
-      headerName: 'Timeframe Start',
-      flex: 1,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
-    },
-    {
-      field: 'timeframeEnd',
-      headerName: 'Timeframe End',
-      flex: 1,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => <FormattedDate>{params.value}</FormattedDate>,
-    },
-    { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
-    { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
-    { field: 'primaryUse', headerName: 'Primary Use', flex: 1, sortable: true },
-    { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
-    { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
-    { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },
-  ];
-
   return (
     <Tabs onSelect={(key) => setActiveTab(key as ActiveTabType)} activeKey={activeTab} className="mb-3 custom-tabs">
       <Tab eventKey="site" title="Site Info">
@@ -128,20 +92,6 @@ export default function WaterRightTabs() {
       </Tab>
       <Tab eventKey="rights" title="Administrative/Regulatory Overlay Info">
         <OverlayDetailsTable waterRightsInfoList={waterRightsInfoList} />
-      </Tab>
-      <Tab eventKey="timeSeries" title="Time Series Info">
-        <div style={{ width: '100%', height: 600 }}>
-          <DataGrid
-            rows={timeSeriesRows}
-            columns={timeSeriesColumns}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
-            slots={{
-              toolbar: QuickSearchToolbar,
-            }}
-          />
-        </div>
       </Tab>
     </Tabs>
   );

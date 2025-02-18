@@ -10,4 +10,5 @@ export interface DashboardFilters {
   legalStatuses: string[];
   siteTypes: string[];
   riverBasins: string[];
+  variableTypes: string[];
 }

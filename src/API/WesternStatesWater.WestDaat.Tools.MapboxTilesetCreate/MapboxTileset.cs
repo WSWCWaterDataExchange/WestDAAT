@@ -300,7 +300,10 @@ public static class MapboxTileset
             {
                 { "uuid", overlay.ReportingUnitUUID },
                 { "oType", PipeDelimiterToDistinctList(overlay.RegulatoryOverlayTypeWaDEName) },
+                { "state", overlay.State },
+                { "wsType", PipeDelimiterToDistinctList(overlay.WaterSourceTypeWaDEName) }
             };
+
 
             var geometry = overlay.Geometry.AsGeoJsonGeometry();
 

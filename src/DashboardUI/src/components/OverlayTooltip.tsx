@@ -1,6 +1,7 @@
 import { mdiHelpCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import Popover from 'react-bootstrap/esm/Popover';
 
 import './OverlayTooltip.scss';
 

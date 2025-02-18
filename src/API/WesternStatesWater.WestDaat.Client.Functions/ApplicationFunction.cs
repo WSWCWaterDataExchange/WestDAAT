@@ -13,7 +13,7 @@ public class ApplicationFunction : FunctionBase
     private readonly IApplicationManager _applicationManager;
     private readonly ILogger _logger;
 
-    private const string RouteBase = "applications";
+    private const string RouteBase = "Applications";
 
     public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger)
     {

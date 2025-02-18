@@ -2,4 +2,8 @@
 
 .overlay-tooltip-icon {
   color: $primary-color;
+
+  // must match `size` attribute of the icon
+  min-width: 1.5em;
+  min-height: 1.5em;
 }

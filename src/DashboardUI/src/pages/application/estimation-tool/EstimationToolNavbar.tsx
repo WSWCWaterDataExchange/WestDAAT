@@ -1,6 +1,7 @@
 import { mdiArrowLeft, mdiWater } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Nav, Navbar } from 'react-bootstrap';
+import Nav from 'react-bootstrap/esm/Nav';
+import Navbar from 'react-bootstrap/esm/Navbar';
 
 interface EstimationToolNavbarProps {
   navigateToWaterRightLandingPage: () => void;
