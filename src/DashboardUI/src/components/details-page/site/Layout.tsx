@@ -5,6 +5,7 @@ import SiteProperties from './SiteProperties';
 import SiteTabs from './SiteTabs';
 import DetailsLineChart from './DetailsLineChart';
 import { useAlerts } from './hooks/useAlerts';
+import SiteHeader from './SiteHeader';
 
 import './site.scss';
 
@@ -12,7 +13,9 @@ export function Layout() {
   useAlerts();
   return (
     <DetailsPage>
-      <DetailsPage.Header>WaDE Site Landing Page</DetailsPage.Header>
+      <DetailsPage.Header>
+        <SiteHeader />
+      </DetailsPage.Header>
       <DetailsPage.Properties>
         <SiteProperties />
       </DetailsPage.Properties>
