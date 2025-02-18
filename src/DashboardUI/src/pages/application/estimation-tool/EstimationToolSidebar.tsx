@@ -190,7 +190,9 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   <span className="text-muted">This estimate is not legally binding to WSWC.</span>
                 </div>
                 <div>
-                  <a href="#">Learn more</a>
+                  <a href="https://westernstateswater.org/wade/westcat/" target="_blank" rel="noreferrer">
+                    Learn more
+                  </a>
                 </div>
               </div>
             </>
