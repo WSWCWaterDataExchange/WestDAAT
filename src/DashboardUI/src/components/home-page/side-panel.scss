@@ -37,6 +37,8 @@
       color: $primary-color;
       &:hover {
         color: $text-color-light;
+        background-color: $primary-color;
+        border-color: $primary-color;
       }
     }
   }

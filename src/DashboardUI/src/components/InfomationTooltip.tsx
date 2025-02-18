@@ -12,9 +12,9 @@ export function InformationTooltip(props: InformationTooltipProps) {
   const { tooltipContents } = props;
   const tooltip = <Tooltip onClick={() => setIsForcedOpen(false)}>{tooltipContents}</Tooltip>;
   return (
-    <span onClick={() => setIsForcedOpen(!isForcedOpen)}>
+    <span className="ms-2" onClick={() => setIsForcedOpen(!isForcedOpen)}>
       <OverlayTrigger overlay={tooltip} show={isForcedOpen || undefined}>
-        <Icon path={mdiInformationOutline} size="1em" className="align-text-bottom" />
+        <Icon path={mdiInformationOutline} size="1em" className="ms-2 align-text-bottom" />
       </OverlayTrigger>
     </span>
   );
