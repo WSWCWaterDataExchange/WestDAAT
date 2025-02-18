@@ -5,6 +5,8 @@ import { OrganizationDetailsListResponse } from '../data-contracts/OrganizationD
 import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationSummaryListResponse';
 import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
 import { rejects } from 'assert';
+import { OrganizationMemberAddRequest } from '../data-contracts/OrganizationMemberAddRequest';
+import { OrganizationMemberAddResponse } from '../data-contracts/OrganizationMemberAddResponse';
 
 export const getOrganizationDetailsList = async (
   msalContext: IMsalContext,
@@ -37,16 +39,19 @@ export const addOrganizationMemeber = async (
   organizationId: string,
   userId: string,
   role: string,
-): Promise<void> => {
-  console.log(`Adding user ${userId} to organization ${organizationId} with role ${role}`);
+): Promise<{ data: OrganizationMemberAddResponse; status: number }> => {
+  const api = await westDaatApi(msalContext);
 
-  // Simulate a call to an API
-  const promise = new Promise<void>((resolve, reject) => {
-    setTimeout(() => {
-      // resolve();
-      reject();
-    }, 3000);
-  });
+  const request: OrganizationMemberAddRequest = {
+    $type: 'OrganizationMemberAddRequest',
+    userId,
+    role,
+  };
 
-  return promise;
+  const { data, status } = await api.post<OrganizationMemberAddResponse>(
+    `Organizations/${organizationId}/Members`,
+    request,
+  );
+
+  return { data, status };
 };

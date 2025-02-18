@@ -12,6 +12,7 @@ import { useDebounceCallback } from '@react-hook/debounce';
 import Alert from 'react-bootstrap/esm/Alert';
 import { addOrganizationMemeber } from '../../accessors/organizationAccessor';
 import { toast } from 'react-toastify';
+import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -30,6 +31,7 @@ function AddUserModal(props: AddUserModalProps) {
   const [maxResultsReturned, setMaxResultsReturned] = useState(false);
   const queryClient = useQueryClient();
   const msalContext = useMsal();
+  const { user } = useAuthenticationContext();
 
   const addOrganizationMemeberMutation = useMutation({
     mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
@@ -44,12 +46,20 @@ function AddUserModal(props: AddUserModalProps) {
         autoClose: 1000,
       });
     },
-    onError: () => {
-      toast.error('Error adding user to organization', {
-        position: 'top-center',
-        theme: 'colored',
-        autoClose: 3000,
-      });
+    onError: (error: { status?: number }) => {
+      if (error?.status === 409) {
+        toast.error('User is already a member of an organization', {
+          position: 'top-center',
+          theme: 'colored',
+          autoClose: 3000,
+        });
+      } else {
+        toast.error('Error adding user to organization', {
+          position: 'top-center',
+          theme: 'colored',
+          autoClose: 3000,
+        });
+      }
     },
   });
 
@@ -80,14 +90,19 @@ function AddUserModal(props: AddUserModalProps) {
     queryClient
       .fetchQuery(['searchUsers', inputValue], () => searchUsers(msalContext, inputValue))
       .then((searchResults) => {
-        const options = searchResults?.searchResults?.map(
-          (result): UserSelectOption => ({
-            value: result.userId,
-            label: `${result.firstName} ${result.lastName}, ${result.userName}`,
-            fullName: `${result.firstName} ${result.lastName}`,
-            userName: result.userName,
-          }),
-        );
+        const options = searchResults?.searchResults
+          ?.filter((result) => {
+            // Exclude current user from search results
+            return result.userId !== user?.userId;
+          })
+          ?.map(
+            (result): UserSelectOption => ({
+              value: result.userId,
+              label: `${result.firstName} ${result.lastName}, ${result.userName}`,
+              fullName: `${result.firstName} ${result.lastName}`,
+              userName: result.userName,
+            }),
+          );
 
         setMaxResultsReturned(options.length >= maxUserSearchResults);
 
