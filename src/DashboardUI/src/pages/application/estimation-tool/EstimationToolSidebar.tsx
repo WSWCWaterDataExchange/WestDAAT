@@ -12,7 +12,7 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { useRef } from 'react';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
-import { Button } from 'react-bootstrap';
+import Button from 'react-bootstrap/esm/Button';
 
 interface EstimationToolSidebarProps {
   isLoadingFundingOrganization: boolean;
