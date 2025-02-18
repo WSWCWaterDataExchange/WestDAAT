@@ -1,0 +1,15 @@
+@import '../styles/colors.scss';
+
+.overlay-tooltip-icon {
+  color: $primary-color;
+
+  // must match `size` attribute of the icon
+  min-width: 1.5em;
+  min-height: 1.5em;
+}
+
+.overlay-tooltip-popover.popover {
+  // Increase the width so text wraps better
+  max-width: 400px !important;
+  width: auto;
+}
