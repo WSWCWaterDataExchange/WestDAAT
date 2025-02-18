@@ -27,16 +27,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     });
   };
 
-  // it feels weird to have this logic here. what's a better place for it? it's duplicated in the useEstimateConsumptiveUse hook
-  const estimateButtonEnabled =
-    !!state.conservationApplication.waterConservationApplicationId &&
-    !!state.conservationApplication.waterRightNativeId &&
-    !!state.conservationApplication.openEtModelName &&
-    !!state.conservationApplication.dateRangeStart &&
-    !!state.conservationApplication.dateRangeEnd &&
-    !!state.conservationApplication.selectedMapPolygons &&
-    state.conservationApplication.selectedMapPolygons.length > 0 &&
-    state.conservationApplication.selectedMapPolygons.every((p) => p.acreage <= 50000);
+  const estimateButtonEnabled = state.canEstimateConsumptiveUse;
 
   return (
     <div className="flex-grow-1 position-relative">

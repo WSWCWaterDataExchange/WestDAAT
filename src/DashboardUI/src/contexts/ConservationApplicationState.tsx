@@ -22,6 +22,7 @@ export interface ConservationApplicationState {
     selectedMapPolygons: EstimationFormMapPolygon[];
     polygonEtData: PolygonEtDataCollection[];
   };
+  canEstimateConsumptiveUse: boolean;
 }
 
 export const defaultState = (): ConservationApplicationState => ({
@@ -42,6 +43,7 @@ export const defaultState = (): ConservationApplicationState => ({
     selectedMapPolygons: [],
     polygonEtData: [],
   },
+  canEstimateConsumptiveUse: false,
 });
 
 export type ApplicationAction =
@@ -154,6 +156,9 @@ const onWaterRightLoaded = (
   { payload }: WaterRightLoadedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterRightNativeId = payload.waterRightNativeId;
+
+  checkCanEstimateConsumptiveUse(draftState);
+
   return draftState;
 };
 
@@ -169,6 +174,9 @@ const onFundingOrganizationLoaded = (
   application.dateRangeStart = payload.dateRangeStart;
   application.dateRangeEnd = payload.dateRangeEnd;
   application.compensationRateModel = payload.compensationRateModel;
+
+  checkCanEstimateConsumptiveUse(draftState);
+
   return draftState;
 };
 
@@ -177,6 +185,9 @@ const onWaterConservationApplicationCreated = (
   { payload }: WaterConservationApplicationCreatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
+
+  checkCanEstimateConsumptiveUse(draftState);
+
   return draftState;
 };
 
@@ -185,6 +196,9 @@ const onMapSelectedPolygonsUpdated = (
   { payload }: MapSelectedPolygonsUpdatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.selectedMapPolygons = payload.polygons;
+
+  checkCanEstimateConsumptiveUse(draftState);
+
   return draftState;
 };
 
@@ -196,6 +210,9 @@ const onEstimationFormUpdated = (
 
   application.desiredCompensationDollars = payload.desiredCompensationDollars;
   application.desiredCompensationUnits = payload.desiredCompensationUnits;
+
+  checkCanEstimateConsumptiveUse(draftState);
+
   return draftState;
 };
 
@@ -209,4 +226,20 @@ const onEstimateConsumptiveUseLoaded = (
   application.conservationPayment = payload.conservationPayment;
   application.polygonEtData = payload.dataCollections;
   return draftState;
+};
+
+const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState) => {
+  const app = draftState.conservationApplication;
+
+  draftState.canEstimateConsumptiveUse =
+    !!app.waterConservationApplicationId &&
+    !!app.waterRightNativeId &&
+    !!app.openEtModelName &&
+    !!app.dateRangeStart &&
+    !!app.dateRangeEnd &&
+    !!app.selectedMapPolygons &&
+    app.selectedMapPolygons.length > 0 &&
+    app.selectedMapPolygons.every((p) => p.acreage <= 50000);
+
+  return;
 };
