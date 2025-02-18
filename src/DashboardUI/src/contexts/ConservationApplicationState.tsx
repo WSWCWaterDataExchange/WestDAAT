@@ -16,7 +16,7 @@ export interface ConservationApplicationState {
     dateRangeEnd: Date | undefined;
     compensationRateModel: string | undefined;
     desiredCompensationDollars: number | undefined;
-    desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined | undefined;
+    desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     selectedMapPolygons: EstimationFormMapPolygon[];
