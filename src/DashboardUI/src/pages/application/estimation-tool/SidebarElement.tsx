@@ -10,13 +10,15 @@ interface SidebarElementProps {
 
 export function SidebarElement(props: SidebarElementProps) {
   return (
-    <div className="sidebar-element mb-4">
-      <div className="d-flex align-items-center gap-3">
-        {/* limit width so the tooltips align properly */}
-        <div>
-          <span className="fs-5 fw-bold">{props.title}</span>
+    <div className="estimation-tool-sidebar-element mb-4">
+      <div className="position-relative">
+        <span className="fs-5 fw-bold element-title">{props.title}</span>
+
+        <div className="d-inline position-absolute right-0 bottom-0">
+          <span className="d-inline element-icon">
+            {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
+          </span>
         </div>
-        {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
       </div>
 
       {props.isLoading ? (

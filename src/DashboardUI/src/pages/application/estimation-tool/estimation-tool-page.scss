@@ -67,3 +67,15 @@
 .estimate-tool-conservation-estimate-text {
   color: $estimate-tool-estimate-text-color;
 }
+
+.estimation-tool-sidebar-element {
+  $text-line-height: 24px;
+
+  .element-title {
+    line-height: $text-line-height;
+  }
+
+  .element-icon {
+    height: $text-line-height;
+  }
+}
