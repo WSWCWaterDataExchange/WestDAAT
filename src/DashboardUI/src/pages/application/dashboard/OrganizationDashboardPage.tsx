@@ -1,7 +1,18 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GetApplyFilterFn,
+  getGridDefaultColumnTypes,
+  GridColDef,
+  GridColumnHeaderParams,
+  GridFilterItem,
+  gridFilterModelSelector,
+  GridFilterOperator,
+  GridRenderCellParams,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
@@ -24,6 +35,8 @@ import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 import './organization-dashboard-page.scss';
 import { useOrganizationQuery } from '../../../hooks/queries';
 import { Placeholder } from 'react-bootstrap';
+import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import { RefObject } from 'react';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -73,17 +86,19 @@ export function OrganizationDashboardPage() {
     <div className="header-column-text">{params.colDef.headerName}</div>
   );
 
-  const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => (
-    <>
-      <Icon
-        size={1}
-        path={mdiCircleMedium}
-        className={getApplicationStatusIconClass(params.value!)}
-        title={formatConservationApplicationStatusText(params.value!)}
-      ></Icon>
-      {formatConservationApplicationStatusText(params.value!)}
-    </>
-  );
+  const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => {
+    return (
+      <>
+        <Icon
+          size={1}
+          path={mdiCircleMedium}
+          className={getApplicationStatusIconClass(params.value!)}
+          title={formatConservationApplicationStatusText(params.value!)}
+        ></Icon>
+        {formatConservationApplicationStatusText(params.value!)}
+      </>
+    );
+  };
 
   const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
     return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
@@ -128,6 +143,40 @@ export function OrganizationDashboardPage() {
     return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
   };
 
+  const defaultDataGridStringColumnFilterOperators = getGridDefaultColumnTypes().string.filterOperators;
+
+  const wrappedAppStatusFilterOperators = defaultDataGridStringColumnFilterOperators?.map(
+    (operator: GridFilterOperator, index) => {
+      // provides the function that will execute the actual filtering logic
+      const updatedApplyFilterFn = (
+        filterItem: GridFilterItem,
+        column: GridColDef<any, ConservationApplicationStatus, any>,
+      ) => {
+        // this is the function that actually evaluates whether the row should be filtered out
+        // ApplyFilterFn = (value: V, row: R, column: GridColDef<R, V, F>, apiRef: RefObject<GridApiCommunity>) => boolean;
+        const innerFilterFn = operator.getApplyFilterFn(filterItem, column);
+
+        // innerFilterFn can be null - if so, return null
+        if (!innerFilterFn) {
+          return null;
+        }
+
+        // we will wrap this function to format the value before passing it to the inner function
+        const wrappedInnerFn = (value: ConservationApplicationStatus, row: any, col: GridColDef, apiRef: any) => {
+          const formattedValue = formatConservationApplicationStatusText(value);
+          return innerFilterFn(formattedValue, row, col, apiRef);
+        };
+
+        return wrappedInnerFn;
+      };
+
+      return {
+        ...operator,
+        getApplyFilterFn: updatedApplyFilterFn,
+      };
+    },
+  );
+
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -155,7 +204,14 @@ export function OrganizationDashboardPage() {
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
-    { field: 'applicationStatus', headerName: 'Status', width: 200, renderCell: renderAppStatusCell, renderHeader },
+    {
+      field: 'applicationStatus',
+      headerName: 'Status',
+      width: 200,
+      renderCell: renderAppStatusCell,
+      renderHeader,
+      filterOperators: wrappedAppStatusFilterOperators,
+    },
   ];
 
   const rows: DataGridRows<ApplicationDataGridColumns> =
