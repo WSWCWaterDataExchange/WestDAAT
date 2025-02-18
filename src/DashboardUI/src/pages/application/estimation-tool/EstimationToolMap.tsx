@@ -6,6 +6,7 @@ import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
+import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -56,7 +57,3 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     </div>
   );
 }
-
-const convertSquareMetersToAcres = (squareMeters: number) => {
-  return squareMeters * 0.000247105;
-};
