@@ -144,7 +144,9 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
               >
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
-                  <option value={value}>{CompensationRateUnitsLabels[value]}</option>
+                  <option key={value} value={value}>
+                    {CompensationRateUnitsLabels[value]}
+                  </option>
                 ))}
               </Form.Select>
             </div>
