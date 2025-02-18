@@ -4,10 +4,11 @@ import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationForm
 import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { Button } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
+  isLoadingConsumptiveUseEstimate: boolean;
 }
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
@@ -27,7 +28,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     });
   };
 
-  const estimateButtonEnabled = state.canEstimateConsumptiveUse;
+  const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
 
   return (
     <div className="flex-grow-1 position-relative">
@@ -39,7 +40,11 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
           onClick={props.handleEstimateConsumptiveUseClicked}
           disabled={!estimateButtonEnabled}
         >
-          Estimate Consumptive Use for the Drawn Polygon(s)
+          {props.isLoadingConsumptiveUseEstimate ? (
+            <Spinner animation="border" size="sm" />
+          ) : (
+            'Estimate Consumptive Use for the Drawn Polygon(s)'
+          )}
         </Button>
       </div>
       <Map
