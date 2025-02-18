@@ -8,6 +8,7 @@ import { useConservationApplicationContext } from '../../../../contexts/Conserva
 interface EstimateConsumptiveUseApiCallFields {
   waterConservationApplicationId: string | undefined;
   waterRightNativeId: string | undefined;
+  fundingOrganizationId: string | undefined;
   model: number | undefined;
   dateRangeStart: Date | undefined;
   dateRangeEnd: Date | undefined;
@@ -27,6 +28,7 @@ export function useEstimateConsumptiveUseMutation() {
       const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
+        fundingOrganizationId: fields.fundingOrganizationId!,
         dateRangeStart: fields.dateRangeStart!,
         dateRangeEnd: fields.dateRangeEnd!,
         model: fields.model!,
@@ -60,6 +62,7 @@ const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
   const isValid: boolean =
     !!fields.waterConservationApplicationId &&
     !!fields.waterRightNativeId &&
+    !!fields.fundingOrganizationId &&
     !!fields.model &&
     !!fields.dateRangeStart &&
     !!fields.dateRangeEnd &&
