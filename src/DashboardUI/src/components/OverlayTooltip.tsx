@@ -14,7 +14,7 @@ export const OverlayTooltip = (props: OverlayTooltipProps) => {
   const { text } = props;
 
   const overlayElement = (props: any) => (
-    <Popover {...props}>
+    <Popover {...props} className="overlay-tooltip-popover">
       <Popover.Body>{text}</Popover.Body>
     </Popover>
   );

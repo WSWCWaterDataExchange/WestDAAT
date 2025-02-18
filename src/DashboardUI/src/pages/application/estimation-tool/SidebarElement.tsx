@@ -11,10 +11,10 @@ interface SidebarElementProps {
 export function SidebarElement(props: SidebarElementProps) {
   return (
     <div className="estimation-tool-sidebar-element mb-4">
-      <div className="position-relative">
+      <div className="position-relative mb-1">
         <span className="fs-5 fw-bold element-title">{props.title}</span>
 
-        <div className="d-inline position-absolute right-0 bottom-0">
+        <div className="d-inline position-absolute ms-2">
           <span className="d-inline element-icon">
             {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
           </span>
