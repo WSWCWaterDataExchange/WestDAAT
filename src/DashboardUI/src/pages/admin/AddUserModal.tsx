@@ -115,7 +115,6 @@ function AddUserModal(props: AddUserModalProps) {
       return;
     }
 
-    console.log('Adding user to organization', selectedUser, selectedRole);
     addOrganizationMemeberMutation.mutate({
       organizationId: props.organization?.organizationId ?? '',
       userId: selectedUser.value,
