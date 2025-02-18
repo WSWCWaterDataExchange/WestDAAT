@@ -180,7 +180,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
 
                   <span className="fs-5 fw-bold">
-                    ${formatNumber(state.conservationApplication.conservationPayment, 2)}
+                    ${formatNumber(state.conservationApplication.conservationPayment, 0)}
                   </span>
                 </span>
               </div>
