@@ -35,7 +35,7 @@ export function EstimationToolPage() {
   );
 
   const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplicationQuery({
-    waterRightNativeId: waterRightNativeId,
+    waterRightNativeId: state.conservationApplication.waterRightNativeId,
     fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
   });
 
