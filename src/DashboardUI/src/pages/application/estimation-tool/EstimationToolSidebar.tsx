@@ -104,10 +104,18 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            <span className="me-1">
-              <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
-            </span>
-            <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+            {etAcreFeet > 0 ? (
+              <>
+                <span className="me-1">
+                  <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
+                </span>
+                <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+              </>
+            ) : (
+              <span className="text-muted">
+                Please draw one or more polygons on the map to estimate the consumptive use.
+              </span>
+            )}
           </div>
         </SidebarElement>
 
