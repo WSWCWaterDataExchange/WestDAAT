@@ -51,7 +51,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">
-          <MapThemeSelector />
+          <div className="mt-2">
+            <MapThemeSelector />
+          </div>
         </SidebarElement>
 
         <SidebarElement
@@ -74,7 +76,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="text-muted">Across one or many fields</span>
           </div>
 
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center my-2">
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
@@ -123,7 +125,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
 
           <div>
             <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
-              <Icon path={mdiPiggyBank} size="1.25em" className="me-1" />
+              <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
 
               <span className="fs-5 fw-bold">${formatNumber(conservationEstimate, 2)}</span>
             </span>
