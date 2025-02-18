@@ -7,13 +7,16 @@ import OverlayAgency from './OverlayAgency';
 import { useAlerts } from './hooks/useAlerts';
 import './overlay.scss';
 import OverlayTabs from './OverlayTabs';
+import OverlayHeader from './OverlayHeader';
 
 export function Layout() {
   useAlerts();
 
   return (
     <DetailsPage>
-      <DetailsPage.Header>WaDE Overlay Landing Page</DetailsPage.Header>
+      <DetailsPage.Header>
+        <OverlayHeader />
+      </DetailsPage.Header>
 
       <DetailsPage.Properties>
         <div>
