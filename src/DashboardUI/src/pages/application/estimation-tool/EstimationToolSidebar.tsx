@@ -206,7 +206,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             <Button
               variant="primary"
               className="w-100"
-              disabled={!state.conservationApplication.conservationPayment}
+              disabled={!state.canContinueToApplication}
               onClick={() => {
                 alert('not implemented');
               }}

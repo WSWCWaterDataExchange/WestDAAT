@@ -23,6 +23,7 @@ export interface ConservationApplicationState {
     polygonEtData: PolygonEtDataCollection[];
   };
   canEstimateConsumptiveUse: boolean;
+  canContinueToApplication: boolean;
 }
 
 export const defaultState = (): ConservationApplicationState => ({
@@ -44,6 +45,7 @@ export const defaultState = (): ConservationApplicationState => ({
     polygonEtData: [],
   },
   canEstimateConsumptiveUse: false,
+  canContinueToApplication: false,
 });
 
 export type ApplicationAction =
@@ -225,10 +227,13 @@ const onEstimateConsumptiveUseLoaded = (
   application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
   application.conservationPayment = payload.conservationPayment;
   application.polygonEtData = payload.dataCollections;
+
+  checkCanContinueToApplication(draftState);
+
   return draftState;
 };
 
-const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState) => {
+const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
   draftState.canEstimateConsumptiveUse =
@@ -237,6 +242,27 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.openEtModelName &&
     !!app.dateRangeStart &&
     !!app.dateRangeEnd &&
+    !!app.selectedMapPolygons &&
+    app.selectedMapPolygons.length > 0 &&
+    app.selectedMapPolygons.every((p) => p.acreage <= 50000);
+
+  return;
+};
+
+const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
+  const app = draftState.conservationApplication;
+
+  draftState.canContinueToApplication =
+    !!app.waterConservationApplicationId &&
+    !!app.fundingOrganizationId &&
+    !!app.waterRightNativeId &&
+    !!app.openEtModelName &&
+    !!app.dateRangeStart &&
+    !!app.dateRangeEnd &&
+    !!app.desiredCompensationDollars &&
+    !!app.desiredCompensationUnits &&
+    !!app.totalAverageYearlyEtAcreFeet &&
+    !!app.conservationPayment &&
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
     app.selectedMapPolygons.every((p) => p.acreage <= 50000);
