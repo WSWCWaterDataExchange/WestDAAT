@@ -52,7 +52,7 @@ export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | EstimationToolPageLoadedAction
   | FundingOrganizationLoadedAction
-  | MapSelectedPolygonsUpdatedAction
+  | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | WaterConservationApplicationCreatedAction
   | EstimateConsumptiveUseLoadedAction;
@@ -83,8 +83,8 @@ export interface FundingOrganizationLoadedAction {
   };
 }
 
-export interface MapSelectedPolygonsUpdatedAction {
-  type: 'MAP_SELECTED_POLYGONS_UPDATED';
+export interface MapPolygonsUpdatedAction {
+  type: 'MAP_POLYGONS_UPDATED';
   payload: {
     polygons: EstimationFormMapPolygon[];
   };
@@ -136,8 +136,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onFundingOrganizationLoaded(draftState, action);
     case 'APPLICATION_CREATED':
       return onWaterConservationApplicationCreated(draftState, action);
-    case 'MAP_SELECTED_POLYGONS_UPDATED':
-      return onMapSelectedPolygonsUpdated(draftState, action);
+    case 'MAP_POLYGONS_UPDATED':
+      return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'ESTIMATE_CONSUMPTIVE_USE_LOADED':
@@ -193,9 +193,9 @@ const onWaterConservationApplicationCreated = (
   return draftState;
 };
 
-const onMapSelectedPolygonsUpdated = (
+const onMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
-  { payload }: MapSelectedPolygonsUpdatedAction,
+  { payload }: MapPolygonsUpdatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.selectedMapPolygons = payload.polygons;
 

@@ -21,7 +21,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     }));
 
     dispatch({
-      type: 'MAP_SELECTED_POLYGONS_UPDATED',
+      type: 'MAP_POLYGONS_UPDATED',
       payload: {
         polygons: polygonData,
       },
