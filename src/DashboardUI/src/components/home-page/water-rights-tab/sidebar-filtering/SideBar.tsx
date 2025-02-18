@@ -152,15 +152,7 @@ function SideBar() {
 
       <div className="position-relative flex-grow-1 panel-content">
         <Accordion flush alwaysOpen activeKey={openAccordionKeys} onSelect={setOpenAccordionKeys}>
-          <Accordion.Item eventKey="colorSizeTools">
-            <Accordion.Header>COLOR AND SIZE TOOLS</Accordion.Header>
-            <Accordion.Body>
-              <MapGrouping />
-              <PointSize />
-              <PodPou />
-              <MapTheme />
-            </Accordion.Body>
-          </Accordion.Item>
+          <MapTheme />
           <Accordion.Item eventKey="overlayFilters">
             <Accordion.Header>
               <Form.Check

@@ -155,13 +155,14 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            OrganizationLoadAllRequest req => ValidateOrganizationLoadAllRequest(req, context),
+            OrganizationDetailsListRequest req => ValidateOrganizationDetailsListRequest(req, context),
+            OrganizationSummaryListRequest req => ValidateOrganizationSummaryListRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented.")
         };
     }
 
-    private ErrorBase ValidateOrganizationLoadAllRequest(OrganizationLoadAllRequest request, ContextBase context)
+    private ErrorBase ValidateOrganizationDetailsListRequest(OrganizationDetailsListRequest request, ContextBase context)
     {
         var permissionsRequest = new DTO.PermissionsGetRequest()
         {
@@ -170,10 +171,18 @@ internal class ValidationEngine : IValidationEngine
 
         var permissions = _securityUtility.Get(permissionsRequest);
 
-        if (!permissions.Contains(Permissions.OrganizationLoadAll))
+        if (!permissions.Contains(Permissions.OrganizationDetailsList))
         {
             return CreateForbiddenError(request, context);
         }
+
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationSummaryListRequest(OrganizationSummaryListRequest request, ContextBase context)
+    {
+        // Must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
 
         return null;
     }
@@ -232,6 +241,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EnrichJwtRequest => ValidateEnrichJwtRequest(context),
+            UserSearchRequest => ValidateUserSearchRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -243,6 +253,25 @@ internal class ValidationEngine : IValidationEngine
         if (context is not IdentityProviderContext)
         {
             return CreateForbiddenError(new EnrichJwtRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserSearchRequest(ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = null // Any organization
+        });
+
+        if (!permissions.Contains(Permissions.UserSearch) &&
+            !orgPermissions.Contains(Permissions.UserSearch))
+        {
+            return CreateForbiddenError(new UserSearchRequest(), context);
         }
 
         return null;
