@@ -2,7 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { Placeholder } from 'react-bootstrap';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
