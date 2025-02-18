@@ -22,7 +22,7 @@ export function EstimationToolPage() {
   useEffect(() => {
     if (waterRightNativeId) {
       dispatch({
-        type: 'WATER_RIGHT_LOADED',
+        type: 'ESTIMATION_TOOL_PAGE_LOADED',
         payload: {
           waterRightNativeId: waterRightNativeId,
         },
