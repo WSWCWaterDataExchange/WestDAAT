@@ -11,6 +11,7 @@ import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
 import Alert from 'react-bootstrap/esm/Alert';
 import { addOrganizationMemeber } from '../../accessors/organizationAccessor';
+import { toast } from 'react-toastify';
 
 interface AddUserModalProps extends ModalProps {
   organization: OrganizationSummaryItem | undefined;
@@ -31,8 +32,25 @@ function AddUserModal(props: AddUserModalProps) {
   const msalContext = useMsal();
 
   const addOrganizationMemeberMutation = useMutation({
-    mutationFn: async (organizationId: string, userId: string, role: string) =>
-      addOrganizationMemeber(msalContext, organizationId, userId, role),
+    mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
+      return await addOrganizationMemeber(msalContext, params.organizationId, params.userId, params.role);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('organizationMembers');
+      props.onHide?.();
+      toast.success('User added to organization', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 1000,
+      });
+    },
+    onError: () => {
+      toast.error('Error adding user to organization', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
+    },
   });
 
   interface UserSelectOption {
@@ -49,6 +67,7 @@ function AddUserModal(props: AddUserModalProps) {
     if (!props.show) {
       setSelectedRole(undefined);
       setSelectedUser(null);
+      setMaxResultsReturned(false);
     }
   }, [props.show]);
 
@@ -83,7 +102,7 @@ function AddUserModal(props: AddUserModalProps) {
 
     console.log('Adding user to organization', selectedUser, selectedRole);
     addOrganizationMemeberMutation.mutate({
-      organizationId: props.organization?.organizationId,
+      organizationId: props.organization?.organizationId ?? '',
       userId: selectedUser.value,
       role: selectedRole,
     });
@@ -99,11 +118,12 @@ function AddUserModal(props: AddUserModalProps) {
       </Modal.Header>
       <Modal.Body>
         {maxResultsReturned && (
-          <Alert variant="warning" className="mb-3">
+          <Alert variant="warning" className="fw-bold mb-3">
             Showing first {maxUserSearchResults} results. Narrow your search to find more users.
           </Alert>
         )}
         <AsyncSelect
+          isDisabled={addOrganizationMemeberMutation.isLoading}
           cacheOptions
           loadOptions={loadUserOptions}
           onChange={handleUserChange}
@@ -128,6 +148,7 @@ function AddUserModal(props: AddUserModalProps) {
           }}
         />
         <Select
+          isDisabled={addOrganizationMemeberMutation.isLoading}
           options={roleOptions}
           onChange={handleRoleChange}
           placeholder="Select Role"
@@ -138,10 +159,15 @@ function AddUserModal(props: AddUserModalProps) {
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onHide}>
+        <Button variant="secondary" onClick={props.onHide} disabled={addOrganizationMemeberMutation.isLoading}>
           Cancel
         </Button>
-        <Button onClick={handleAddUserClick}>Add User</Button>
+        <Button
+          onClick={handleAddUserClick}
+          disabled={!selectedUser || !selectedRole || addOrganizationMemeberMutation.isLoading}
+        >
+          Add User
+        </Button>
       </Modal.Footer>
     </Modal>
   );

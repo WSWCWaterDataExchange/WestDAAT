@@ -4,6 +4,7 @@ import westDaatApi from './westDaatApi';
 import { OrganizationDetailsListResponse } from '../data-contracts/OrganizationDetailsListResponse';
 import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationSummaryListResponse';
 import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
+import { rejects } from 'assert';
 
 export const getOrganizationDetailsList = async (
   msalContext: IMsalContext,
@@ -40,9 +41,10 @@ export const addOrganizationMemeber = async (
   console.log(`Adding user ${userId} to organization ${organizationId} with role ${role}`);
 
   // Simulate a call to an API
-  const promise = new Promise<void>((resolve) => {
+  const promise = new Promise<void>((resolve, reject) => {
     setTimeout(() => {
-      resolve();
+      // resolve();
+      reject();
     }, 3000);
   });
 
