@@ -64,7 +64,7 @@ export const createWaterConservationApplication = async (
   };
 
   const api = await westDaatApi(context);
-  const { data } = await api.post<WaterConservationApplicationCreateResponse>('applications', request);
+  const { data } = await api.post<WaterConservationApplicationCreateResponse>('Applications', request);
   return data;
 };
 
@@ -93,7 +93,7 @@ export const estimateConsumptiveUse = async (
   };
 
   const api = await westDaatApi(context);
-  const { data } = await api.post<EstimateConsumptiveUseResponse>('applications/EstimateConsumptiveUse', request);
+  const { data } = await api.post<EstimateConsumptiveUseResponse>('Applications/EstimateConsumptiveUse', request);
 
   return data;
 };
