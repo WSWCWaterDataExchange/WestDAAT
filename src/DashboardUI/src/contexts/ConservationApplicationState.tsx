@@ -55,7 +55,7 @@ export type ApplicationAction =
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | EstimateConsumptiveUseLoadedAction;
+  | ConsumptiveUseEstimatedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -105,8 +105,8 @@ export interface ApplicationCreatedAction {
   };
 }
 
-export interface EstimateConsumptiveUseLoadedAction {
-  type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED';
+export interface ConsumptiveUseEstimatedAction {
+  type: 'CONSUMPTIVE_USE_ESTIMATED';
   payload: {
     totalAverageYearlyEtAcreFeet: number;
     conservationPayment: number | undefined;
@@ -140,8 +140,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
-    case 'ESTIMATE_CONSUMPTIVE_USE_LOADED':
-      return onEstimateConsumptiveUseLoaded(draftState, action);
+    case 'CONSUMPTIVE_USE_ESTIMATED':
+      return onConsumptiveUseEstimated(draftState, action);
   }
 };
 
@@ -220,9 +220,9 @@ const onEstimationFormUpdated = (
   return draftState;
 };
 
-const onEstimateConsumptiveUseLoaded = (
+const onConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
-  { payload }: EstimateConsumptiveUseLoadedAction,
+  { payload }: ConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 

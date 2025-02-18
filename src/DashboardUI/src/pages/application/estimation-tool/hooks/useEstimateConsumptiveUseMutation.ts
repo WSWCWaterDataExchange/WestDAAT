@@ -42,7 +42,7 @@ export function useEstimateConsumptiveUseMutation() {
     onSuccess: (result: EstimateConsumptiveUseResponse) => {
       if (result) {
         dispatch({
-          type: 'ESTIMATE_CONSUMPTIVE_USE_LOADED',
+          type: 'CONSUMPTIVE_USE_ESTIMATED',
           payload: {
             totalAverageYearlyEtAcreFeet: result.totalAverageYearlyEtAcreFeet,
             conservationPayment: result.conservationPayment,
