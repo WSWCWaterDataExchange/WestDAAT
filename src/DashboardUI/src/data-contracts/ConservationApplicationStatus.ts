@@ -9,5 +9,5 @@ export const ConservationApplicationStatusDisplayNames: { [key in ConservationAp
   [ConservationApplicationStatus.Unknown]: 'Unknown',
   [ConservationApplicationStatus.InReview]: 'In Review',
   [ConservationApplicationStatus.Approved]: 'Approved',
-  [ConservationApplicationStatus.Rejected]: 'Rejected'
-}
+  [ConservationApplicationStatus.Rejected]: 'Rejected',
+};
