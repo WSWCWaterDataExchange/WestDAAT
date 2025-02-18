@@ -26,7 +26,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
       <div className="container-fluid pt-3 px-3">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold text-primary">{formatNumber(acreageSum, 2)} Acres</span>
+            <span className="fs-5 fw-bold et-blue-text">{formatNumber(acreageSum, 2)} Acres</span>
           </div>
 
           <div>
@@ -78,7 +78,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
-            <span className="fs-5 fw-bold text-primary">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
+            <span className="fs-5 fw-bold et-blue-text">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
           </div>
         </SidebarElement>
 
