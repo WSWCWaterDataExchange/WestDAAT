@@ -1,6 +1,7 @@
 import { mdiArrowLeft, mdiWater } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Nav, Navbar } from 'react-bootstrap';
+import Nav from 'react-bootstrap/esm/Nav';
+import Navbar from 'react-bootstrap/esm/Navbar';
 
 interface EstimationToolNavbarProps {
   navigateToWaterRightLandingPage: () => void;
@@ -24,7 +25,7 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
 
         <Navbar.Brand>
           <div className="d-flex align-items-center gap-2">
-            <Icon path={mdiWater} size="1.25em" className="water-icon" />
+            <Icon path={mdiWater} size="1.25em" className="estimate-tool-water-icon" />
             <span>Water Conservation Estimation Tool</span>
           </div>
         </Navbar.Brand>
