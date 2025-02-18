@@ -247,8 +247,6 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
     app.selectedMapPolygons.every((p) => p.acreage <= 50000);
-
-  return;
 };
 
 const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
@@ -268,8 +266,6 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
     app.selectedMapPolygons.every((p) => p.acreage <= 50000);
-
-  return;
 };
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
