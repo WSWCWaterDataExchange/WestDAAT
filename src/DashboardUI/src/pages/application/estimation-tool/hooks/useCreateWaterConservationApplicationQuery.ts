@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { WaterConservationApplicationCreateResponse } from '../../../../data-contracts/WaterConservationApplicationCreateResponse';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 
-export function useCreateWaterConservationApplication(fields: {
+export function useCreateWaterConservationApplicationQuery(fields: {
   waterRightNativeId: string | undefined;
   fundingOrganizationId: string | undefined;
 }) {

@@ -16,7 +16,7 @@ interface EstimateConsumptiveUseApiCallFields {
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }
 
-export function useEstimateConsumptiveUse() {
+export function useEstimateConsumptiveUseMutation() {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
 

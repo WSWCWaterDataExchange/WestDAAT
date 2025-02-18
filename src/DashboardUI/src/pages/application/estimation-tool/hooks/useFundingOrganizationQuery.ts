@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { FundingOrganizationDetails } from '../../../../data-contracts/FundingOrganizationDetails';
 
-export function useFundingOrganization(waterRightNativeId: string | undefined) {
+export function useFundingOrganizationQuery(waterRightNativeId: string | undefined) {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
 

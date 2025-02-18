@@ -4,9 +4,9 @@ import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
-import { useFundingOrganization } from './hooks/useFundingOrganization';
-import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
-import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
+import { useFundingOrganizationQuery } from './hooks/useFundingOrganizationQuery';
+import { useCreateWaterConservationApplicationQuery } from './hooks/useCreateWaterConservationApplicationQuery';
+import { useEstimateConsumptiveUseMutation } from './hooks/useEstimateConsumptiveUseMutation';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
 
@@ -30,16 +30,16 @@ export function EstimationToolPage() {
     }
   }, [waterRightNativeId]);
 
-  const { isLoading: isLoadingFundingOrganization } = useFundingOrganization(
+  const { isLoading: isLoadingFundingOrganization } = useFundingOrganizationQuery(
     state.conservationApplication.waterRightNativeId,
   );
 
-  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication({
+  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplicationQuery({
     waterRightNativeId: waterRightNativeId,
     fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
   });
 
-  const estimateConsumptiveUseMutation = useEstimateConsumptiveUse();
+  const estimateConsumptiveUseMutation = useEstimateConsumptiveUseMutation();
 
   const handleEstimateConsumptiveUseClicked = async () => {
     await estimateConsumptiveUseMutation.mutateAsync({
