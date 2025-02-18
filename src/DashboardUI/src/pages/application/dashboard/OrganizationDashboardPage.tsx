@@ -3,6 +3,7 @@ import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
 import { applicationSearch } from '../../../accessors/applicationAccessor';
@@ -21,7 +22,8 @@ import { getUserOrganization, hasUserRole } from '../../../utilities/securityHel
 import { formatDateString } from '../../../utilities/valueFormatters';
 
 import './organization-dashboard-page.scss';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
+import { Button } from 'react-bootstrap';
+import { useState } from 'react';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -41,7 +43,7 @@ export function OrganizationDashboardPage() {
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
-  const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
+  const { isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
     onSuccess(data) {
       dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
@@ -138,29 +140,41 @@ export function OrganizationDashboardPage() {
         applicationStatus: app.status,
       };
     }) ?? [];
-
+  const [isLoading, setIsLoading] = useState(false);
+  const flipLoading = () => {
+    setIsLoading(!isLoading);
+  };
   return (
-    <div className="overflow-y-auto h-100">
-      <div className="m-3">
-        <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
-        <div className="row my-4">
-          {renderStatisticsCard('Submitted Applications', 42)}
-          {renderStatisticsCard('Accepted Applications', 42)}
-          {renderStatisticsCard('Rejected Applications', 42)}
-          {renderStatisticsCard('Applications In Review', 42)}
-          {renderStatisticsCard('Cumulative Est. Savings', 42)}
-          {renderStatisticsCard('Total Obligation', 42)}
-        </div>
-        {isLoading && (
-          <Placeholder animation="glow">
-            <Placeholder className="fs-5 mt-5"></Placeholder>
-          </Placeholder>
-        )}
-        <h2 className="fs-5 mt-5">Applications</h2>
-        <TableLoading isLoading={isLoading} isErrored={isError}>
-          <DataGrid rows={rows} columns={columns}></DataGrid>
-        </TableLoading>
+    <>
+      <div>
+        {'isLoading? ' + isLoading}
+        <Button onClick={flipLoading}>flip loading</Button>
       </div>
-    </div>
+      <div className="overflow-y-auto h-100">
+        <div className="m-3">
+          <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
+          <div className="row my-4">
+            {renderStatisticsCard('Submitted Applications', 42)}
+            {renderStatisticsCard('Accepted Applications', 42)}
+            {renderStatisticsCard('Rejected Applications', 42)}
+            {renderStatisticsCard('Applications In Review', 42)}
+            {renderStatisticsCard('Cumulative Est. Savings', 42)}
+            {renderStatisticsCard('Total Obligation', 42)}
+          </div>
+          <div className="row">
+            {isLoading && (
+              <Placeholder animation="glow">
+                <Placeholder className="h2 mt-5 rounded" xs={6} />
+              </Placeholder>
+            )}
+            {!isLoading && <h2 className="fs-5 mt-5">Applications</h2>}
+          </div>
+          {/* <h2 className="fs-5 mt-5">Applications</h2> */}
+          <TableLoading isLoading={isLoading} isErrored={isError}>
+            <DataGrid rows={rows} columns={columns}></DataGrid>
+          </TableLoading>
+        </div>
+      </div>
+    </>
   );
 }
