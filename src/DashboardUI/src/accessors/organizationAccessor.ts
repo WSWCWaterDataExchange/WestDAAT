@@ -4,7 +4,6 @@ import westDaatApi from './westDaatApi';
 import { OrganizationDetailsListResponse } from '../data-contracts/OrganizationDetailsListResponse';
 import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationSummaryListResponse';
 import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
-import { rejects } from 'assert';
 import { OrganizationMemberAddRequest } from '../data-contracts/OrganizationMemberAddRequest';
 import { OrganizationMemberAddResponse } from '../data-contracts/OrganizationMemberAddResponse';
 
