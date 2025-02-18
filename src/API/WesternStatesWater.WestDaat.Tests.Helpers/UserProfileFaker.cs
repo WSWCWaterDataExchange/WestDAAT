@@ -6,5 +6,6 @@ public class UserProfileFaker : Faker<EFWD.UserProfile>
     {
         RuleFor(up => up.FirstName, f => f.Person.FirstName);
         RuleFor(up => up.LastName, f => f.Person.LastName);
+        RuleFor(up => up.UserName, f => f.Person.UserName);
     }
 }

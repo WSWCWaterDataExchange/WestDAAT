@@ -5,3 +5,10 @@ export enum Role {
   OrganizationAdmin = 'OrganizationAdmin',
   GlobalAdmin = 'GlobalAdmin',
 }
+
+export const RoleDisplayNames: { [key in Role]: string } = {
+  Member: 'Member',
+  TechnicalReviewer: 'Technical Reviewer',
+  OrganizationAdmin: 'Organization Admin',
+  GlobalAdmin: 'Global Admin',
+};

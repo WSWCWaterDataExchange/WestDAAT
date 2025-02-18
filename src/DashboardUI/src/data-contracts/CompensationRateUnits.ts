@@ -4,13 +4,12 @@ export enum CompensationRateUnits {
   Acres = 2,
 }
 
-export function formatCompensationRateUnitsText(units: CompensationRateUnits): string {
-  switch (units) {
-    case CompensationRateUnits.AcreFeet:
-      return 'Acre-Feet';
-    case CompensationRateUnits.Acres:
-      return 'Acre';
-    case CompensationRateUnits.None:
-      return 'None';
-  }
-}
+export const CompensationRateUnitsLabels: Record<CompensationRateUnits, string> = {
+  [CompensationRateUnits.None]: 'None',
+  [CompensationRateUnits.AcreFeet]: 'Acre-Feet',
+  [CompensationRateUnits.Acres]: 'Acres',
+};
+
+export const CompensationRateUnitsOptions = Object.keys(CompensationRateUnitsLabels)
+  .map((key) => Number(key) as CompensationRateUnits)
+  .filter((value) => value !== CompensationRateUnits.None);

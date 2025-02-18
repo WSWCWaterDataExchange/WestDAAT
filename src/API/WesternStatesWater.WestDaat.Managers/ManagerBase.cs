@@ -136,7 +136,10 @@ namespace WesternStatesWater.WestDaat.Managers
             {
                 Logger.LogError(ex, "An error occurred while processing the request");
 
-                return CreateErrorResponse<TRequest, TResponse>(new InternalError());
+                return CreateErrorResponse<TRequest, TResponse>(new InternalError
+                {
+                    LogMessage = ex.Message
+                });
             }
         }
 

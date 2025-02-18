@@ -1,4 +1,4 @@
-import { Button } from 'react-bootstrap';
+import Button from 'react-bootstrap/esm/Button';
 
 export function EstimationToolMapHeader() {
   return (

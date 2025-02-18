@@ -1,7 +1,9 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
+import Button from '@mui/material/Button';
 import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
+import { useState } from 'react';
 import Card from 'react-bootstrap/esm/Card';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useQuery } from 'react-query';
@@ -11,19 +13,19 @@ import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDashboardListItem } from '../../../data-contracts/ApplicationDashboardListItem';
-import { formatCompensationRateUnitsText } from '../../../data-contracts/CompensationRateUnits';
+import { CompensationRateUnitsLabels } from '../../../data-contracts/CompensationRateUnits';
 import {
   ConservationApplicationStatus,
   formatConservationApplicationStatusText,
 } from '../../../data-contracts/ConservationApplicationStatus';
+import { useOrganizationQuery } from '../../../hooks/queries';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
+import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
-import { Button } from 'react-bootstrap';
-import { useState } from 'react';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -42,6 +44,8 @@ export function OrganizationDashboardPage() {
   const msalContext = useMsal();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+
+  const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
   const { isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(msalContext, organizationIdFilter),
@@ -103,6 +107,29 @@ export function OrganizationDashboardPage() {
     );
   };
 
+  const dashboardTitle = () => {
+    if (organizationListLoading) {
+      return (
+        <Placeholder as="h1" animation="glow" className="fs-3 fw-bolder">
+          <Placeholder xs={4} className="rounded" />
+        </Placeholder>
+      );
+    }
+
+    let titleText = 'Application Dashboard';
+    if (organizationIdFilter) {
+      const organization = organizationListResponse?.organizations.find(
+        (org) => org.organizationId === organizationIdFilter,
+      );
+
+      if (organization) {
+        titleText = `${organization.name} Dashboard`;
+      }
+    }
+
+    return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
+  };
+
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -119,7 +146,14 @@ export function OrganizationDashboardPage() {
       renderHeader,
       renderCell: renderAppIdCell,
     },
-    { field: 'submittedDate', headerName: 'Date Submitted', width: 150, renderHeader, valueFormatter: dateFormatter },
+    {
+      field: 'submittedDate',
+      headerName: 'Date Submitted',
+      width: 150,
+      renderHeader,
+      valueFormatter: dateFormatter,
+      filterOperators: [dataGridDateRangeFilter],
+    },
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
@@ -134,7 +168,7 @@ export function OrganizationDashboardPage() {
         waterRightNativeId: app.waterRightNativeId,
         applicationDisplayId: app.applicationDisplayId,
         submittedDate: app.submittedDate,
-        requestedFunding: `$${app.compensationRateDollars}/${formatCompensationRateUnitsText(app.compensationRateUnits)}`,
+        requestedFunding: `$${app.compensationRateDollars}/${CompensationRateUnitsLabels[app.compensationRateUnits]}`,
         waterRightState: app.waterRightState,
         fundingOrganization: app.organizationName,
         applicationStatus: app.status,
@@ -152,7 +186,7 @@ export function OrganizationDashboardPage() {
       </div>
       <div className="overflow-y-auto h-100">
         <div className="m-3">
-          <h1 className="fs-3 fw-bolder">Application Dashboard</h1>
+          {dashboardTitle()}
           <div className="row my-4">
             {renderStatisticsCard('Submitted Applications', 42)}
             {renderStatisticsCard('Accepted Applications', 42)}
@@ -169,9 +203,22 @@ export function OrganizationDashboardPage() {
             )}
             {!isLoading && <h2 className="fs-5 mt-5">Applications</h2>}
           </div>
-          {/* <h2 className="fs-5 mt-5">Applications</h2> */}
           <TableLoading isLoading={isLoading} isErrored={isError}>
-            <DataGrid rows={rows} columns={columns}></DataGrid>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              slotProps={{
+                filterPanel: {
+                  filterFormProps: {
+                    valueInputProps: {
+                      sx: {
+                        width: 'auto', // This prevents the filter from having a horizontal scrollbar
+                      },
+                    },
+                  },
+                },
+              }}
+            ></DataGrid>
           </TableLoading>
         </div>
       </div>
