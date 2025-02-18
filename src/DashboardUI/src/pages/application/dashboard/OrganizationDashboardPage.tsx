@@ -24,7 +24,7 @@ import { ApplicationDashboardListItem } from '../../../data-contracts/Applicatio
 import { formatCompensationRateUnitsText } from '../../../data-contracts/CompensationRateUnits';
 import {
   ConservationApplicationStatus,
-  formatConservationApplicationStatusText,
+  ConservationApplicationStatusDisplayNames,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
@@ -86,16 +86,16 @@ export function OrganizationDashboardPage() {
     <div className="header-column-text">{params.colDef.headerName}</div>
   );
 
-  const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => {
+  const renderAppStatusCell = (params: GridRenderCellParams<any, string>) => {
     return (
       <>
         <Icon
           size={1}
           path={mdiCircleMedium}
-          className={getApplicationStatusIconClass(params.value!)}
-          title={formatConservationApplicationStatusText(params.value!)}
+          className={getApplicationStatusIconClass(params.row.applicationStatus)}
+          title={params.value!}
         ></Icon>
-        {formatConservationApplicationStatusText(params.value!)}
+        {params.value!}
       </>
     );
   };
@@ -143,40 +143,6 @@ export function OrganizationDashboardPage() {
     return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
   };
 
-  const defaultDataGridStringColumnFilterOperators = getGridDefaultColumnTypes().string.filterOperators;
-
-  const wrappedAppStatusFilterOperators = defaultDataGridStringColumnFilterOperators?.map(
-    (operator: GridFilterOperator, index) => {
-      // provides the function that will execute the actual filtering logic
-      const updatedApplyFilterFn = (
-        filterItem: GridFilterItem,
-        column: GridColDef<any, ConservationApplicationStatus, any>,
-      ) => {
-        // this is the function that actually evaluates whether the row should be filtered out
-        // ApplyFilterFn = (value: V, row: R, column: GridColDef<R, V, F>, apiRef: RefObject<GridApiCommunity>) => boolean;
-        const innerFilterFn = operator.getApplyFilterFn(filterItem, column);
-
-        // innerFilterFn can be null - if so, return null
-        if (!innerFilterFn) {
-          return null;
-        }
-
-        // we will wrap this function to format the value before passing it to the inner function
-        const wrappedInnerFn = (value: ConservationApplicationStatus, row: any, col: GridColDef, apiRef: any) => {
-          const formattedValue = formatConservationApplicationStatusText(value);
-          return innerFilterFn(formattedValue, row, col, apiRef);
-        };
-
-        return wrappedInnerFn;
-      };
-
-      return {
-        ...operator,
-        getApplyFilterFn: updatedApplyFilterFn,
-      };
-    },
-  );
-
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -210,7 +176,9 @@ export function OrganizationDashboardPage() {
       width: 200,
       renderCell: renderAppStatusCell,
       renderHeader,
-      filterOperators: wrappedAppStatusFilterOperators,
+      valueGetter: (status: ConservationApplicationStatus) => {
+        return ConservationApplicationStatusDisplayNames[status];
+      },
     },
   ];
 

@@ -2,18 +2,12 @@ export enum ConservationApplicationStatus {
   Unknown = 0,
   InReview = 1,
   Approved = 2,
-  Rejected = 3
+  Rejected = 3,
 }
 
-export function formatConservationApplicationStatusText(status: ConservationApplicationStatus): string {
-  switch (status) {
-    case ConservationApplicationStatus.InReview:
-      return 'In Review';
-    case ConservationApplicationStatus.Approved:
-      return 'Approved';
-    case ConservationApplicationStatus.Rejected:
-      return 'Rejected';
-    case ConservationApplicationStatus.Unknown:
-      return 'Unknown';
-  }
+export const ConservationApplicationStatusDisplayNames: { [key in ConservationApplicationStatus]: string } = {
+  [ConservationApplicationStatus.Unknown]: 'Unknown',
+  [ConservationApplicationStatus.InReview]: 'In Review',
+  [ConservationApplicationStatus.Approved]: 'Approved',
+  [ConservationApplicationStatus.Rejected]: 'Rejected'
 }
