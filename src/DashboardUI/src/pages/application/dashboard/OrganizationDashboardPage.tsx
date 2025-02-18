@@ -21,7 +21,7 @@ import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDashboardListItem } from '../../../data-contracts/ApplicationDashboardListItem';
-import { formatCompensationRateUnitsText } from '../../../data-contracts/CompensationRateUnits';
+import { CompensationRateUnitsLabels } from '../../../data-contracts/CompensationRateUnits';
 import {
   ConservationApplicationStatus,
   ConservationApplicationStatusDisplayNames,
@@ -190,7 +190,7 @@ export function OrganizationDashboardPage() {
         waterRightNativeId: app.waterRightNativeId,
         applicationDisplayId: app.applicationDisplayId,
         submittedDate: app.submittedDate,
-        requestedFunding: `$${app.compensationRateDollars}/${formatCompensationRateUnitsText(app.compensationRateUnits)}`,
+        requestedFunding: `$${app.compensationRateDollars}/${CompensationRateUnitsLabels[app.compensationRateUnits]}`,
         waterRightState: app.waterRightState,
         fundingOrganization: app.organizationName,
         applicationStatus: app.status,
