@@ -54,7 +54,7 @@ export type ApplicationAction =
   | FundingOrganizationLoadedAction
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
-  | WaterConservationApplicationCreatedAction
+  | ApplicationCreatedAction
   | EstimateConsumptiveUseLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -98,7 +98,7 @@ export interface EstimationFormUpdatedAction {
   };
 }
 
-export interface WaterConservationApplicationCreatedAction {
+export interface ApplicationCreatedAction {
   type: 'APPLICATION_CREATED';
   payload: {
     waterConservationApplicationId: string;
@@ -135,7 +135,7 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
     case 'APPLICATION_CREATED':
-      return onWaterConservationApplicationCreated(draftState, action);
+      return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
@@ -182,9 +182,9 @@ const onFundingOrganizationLoaded = (
   return draftState;
 };
 
-const onWaterConservationApplicationCreated = (
+const onApplicationCreated = (
   draftState: ConservationApplicationState,
-  { payload }: WaterConservationApplicationCreatedAction,
+  { payload }: ApplicationCreatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
 
