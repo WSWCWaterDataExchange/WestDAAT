@@ -7,3 +7,9 @@
   min-width: 1.5em;
   min-height: 1.5em;
 }
+
+.overlay-tooltip-popover.popover {
+  // Increase the width so text wraps better
+  max-width: 400px !important;
+  width: auto;
+}
