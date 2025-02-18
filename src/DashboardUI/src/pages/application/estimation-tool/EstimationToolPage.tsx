@@ -45,7 +45,7 @@ export function EstimationToolPage() {
     await estimateConsumptiveUseMutation.mutateAsync({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      model: 0,
+      model: 1,
       dateRangeStart: state.conservationApplication.dateRangeStart,
       dateRangeEnd: state.conservationApplication.dateRangeEnd,
       polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
