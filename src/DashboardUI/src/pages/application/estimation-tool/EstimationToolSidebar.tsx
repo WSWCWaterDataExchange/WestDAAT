@@ -43,8 +43,10 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
     (sum, polygon) => sum + polygon.acreage,
     0,
   );
-  const evapotranspiration = 1000;
-  const conservationEstimate = 15000;
+  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
+    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
+    0,
+  );
 
   return (
     <div className="flex-grow-1 panel-content">
@@ -105,7 +107,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
             <span className="me-1">
               <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
             </span>
-            <span className="fs-5 fw-bold et-blue-text">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
+            <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
           </div>
         </SidebarElement>
 
@@ -159,26 +161,36 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           tooltip="Conservation Estimate refers to the projected reduction in water use resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing. This estimate helps assess potential water savings and informs compensation programs."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <div>
-            <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
-          </div>
+          {state.conservationApplication.conservationPayment ? (
+            <>
+              <div>
+                <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
+              </div>
 
-          <div>
-            <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
-              <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
+              <div>
+                <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
+                  <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
 
-              <span className="fs-5 fw-bold">${formatNumber(conservationEstimate, 2)}</span>
-            </span>
-          </div>
+                  <span className="fs-5 fw-bold">
+                    ${formatNumber(state.conservationApplication.conservationPayment, 2)}
+                  </span>
+                </span>
+              </div>
 
-          <div>
+              <div>
+                <div>
+                  <span className="text-muted">This estimate is not legally binding to WSWC.</span>
+                </div>
+                <div>
+                  <a href="#">Learn more</a>
+                </div>
+              </div>
+            </>
+          ) : (
             <div>
-              <span className="text-muted">This estimate is not legally binding to WSWC.</span>
+              <span className="text-muted">Please input desired compensation to be provided with an estimate</span>
             </div>
-            <div>
-              <a href="#">Learn more</a>
-            </div>
-          </div>
+          )}
         </SidebarElement>
 
         <SidebarElement>
