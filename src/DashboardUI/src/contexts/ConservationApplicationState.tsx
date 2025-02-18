@@ -199,6 +199,7 @@ const onMapSelectedPolygonsUpdated = (
 ): ConservationApplicationState => {
   draftState.conservationApplication.selectedMapPolygons = payload.polygons;
 
+  resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
@@ -213,6 +214,7 @@ const onEstimationFormUpdated = (
   application.desiredCompensationDollars = payload.desiredCompensationDollars;
   application.desiredCompensationUnits = payload.desiredCompensationUnits;
 
+  resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
 
   return draftState;
@@ -268,4 +270,11 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     app.selectedMapPolygons.every((p) => p.acreage <= 50000);
 
   return;
+};
+
+const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
+  draftState.conservationApplication.totalAverageYearlyEtAcreFeet = undefined;
+  draftState.conservationApplication.conservationPayment = undefined;
+  draftState.conservationApplication.polygonEtData = [];
+  draftState.canContinueToApplication = false;
 };
