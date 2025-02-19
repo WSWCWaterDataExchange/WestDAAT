@@ -4,17 +4,22 @@ import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
-import { useEstimateConsumptiveUseMutation } from './hooks/useEstimateConsumptiveUseMutation';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
 import {
   useCreateWaterConservationApplicationQuery,
   useFundingOrganizationQuery,
 } from '../../../hooks/queries/useApplicationQuery';
+import { useMutation } from 'react-query';
+import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
+import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
+import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
 
 import './estimation-tool-page.scss';
 
 export function EstimationToolPage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const routeParams = useParams();
   const { state, dispatch } = useConservationApplicationContext();
@@ -41,7 +46,41 @@ export function EstimationToolPage() {
     fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
   });
 
-  const estimateConsumptiveUseMutation = useEstimateConsumptiveUseMutation();
+  const estimateConsumptiveUseMutation = useMutation({
+    mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
+      validateFields(fields);
+
+      const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
+        waterRightNativeId: fields.waterRightNativeId!,
+        waterConservationApplicationId: fields.waterConservationApplicationId!,
+        fundingOrganizationId: fields.fundingOrganizationId!,
+        dateRangeStart: fields.dateRangeStart!,
+        dateRangeEnd: fields.dateRangeEnd!,
+        model: fields.model!,
+        polygonWkts: fields.polygonWkts!,
+        compensationRateDollars: fields.compensationRateDollars,
+        units: fields.units,
+      };
+
+      return await estimateConsumptiveUse(context, apiCallFields);
+    },
+    onSuccess: (result: EstimateConsumptiveUseResponse) => {
+      if (result) {
+        dispatch({
+          type: 'CONSUMPTIVE_USE_ESTIMATED',
+          payload: {
+            totalAverageYearlyEtAcreFeet: result.totalAverageYearlyEtAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+          },
+        });
+      }
+    },
+    onError: (error: Error) => {
+      console.error(error);
+      throw error;
+    },
+  });
 
   const handleEstimateConsumptiveUseClicked = async () => {
     await estimateConsumptiveUseMutation.mutateAsync({
@@ -85,3 +124,30 @@ export function EstimationToolPage() {
     </MapProvider>
   );
 }
+
+interface EstimateConsumptiveUseApiCallFields {
+  waterConservationApplicationId: string | undefined;
+  waterRightNativeId: string | undefined;
+  fundingOrganizationId: string | undefined;
+  model: number | undefined;
+  dateRangeStart: Date | undefined;
+  dateRangeEnd: Date | undefined;
+  polygonWkts: string[] | undefined;
+  compensationRateDollars: number | undefined;
+  units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
+}
+
+const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
+  const isValid: boolean =
+    !!fields.waterConservationApplicationId &&
+    !!fields.waterRightNativeId &&
+    !!fields.fundingOrganizationId &&
+    !!fields.model &&
+    !!fields.dateRangeStart &&
+    !!fields.dateRangeEnd &&
+    !!fields.polygonWkts &&
+    fields.polygonWkts.length > 0; // compensation rate is optional
+  if (!isValid) {
+    throw new Error('Invalid fields');
+  }
+};
