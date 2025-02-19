@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Card from 'react-bootstrap/esm/Card';
 import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
@@ -13,8 +14,9 @@ import { ApplicationDashboardListItem } from '../../../data-contracts/Applicatio
 import { CompensationRateUnitsLabels } from '../../../data-contracts/CompensationRateUnits';
 import {
   ConservationApplicationStatus,
-  formatConservationApplicationStatusText,
+  ConservationApplicationStatusDisplayNames,
 } from '../../../data-contracts/ConservationApplicationStatus';
+import { useOrganizationQuery } from '../../../hooks/queries';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
@@ -22,8 +24,6 @@ import { formatDateString } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
-import { useOrganizationQuery } from '../../../hooks/queries';
-import { Placeholder } from 'react-bootstrap';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -73,17 +73,19 @@ export function OrganizationDashboardPage() {
     <div className="header-column-text">{params.colDef.headerName}</div>
   );
 
-  const renderAppStatusCell = (params: GridRenderCellParams<any, ConservationApplicationStatus>) => (
-    <>
-      <Icon
-        size={1}
-        path={mdiCircleMedium}
-        className={getApplicationStatusIconClass(params.value!)}
-        title={formatConservationApplicationStatusText(params.value!)}
-      ></Icon>
-      {formatConservationApplicationStatusText(params.value!)}
-    </>
-  );
+  const renderAppStatusCell = (params: GridRenderCellParams<any, string>) => {
+    return (
+      <>
+        <Icon
+          size={1}
+          path={mdiCircleMedium}
+          className={getApplicationStatusIconClass(params.row.applicationStatus)}
+          title={params.value!}
+        ></Icon>
+        {params.value!}
+      </>
+    );
+  };
 
   const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
     return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
@@ -155,7 +157,14 @@ export function OrganizationDashboardPage() {
     { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
-    { field: 'applicationStatus', headerName: 'Status', width: 200, renderCell: renderAppStatusCell, renderHeader },
+    {
+      field: 'applicationStatus',
+      headerName: 'Status',
+      width: 200,
+      renderCell: renderAppStatusCell,
+      renderHeader,
+      valueGetter: (status: ConservationApplicationStatus) => ConservationApplicationStatusDisplayNames[status],
+    },
   ];
 
   const rows: DataGridRows<ApplicationDataGridColumns> =
