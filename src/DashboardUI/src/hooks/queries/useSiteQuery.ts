@@ -1,7 +1,6 @@
 import { useQuery } from 'react-query';
 import {
   getSiteDetails,
-  getWaterRightsDigests,
   getWaterSiteLocation,
   getWaterSiteSourceInfoList,
   getWaterRightInfoList,
@@ -18,12 +17,6 @@ import { WaterSourceInfoListItem } from '../../data-contracts/WaterSourceInfoLis
 import { VariableInfoListItem } from '../../data-contracts/VariableInfoListItem';
 import { MethodInfoListItem } from '../../data-contracts/MethodInfoListItem';
 import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
-
-export function useWaterRightsDigests(siteUuid: string) {
-  return useQuery(['site.waterRightsDigests', siteUuid], async () => await getWaterRightsDigests(siteUuid), {
-    enabled: !!siteUuid,
-  });
-}
 
 export function useSiteDigest(siteUuid: string) {
   return useQuery(['site.siteDigest', siteUuid], async () => await getSiteDigest(siteUuid), {

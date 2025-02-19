@@ -8,9 +8,10 @@ interface SiteDigestMapPopupProps {
   site: SiteDigest;
   onClosePopup: () => void;
 }
+
 function SiteDigestCard(props: SiteDigestMapPopupProps) {
   const { onClosePopup } = props;
-  const { siteNativeId, siteName, siteType, siteUuid } = props.site;
+  const { siteNativeId, siteName, siteType, siteUuid, hasTimeSeriesData } = props.site;
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
@@ -42,10 +43,19 @@ function SiteDigestCard(props: SiteDigestMapPopupProps) {
               </div>
               {siteType}
             </div>
+            {hasTimeSeriesData && (
+              <div className="mt-2">
+                <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
+                  Time Series Landing Page{' '}
+                  <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                </a>
+              </div>
+            )}
           </div>
         ),
       }}
     </MapPopupCard>
   );
 }
+
 export default SiteDigestCard;
