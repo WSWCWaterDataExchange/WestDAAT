@@ -7,6 +7,7 @@ import { AuthenticationResult, EventMessage, EventType, PublicClientApplication 
 import { msalConfig } from './authConfig';
 
 const msalInstance = new PublicClientApplication(msalConfig);
+await msalInstance.initialize();
 
 const accounts = msalInstance.getAllAccounts();
 if (accounts.length > 0) {
