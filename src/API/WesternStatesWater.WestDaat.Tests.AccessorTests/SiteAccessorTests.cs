@@ -165,25 +165,25 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             await call.Should().ThrowAsync<Exception>();
         }
-
+        
         [TestMethod]
-        public async Task GetSiteDigestByUuid_Matches()
+        public async Task GetSiteDigestByUuid_ShouldReturnSiteWithWaterRights()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
             var site = new SitesDimFaker()
                 .RuleFor(a => a.CoordinateAccuracy, f => f.Random.AlphaNumeric(5))
                 .Generate();
-            db.SitesDim.Add(site);
-            db.SaveChanges();
 
-            var expectedResult = new Common.DataContracts.SiteDigest
-            {
-                SiteUuid = site.SiteUuid,
-                SiteName = site.SiteName,
-                SiteNativeId = site.SiteNativeId,
-                SiteType = site.SiteTypeCv,
-            };
+            var allocations = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(10, 'A', 'z'))
+                .RuleFor(a => a.AllocationUuid, f => Guid.NewGuid().ToString())
+                .LinkSites(site)
+                .Generate(3);
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.AddRange(allocations);
+            db.SaveChanges();
 
             // Act
             var accessor = CreateSiteAccessor();
@@ -191,9 +191,88 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeEquivalentTo(expectedResult);
+            result.SiteUuid.Should().Be(site.SiteUuid);
+            result.SiteName.Should().Be(site.SiteName);
+            result.SiteNativeId.Should().Be(site.SiteNativeId);
+            result.SiteType.Should().Be(site.SiteTypeCv);
+            result.WaterRightsDigests.Should().HaveCount(3);
+            result.WaterRightsDigests.Select(w => w.NativeId).Should().BeEquivalentTo(allocations.Select(a => a.AllocationNativeId));
         }
 
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_ShouldReturnSiteWithoutWaterRights()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.SiteUuid.Should().Be(site.SiteUuid);
+            result.WaterRightsDigests.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_WithBeneficialUses()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(2);
+            var allocation = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.Add(allocation);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDigests.Should().HaveCount(1);
+            result.WaterRightsDigests[0].BeneficialUses.Should().BeEquivalentTo(beneficialUses.Select(a => a.Name));
+        }
+
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_WithPriorityDate()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            var priorityDate = new DateTime(1980, 5, 15);
+
+            var allocation = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .SetAllocationPriorityDate(priorityDate)
+                .Generate();
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.Add(allocation);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDigests.Should().HaveCount(1);
+            result.WaterRightsDigests[0].PriorityDate.Should().Be(priorityDate);
+        }
+       
         [TestMethod]
         public async Task SiteAccessor_GetWaterRightInfoListByUuid_Matches()
         {
