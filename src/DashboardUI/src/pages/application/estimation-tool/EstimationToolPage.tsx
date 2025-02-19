@@ -4,11 +4,13 @@ import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
-import { useFundingOrganizationQuery } from './hooks/useFundingOrganizationQuery';
-import { useCreateWaterConservationApplicationQuery } from './hooks/useCreateWaterConservationApplicationQuery';
 import { useEstimateConsumptiveUseMutation } from './hooks/useEstimateConsumptiveUseMutation';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
+import {
+  useCreateWaterConservationApplicationQuery,
+  useFundingOrganizationQuery,
+} from '../../../hooks/queries/useApplicationQuery';
 
 import './estimation-tool-page.scss';
 
