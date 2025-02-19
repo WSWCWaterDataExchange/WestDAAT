@@ -97,7 +97,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationUserListRequest, CommonContracts.UserListRequest>();
 
-            CreateMap<CommonContracts.UserListResponse, CommonContracts.UserListRequest>()
+            CreateMap<ClientContracts.Requests.Admin.UserListRequest, CommonContracts.UserListRequest>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(_ => (Guid?)null));
 
             CreateMap<CommonContracts.UserListResponse, ClientContracts.Responses.Admin.UserListResponse>()

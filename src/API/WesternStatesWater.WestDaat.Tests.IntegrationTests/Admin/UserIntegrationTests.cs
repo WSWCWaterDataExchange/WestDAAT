@@ -384,4 +384,68 @@ public class UserIntegrationTests : IntegrationTestBase
             result.Error.Should().BeOfType<ForbiddenError>();
         }
     }
+
+    [TestMethod]
+    public async Task Load_OrganizationUserListRequest_MultipleOrganizations_ShouldFilterToRequestedOrg()
+    {
+        // Arrange
+        var users = new UserFaker().Generate(3);
+        var unrelatedUsers = new UserFaker().Generate(3);
+        var organization = new OrganizationFaker().Generate();
+        var unrelatedOrganization = new OrganizationFaker().Generate();
+
+        // Should be included in results
+        var userOrganization1 = new UserOrganizationFaker(users[0], organization).Generate();
+        var userOrganization2 = new UserOrganizationFaker(users[1], organization).Generate();
+        var userOrganization3 = new UserOrganizationFaker(users[2], organization).Generate();
+
+        userOrganization1.UserOrganizationRoles.Add(new UserOrganizationRoleFaker(userOrganization1).Generate());
+        userOrganization2.UserOrganizationRoles.Add(new UserOrganizationRoleFaker(userOrganization2).Generate());
+        userOrganization3.UserOrganizationRoles.Add(new UserOrganizationRoleFaker(userOrganization3).Generate());
+
+        // Should not be included in results
+        var unrelatedUserOrganization1 = new UserOrganizationFaker(unrelatedUsers[0], unrelatedOrganization).Generate();
+        var unrelatedUserOrganization2 = new UserOrganizationFaker(unrelatedUsers[1], unrelatedOrganization).Generate();
+        var unrelatedUserOrganization3 = new UserOrganizationFaker(unrelatedUsers[2], unrelatedOrganization).Generate();
+
+        await _dbContext.Users.AddRangeAsync(users);
+        await _dbContext.Users.AddRangeAsync(unrelatedUsers);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Organizations.AddAsync(unrelatedOrganization);
+        await _dbContext.UserOrganizations.AddRangeAsync(userOrganization1, userOrganization2, userOrganization3);
+        await _dbContext.UserOrganizations.AddRangeAsync(unrelatedUserOrganization1, unrelatedUserOrganization2, unrelatedUserOrganization3);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = users[0].Id,
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.OrganizationUserListRequest, CLI.Responses.Admin.UserListResponse>(
+            new CLI.Requests.Admin.OrganizationUserListRequest
+            {
+                OrganizationId = organization.Id
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeNull();
+        result.Users.Should().HaveCount(3);
+
+        // Has the users we expected
+        result.Users.Any(u => u.UserId == users[0].Id).Should().BeTrue();
+        result.Users.Any(u => u.UserId == users[1].Id).Should().BeTrue();
+        result.Users.Any(u => u.UserId == users[2].Id).Should().BeTrue();
+
+        result.Users.All(u => !string.IsNullOrEmpty(u.FirstName));
+        result.Users.All(u => !string.IsNullOrEmpty(u.LastName));
+        result.Users.All(u => !string.IsNullOrEmpty(u.UserName));
+        result.Users.All(u => !string.IsNullOrEmpty(u.Email));
+        result.Users.All(u => !string.IsNullOrEmpty(u.Role));
+    }
 }
