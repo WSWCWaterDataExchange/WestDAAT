@@ -14,6 +14,7 @@ describe('AuthorizedTemplate', () => {
       isAuthenticated: true,
       authenticationComplete: true,
       user: {
+        userId: '123',
         emailAddress: 'wesley@westdaat.com',
         roles: [Role.GlobalAdmin],
         organizationRoles: [],
@@ -34,6 +35,7 @@ describe('AuthorizedTemplate', () => {
       isAuthenticated: true,
       authenticationComplete: true,
       user: {
+        userId: '123',
         emailAddress: 'wesley@westdaat.com',
         roles: [],
         organizationRoles: [
@@ -59,6 +61,7 @@ describe('AuthorizedTemplate', () => {
       isAuthenticated: true,
       authenticationComplete: true,
       user: {
+        userId: '123',
         emailAddress: 'wesley@westdaat.com',
         roles: [Role.Member],
         organizationRoles: [],
