@@ -53,6 +53,7 @@ export type ApplicationAction =
   | EstimationToolPageLoadedAction
   | FundingOrganizationLoadedAction
   | MapPolygonsUpdatedAction
+  | MapPolygonsUpdatedInvalidAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction;
@@ -88,6 +89,10 @@ export interface MapPolygonsUpdatedAction {
   payload: {
     polygons: EstimationFormMapPolygon[];
   };
+}
+
+export interface MapPolygonsUpdatedInvalidAction {
+  type: 'MAP_POLYGONS_UPDATED_INVALID';
 }
 
 export interface EstimationFormUpdatedAction {
@@ -138,6 +143,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
+    case 'MAP_POLYGONS_UPDATED_INVALID':
+      return onMapPolygonsUpdatedInvalid(draftState);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
@@ -198,6 +205,15 @@ const onMapPolygonsUpdated = (
   { payload }: MapPolygonsUpdatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.selectedMapPolygons = payload.polygons;
+
+  resetConsumptiveUseEstimation(draftState);
+  checkCanEstimateConsumptiveUse(draftState);
+
+  return draftState;
+};
+
+const onMapPolygonsUpdatedInvalid = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.conservationApplication.selectedMapPolygons = [];
 
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);

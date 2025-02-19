@@ -22,6 +22,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (doPolygonsIntersect(polygons)) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
+      dispatch({
+        type: 'MAP_POLYGONS_UPDATED_INVALID',
+      });
       return;
     }
 
