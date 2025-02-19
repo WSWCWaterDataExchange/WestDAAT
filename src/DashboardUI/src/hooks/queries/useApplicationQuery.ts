@@ -1,9 +1,25 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
 import { useQuery } from 'react-query';
-import { createWaterConservationApplication, getFundingOrganizationDetails } from '../../accessors/applicationAccessor';
+import {
+  applicationSearch,
+  createWaterConservationApplication,
+  getFundingOrganizationDetails,
+} from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { FundingOrganizationDetails } from '../../data-contracts/FundingOrganizationDetails';
+
+export function useLoadOrganization(organizationIdFilter: string | null) {
+  const context = useMsal();
+  const { dispatch } = useConservationApplicationContext();
+
+  return useQuery(['organization-dashboard-load', organizationIdFilter], {
+    queryFn: () => applicationSearch(context, organizationIdFilter),
+    onSuccess(data) {
+      dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
+    },
+  });
+}
 
 export function useCreateWaterConservationApplicationQuery(fields: {
   waterRightNativeId: string | undefined;

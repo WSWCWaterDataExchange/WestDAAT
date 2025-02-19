@@ -1,11 +1,8 @@
-import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
 import Card from 'react-bootstrap/esm/Card';
-import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
-import { applicationSearch } from '../../../accessors/applicationAccessor';
 import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -20,10 +17,11 @@ import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
-
-import './organization-dashboard-page.scss';
 import { useOrganizationQuery } from '../../../hooks/queries';
 import { Placeholder } from 'react-bootstrap';
+import { useLoadOrganization } from '../../../hooks/queries/useApplicationQuery';
+
+import './organization-dashboard-page.scss';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -38,19 +36,13 @@ interface ApplicationDataGridColumns {
 
 export function OrganizationDashboardPage() {
   const { user } = useAuthenticationContext();
-  const { state, dispatch } = useConservationApplicationContext();
-  const msalContext = useMsal();
+  const { state } = useConservationApplicationContext();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isLoading, isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
-    queryFn: () => applicationSearch(msalContext, organizationIdFilter),
-    onSuccess(data) {
-      dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
-    },
-  });
+  const { isLoading, isError } = useLoadOrganization(organizationIdFilter);
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');
