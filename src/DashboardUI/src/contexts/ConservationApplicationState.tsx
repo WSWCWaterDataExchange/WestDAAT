@@ -20,6 +20,7 @@ export interface ConservationApplicationState {
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     selectedMapPolygons: EstimationFormMapPolygon[];
+    doPolygonsOverlap: boolean;
     polygonEtData: PolygonEtDataCollection[];
   };
   canEstimateConsumptiveUse: boolean;
@@ -42,6 +43,7 @@ export const defaultState = (): ConservationApplicationState => ({
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
     selectedMapPolygons: [],
+    doPolygonsOverlap: false,
     polygonEtData: [],
   },
   canEstimateConsumptiveUse: false,
@@ -53,7 +55,6 @@ export type ApplicationAction =
   | EstimationToolPageLoadedAction
   | FundingOrganizationLoadedAction
   | MapPolygonsUpdatedAction
-  | MapPolygonsUpdatedInvalidAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction;
@@ -88,11 +89,8 @@ export interface MapPolygonsUpdatedAction {
   type: 'MAP_POLYGONS_UPDATED';
   payload: {
     polygons: EstimationFormMapPolygon[];
+    doPolygonsOverlap: boolean;
   };
-}
-
-export interface MapPolygonsUpdatedInvalidAction {
-  type: 'MAP_POLYGONS_UPDATED_INVALID';
 }
 
 export interface EstimationFormUpdatedAction {
@@ -143,8 +141,6 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
-    case 'MAP_POLYGONS_UPDATED_INVALID':
-      return onMapPolygonsUpdatedInvalid(draftState);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
@@ -212,15 +208,6 @@ const onMapPolygonsUpdated = (
   return draftState;
 };
 
-const onMapPolygonsUpdatedInvalid = (draftState: ConservationApplicationState): ConservationApplicationState => {
-  draftState.conservationApplication.selectedMapPolygons = [];
-
-  resetConsumptiveUseEstimation(draftState);
-  checkCanEstimateConsumptiveUse(draftState);
-
-  return draftState;
-};
-
 const onEstimationFormUpdated = (
   draftState: ConservationApplicationState,
   { payload }: EstimationFormUpdatedAction,
@@ -262,7 +249,8 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.dateRangeEnd &&
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
-    app.selectedMapPolygons.every((p) => p.acreage <= 50000);
+    app.selectedMapPolygons.every((p) => p.acreage <= 50000) &&
+    !app.doPolygonsOverlap;
 };
 
 const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
@@ -281,7 +269,8 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.conservationPayment &&
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
-    app.selectedMapPolygons.every((p) => p.acreage <= 50000);
+    app.selectedMapPolygons.every((p) => p.acreage <= 50000) &&
+    !app.doPolygonsOverlap;
 };
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {

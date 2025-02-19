@@ -121,6 +121,7 @@ describe('ConservationApplicationState reducer', () => {
             acreage: 1,
           },
         ],
+        doPolygonsOverlap: false,
       },
     });
 
@@ -130,28 +131,10 @@ describe('ConservationApplicationState reducer', () => {
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
     expect(newState.conservationApplication.selectedMapPolygons[0].acreage).toEqual(1);
-    expect(newState.canEstimateConsumptiveUse).toEqual(false);
+    expect(newState.conservationApplication.doPolygonsOverlap).toEqual(false);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
-  });
-
-  it('attempting to update map with invalid polygons should update state', () => {
-    // Arrange
-    state.conservationApplication.selectedMapPolygons = [
-      {
-        polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-        acreage: 1,
-      },
-    ];
-
-    // Act
-    const newState = reducer(state, {
-      type: 'MAP_POLYGONS_UPDATED_INVALID',
-    });
-
-    // Assert
-    expect(newState.conservationApplication.selectedMapPolygons.length).toEqual(0);
   });
 
   it('updating estimation form should update state', () => {
@@ -253,6 +236,7 @@ describe('ConservationApplicationState reducer', () => {
               acreage: 1,
             },
           ],
+          doPolygonsOverlap: false,
         },
       });
 
@@ -305,6 +289,7 @@ describe('ConservationApplicationState reducer', () => {
               acreage: 1,
             },
           ],
+          doPolygonsOverlap: false,
         },
       });
 

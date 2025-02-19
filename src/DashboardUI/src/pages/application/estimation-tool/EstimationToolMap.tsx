@@ -20,12 +20,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
-    if (doPolygonsIntersect(polygons)) {
+    const doPolygonsOverlap = doPolygonsIntersect(polygons);
+    if (doPolygonsOverlap) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
-      dispatch({
-        type: 'MAP_POLYGONS_UPDATED_INVALID',
-      });
-      return;
     }
 
     const polygonData: EstimationFormMapPolygon[] = polygons.map((polygonFeature) => ({
@@ -37,6 +34,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       type: 'MAP_POLYGONS_UPDATED',
       payload: {
         polygons: polygonData,
+        doPolygonsOverlap,
       },
     });
   };
