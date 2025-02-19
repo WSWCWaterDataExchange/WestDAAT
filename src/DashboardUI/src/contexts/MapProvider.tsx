@@ -1,12 +1,4 @@
-import React, {
-  createContext,
-  JSX,
-  ReactElement,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, JSX, ReactElement, useCallback, useContext, useMemo, useState } from 'react';
 import deepEqual from 'fast-deep-equal/es6';
 import { MapBoundSettings } from '@data-contracts';
 
@@ -134,6 +126,8 @@ interface MapContextState {
   >;
   isMapRendering: boolean;
   setIsMapRendering: React.Dispatch<React.SetStateAction<boolean>>;
+  drawPolygon: GeoJSON.Feature<GeoJSON.Polygon> | null;
+  setDrawPolygon: React.Dispatch<React.SetStateAction<GeoJSON.Feature<GeoJSON.Polygon> | null>>;
 }
 
 const defaultState: MapContextState = {
@@ -178,6 +172,8 @@ const defaultState: MapContextState = {
   setMapLocationSettings: () => {},
   isMapRendering: false,
   setIsMapRendering: () => {},
+  drawPolygon: null,
+  setDrawPolygon: () => {},
 };
 
 const MapContext = createContext<MapContextState>(defaultState);
@@ -187,6 +183,7 @@ interface MapProviderProps {
   children: React.ReactNode;
 }
 const MapProvider = ({ children }: MapProviderProps) => {
+  const [drawPolygon, setDrawPolygon] = useState<GeoJSON.Feature<GeoJSON.Polygon> | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapStyle, setMapStyle] = useState(defaultMapStyle);
 
@@ -438,6 +435,8 @@ const MapProvider = ({ children }: MapProviderProps) => {
     setMapLocationSettings,
     isMapRendering,
     setIsMapRendering,
+    drawPolygon,
+    setDrawPolygon,
   };
 
   return <MapContext.Provider value={mapContextProviderValue}>{children}</MapContext.Provider>;
