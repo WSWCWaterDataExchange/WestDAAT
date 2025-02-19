@@ -41,10 +41,11 @@ export function EstimationToolPage() {
   const { isLoading: isLoadingFundingOrganization, isError: fundingOrganizationLoadFailed } =
     useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
-  const { isLoading: isLoadingApplication } = useCreateWaterConservationApplicationQuery({
-    waterRightNativeId: state.conservationApplication.waterRightNativeId,
-    fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
-  });
+  const { isLoading: isLoadingApplication, isError: applicationLoadFailed } =
+    useCreateWaterConservationApplicationQuery({
+      waterRightNativeId: state.conservationApplication.waterRightNativeId,
+      fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
+    });
 
   const estimateConsumptiveUseMutation = useMutation({
     mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
@@ -108,8 +109,8 @@ export function EstimationToolPage() {
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
               <EstimationToolSidebar
-                isLoadingFundingOrganization={isLoadingFundingOrganization}
-                fundingOrganizationLoadFailed={fundingOrganizationLoadFailed}
+                isLoading={isLoadingFundingOrganization || isLoadingApplication}
+                loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
               />
             </div>
 
