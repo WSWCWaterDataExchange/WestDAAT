@@ -24,7 +24,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .SingleAsync();
         }
 
-        public async Task<SiteDigest> GetSiteDigestByUuid(string siteUuid)
+        async Task<SiteDigest> ISiteAccessor.GetSiteDigestByUuid(string siteUuid)
         {
             await using var db = _databaseContextFactory.Create();
             db.Database.SetCommandTimeout(int.MaxValue);
