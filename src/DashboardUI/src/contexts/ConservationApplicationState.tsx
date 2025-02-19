@@ -201,6 +201,7 @@ const onMapPolygonsUpdated = (
   { payload }: MapPolygonsUpdatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.selectedMapPolygons = payload.polygons;
+  draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);

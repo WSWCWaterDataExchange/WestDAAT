@@ -121,7 +121,7 @@ describe('ConservationApplicationState reducer', () => {
             acreage: 1,
           },
         ],
-        doPolygonsOverlap: false,
+        doPolygonsOverlap: true,
       },
     });
 
@@ -131,7 +131,7 @@ describe('ConservationApplicationState reducer', () => {
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
     expect(newState.conservationApplication.selectedMapPolygons[0].acreage).toEqual(1);
-    expect(newState.conservationApplication.doPolygonsOverlap).toEqual(false);
+    expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
