@@ -7,9 +7,8 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
-import intersect from '@turf/intersect';
-import { featureCollection } from '@turf/helpers';
 import { toast } from 'react-toastify';
+import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -66,20 +65,3 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     </div>
   );
 }
-
-const doPolygonsIntersect = (polygons: Feature<Geometry, GeoJsonProperties>[]): boolean => {
-  for (let i = 0; i < polygons.length; i++) {
-    for (let j = i + 1; j < polygons.length; j++) {
-      const p1 = polygons[i] as Feature<Polygon, GeoJsonProperties>;
-      const p2 = polygons[j] as Feature<Polygon, GeoJsonProperties>;
-
-      const intersection = intersect(featureCollection([p1, p2]));
-
-      if (intersection) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-};
