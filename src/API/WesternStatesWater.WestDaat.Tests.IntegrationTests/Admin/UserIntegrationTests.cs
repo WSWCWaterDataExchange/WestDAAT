@@ -265,4 +265,123 @@ public class UserIntegrationTests : IntegrationTestBase
         result.Error.Should().BeNull();
         result.SearchResults.Should().HaveCount(resultCount);
     }
+
+    [DataTestMethod]
+    [DataRow(Roles.GlobalAdmin, true)]
+    [DataRow(Roles.OrganizationAdmin, false)]
+    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.TechnicalReviewer, false)]
+    public async Task Load_UserListRequest_ShouldThrowIfInsufficientPermissions(string role, bool isAllowed)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = user.Id,
+                Roles = role == Roles.GlobalAdmin ? [role] : [],
+                OrganizationRoles = role != Roles.GlobalAdmin
+                    ?
+                    [
+                        new OrganizationRole
+                        {
+                            OrganizationId = userOrgnization.OrganizationId,
+                            RoleNames = [role]
+                        }
+                    ]
+                    : []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserListRequest, CLI.Responses.Admin.UserListResponse>(
+            new CLI.Requests.Admin.UserListRequest()
+        );
+
+        // Assert
+        if (isAllowed)
+        {
+            result.Error.Should().BeNull();
+            result.Users.Should().NotBeEmpty();
+        }
+        else
+        {
+            result.Error.Should().BeOfType<ForbiddenError>();
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow(Roles.GlobalAdmin, true)]
+    [DataRow(Roles.OrganizationAdmin, true)]
+    [DataRow(Roles.Member, false)]
+    [DataRow(Roles.TechnicalReviewer, false)]
+    public async Task Load_OrganizationUserListRequest_ShouldThrowIfInsufficientPermissions(string role, bool isAllowed)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var unrelatedOrganization = new OrganizationFaker().Generate();
+        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
+        var unrelatedUserOrgnization = new UserOrganizationFaker(user, unrelatedOrganization).Generate();
+
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Organizations.AddAsync(unrelatedOrganization);
+        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
+        await _dbContext.UserOrganizations.AddAsync(unrelatedUserOrgnization);
+        await _dbContext.SaveChangesAsync();
+
+        // This unrelated org should not affect permissions
+        var unrelatedOrgAdminRole = new OrganizationRole
+        {
+            OrganizationId = unrelatedOrganization.Id,
+            RoleNames = [Roles.OrganizationAdmin]
+        };
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = user.Id,
+                Roles = role == Roles.GlobalAdmin ? [role] : [],
+                OrganizationRoles = role != Roles.GlobalAdmin
+                    ?
+                    [
+                        unrelatedOrgAdminRole,
+                        new OrganizationRole
+                        {
+                            OrganizationId = userOrgnization.OrganizationId,
+                            RoleNames = [role]
+                        }
+                    ]
+                    : [unrelatedOrgAdminRole]
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.OrganizationUserListRequest, CLI.Responses.Admin.UserListResponse>(
+            new CLI.Requests.Admin.OrganizationUserListRequest
+            {
+                OrganizationId = userOrgnization.OrganizationId
+            }
+        );
+
+        // Assert
+        if (isAllowed)
+        {
+            result.Error.Should().BeNull();
+            result.Users.Should().NotBeEmpty();
+        }
+        else
+        {
+            result.Error.Should().BeOfType<ForbiddenError>();
+        }
+    }
 }
