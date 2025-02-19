@@ -7,6 +7,7 @@ using System.Net;
 using System.Text.Json;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -58,6 +59,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
         {
             return error switch
             {
+                ConflictError => await CreateConflictResponse(request),
                 ForbiddenError => await CreateForbiddenResponse(request),
                 InternalError => await CreateInternalServerErrorResponse(request),
                 NotFoundError err => await CreateNotFoundResponse(request, err),
@@ -65,6 +67,19 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 ServiceUnavailableError err => await CreateServiceUnavailableResponse(request, err),
                 _ => await CreateInternalServerErrorResponse(request)
             };
+        }
+
+        private static Task<HttpResponseData> CreateConflictResponse(HttpRequestData request)
+        {
+            var details = new ProblemDetails
+            {
+                Status = (int)HttpStatusCode.Conflict,
+                Title = "Conflict",
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+                Detail = "The request could not be completed due to a conflict with the current state of the resource."
+            };
+
+            return CreateProblemDetailsResponse(request, details, HttpStatusCode.Conflict);
         }
 
         private static Task<HttpResponseData> CreateForbiddenResponse(HttpRequestData request)
@@ -145,7 +160,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return response;
         }
 
-        protected async Task<T> ParseRequestBody<T>(HttpRequestData req)
+        protected async Task<T> ParseRequestBody<T>(HttpRequestData req, Dictionary<string, object> routeParams = null)
         {
             var requestBody = string.Empty;
             using (var streamReader = new StreamReader(req.Body))
@@ -153,7 +168,15 @@ namespace WesternStatesWater.WestDaat.Client.Functions
                 requestBody = await streamReader.ReadToEndAsync();
             }
 
-            return JsonSerializer.Deserialize<T>(requestBody, JsonSerializerOptions);
+            var dto = JsonSerializer.Deserialize<T>(requestBody, JsonSerializerOptions);
+
+            // Map the optional route parameters to the DTO
+            if (dto is not null && routeParams is not null)
+            {
+                DtoMapper.Map(routeParams, dto);
+            }
+
+            return dto;
         }
     }
 }
