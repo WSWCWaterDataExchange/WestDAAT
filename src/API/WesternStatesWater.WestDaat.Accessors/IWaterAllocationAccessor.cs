@@ -1,18 +1,6 @@
 using NetTopologySuite.Geometries;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Contracts.Client;
-using AnalyticsSummaryInformation = WesternStatesWater.WestDaat.Common.DataContracts.AnalyticsSummaryInformation;
-using OverlayDetails = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDetails;
-using OverlayDetailsSearchCriteria = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDetailsSearchCriteria;
-using OverlayDigest = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDigest;
-using OverlayTableEntry = WesternStatesWater.WestDaat.Common.DataContracts.OverlayTableEntry;
-using SiteInfoListItem = WesternStatesWater.WestDaat.Common.DataContracts.SiteInfoListItem;
-using SiteUsageListItem = WesternStatesWater.WestDaat.Common.DataContracts.SiteUsageListItem;
-using WaterRightDetails = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightDetails;
-using WaterRightsSearchCriteria = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightsSearchCriteria;
-using WaterRightsSearchResults = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightsSearchResults;
-using WaterSourceInfoListItem = WesternStatesWater.WestDaat.Common.DataContracts.WaterSourceInfoListItem;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -37,6 +25,8 @@ namespace WesternStatesWater.WestDaat.Accessors
         Task<List<AllocationAmount>> GetAllWaterAllocations();
 
         Task<List<SiteLocation>> GetWaterRightSiteLocationsById(string allocationUuid);
+
+        Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
 
         int GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
 
