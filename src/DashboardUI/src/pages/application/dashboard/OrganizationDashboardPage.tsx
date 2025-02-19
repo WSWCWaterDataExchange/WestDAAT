@@ -19,7 +19,7 @@ import { formatDateString } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 import { useOrganizationQuery } from '../../../hooks/queries';
 import { Placeholder } from 'react-bootstrap';
-import { useLoadOrganization } from '../../../hooks/queries/useApplicationQuery';
+import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 
 import './organization-dashboard-page.scss';
 
@@ -42,7 +42,7 @@ export function OrganizationDashboardPage() {
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isLoading, isError } = useLoadOrganization(organizationIdFilter);
+  const { isLoading, isError } = useLoadDashboardApplications(organizationIdFilter);
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');

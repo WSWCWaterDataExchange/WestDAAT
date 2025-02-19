@@ -9,7 +9,7 @@ import {
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { FundingOrganizationDetails } from '../../data-contracts/FundingOrganizationDetails';
 
-export function useLoadOrganization(organizationIdFilter: string | null) {
+export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
 
