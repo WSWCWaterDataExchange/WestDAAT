@@ -130,13 +130,13 @@ public class UserIntegrationTests : IntegrationTestBase
         // Arrange
         var user = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
-        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
+        var userOrganization = new UserOrganizationFaker(user, organization).Generate();
         var userRoles = new UserRoleFaker(user).Generate(1);
         userRoles[0].Role = role;
 
         await _dbContext.Users.AddAsync(user);
         await _dbContext.Organizations.AddAsync(organization);
-        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
         await _dbContext.UserRoles.AddRangeAsync(userRoles);
         await _dbContext.SaveChangesAsync();
 
@@ -150,7 +150,7 @@ public class UserIntegrationTests : IntegrationTestBase
                     [
                         new OrganizationRole
                         {
-                            OrganizationId = userOrgnization.OrganizationId,
+                            OrganizationId = userOrganization.OrganizationId,
                             RoleNames = [role]
                         }
                     ]
@@ -276,11 +276,11 @@ public class UserIntegrationTests : IntegrationTestBase
         // Arrange
         var user = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
-        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
+        var userOrganization = new UserOrganizationFaker(user, organization).Generate();
 
         await _dbContext.Users.AddAsync(user);
         await _dbContext.Organizations.AddAsync(organization);
-        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
         await _dbContext.SaveChangesAsync();
 
         UseUserContext(
@@ -293,7 +293,7 @@ public class UserIntegrationTests : IntegrationTestBase
                     [
                         new OrganizationRole
                         {
-                            OrganizationId = userOrgnization.OrganizationId,
+                            OrganizationId = userOrganization.OrganizationId,
                             RoleNames = [role]
                         }
                     ]
@@ -329,14 +329,14 @@ public class UserIntegrationTests : IntegrationTestBase
         var user = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
         var unrelatedOrganization = new OrganizationFaker().Generate();
-        var userOrgnization = new UserOrganizationFaker(user, organization).Generate();
-        var unrelatedUserOrgnization = new UserOrganizationFaker(user, unrelatedOrganization).Generate();
+        var userOrganization = new UserOrganizationFaker(user, organization).Generate();
+        var unrelatedUserOrganization = new UserOrganizationFaker(user, unrelatedOrganization).Generate();
 
         await _dbContext.Users.AddAsync(user);
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.Organizations.AddAsync(unrelatedOrganization);
-        await _dbContext.UserOrganizations.AddAsync(userOrgnization);
-        await _dbContext.UserOrganizations.AddAsync(unrelatedUserOrgnization);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
+        await _dbContext.UserOrganizations.AddAsync(unrelatedUserOrganization);
         await _dbContext.SaveChangesAsync();
 
         // This unrelated org should not affect permissions
@@ -357,7 +357,7 @@ public class UserIntegrationTests : IntegrationTestBase
                         unrelatedOrgAdminRole,
                         new OrganizationRole
                         {
-                            OrganizationId = userOrgnization.OrganizationId,
+                            OrganizationId = userOrganization.OrganizationId,
                             RoleNames = [role]
                         }
                     ]
@@ -369,7 +369,7 @@ public class UserIntegrationTests : IntegrationTestBase
         var result = await _userManager.Load<CLI.Requests.Admin.OrganizationUserListRequest, CLI.Responses.Admin.UserListResponse>(
             new CLI.Requests.Admin.OrganizationUserListRequest
             {
-                OrganizationId = userOrgnization.OrganizationId
+                OrganizationId = userOrganization.OrganizationId
             }
         );
 
