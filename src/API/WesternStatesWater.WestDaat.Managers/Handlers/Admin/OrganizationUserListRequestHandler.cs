@@ -1,8 +1,9 @@
 using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
+using WesternStatesWater.WestDaat.Managers.Mapping;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Admin;
 
@@ -17,22 +18,8 @@ public class OrganizationUserListRequestHandler : IRequestHandler<OrganizationUs
 
     public async Task<UserListResponse> Handle(OrganizationUserListRequest request)
     {
-        await Task.CompletedTask;
-
-        return new UserListResponse
-        {
-            Users =
-            [
-                new UserListResult
-                {
-                    Email = "test@test.com",
-                    Role = Roles.Member,
-                    FirstName = "Tester",
-                    LastName = "McTesterson",
-                    UserId = Guid.NewGuid(),
-                    UserName = "tmctester"
-                }
-            ]
-        };
+        var dto = request.Map<CommonContracts.UserListRequest>();
+        var response = (CommonContracts.UserListResponse)await UserAccessor.Load(dto);
+        return response.Map<UserListResponse>();
     }
 }

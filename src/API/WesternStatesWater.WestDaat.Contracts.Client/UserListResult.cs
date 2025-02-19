@@ -1,4 +1,4 @@
-namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
+namespace WesternStatesWater.WestDaat.Contracts.Client;
 
 public class UserListResult
 {
