@@ -8,6 +8,7 @@ import {
 } from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { FundingOrganizationDetails } from '../../data-contracts/FundingOrganizationDetails';
+import { toast } from 'react-toastify';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -46,6 +47,9 @@ export function useCreateWaterConservationApplicationQuery(fields: {
           });
         }
       },
+      onError: (error: Error) => {
+        toast.error('Failed to load data. Please try again later.');
+      },
     },
   );
 }
@@ -73,6 +77,9 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
             },
           });
         }
+      },
+      onError: (error: Error) => {
+        toast.error('Failed to load data. Please try again later.');
       },
     },
   );

@@ -17,6 +17,7 @@ import { useMsal } from '@azure/msal-react';
 import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
 
 import './estimation-tool-page.scss';
+import { toast } from 'react-toastify';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -77,8 +78,7 @@ export function EstimationToolPage() {
       }
     },
     onError: (error: Error) => {
-      console.error(error);
-      throw error;
+      toast.error('Failed to estimate consumptive use. Please try again later.');
     },
   });
 

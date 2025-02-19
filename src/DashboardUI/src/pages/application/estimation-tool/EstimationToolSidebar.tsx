@@ -16,6 +16,7 @@ import Button from 'react-bootstrap/esm/Button';
 
 interface EstimationToolSidebarProps {
   isLoadingFundingOrganization: boolean;
+  fundingOrganizationLoadFailed: boolean;
 }
 
 export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
