@@ -38,9 +38,8 @@ export function EstimationToolPage() {
     }
   }, [waterRightNativeId]);
 
-  const { isLoading: isLoadingFundingOrganization } = useFundingOrganizationQuery(
-    state.conservationApplication.waterRightNativeId,
-  );
+  const { isLoading: isLoadingFundingOrganization, isError: fundingOrganizationLoadFailed } =
+    useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
   const { isLoading: isLoadingApplication } = useCreateWaterConservationApplicationQuery({
     waterRightNativeId: state.conservationApplication.waterRightNativeId,
@@ -108,7 +107,10 @@ export function EstimationToolPage() {
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar isLoadingFundingOrganization={isLoadingFundingOrganization} />
+              <EstimationToolSidebar
+                isLoadingFundingOrganization={isLoadingFundingOrganization}
+                fundingOrganizationLoadFailed={fundingOrganizationLoadFailed}
+              />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
