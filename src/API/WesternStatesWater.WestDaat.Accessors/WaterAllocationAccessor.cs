@@ -13,8 +13,21 @@ using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Utilities;
+using AnalyticsSummaryInformation = WesternStatesWater.WestDaat.Common.DataContracts.AnalyticsSummaryInformation;
 using Organization = WesternStatesWater.WestDaat.Common.DataContracts.Organization;
+using OverlayDetails = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDetails;
+using OverlayDetailsSearchCriteria = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDetailsSearchCriteria;
+using OverlayDigest = WesternStatesWater.WestDaat.Common.DataContracts.OverlayDigest;
+using OverlayTableEntry = WesternStatesWater.WestDaat.Common.DataContracts.OverlayTableEntry;
+using SiteInfoListItem = WesternStatesWater.WestDaat.Common.DataContracts.SiteInfoListItem;
+using SiteUsageListItem = WesternStatesWater.WestDaat.Common.DataContracts.SiteUsageListItem;
+using WaterRightDetails = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightDetails;
+using WaterRightsSearchCriteria = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightsSearchCriteria;
+using WaterRightsSearchDetail = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightsSearchDetail;
+using WaterRightsSearchResults = WesternStatesWater.WestDaat.Common.DataContracts.WaterRightsSearchResults;
+using WaterSourceInfoListItem = WesternStatesWater.WestDaat.Common.DataContracts.WaterSourceInfoListItem;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -451,24 +464,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Select(x => x.Site)
                 .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
                 .ProjectTo<SiteLocation>(DtoMapper.Configuration)
-                .ToListAsync();
-        }
-
-        public async Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid)
-        {
-            await using var db = _databaseContextFactory.Create();
-            db.Database.SetCommandTimeout(int.MaxValue);
-            return await db.AllocationAmountsFact
-                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
-                .Select(x => new WaterRightsDigest
-                {
-                    AllocationUuid = x.AllocationUuid,
-                    NativeId = x.AllocationNativeId,
-                    PriorityDate = x.AllocationPriorityDateNavigation.Date,
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList(),
-                    HasTimeSeriesData = x.AllocationBridgeSitesFact
-                        .Any(bridge => bridge.Site.SiteVariableAmountsFact.Count != 0)
-                })
                 .ToListAsync();
         }
         

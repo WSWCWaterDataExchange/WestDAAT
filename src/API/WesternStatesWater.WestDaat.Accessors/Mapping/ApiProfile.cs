@@ -88,8 +88,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EF.SitesDim, SiteDetails>()
                 .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCv))
                 .ForMember(a => a.PodOrPou, b => b.MapFrom(c => c.PODorPOUSite));
-            CreateMap<EF.SitesDim, SiteDigest>()
-                .ForMember(a => a.SiteType, b => b.MapFrom(c => c.SiteTypeCv));
             CreateMap<EF.OrganizationsDim, Organization>();
             CreateMap<EF.WaterSourcesDim, WaterSourceInfoListItem>()
                 .ForMember(dest => dest.WaterSourceType, opt => opt.MapFrom(source => source.WaterSourceTypeCv))
@@ -193,6 +191,23 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                         .Distinct()
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
+            
+            CreateMap<EF.AllocationAmountsFact, WaterRightsDigest>()
+                .ForMember(dest => dest.AllocationUuid, opt => opt.MapFrom(src => src.AllocationUuid))
+                .ForMember(dest => dest.NativeId, opt => opt.MapFrom(src => src.AllocationNativeId))
+                .ForMember(dest => dest.PriorityDate, opt => opt.MapFrom(src => src.AllocationPriorityDateNavigation.Date))
+                .ForMember(dest => dest.BeneficialUses, opt => opt.MapFrom(src => src.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList()))
+                .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Any(bs => bs.Site.SiteVariableAmountsFact.Any())));
+
+            CreateMap<EF.SitesDim, SiteDigest>()
+                .ForMember(dest => dest.SiteUuid, opt => opt.MapFrom(src => src.SiteUuid))
+                .ForMember(dest => dest.SiteNativeId, opt => opt.MapFrom(src => src.SiteNativeId))
+                .ForMember(dest => dest.SiteName, opt => opt.MapFrom(src => src.SiteName))
+                .ForMember(dest => dest.SiteType, opt => opt.MapFrom(src => src.SiteTypeCv))
+                .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Any()))
+                .ForMember(dest => dest.WaterRightsDigests, 
+                    opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Select(ab => ab.AllocationAmount)));
+
 
             AddUserMappings();
             AddOrganizationMappings();

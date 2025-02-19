@@ -24,10 +24,12 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .SingleAsync();
         }
 
-        async Task<SiteDigest> ISiteAccessor.GetSiteDigestByUuid(string siteUuid)
+        public async Task<SiteDigest> GetSiteDigestByUuid(string siteUuid)
         {
             await using var db = _databaseContextFactory.Create();
+            db.Database.SetCommandTimeout(int.MaxValue);
             return await db.SitesDim
+                .AsNoTracking()
                 .Where(x => x.SiteUuid == siteUuid)
                 .ProjectTo<SiteDigest>(DtoMapper.Configuration)
                 .SingleAsync();
