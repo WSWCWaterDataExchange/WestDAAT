@@ -38,12 +38,10 @@ export function useWaterRightsFilter() {
   const { mapFilters: legalStatusesFilter } = useLegalStatusesFilter();
   const { mapFilters: siteTypesFilter } = useSiteTypesFilter();
 
-  return useMemo(() => {
-    if (!isWaterRightsFilterActive) {
-      return [];
-    }
+  const combinedFilters = useMemo(() => {
+    if (!isWaterRightsFilterActive) return null;
 
-    const rawFilters = [
+    const filters = [
       podPouMapFilters,
       includeExemptMapFilters,
       beneficialUsesMapFilters,
@@ -60,9 +58,11 @@ export function useWaterRightsFilter() {
       nldiMapFilters,
       legalStatusesFilter,
       siteTypesFilter,
-    ];
+    ].filter((filter) => Array.isArray(filter) && filter.length > 0);
 
-    return rawFilters.filter((filter) => Array.isArray(filter) && filter.length > 0);
+    if (filters.length === 0) return null;
+
+    return ['all', ...filters];
   }, [
     isWaterRightsFilterActive,
     podPouMapFilters,
@@ -82,4 +82,8 @@ export function useWaterRightsFilter() {
     legalStatusesFilter,
     siteTypesFilter,
   ]);
+
+  return {
+    mapFilters: combinedFilters,
+  };
 }
