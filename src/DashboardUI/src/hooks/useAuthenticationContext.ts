@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { Role } from '../config/role';
 
 export interface User {
+  userId?: string;
   emailAddress: string | null;
   externalAuthId?: string;
 
@@ -54,6 +55,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
           user: {
             emailAddress: result?.account?.username ?? null,
             externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
+            userId: parseUserId(idTokenClaims),
             roles: parseRoles(idTokenClaims),
             organizationRoles: parseOrganizationRoles(idTokenClaims),
           },
@@ -70,6 +72,10 @@ export function useAuthenticationContext(): IAuthenticationContext {
 
   return authContext;
 }
+
+export const parseUserId = (token: { [key: string]: any } | undefined): string | undefined => {
+  return parseTokenClaims(token, 'extension_westdaat_userId');
+};
 
 export const parseRoles = (token: { [key: string]: any } | undefined): Role[] | undefined => {
   // Come in the form of "rol_<role1>,rol_<role2>,rol_<role3>"
