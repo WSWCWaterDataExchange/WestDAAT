@@ -7,6 +7,8 @@ import {
   GridFilterState,
   GridRenderCellParams,
   GridState,
+  GridToolbarContainer,
+  GridToolbarExport,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { useDebounceCallback } from '@react-hook/debounce';
@@ -181,6 +183,14 @@ export function OrganizationDashboardPage() {
     return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
   };
 
+  const CustomToolbar = () => {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  };
+
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -205,7 +215,7 @@ export function OrganizationDashboardPage() {
       valueFormatter: dateFormatter,
       filterOperators: [dataGridDateRangeFilter],
     },
-    { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
+    { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader, filterable: false },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
     {
@@ -259,6 +269,7 @@ export function OrganizationDashboardPage() {
             rows={rows}
             columns={columns}
             apiRef={apiRef}
+            slots={{ toolbar: CustomToolbar }}
             slotProps={{
               filterPanel: {
                 filterFormProps: {
