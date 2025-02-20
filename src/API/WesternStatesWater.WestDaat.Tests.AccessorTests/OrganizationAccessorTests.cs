@@ -1,3 +1,4 @@
+using System.Transactions;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -88,6 +89,10 @@ public class OrganizationAccessorTests : AccessorTestBase
     public async Task Load_GetOrganizationFundingDetails_Success(bool waterRightExists, bool waterRightHasLinkedOrganization, bool shouldSucceed)
     {
         // Arrange
+        using var transaction = new TransactionScope(
+            TransactionScopeOption.Suppress,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
         Database.EntityFramework.Organization organization = null;
         string waterRightNativeId = string.Empty;
 
@@ -153,6 +158,8 @@ public class OrganizationAccessorTests : AccessorTestBase
         {
             await call.Should().ThrowAsync<InvalidOperationException>();
         }
+
+        transaction.Dispose();
     }
 
     private class InvalidOrganizationLoadRequest : OrganizationLoadRequestBase
