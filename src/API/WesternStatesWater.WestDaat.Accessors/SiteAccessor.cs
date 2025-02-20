@@ -106,7 +106,9 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _databaseContextFactory.Create();
 
             var query = from timeser in db.SiteVariableAmountsFact
-                join aaf in db.AllocationAmountsFact on timeser.AssociatedNativeAllocationIds equals aaf.AllocationNativeId
+                join aaf in db.AllocationAmountsFact
+                    on timeser.AssociatedNativeAllocationIds equals aaf.AllocationNativeId into allocs
+                from aaf in allocs.DefaultIfEmpty()
                 where timeser.Site.SiteUuid == siteUuid
                 orderby timeser.TimeframeStartNavigation.Date
                 select new SiteUsageListItem
@@ -123,11 +125,12 @@ namespace WesternStatesWater.WestDaat.Accessors
                     CropDutyAmount = timeser.AllocationCropDutyAmount,
                     CommunityWaterSupplySystem = timeser.CommunityWaterSupplySystem,
                     AssociatedNativeAllocationId = timeser.AssociatedNativeAllocationIds,
-                    AllocationUuid = aaf.AllocationUuid
+                    AllocationUuid = aaf != null ? aaf.AllocationUuid : null
                 };
-            
+
             return await query.ToListAsync();
         }
+
         
         public async Task<IEnumerable<VariableInfoListItem>> GetVariableInfoListByUuid(string siteUuid)
         {
