@@ -69,6 +69,32 @@ export default function SiteTabs() {
     { field: 'reportYear', headerName: 'Report Year', flex: 1, sortable: true },
     { field: 'amount', headerName: 'Amount', flex: 1, sortable: true },
     { field: 'primaryUse', headerName: 'Primary Use', flex: 1, sortable: true },
+    {
+      field: 'associatedNativeAllocationId',
+      headerName: 'Associated Native Allocation ID',
+      flex: 1,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const nativeId = params.value as string | null;
+        const allocationUuid = params.row.allocationUuid as string | null;
+
+        if (!nativeId) {
+          return null;
+        }
+
+        if (!allocationUuid) {
+          return <span>{nativeId}</span>;
+        }
+
+        return (
+          <a href={`/details/right/${allocationUuid}`} target="_blank" rel="noopener noreferrer">
+            {nativeId}
+          </a>
+        );
+      },
+    },
+    { field: 'allocationUuid', headerName: 'Allocation UUID', flex: 1, sortable: true },
+
     { field: 'populationServed', headerName: 'Population Served', flex: 1, sortable: true },
     { field: 'cropDutyAmount', headerName: 'Crop Duty Amount', flex: 1, sortable: true },
     { field: 'communityWaterSupplySystem', headerName: 'Community Water Supply System', flex: 1, sortable: true },

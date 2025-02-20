@@ -103,11 +103,29 @@ namespace WesternStatesWater.WestDaat.Accessors
         public async Task<IEnumerable<SiteUsageListItem>> GetSiteUsageInfoListBySiteUuid(string siteUuid)
         {
             await using var db = _databaseContextFactory.Create();
-            return await db.SiteVariableAmountsFact
-                .Where(x => x.Site.SiteUuid == siteUuid)
-                .ProjectTo<SiteUsageListItem>(DtoMapper.Configuration)
-                .OrderBy(x => x.TimeframeStart)
-                .ToListAsync();
+
+            var query = from timeser in db.SiteVariableAmountsFact
+                join aaf in db.AllocationAmountsFact on timeser.AssociatedNativeAllocationIds equals aaf.AllocationNativeId
+                where timeser.Site.SiteUuid == siteUuid
+                orderby timeser.TimeframeStartNavigation.Date
+                select new SiteUsageListItem
+                {
+                    WaDEVariableUuid = timeser.VariableSpecific.VariableSpecificUuid,
+                    WaDEMethodUuid = timeser.Method.MethodUuid,
+                    WaDEWaterSourceUuid = timeser.WaterSource.WaterSourceUuid,
+                    TimeframeStart = timeser.TimeframeStartNavigation.Date,
+                    TimeframeEnd = timeser.TimeframeEndNavigation.Date,
+                    ReportYear = timeser.ReportYearCv,
+                    Amount = timeser.Amount,
+                    PrimaryUse = timeser.PrimaryBeneficialUse.WaDEName,
+                    PopulationServed = timeser.PopulationServed,
+                    CropDutyAmount = timeser.AllocationCropDutyAmount,
+                    CommunityWaterSupplySystem = timeser.CommunityWaterSupplySystem,
+                    AssociatedNativeAllocationId = timeser.AssociatedNativeAllocationIds,
+                    AllocationUuid = aaf.AllocationUuid
+                };
+            
+            return await query.ToListAsync();
         }
         
         public async Task<IEnumerable<VariableInfoListItem>> GetVariableInfoListByUuid(string siteUuid)
