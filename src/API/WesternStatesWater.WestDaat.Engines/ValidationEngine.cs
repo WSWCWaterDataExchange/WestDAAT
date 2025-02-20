@@ -142,6 +142,19 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
+        var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
+
+        for (int i = 0; i < polygonGeometries.Length; i++)
+        {
+            for (int j = i + 1; j < polygonGeometries.Length; j++)
+            {
+                if (polygonGeometries[i].Intersects(polygonGeometries[j]))
+                {
+                    return CreateValidationError(request, nameof(EstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
+                }
+            }
+        }
+
         return null;
     }
 
@@ -319,8 +332,20 @@ internal class ValidationEngine : IValidationEngine
             $"'{context.ToLogString()}' attempted to make a request of type '{request.GetType().Name}', " +
             $"but the resource '{resourceName}' with ID(s) '{string.Join(", ", resourceIds)}' already exists.";
 
-
         return new ConflictError { LogMessage = logMessage };
+    }
+
+    private ValidationError CreateValidationError(
+        RequestBase request,
+        string fieldName,
+        string errorMessage
+    )
+    {
+        var errors = new Dictionary<string, string[]> { { fieldName, new[] { errorMessage } } };
+        var logMessage =
+            $"'{request.GetType().Name}' failed validation on the fields {fieldName}";
+
+        return new ValidationError(errors) { LogMessage = logMessage };
     }
 
     private ForbiddenError CreateForbiddenError(

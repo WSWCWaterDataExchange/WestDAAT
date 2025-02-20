@@ -1,4 +1,6 @@
-﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework;
+﻿using WesternStatesWater.WestDaat.Common.DataContracts;
+
+namespace WesternStatesWater.WestDaat.Database.EntityFramework;
 
 public class Organization
 {
@@ -14,6 +16,12 @@ public class Organization
     public string EmailDomain { get; set; } = null!;
 
     public string AbbreviatedName { get; set; } = null!;
+
+    public RasterTimeSeriesModel OpenEtModel { get; set; }
+
+    public int OpenEtDateRangeInYears { get; set; }
+
+    public string OpenEtCompensationRateModel { get; set; }
 
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }

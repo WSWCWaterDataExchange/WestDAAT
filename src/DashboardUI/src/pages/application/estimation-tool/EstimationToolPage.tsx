@@ -17,6 +17,7 @@ import { useMsal } from '@azure/msal-react';
 import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
 
 import './estimation-tool-page.scss';
+import { toast } from 'react-toastify';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -37,14 +38,14 @@ export function EstimationToolPage() {
     }
   }, [waterRightNativeId]);
 
-  const { isLoading: isLoadingFundingOrganization } = useFundingOrganizationQuery(
-    state.conservationApplication.waterRightNativeId,
-  );
+  const { isLoading: isLoadingFundingOrganization, isError: fundingOrganizationLoadFailed } =
+    useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
-  const { isLoading: isLoadingApplication } = useCreateWaterConservationApplicationQuery({
-    waterRightNativeId: state.conservationApplication.waterRightNativeId,
-    fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
-  });
+  const { isLoading: isLoadingApplication, isError: applicationLoadFailed } =
+    useCreateWaterConservationApplicationQuery({
+      waterRightNativeId: state.conservationApplication.waterRightNativeId,
+      fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
+    });
 
   const estimateConsumptiveUseMutation = useMutation({
     mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
@@ -77,8 +78,7 @@ export function EstimationToolPage() {
       }
     },
     onError: (error: Error) => {
-      console.error(error);
-      throw error;
+      toast.error('Failed to estimate consumptive use. Please try again later.');
     },
   });
 
@@ -108,7 +108,10 @@ export function EstimationToolPage() {
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar isLoadingFundingOrganization={isLoadingFundingOrganization} />
+              <EstimationToolSidebar
+                isLoading={isLoadingFundingOrganization || isLoadingApplication}
+                loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
+              />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">

@@ -15,7 +15,8 @@ import { SidebarElement } from './SidebarElement';
 import Button from 'react-bootstrap/esm/Button';
 
 interface EstimationToolSidebarProps {
-  isLoadingFundingOrganization: boolean;
+  isLoading: boolean;
+  loadFailed: boolean;
 }
 
 export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
@@ -64,7 +65,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         <SidebarElement
           title="FUNDING ORGANIZATION"
           tooltip="The Conservation Organization (or program sponsor) is the entity (governmental, nonprofit, or private) with a voluntary program to conserve or reduce water use with funding to compensate water users for relinquishing or abstaining from the use of their state water right. Conservation Organization decide on the following parameters: (a) the OpenET consumptive use model(s) or ensemble to use; (b) the time period (i.e., number of years and start and end months) used to evaluate historical consumptive use; and (c) the compensation in U.S. dollars per acre or per acre-foot of conserved water offered a user."
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           <span>{state.conservationApplication.fundingOrganizationName}</span>
         </SidebarElement>
@@ -72,7 +75,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         <SidebarElement
           title="OpenET MODEL"
           tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           <span>{state.conservationApplication.openEtModelName}</span>
         </SidebarElement>
@@ -86,7 +91,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"
           tooltip="Estimated Consumptive Use refers to the portion of diverted water that is consumed and not returned to the source, typically through evapotranspiration (ET), which is determined by the selected OpenET Model."
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           <span>
             {state.conservationApplication.dateRangeStart?.toLocaleDateString()} to{' '}
@@ -97,7 +104,9 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
           tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water nott returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           <div>
             <span className="text-muted">Across one or many fields</span>
@@ -124,12 +133,19 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="Conservation Organization Compensation Rate refers to the rate at which a Conservation Organization compensates water rights holders for reducing their consumptive water use. This rate is typically based on factors like water savings, market value, regional demand, and environmental benefits to support sustainable water management.
 Conservation Estimate: Conservation Estimate refers to the projected monetary ($) value offered by the Funding Organization(s) to applicants as compensation for their voluntary efforts in water use reduction resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing.
 "
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           <span className="text-muted">{state.conservationApplication.compensationRateModel}</span>
         </SidebarElement>
 
-        <SidebarElement title="DESIRED COMPENSATION ($)" isLoading={props.isLoadingFundingOrganization}>
+        <SidebarElement
+          title="DESIRED COMPENSATION ($)"
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
+        >
           <span className="text-muted">
             Input values below to estimate the amount of savings you may be eligible for
           </span>
@@ -167,7 +183,9 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
         <SidebarElement
           title="CONSERVATION ESTIMATE"
           tooltip="Conservation Estimate refers to the projected reduction in water use resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing. This estimate helps assess potential water savings and informs compensation programs."
-          isLoading={props.isLoadingFundingOrganization}
+          isLoading={props.isLoading}
+          isError={props.loadFailed}
+          errorText="Failed to load details. Please try again later."
         >
           {state.conservationApplication.conservationPayment ? (
             <>
