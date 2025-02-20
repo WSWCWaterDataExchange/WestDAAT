@@ -48,7 +48,7 @@ interface ApplicationDataGridColumns {
 }
 
 export function OrganizationDashboardPage() {
-  const [tableFilters, setTableFilters] = useState<GridFilterItem[]>([]);
+  const [dataGridFilters, setDataGridFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
 
@@ -72,8 +72,8 @@ export function OrganizationDashboardPage() {
   }
 
   const handleDataGridStateChange = useDebounceCallback((state: GridState) => {
-    if (!deepEqual(tableFilters, state.filter.filterModel.items)) {
-      setTableFilters(state.filter.filterModel.items);
+    if (!deepEqual(dataGridFilters, state.filter.filterModel.items)) {
+      setDataGridFilters(state.filter.filterModel.items);
       const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
       const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
       const applicationIds = rows.map((row) => row.id);
