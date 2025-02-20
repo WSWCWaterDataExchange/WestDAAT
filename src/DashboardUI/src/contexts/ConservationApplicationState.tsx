@@ -1,29 +1,25 @@
 import { produce } from 'immer';
-import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import {
+  ApplicationDashboardListItem,
+  ApplicationDashboardStatistics,
+} from '../data-contracts/ApplicationDashboardListItem';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
-  dashboardApplicationsStatistics: {
-    submittedApplications: number;
-    acceptedApplications: number;
-    rejectedApplications: number;
-    inReviewApplications: number;
-    cumulativeEstimatedSavingsAcreFeet: number;
-    totalObligationDollars: number;
-  };
+  dashboardApplicationsStatistics: ApplicationDashboardStatistics;
 }
 
 export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   dashboardApplicationsStatistics: {
-    submittedApplications: 0,
-    acceptedApplications: 0,
-    rejectedApplications: 0,
-    inReviewApplications: 0,
-    cumulativeEstimatedSavingsAcreFeet: 0,
-    totalObligationDollars: 0,
+    submittedApplications: null,
+    acceptedApplications: null,
+    rejectedApplications: null,
+    inReviewApplications: null,
+    cumulativeEstimatedSavingsAcreFeet: null,
+    totalObligationDollars: null,
   },
 });
 
@@ -69,6 +65,7 @@ const onDashboardApplicationsLoaded = (
   action: DashboardApplicationsLoadedAction,
 ): ConservationApplicationState => {
   draftState.dashboardApplications = action.payload.dashboardApplications;
+  draftState.dashboardApplicationsStatistics = calculateApplicationStatistics(action.payload.dashboardApplications);
   return draftState;
 };
 
@@ -76,23 +73,28 @@ const onDashboardApplicationsFiltered = (
   draftState: ConservationApplicationState,
   action: DashboardApplicationsFilteredAction,
 ): ConservationApplicationState => {
-  const filteredApps = action.payload.applicationIds.map((appId) =>
-    draftState.dashboardApplications.find((app) => app.applicationId === appId),
-  );
+  const filteredApps = action.payload.applicationIds
+    .map((appId) => draftState.dashboardApplications.find((app) => app.applicationId === appId))
+    .filter((app) => app !== undefined);
 
-  const submittedApps = filteredApps.length;
-  const approvedApps = filteredApps.filter((app) => app?.status === ConservationApplicationStatus.Approved).length;
-  const inReviewApps = filteredApps.filter((app) => app?.status === ConservationApplicationStatus.InReview).length;
-  const rejectedApps = filteredApps.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
-  const waterSavings = filteredApps
+  draftState.dashboardApplicationsStatistics = calculateApplicationStatistics(filteredApps);
+  return draftState;
+};
+
+function calculateApplicationStatistics(applications: ApplicationDashboardListItem[]): ApplicationDashboardStatistics {
+  const submittedApps = applications.length;
+  const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Approved).length;
+  const inReviewApps = applications.filter((app) => app?.status === ConservationApplicationStatus.InReview).length;
+  const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
+  const waterSavings = applications
     .filter((app) => app?.status === ConservationApplicationStatus.Approved)
     .filter((app) => app?.compensationRateUnits === CompensationRateUnits.AcreFeet)
     .reduce((sum, app) => sum + (app?.totalWaterVolumeSavingsAcreFeet ?? 0), 0);
-  const totalObligation = filteredApps
+  const totalObligation = applications
     .filter((app) => app?.status === ConservationApplicationStatus.Approved)
     .reduce((sum, app) => sum + (app?.totalObligationDollars ?? 0), 0);
 
-  draftState.dashboardApplicationsStatistics = {
+  return {
     submittedApplications: submittedApps,
     acceptedApplications: approvedApps,
     rejectedApplications: rejectedApps,
@@ -100,7 +102,4 @@ const onDashboardApplicationsFiltered = (
     cumulativeEstimatedSavingsAcreFeet: waterSavings,
     totalObligationDollars: totalObligation,
   };
-
-  console.log('application dashboard filter reducer');
-  return draftState;
-};
+}

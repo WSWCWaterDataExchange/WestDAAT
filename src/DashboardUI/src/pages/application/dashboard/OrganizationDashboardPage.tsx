@@ -27,6 +27,7 @@ import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
+import { formatNumberToLargestUnit } from './formatNumber';
 
 import './organization-dashboard-page.scss';
 
@@ -64,8 +65,8 @@ export function OrganizationDashboardPage() {
     return keys;
   }
 
-  // TODO: JN - boy this sure prints out a lot
   const handleDataGridStateChange = useDebounceCallback((state: GridState) => {
+    // TODO: JN - add a local state for the filtering to check if it actually changed - "deep equal" package already being used
     const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
     const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
     const applicationIds = rows.map((row) => row.id);
@@ -73,7 +74,7 @@ export function OrganizationDashboardPage() {
       type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
       payload: { applicationIds },
     });
-  }, 1000);
+  }, 200);
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');
@@ -117,13 +118,12 @@ export function OrganizationDashboardPage() {
     return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
   };
 
-  // TODO: JN - sizing when small
-  const renderStatisticsCard = (description: string, value: number) => {
+  const renderStatisticsCard = (description: string, value: number | string | null) => {
     return (
       <div className="col-md-2 col-sm-4 col-6 my-1 align-self-stretch">
         <Card className="rounded-3 shadow-sm text-center h-100">
           <Card.Title className="mt-3 fs-1 flex-grow-1 align-content-center">
-            {applicationListLoading ? (
+            {applicationListLoading || value === null ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
               </Placeholder>
@@ -224,12 +224,14 @@ export function OrganizationDashboardPage() {
           {renderStatisticsCard('Applications In Review', state.dashboardApplicationsStatistics.inReviewApplications)}
           {renderStatisticsCard(
             'Cumulative Est. Savings',
-            state.dashboardApplicationsStatistics.cumulativeEstimatedSavingsAcreFeet,
+            formatNumberToLargestUnit(state.dashboardApplicationsStatistics.cumulativeEstimatedSavingsAcreFeet),
           )}
-          {renderStatisticsCard('Total Obligation', state.dashboardApplicationsStatistics.totalObligationDollars)}
+          {renderStatisticsCard(
+            'Total Obligation',
+            `$${formatNumberToLargestUnit(state.dashboardApplicationsStatistics.totalObligationDollars)}`,
+          )}
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
-        {/* TODO: JN - is loading - table shifts to the right because TableLoading has mx-4 */}
         <TableLoading isLoading={applicationListLoading} isErrored={applicationListErrored}>
           <DataGrid
             rows={rows}

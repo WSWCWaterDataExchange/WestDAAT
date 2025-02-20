@@ -61,6 +61,28 @@ describe('ConservationApplicationState reducer', () => {
     })
   });
 
+  it('should handle empty state correctly', () => {
+    // Arrange
+    const dashboardApplications: ApplicationDashboardListItem[] = [];
+
+    // Act
+    const newState = reducer(state, {
+      type: 'DASHBOARD_APPLICATIONS_LOADED',
+      payload: { dashboardApplications },
+    });
+
+    // Assert
+    expect(newState.dashboardApplications).toEqual([]);
+    expect(newState.dashboardApplicationsStatistics).toEqual({
+      submittedApplications: 0,
+      acceptedApplications: 0,
+      rejectedApplications: 0,
+      inReviewApplications: 0,
+      cumulativeEstimatedSavingsAcreFeet: 0,
+      totalObligationDollars: 0,
+    });
+  })
+
   const mockApplication: ApplicationDashboardListItem = {
     applicantFullName: 'Bobby Hill',
     applicationDisplayId: '2025-ABCD-001',

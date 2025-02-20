@@ -15,7 +15,6 @@ export function useUserSearchQuery(searchTerm: string) {
   return useQuery(['searchUsers', searchTerm], async () => await searchUsers(msalContext, searchTerm));
 }
 
-// TODO: JN - review (was in OrganizationDashboardPage). right place? okay to dispatch from here?
 export function useOrganizationDashboardLoadQuery(organizationIdFilter: string | null) {
   const msalContext = useMsal();
   const { dispatch } = useConservationApplicationContext();
