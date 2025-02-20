@@ -89,10 +89,12 @@ public class OrganizationAccessorTests : AccessorTestBase
     public async Task Load_GetOrganizationFundingDetails_Success(bool waterRightExists, bool waterRightHasLinkedOrganization, bool shouldSucceed)
     {
         // Arrange
-        using var transaction = new TransactionScope(
+        // override TransactionScope in AccessorTestBase
+        using var transactionScope = new TransactionScope(
             TransactionScopeOption.Suppress,
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
+
         Database.EntityFramework.Organization organization = null;
         string waterRightNativeId = string.Empty;
 
@@ -164,6 +166,7 @@ public class OrganizationAccessorTests : AccessorTestBase
         finally
         {
             // cleanup
+            // necessary since we're using a custom transaction scope
             wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
             wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
             wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
@@ -181,9 +184,6 @@ public class OrganizationAccessorTests : AccessorTestBase
             westDaatDb.Organizations.RemoveRange(westDaatDb.Organizations);
             await westDaatDb.SaveChangesAsync();
         }
-
-
-        transaction.Dispose();
     }
 
     private class InvalidOrganizationLoadRequest : OrganizationLoadRequestBase
