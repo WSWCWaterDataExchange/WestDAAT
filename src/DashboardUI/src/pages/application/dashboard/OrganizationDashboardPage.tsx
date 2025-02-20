@@ -1,14 +1,17 @@
-import { useMsal } from '@azure/msal-react';
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import Button from '@mui/material/Button';
-import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { useState } from 'react';
+import {
+  DataGrid,
+  GridColumnHeaderParams,
+  GridFilterState,
+  GridRenderCellParams,
+  GridState,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import { useDebounceCallback } from '@react-hook/debounce';
 import Card from 'react-bootstrap/esm/Card';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
-import { useQuery } from 'react-query';
 import { NavLink } from 'react-router-dom';
-import { applicationSearch } from '../../../accessors/applicationAccessor';
 import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -18,7 +21,7 @@ import {
   ConservationApplicationStatus,
   formatConservationApplicationStatusText,
 } from '../../../data-contracts/ConservationApplicationStatus';
-import { useOrganizationQuery } from '../../../hooks/queries';
+import { useOrganizationDashboardLoadQuery, useOrganizationQuery } from '../../../hooks/queries';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
@@ -41,18 +44,36 @@ interface ApplicationDataGridColumns {
 export function OrganizationDashboardPage() {
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
-  const msalContext = useMsal();
+
+  const apiRef = useGridApiRef();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isError } = useQuery(['organization-dashboard-load', organizationIdFilter], {
-    queryFn: () => applicationSearch(msalContext, organizationIdFilter),
-    onSuccess(data) {
-      dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
-    },
-  });
+  const { isLoading: applicationListLoading, isError: applicationListErrored } =
+    useOrganizationDashboardLoadQuery(organizationIdFilter);
+
+  function getKeysFromLookup(obj: GridFilterState['filteredRowsLookup']) {
+    const keys = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key) && obj[key]) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  }
+
+  // TODO: JN - boy this sure prints out a lot
+  const handleDataGridStateChange = useDebounceCallback((state: GridState) => {
+    const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
+    const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
+    const applicationIds = rows.map((row) => row.id);
+    dispatch({
+      type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
+      payload: { applicationIds },
+    });
+  }, 1000);
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');
@@ -96,12 +117,29 @@ export function OrganizationDashboardPage() {
     return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
   };
 
+  // TODO: JN - sizing when small
   const renderStatisticsCard = (description: string, value: number) => {
     return (
-      <div className="col-md-2 col-sm-4 col-6 my-1">
-        <Card className="rounded-3 shadow-sm text-center">
-          <Card.Title className="mt-3 fs-1">{value}</Card.Title>
-          <Card.Text className="mb-3 fs-6">{description}</Card.Text>
+      <div className="col-md-2 col-sm-4 col-6 my-1 align-self-stretch">
+        <Card className="rounded-3 shadow-sm text-center h-100">
+          <Card.Title className="mt-3 fs-1 flex-grow-1 align-content-center">
+            {applicationListLoading ? (
+              <Placeholder animation="glow">
+                <Placeholder xs={10} className="rounded" />
+              </Placeholder>
+            ) : (
+              <span>{value}</span>
+            )}
+          </Card.Title>
+          <Card.Text className="mb-3 fs-6">
+            {applicationListLoading ? (
+              <Placeholder animation="glow">
+                <Placeholder xs={10} className="rounded" />
+              </Placeholder>
+            ) : (
+              <span>{description}</span>
+            )}
+          </Card.Text>
         </Card>
       </div>
     );
@@ -174,54 +212,44 @@ export function OrganizationDashboardPage() {
         applicationStatus: app.status,
       };
     }) ?? [];
-  const [isLoading, setIsLoading] = useState(false);
-  const flipLoading = () => {
-    setIsLoading(!isLoading);
-  };
+
   return (
-    <>
-      <div>
-        {'isLoading? ' + isLoading}
-        <Button onClick={flipLoading}>flip loading</Button>
-      </div>
-      <div className="overflow-y-auto h-100">
-        <div className="m-3">
-          {dashboardTitle()}
-          <div className="row my-4">
-            {renderStatisticsCard('Submitted Applications', 42)}
-            {renderStatisticsCard('Accepted Applications', 42)}
-            {renderStatisticsCard('Rejected Applications', 42)}
-            {renderStatisticsCard('Applications In Review', 42)}
-            {renderStatisticsCard('Cumulative Est. Savings', 42)}
-            {renderStatisticsCard('Total Obligation', 42)}
-          </div>
-          <div className="row">
-            {isLoading && (
-              <Placeholder animation="glow">
-                <Placeholder className="h2 mt-5 rounded" xs={6} />
-              </Placeholder>
-            )}
-            {!isLoading && <h2 className="fs-5 mt-5">Applications</h2>}
-          </div>
-          <TableLoading isLoading={isLoading} isErrored={isError}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              slotProps={{
-                filterPanel: {
-                  filterFormProps: {
-                    valueInputProps: {
-                      sx: {
-                        width: 'auto', // This prevents the filter from having a horizontal scrollbar
-                      },
+    <div className="overflow-y-auto h-100">
+      <div className="m-3">
+        {dashboardTitle()}
+        <div className="row my-4">
+          {renderStatisticsCard('Submitted Applications', state.dashboardApplicationsStatistics.submittedApplications)}
+          {renderStatisticsCard('Accepted Applications', state.dashboardApplicationsStatistics.acceptedApplications)}
+          {renderStatisticsCard('Rejected Applications', state.dashboardApplicationsStatistics.rejectedApplications)}
+          {renderStatisticsCard('Applications In Review', state.dashboardApplicationsStatistics.inReviewApplications)}
+          {renderStatisticsCard(
+            'Cumulative Est. Savings',
+            state.dashboardApplicationsStatistics.cumulativeEstimatedSavingsAcreFeet,
+          )}
+          {renderStatisticsCard('Total Obligation', state.dashboardApplicationsStatistics.totalObligationDollars)}
+        </div>
+        <h2 className="fs-5 mt-5">Applications</h2>
+        {/* TODO: JN - is loading - table shifts to the right because TableLoading has mx-4 */}
+        <TableLoading isLoading={applicationListLoading} isErrored={applicationListErrored}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            apiRef={apiRef}
+            slotProps={{
+              filterPanel: {
+                filterFormProps: {
+                  valueInputProps: {
+                    sx: {
+                      width: 'auto', // This prevents the filter from having a horizontal scrollbar
                     },
                   },
                 },
-              }}
-            ></DataGrid>
-          </TableLoading>
-        </div>
+              },
+            }}
+            onStateChange={handleDataGridStateChange}
+          ></DataGrid>
+        </TableLoading>
       </div>
-    </>
+    </div>
   );
 }
