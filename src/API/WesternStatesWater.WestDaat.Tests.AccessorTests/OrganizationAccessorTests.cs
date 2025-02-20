@@ -1,3 +1,4 @@
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
@@ -11,19 +12,24 @@ public class OrganizationAccessorTests : AccessorTestBase
 {
     private IOrganizationAccessor _organizationAccessor;
 
-    private WestDaatDatabaseContext _db;
+    private WestDaatDatabaseContext _westdaatDb;
+
+    private DatabaseContext _wadeDb;
 
     [TestInitialize]
     public void TestInitialize()
     {
-        var dbFactory = CreateWestDaatDatabaseContextFactory();
+        var westdaatDbFactory = CreateWestDaatDatabaseContextFactory();
+        var wadeDbFactory = CreateDatabaseContextFactory();
 
         _organizationAccessor = new OrganizationAccessor(
             CreateLogger<OrganizationAccessor>(),
-            dbFactory
+            westdaatDbFactory,
+            wadeDbFactory
         );
 
-        _db = dbFactory.Create();
+        _westdaatDb = westdaatDbFactory.Create();
+        _wadeDb = wadeDbFactory.Create();
     }
 
     [TestMethod]
@@ -42,8 +48,8 @@ public class OrganizationAccessorTests : AccessorTestBase
         // Arrange
         var organization = new OrganizationFaker().Generate();
 
-        await _db.Organizations.AddAsync(organization);
-        await _db.SaveChangesAsync();
+        await _westdaatDb.Organizations.AddAsync(organization);
+        await _westdaatDb.SaveChangesAsync();
 
         var request = new OrganizationLoadDetailsRequest
         {
@@ -73,6 +79,74 @@ public class OrganizationAccessorTests : AccessorTestBase
         var call = () => _organizationAccessor.Load(request);
 
         await call.Should().ThrowAsync<WestDaatException>();
+    }
+
+    [DataTestMethod]
+    [DataRow(false, false, false, DisplayName = "No water right, should throw")]
+    [DataRow(true, false, false, DisplayName = "Water right exists but no organization supports this water right, should throw")]
+    [DataRow(true, true, true, DisplayName = "Water right exists and has organization support, success")]
+    public async Task Load_GetOrganizationFundingDetails_Success(bool waterRightExists, bool waterRightHasLinkedOrganization, bool shouldSucceed)
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        await _westdaatDb.Organizations.AddAsync(organization);
+        await _westdaatDb.SaveChangesAsync();
+
+        string waterRightNativeId = string.Empty;
+        if (waterRightExists)
+        {
+            var waterRightFaker = new AllocationAmountFactFaker();
+
+            if (waterRightHasLinkedOrganization)
+            {
+                waterRightFaker.RuleFor(x => x.ConservationApplicationFundingOrganizationId, organization.Id);
+            }
+
+            var waterRight = waterRightFaker.Generate();
+            await _wadeDb.AllocationAmountsFact.AddAsync(waterRight);
+            await _wadeDb.SaveChangesAsync();
+
+            waterRightNativeId = waterRight.AllocationNativeId;
+        }
+
+        // Act
+        var request = new OrganizationFundingDetailsRequest
+        {
+            WaterRightNativeId = waterRightNativeId
+        };
+        var call = async () => await _organizationAccessor.Load(request);
+
+        // Assert
+        if (shouldSucceed)
+        {
+            var response = (OrganizationFundingDetailsResponse)await call();
+
+            response.Should().NotBeNull();
+
+            var org = response.Organization;
+            org.Should().NotBeNull();
+            org.OrganizationId.Should().Be(organization.Id);
+            org.OrganizationName.Should().Be(organization.Name);
+            org.OpenEtModelDisplayName.Should().Be(Enum.GetName(organization.OpenEtModel));
+            org.CompensationRateModel.Should().Be(organization.OpenEtCompensationRateModel);
+            org.OpenEtDateRangeStart.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .UtcDateTime
+                )
+            );
+            org.OpenEtDateRangeEnd.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .AddMinutes(-1)
+                    .UtcDateTime
+                )
+            );
+        }
+        else
+        {
+            await call.Should().ThrowAsync<InvalidOperationException>();
+        }
     }
 
     private class InvalidOrganizationLoadRequest : OrganizationLoadRequestBase
