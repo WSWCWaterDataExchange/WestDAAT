@@ -11,8 +11,7 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-        public OrganizationAccessor(ILogger<OrganizationAccessor> logger,
-            EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
+        public OrganizationAccessor(ILogger<OrganizationAccessor> logger, EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
         {
             _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
         }
@@ -69,8 +68,9 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var westDaatDb = _westDaatDatabaseContextFactory.Create();
 
             var organizationFundingDetails = await westDaatDb.Organizations
+                .Where(org => org.Id == request.OrganizationId)
                 .ProjectTo<OrganizationFundingDetails>(DtoMapper.Configuration)
-                .SingleAsync(org => org.OrganizationId == request.OrganizationId);
+                .SingleAsync();
 
             return new OrganizationFundingDetailsResponse
             {

@@ -11,19 +11,19 @@ public class OrganizationAccessorTests : AccessorTestBase
 {
     private IOrganizationAccessor _organizationAccessor;
 
-    private WestDaatDatabaseContext _westdaatDb;
+    private WestDaatDatabaseContext _db;
 
     [TestInitialize]
     public void TestInitialize()
     {
-        var westdaatDbFactory = CreateWestDaatDatabaseContextFactory();
+        var dbFactory = CreateWestDaatDatabaseContextFactory();
 
         _organizationAccessor = new OrganizationAccessor(
             CreateLogger<OrganizationAccessor>(),
-            westdaatDbFactory
+            dbFactory
         );
 
-        _westdaatDb = westdaatDbFactory.Create();
+        _db = dbFactory.Create();
     }
 
     [TestMethod]
@@ -42,8 +42,8 @@ public class OrganizationAccessorTests : AccessorTestBase
         // Arrange
         var organization = new OrganizationFaker().Generate();
 
-        await _westdaatDb.Organizations.AddAsync(organization);
-        await _westdaatDb.SaveChangesAsync();
+        await _db.Organizations.AddAsync(organization);
+        await _db.SaveChangesAsync();
 
         var request = new OrganizationLoadDetailsRequest
         {
@@ -85,8 +85,8 @@ public class OrganizationAccessorTests : AccessorTestBase
         if (organizationExists)
         {
             organization = new OrganizationFaker().Generate();
-            await _westdaatDb.Organizations.AddAsync(organization);
-            await _westdaatDb.SaveChangesAsync();
+            await _db.Organizations.AddAsync(organization);
+            await _db.SaveChangesAsync();
 
             organizationId = organization.Id;
         }
