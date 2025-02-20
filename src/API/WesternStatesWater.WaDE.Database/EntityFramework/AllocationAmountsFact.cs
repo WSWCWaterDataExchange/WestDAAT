@@ -236,6 +236,15 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
             return predicate;
         }
 
+        public static ExpressionStarter<AllocationAmountsFact> IsAllocationNativeId(string allocationNativeId)
+        {
+            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+
+            predicate = predicate.Or(x => x.AllocationNativeId == allocationNativeId);
+
+            return predicate;
+        }
+
         #endregion
     }
 }
