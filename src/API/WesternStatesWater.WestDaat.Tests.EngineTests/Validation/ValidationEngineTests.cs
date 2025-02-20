@@ -54,11 +54,18 @@ public class ValidationEngineTests : EngineTestBase
     }
 
     [DataTestMethod]
-    [DataRow(true, true, true, true, DisplayName = "User requests estimate for their own Application with matching fields")]
-    [DataRow(false, false, false, false, DisplayName = "User requests estimate for Application that does not exist")]
-    [DataRow(true, false, true, false, DisplayName = "User requests estimate for a different Application that they own")]
-    [DataRow(true, true, false, false, DisplayName = "User requests estimate for their own Application but with an incorrect Funding Organization")]
-    public async Task Validate_ValidateEstimateConsumptiveUseRequest_Success(bool applicationExists, bool applicationIdMatches, bool organizationIdMatches, bool shouldSucceed)
+    [DataRow(true, true, true, false, true, DisplayName = "User requests estimate for their own Application with matching fields")]
+    [DataRow(false, false, false, false, false, DisplayName = "User requests estimate for Application that does not exist")]
+    [DataRow(true, false, true, false, false, DisplayName = "User requests estimate for a different Application that they own")]
+    [DataRow(true, true, false, false, false, DisplayName = "User requests estimate for their own Application but with an incorrect Funding Organization")]
+    [DataRow(true, true, true, true, false, DisplayName = "User requests estimate for their own Application with intersecting polygons")]
+    public async Task Validate_ValidateEstimateConsumptiveUseRequest_Success(
+        bool applicationExists,
+        bool applicationIdMatches,
+        bool organizationIdMatches,
+        bool polygonsIntersect,
+        bool shouldSucceed
+    )
     {
         Guid? applicationId = applicationExists ? Guid.NewGuid() : null;
         Guid? organizationId = Guid.NewGuid();
@@ -83,20 +90,20 @@ public class ValidationEngineTests : EngineTestBase
         _contextUtilityMock.Setup(x => x.GetContext()).Returns(userContext);
         _contextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>()).Returns(userContext);
 
-
         // Act
+        string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
         {
             // relevant properties
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
             FundingOrganizationId = organizationIdMatches ? organizationId.Value : Guid.NewGuid(),
+            Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
 
             // extraneous properties
             DateRangeStart = DateOnly.MinValue,
             DateRangeEnd = DateOnly.MaxValue,
             Model = RasterTimeSeriesModel.SSEBop,
-            Polygons = ["polygon"],
         };
         var result = await _validationEngine.Validate(request);
 
@@ -116,6 +123,10 @@ public class ValidationEngineTests : EngineTestBase
             else if (!applicationIdMatches || !organizationIdMatches)
             {
                 result.Should().BeOfType<ForbiddenError>();
+            }
+            else if (polygonsIntersect)
+            {
+                result.Should().BeOfType<ValidationError>();
             }
         }
     }
