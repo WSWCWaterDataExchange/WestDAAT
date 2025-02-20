@@ -27,19 +27,19 @@ function SiteDigestCard(props: SiteDigestMapPopupProps) {
           <div className="map-popup-card-water-rights-body">
             <div className="mb-2">
               <div>
-                <strong>Native ID:</strong>
+                <strong>Site Native ID:</strong>
               </div>
               {siteNativeId}
             </div>
             <div className="mb-2">
               <div>
-                <strong>Name:</strong>
+                <strong>Site Name:</strong>
               </div>
               {siteName}
             </div>
             <div className="mb-0">
               <div>
-                <strong>Type:</strong>
+                <strong>Site Type:</strong>
               </div>
               {siteType}
             </div>
