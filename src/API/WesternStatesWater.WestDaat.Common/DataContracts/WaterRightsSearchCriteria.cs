@@ -19,5 +19,6 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts
         public string PodOrPou { get; set; }
         public DateTime? MinimumPriorityDate { get; set; }
         public DateTime? MaximumPriorityDate { get; set; }
+        public string AllocationNativeId { get; set; }
     }
 }
