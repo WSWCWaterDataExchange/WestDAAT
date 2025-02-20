@@ -10,4 +10,6 @@ export interface TimeSeriesListItem {
   populationServed?: number;
   cropDutyAmount?: number;
   communityWaterSupplySystem: string;
+  associatedNativeAllocationId?: string;
+  allocationUuid?: string;
 }

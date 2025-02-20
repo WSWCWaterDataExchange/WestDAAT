@@ -13,4 +13,7 @@ public class SiteUsageListItem
     public long? PopulationServed { get; set; }
     public double? CropDutyAmount { get; set; }
     public string CommunityWaterSupplySystem { get; set; }
+    
+    public string AssociatedNativeAllocationId { get; set; }
+    public string AllocationUuid { get; set; }
 }
