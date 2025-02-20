@@ -8,6 +8,6 @@ public class EnrichJwtRequestValidator : AbstractValidator<EnrichJwtRequest>
     {
         RuleFor(x => x.ObjectId).NotEmpty();
 
-        RuleFor(x => x.Email).NotEmpty().EmailAddress(mode: FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible);
+        RuleFor(x => x.Email).EmailAddress(mode: FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible);
     }
 }
