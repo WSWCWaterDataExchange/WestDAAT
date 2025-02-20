@@ -11,9 +11,14 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-        public OrganizationAccessor(ILogger<OrganizationAccessor> logger, EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
+        private readonly EF.IDatabaseContextFactory _wadeDbContextFactory;
+
+        public OrganizationAccessor(ILogger<OrganizationAccessor> logger,
+            EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory,
+            EF.IDatabaseContextFactory wadeDbContextFactory) : base(logger)
         {
             _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
+            _wadeDbContextFactory = wadeDbContextFactory;
         }
 
         public async Task<OrganizationLoadResponseBase> Load(OrganizationLoadRequestBase request)
@@ -22,6 +27,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 OrganizationDetailsListRequest => await GetOrganizationDetailsList(),
                 OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
+                OrganizationFundingDetailsRequest req => await GetOrganizationFundingDetails(req),
                 UserOrganizationLoadRequest req => await GetUserOrganizations(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -59,6 +65,26 @@ namespace WesternStatesWater.WestDaat.Accessors
             return new OrganizationLoadDetailsResponse
             {
                 Organization = organization,
+            };
+        }
+
+        private async Task<OrganizationFundingDetailsResponse> GetOrganizationFundingDetails(OrganizationFundingDetailsRequest request)
+        {
+            await using var wadeDb = _wadeDbContextFactory.Create();
+
+            var fundingOrganizationId = (await wadeDb.AllocationAmountsFact
+                .SingleAsync(waterRight => waterRight.AllocationNativeId == request.WaterRightNativeId))
+                .ConservationApplicationFundingOrganizationId;
+
+            await using var westDaatDb = _westDaatDatabaseContextFactory.Create();
+
+            var organizationFundingDetails = await westDaatDb.Organizations
+                .ProjectTo<OrganizationFundingDetails>(DtoMapper.Configuration)
+                .FirstOrDefaultAsync(org => org.OrganizationId == fundingOrganizationId);
+
+            return new OrganizationFundingDetailsResponse
+            {
+                Organization = organizationFundingDetails
             };
         }
 
