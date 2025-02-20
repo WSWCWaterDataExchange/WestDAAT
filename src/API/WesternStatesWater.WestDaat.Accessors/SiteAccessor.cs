@@ -28,6 +28,7 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             await using var db = _databaseContextFactory.Create();
             return await db.SitesDim
+                .AsNoTracking()
                 .Where(x => x.SiteUuid == siteUuid)
                 .ProjectTo<SiteDigest>(DtoMapper.Configuration)
                 .SingleAsync();

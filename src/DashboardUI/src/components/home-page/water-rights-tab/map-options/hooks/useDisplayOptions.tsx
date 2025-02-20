@@ -6,7 +6,7 @@ import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useMapLegend } from './useMapLegend';
 import { useMapPointScaling } from './useMapPointScaling';
 import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
-import useWaterRightDigestMapPopup from '../../../../../hooks/map-popups/useWaterRightDigestMapPopup';
+import useSiteDigestMapPopup from '../../../../../hooks/map-popups/useSiteDigestMapPopup';
 import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
 import { useAlerts } from '../../useAlerts';
 import { useTimeSeriesFilter } from '../../sidebar-filtering/time-series/hooks/useTimeSeriesFilter';
@@ -72,6 +72,6 @@ export function useDisplayOptions() {
   useMapPointScaling();
   useNldiMapPopup();
   useOverlayDigestMapPopup();
-  useWaterRightDigestMapPopup();
+  useSiteDigestMapPopup();
   useAlerts();
 }

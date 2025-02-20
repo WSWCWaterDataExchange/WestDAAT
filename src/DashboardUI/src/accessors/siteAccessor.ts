@@ -1,17 +1,10 @@
 import { WaterSourceInfoListItem, SiteDetails, WaterRightInfoListItem, OverlayDigest } from '@data-contracts';
-import WaterRightDigest from '../data-contracts/WaterRightsDigest';
 import SiteDigest from '../data-contracts/SiteDigest';
 import { SiteUsage } from '../data-contracts/SiteUsage';
 import { VariableInfoListItem } from '../data-contracts/VariableInfoListItem';
 import { MethodInfoListItem } from '../data-contracts/MethodInfoListItem';
 import westDaatApi from './westDaatApi';
 import { TimeSeriesListItem } from '../data-contracts/TimeSeriesListItem';
-
-export const getWaterRightsDigests = async (siteUuid: string): Promise<WaterRightDigest[]> => {
-  const api = await westDaatApi();
-  const { data } = await api.get<WaterRightDigest[]>(`Sites/${siteUuid}/WaterRightsDigest`);
-  return data;
-};
 
 export const getSiteDigest = async (siteUuid: string): Promise<SiteDigest> => {
   const api = await westDaatApi();
