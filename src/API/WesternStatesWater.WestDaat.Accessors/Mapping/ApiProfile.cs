@@ -252,13 +252,24 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.Organization, OrganizationFundingDetails>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.CompensationRateModel, opt => opt.MapFrom(src => src.OpenEtCompensationRateModel))
+                .ForMember(dest => dest.OpenEtModelDisplayName, opt => opt.MapFrom(src => Enum.GetName(src.OpenEtModel)))
                 .ForMember(dest => dest.OpenEtDateRangeStart, opt => opt.MapFrom(src =>
                     // start of current year minus `dateRange` years
-                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - src.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)))
+                    DateOnly.FromDateTime(
+                        new DateTimeOffset(DateTimeOffset.UtcNow.Year - src.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                        .UtcDateTime
+                        )
+                    )
+                )
                 .ForMember(dest => dest.OpenEtDateRangeEnd, opt => opt.MapFrom(src =>
                     // start of current year minus one minute to get end of previous year
-                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMinutes(-1)));
-
+                    DateOnly.FromDateTime(
+                        new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMinutes(-1)
+                        .UtcDateTime
+                        )
+                    )
+                );
         }
 
         private void AddApplicationMappings()
