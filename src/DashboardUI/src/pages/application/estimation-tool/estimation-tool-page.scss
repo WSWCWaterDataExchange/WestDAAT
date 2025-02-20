@@ -72,6 +72,17 @@
   color: $estimate-tool-estimate-text-color;
 }
 
+.estimate-tool-map-dimmed-overlay {
+  z-index: 1000;
+  display: block;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .estimation-tool-sidebar-element {
   $text-line-height: 24px;
 

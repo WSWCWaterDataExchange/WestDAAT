@@ -1,7 +1,7 @@
 export interface FundingOrganizationDetails {
   fundingOrganizationId: string;
   fundingOrganizationName: string;
-  openEtModel: string;
+  openEtModelName: string;
   dateRangeStart: Date;
   dateRangeEnd: Date;
   compensationRateModel: string;
