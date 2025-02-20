@@ -80,7 +80,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             var organizationFundingDetails = await westDaatDb.Organizations
                 .ProjectTo<OrganizationFundingDetails>(DtoMapper.Configuration)
-                .FirstOrDefaultAsync(org => org.OrganizationId == fundingOrganizationId);
+                .SingleAsync(org => org.OrganizationId == fundingOrganizationId);
 
             return new OrganizationFundingDetailsResponse
             {
