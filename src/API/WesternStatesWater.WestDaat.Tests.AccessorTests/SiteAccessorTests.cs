@@ -581,28 +581,24 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             await db.SaveChangesAsync();
 
             var allocations = validAllocationIds
-                .Select(validId => new AllocationAmountsFact
-                {
-                    AllocationNativeId = validId,
-                    AllocationUuid = Guid.NewGuid().ToString()
-                })
+                .Select(validId => new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationNativeId, f => validId)
+                    .RuleFor(a => a.AllocationUuid, f => Guid.NewGuid().ToString())
+                    .Generate())
                 .ToList();
 
             await db.AllocationAmountsFact.AddRangeAsync(allocations);
             await db.SaveChangesAsync();
 
-            // Act
             var accessor = CreateSiteAccessor();
             var result = (await accessor.GetSiteUsageInfoListBySiteUuid(site.SiteUuid)).ToList();
 
             // Assert
             result.Should().HaveCount(10);
-
             result.Should().BeInAscendingOrder(x => x.TimeframeStart);
-
             foreach (var item in result)
             {
-                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) && 
+                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) &&
                     item.AssociatedNativeAllocationId.StartsWith("VALID_"))
                 {
                     item.AllocationUuid.Should().NotBeNullOrEmpty();
@@ -613,7 +609,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 }
             }
         }
-
 
         [TestMethod]
         public async Task SiteAccessor_GetMethodInfoListBySiteUuid()
