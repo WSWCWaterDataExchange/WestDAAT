@@ -1,11 +1,12 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Tests.Helpers;
-using EF = WesternStatesWater.WaDE.Database.EntityFramework;
-using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
-using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
+using WesternStatesWater.WestDaat.Utilities;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using EF = WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -1578,7 +1579,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 result.WaterRightsDetails.Should().BeEmpty();
             }
-            
+
         }
 
         [TestMethod]
@@ -1916,7 +1917,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
                 db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
-                await db.SaveChangesAsync();  
+                await db.SaveChangesAsync();
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();
@@ -2163,7 +2164,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             //Arrange
             var date = minimumPriorityDate ?? new DateTime(1901, 1, 1);
-            
+
             var matchedAllocationAmounts = Enumerable.Range(1, expectedResultCount)
                 .Select(i =>
                 {
@@ -2175,8 +2176,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 })
                 .ToList();
 
-            var nonMatchingDate = minimumPriorityDate?.AddYears(-1) 
-                                  ?? maximumPriorityDate?.AddYears(1) 
+            var nonMatchingDate = minimumPriorityDate?.AddYears(-1)
+                                  ?? maximumPriorityDate?.AddYears(1)
                                   ?? default;
 
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
@@ -2927,6 +2928,53 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = accessor.GetWaterRightsCount(searCriteria);
 
             result.Should().Be(50);
+        }
+
+        [DataTestMethod]
+        [DataRow(false, false, false, DisplayName = "Water right does not exist")]
+        [DataRow(true, false, false, DisplayName = "Water right does not have funding org")]
+        [DataRow(true, true, true, DisplayName = "Water right has funding org")]
+        public async Task WaterAllocationAccessor_GetWaterRightFundingOrgDetailsByNativeId_Success(
+            bool waterRightExists,
+            bool waterRightHasFundingOrg,
+            bool shouldSucceed
+        )
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            string nativeId = string.Empty;
+
+            if (waterRightExists)
+            {
+                var waterRightFaker = new AllocationAmountFactFaker();
+
+                if (waterRightHasFundingOrg)
+                {
+                    waterRightFaker.RuleFor(aaf => aaf.ConservationApplicationFundingOrganizationId, () => Guid.NewGuid());
+                }
+
+                var waterRight = waterRightFaker.Generate();
+                db.AllocationAmountsFact.Add(waterRight);
+                db.SaveChanges();
+
+                nativeId = waterRight.AllocationNativeId;
+            }
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var call = async () => await accessor.GetWaterRightFundingOrgDetailsByNativeId(nativeId);
+
+            // Assert
+            if (shouldSucceed)
+            {
+                var response = await call();
+                response.Should().NotBeNull();
+                response.FundingOrganizationId.Should().NotBeEmpty();
+            }
+            else
+            {
+                await call.Should().ThrowAsync<WestDaatException>();
+            }
         }
 
         private WaterAllocationAccessor CreateWaterAllocationAccessor()
