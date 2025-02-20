@@ -161,17 +161,6 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return await CreateOkResponse(request, result);
         }
         
-        [Function(nameof(GetWaterRightSiteDigest))]
-        [OpenApiOperation(nameof(GetWaterRightSiteDigest))]
-        [OpenApiParameter("siteUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]
-        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterRightsDigest[]))]
-        public async Task<HttpResponseData> GetWaterRightSiteDigest([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Sites/{siteUuid}/WaterRightsDigest")] HttpRequestData request, string siteUuid)
-        {
-            var result = await _waterResourceManager.GetWaterRightsDigestsBySite(siteUuid);
-        
-            return await CreateOkResponse(request, result);
-        }
-        
         [Function(nameof(GetOverlayDigest))]
         [OpenApiOperation(nameof(GetOverlayDigest))]
         [OpenApiParameter("overlayUuid", Type = typeof(string), In = ParameterLocation.Path, Required = true)]

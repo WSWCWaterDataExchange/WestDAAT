@@ -26,8 +26,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<SiteLocation>> GetWaterRightSiteLocationsById(string allocationUuid);
 
-        Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
-
         int GetWaterRightsCount(WaterRightsSearchCriteria accessorSearchRequest);
 
         IEnumerable<(string Name, IEnumerable<object> Data)> GetWaterRights(WaterRightsSearchCriteria accessorSearchRequest);
