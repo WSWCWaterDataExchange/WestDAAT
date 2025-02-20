@@ -779,7 +779,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             return new WaterRightFundingOrgDetails
             {
-                FundingOrganizationId = allocationAmount?.ConservationApplicationFundingOrganizationId,
+                FundingOrganizationId = allocationAmount.ConservationApplicationFundingOrganizationId.Value,
             };
         }
     }
