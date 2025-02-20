@@ -1,3 +1,4 @@
+using System.Transactions;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
@@ -89,27 +90,40 @@ public class OrganizationAccessorTests : AccessorTestBase
     {
         // Arrange
         Database.EntityFramework.Organization organization = null;
-
         string waterRightNativeId = string.Empty;
-        if (waterRightExists)
+
+        var transactionOptions = new TransactionOptions
         {
-            var waterRightFaker = new AllocationAmountFactFaker();
+            IsolationLevel = IsolationLevel.ReadCommitted,
+        };
 
-            if (waterRightHasLinkedOrganization)
+        using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, transactionOptions, TransactionScopeAsyncFlowOption.Enabled))
+        {
+            await using var wadeDb = CreateDatabaseContextFactory().Create();
+            await using var westDaatDb = CreateWestDaatDatabaseContextFactory().Create();
             {
-                organization = new OrganizationFaker().Generate();
-                await _westdaatDb.Organizations.AddAsync(organization);
-                await _westdaatDb.SaveChangesAsync();
+                if (waterRightExists)
+                {
+                    var waterRightFaker = new AllocationAmountFactFaker();
 
-                waterRightFaker.RuleFor(x => x.ConservationApplicationFundingOrganizationId, organization.Id);
+                    if (waterRightHasLinkedOrganization)
+                    {
+                        organization = new OrganizationFaker().Generate();
+                        await westDaatDb.Organizations.AddAsync(organization);
+                        await westDaatDb.SaveChangesAsync();
+
+                        waterRightFaker.RuleFor(x => x.ConservationApplicationFundingOrganizationId, organization.Id);
+                    }
+
+                    var waterRight = waterRightFaker.Generate();
+                    await wadeDb.AllocationAmountsFact.AddAsync(waterRight);
+                    await wadeDb.SaveChangesAsync();
+
+                    waterRightNativeId = waterRight.AllocationNativeId;
+                }
             }
-
-            var waterRight = waterRightFaker.Generate();
-            await _wadeDb.AllocationAmountsFact.AddAsync(waterRight);
-            await _wadeDb.SaveChangesAsync();
-
-            waterRightNativeId = waterRight.AllocationNativeId;
         }
+
 
         // Act
         var request = new OrganizationFundingDetailsRequest
