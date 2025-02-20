@@ -170,6 +170,7 @@ internal class ValidationEngine : IValidationEngine
         {
             OrganizationDetailsListRequest req => ValidateOrganizationDetailsListRequest(req, context),
             OrganizationSummaryListRequest req => ValidateOrganizationSummaryListRequest(req, context),
+            OrganizationFundingDetailsRequest req => ValidateOrganizationFundingDetailsRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented.")
         };
@@ -193,6 +194,14 @@ internal class ValidationEngine : IValidationEngine
     }
 
     private ErrorBase ValidateOrganizationSummaryListRequest(OrganizationSummaryListRequest request, ContextBase context)
+    {
+        // Must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
+
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationFundingDetailsRequest(OrganizationFundingDetailsRequest request, ContextBase context)
     {
         // Must be logged in
         _contextUtility.GetRequiredContext<UserContext>();
