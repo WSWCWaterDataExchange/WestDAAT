@@ -30,8 +30,10 @@ public class UserFunction : FunctionBase
         HttpRequestData req)
     {
         var userLoadRequest = await ParseRequestBody<UserLoadRequestBase>(req);
-        var result = userLoadRequest switch
+        UserLoadResponseBase result = userLoadRequest switch
         {
+            OrganizationUserListRequest request => await _userManager.Load<OrganizationUserListRequest, UserListResponse>(request),
+            UserListRequest request => await _userManager.Load<UserListRequest, UserListResponse>(request),
             UserSearchRequest request => await _userManager.Load<UserSearchRequest, UserSearchResponse>(request),
             _ => throw new NotImplementedException($"Request type {userLoadRequest.GetType()} is not implemented.")
         };

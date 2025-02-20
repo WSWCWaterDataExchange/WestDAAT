@@ -4,47 +4,101 @@ import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
 import { EstimationToolNavbar } from './EstimationToolNavbar';
-import { useFundingOrganization } from './hooks/useFundingOrganization';
-import { useCreateWaterConservationApplication } from './hooks/useCreateWaterConservationApplication';
-import { useEstimateConsumptiveUse } from './hooks/useEstimateConsumptiveUse';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useEffect } from 'react';
+import {
+  useCreateWaterConservationApplicationQuery,
+  useFundingOrganizationQuery,
+} from '../../../hooks/queries/useApplicationQuery';
+import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
+import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
+import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
 
 import './estimation-tool-page.scss';
+import { toast } from 'react-toastify';
 
 export function EstimationToolPage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const routeParams = useParams();
+  const { state, dispatch } = useConservationApplicationContext();
+
   const { waterRightNativeId } = routeParams;
-  const context = useMsal();
+
+  useEffect(() => {
+    if (waterRightNativeId) {
+      dispatch({
+        type: 'ESTIMATION_TOOL_PAGE_LOADED',
+        payload: {
+          waterRightNativeId: waterRightNativeId,
+        },
+      });
+    }
+  }, [waterRightNativeId]);
+
+  const { isLoading: isLoadingFundingOrganization, isError: fundingOrganizationLoadFailed } =
+    useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
+
+  const { isLoading: isLoadingApplication, isError: applicationLoadFailed } =
+    useCreateWaterConservationApplicationQuery({
+      waterRightNativeId: state.conservationApplication.waterRightNativeId,
+      fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
+    });
+
+  const estimateConsumptiveUseMutation = useMutation({
+    mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
+      validateFields(fields);
+
+      const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
+        waterRightNativeId: fields.waterRightNativeId!,
+        waterConservationApplicationId: fields.waterConservationApplicationId!,
+        fundingOrganizationId: fields.fundingOrganizationId!,
+        dateRangeStart: fields.dateRangeStart!,
+        dateRangeEnd: fields.dateRangeEnd!,
+        model: fields.model!,
+        polygonWkts: fields.polygonWkts!,
+        compensationRateDollars: fields.compensationRateDollars,
+        units: fields.units,
+      };
+
+      return await estimateConsumptiveUse(context, apiCallFields);
+    },
+    onSuccess: (result: EstimateConsumptiveUseResponse) => {
+      if (result) {
+        dispatch({
+          type: 'CONSUMPTIVE_USE_ESTIMATED',
+          payload: {
+            totalAverageYearlyEtAcreFeet: result.totalAverageYearlyEtAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+          },
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to estimate consumptive use. Please try again later.');
+    },
+  });
+
+  const handleEstimateConsumptiveUseClicked = async () => {
+    await estimateConsumptiveUseMutation.mutateAsync({
+      waterRightNativeId: state.conservationApplication.waterRightNativeId,
+      waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
+      fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
+      model: 1,
+      dateRangeStart: state.conservationApplication.dateRangeStart,
+      dateRangeEnd: state.conservationApplication.dateRangeEnd,
+      polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
+      compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
+      units: state.conservationApplication.desiredCompensationUnits,
+    });
+  };
 
   const navigateToWaterRightLandingPage = () => {
     navigate(`/details/right/${waterRightNativeId}`);
   };
-
-  const { data: fundingOrganizationDetails, isLoading: isLoadingFundingOrganization } = useFundingOrganization(
-    context,
-    waterRightNativeId,
-  );
-
-  const { data: applicationDetails, isLoading: isLoadingApplication } = useCreateWaterConservationApplication(context, {
-    waterRightNativeId: waterRightNativeId,
-    fundingOrganizationId: fundingOrganizationDetails?.fundingOrganizationId,
-  });
-
-  const { data: estimateConsumptiveUse, isLoading: isLoadingEstimateConsumptiveUse } = useEstimateConsumptiveUse(
-    context,
-    {
-      waterConservationApplicationId: applicationDetails?.waterConservationApplicationId,
-      waterRightNativeId: waterRightNativeId,
-      model: 0,
-      dateRangeStart: new Date(),
-      dateRangeEnd: new Date(),
-      polygons: [],
-      compensationRateDollars: 0,
-      units: CompensationRateUnits.AcreFeet,
-    },
-  );
 
   return (
     <MapProvider>
@@ -55,14 +109,17 @@ export function EstimationToolPage() {
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
             <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
               <EstimationToolSidebar
-                fundingOrganizationDetails={fundingOrganizationDetails}
-                isLoadingFundingOrganization={isLoadingFundingOrganization}
+                isLoading={isLoadingFundingOrganization || isLoadingApplication}
+                loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
               />
             </div>
 
             <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
               <EstimationToolMapHeader />
-              <EstimationToolMap />
+              <EstimationToolMap
+                handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
+                isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
+              />
             </div>
           </div>
         </div>
@@ -70,3 +127,30 @@ export function EstimationToolPage() {
     </MapProvider>
   );
 }
+
+interface EstimateConsumptiveUseApiCallFields {
+  waterConservationApplicationId: string | undefined;
+  waterRightNativeId: string | undefined;
+  fundingOrganizationId: string | undefined;
+  model: number | undefined;
+  dateRangeStart: Date | undefined;
+  dateRangeEnd: Date | undefined;
+  polygonWkts: string[] | undefined;
+  compensationRateDollars: number | undefined;
+  units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
+}
+
+const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
+  const isValid: boolean =
+    !!fields.waterConservationApplicationId &&
+    !!fields.waterRightNativeId &&
+    !!fields.fundingOrganizationId &&
+    !!fields.model &&
+    !!fields.dateRangeStart &&
+    !!fields.dateRangeEnd &&
+    !!fields.polygonWkts &&
+    fields.polygonWkts.length > 0; // compensation rate is optional
+  if (!isValid) {
+    throw new Error('Invalid fields');
+  }
+};

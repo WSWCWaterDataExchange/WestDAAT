@@ -3,6 +3,8 @@ using WesternStatesWater.Shared.DataContracts;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 
+[JsonDerivedType(typeof(OrganizationUserListRequest), typeDiscriminator: nameof(OrganizationUserListRequest))]
+[JsonDerivedType(typeof(UserListRequest), typeDiscriminator: nameof(UserListRequest))]
 [JsonDerivedType(typeof(UserSearchRequest), typeDiscriminator: nameof(UserSearchRequest))]
 public class UserLoadRequestBase : RequestBase
 {
