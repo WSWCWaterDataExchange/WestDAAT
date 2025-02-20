@@ -88,9 +88,7 @@ public class OrganizationAccessorTests : AccessorTestBase
     public async Task Load_GetOrganizationFundingDetails_Success(bool waterRightExists, bool waterRightHasLinkedOrganization, bool shouldSucceed)
     {
         // Arrange
-        var organization = new OrganizationFaker().Generate();
-        await _westdaatDb.Organizations.AddAsync(organization);
-        await _westdaatDb.SaveChangesAsync();
+        Database.EntityFramework.Organization organization = null;
 
         string waterRightNativeId = string.Empty;
         if (waterRightExists)
@@ -99,6 +97,10 @@ public class OrganizationAccessorTests : AccessorTestBase
 
             if (waterRightHasLinkedOrganization)
             {
+                organization = new OrganizationFaker().Generate();
+                await _westdaatDb.Organizations.AddAsync(organization);
+                await _westdaatDb.SaveChangesAsync();
+
                 waterRightFaker.RuleFor(x => x.ConservationApplicationFundingOrganizationId, organization.Id);
             }
 
