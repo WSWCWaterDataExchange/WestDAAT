@@ -4,22 +4,49 @@ import { mdiPiggyBank, mdiWater } from '@mdi/js';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
 import {
+  CompensationRateUnits,
   CompensationRateUnitsLabels,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { FundingOrganizationDetails } from '../../../data-contracts/FundingOrganizationDetails';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useRef } from 'react';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
+import Button from 'react-bootstrap/esm/Button';
 
 interface EstimationToolSidebarProps {
-  fundingOrganizationDetails: FundingOrganizationDetails | undefined;
   isLoadingFundingOrganization: boolean;
 }
 
 export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
-  const acreageSum = 4681;
-  const evapotranspiration = 1000;
-  const conservationEstimate = 15000;
+  const { state, dispatch } = useConservationApplicationContext();
+  const desiredDollarsRef = useRef<HTMLInputElement>(null);
+  const desiredUnitsRef = useRef<HTMLSelectElement>(null);
+
+  const onEstimationFormChanged = () => {
+    const desiredDollars = Number(desiredDollarsRef.current?.value);
+    const desiredUnitsAsEnum: CompensationRateUnits = Number(desiredUnitsRef.current?.value) as CompensationRateUnits;
+    const desiredUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined =
+      desiredUnitsAsEnum === CompensationRateUnits.None ? undefined : desiredUnitsAsEnum;
+
+    dispatch({
+      type: 'ESTIMATION_FORM_UPDATED',
+      payload: {
+        desiredCompensationDollars: desiredDollars,
+        desiredCompensationUnits: desiredUnits,
+      },
+    });
+  };
+
+  // assumes all polygons are not intersecting
+  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
+    (sum, polygon) => sum + polygon.acreage,
+    0,
+  );
+  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
+    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
+    0,
+  );
 
   return (
     <div className="flex-grow-1 panel-content">
@@ -39,7 +66,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="The Conservation Organization (or program sponsor) is the entity (governmental, nonprofit, or private) with a voluntary program to conserve or reduce water use with funding to compensate water users for relinquishing or abstaining from the use of their state water right. Conservation Organization decide on the following parameters: (a) the OpenET consumptive use model(s) or ensemble to use; (b) the time period (i.e., number of years and start and end months) used to evaluate historical consumptive use; and (c) the compensation in U.S. dollars per acre or per acre-foot of conserved water offered a user."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span>{props.fundingOrganizationDetails?.fundingOrganizationName}</span>
+          <span>{state.conservationApplication.fundingOrganizationName}</span>
         </SidebarElement>
 
         <SidebarElement
@@ -47,7 +74,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           tooltip="OpenET uses a combination of satellite data, weather data, and crop-specific information to estimate evapotranspiration (ET) rates for different land cover types. OpenET provides data from multiple models that are used to calculate ET and also provides a single ET value, or “ensemble value,” from those models for each location. Each model has its own strengths and limitations for different geographies, crops, and conditions. Which model used is determined by the Funding Organization(s) for their desired purpose."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span>{props.fundingOrganizationDetails?.openEtModel}</span>
+          <span>{state.conservationApplication.openEtModelName}</span>
         </SidebarElement>
 
         <SidebarElement title="MAP LAYER">
@@ -62,8 +89,8 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           isLoading={props.isLoadingFundingOrganization}
         >
           <span>
-            {props.fundingOrganizationDetails?.dateRangeStart.toLocaleDateString()} to{' '}
-            {props.fundingOrganizationDetails?.dateRangeEnd.toLocaleDateString()}
+            {state.conservationApplication.dateRangeStart?.toLocaleDateString()} to{' '}
+            {state.conservationApplication.dateRangeEnd?.toLocaleDateString()}
           </span>
         </SidebarElement>
 
@@ -77,10 +104,18 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            <span className="me-1">
-              <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
-            </span>
-            <span className="fs-5 fw-bold et-blue-text">{formatNumber(evapotranspiration, 2)} Acre-Feet</span>
+            {etAcreFeet > 0 ? (
+              <>
+                <span className="me-1">
+                  <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
+                </span>
+                <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+              </>
+            ) : (
+              <span className="text-muted">
+                Please draw one or more polygons on the map to estimate the consumptive use.
+              </span>
+            )}
           </div>
         </SidebarElement>
 
@@ -91,7 +126,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
 "
           isLoading={props.isLoadingFundingOrganization}
         >
-          <span className="text-muted">{props.fundingOrganizationDetails?.compensationRateModel}</span>
+          <span className="text-muted">{state.conservationApplication.compensationRateModel}</span>
         </SidebarElement>
 
         <SidebarElement title="DESIRED COMPENSATION ($)" isLoading={props.isLoadingFundingOrganization}>
@@ -99,19 +134,34 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
             Input values below to estimate the amount of savings you may be eligible for
           </span>
 
-          <div className="d-flex justify-content-between align-items-center gap-3">
-            <InputGroup>
-              <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
-              <Form.Control type="number" placeholder="600" min={1} aria-describedby="dollar-sign-addon"></Form.Control>
-            </InputGroup>
+          <Form onChange={onEstimationFormChanged} noValidate>
+            <div className="d-flex justify-content-between align-items-center gap-3">
+              <InputGroup>
+                <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
+                <Form.Control
+                  type="number"
+                  placeholder="100"
+                  min={1}
+                  aria-describedby="dollar-sign-addon"
+                  value={state.conservationApplication.desiredCompensationDollars}
+                  ref={desiredDollarsRef}
+                ></Form.Control>
+              </InputGroup>
 
-            <Form.Select aria-label="Desired compensation units">
-              <option>Select an option</option>
-              {CompensationRateUnitsOptions.map((value) => (
-                <option value={value}>{CompensationRateUnitsLabels[value]}</option>
-              ))}
-            </Form.Select>
-          </div>
+              <Form.Select
+                aria-label="Desired compensation units"
+                value={state.conservationApplication.desiredCompensationUnits}
+                ref={desiredUnitsRef}
+              >
+                <option value={0}>Select an option</option>
+                {CompensationRateUnitsOptions.map((value) => (
+                  <option key={value} value={value}>
+                    {CompensationRateUnitsLabels[value]}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+          </Form>
         </SidebarElement>
 
         <SidebarElement
@@ -119,25 +169,59 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           tooltip="Conservation Estimate refers to the projected reduction in water use resulting from conservation measures, such as improved irrigation efficiency, crop selection, or temporary fallowing. This estimate helps assess potential water savings and informs compensation programs."
           isLoading={props.isLoadingFundingOrganization}
         >
-          <div>
-            <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
+          {state.conservationApplication.conservationPayment ? (
+            <>
+              <div>
+                <span className="text-muted">Based on the given information, we estimate you may be eligible for</span>
+              </div>
+
+              <div>
+                <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
+                  <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
+
+                  <span className="fs-5 fw-bold">
+                    ${formatNumber(state.conservationApplication.conservationPayment, 0)}
+                  </span>
+                </span>
+              </div>
+
+              <div>
+                <div>
+                  <span className="text-muted">This estimate is not legally binding to WSWC.</span>
+                </div>
+                <div>
+                  <a href="https://westernstateswater.org/wade/westcat/" target="_blank" rel="noreferrer">
+                    Learn more
+                  </a>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>
+              <span className="text-muted">Please input desired compensation to be provided with an estimate</span>
+            </div>
+          )}
+        </SidebarElement>
+
+        <SidebarElement>
+          <div className="mb-3">
+            <Button
+              variant="primary"
+              className="w-100"
+              disabled={!state.canContinueToApplication}
+              onClick={() => {
+                alert('not implemented');
+              }}
+            >
+              Continue to Application
+            </Button>
           </div>
-
           <div>
-            <span className="fs-5 d-flex align-items-center estimate-tool-conservation-estimate-text">
-              <Icon path={mdiPiggyBank} size="1.25em" className="me-1 my-2" />
-
-              <span className="fs-5 fw-bold">${formatNumber(conservationEstimate, 2)}</span>
+            <span className="text-muted">
+              If you own this water right or have legal authority over the use of its water, you may apply to a water
+              conservation program for compensated, temporary, and voluntary measure. Pending verification and approval
+              by appropriate parties.
             </span>
-          </div>
-
-          <div>
-            <div>
-              <span className="text-muted">This estimate is not legally binding to WSWC.</span>
-            </div>
-            <div>
-              <a href="#">Learn more</a>
-            </div>
           </div>
         </SidebarElement>
       </div>
