@@ -453,24 +453,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteLocation>(DtoMapper.Configuration)
                 .ToListAsync();
         }
-
-        public async Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid)
-        {
-            await using var db = _databaseContextFactory.Create();
-            db.Database.SetCommandTimeout(int.MaxValue);
-            return await db.AllocationAmountsFact
-                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
-                .Select(x => new WaterRightsDigest
-                {
-                    AllocationUuid = x.AllocationUuid,
-                    NativeId = x.AllocationNativeId,
-                    PriorityDate = x.AllocationPriorityDateNavigation.Date,
-                    BeneficialUses = x.AllocationBridgeBeneficialUsesFact.Select(a => a.BeneficialUseCV).ToList(),
-                    HasTimeSeriesData = x.AllocationBridgeSitesFact
-                        .Any(bridge => bridge.Site.SiteVariableAmountsFact.Count != 0)
-                })
-                .ToListAsync();
-        }
         
         public async Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid)
         {

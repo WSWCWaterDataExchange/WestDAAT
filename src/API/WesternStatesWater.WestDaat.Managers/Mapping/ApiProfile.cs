@@ -32,7 +32,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.OverlayDetailsSearchCriteria, CommonContracts.OverlayDetailsSearchCriteria>();
             CreateMap<CommonContracts.OverlayTableEntry, ClientContracts.OverlayTableEntry>();
             CreateMap<CommonContracts.OverlayDigest, ClientContracts.OverlayDigest>();
-
             AddUserMappings();
             AddOrganizationMappings();
             AddApplicationMappings();
