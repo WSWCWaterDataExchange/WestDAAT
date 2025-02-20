@@ -47,11 +47,9 @@ interface ApplicationDataGridColumns {
 }
 
 export function OrganizationDashboardPage() {
+  const [tableFilters, setTableFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
-
-  const [tableFilters, setTableFilters] = useState<GridFilterItem[]>([]);
-  const apiRef = useGridApiRef();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
 
@@ -59,6 +57,8 @@ export function OrganizationDashboardPage() {
 
   const { isLoading: applicationListLoading, isError: applicationListErrored } =
     useLoadDashboardApplications(organizationIdFilter);
+
+  const apiRef = useGridApiRef();
 
   function getKeysFromLookup(obj: GridFilterState['filteredRowsLookup']) {
     const keys = [];
@@ -129,6 +129,10 @@ export function OrganizationDashboardPage() {
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null) => {
+    if (applicationListErrored) {
+      value = '-';
+    }
+
     return (
       <div className="col-md-2 col-sm-4 col-6 my-1 align-self-stretch">
         <Card className="rounded-3 shadow-sm text-center h-100">
@@ -234,6 +238,7 @@ export function OrganizationDashboardPage() {
     <div className="overflow-y-auto h-100">
       <div className="m-3">
         {dashboardTitle()}
+        {/* {!applicationListErrored && ( */}
         <div className="row my-4">
           {renderStatisticsCard('Submitted Applications', state.dashboardApplicationsStatistics.submittedApplications)}
           {renderStatisticsCard('Accepted Applications', state.dashboardApplicationsStatistics.acceptedApplications)}
@@ -248,6 +253,7 @@ export function OrganizationDashboardPage() {
             `$${formatNumberToLargestUnit(state.dashboardApplicationsStatistics.totalObligationDollars)}`,
           )}
         </div>
+        {/* )} */}
         <h2 className="fs-5 mt-5">Applications</h2>
         <TableLoading isLoading={applicationListLoading} isErrored={applicationListErrored}>
           <DataGrid
