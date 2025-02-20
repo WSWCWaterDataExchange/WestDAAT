@@ -2,5 +2,5 @@
 
 public class WaterRightFundingOrgDetails
 {
-    public string FundingOrganizationId { get; set; }
+    public Guid? FundingOrganizationId { get; set; }
 }

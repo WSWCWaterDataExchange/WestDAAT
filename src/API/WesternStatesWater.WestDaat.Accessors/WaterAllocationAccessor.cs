@@ -4,15 +4,15 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using System.Collections.Concurrent;
 using System.Transactions;
-using NetTopologySuite.Geometries.Utilities;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.CsvModels;
 using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Utilities;
 using Organization = WesternStatesWater.WestDaat.Common.DataContracts.Organization;
 
@@ -38,7 +38,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             // db.database does not pick up transaction from transactionScope if we do not open connection
             await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
-            
+
             var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(db, predicate, groupValue);
 
             ts.Complete();
@@ -398,7 +398,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
                 .ToListAsync();
         }
-        
+
         public async Task<IEnumerable<SiteUsageListItem>> GetRightUsageInfoListByAllocationUuid(string allocationUuid)
         {
             await using var db = _databaseContextFactory.Create();
@@ -453,7 +453,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .ProjectTo<SiteLocation>(DtoMapper.Configuration)
                 .ToListAsync();
         }
-        
+
         public async Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid)
         {
             await using var db = _databaseContextFactory.Create();
@@ -696,7 +696,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             });
             return allRegulatoryUuids;
         }
-        
+
         public async Task<OverlayDetails> GetOverlayDetails(string overlayUuid)
         {
             await using var db = _databaseContextFactory.Create();
@@ -760,6 +760,21 @@ namespace WesternStatesWater.WestDaat.Accessors
                 return ValueTask.CompletedTask;
             });
             return allRegulatoryUuids;
+        }
+
+        public async Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByNativeId(string allocationNativeId)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var allocationAmount = await db.AllocationAmountsFact
+                .AsNoTracking()
+                .SingleOrDefaultAsync(aaf => aaf.AllocationNativeId == allocationNativeId);
+
+            return new WaterRightFundingOrgDetails
+            {
+                FundingOrganizationId = allocationAmount?.ConservationApplicationFundingOrganizationId,
+            };
         }
     }
 }
