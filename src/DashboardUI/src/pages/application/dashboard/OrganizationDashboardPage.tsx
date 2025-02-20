@@ -3,12 +3,15 @@ import { Icon } from '@mdi/react';
 import {
   DataGrid,
   GridColumnHeaderParams,
+  GridFilterItem,
   GridFilterState,
   GridRenderCellParams,
   GridState,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { useDebounceCallback } from '@react-hook/debounce';
+import deepEqual from 'fast-deep-equal/es6';
+import { useState } from 'react';
 import Card from 'react-bootstrap/esm/Card';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { NavLink } from 'react-router-dom';
@@ -46,6 +49,7 @@ export function OrganizationDashboardPage() {
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
 
+  const [tableFilters, setTableFilters] = useState<GridFilterItem[]>([]);
   const apiRef = useGridApiRef();
 
   const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
@@ -66,14 +70,17 @@ export function OrganizationDashboardPage() {
   }
 
   const handleDataGridStateChange = useDebounceCallback((state: GridState) => {
-    // TODO: JN - add a local state for the filtering to check if it actually changed - "deep equal" package already being used
-    const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
-    const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
-    const applicationIds = rows.map((row) => row.id);
-    dispatch({
-      type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
-      payload: { applicationIds },
-    });
+    if (!deepEqual(tableFilters, state.filter.filterModel.items)) {
+      setTableFilters(state.filter.filterModel.items);
+      const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
+      const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
+      const applicationIds = rows.map((row) => row.id);
+
+      dispatch({
+        type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
+        payload: { applicationIds },
+      });
+    }
   }, 200);
 
   const dateFormatter = (date: Date) => {
@@ -122,7 +129,7 @@ export function OrganizationDashboardPage() {
     return (
       <div className="col-md-2 col-sm-4 col-6 my-1 align-self-stretch">
         <Card className="rounded-3 shadow-sm text-center h-100">
-          <Card.Title className="mt-3 fs-1 flex-grow-1 align-content-center">
+          <Card.Title className="mt-3 mx-3 fs-1 flex-grow-1 align-content-center">
             {applicationListLoading || value === null ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
@@ -131,7 +138,7 @@ export function OrganizationDashboardPage() {
               <span>{value}</span>
             )}
           </Card.Title>
-          <Card.Text className="mb-3 fs-6">
+          <Card.Text className="mb-3 mx-3 fs-6">
             {applicationListLoading ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
