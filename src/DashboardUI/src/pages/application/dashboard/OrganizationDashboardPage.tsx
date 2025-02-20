@@ -29,9 +29,8 @@ import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicat
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
-import { formatDateString } from '../../../utilities/valueFormatters';
+import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
-import { formatNumberToLargestUnit } from './formatNumber';
 
 import './organization-dashboard-page.scss';
 
