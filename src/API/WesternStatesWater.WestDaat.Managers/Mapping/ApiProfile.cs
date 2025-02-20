@@ -104,7 +104,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.UserListResult, ClientContracts.UserListResult>();
 
-            CreateMap<ClientContracts.Requests.Admin.OrganizationFundingDetailsRequest, CommonContracts.OrganizationFundingDetailsRequest>();
+            CreateMap<CommonContracts.WaterRightFundingOrgDetails, CommonContracts.OrganizationFundingDetailsRequest>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId));
 
             CreateMap<CommonContracts.OrganizationFundingDetails, ClientContracts.OrganizationFundingDetails>();
 

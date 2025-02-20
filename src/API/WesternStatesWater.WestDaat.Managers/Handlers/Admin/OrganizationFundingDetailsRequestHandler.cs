@@ -12,15 +12,22 @@ public class OrganizationFundingDetailsRequestHandler : IRequestHandler<Organiza
 {
     public IOrganizationAccessor OrganizationAccessor { get; }
 
-    public OrganizationFundingDetailsRequestHandler(IOrganizationAccessor organizationAccessor)
+    public IWaterAllocationAccessor WaterAllocationAccessor { get; }
+
+    public OrganizationFundingDetailsRequestHandler(IOrganizationAccessor organizationAccessor, IWaterAllocationAccessor waterAllocationAccessor)
     {
         OrganizationAccessor = organizationAccessor;
+        WaterAllocationAccessor = waterAllocationAccessor;
     }
 
     public async Task<OrganizationFundingDetailsResponse> Handle(OrganizationFundingDetailsRequest request)
     {
-        var dtoRequest = request.Map<CommonContracts.OrganizationFundingDetailsRequest>();
-        var dtoResponse = (CommonContracts.OrganizationFundingDetailsResponse)await OrganizationAccessor.Load(dtoRequest);
-        return dtoResponse.Map<OrganizationFundingDetailsResponse>();
+        // get the funding org id from the water right
+        var waterRightFundingOrgDetailsResponse = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByNativeId(request.WaterRightNativeId);
+
+        // get the funding org details
+        var getFundingOrgDetailsRequest = waterRightFundingOrgDetailsResponse.Map<CommonContracts.OrganizationFundingDetailsRequest>();
+        var getFundingOrgDetailsResponse = (CommonContracts.OrganizationFundingDetailsResponse)await OrganizationAccessor.Load(getFundingOrgDetailsRequest);
+        return getFundingOrgDetailsResponse.Map<OrganizationFundingDetailsResponse>();
     }
 }
