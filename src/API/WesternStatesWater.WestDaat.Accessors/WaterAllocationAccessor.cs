@@ -13,6 +13,7 @@ using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
 using Organization = WesternStatesWater.WestDaat.Common.DataContracts.Organization;
 
@@ -770,6 +771,11 @@ namespace WesternStatesWater.WestDaat.Accessors
             var allocationAmount = await db.AllocationAmountsFact
                 .AsNoTracking()
                 .SingleOrDefaultAsync(aaf => aaf.AllocationNativeId == allocationNativeId);
+
+            if (allocationAmount?.ConservationApplicationFundingOrganizationId == null)
+            {
+                throw new WestDaatException($"Allocation with native ID '{allocationNativeId}' does not have a funding organization.");
+            }
 
             return new WaterRightFundingOrgDetails
             {

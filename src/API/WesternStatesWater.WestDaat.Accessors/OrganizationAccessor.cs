@@ -70,17 +70,11 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private async Task<OrganizationFundingDetailsResponse> GetOrganizationFundingDetails(OrganizationFundingDetailsRequest request)
         {
-            await using var wadeDb = _wadeDbContextFactory.Create();
-
-            var fundingOrganizationId = (await wadeDb.AllocationAmountsFact
-                .SingleAsync(waterRight => waterRight.AllocationNativeId == request.WaterRightNativeId))
-                .ConservationApplicationFundingOrganizationId;
-
             await using var westDaatDb = _westDaatDatabaseContextFactory.Create();
 
             var organizationFundingDetails = await westDaatDb.Organizations
                 .ProjectTo<OrganizationFundingDetails>(DtoMapper.Configuration)
-                .SingleAsync(org => org.OrganizationId == fundingOrganizationId);
+                .SingleAsync(org => org.OrganizationId == request.OrganizationId);
 
             return new OrganizationFundingDetailsResponse
             {

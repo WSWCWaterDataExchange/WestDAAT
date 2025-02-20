@@ -2,5 +2,5 @@
 
 public class OrganizationFundingDetailsRequest : OrganizationLoadRequestBase
 {
-    public string WaterRightNativeId { get; set; } = null!;
+    public Guid OrganizationId { get; set; }
 }
