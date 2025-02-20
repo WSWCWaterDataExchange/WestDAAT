@@ -16,7 +16,7 @@ public class OrganizationFunction : FunctionBase
 
     private const string RouteBase = "Organizations";
 
-    public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger)
+    public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger) : base(logger)
     {
         _organizationManager = organizationManager;
         _logger = logger;

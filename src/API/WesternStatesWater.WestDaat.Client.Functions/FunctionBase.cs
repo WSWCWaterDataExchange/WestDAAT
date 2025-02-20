@@ -5,19 +5,19 @@ using Microsoft.Azure.Functions.Worker.Http;
 using System.IO;
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public abstract class FunctionBase
+    public abstract class FunctionBase(ILogger logger)
     {
         private static JsonSerializerOptions JsonSerializerOptions => new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-
 
         protected async Task<HttpResponseData> CreateResponse(HttpRequestData request, ResponseBase response)
         {
@@ -55,8 +55,10 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             return data;
         }
 
-        private static async Task<HttpResponseData> CreateErrorResponse(HttpRequestData request, ErrorBase error)
+        private async Task<HttpResponseData> CreateErrorResponse(HttpRequestData request, ErrorBase error)
         {
+            logger.LogError($"Request resulted in an error response. LogMessage: {error.LogMessage}");
+
             return error switch
             {
                 ConflictError => await CreateConflictResponse(request),
