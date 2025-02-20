@@ -9,7 +9,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class Function1(ITestManager testManager) : FunctionBase
+    public class Function1(ITestManager testManager, ILogger logger) : FunctionBase(logger)
     {
         [Function("TestMe")]
         [OpenApiOperation("TestMe")]

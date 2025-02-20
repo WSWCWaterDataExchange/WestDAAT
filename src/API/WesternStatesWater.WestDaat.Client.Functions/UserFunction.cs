@@ -16,7 +16,7 @@ public class UserFunction : FunctionBase
 
     private const string RouteBase = "Users";
 
-    public UserFunction(IUserManager userManager, ILogger<UserFunction> logger)
+    public UserFunction(IUserManager userManager, ILogger<UserFunction> logger) : base(logger)
     {
         _userManager = userManager;
         _logger = logger;

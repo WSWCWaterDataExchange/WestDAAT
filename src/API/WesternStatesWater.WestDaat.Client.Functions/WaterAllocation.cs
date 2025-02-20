@@ -17,7 +17,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class WaterAllocation : FunctionBase
     {
-        public WaterAllocation(IWaterResourceManager waterResourceManager, ILogger<WaterAllocation> logger)
+        public WaterAllocation(IWaterResourceManager waterResourceManager, ILogger<WaterAllocation> logger) : base(logger)
         {
             _waterResourceManager = waterResourceManager;
             _logger = logger;
