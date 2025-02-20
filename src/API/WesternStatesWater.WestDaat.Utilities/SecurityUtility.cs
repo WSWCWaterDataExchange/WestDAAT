@@ -88,6 +88,7 @@ internal class SecurityUtility : ISecurityUtility
             [
                 Permissions.OrganizationApplicationDashboardLoad,
                 Permissions.OrganizationMemberAdd,
+                Permissions.OrganizationUserList,
                 Permissions.UserSearch
             ]
         },

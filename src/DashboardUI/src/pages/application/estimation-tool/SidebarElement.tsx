@@ -2,8 +2,10 @@ import { OverlayTooltip } from '../../../components/OverlayTooltip';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 interface SidebarElementProps {
-  title: string;
+  title?: string;
   isLoading?: boolean;
+  isError?: boolean;
+  errorText?: string;
   tooltip?: string;
   children?: React.ReactNode;
 }
@@ -21,15 +23,17 @@ export function SidebarElement(props: SidebarElementProps) {
         </div>
       </div>
 
-      {props.isLoading ? (
+      {props.isLoading && (
         <div>
           <Placeholder as="div" animation="wave">
             <Placeholder xs={8} className="me-2 rounded"></Placeholder>
           </Placeholder>
         </div>
-      ) : (
-        <div>{props.children}</div>
       )}
+
+      {props.isError && <div className="text-danger">{props.errorText}</div>}
+
+      {!props.isLoading && !props.isError && <div>{props.children}</div>}
     </div>
   );
 }
