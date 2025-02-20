@@ -50,7 +50,6 @@ public class UserIntegrationTests : IntegrationTestBase
             new CLI.Requests.Admin.EnrichJwtRequest
             {
                 ObjectId = user.ExternalAuthId,
-                Email = user.Email
             });
 
         // Assert
@@ -97,6 +96,25 @@ public class UserIntegrationTests : IntegrationTestBase
         dbUser.CreatedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
     }
 
+    [TestMethod]
+    public async Task Load_EnrichJwtRequest_NewUser_MissingEmail_ShouldThrow()
+    {
+        // Arrange
+        UseIdentityProviderContext();
+
+        // Act
+        var request = new CLI.Requests.Admin.EnrichJwtRequest
+        {
+            ObjectId = "1234",
+        };
+        var response = await _userManager.Load<CLI.Requests.Admin.EnrichJwtRequest, CLI.Responses.Admin.EnrichJwtResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error!.Should().BeOfType<ValidationError>();
+        response.Error!.LogMessage.Should().Contain("Email is required.");
+    }
+
     [DataTestMethod]
     [DataRow(typeof(AnonymousContext))]
     [DataRow(typeof(UserContext))]
@@ -112,7 +130,6 @@ public class UserIntegrationTests : IntegrationTestBase
             new CLI.Requests.Admin.EnrichJwtRequest
             {
                 ObjectId = "1234",
-                Email = "email@website"
             });
 
         // Assert
