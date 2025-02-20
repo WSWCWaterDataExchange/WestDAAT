@@ -15,7 +15,7 @@ public class ApplicationFunction : FunctionBase
 
     private const string RouteBase = "Applications";
 
-    public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger)
+    public ApplicationFunction(IApplicationManager applicationManager, ILogger<ApplicationFunction> logger) : base(logger)
     {
         _applicationManager = applicationManager;
         _logger = logger;
@@ -31,7 +31,8 @@ public class ApplicationFunction : FunctionBase
         var applicationLoadRequest = await ParseRequestBody<ApplicationLoadRequestBase>(req);
         var result = applicationLoadRequest switch
         {
-            OrganizationApplicationDashboardLoadRequest request => await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request),
+            OrganizationApplicationDashboardLoadRequest request => await _applicationManager
+                .Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(request),
             _ => throw new NotImplementedException($"Request type {applicationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);

@@ -18,7 +18,7 @@ public class AdminFunction : FunctionBase
     // "_" prefix is necessary because Azure Functions reserves the route "admin"
     private const string RouteBase = "_admin";
 
-    public AdminFunction(IUserManager userManager, ILogger<AdminFunction> logger)
+    public AdminFunction(IUserManager userManager, ILogger<AdminFunction> logger) : base(logger)
     {
         _userManager = userManager;
         _logger = logger;
