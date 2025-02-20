@@ -191,7 +191,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                         .Distinct()
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
-            
+
             CreateMap<EF.AllocationAmountsFact, WaterRightsDigest>()
                 .ForMember(dest => dest.AllocationUuid, opt => opt.MapFrom(src => src.AllocationUuid))
                 .ForMember(dest => dest.NativeId, opt => opt.MapFrom(src => src.AllocationNativeId))
@@ -205,7 +205,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SiteName, opt => opt.MapFrom(src => src.SiteName))
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(src => src.SiteTypeCv))
                 .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Any()))
-                .ForMember(dest => dest.WaterRightsDigests, 
+                .ForMember(dest => dest.WaterRightsDigests,
                     opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Select(ab => ab.AllocationAmount)));
 
 
@@ -248,6 +248,17 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.Organization, OrganizationSlim>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<EFWD.Organization, OrganizationFundingDetails>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.OpenEtDateRangeStart, opt => opt.MapFrom(src =>
+                    // start of current year minus `dateRange` years
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - src.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)))
+                .ForMember(dest => dest.OpenEtDateRangeEnd, opt => opt.MapFrom(src =>
+                    // start of current year minus one minute to get end of previous year
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMinutes(-1)));
+
         }
 
         private void AddApplicationMappings()
