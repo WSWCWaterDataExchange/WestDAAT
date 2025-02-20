@@ -530,11 +530,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
         
         [TestMethod]
-        public async Task SiteAccessor_GetSiteUsageInfoListBySiteUuid()
+        public async Task SiteAccessor_GetSiteUsageInfoListBySiteUuid_WithAllocationJoin()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
-
             var dates = new DateDimFaker().Generate(31);
             db.DateDim.AddRange(dates);
             await db.SaveChangesAsync();
@@ -543,35 +542,66 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             db.SitesDim.AddRange(siteDims);
             await db.SaveChangesAsync();
 
+            var site = siteDims[0];
             var timeSeries = new List<SiteVariableAmountsFact>();
+            var validAllocationIds = new List<string>();
 
-            foreach (var siteDim in siteDims)
+            for (int i = 0; i < 10; i++)
             {
-                timeSeries.AddRange(
-                    new SiteVariableAmountsFactFaker()
-                        .RuleFor(r => r.SiteId, siteDim.SiteId)
-                        .RuleFor(r => r.Site, siteDim)
-                        .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0, 30)].DateId)
-                        .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
-                        .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
-                        .RuleFor(r => r.AllocationCropDutyAmount, f => f.Random.Double(1.0, 100.0))
-                        .RuleFor(r => r.PopulationServed, f => f.Random.Long(100, 10000))
-                        .Generate(10)
-                );
+                var ts = new SiteVariableAmountsFactFaker()
+                    .RuleFor(r => r.SiteId, site.SiteId)
+                    .RuleFor(r => r.Site, site)
+                    .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0, 30)].DateId)
+                    .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                    .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                    .RuleFor(r => r.AllocationCropDutyAmount, f => f.Random.Double(1.0, 100.0))
+                    .RuleFor(r => r.PopulationServed, f => f.Random.Long(100, 10000))
+                    .Generate();
+
+                if (i < 5)
+                {
+                    string validId = "VALID_" + i;
+                    ts.AssociatedNativeAllocationIds = validId;
+                    validAllocationIds.Add(validId);
+                }
+                else
+                {
+                    ts.AssociatedNativeAllocationIds = (i % 2 == 0) ? null : "INVALID_" + i;
+                }
+
+                timeSeries.Add(ts);
             }
 
             await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
             await db.SaveChangesAsync();
 
-            db.SiteVariableAmountsFact.Should().HaveCount(20);
+            var allocations = validAllocationIds.Select(validId => new AllocationAmountsFact
+            {
+                AllocationNativeId = validId,
+                AllocationUuid = Guid.NewGuid().ToString()
+            }).ToList();
+
+            await db.AllocationAmountsFact.AddRangeAsync(allocations);
+            await db.SaveChangesAsync();
 
             // Act
             var accessor = CreateSiteAccessor();
-            var result = await accessor.GetSiteUsageInfoListBySiteUuid(siteDims[0].SiteUuid);
+            var result = (await accessor.GetSiteUsageInfoListBySiteUuid(site.SiteUuid)).ToList();
 
             // Assert
             result.Should().HaveCount(10);
             result.Should().BeInAscendingOrder(x => x.TimeframeStart);
+            foreach (var item in result)
+            {
+                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) && item.AssociatedNativeAllocationId.StartsWith("VALID_"))
+                {
+                    item.AllocationUuid.Should().NotBeNullOrEmpty();
+                }
+                else
+                {
+                    item.AllocationUuid.Should().BeNull();
+                }
+            }
         }
 
         [TestMethod]
