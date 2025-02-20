@@ -534,8 +534,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
-            var dates = new DateDimFaker().Generate(31);
-            db.DateDim.AddRange(dates);
+            
+            var dateFaker = new DateDimFaker();
+            var dateList = dateFaker.Generate(31).OrderBy(x => x.Date).ToList();
+            db.DateDim.AddRange(dateList);
             await db.SaveChangesAsync();
 
             var siteDims = new SitesDimFaker().Generate(2);
@@ -543,17 +545,20 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             await db.SaveChangesAsync();
 
             var site = siteDims[0];
+
             var timeSeries = new List<SiteVariableAmountsFact>();
             var validAllocationIds = new List<string>();
 
             for (int i = 0; i < 10; i++)
             {
+                var dateRow = dateList[i];
+
                 var ts = new SiteVariableAmountsFactFaker()
                     .RuleFor(r => r.SiteId, site.SiteId)
                     .RuleFor(r => r.Site, site)
-                    .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0, 30)].DateId)
-                    .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
-                    .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                    .RuleFor(r => r.TimeframeStartID, dateRow.DateId)
+                    .RuleFor(r => r.TimeframeEndID, dateList[6].DateId)
+                    .RuleFor(r => r.DataPublicationDateID, dateList[6].DateId)
                     .RuleFor(r => r.AllocationCropDutyAmount, f => f.Random.Double(1.0, 100.0))
                     .RuleFor(r => r.PopulationServed, f => f.Random.Long(100, 10000))
                     .Generate();
@@ -575,11 +580,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
             await db.SaveChangesAsync();
 
-            var allocations = validAllocationIds.Select(validId => new AllocationAmountsFact
-            {
-                AllocationNativeId = validId,
-                AllocationUuid = Guid.NewGuid().ToString()
-            }).ToList();
+            var allocations = validAllocationIds
+                .Select(validId => new AllocationAmountsFact
+                {
+                    AllocationNativeId = validId,
+                    AllocationUuid = Guid.NewGuid().ToString()
+                })
+                .ToList();
 
             await db.AllocationAmountsFact.AddRangeAsync(allocations);
             await db.SaveChangesAsync();
@@ -590,10 +597,13 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().HaveCount(10);
+
             result.Should().BeInAscendingOrder(x => x.TimeframeStart);
+
             foreach (var item in result)
             {
-                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) && item.AssociatedNativeAllocationId.StartsWith("VALID_"))
+                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) && 
+                    item.AssociatedNativeAllocationId.StartsWith("VALID_"))
                 {
                     item.AllocationUuid.Should().NotBeNullOrEmpty();
                 }
@@ -603,6 +613,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 }
             }
         }
+
 
         [TestMethod]
         public async Task SiteAccessor_GetMethodInfoListBySiteUuid()
