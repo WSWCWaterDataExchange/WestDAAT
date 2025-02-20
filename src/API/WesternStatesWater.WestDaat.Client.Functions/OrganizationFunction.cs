@@ -16,7 +16,7 @@ public class OrganizationFunction : FunctionBase
 
     private const string RouteBase = "Organizations";
 
-    public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger)
+    public OrganizationFunction(IOrganizationManager organizationManager, ILogger<OrganizationFunction> logger) : base(logger)
     {
         _organizationManager = organizationManager;
         _logger = logger;
@@ -45,9 +45,12 @@ public class OrganizationFunction : FunctionBase
     [OpenApiParameter("organizationId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
     public async Task<HttpResponseData> OrganizationMembers(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/{{organizationId}}/Members")]
-        HttpRequestData req)
+        HttpRequestData req, Guid organizationId)
     {
-        var organizationStoreRequest = await ParseRequestBody<OrganizationStoreRequestBase>(req);
+        var organizationStoreRequest = await ParseRequestBody<OrganizationStoreRequestBase>(req,
+            new Dictionary<string, object> { { "OrganizationId", organizationId } }
+        );
+
         var result = organizationStoreRequest switch
         {
             OrganizationMemberAddRequest request => await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(request),

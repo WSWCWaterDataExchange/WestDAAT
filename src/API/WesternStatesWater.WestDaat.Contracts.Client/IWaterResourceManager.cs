@@ -38,9 +38,7 @@ public interface IWaterResourceManager : IServiceContractBase
     Task<string> GetWaterAllocationSiteGeoconnexIntegrationData(string siteUuid);
 
     Task<WaterRightDetails> GetWaterRightDetails(string allocationUuid);
-
-    Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid);
-
+    
     Task<FeatureCollection> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchRequest);
 
     Task<List<WaterRightInfoListItem>> GetWaterRightsInfoListByReportingUnitUuid(string reportingUnitUuid);

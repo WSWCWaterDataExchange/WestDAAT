@@ -142,6 +142,19 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
+        var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
+
+        for (int i = 0; i < polygonGeometries.Length; i++)
+        {
+            for (int j = i + 1; j < polygonGeometries.Length; j++)
+            {
+                if (polygonGeometries[i].Intersects(polygonGeometries[j]))
+                {
+                    return CreateValidationError(request, nameof(EstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
+                }
+            }
+        }
+
         return null;
     }
 
@@ -241,6 +254,8 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EnrichJwtRequest => ValidateEnrichJwtRequest(context),
+            OrganizationUserListRequest req => ValidateOrganizationUserListRequest(req, context),
+            UserListRequest => ValidateUserListRequest(context),
             UserSearchRequest => ValidateUserSearchRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -253,6 +268,35 @@ internal class ValidationEngine : IValidationEngine
         if (context is not IdentityProviderContext)
         {
             return CreateForbiddenError(new EnrichJwtRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationUserListRequest(OrganizationUserListRequest request, ContextBase context)
+    {
+        var organizationPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+
+        if (!organizationPermissions.Contains(Permissions.OrganizationUserList))
+        {
+            return CreateForbiddenError(new OrganizationUserListRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserListRequest(ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+
+        // Must have permission at the non-organization level (Global Admin, etc)
+        if (!permissions.Contains(Permissions.UserList))
+        {
+            return CreateForbiddenError(new UserListRequest(), context);
         }
 
         return null;
@@ -288,8 +332,20 @@ internal class ValidationEngine : IValidationEngine
             $"'{context.ToLogString()}' attempted to make a request of type '{request.GetType().Name}', " +
             $"but the resource '{resourceName}' with ID(s) '{string.Join(", ", resourceIds)}' already exists.";
 
-
         return new ConflictError { LogMessage = logMessage };
+    }
+
+    private ValidationError CreateValidationError(
+        RequestBase request,
+        string fieldName,
+        string errorMessage
+    )
+    {
+        var errors = new Dictionary<string, string[]> { { fieldName, new[] { errorMessage } } };
+        var logMessage =
+            $"'{request.GetType().Name}' failed validation on the fields {fieldName}";
+
+        return new ValidationError(errors) { LogMessage = logMessage };
     }
 
     private ForbiddenError CreateForbiddenError(

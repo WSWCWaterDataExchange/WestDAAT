@@ -21,6 +21,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return request switch
         {
             UserExistsRequest req => await GetUserExists(req),
+            UserListRequest req => await ListUsers(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
             UserSearchRequest req => await SearchUsers(req),
             _ => throw new NotImplementedException(
@@ -61,6 +62,31 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return new UserExistsResponse
         {
             UserExists = userExists
+        };
+    }
+
+    private async Task<UserListResponse> ListUsers(UserListRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var query = db.Users
+            .Where(u => u.UserProfile != null)
+            .OrderBy(u => u.UserProfile.FirstName)
+            .ThenBy(u => u.UserProfile.LastName)
+            .AsQueryable();
+
+        if (request.OrganizationId != null)
+        {
+            query = query.Where(u => u.UserOrganizations.Any(uo => uo.OrganizationId == request.OrganizationId));
+        }
+
+        var users = await query
+            .ProjectTo<UserListResult>(DtoMapper.Configuration)
+            .ToArrayAsync();
+
+        return new UserListResponse
+        {
+            Users = users
         };
     }
 

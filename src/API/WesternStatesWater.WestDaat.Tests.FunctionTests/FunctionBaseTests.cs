@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Moq;
 using System.Net;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Client.Functions;
@@ -13,7 +14,7 @@ namespace WesternStatesWater.WestDaat.Tests.FunctionTests;
 [TestClass]
 public class FunctionBaseTests
 {
-    private readonly TestFunction _function = new();
+    private readonly TestFunction _function = new(new Mock<ILogger>().Object);
 
     [TestMethod]
     public async Task CreateResponse_DescendentOfResponseBase_ShouldReturn200()
@@ -159,7 +160,7 @@ public class FunctionBaseTests
     {
     }
 
-    private class TestFunction : FunctionBase
+    private class TestFunction(ILogger logger) : FunctionBase(logger)
     {
         public new Task<HttpResponseData> CreateResponse(HttpRequestData request, ResponseBase response)
         {

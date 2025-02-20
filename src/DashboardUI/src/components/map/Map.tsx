@@ -88,6 +88,7 @@ function Map({
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
+  const { setDrawPolygon } = useMapContext();
   const [styleFlag, setStyleFlag] = useState(0);
   const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
@@ -149,7 +150,16 @@ function Map({
     mapInstance.addControl(dc);
 
     const callback = () => {
-      if (handleMapDrawnPolygonChange) handleMapDrawnPolygonChange(dc.getAll().features);
+      const features = dc.getAll().features;
+      const polygon = features.find((f) => f.geometry.type === 'Polygon') as
+        | GeoJSON.Feature<GeoJSON.Polygon>
+        | undefined;
+
+      setDrawPolygon(polygon ?? null);
+
+      if (handleMapDrawnPolygonChange) {
+        handleMapDrawnPolygonChange(features);
+      }
     };
 
     mapInstance.on('draw.create', callback);
