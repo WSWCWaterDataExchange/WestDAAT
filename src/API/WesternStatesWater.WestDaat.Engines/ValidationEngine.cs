@@ -254,6 +254,8 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EnrichJwtRequest => ValidateEnrichJwtRequest(context),
+            OrganizationUserListRequest req => ValidateOrganizationUserListRequest(req, context),
+            UserListRequest => ValidateUserListRequest(context),
             UserSearchRequest => ValidateUserSearchRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -266,6 +268,35 @@ internal class ValidationEngine : IValidationEngine
         if (context is not IdentityProviderContext)
         {
             return CreateForbiddenError(new EnrichJwtRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationUserListRequest(OrganizationUserListRequest request, ContextBase context)
+    {
+        var organizationPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+
+        if (!organizationPermissions.Contains(Permissions.OrganizationUserList))
+        {
+            return CreateForbiddenError(new OrganizationUserListRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserListRequest(ContextBase context)
+    {
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+
+        // Must have permission at the non-organization level (Global Admin, etc)
+        if (!permissions.Contains(Permissions.UserList))
+        {
+            return CreateForbiddenError(new UserListRequest(), context);
         }
 
         return null;

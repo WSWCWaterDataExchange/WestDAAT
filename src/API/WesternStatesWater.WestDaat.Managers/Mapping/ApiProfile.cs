@@ -69,7 +69,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.UserSearchResponse, ClientContracts.Responses.Admin.UserSearchResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            
+
             CreateMap<CommonContracts.UserSearchResult, ClientContracts.UserSearchResult>();
         }
 
@@ -89,11 +89,21 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.OrganizationDetailsListResponse, ClientContracts.Responses.Admin.OrganizationSummaryListResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            
+
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationSummaryItem>();
-            
+
             CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<ClientContracts.Requests.Admin.OrganizationUserListRequest, CommonContracts.UserListRequest>();
+
+            CreateMap<ClientContracts.Requests.Admin.UserListRequest, CommonContracts.UserListRequest>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(_ => (Guid?)null));
+
+            CreateMap<CommonContracts.UserListResponse, ClientContracts.Responses.Admin.UserListResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.UserListResult, ClientContracts.UserListResult>();
         }
 
         private void AddApplicationMappings()

@@ -213,6 +213,16 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserProfile.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserProfile.LastName))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName));
+
+            CreateProjection<EFWD.User, UserListResult>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserProfile.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserProfile.LastName))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                // Intentionally only mapping the first org and first role. Multi-org / multi-role is not supported.
+                // Do not FirstOrDefault. We don't want this to silently fail if multi is supported later
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizations.Single().UserOrganizationRoles.Single().Role));
         }
 
         private void AddOrganizationMappings()
