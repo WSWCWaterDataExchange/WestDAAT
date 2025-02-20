@@ -1,5 +1,3 @@
-using System.Transactions;
-using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
@@ -15,22 +13,17 @@ public class OrganizationAccessorTests : AccessorTestBase
 
     private WestDaatDatabaseContext _westdaatDb;
 
-    private DatabaseContext _wadeDb;
-
     [TestInitialize]
     public void TestInitialize()
     {
         var westdaatDbFactory = CreateWestDaatDatabaseContextFactory();
-        var wadeDbFactory = CreateDatabaseContextFactory();
 
         _organizationAccessor = new OrganizationAccessor(
             CreateLogger<OrganizationAccessor>(),
-            westdaatDbFactory,
-            wadeDbFactory
+            westdaatDbFactory
         );
 
         _westdaatDb = westdaatDbFactory.Create();
-        _wadeDb = wadeDbFactory.Create();
     }
 
     [TestMethod]
@@ -83,106 +76,58 @@ public class OrganizationAccessorTests : AccessorTestBase
     }
 
     [DataTestMethod]
-    [DataRow(false, false, false, DisplayName = "No water right, should throw")]
-    [DataRow(true, false, false, DisplayName = "Water right exists but no organization supports this water right, should throw")]
-    [DataRow(true, true, true, DisplayName = "Water right exists and has organization support, success")]
-    public async Task Load_GetOrganizationFundingDetails_Success(bool waterRightExists, bool waterRightHasLinkedOrganization, bool shouldSucceed)
+    [DataRow(false, false, DisplayName = "Organization does not exist, should throw")]
+    [DataRow(true, true, DisplayName = "Organization exists, success")]
+    public async Task Load_GetOrganizationFundingDetails_Success(bool organizationExists, bool shouldSucceed)
     {
-        // Arrange
-        // override TransactionScope in AccessorTestBase
-        using var transactionScope = new TransactionScope(
-            TransactionScopeOption.Suppress,
-            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-            TransactionScopeAsyncFlowOption.Enabled);
-
-        Database.EntityFramework.Organization organization = null;
-        string waterRightNativeId = string.Empty;
-
-        await using var wadeDb = CreateDatabaseContextFactory().Create();
-        await using var westDaatDb = CreateWestDaatDatabaseContextFactory().Create();
-
-        try
+        Guid? organizationId = null;
+        WestDaat.Database.EntityFramework.Organization organization = null;
+        if (organizationExists)
         {
-            if (waterRightExists)
-            {
-                var waterRightFaker = new AllocationAmountFactFaker();
+            organization = new OrganizationFaker().Generate();
+            await _westdaatDb.Organizations.AddAsync(organization);
+            await _westdaatDb.SaveChangesAsync();
 
-                if (waterRightHasLinkedOrganization)
-                {
-                    organization = new OrganizationFaker().Generate();
-                    await westDaatDb.Organizations.AddAsync(organization);
-                    await westDaatDb.SaveChangesAsync();
-
-                    waterRightFaker.RuleFor(x => x.ConservationApplicationFundingOrganizationId, organization.Id);
-                }
-
-                var waterRight = waterRightFaker.Generate();
-                await wadeDb.AllocationAmountsFact.AddAsync(waterRight);
-                await wadeDb.SaveChangesAsync();
-
-                waterRightNativeId = waterRight.AllocationNativeId;
-            }
-
-
-            // Act
-            var request = new OrganizationFundingDetailsRequest
-            {
-                WaterRightNativeId = waterRightNativeId
-            };
-            var call = async () => await _organizationAccessor.Load(request);
-
-            // Assert
-            if (shouldSucceed)
-            {
-                var response = (OrganizationFundingDetailsResponse)await call();
-
-                response.Should().NotBeNull();
-
-                var org = response.Organization;
-                org.Should().NotBeNull();
-                org.OrganizationId.Should().Be(organization.Id);
-                org.OrganizationName.Should().Be(organization.Name);
-                org.OpenEtModelDisplayName.Should().Be(Enum.GetName(organization.OpenEtModel));
-                org.CompensationRateModel.Should().Be(organization.OpenEtCompensationRateModel);
-                org.OpenEtDateRangeStart.Should().Be(
-                    DateOnly.FromDateTime(
-                        new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                        .UtcDateTime
-                    )
-                );
-                org.OpenEtDateRangeEnd.Should().Be(
-                    DateOnly.FromDateTime(
-                        new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                        .AddMinutes(-1)
-                        .UtcDateTime
-                    )
-                );
-            }
-            else
-            {
-                await call.Should().ThrowAsync<InvalidOperationException>();
-            }
+            organizationId = organization.Id;
         }
-        finally
-        {
-            // cleanup
-            // necessary since we're using a custom transaction scope
-            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
-            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
-            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
-            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
-            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
-            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
-            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
-            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
-            wadeDb.Variable.RemoveRange(wadeDb.Variable);
-            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
-            wadeDb.Units.RemoveRange(wadeDb.Units);
-            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
-            await wadeDb.SaveChangesAsync();
 
-            westDaatDb.Organizations.RemoveRange(westDaatDb.Organizations);
-            await westDaatDb.SaveChangesAsync();
+        // Act
+        var request = new OrganizationFundingDetailsRequest
+        {
+            OrganizationId = organizationId ?? Guid.NewGuid()
+        };
+        var call = async () => await _organizationAccessor.Load(request);
+
+        // Assert
+        if (shouldSucceed)
+        {
+            var response = (OrganizationFundingDetailsResponse)await call();
+
+            response.Should().NotBeNull();
+
+            var org = response.Organization;
+            org.Should().NotBeNull();
+            org.OrganizationId.Should().Be(organization.Id);
+            org.OrganizationName.Should().Be(organization.Name);
+            org.OpenEtModelDisplayName.Should().Be(Enum.GetName(organization.OpenEtModel));
+            org.CompensationRateModel.Should().Be(organization.OpenEtCompensationRateModel);
+            org.OpenEtDateRangeStart.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .UtcDateTime
+                )
+            );
+            org.OpenEtDateRangeEnd.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .AddMinutes(-1)
+                    .UtcDateTime
+                )
+            );
+        }
+        else
+        {
+            await call.Should().ThrowAsync<InvalidOperationException>();
         }
     }
 

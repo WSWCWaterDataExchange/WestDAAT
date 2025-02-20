@@ -11,14 +11,10 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         private readonly EFWD.IWestDaatDatabaseContextFactory _westDaatDatabaseContextFactory;
 
-        private readonly EF.IDatabaseContextFactory _wadeDbContextFactory;
-
         public OrganizationAccessor(ILogger<OrganizationAccessor> logger,
-            EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory,
-            EF.IDatabaseContextFactory wadeDbContextFactory) : base(logger)
+            EFWD.IWestDaatDatabaseContextFactory westDaatDatabaseContextFactory) : base(logger)
         {
             _westDaatDatabaseContextFactory = westDaatDatabaseContextFactory;
-            _wadeDbContextFactory = wadeDbContextFactory;
         }
 
         public async Task<OrganizationLoadResponseBase> Load(OrganizationLoadRequestBase request)
