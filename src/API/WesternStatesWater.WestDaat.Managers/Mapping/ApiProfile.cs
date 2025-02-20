@@ -103,6 +103,12 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.UserListResult, ClientContracts.UserListResult>();
+
+            CreateMap<ClientContracts.Requests.Admin.OrganizationFundingDetailsRequest, CommonContracts.OrganizationFundingDetailsRequest>();
+
+            CreateMap<CommonContracts.OrganizationFundingDetails, ClientContracts.OrganizationFundingDetails>();
+
+            CreateMap<CommonContracts.OrganizationFundingDetailsResponse, ClientContracts.Responses.Admin.OrganizationFundingDetailsResponse>();
         }
 
         private void AddApplicationMappings()
