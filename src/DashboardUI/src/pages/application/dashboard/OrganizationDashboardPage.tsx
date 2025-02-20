@@ -51,8 +51,8 @@ export function OrganizationDashboardPage() {
   const [dataGridFilters, setDataGridFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
-
-  const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+  const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
+  const organizationIdFilter = !isGlobalAdmin ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
@@ -129,9 +129,10 @@ export function OrganizationDashboardPage() {
     return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
   };
 
-  const renderStatisticsCard = (description: string, value: number | string | null) => {
+  const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
     if (applicationListErrored) {
       value = '-';
+      subtitle = undefined;
     }
 
     return (
@@ -147,6 +148,7 @@ export function OrganizationDashboardPage() {
             )}
           </Card.Title>
           <Card.Text className="mb-3 mx-3 fs-6">
+            {!applicationListLoading && subtitle && <p className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</p>}
             {applicationListLoading ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
@@ -256,6 +258,7 @@ export function OrganizationDashboardPage() {
           {renderStatisticsCard(
             'Cumulative Est. Savings',
             formatNumberToLargestUnit(state.dashboardApplicationsStatistics.cumulativeEstimatedSavingsAcreFeet),
+            'Acre-Feet',
           )}
           {renderStatisticsCard(
             'Total Obligation',
@@ -282,6 +285,13 @@ export function OrganizationDashboardPage() {
               },
             }}
             onStateChange={handleDataGridStateChange}
+            initialState={{
+              columns: {
+                columnVisibilityModel: {
+                  fundingOrganization: isGlobalAdmin ? true : false,
+                },
+              },
+            }}
           ></DataGrid>
         </TableLoading>
       </div>
