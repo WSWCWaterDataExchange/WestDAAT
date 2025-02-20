@@ -57,7 +57,7 @@ namespace WesternStatesWater.WestDaat.Client.Functions
 
         private async Task<HttpResponseData> CreateErrorResponse(HttpRequestData request, ErrorBase error)
         {
-            logger.LogError(error.LogMessage);
+            logger.LogError($"Request resulted in an error response. LogMessage: {error.LogMessage}");
 
             return error switch
             {
