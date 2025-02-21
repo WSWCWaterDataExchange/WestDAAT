@@ -189,20 +189,20 @@ export function NldiFilters() {
 }
 
 function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
-  const [{ dropResult, isDragging }, dragRef] = useDrag({
+  const { setLatLong } = props;
+  const [{ isDragging }, dragRef] = useDrag({
     type: 'nldiMapPoint',
     item: {},
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult<{ latitude: number; longitude: number }>();
+      if (dropResult) {
+        setLatLong(dropResult.latitude.toString(), dropResult.longitude.toString());
+      }
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
-      dropResult: monitor.getDropResult<{ latitude: number; longitude: number } | undefined>(),
     }),
   });
-  const { setLatLong } = props;
-  useEffect(() => {
-    if (dropResult) {
-      setLatLong(dropResult.latitude.toString(), dropResult.longitude.toString());
-    }
-  }, [dropResult, setLatLong]);
 
   useEffect(() => {
     if (isDragging) {
