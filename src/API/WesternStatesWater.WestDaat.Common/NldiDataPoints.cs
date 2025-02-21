@@ -3,9 +3,10 @@
     [Flags]
     public enum NldiDataPoints
     {
-        None = 0,
-        Wade = 1 << 0,
-        Usgs = 1 << 1,
-        Epa = 1 << 2
+        None           = 0,
+        Usgs           = 1 << 0,
+        Epa            = 1 << 1,
+        WadeRights     = 1 << 2,
+        WadeTimeseries = 1 << 3
     }
 }
