@@ -249,8 +249,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     )
     {
         // Arrange
+        const int monthsInYear = 12;
+        const int startYear = 2024;
+        const int yearRange = 1;
+
         var user = new UserFaker().Generate();
-        var organization = new OrganizationFaker().Generate();
+        var organization = new OrganizationFaker()
+            .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
+            .Generate();
         var application = new WaterConservationApplicationFaker(user, organization).Generate();
 
         await _dbContext.WaterConservationApplications.AddAsync(application);
@@ -276,9 +282,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
 
 
-        const int monthsInYear = 12;
-        const int startYear = 2024;
-        const int yearRange = 1;
         OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
@@ -311,9 +314,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterConservationApplicationId = application.Id,
             WaterRightNativeId = application.WaterRightNativeId,
             Polygons = [memorialStadiumFootballField],
-            DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
-            DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + yearRange, 1, 1)),
-            Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
         };
 
         if (requestShouldIncludeCompensationInfo)
@@ -369,14 +369,25 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             // verify db fields all match expectations
             dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
-            dbEstimate.Model.Should().Be(request.Model);
-            dbEstimate.DateRangeStart.Should().Be(request.DateRangeStart);
-            dbEstimate.DateRangeEnd.Should().Be(request.DateRangeEnd);
+            dbEstimate.Model.Should().Be(organization.OpenEtModel);
+            dbEstimate.DateRangeStart.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - yearRange, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .UtcDateTime
+                )
+            );
+            dbEstimate.DateRangeEnd.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .AddMinutes(-1)
+                    .UtcDateTime
+                )
+            );
             dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
             dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
             dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
             dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
-            
+
             dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
             dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
@@ -442,9 +453,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterConservationApplicationId = application.Id,
             WaterRightNativeId = application.WaterRightNativeId,
             Polygons = [memorialStadiumFootballField],
-            DateRangeStart = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
-            DateRangeEnd = DateOnly.FromDateTime(new DateTime(startYear + 1, 1, 1)),
-            Model = Common.DataContracts.RasterTimeSeriesModel.SSEBop,
         };
 
         // Act

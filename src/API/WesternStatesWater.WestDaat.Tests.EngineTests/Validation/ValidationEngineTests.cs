@@ -94,16 +94,10 @@ public class ValidationEngineTests : EngineTestBase
         string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
         {
-            // relevant properties
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
             FundingOrganizationId = organizationIdMatches ? organizationId.Value : Guid.NewGuid(),
             Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
-
-            // extraneous properties
-            DateRangeStart = DateOnly.MinValue,
-            DateRangeEnd = DateOnly.MaxValue,
-            Model = RasterTimeSeriesModel.SSEBop,
         };
         var result = await _validationEngine.Validate(request);
 
