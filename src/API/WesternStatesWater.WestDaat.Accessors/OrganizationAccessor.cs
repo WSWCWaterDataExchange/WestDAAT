@@ -49,7 +49,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _westDaatDatabaseContextFactory.Create();
 
             var organization = await db.Organizations
-                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .ProjectTo<OrganizationSummaryItem>(DtoMapper.Configuration)
                 .FirstOrDefaultAsync(org => org.OrganizationId == request.OrganizationId);
 
             if (organization == null)
@@ -84,7 +84,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
             var organizations = await db.Organizations
                 .Where(org => org.UserOrganizations.Any(uo => uo.UserId == request.UserId))
-                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .ProjectTo<OrganizationSummaryItem>(DtoMapper.Configuration)
                 .ToArrayAsync();
 
             return new UserOrganizationLoadResponse
