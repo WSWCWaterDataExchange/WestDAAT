@@ -171,9 +171,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     };
                 });
 
-            CreateMap<CommonContracts.WaterRightFundingOrgDetails, CommonContracts.OrganizationFundingDetailsRequest>()
-                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId));
-
             CreateMap<(
                     ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
                     CommonContracts.OrganizationFundingDetails Organization,
