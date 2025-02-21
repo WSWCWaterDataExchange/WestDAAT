@@ -17,6 +17,7 @@
                     url.Equals("/sites/{siteuuid}/geoconnex") ||
                     url.Equals("/sites/{siteuuid}/methods") ||
                     url.Equals("/sites/{siteuuid}/rights") ||
+                    url.Equals("/sites/{siteuuid}/usagetable") ||
                     url.Equals("/sites/{siteuuid}/sitelocation") ||
                     url.Equals("/sites/{siteuuid}/siteusage") ||
                     url.Equals("/sites/{siteuuid}/sources") ||
