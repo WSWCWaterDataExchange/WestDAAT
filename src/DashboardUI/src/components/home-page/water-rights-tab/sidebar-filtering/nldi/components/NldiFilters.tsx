@@ -1,5 +1,4 @@
-import React from 'react';
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Directions, DataPoints } from '../../../../../../data-contracts/nldi';
 import { Button, Form } from 'react-bootstrap';
 import { mdiMapMarker } from '@mdi/js';
@@ -22,84 +21,79 @@ export function NldiFilters() {
     longitude: nldiFilters.longitude?.toFixed(nldi.latLongPrecision) ?? '',
   });
 
-  const handleLatitudeChanged = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setPointData((s) => ({
-        ...s,
-        latitude: e.target.value,
-      }));
-    },
-    [setPointData],
-  );
+  const handleLatitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setPointData((prev) => ({
+      ...prev,
+      latitude: e.target.value,
+    }));
+  }, []);
 
-  const handleLongitudeChanged = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setPointData((s) => ({
-        ...s,
-        longitude: e.target.value,
-      }));
-    },
-    [setPointData],
-  );
+  const handleLongitudeChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setPointData((prev) => ({
+      ...prev,
+      longitude: e.target.value,
+    }));
+  }, []);
 
   const setLatLongData = useCallback(
     (latValue: string, longValue: string) => {
       let lat = parseFloat(latValue);
-      let long = parseFloat(longValue);
+      let lng = parseFloat(longValue);
+
       const pointLat = isNaN(lat) ? '' : lat.toFixed(nldi.latLongPrecision);
-      const pointLong = isNaN(long) ? '' : long.toFixed(nldi.latLongPrecision);
-      if (isNaN(lat) || isNaN(long)) {
-        setPointData((s) => ({
-          ...s,
+      const pointLng = isNaN(lng) ? '' : lng.toFixed(nldi.latLongPrecision);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        setPointData((prev) => ({
+          ...prev,
           latitude: pointLat,
-          longitude: pointLong,
+          longitude: pointLng,
         }));
         setLatLong(null, null);
         return;
       }
-      if (lat > 90) {
-        lat = 90;
-      } else if (lat < -90) {
-        lat = -90;
-      }
-      if (long > 180) {
-        long = 180;
-      } else if (long < -180) {
-        long = -180;
-      }
+
+      if (lat > 90) lat = 90;
+      else if (lat < -90) lat = -90;
+      if (lng > 180) lng = 180;
+      else if (lng < -180) lng = -180;
+
       lat = parseFloat(lat.toFixed(nldi.latLongPrecision));
-      long = parseFloat(long.toFixed(nldi.latLongPrecision));
-      setLatLong(lat, long);
-      setPointData((s) => ({
-        ...s,
+      lng = parseFloat(lng.toFixed(nldi.latLongPrecision));
+
+      setLatLong(lat, lng);
+
+      setPointData((prev) => ({
+        ...prev,
         latitude: lat.toFixed(nldi.latLongPrecision),
-        longitude: long.toFixed(nldi.latLongPrecision),
+        longitude: lng.toFixed(nldi.latLongPrecision),
       }));
     },
     [setLatLong],
   );
 
-  const handleLatitudeBlurred = () => {
+  const handleLatitudeBlurred = useCallback(() => {
     setLatLongData(pointData.latitude, pointData.longitude);
-  };
+  }, [pointData, setLatLongData]);
 
-  const handleLongitudeBlurred = () => {
+  const handleLongitudeBlurred = useCallback(() => {
     setLatLongData(pointData.latitude, pointData.longitude);
-  };
+  }, [pointData, setLatLongData]);
 
   const handleDirectionsChanged = (e: ChangeEvent<HTMLInputElement>, dir: Directions) => {
-    const val = e.target.checked ? nldiFilters.directions | dir : nldiFilters.directions & ~dir;
-    setDirections(val);
+    const newValue = e.target.checked ? nldiFilters.directions | dir : nldiFilters.directions & ~dir;
+    setDirections(newValue);
   };
 
   const handleDataPointsChanged = (e: ChangeEvent<HTMLInputElement>, dataPoint: DataPoints) => {
-    const val = e.target.checked ? nldiFilters.dataPoints | dataPoint : nldiFilters.dataPoints & ~dataPoint;
-    setDataPoints(val);
+    const newValue = e.target.checked ? nldiFilters.dataPoints | dataPoint : nldiFilters.dataPoints & ~dataPoint;
+    setDataPoints(newValue);
   };
 
   return (
     <div className="position-relative flex-grow-1">
       <NldiDragAndDropButton setLatLong={setLatLongData} />
+
       <Form.Group className="mb-3">
         <Form.Label htmlFor="nldiLatitude">Latitude</Form.Label>
         <Form.Control
@@ -109,7 +103,7 @@ export function NldiFilters() {
           max={90}
           min={-90}
           step={0.01}
-          value={pointData.latitude ?? ''}
+          value={pointData.latitude}
           onChange={handleLatitudeChanged}
           onBlur={handleLatitudeBlurred}
         />
@@ -123,7 +117,7 @@ export function NldiFilters() {
           max={180}
           min={-180}
           step={0.01}
-          value={pointData.longitude ?? ''}
+          value={pointData.longitude}
           onChange={handleLongitudeChanged}
           onBlur={handleLongitudeBlurred}
         />
@@ -135,8 +129,8 @@ export function NldiFilters() {
             className="toggle"
             type="switch"
             id="nldiUpstream"
-            checked={(nldiFilters.directions & Directions.Upsteam) > 0}
-            onChange={(e) => handleDirectionsChanged(e, Directions.Upsteam)}
+            checked={(nldiFilters.directions & Directions.Upstream) > 0}
+            onChange={(e) => handleDirectionsChanged(e, Directions.Upstream)}
             label="Upstream"
           />
         </Form.Group>
@@ -145,8 +139,8 @@ export function NldiFilters() {
             className="toggle"
             type="switch"
             id="nldiDownstream"
-            checked={(nldiFilters.directions & Directions.Downsteam) > 0}
-            onChange={(e) => handleDirectionsChanged(e, Directions.Downsteam)}
+            checked={(nldiFilters.directions & Directions.Downstream) > 0}
+            onChange={(e) => handleDirectionsChanged(e, Directions.Downstream)}
             label="Downstream"
           />
         </Form.Group>
@@ -157,12 +151,23 @@ export function NldiFilters() {
           <Form.Check
             className="toggle"
             type="switch"
-            id="nldiWade"
-            checked={(nldiFilters.dataPoints & DataPoints.Wade) > 0}
-            onChange={(e) => handleDataPointsChanged(e, DataPoints.Wade)}
-            label="WaDE Sites"
+            id="nldiWadeRights"
+            checked={(nldiFilters.dataPoints & DataPoints.WadeRights) > 0}
+            onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeRights)}
+            label="WaDE Rights"
           />
         </Form.Group>
+        <Form.Group>
+          <Form.Check
+            className="toggle"
+            type="switch"
+            id="nldiWadeTimeseries"
+            checked={(nldiFilters.dataPoints & DataPoints.WadeTimeseries) > 0}
+            onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeTimeseries)}
+            label="WaDE Timeseries"
+          />
+        </Form.Group>
+
         <Form.Group>
           <Form.Check
             className="toggle"
@@ -170,7 +175,7 @@ export function NldiFilters() {
             id="nldiUsgs"
             checked={(nldiFilters.dataPoints & DataPoints.Usgs) > 0}
             onChange={(e) => handleDataPointsChanged(e, DataPoints.Usgs)}
-            label="USGS sites"
+            label="USGS Sites"
           />
         </Form.Group>
         <Form.Group>
@@ -187,8 +192,7 @@ export function NldiFilters() {
     </div>
   );
 }
-
-function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) => void }) {
+function NldiDragAndDropButton(props: { setLatLong: (lat: string, lng: string) => void }) {
   const { setLatLong } = props;
   const [{ isDragging }, dragRef] = useDrag({
     type: 'nldiMapPoint',
@@ -216,11 +220,13 @@ function NldiDragAndDropButton(props: { setLatLong: (lat: string, long: string) 
     <div className="d-inline-flex flex-row align-items-center">
       <Button
         type="button"
-        ref={(el) => {
-          dragRef(el);
-        }}
         variant="no-outline"
         className="grabbable me-2"
+        ref={(el) => {
+          if (el) {
+            dragRef(el);
+          }
+        }}
       >
         <Icon path={mdiMapMarker} color={nldi.colors.mapMarker} size="48px" />
       </Button>

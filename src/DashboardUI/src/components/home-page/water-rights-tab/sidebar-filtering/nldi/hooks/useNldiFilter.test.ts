@@ -8,7 +8,7 @@ let currFilters = { ...WaterRightsProvider.defaultWaterRightsFilters };
 const differentNldiFilters = {
   latitude: 30,
   longitude: -90,
-  directions: Directions.Downsteam,
+  directions: Directions.Downstream,
   dataPoints: DataPoints.Epa,
 };
 const mockSetFilters = jest.fn((a) => (currFilters = a()));
