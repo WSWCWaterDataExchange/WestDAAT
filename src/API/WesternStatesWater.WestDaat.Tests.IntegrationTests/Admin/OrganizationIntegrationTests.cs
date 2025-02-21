@@ -198,7 +198,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             // Act
             var request = new OrganizationFundingDetailsRequest()
             {
-                WaterRightNativeId = allocationAmountFact.AllocationNativeId,
+                WaterRightNativeId = allocationAmountFact.AllocationUuid,
             };
             var response = await _organizationManager.Load<OrganizationFundingDetailsRequest, OrganizationFundingDetailsResponse>(request);
 

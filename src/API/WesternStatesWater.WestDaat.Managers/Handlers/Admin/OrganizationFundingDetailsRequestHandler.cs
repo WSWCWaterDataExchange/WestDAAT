@@ -23,7 +23,7 @@ public class OrganizationFundingDetailsRequestHandler : IRequestHandler<Organiza
     public async Task<OrganizationFundingDetailsResponse> Handle(OrganizationFundingDetailsRequest request)
     {
         // get the funding org id from the water right
-        var waterRightFundingOrgDetailsResponse = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByNativeId(request.WaterRightNativeId);
+        var waterRightFundingOrgDetailsResponse = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByUuid(request.WaterRightNativeId);
 
         // get the funding org details
         var getFundingOrgDetailsRequest = waterRightFundingOrgDetailsResponse.Map<CommonContracts.OrganizationFundingDetailsRequest>();

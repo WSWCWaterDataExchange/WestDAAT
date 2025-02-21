@@ -2957,12 +2957,12 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 db.AllocationAmountsFact.Add(waterRight);
                 db.SaveChanges();
 
-                nativeId = waterRight.AllocationNativeId;
+                nativeId = waterRight.AllocationUuid;
             }
 
             // Act
             var accessor = CreateWaterAllocationAccessor();
-            var call = async () => await accessor.GetWaterRightFundingOrgDetailsByNativeId(nativeId);
+            var call = async () => await accessor.GetWaterRightFundingOrgDetailsByUuid(nativeId);
 
             // Assert
             if (shouldSucceed)
