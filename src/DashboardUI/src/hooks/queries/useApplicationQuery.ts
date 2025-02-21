@@ -1,14 +1,11 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
 import { useQuery } from 'react-query';
-import {
-  applicationSearch,
-  createWaterConservationApplication,
-  getFundingOrganizationDetails,
-} from '../../accessors/applicationAccessor';
+import { applicationSearch, createWaterConservationApplication } from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
-import { FundingOrganizationDetails } from '../../data-contracts/FundingOrganizationDetails';
 import { toast } from 'react-toastify';
+import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
+import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -60,20 +57,22 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
   return useQuery(
     ['fundingOrganizationDetails', waterRightNativeId],
-    () => getFundingOrganizationDetails(context, waterRightNativeId!),
+    () => getOrganizationFundingDetails(context, waterRightNativeId!),
     {
       enabled: !!waterRightNativeId,
-      onSuccess: (result: FundingOrganizationDetails) => {
-        if (result) {
+      onSuccess: (result: OrganizationFundingDetailsResponse) => {
+        if (result && result.organization) {
+          const org = result.organization;
+
           dispatch({
             type: 'FUNDING_ORGANIZATION_LOADED',
             payload: {
-              fundingOrganizationId: result.fundingOrganizationId,
-              fundingOrganizationName: result.fundingOrganizationName,
-              openEtModelName: result.openEtModelName,
-              dateRangeStart: result.dateRangeStart,
-              dateRangeEnd: result.dateRangeEnd,
-              compensationRateModel: result.compensationRateModel,
+              fundingOrganizationId: org.organizationId,
+              fundingOrganizationName: org.organizationName,
+              openEtModelName: org.openEtModelDisplayName,
+              dateRangeStart: new Date(org.openEtDateRangeStart),
+              dateRangeEnd: new Date(org.openEtDateRangeEnd),
+              compensationRateModel: org.compensationRateModel,
             },
           });
         }

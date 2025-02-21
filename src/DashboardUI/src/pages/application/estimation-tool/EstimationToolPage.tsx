@@ -15,9 +15,9 @@ import { CompensationRateUnits } from '../../../data-contracts/CompensationRateU
 import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
+import { toast } from 'react-toastify';
 
 import './estimation-tool-page.scss';
-import { toast } from 'react-toastify';
 
 export function EstimationToolPage() {
   const context = useMsal();
