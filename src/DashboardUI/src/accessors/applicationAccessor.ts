@@ -51,11 +51,7 @@ export const estimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
-    fundingOrganizationId: string;
     waterRightNativeId: string;
-    model: RasterTimeSeriesModel;
-    dateRangeStart: Date;
-    dateRangeEnd: Date;
     polygonWkts: string[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
@@ -63,11 +59,8 @@ export const estimateConsumptiveUse = async (
 ): Promise<EstimateConsumptiveUseResponse> => {
   const request: EstimateConsumptiveUseRequest = {
     waterConservationApplicationId: fields.waterConservationApplicationId,
-    fundingOrganizationId: fields.fundingOrganizationId,
+    fundingOrganizationId: '', // not trusting the frontend to provide this
     waterRightNativeId: fields.waterRightNativeId,
-    model: fields.model,
-    dateRangeStart: toDateOnlyString(fields.dateRangeStart),
-    dateRangeEnd: toDateOnlyString(fields.dateRangeEnd),
     polygons: fields.polygonWkts,
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
@@ -78,5 +71,3 @@ export const estimateConsumptiveUse = async (
 
   return data;
 };
-
-const toDateOnlyString = (date: Date): string => date.toISOString().split('T')[0];
