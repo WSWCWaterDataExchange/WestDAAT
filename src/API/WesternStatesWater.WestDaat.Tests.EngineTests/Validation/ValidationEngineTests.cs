@@ -57,7 +57,6 @@ public class ValidationEngineTests : EngineTestBase
     [DataRow(true, true, true, false, true, DisplayName = "User requests estimate for their own Application with matching fields")]
     [DataRow(false, false, false, false, false, DisplayName = "User requests estimate for Application that does not exist")]
     [DataRow(true, false, true, false, false, DisplayName = "User requests estimate for a different Application that they own")]
-    [DataRow(true, true, false, false, false, DisplayName = "User requests estimate for their own Application but with an incorrect Funding Organization")]
     [DataRow(true, true, true, true, false, DisplayName = "User requests estimate for their own Application with intersecting polygons")]
     public async Task Validate_ValidateEstimateConsumptiveUseRequest_Success(
         bool applicationExists,
