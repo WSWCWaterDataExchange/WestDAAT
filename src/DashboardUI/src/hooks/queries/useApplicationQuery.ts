@@ -6,6 +6,7 @@ import { WaterConservationApplicationCreateResponse } from '../../data-contracts
 import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
+import { parseDateOnly } from '../../utilities/dateHelpers';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -70,8 +71,8 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
               fundingOrganizationId: org.organizationId,
               fundingOrganizationName: org.organizationName,
               openEtModelName: org.openEtModelDisplayName,
-              dateRangeStart: new Date(org.openEtDateRangeStart),
-              dateRangeEnd: new Date(org.openEtDateRangeEnd),
+              dateRangeStart: parseDateOnly(org.openEtDateRangeStart),
+              dateRangeEnd: parseDateOnly(org.openEtDateRangeEnd),
               compensationRateModel: org.compensationRateModel,
             },
           });
