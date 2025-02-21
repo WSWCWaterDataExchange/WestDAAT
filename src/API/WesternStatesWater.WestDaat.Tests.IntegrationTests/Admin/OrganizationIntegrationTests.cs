@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Transactions;
 using WesternStatesWater.Shared.Errors;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
-using WesternStatesWater.WestDaat.Database.EntityFramework;
-using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -158,6 +160,93 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Organizations[0].Should().BeEquivalentTo(expected.ElementAt(0));
         response.Organizations[1].Should().BeEquivalentTo(expected.ElementAt(1));
         response.Organizations[2].Should().BeEquivalentTo(expected.ElementAt(2));
+    }
+
+    [TestMethod]
+    public async Task Load_OrganizationFundingDetailsRequest_Success()
+    {
+        // Arrange
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // perform db setup in custom transaction scope to avoid implicit distributed transactions error
+        using var transactionScope = new TransactionScope(TransactionScopeOption.Suppress, new TransactionOptions
+        {
+            IsolationLevel = IsolationLevel.ReadCommitted,
+        }, TransactionScopeAsyncFlowOption.Enabled);
+
+        var organization = new OrganizationFaker().Generate();
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.SaveChangesAsync();
+
+        var wadeDbContext = Services.GetRequiredService<IDatabaseContextFactory>();
+        var wadeDb = wadeDbContext.Create();
+
+        var allocationAmountFact = new AllocationAmountFactFaker()
+            .RuleFor(x => x.ConservationApplicationFundingOrganizationId, () => organization.Id)
+            .Generate();
+        await wadeDb.AllocationAmountsFact.AddAsync(allocationAmountFact);
+        await wadeDb.SaveChangesAsync();
+
+        try
+        {
+            // Act
+            var request = new OrganizationFundingDetailsRequest()
+            {
+                WaterRightNativeId = allocationAmountFact.AllocationNativeId,
+            };
+            var response = await _organizationManager.Load<OrganizationFundingDetailsRequest, OrganizationFundingDetailsResponse>(request);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.Error.Should().BeNull();
+            response.GetType().Should().Be<OrganizationFundingDetailsResponse>();
+
+            response.Organization.Should().NotBeNull();
+            response.Organization.OrganizationId.Should().Be(organization.Id);
+            response.Organization.OrganizationName.Should().Be(organization.Name);
+            response.Organization.OpenEtModelDisplayName.Should().Be(Enum.GetName(organization.OpenEtModel));
+            response.Organization.CompensationRateModel.Should().Be(organization.OpenEtCompensationRateModel);
+            response.Organization.OpenEtDateRangeStart.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .UtcDateTime
+                )
+            );
+            response.Organization.OpenEtDateRangeEnd.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    .AddMinutes(-1)
+                    .UtcDateTime
+                )
+            );
+        }
+        finally
+        {
+            // cleanup
+            // necessary since we're using a custom transaction scope
+            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
+            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
+            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
+            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
+            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
+            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
+            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
+            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
+            wadeDb.Variable.RemoveRange(wadeDb.Variable);
+            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
+            wadeDb.Units.RemoveRange(wadeDb.Units);
+            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
+            await wadeDb.SaveChangesAsync();
+
+            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
 
