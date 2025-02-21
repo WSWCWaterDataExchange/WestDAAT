@@ -62,21 +62,19 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
     {
       enabled: !!waterRightNativeId,
       onSuccess: (result: OrganizationFundingDetailsResponse) => {
-        if (result && result.organization) {
-          const org = result.organization;
+        const org = result.organization;
 
-          dispatch({
-            type: 'FUNDING_ORGANIZATION_LOADED',
-            payload: {
-              fundingOrganizationId: org.organizationId,
-              fundingOrganizationName: org.organizationName,
-              openEtModelName: org.openEtModelDisplayName,
-              dateRangeStart: parseDateOnly(org.openEtDateRangeStart),
-              dateRangeEnd: parseDateOnly(org.openEtDateRangeEnd),
-              compensationRateModel: org.compensationRateModel,
-            },
-          });
-        }
+        dispatch({
+          type: 'FUNDING_ORGANIZATION_LOADED',
+          payload: {
+            fundingOrganizationId: org.organizationId,
+            fundingOrganizationName: org.organizationName,
+            openEtModelName: org.openEtModelDisplayName,
+            dateRangeStart: parseDateOnly(org.openEtDateRangeStart),
+            dateRangeEnd: parseDateOnly(org.openEtDateRangeEnd),
+            compensationRateModel: org.compensationRateModel,
+          },
+        });
       },
       onError: (error: Error) => {
         toast.error('Failed to load data. Please try again later.');
