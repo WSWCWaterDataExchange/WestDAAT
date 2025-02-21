@@ -763,18 +763,18 @@ namespace WesternStatesWater.WestDaat.Accessors
             return allRegulatoryUuids;
         }
 
-        public async Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByNativeId(string allocationNativeId)
+        public async Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByUuid(string allocationUuid)
         {
             await using var db = _databaseContextFactory.Create();
             await db.Database.OpenConnectionAsync();
 
             var allocationAmount = await db.AllocationAmountsFact
                 .AsNoTracking()
-                .SingleOrDefaultAsync(aaf => aaf.AllocationNativeId == allocationNativeId);
+                .SingleOrDefaultAsync(aaf => aaf.AllocationUuid == allocationUuid);
 
             if (allocationAmount?.ConservationApplicationFundingOrganizationId == null)
             {
-                throw new WestDaatException($"Allocation with native ID '{allocationNativeId}' does not have a funding organization.");
+                throw new WestDaatException($"Allocation with UUID '{allocationUuid}' does not have a funding organization.");
             }
 
             return new WaterRightFundingOrgDetails

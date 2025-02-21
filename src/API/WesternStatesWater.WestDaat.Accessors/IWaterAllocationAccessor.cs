@@ -36,6 +36,6 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid);
 
-        Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByNativeId(string allocationNativeId);
+        Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByUuid(string allocationUuid);
     }
 }
