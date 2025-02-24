@@ -133,15 +133,6 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        // user has an in-progress application for the requested water right
-        // BUT user is attempting to request an estimate using an organization that may not control this water right
-        var estimateRequestedOfIncorrectOrganization = inProgressApplicationExistsResponse.FundingOrganizationId.HasValue &&
-                                                       inProgressApplicationExistsResponse.FundingOrganizationId.Value != request.FundingOrganizationId;
-        if (estimateRequestedOfIncorrectOrganization)
-        {
-            return CreateForbiddenError(request, context);
-        }
-
         var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
