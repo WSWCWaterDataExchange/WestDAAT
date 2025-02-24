@@ -95,7 +95,6 @@ public class ValidationEngineTests : EngineTestBase
         {
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
-            FundingOrganizationId = organizationIdMatches ? organizationId.Value : Guid.NewGuid(),
             Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
         };
         var result = await _validationEngine.Validate(request);

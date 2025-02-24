@@ -337,7 +337,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             var requestedCompensationPerAcreFoot = 1000;
             var request = new EstimateConsumptiveUseRequest
             {
-                FundingOrganizationId = Guid.Empty, // not trusting the frontend to provide this field
                 WaterConservationApplicationId = application.Id,
                 WaterRightNativeId = application.WaterRightNativeId,
                 Polygons = [memorialStadiumFootballField],
@@ -504,7 +503,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         var request = new EstimateConsumptiveUseRequest
         {
-            FundingOrganizationId = organization.Id,
             WaterConservationApplicationId = application.Id,
             WaterRightNativeId = application.WaterRightNativeId,
             Polygons = [memorialStadiumFootballField],
