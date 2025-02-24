@@ -82,6 +82,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 .Build();
 
             serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
+            serviceCollection.AddScoped(_ => config.GetPerformanceConfiguration());
         }
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)

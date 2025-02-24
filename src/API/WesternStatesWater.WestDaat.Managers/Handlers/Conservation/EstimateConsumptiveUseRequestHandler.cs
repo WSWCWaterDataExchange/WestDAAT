@@ -14,19 +14,30 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
     public IApplicationAccessor ApplicationAccessor { get; }
+    public IOrganizationAccessor OrganizationAccessor { get; }
+    public IWaterAllocationAccessor WaterAllocationAccessor { get; }
 
     public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk,
-        IApplicationAccessor applicationAccessor)
+        IApplicationAccessor applicationAccessor,
+        IOrganizationAccessor organizationAccessor,
+        IWaterAllocationAccessor waterAllocationAccessor)
     {
         CalculationEngine = calculationEngine;
         OpenEtSdk = openEtSdk;
         ApplicationAccessor = applicationAccessor;
+        OrganizationAccessor = organizationAccessor;
+        WaterAllocationAccessor = waterAllocationAccessor;
     }
 
     public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
     {
-        var multiPolygonEtRequest = request.Map<MultiPolygonYearlyEtRequest>();
+        var waterRightFundingOrgDetails = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByUuid(request.WaterRightNativeId);
+
+        var fundingOrgDetailsRequest = waterRightFundingOrgDetails.Map<OrganizationFundingDetailsRequest>();
+        var fundingOrgDetailsResponse = (OrganizationFundingDetailsResponse)await OrganizationAccessor.Load(fundingOrgDetailsRequest);
+
+        var multiPolygonEtRequest = DtoMapper.Map<MultiPolygonYearlyEtRequest>((request, fundingOrgDetailsResponse.Organization));
         var multiPolygonYearlyEtResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(multiPolygonEtRequest);
 
         EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
@@ -38,6 +49,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
             // only store the estimate if a compensation estimate was requested
             var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
                 request,
+                fundingOrgDetailsResponse.Organization,
                 multiPolygonYearlyEtResponse,
                 estimateConservationPaymentResponse
             ));

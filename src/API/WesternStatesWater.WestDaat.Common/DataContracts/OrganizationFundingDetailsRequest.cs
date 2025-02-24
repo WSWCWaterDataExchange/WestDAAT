@@ -1,8 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class OrganizationSlim
+public class OrganizationFundingDetailsRequest : OrganizationLoadRequestBase
 {
     public Guid OrganizationId { get; set; }
-
-    public string AbbreviatedName { get; set; }
 }

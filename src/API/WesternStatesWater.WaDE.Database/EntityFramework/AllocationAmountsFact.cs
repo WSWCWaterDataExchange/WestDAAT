@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using LinqKit;
+﻿using LinqKit;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Utilities;
+using System.ComponentModel.DataAnnotations;
 
 namespace WesternStatesWater.WaDE.Database.EntityFramework
 {
@@ -52,6 +52,7 @@ namespace WesternStatesWater.WaDE.Database.EntityFramework
         public bool? ExemptOfVolumeFlowPriority { get; set; }
         public string PowerType { get; set; }
         public string OwnerClassificationCV { get; set; }
+        public Guid? ConservationApplicationFundingOrganizationId { get; set; }
 
         public virtual DateDim AllocationApplicationDateNavigation { get; set; }
         public virtual WaterAllocationBasis AllocationBasisCvNavigation { get; set; }
