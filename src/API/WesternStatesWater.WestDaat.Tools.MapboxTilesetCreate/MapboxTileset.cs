@@ -172,80 +172,120 @@ public static class MapboxTileset
         var tempPolygonsDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Polygons"));
         var tempUnknownDir = Directory.CreateDirectory(Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Unknown"));
 
+        ConcurrentBag<Feature> pointFeatures = [];
+        ConcurrentBag<Feature> polygonFeatures = [];
+        ConcurrentBag<Feature> unknownFeatures = [];
+        List<TimeSeries> featureSites = [];
         try
         {
-            bool end = false;
-            int page = 0;
-            int take = 10000;
-            long lastSiteId = 0;
+            bool end = false; // Used to determine when to stop querying the database.
+            int page = 0; // Used for logging to indicate where we are in paging the database.
+            int take = 50000; // Number of records to return from the query
+            
+            // These are used for our keyset pagination. We order by SiteId and SiteVariableAmountId.
+            long lastSiteId = 0; // Used to track the last SiteID returned from the query.
+            long lastSiteVariableAmountId = 0; // Used to track the last SiteVariableAmountID returned from the query.
+            
+            long? previousSiteId = null; // Used to track the previous SiteID to determine when to create a GeoJSON feature.
             while (!end)
             {
-                ConcurrentBag<Feature> pointFeatures = [];
-                ConcurrentBag<Feature> polygonFeatures = [];
-                ConcurrentBag<Feature> unknownFeatures = [];
-
                 Console.WriteLine($"Fetching time series records {page * take} to {(page + 1) * take}");
-                var sites = await db.TimeSeriesView
+                // Due to the amount of time series (SiteVariableAmountsFact) records, we order by SiteId and SiteVariableAmountId.
+                // When the SiteID changes, we generate a GeoJSON feature and add it to the appropriate list.
+                var timeSeries = await db.SiteVariableAmountsFact
                     .AsNoTracking()
                     .OrderBy(s => s.SiteId)
-                    .Where(s => s.SiteId > lastSiteId)
+                    .ThenBy(s => s.SiteVariableAmountId)
+                    .Where(s => s.SiteId > lastSiteId ||
+                                (s.SiteId == lastSiteId && s.SiteVariableAmountId > lastSiteVariableAmountId))
                     .Take(take)
+                    .Select(x => new TimeSeries
+                    {
+                        SiteId = x.SiteId,
+                        SiteVariableAmountId = x.SiteVariableAmountId,
+                        SiteUuid = x.Site.SiteUuid,
+                        State = x.Site.StateCv,
+                        PrimaryUseCagtegory = x.PrimaryBeneficialUse.WaDEName,
+                        VariableType = x.VariableSpecific.VariableCvNavigation.WaDEName,
+                        SiteType = x.Site.SiteTypeCvNavigation.WaDEName,
+                        WaterSourceType = x.WaterSource.WaterSourceTypeCvNavigation.WaDEName,
+                        Location = x.Site.Geometry ?? x.Site.SitePoint,
+                        StartDate = x.TimeframeStartNavigation.Date,
+                        EndDate = x.TimeframeEndNavigation.Date
+                    })
                     .ToArrayAsync();
 
-                Parallel.ForEach(sites, site =>
+                foreach (var timeSeriesSite in timeSeries)
                 {
-                    var properties = new Dictionary<string, object>
+                    // Check if the SitEID has changed from the previous record.
+                    if (previousSiteId != null && timeSeriesSite.SiteId != previousSiteId)
                     {
-                        { "uuid", site.SiteUuid },
-                        { "state", site.State },
-                        { "primaryUseCategory", site.PrimaryUseCategory },
-                        { "variableType", site.VariableType },
-                        { "siteType", site.SiteType },
-                        { "waterSourceType", site.WaterSourceType },
-                    };
+                        // SiteID changed, create GeoJSON feature 
+                        var feature = CreateSiteTimeSeriesFeature(featureSites);
 
-                    if (site.StartDate.HasValue)
-                        properties.Add("startDate", GetUnixTime(site.StartDate.Value));
-                    if (site.EndDate.HasValue)
-                        properties.Add("endDate", GetUnixTime(site.EndDate.Value));
+                        switch (feature.Geometry.Type)
+                        {
+                            case GeoJSON.Text.GeoJSONObjectType.Point:
+                            case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
+                                pointFeatures.Add(feature);
+                                break;
+                            case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                            case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                                polygonFeatures.Add(feature);
+                                break;
+                            default:
+                                unknownFeatures.Add(feature);
+                                break;
+                        }
 
-                    var geometry = site.Geometry.AsGeoJsonGeometry() ?? site.Point.AsGeoJsonGeometry();
-                    var feature = new Feature(geometry, properties);
-
-                    switch (geometry.Type)
-                    {
-                        case GeoJSON.Text.GeoJSONObjectType.Point:
-                        case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
-                            pointFeatures.Add(feature);
-                            break;
-                        case GeoJSON.Text.GeoJSONObjectType.Polygon:
-                        case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
-                            polygonFeatures.Add(feature);
-                            break;
-                        default:
-                            unknownFeatures.Add(feature);
-                            break;
+                        featureSites.Clear();
                     }
-                });
 
-                var pointsTask = WriteFeatures(pointFeatures,
-                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points", Path.GetRandomFileName()));
-                var polygonsTask = WriteFeatures(polygonFeatures,
-                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Polygons", Path.GetRandomFileName()));
-                var unknownTask = WriteFeatures(unknownFeatures,
-                    Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Unknown", Path.GetRandomFileName()));
-
-                await pointsTask;
-                await polygonsTask;
-                await unknownTask;
+                    featureSites.Add(timeSeriesSite);
+                    previousSiteId = timeSeriesSite.SiteId;
+                }
 
                 page++;
-                end = sites.Length < take;
-                if (sites.Length > 0)
+                end = timeSeries.Length < take;
+                if (timeSeries.Length > 0)
                 {
-                    lastSiteId = sites[^1].SiteId;
+                    lastSiteId = timeSeries[^1].SiteId;
+                    lastSiteVariableAmountId = timeSeries[^1].SiteVariableAmountId;
                 }
             }
+
+            // Check if there are any remaining sites in the featureSites list.
+            if (featureSites.Count > 0)
+            {
+                var feature = CreateSiteTimeSeriesFeature(featureSites);
+                switch (feature.Geometry.Type)
+                {
+                    case GeoJSON.Text.GeoJSONObjectType.Point:
+                    case GeoJSON.Text.GeoJSONObjectType.MultiPoint:
+                        pointFeatures.Add(feature);
+                        break;
+                    case GeoJSON.Text.GeoJSONObjectType.Polygon:
+                    case GeoJSON.Text.GeoJSONObjectType.MultiPolygon:
+                        polygonFeatures.Add(feature);
+                        break;
+                    default:
+                        unknownFeatures.Add(feature);
+                        break;
+                }
+
+                featureSites.Clear();
+            }
+
+            var pointsTask = WriteFeatures(pointFeatures,
+                Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Points", Path.GetRandomFileName()));
+            var polygonsTask = WriteFeatures(polygonFeatures,
+                Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Polygons", Path.GetRandomFileName()));
+            var unknownTask = WriteFeatures(unknownFeatures,
+                Path.Combine(geoJsonDirectoryPath, "TimeSeries", "Unknown", Path.GetRandomFileName()));
+
+            await pointsTask;
+            await polygonsTask;
+            await unknownTask;
 
             string[] pointFiles = tempPointsDir.GetFiles()
                 .Where(f => !f.Name.Contains("DS_Store"))
@@ -405,5 +445,23 @@ public static class MapboxTileset
         {
             File.Delete(path);
         }
+    }
+
+    private static Feature CreateSiteTimeSeriesFeature(List<TimeSeries> siteTimeSeries)
+    {
+        var properties = new Dictionary<string, object>
+        {
+            { "uuid", siteTimeSeries.First().SiteUuid },
+            { "state", siteTimeSeries.First().State },
+            { "siteType", siteTimeSeries.First().SiteType },
+            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate)) },
+            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate)) },
+            { "primaryUseCategory", siteTimeSeries.Select(x => x.PrimaryUseCagtegory).Distinct().ToArray() },
+            { "variableType", siteTimeSeries.Select(x => x.VariableType).Distinct().ToArray() },
+            { "waterSourceType", siteTimeSeries.Select(x => x.WaterSourceType).Distinct().ToArray() }
+        };
+
+        var geometry = siteTimeSeries.First().Location.AsGeoJsonGeometry();
+        return new Feature(geometry, properties);
     }
 }

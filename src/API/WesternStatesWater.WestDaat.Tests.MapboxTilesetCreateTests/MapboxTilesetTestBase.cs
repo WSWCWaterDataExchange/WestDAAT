@@ -82,3 +82,15 @@ public class OverlayFeatureProperties
     public string uuid { get; set; } = null!;
     public string[] oType { get; set; } = null!;
 }
+
+public class TimeSeriesFeatureProperties
+{
+    public string uuid { get; set; } = null!;
+    public string state { get; set; } = null!;
+    public string siteType { get; set; } = null!;
+    public long startDate { get; set; }
+    public long endDate { get; set; }
+    public string[] primaryUseCategory { get; set; } = null!;
+    public string[] variableType { get; set; } = null!;
+    public string[] waterSourceType { get; set; } = null!;
+}
