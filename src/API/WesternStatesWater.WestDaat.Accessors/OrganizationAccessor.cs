@@ -22,6 +22,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 OrganizationDetailsListRequest => await GetOrganizationDetailsList(),
                 OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
+                OrganizationFundingDetailsRequest req => await GetOrganizationFundingDetails(req),
                 UserOrganizationLoadRequest req => await GetUserOrganizations(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -48,7 +49,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             await using var db = _westDaatDatabaseContextFactory.Create();
 
             var organization = await db.Organizations
-                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .ProjectTo<OrganizationSummaryItem>(DtoMapper.Configuration)
                 .FirstOrDefaultAsync(org => org.OrganizationId == request.OrganizationId);
 
             if (organization == null)
@@ -62,13 +63,28 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
+        private async Task<OrganizationFundingDetailsResponse> GetOrganizationFundingDetails(OrganizationFundingDetailsRequest request)
+        {
+            await using var westDaatDb = _westDaatDatabaseContextFactory.Create();
+
+            var organizationFundingDetails = await westDaatDb.Organizations
+                .Where(org => org.Id == request.OrganizationId)
+                .ProjectTo<OrganizationFundingDetails>(DtoMapper.Configuration)
+                .SingleAsync();
+
+            return new OrganizationFundingDetailsResponse
+            {
+                Organization = organizationFundingDetails
+            };
+        }
+
         private async Task<UserOrganizationLoadResponse> GetUserOrganizations(UserOrganizationLoadRequest request)
         {
             await using var db = _westDaatDatabaseContextFactory.Create();
 
             var organizations = await db.Organizations
                 .Where(org => org.UserOrganizations.Any(uo => uo.UserId == request.UserId))
-                .ProjectTo<OrganizationSlim>(DtoMapper.Configuration)
+                .ProjectTo<OrganizationSummaryItem>(DtoMapper.Configuration)
                 .ToArrayAsync();
 
             return new UserOrganizationLoadResponse

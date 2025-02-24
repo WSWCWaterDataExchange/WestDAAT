@@ -1,5 +1,4 @@
 import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
-import { FundingOrganizationDetails } from '../data-contracts/FundingOrganizationDetails';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import westDaatApi from './westDaatApi';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
@@ -31,24 +30,6 @@ export const applicationSearch = async (
   return data;
 };
 
-export const getFundingOrganizationDetails = (
-  context: IMsalContext,
-  waterRightNativeId: string,
-): Promise<FundingOrganizationDetails> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        fundingOrganizationId: 'F3D1124F-9387-4C11-915E-32E9C3CF0156',
-        fundingOrganizationName: 'Colorado River Basin',
-        openEtModelName: 'eeMETRIC',
-        dateRangeStart: new Date(2024, 0, 1),
-        dateRangeEnd: new Date(2024, 11, 31),
-        compensationRateModel: 'You will be paid $300 per acre-foot. The commission will pay [Lorem ipsum...]',
-      });
-    }, 3000);
-  });
-};
-
 export const createWaterConservationApplication = async (
   context: IMsalContext,
   fields: {
@@ -70,11 +51,7 @@ export const estimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
-    fundingOrganizationId: string;
     waterRightNativeId: string;
-    model: RasterTimeSeriesModel;
-    dateRangeStart: Date;
-    dateRangeEnd: Date;
     polygonWkts: string[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
@@ -82,11 +59,7 @@ export const estimateConsumptiveUse = async (
 ): Promise<EstimateConsumptiveUseResponse> => {
   const request: EstimateConsumptiveUseRequest = {
     waterConservationApplicationId: fields.waterConservationApplicationId,
-    fundingOrganizationId: fields.fundingOrganizationId,
     waterRightNativeId: fields.waterRightNativeId,
-    model: fields.model,
-    dateRangeStart: toDateOnlyString(fields.dateRangeStart),
-    dateRangeEnd: toDateOnlyString(fields.dateRangeEnd),
     polygons: fields.polygonWkts,
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
@@ -97,5 +70,3 @@ export const estimateConsumptiveUse = async (
 
   return data;
 };
-
-const toDateOnlyString = (date: Date): string => date.toISOString().split('T')[0];

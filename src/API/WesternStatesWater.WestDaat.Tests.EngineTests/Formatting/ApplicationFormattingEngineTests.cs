@@ -36,7 +36,7 @@ public class ApplicationFormattingEngineTests : EngineTestBase
         _organizationAccessorMock.Setup(x => x.Load(It.IsAny<OrganizationLoadDetailsRequest>()))
             .ReturnsAsync(new OrganizationLoadDetailsResponse
             {
-                Organization = new OrganizationSlim
+                Organization = new OrganizationSummaryItem
                 {
                     OrganizationId = organizationId,
                     AbbreviatedName = organizationAgencyId,
