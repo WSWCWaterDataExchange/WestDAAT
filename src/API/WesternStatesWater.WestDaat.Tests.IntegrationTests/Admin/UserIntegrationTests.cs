@@ -465,4 +465,104 @@ public class UserIntegrationTests : IntegrationTestBase
         result.Users.All(u => !string.IsNullOrEmpty(u.Email));
         result.Users.All(u => !string.IsNullOrEmpty(u.Role));
     }
+
+    [DataTestMethod]
+    [DataRow(Roles.Member)]
+    [DataRow(Roles.TechnicalReviewer)]
+    [DataRow(Roles.OrganizationAdmin)]
+    [DataRow(Roles.GlobalAdmin)]
+    public async Task Load_UserProfileRequest_NotSelf_ShouldThrow(string role)
+    {
+        // Arrange
+        var currentUser = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var userOrganization = new UserOrganizationFaker(currentUser, organization).Generate();
+
+        var stranger = new UserFaker().Generate();
+        var strangerOrganization = new UserOrganizationFaker(stranger, organization).Generate();
+        var strangerRoles = new UserRoleFaker(stranger).Generate(1);
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.Users.AddAsync(stranger);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
+        await _dbContext.UserOrganizations.AddAsync(strangerOrganization);
+        await _dbContext.UserRoles.AddRangeAsync(strangerRoles);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+                Roles = role == Roles.GlobalAdmin ? [role] : [],
+                OrganizationRoles = role != Roles.GlobalAdmin
+                    ?
+                    [
+                        new OrganizationRole
+                        {
+                            OrganizationId = userOrganization.OrganizationId,
+                            RoleNames = [role]
+                        }
+                    ]
+                    : []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserProfileRequest, CLI.Responses.Admin.UserProfileResponse>(
+            new CLI.Requests.Admin.UserProfileRequest
+            {
+                UserId = stranger.Id // Different than current user, should throw
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeOfType<ForbiddenError>();
+    }
+
+    [TestMethod]
+    public async Task Load_UserProfileRequest_Self_Success()
+    {
+        // Arrange
+        var currentUser = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var userOrganization = new UserOrganizationFaker(currentUser, organization).Generate();
+        var userRoles = new UserRoleFaker(currentUser).Generate(1);
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.UserOrganizations.AddAsync(userOrganization);
+        await _dbContext.UserRoles.AddRangeAsync(userRoles);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserProfileRequest, CLI.Responses.Admin.UserProfileResponse>(
+            new CLI.Requests.Admin.UserProfileRequest
+            {
+                UserId = currentUser.Id // Same as current user, should succeed
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeNull();
+        result.UserProfile.Should().NotBeNull();
+        result.UserProfile.UserId.Should().Be(currentUser.Id);
+        result.UserProfile.FirstName.Should().Be(currentUser.UserProfile.FirstName);
+        result.UserProfile.LastName.Should().Be(currentUser.UserProfile.LastName);
+        result.UserProfile.UserName.Should().Be(currentUser.UserProfile.UserName);
+        result.UserProfile.Email.Should().Be(currentUser.Email);
+        result.UserProfile.OrganizationMemberships.Should().HaveCount(1);
+        result.UserProfile.OrganizationMemberships.First().OrganizationId.Should().Be(organization.Id);
+        result.UserProfile.OrganizationMemberships.First().OrganizationName.Should().Be(organization.Name);
+        result.UserProfile.OrganizationMemberships.First().Role.Should().Be(userRoles.First().Role);
+    }
 }

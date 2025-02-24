@@ -256,6 +256,7 @@ internal class ValidationEngine : IValidationEngine
             EnrichJwtRequest => ValidateEnrichJwtRequest(context),
             OrganizationUserListRequest req => ValidateOrganizationUserListRequest(req, context),
             UserListRequest => ValidateUserListRequest(context),
+            UserProfileRequest req => ValidateUserProfileRequest(req, context),
             UserSearchRequest => ValidateUserSearchRequest(context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
@@ -297,6 +298,18 @@ internal class ValidationEngine : IValidationEngine
         if (!permissions.Contains(Permissions.UserList))
         {
             return CreateForbiddenError(new UserListRequest(), context);
+        }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserProfileRequest(UserProfileRequest request, ContextBase context)
+    {
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        if (request.UserId != userContext.UserId)
+        {
+            return CreateForbiddenError(request, context);
         }
 
         return null;

@@ -178,7 +178,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                         .Distinct()
                         .ToList()))
                 .ForMember(dest => dest.NativeOverlayAreaType, opt => opt.MapFrom(source => source.ReportingUnitTypeCv));
-            
+
             CreateMap<EF.AllocationAmountsFact, WaterRightsDigest>()
                 .ForMember(dest => dest.AllocationUuid, opt => opt.MapFrom(src => src.AllocationUuid))
                 .ForMember(dest => dest.NativeId, opt => opt.MapFrom(src => src.AllocationNativeId))
@@ -192,7 +192,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SiteName, opt => opt.MapFrom(src => src.SiteName))
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(src => src.SiteTypeCv))
                 .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Any()))
-                .ForMember(dest => dest.WaterRightsDigests, 
+                .ForMember(dest => dest.WaterRightsDigests,
                     opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Select(ab => ab.AllocationAmount)));
 
 
@@ -225,6 +225,45 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 // Intentionally only mapping the first org and first role. Multi-org / multi-role is not supported.
                 // Do not FirstOrDefault. We don't want this to silently fail if multi is supported later
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizations.Single().UserOrganizationRoles.Single().Role));
+
+            CreateMap<EFWD.User, UserProfile>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrganizationMemberships, opt => opt.MapFrom(src => src.UserOrganizations))
+                .ForMember(dest => dest.FirstName, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.FirstName);
+                })
+                .ForMember(dest => dest.LastName, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.LastName);
+                })
+                .ForMember(dest => dest.UserName, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.UserName);
+                })
+                .ForMember(dest => dest.State, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.State);
+                })
+                .ForMember(dest => dest.County, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.County);
+                })
+                .ForMember(dest => dest.PhoneNumber, opt =>
+                {
+                    opt.PreCondition(src => src.UserProfile != null);
+                    opt.MapFrom(src => src.UserProfile.PhoneNumber);
+                });
+
+            CreateMap<EFWD.UserOrganization, OrganizationMembership>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationId))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizationRoles.Single().Role));
         }
 
         private void AddOrganizationMappings()
