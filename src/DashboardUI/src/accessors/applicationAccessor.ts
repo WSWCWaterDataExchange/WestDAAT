@@ -59,7 +59,6 @@ export const estimateConsumptiveUse = async (
 ): Promise<EstimateConsumptiveUseResponse> => {
   const request: EstimateConsumptiveUseRequest = {
     waterConservationApplicationId: fields.waterConservationApplicationId,
-    fundingOrganizationId: '00000000-0000-0000-0000-000000000000', // not trusting the frontend to provide this
     waterRightNativeId: fields.waterRightNativeId,
     polygons: fields.polygonWkts,
     compensationRateDollars: fields.compensationRateDollars,
