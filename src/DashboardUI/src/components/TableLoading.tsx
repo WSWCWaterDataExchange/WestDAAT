@@ -14,7 +14,7 @@ export function TableLoading(props: { isLoading: boolean; isErrored?: boolean; c
   }
 
   return props.isLoading ? (
-    <div className="d-flex mx-4">
+    <div className="d-flex">
       <table className="w-100">
         <thead>
           <tr>

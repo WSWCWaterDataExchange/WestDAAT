@@ -33,6 +33,60 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.dashboardApplications).toEqual([...dashboardApplications]);
   });
 
+  it('filtering dashboard applications should update state', () => {
+    // Arrange
+    state.dashboardApplications = [
+      { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Approved },
+      { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Rejected },
+      { ...mockApplication, applicationId: 'application-guid-3', status: ConservationApplicationStatus.InReview },
+      { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Approved },
+      {
+        ...mockApplication,
+        applicationId: 'application-guid-5',
+        status: ConservationApplicationStatus.Approved,
+        compensationRateUnits: CompensationRateUnits.Acres
+      },
+    ];
+
+    // Act
+    const newState = reducer(state, {
+      type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
+      payload: { applicationIds: ['application-guid-2', 'application-guid-3', 'application-guid-4', 'application-guid-5'] },
+    })
+
+    // Assert
+    expect(newState.dashboardApplicationsStatistics).toEqual({
+      submittedApplications: 4,
+      acceptedApplications: 2,
+      rejectedApplications: 1,
+      inReviewApplications: 1,
+      cumulativeEstimatedSavingsAcreFeet: 300,
+      totalObligationDollars: 400,
+    })
+  });
+
+  it('loading dashboard with zero applications should not error', () => {
+    // Arrange
+    const dashboardApplications: ApplicationDashboardListItem[] = [];
+
+    // Act
+    const newState = reducer(state, {
+      type: 'DASHBOARD_APPLICATIONS_LOADED',
+      payload: { dashboardApplications },
+    });
+
+    // Assert
+    expect(newState.dashboardApplications).toEqual([]);
+    expect(newState.dashboardApplicationsStatistics).toEqual({
+      submittedApplications: 0,
+      acceptedApplications: 0,
+      rejectedApplications: 0,
+      inReviewApplications: 0,
+      cumulativeEstimatedSavingsAcreFeet: 0,
+      totalObligationDollars: 0,
+    });
+  })
+
   const mockApplication: ApplicationDashboardListItem = {
     applicantFullName: 'Bobby Hill',
     applicationDisplayId: '2025-ABCD-001',
