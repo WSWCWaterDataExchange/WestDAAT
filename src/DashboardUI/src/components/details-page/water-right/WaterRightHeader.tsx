@@ -6,8 +6,16 @@ import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';
 import { useState } from 'react';
 import { OverlayTooltip } from '../../OverlayTooltip';
+import { useWaterRightDetailsContext } from './Provider';
+import { Spinner } from 'react-bootstrap';
 
 function WaterRightHeader() {
+  const {
+    hostData: {
+      detailsQuery: { data: details, isLoading: isLoadingDetails },
+    },
+  } = useWaterRightDetailsContext();
+
   const navigate = useNavigate();
   const routeParams = useParams();
   const isAuthenticated = useIsAuthenticated();
@@ -47,23 +55,39 @@ function WaterRightHeader() {
                 <OverlayTooltip text="Only available to those water rights approved to take part in a Funding Organization’s available water use reduction program. Uses OpenET’s consumptive use estimate to help determine potential water savings and monetary compensation for voluntary efforts towards water savings." />
               </div>
               <div>
-                <Button variant="primary" onClick={consumptiveUseBtnClickHandler}>
-                  Estimate Consumptive Use
+                <Button
+                  variant="primary"
+                  onClick={consumptiveUseBtnClickHandler}
+                  disabled={isLoadingDetails || !details?.isConservationApplicationEligible}
+                >
+                  {isLoadingDetails && <Spinner animation="border" size="sm" />}
+
+                  {!isLoadingDetails && <>Estimate Consumptive Use</>}
                 </Button>
               </div>
             </div>
             <div>
-              <span>
-                <span className="me-1">By clicking this button, you are agreeing to WestDAAT’s</span>
+              {!isLoadingDetails && (
+                <>
+                  <span>
+                    {!details?.isConservationApplicationEligible && <>This water right is not eligible.</>}
 
-                <a
-                  href="https://westernstateswater.org/wade/westdaat-terms-of-service/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Terms & Conditions
-                </a>
-              </span>
+                    {details?.isConservationApplicationEligible && (
+                      <>
+                        <span className="me-1">By clicking this button, you are agreeing to WestDAAT’s</span>
+
+                        <a
+                          href="https://westernstateswater.org/wade/westdaat-terms-of-service/"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Terms & Conditions
+                        </a>
+                      </>
+                    )}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
