@@ -15,3 +15,12 @@ export interface ApplicationDashboardListItem {
   waterRightNativeId: string;
   waterRightState: string;
 }
+
+export interface ApplicationDashboardStatistics {
+  submittedApplications: number | null;
+  acceptedApplications: number | null;
+  rejectedApplications: number | null;
+  inReviewApplications: number | null;
+  cumulativeEstimatedSavingsAcreFeet: number | null;
+  totalObligationDollars: number | null;
+}

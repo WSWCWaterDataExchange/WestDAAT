@@ -1,8 +1,21 @@
 import { mdiCircleMedium } from '@mdi/js';
 import { Icon } from '@mdi/react';
-import { DataGrid, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
+import {
+  DataGrid,
+  GridColumnHeaderParams,
+  GridFilterItem,
+  GridFilterState,
+  GridRenderCellParams,
+  GridState,
+  GridToolbarContainer,
+  GridToolbarExport,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import { useDebounceCallback } from '@react-hook/debounce';
+import deepEqual from 'fast-deep-equal/es6';
+import { useState } from 'react';
 import Card from 'react-bootstrap/esm/Card';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { NavLink } from 'react-router-dom';
 import { TableLoading } from '../../../components/TableLoading';
 import { Role } from '../../../config/role';
@@ -14,12 +27,12 @@ import {
   ConservationApplicationStatusDisplayNames,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useOrganizationQuery } from '../../../hooks/queries';
+import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
 import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
-import { formatDateString } from '../../../utilities/valueFormatters';
+import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
-import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 
 import './organization-dashboard-page.scss';
 
@@ -35,14 +48,42 @@ interface ApplicationDataGridColumns {
 }
 
 export function OrganizationDashboardPage() {
+  const [dataGridFilters, setDataGridFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
-  const { state } = useConservationApplicationContext();
-
-  const organizationIdFilter = !hasUserRole(user, Role.GlobalAdmin) ? getUserOrganization(user) : null;
+  const { state, dispatch } = useConservationApplicationContext();
+  const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
+  const organizationIdFilter = !isGlobalAdmin ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isLoading, isError } = useLoadDashboardApplications(organizationIdFilter);
+  const { isLoading: applicationListLoading, isError: applicationListErrored } =
+    useLoadDashboardApplications(organizationIdFilter);
+
+  const apiRef = useGridApiRef();
+
+  const getKeysFromLookup = (obj: GridFilterState['filteredRowsLookup']) => {
+    const keys = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key) && obj[key]) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  };
+
+  const handleDataGridStateChange = useDebounceCallback((state: GridState) => {
+    if (!deepEqual(dataGridFilters, state.filter.filterModel.items)) {
+      setDataGridFilters(state.filter.filterModel.items);
+      const filteredKeys = getKeysFromLookup(state.filter.filteredRowsLookup);
+      const rows = filteredKeys.map((key) => apiRef.current.getRow(key));
+      const applicationIds = rows.map((row) => row.id);
+
+      dispatch({
+        type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
+        payload: { applicationIds },
+      });
+    }
+  }, 200);
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');
@@ -88,12 +129,34 @@ export function OrganizationDashboardPage() {
     return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
   };
 
-  const renderStatisticsCard = (description: string, value: number) => {
+  const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
+    if (applicationListErrored) {
+      value = '-';
+      subtitle = undefined;
+    }
+
     return (
-      <div className="col-md-2 col-sm-4 col-6 my-1">
-        <Card className="rounded-3 shadow-sm text-center">
-          <Card.Title className="mt-3 fs-1">{value}</Card.Title>
-          <Card.Text className="mb-3 fs-6">{description}</Card.Text>
+      <div className="col-md-2 col-sm-4 col-6 my-1 align-self-stretch">
+        <Card className="rounded-3 shadow-sm text-center h-100">
+          <Card.Title className="mt-3 mx-3 fs-1 flex-grow-1 align-content-center">
+            {applicationListLoading || value === null ? (
+              <Placeholder animation="glow">
+                <Placeholder xs={10} className="rounded" />
+              </Placeholder>
+            ) : (
+              <span>{value}</span>
+            )}
+          </Card.Title>
+          <Card.Text className="mb-3 mx-3 fs-6">
+            {!applicationListLoading && subtitle && <p className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</p>}
+            {applicationListLoading ? (
+              <Placeholder animation="glow">
+                <Placeholder xs={10} className="rounded" />
+              </Placeholder>
+            ) : (
+              <span>{description}</span>
+            )}
+          </Card.Text>
         </Card>
       </div>
     );
@@ -122,6 +185,14 @@ export function OrganizationDashboardPage() {
     return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
   };
 
+  const CustomToolbar = () => {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  };
+
   const columns: DataGridColumns<ApplicationDataGridColumns>[] = [
     { field: 'applicant', headerName: 'Applicant', width: 200, renderHeader },
     {
@@ -146,7 +217,7 @@ export function OrganizationDashboardPage() {
       valueFormatter: dateFormatter,
       filterOperators: [dataGridDateRangeFilter],
     },
-    { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader },
+    { field: 'requestedFunding', headerName: 'Requested Funding', width: 200, renderHeader, filterable: false },
     { field: 'waterRightState', headerName: 'State', renderHeader },
     { field: 'fundingOrganization', headerName: 'Funding Organization', width: 300, renderHeader },
     {
@@ -179,18 +250,27 @@ export function OrganizationDashboardPage() {
       <div className="m-3">
         {dashboardTitle()}
         <div className="row my-4">
-          {renderStatisticsCard('Submitted Applications', 42)}
-          {renderStatisticsCard('Accepted Applications', 42)}
-          {renderStatisticsCard('Rejected Applications', 42)}
-          {renderStatisticsCard('Applications In Review', 42)}
-          {renderStatisticsCard('Cumulative Est. Savings', 42)}
-          {renderStatisticsCard('Total Obligation', 42)}
+          {renderStatisticsCard('Submitted Applications', state.dashboardApplicationsStatistics.submittedApplications)}
+          {renderStatisticsCard('Accepted Applications', state.dashboardApplicationsStatistics.acceptedApplications)}
+          {renderStatisticsCard('Rejected Applications', state.dashboardApplicationsStatistics.rejectedApplications)}
+          {renderStatisticsCard('Applications In Review', state.dashboardApplicationsStatistics.inReviewApplications)}
+          {renderStatisticsCard(
+            'Cumulative Est. Savings',
+            formatNumberToLargestUnit(state.dashboardApplicationsStatistics.cumulativeEstimatedSavingsAcreFeet),
+            'Acre-Feet',
+          )}
+          {renderStatisticsCard(
+            'Total Obligation',
+            `$${formatNumberToLargestUnit(state.dashboardApplicationsStatistics.totalObligationDollars)}`,
+          )}
         </div>
         <h2 className="fs-5 mt-5">Applications</h2>
-        <TableLoading isLoading={isLoading} isErrored={isError}>
+        <TableLoading isLoading={applicationListLoading} isErrored={applicationListErrored}>
           <DataGrid
             rows={rows}
             columns={columns}
+            apiRef={apiRef}
+            slots={{ toolbar: CustomToolbar }}
             slotProps={{
               filterPanel: {
                 filterFormProps: {
@@ -199,6 +279,14 @@ export function OrganizationDashboardPage() {
                       width: 'auto', // This prevents the filter from having a horizontal scrollbar
                     },
                   },
+                },
+              },
+            }}
+            onStateChange={handleDataGridStateChange}
+            initialState={{
+              columns: {
+                columnVisibilityModel: {
+                  fundingOrganization: isGlobalAdmin ? true : false,
                 },
               },
             }}
