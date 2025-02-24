@@ -76,9 +76,12 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.UserProfileResponse, ClientContracts.Responses.Admin.UserProfileResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
-            CreateMap<ClientContracts.UserProfile, CommonContracts.UserProfile>();
+            CreateMap<CommonContracts.UserProfile, ClientContracts.UserProfile>();
 
-            CreateMap<ClientContracts.OrganizationMembership, CommonContracts.OrganizationMembership>();
+            CreateMap<CommonContracts.OrganizationMembership, ClientContracts.OrganizationMembership>();
+
+            CreateMap<CommonContracts.UserProfileResponse, ClientContracts.Responses.Admin.UserProfileResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         private void AddOrganizationMappings()

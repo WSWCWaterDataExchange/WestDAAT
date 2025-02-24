@@ -527,12 +527,12 @@ public class UserIntegrationTests : IntegrationTestBase
         var currentUser = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
         var userOrganization = new UserOrganizationFaker(currentUser, organization).Generate();
-        var userRoles = new UserRoleFaker(currentUser).Generate(1);
+        var userOrganizationRole = new UserOrganizationRoleFaker(userOrganization).Generate();
 
         await _dbContext.Users.AddAsync(currentUser);
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.UserOrganizations.AddAsync(userOrganization);
-        await _dbContext.UserRoles.AddRangeAsync(userRoles);
+        await _dbContext.UserOrganizationRoles.AddAsync(userOrganizationRole);
         await _dbContext.SaveChangesAsync();
 
         UseUserContext(
@@ -563,6 +563,6 @@ public class UserIntegrationTests : IntegrationTestBase
         result.UserProfile.OrganizationMemberships.Should().HaveCount(1);
         result.UserProfile.OrganizationMemberships.First().OrganizationId.Should().Be(organization.Id);
         result.UserProfile.OrganizationMemberships.First().OrganizationName.Should().Be(organization.Name);
-        result.UserProfile.OrganizationMemberships.First().Role.Should().Be(userRoles.First().Role);
+        result.UserProfile.OrganizationMemberships.First().Role.Should().Be(userOrganizationRole.Role);
     }
 }

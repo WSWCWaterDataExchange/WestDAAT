@@ -14,7 +14,7 @@ public class UserProfile
 
     public string State { get; set; } = null!;
 
-    public string County { get; set; } = null!;
+    public string Country { get; set; } = null!;
 
     public string PhoneNumber { get; set; } = null!;
 

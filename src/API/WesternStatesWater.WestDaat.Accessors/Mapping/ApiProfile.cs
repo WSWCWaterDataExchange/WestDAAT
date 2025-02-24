@@ -252,7 +252,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.County, opt =>
                 {
                     opt.PreCondition(src => src.UserProfile != null);
-                    opt.MapFrom(src => src.UserProfile.County);
+                    opt.MapFrom(src => src.UserProfile.Country);
                 })
                 .ForMember(dest => dest.PhoneNumber, opt =>
                 {
