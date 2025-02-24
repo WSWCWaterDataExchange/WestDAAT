@@ -57,7 +57,6 @@ public class ValidationEngineTests : EngineTestBase
     [DataRow(true, true, true, false, true, DisplayName = "User requests estimate for their own Application with matching fields")]
     [DataRow(false, false, false, false, false, DisplayName = "User requests estimate for Application that does not exist")]
     [DataRow(true, false, true, false, false, DisplayName = "User requests estimate for a different Application that they own")]
-    [DataRow(true, true, false, false, false, DisplayName = "User requests estimate for their own Application but with an incorrect Funding Organization")]
     [DataRow(true, true, true, true, false, DisplayName = "User requests estimate for their own Application with intersecting polygons")]
     public async Task Validate_ValidateEstimateConsumptiveUseRequest_Success(
         bool applicationExists,
@@ -94,16 +93,10 @@ public class ValidationEngineTests : EngineTestBase
         string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
         {
-            // relevant properties
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
             FundingOrganizationId = organizationIdMatches ? organizationId.Value : Guid.NewGuid(),
             Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
-
-            // extraneous properties
-            DateRangeStart = DateOnly.MinValue,
-            DateRangeEnd = DateOnly.MaxValue,
-            Model = RasterTimeSeriesModel.SSEBop,
         };
         var result = await _validationEngine.Validate(request);
 

@@ -6,6 +6,8 @@ public class OrganizationFundingDetails
 
     public string OrganizationName { get; set; }
 
+    public RasterTimeSeriesModel OpenEtModel { get; set; }
+
     public string OpenEtModelDisplayName { get; set; }
 
     public DateOnly OpenEtDateRangeStart { get; set; }
