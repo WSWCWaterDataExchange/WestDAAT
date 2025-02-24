@@ -454,8 +454,8 @@ public static class MapboxTileset
             { "uuid", siteTimeSeries.First().SiteUuid },
             { "state", siteTimeSeries.First().State },
             { "siteType", siteTimeSeries.First().SiteType },
-            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate)) },
-            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate)) },
+            { "startDate", GetUnixTime(siteTimeSeries.Min(x => x.StartDate))! },
+            { "endDate", GetUnixTime(siteTimeSeries.Max(x => x.EndDate))! },
             { "primaryUseCategory", siteTimeSeries.Select(x => x.PrimaryUseCagtegory).Distinct().ToArray() },
             { "variableType", siteTimeSeries.Select(x => x.VariableType).Distinct().ToArray() },
             { "waterSourceType", siteTimeSeries.Select(x => x.WaterSourceType).Distinct().ToArray() }
