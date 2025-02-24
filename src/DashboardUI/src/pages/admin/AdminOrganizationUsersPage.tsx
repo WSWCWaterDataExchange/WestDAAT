@@ -1,10 +1,10 @@
+import { useState } from 'react';
+import Button from 'react-bootstrap/esm/Button';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useParams } from 'react-router-dom';
 import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
-import Button from 'react-bootstrap/esm/Button';
-import { useState } from 'react';
+import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import AddUserModal from './AddUserModal';
-import { useOrganizationQuery } from '../../hooks/queries';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
@@ -12,6 +12,10 @@ export function AdminOrganizationsUsersPage() {
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
   const organization = organizationListResponse?.organizations.find((org) => org.organizationId === organizationId);
+  // TODO: JN - how to handle if organization is undefined?
+  const { data: organizationUsersListResponse, isLoading: organizationUsersListLoading } = useOrganizationUsersQuery(
+    organizationId ?? '',
+  );
 
   const pageTitle = () => {
     if (organizationListLoading) {
@@ -48,6 +52,9 @@ export function AdminOrganizationsUsersPage() {
       <NotImplementedPlaceholder />
 
       <pre>OrganizationId: {organizationId}</pre>
+      {!organizationUsersListLoading && organizationUsersListResponse && (
+        <pre>OrganizationUsers: {JSON.stringify(organizationUsersListResponse)}</pre>
+      )}
 
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
     </div>
