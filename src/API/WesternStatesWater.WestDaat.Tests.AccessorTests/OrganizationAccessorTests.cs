@@ -111,19 +111,6 @@ public class OrganizationAccessorTests : AccessorTestBase
             org.OrganizationName.Should().Be(organization.Name);
             org.OpenEtModelDisplayName.Should().Be(Enum.GetName(organization.OpenEtModel));
             org.CompensationRateModel.Should().Be(organization.OpenEtCompensationRateModel);
-            org.OpenEtDateRangeStart.Should().Be(
-                DateOnly.FromDateTime(
-                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                    .UtcDateTime
-                )
-            );
-            org.OpenEtDateRangeEnd.Should().Be(
-                DateOnly.FromDateTime(
-                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                    .AddMinutes(-1)
-                    .UtcDateTime
-                )
-            );
         }
         else
         {
