@@ -20,6 +20,12 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
+    if (polygons.length > 20) {
+      toast.error(
+        'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
+      );
+    }
+
     const doPolygonsOverlap = doPolygonsIntersect(polygons);
     if (doPolygonsOverlap) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');

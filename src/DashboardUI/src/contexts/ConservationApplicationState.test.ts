@@ -1,6 +1,7 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
+import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 import { reducer, defaultState, ConservationApplicationState } from './ConservationApplicationState';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
@@ -253,6 +254,52 @@ describe('ConservationApplicationState reducer', () => {
       // Act
       // Assert
       shouldBeAbleToPerformConsumptiveUseEstimate(state, false);
+    });
+
+    it('estimate consumptive use should be disabled when more than 20 polygons have been selected', () => {
+      // Arrange
+      // Act
+      let newState = reducer(state, {
+        type: 'ESTIMATION_TOOL_PAGE_LOADED',
+        payload: {
+          waterRightNativeId: 'mock-water-right-native-id',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'FUNDING_ORGANIZATION_LOADED',
+        payload: {
+          fundingOrganizationId: 'funding-organization-guid',
+          fundingOrganizationName: 'Mock Funding Organization',
+          openEtModelName: 'Mock Open ET Model',
+          dateRangeStart: new Date(2025, 0, 1),
+          dateRangeEnd: new Date(2025, 11, 31),
+          compensationRateModel: 'Mock Compensation Rate Model',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'APPLICATION_CREATED',
+        payload: {
+          waterConservationApplicationId: 'application-guid',
+        },
+      });
+
+      const polygon: EstimationFormMapPolygon = {
+        polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        acreage: 1,
+      };
+
+      newState = reducer(newState, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: Array.from({ length: 21 }, () => polygon),
+          doPolygonsOverlap: false,
+        },
+      });
+
+      // Assert
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     });
 
     it('estimate consumptive use should be enabled when all required data is present', () => {

@@ -311,6 +311,7 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.dateRangeEnd &&
     !!app.selectedMapPolygons &&
     app.selectedMapPolygons.length > 0 &&
+    app.selectedMapPolygons.length <= 20 &&
     app.selectedMapPolygons.every((p) => p.acreage <= 50000) &&
     !app.doPolygonsOverlap;
 };
