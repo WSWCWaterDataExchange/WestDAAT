@@ -7,7 +7,7 @@
   right: 0;
   bottom: 0;
   height: 60vh;
-  z-index: 4;
+  z-index: 1000;
   transform: translateY(100%);
   transition: transform 0.3s ease-in-out;
   display: flex;
@@ -15,9 +15,7 @@
   pointer-events: auto;
 
   &.expanded {
-    $dim-overlay-header-height: 48px; // approximate height
-    $data-table-btn-height: 40px;
-    transform: translateY(calc($dim-overlay-header-height + $data-table-btn-height));
+    transform: translateY(0);
   }
 
   .estimation-tool-table-view-slide-content {
