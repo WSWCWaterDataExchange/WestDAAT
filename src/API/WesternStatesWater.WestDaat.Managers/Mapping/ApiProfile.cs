@@ -79,9 +79,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.UserProfile, ClientContracts.UserProfile>();
 
             CreateMap<CommonContracts.OrganizationMembership, ClientContracts.OrganizationMembership>();
-
-            CreateMap<CommonContracts.UserProfileResponse, ClientContracts.Responses.Admin.UserProfileResponse>()
-                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         private void AddOrganizationMappings()
@@ -150,8 +147,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
             CreateMap<
-                (ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
-                CommonContracts.MultiPolygonYearlyEtRequest>()
+                    (ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
+                    CommonContracts.MultiPolygonYearlyEtRequest>()
                 .ForMember(dest => dest.Polygons, opt => opt.MapFrom(src => src.Request.Polygons))
                 .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
                 .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
