@@ -111,5 +111,5 @@ export function useSiteMethodInfoList(siteUuid: string | undefined, options?: Me
     ...options,
     enabled: options?.enabled && !!siteUuid,
   };
-  return useQuery(['site.VariableInfoList', siteUuid], async () => await getSiteMethodInfoList(siteUuid!), setOptions);
+  return useQuery(['site.MethodInfoList', siteUuid], async () => await getSiteMethodInfoList(siteUuid!), setOptions);
 }
