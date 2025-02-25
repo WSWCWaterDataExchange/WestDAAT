@@ -106,7 +106,7 @@ export function EstimationToolPage() {
               />
             </div>
 
-            <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
+            <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
               <EstimationToolMapHeader />
               <EstimationToolMap
                 handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
