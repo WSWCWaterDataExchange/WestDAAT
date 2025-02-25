@@ -7,14 +7,31 @@ export function useAlerts() {
   const {
     hostData: {
       detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
+      overlayInfoListQuery: { isLoading: overlayInfoListIsLoading, isError: overlayInfoListIsError },
+      waterRightsInfoListByReportingUnitQuery: {
+        isLoading: waterRightsInfoListByReportingUnitIsLoading,
+        isError: waterRightsInfoListByReportingUnitIsError
+      },
+      waterRightsInfoListByAllocationQuery: {
+        isLoading: waterRightsInfoListByAllocationIsLoading,
+        isError: waterRightsInfoListByAllocationIsError
+      }
     },
   } = useOverlayDetailsContext();
 
   const isError = useMemo(() => {
-    return detailsIsError;
+    return detailsIsError ||
+      overlayInfoListIsError ||
+      waterRightsInfoListByReportingUnitIsError ||
+      waterRightsInfoListByAllocationIsError;
   }, [detailsIsError]);
 
-  useProgressIndicator([!detailsIsLoading], 'Loading Overlay Data');
+  useProgressIndicator([
+    !detailsIsLoading,
+    !overlayInfoListIsLoading,
+    !waterRightsInfoListByReportingUnitIsLoading,
+    !waterRightsInfoListByAllocationIsLoading
+  ], 'Loading Overlay Data');
 
   useEffect(() => {
     if (isError) {

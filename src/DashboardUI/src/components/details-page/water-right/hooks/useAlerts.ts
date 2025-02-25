@@ -6,19 +6,21 @@ import { useWaterRightDetailsContext } from '../Provider';
 export function useAlerts() {
   const {
     hostData: {
-      detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
-      siteLocationsQuery: { isLoading: siteLocationsIsLoading, isError: siteLocationsIsError },
-      siteInfoListQuery: { isLoading: siteInfoListIsLoading, isError: siteInfoListIsError },
-      sourceInfoListQuery: { isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError },
+      detailsQuery: {isLoading: detailsIsLoading, isError: detailsIsError},
+      siteLocationsQuery: {isLoading: siteLocationsIsLoading, isError: siteLocationsIsError},
+      siteInfoListQuery: {isLoading: siteInfoListIsLoading, isError: siteInfoListIsError},
+      sourceInfoListQuery: {isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError},
+      waterRightsInfoListQuery: {isLoading: waterRightsInfoListIsLoading, isError: waterRightsInfoListIsError},
+      timeSeriesInfoListQuery: {isLoading: timeSeriesInfoListIsLoading, isError: timeSeriesInfoListIsError}
     },
   } = useWaterRightDetailsContext();
 
   const isError = useMemo(() => {
-    return detailsIsError || siteLocationsIsError || siteInfoListIsError || sourceInfoListIsError;
-  }, [detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError]);
+    return detailsIsError || siteLocationsIsError || siteInfoListIsError || sourceInfoListIsError || waterRightsInfoListIsError || timeSeriesInfoListIsError;
+  }, [ detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError, waterRightsInfoListIsError, timeSeriesInfoListIsError ]);
 
   useProgressIndicator(
-    [!detailsIsLoading, !siteLocationsIsLoading, !siteInfoListIsLoading, !sourceInfoListIsLoading],
+    [ !detailsIsLoading, !siteLocationsIsLoading, !siteInfoListIsLoading, !sourceInfoListIsLoading, !waterRightsInfoListIsLoading, !timeSeriesInfoListIsLoading ],
     'Loading Water Right Data',
   );
 
@@ -30,5 +32,5 @@ export function useAlerts() {
         autoClose: false,
       });
     }
-  }, [isError]);
+  }, [ isError ]);
 }
