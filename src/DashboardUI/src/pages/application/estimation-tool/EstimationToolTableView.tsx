@@ -4,12 +4,11 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Nav from 'react-bootstrap/esm/Nav';
 import Tab from 'react-bootstrap/esm/Tab';
-
-import './estimation-tool-table-view.scss';
 import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
-import { formatNumber } from '../../../utilities/valueFormatters';
+
+import './estimation-tool-table-view.scss';
 
 function EstimationToolTableView() {
   const { state } = useConservationApplicationContext();
