@@ -29,7 +29,7 @@ function EstimationToolTableView() {
     <div
       className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} d-flex flex-column position-absolute start-0 end-0 bottom-0`}
     >
-      <div className="estimation-tool-table-view-slide-content">
+      <div className="estimation-tool-table-view-slide-content flex-grow-1 d-flex flex-column">
         <div className="d-flex flex-column flex-grow-1 h-100">
           <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || fields[0].fieldName)}>
             <Nav variant="tabs" className="py-2 px-3">
