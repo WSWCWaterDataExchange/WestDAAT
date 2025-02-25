@@ -41,8 +41,8 @@ export function useAlerts() {
 
   useEffect(() => {
     handleErrorToast(detailsIsError, 'Error loading overlay data. Please try again.', previousErrors.current.detailsIsError);
-    handleErrorToast(overlayInfoIsError, 'Error loading overlay info. Please try again.', previousErrors.current.overlayInfoIsError);
-    handleErrorToast(waterRightInfoIsError, 'Error loading water rights data. Please try again.', previousErrors.current.waterRightInfoIsError);
+    handleErrorToast(overlayInfoIsError, 'Error loading overlay information. Please try again.', previousErrors.current.overlayInfoIsError);
+    handleErrorToast(waterRightInfoIsError, 'Error loading water right information. Please try again.', previousErrors.current.waterRightInfoIsError);
 
     previousErrors.current = {
       detailsIsError,
