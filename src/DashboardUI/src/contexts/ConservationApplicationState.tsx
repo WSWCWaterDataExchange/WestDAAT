@@ -26,7 +26,7 @@ export interface ConservationApplicationState {
     conservationPayment: number | undefined;
     selectedMapPolygons: EstimationFormMapPolygon[];
     doPolygonsOverlap: boolean;
-    polygonEtData: PolygonEtDataCollection[];
+    polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -290,7 +290,10 @@ const onConsumptiveUseEstimated = (
 
   application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
   application.conservationPayment = payload.conservationPayment;
-  application.polygonEtData = payload.dataCollections;
+  application.polygonEtData = payload.dataCollections.map((dataCollection, index) => ({
+    ...dataCollection,
+    fieldName: `Field ${index + 1}`,
+  }));
 
   checkCanContinueToApplication(draftState);
 
