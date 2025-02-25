@@ -10,6 +10,7 @@ export function useAlerts() {
       locationsQuery: { isLoading: locationsIsLoading, isError: locationsIsError },
       waterRightInfoListQuery: { isLoading: waterRightInfoListIsLoading, isError: waterRightInfoListIsError },
       sourceInfoListQuery: { isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError },
+      siteUsageQuery: { isLoading: siteUsageIsLoading, isError: siteUsageIsError },
       variableInfoListQuery: { isLoading: variableInfoListIsLoading, isError: variableInfoListIsError },
       methodInfoListQuery: { isLoading: methodInfoListIsLoading, isError: methodInfoListIsError },
       timeSeriesInfoListQuery: { isLoading: timeSeriesInfoListIsLoading, isError: timeSeriesInfoListIsError },
@@ -21,6 +22,7 @@ export function useAlerts() {
       locationsIsError ||
       waterRightInfoListIsError ||
       sourceInfoListIsError ||
+      siteUsageIsError ||
       variableInfoListIsError ||
       methodInfoListIsError ||
       timeSeriesInfoListIsError;
@@ -29,9 +31,11 @@ export function useAlerts() {
     locationsIsError,
     waterRightInfoListIsError,
     sourceInfoListIsError,
+    siteUsageIsError,
     variableInfoListIsError,
     methodInfoListIsError,
-    timeSeriesInfoListIsError]);
+    timeSeriesInfoListIsError
+  ]);
 
   useProgressIndicator(
     [
@@ -39,6 +43,7 @@ export function useAlerts() {
       !locationsIsLoading,
       !waterRightInfoListIsLoading,
       !sourceInfoListIsLoading,
+      !siteUsageIsLoading,
       !variableInfoListIsLoading,
       !methodInfoListIsLoading,
       !timeSeriesInfoListIsLoading

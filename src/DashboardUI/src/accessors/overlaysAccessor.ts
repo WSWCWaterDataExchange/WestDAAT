@@ -1,4 +1,4 @@
-import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
+import { OverlayDetails, OverlayDigest, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
 import westDaatApi from './westDaatApi';
 
 export const getOverlayDetails = async (overlayUuid: string): Promise<OverlayDetails> => {
@@ -21,10 +21,9 @@ export const getWaterRightsInfoListByReportingUnitUuid = async (
   return data;
 };
 
-export const getWaterRightsInfoListByAllocationUuid = async (
-  allocationUuid: string,
-): Promise<WaterRightsInfoListItem[]> => {
+export const getOverlayDigests = async (overlayUuid: string): Promise<OverlayDigest[]> => {
   const api = await westDaatApi();
-  const { data } = await api.get<WaterRightsInfoListItem[]>(`WaterRights/${allocationUuid}/Overlays`);
+  const { data } = await api.get<OverlayDigest[]>(`Overlays/${overlayUuid}/OverlayDigest`);
   return data;
 };
+

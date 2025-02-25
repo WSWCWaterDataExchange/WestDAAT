@@ -57,7 +57,9 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
   const detailsQuery = useOverlayDetails(overlayUuid);
   const overlayInfoListQuery = useOverlayInfoById(overlayUuid);
   const waterRightsInfoListByReportingUnitQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid);
-  const waterRightsInfoListByAllocationQuery = useWaterRightsInfoListByAllocationUuid(overlayUuid);
+  const waterRightsInfoListByAllocationQuery = useWaterRightsInfoListByAllocationUuid(overlayUuid, {
+    enabled: activeTab === 'right'
+  });
   const geometryFeature: FeatureCollection | null = detailsQuery.data?.geometry || null;
 
   const contextValue: OverlayDetailsPageContextState = {

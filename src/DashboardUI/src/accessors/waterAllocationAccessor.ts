@@ -1,4 +1,4 @@
-import { SiteInfoListItem, WaterRightDetails, WaterSourceInfoListItem } from '@data-contracts';
+import { SiteInfoListItem, WaterRightDetails, WaterRightsInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 import { saveAs } from 'file-saver';
 import {
   WaterRightsSearchCriteria,
@@ -54,6 +54,15 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
   const { data } = await api.get<FeatureCollection>(`WaterRights/${allocationUuid}/SiteLocations`);
   return data;
 };
+
+export const getWaterRightOverlayInfoList = async (
+  allocationUuid: string,
+): Promise<WaterRightsInfoListItem[]> => {
+  const api = await westDaatApi();
+  const { data } = await api.get<WaterRightsInfoListItem[]>(`WaterRights/${allocationUuid}/Overlays`);
+  return data;
+};
+
 
 export const downloadWaterRights = async (searchCriteria: WaterRightsSearchCriteriaWithFilterUrl) => {
   // using fetch instead of axios as axios seems not to be able to handle zip downloads on POST requests

@@ -7,7 +7,7 @@ import {
   findWaterRight,
   getWaterRightAnalyticsSummaryInfo,
   downloadWaterRights,
-  getWaterRightDataEnvelope,
+  getWaterRightDataEnvelope, getWaterRightOverlayInfoList,
 } from '../../accessors/waterAllocationAccessor';
 import {
   WaterRightsSearchCriteria,
@@ -17,9 +17,7 @@ import {
 } from '../../data-contracts/WaterRightsSearchCriteria';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
-import { SiteInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
-import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
-import { getTimeSeriesRightInfoList } from '../../accessors/siteAccessor';
+import { SiteInfoListItem, WaterRightsInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 
 export function useWaterRightDetails(allocationUuid: string | undefined) {
   return useQuery(['waterRight.Details', allocationUuid], async () => await getWaterRightDetails(allocationUuid!), {
@@ -97,23 +95,6 @@ export function useWaterRightSourceInfoList(
   );
 }
 
-type TimeSeriesInfoListOptionsType = UseQueryOptionsParameter<undefined, TimeSeriesListItem[]>;
-
-export function useTimeSeriesRightsInfoList(
-  allocationUuid: string | undefined,
-  options?: TimeSeriesInfoListOptionsType,
-) {
-  const setOptions = {
-    ...options,
-    enabled: options?.enabled && !!allocationUuid,
-  };
-  return useQuery(
-    ['site.TimeSeriesInfoList', allocationUuid],
-    async () => await getTimeSeriesRightInfoList(allocationUuid!),
-    setOptions,
-  );
-}
-
 export function useWaterRightSiteLocations(allocationUuid: string | undefined) {
   return useQuery(
     ['waterRight.SiteLocations', allocationUuid],
@@ -130,4 +111,20 @@ export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteria
     retry: false,
     cacheTime: 0,
   });
+}
+
+export function useWaterRightsInfoListByAllocationUuid(
+  allocationUuid: string | undefined,
+  options?: UseQueryOptionsParameter<undefined, WaterRightsInfoListItem[]>,
+) {
+  const setOptions = {
+    ...options,
+    enabled: options?.enabled && !!allocationUuid,
+  };
+
+  return useQuery(
+    ['waterRight.OverlayInfoList', allocationUuid],
+    async () => await getWaterRightOverlayInfoList(allocationUuid!),
+    setOptions,
+  );
 }

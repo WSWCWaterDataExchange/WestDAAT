@@ -6,21 +6,20 @@ import { useWaterRightDetailsContext } from '../Provider';
 export function useAlerts() {
   const {
     hostData: {
-      detailsQuery: {isLoading: detailsIsLoading, isError: detailsIsError},
-      siteLocationsQuery: {isLoading: siteLocationsIsLoading, isError: siteLocationsIsError},
-      siteInfoListQuery: {isLoading: siteInfoListIsLoading, isError: siteInfoListIsError},
-      sourceInfoListQuery: {isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError},
-      waterRightsInfoListQuery: {isLoading: waterRightsInfoListIsLoading, isError: waterRightsInfoListIsError},
-      timeSeriesInfoListQuery: {isLoading: timeSeriesInfoListIsLoading, isError: timeSeriesInfoListIsError}
+      detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
+      siteLocationsQuery: { isLoading: siteLocationsIsLoading, isError: siteLocationsIsError },
+      siteInfoListQuery: { isLoading: siteInfoListIsLoading, isError: siteInfoListIsError },
+      sourceInfoListQuery: { isLoading: sourceInfoListIsLoading, isError: sourceInfoListIsError },
+      waterRightsInfoListQuery: { isLoading: waterRightsInfoListIsLoading, isError: waterRightsInfoListIsError },
     },
   } = useWaterRightDetailsContext();
 
   const isError = useMemo(() => {
-    return detailsIsError || siteLocationsIsError || siteInfoListIsError || sourceInfoListIsError || waterRightsInfoListIsError || timeSeriesInfoListIsError;
-  }, [ detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError, waterRightsInfoListIsError, timeSeriesInfoListIsError ]);
+    return detailsIsError || siteLocationsIsError || siteInfoListIsError || sourceInfoListIsError || waterRightsInfoListIsError;
+  }, [detailsIsError, siteLocationsIsError, siteInfoListIsError, sourceInfoListIsError, waterRightsInfoListIsError]);
 
   useProgressIndicator(
-    [ !detailsIsLoading, !siteLocationsIsLoading, !siteInfoListIsLoading, !sourceInfoListIsLoading, !waterRightsInfoListIsLoading, !timeSeriesInfoListIsLoading ],
+    [!detailsIsLoading, !siteLocationsIsLoading, !siteInfoListIsLoading, !sourceInfoListIsLoading, !waterRightsInfoListIsLoading],
     'Loading Water Right Data',
   );
 
@@ -32,5 +31,5 @@ export function useAlerts() {
         autoClose: false,
       });
     }
-  }, [ isError ]);
+  }, [isError]);
 }

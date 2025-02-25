@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query';
 import {
-  getOverlayDetails,
+  getOverlayDetails, getOverlayDigests,
   getOverlayInfoById,
-  getWaterRightsInfoListByAllocationUuid,
   getWaterRightsInfoListByReportingUnitUuid,
 } from '../../accessors/overlaysAccessor';
 import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
@@ -18,6 +17,12 @@ export function useOverlayDetails(
   };
 
   return useQuery(['overlay.Details', overlayUuid], async () => await getOverlayDetails(overlayUuid!), setOptions);
+}
+
+export function useOverlayDigests(overlayUuid: string | undefined) {
+  return useQuery(['overlay.Digests', overlayUuid], async () => await getOverlayDigests(overlayUuid!), {
+    enabled: !!overlayUuid,
+  });
 }
 
 export function useOverlayInfoById(
@@ -38,28 +43,12 @@ export function useWaterRightsInfoListByReportingUnitUuid(
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled !== false && !!reportingUnitUuid,
+    enabled: !!reportingUnitUuid,
   };
 
   return useQuery(
-    ['overlay.Legal', reportingUnitUuid],
+    ['overlay.LegalInfoList', reportingUnitUuid],
     async () => await getWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid!),
-    setOptions,
-  );
-}
-
-export function useWaterRightsInfoListByAllocationUuid(
-  allocationUuid: string | undefined,
-  options?: UseQueryOptionsParameter<undefined, WaterRightsInfoListItem[]>,
-) {
-  const setOptions = {
-    ...options,
-    enabled: options?.enabled !== false && !!allocationUuid,
-  };
-
-  return useQuery(
-    ['overlay.Legal', allocationUuid],
-    async () => await getWaterRightsInfoListByAllocationUuid(allocationUuid!),
     setOptions,
   );
 }
