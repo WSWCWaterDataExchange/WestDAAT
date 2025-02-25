@@ -5,6 +5,7 @@ import mapboxgl, {
   LngLat,
   NavigationControl,
   MapMouseEvent,
+  GeoJSONSource,
 } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
@@ -16,7 +17,7 @@ import {
   RenderedFeatureType,
   useMapContext,
 } from '../../contexts/MapProvider';
-import mapConfig from '../../config/maps';
+import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
 import { mdiAlert, mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
@@ -24,7 +25,7 @@ import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
-import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
@@ -42,6 +43,9 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
+  generatePolygonLabelFeatures?: (
+    polygons: Feature<Geometry, GeoJsonProperties>[],
+  ) => Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
 }
@@ -53,6 +57,7 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
+  generatePolygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
 }: mapProps) {
@@ -149,6 +154,22 @@ function Map({
 
     mapInstance.addControl(dc);
 
+    const updatePolygonLabels = () => {
+      const data = dc.getAll();
+
+      const labelFeatures = generatePolygonLabelFeatures!(data.features);
+
+      const source = mapInstance.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+
+      source?.setData({
+        type: 'FeatureCollection',
+        features: labelFeatures,
+      });
+
+      // unsure why, but the layer visibility is being set to `none`. This is a workaround to set it back to `visible`
+      mapInstance.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+    };
+
     const callback = () => {
       const features = dc.getAll().features;
       const polygon = features.find((f) => f.geometry.type === 'Polygon') as
@@ -159,6 +180,10 @@ function Map({
 
       if (handleMapDrawnPolygonChange) {
         handleMapDrawnPolygonChange(features);
+      }
+
+      if (generatePolygonLabelFeatures) {
+        updatePolygonLabels();
       }
     };
 
