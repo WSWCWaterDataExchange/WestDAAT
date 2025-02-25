@@ -42,14 +42,7 @@ function EstimationToolTableView() {
               {fields.map((field) => (
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
                   {show && activeTab === field.fieldName && (
-                    <>
-                      <div>
-                        <span className="fw-bold">Total Area</span>
-                        <br />
-                        <span>{formatNumber(getFieldAcres(field), 2)} acres</span>
-                      </div>
-                      <EstimationToolFieldDataTable datapoints={field.datapoints} />
-                    </>
+                    <EstimationToolFieldDataTable data={field} fieldAcreage={getFieldAcres(field)} />
                   )}
                 </Tab.Pane>
               ))}
