@@ -48,9 +48,11 @@
 
 1. Run MapboxTilesetCreate console app located in /tools
 2. Optional - Add personal.settings.json for connection string settings
-3. Allocations.Points.geojson and Allocations.Polygons.geojson files will be generated in geojson dir
-4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson" -L polygons:"Overlays.Polygons.geojson"` This will take about 5 minutes
-5. Upload to mapbox studio
+3. Allocations.Points.geojson and Allocations.Polygons.geojson, Overlays.Polygons.geojson, and TimeSeries.Points.geojson files will be generated in geojson dir
+4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson"` to generate Water Right Map Tiles. This will take about 5 minutes
+5. Run `tippecanoe -zg -o overlays.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L polygons:"Overlays.Polygons.geojson"` to generate Overlay Map Tiles. This will take about 5 minutes
+6. Run `tippecanoe -zg -o timeSeries.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"TimeSeries.Points.geojson"` to generate Time Series Map Tiles. This will take about 5 minutes
+7. Upload to mapbox studio
 
 
 ## Deployment
