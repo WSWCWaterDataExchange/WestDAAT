@@ -13,7 +13,11 @@ export function useUserSearchQuery(searchTerm: string) {
   return useQuery(['searchUsers', searchTerm], async () => await searchUsers(msalContext, searchTerm));
 }
 
-export function useOrganizationUsersQuery(organizationId: string) {
+export function useOrganizationUsersQuery(organizationId?: string) {
   const msalContext = useMsal();
-  return useQuery(['organizationUsers', organizationId], async () => await getOrganizationUsers(msalContext, organizationId));
+  return useQuery({
+    queryKey: ['organizationUsers', organizationId],
+    queryFn: async () => await getOrganizationUsers(msalContext, organizationId!),
+    enabled: !!organizationId
+  });
 }
