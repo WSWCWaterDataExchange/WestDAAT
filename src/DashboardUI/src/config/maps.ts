@@ -14,6 +14,7 @@ export const mapLayerNames = {
   nldiUsgsLocationLayer: 'nldi-usgs-location',
   timeSeriesPointsLayer: 'timeSeriesPoints',
   timeSeriesPolygonsLayer: 'timeSeriesPolygons',
+  userDrawnPolygonLabelsLayer: 'user-drawn-polygon-labels',
 };
 
 export const mapSourceNames = {
@@ -23,6 +24,7 @@ export const mapSourceNames = {
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
+  userDrawnPolygonLabelsGeoJson: 'user-drawn-polygon-labels-geojson',
 };
 
 export const defaultPointCircleRadius = [
@@ -105,6 +107,14 @@ const mapsJson = {
     },
     {
       id: mapSourceNames.riverBasinsGeoJson,
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    },
+    {
+      id: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -304,6 +314,18 @@ const mapsJson = {
         ],
         'circle-color': '#FF7F50',
         'circle-opacity': 0.75,
+      },
+    },
+    {
+      id: mapLayerNames.userDrawnPolygonLabelsLayer,
+      type: 'symbol',
+      source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
+      layout: {
+        'text-field': ['get', 'title'],
+        'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-radial-offset': 0.5,
+        'text-justify': 'auto',
+        'icon-image': ['get', 'icon'],
       },
     },
   ],
