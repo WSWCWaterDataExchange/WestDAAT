@@ -225,6 +225,21 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 // Intentionally only mapping the first org and first role. Multi-org / multi-role is not supported.
                 // Do not FirstOrDefault. We don't want this to silently fail if multi is supported later
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizations.Single().UserOrganizationRoles.Single().Role));
+
+            CreateMap<EFWD.User, UserProfile>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrganizationMemberships, opt => opt.MapFrom(src => src.UserOrganizations))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserProfile.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserProfile.LastName))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName))
+                .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.UserProfile.State))
+                .ForMember(dest => dest.County, opt => opt.MapFrom(src => src.UserProfile.Country))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.UserProfile.PhoneNumber));
+
+            CreateMap<EFWD.UserOrganization, OrganizationMembership>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationId))
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizationRoles.Single().Role));
         }
 
         private void AddOrganizationMappings()
@@ -242,18 +257,18 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.CompensationRateModel, opt => opt.MapFrom(src => src.OpenEtCompensationRateModel))
                 .ForMember(dest => dest.OpenEtModelDisplayName, opt => opt.MapFrom(src => Enum.GetName(src.OpenEtModel)))
                 .ForMember(dest => dest.OpenEtDateRangeStart, opt => opt.MapFrom(src =>
-                    // start of current year minus `dateRange` years
-                    DateOnly.FromDateTime(
-                        new DateTimeOffset(DateTimeOffset.UtcNow.Year - src.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                        .UtcDateTime
+                        // start of current year minus `dateRange` years
+                        DateOnly.FromDateTime(
+                            new DateTimeOffset(DateTimeOffset.UtcNow.Year - src.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                                .UtcDateTime
                         )
                     )
                 )
                 .ForMember(dest => dest.OpenEtDateRangeEnd, opt => opt.MapFrom(src =>
-                    // start of current year minus one minute to get end of previous year
-                    DateOnly.FromDateTime(
-                        new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMinutes(-1)
-                        .UtcDateTime
+                        // start of current year minus one minute to get end of previous year
+                        DateOnly.FromDateTime(
+                            new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMinutes(-1)
+                                .UtcDateTime
                         )
                     )
                 );
