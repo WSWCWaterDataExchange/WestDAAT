@@ -59,9 +59,6 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         await using var db = _westdaatDatabaseContextFactory.Create();
 
         var user = await db.Users
-            .Include(u => u.UserProfile)
-            .Include(u => u.UserOrganizations)
-            .ThenInclude(uor => uor.Organization)
             .Where(u => u.Id == request.UserId)
             .ProjectTo<UserProfile>(DtoMapper.Configuration)
             .FirstOrDefaultAsync();
