@@ -26,6 +26,10 @@ export function useOverlayTypeLegend() {
   }, [renderedFeatures, overlayTypeColors, visibleOverlayTypes]);
 
   const legendItems = useMemo(() => {
+    if (renderedOverlayTypes.length === 0) {
+      return undefined;
+    }
+
     return renderedOverlayTypes.map((colorObj) => (
       <MapLegendCircleItem key={colorObj.key} color={colorObj.color}>
         {colorObj.key}
