@@ -1,6 +1,7 @@
 import Table from 'react-bootstrap/esm/Table';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
+import Card from 'react-bootstrap/esm/Card';
 
 interface EstimationToolFieldDataTableProps {
   data: PolygonEtDataCollection;
@@ -8,33 +9,33 @@ interface EstimationToolFieldDataTableProps {
 }
 
 function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) {
+  const convertFieldEtInInchesToAcreFeet = (etInInches: number) => (etInInches / 12) * props.fieldAcreage;
+
+  const renderCard = (value: number, title: string, units: string) => (
+    <Card className="rounded-3 shadow-sm col-xxl-2 col-lg-3 col-4">
+      <Card.Body>
+        <Card.Title className="mt-3 fs-3 text-center fw-bold">{formatNumber(value, 2)}</Card.Title>
+        <Card.Text className="text-center fw-bold fs-6">
+          {title} ({units})
+        </Card.Text>
+      </Card.Body>
+    </Card>
+  );
+
   return (
     <>
-      <Table>
-        <thead>
-          <tr>
-            <th>Field Area (acres)</th>
-            <th>Average Yearly ET (inches)</th>
-            <th>Average Yearly ET (acre-feet)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{formatNumber(props.fieldAcreage, 2)}</td>
-            <td>{formatNumber(props.data.averageYearlyEtInInches, 2)}</td>
-            <td>{formatNumber(props.data.averageYearlyEtInAcreFeet, 2)}</td>
-          </tr>
-        </tbody>
-      </Table>
+      <div className="d-flex justify-content-around align-items-center mb-3">
+        {renderCard(props.fieldAcreage, 'Field Area', 'acres')}
+        {renderCard(props.data.averageYearlyEtInInches, 'Average Yearly ET', 'inches')}
+        {renderCard(props.data.averageYearlyEtInAcreFeet, 'Average Yearly ET', 'acre-feet')}
+      </div>
 
       <Table>
         <thead>
           <tr>
-            <th colSpan={2}>Yearly Evapotranspiration Data</th>
-          </tr>
-          <tr>
             <th>Year</th>
             <th>Total ET (inches)</th>
+            <th>Total ET (acre-feet)</th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
             <tr key={item.year}>
               <td>{item.year}</td>
               <td>{formatNumber(item.etInInches, 2)}</td>
+              <td>{formatNumber(convertFieldEtInInchesToAcreFeet(item.etInInches), 2)}</td>
             </tr>
           ))}
         </tbody>
