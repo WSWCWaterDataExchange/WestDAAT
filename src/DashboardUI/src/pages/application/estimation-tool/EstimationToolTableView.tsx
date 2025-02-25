@@ -6,6 +6,7 @@ import Nav from 'react-bootstrap/esm/Nav';
 import Tab from 'react-bootstrap/esm/Tab';
 
 import './estimation-tool-table-view.scss';
+import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 
 interface EstimationToolTableViewProps {
   fields: string[];
@@ -33,7 +34,7 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
             <Tab.Content className="flex-grow-1 overflow-y-auto p-3">
               {props.fields.map((field) => (
                 <Tab.Pane eventKey={field} key={field} className="h-100">
-                  {show && activeTab === field && <div>{field}</div>}
+                  {show && activeTab === field && <EstimationToolFieldDataTable />}
                 </Tab.Pane>
               ))}
             </Tab.Content>
