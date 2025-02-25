@@ -51,7 +51,12 @@ function EstimationToolTableView() {
         </div>
       </div>
 
-      <Button type="button" className="estimation-tool-table-view-toggle-btn" variant="primary" onClick={toggleshow}>
+      <Button
+        type="button"
+        className="estimation-tool-table-view-toggle-btn d-flex align-items-center justify-content-center py-2 px-4"
+        variant="primary"
+        onClick={toggleshow}
+      >
         <span>DATA TABLE</span>
         <Icon path={show ? mdiChevronDown : mdiChevronUp} size={1} />
       </Button>

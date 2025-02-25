@@ -30,10 +30,6 @@
 
   .estimation-tool-table-view-toggle-btn {
     color: $text-color-light;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1.5rem;
     font-size: 14px;
     border: none;
     border-radius: 5px 5px 0 0 !important;
@@ -41,7 +37,6 @@
     top: -2.5rem;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 5;
     transition:
       top 0.3s ease-in-out,
       background-color 0.2s ease-in-out;
