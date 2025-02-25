@@ -1,13 +1,13 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/esm/Modal';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginRequest } from '../../../authConfig';
 import { isFeatureEnabled } from '../../../config/features';
 import { useState } from 'react';
 import { OverlayTooltip } from '../../OverlayTooltip';
 import { useWaterRightDetailsContext } from './Provider';
-import { Spinner } from 'react-bootstrap';
 
 function WaterRightHeader() {
   const {
@@ -55,18 +55,30 @@ function WaterRightHeader() {
                 <OverlayTooltip text="Only available to those water rights approved to take part in a Funding Organization’s available water use reduction program. Uses OpenET’s consumptive use estimate to help determine potential water savings and monetary compensation for voluntary efforts towards water savings." />
               </div>
               <div>
-                <Button
-                  variant="primary"
-                  onClick={consumptiveUseBtnClickHandler}
-                  disabled={isLoadingDetails || !details?.isConservationApplicationEligible}
-                >
-                  {isLoadingDetails && <Spinner animation="border" size="sm" />}
+                {isLoadingDetails && (
+                  <Placeholder animation="glow">
+                    <Placeholder xs={12} className="rounded" style={{ width: '200px' }} />
+                  </Placeholder>
+                )}
 
-                  {!isLoadingDetails && <>Estimate Consumptive Use</>}
-                </Button>
+                {!isLoadingDetails && (
+                  <Button
+                    variant="primary"
+                    onClick={consumptiveUseBtnClickHandler}
+                    disabled={isLoadingDetails || !details?.isConservationApplicationEligible}
+                  >
+                    Estimate Consumptive Use
+                  </Button>
+                )}
               </div>
             </div>
             <div>
+              {isLoadingDetails && (
+                <Placeholder animation="glow">
+                  <Placeholder xs={12} className="rounded" style={{ width: '400px' }} />
+                </Placeholder>
+              )}
+
               {!isLoadingDetails && (
                 <>
                   <span>
