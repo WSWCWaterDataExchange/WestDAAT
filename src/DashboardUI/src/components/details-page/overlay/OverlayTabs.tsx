@@ -15,18 +15,18 @@ function OverlayTabs() {
     activeTab,
     setActiveTab,
     hostData: {
+      waterRightInfoListQuery: { data: waterRightInfoList },
       overlayInfoListQuery: { data: overlayInfoList },
-      waterRightsInfoListByReportingUnitQuery: { data: waterRightsInfoListByReportingUnit },
     },
   } = useOverlayDetailsContext();
 
   const waterRightRows = React.useMemo(() => {
-    if (!overlayInfoList) return [];
-    return overlayInfoList.map((entry) => ({
+    if (!waterRightInfoList) return [];
+    return waterRightInfoList.map((entry) => ({
       id: entry.allocationUuid,
       ...entry,
     }));
-  }, [overlayInfoList]);
+  }, [waterRightInfoList]);
 
   const waterRightColumns: GridColDef[] = [
     {
@@ -79,7 +79,7 @@ function OverlayTabs() {
       className="mb-3 custom-tabs"
     >
       <Tab eventKey={OverlayTab.Admin} title="Administrative/Regulatory Overlay Info">
-        <OverlayDetailsTable waterRightsInfoList={waterRightsInfoListByReportingUnit} />
+        <OverlayDetailsTable overlayInfoList={overlayInfoList} />
       </Tab>
 
       <Tab eventKey={OverlayTab.WaterRight} title="Related Water Right Information">

@@ -1,4 +1,4 @@
-import { SiteInfoListItem, WaterRightDetails, WaterRightsInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
+import { SiteInfoListItem, WaterRightDetails, OverlayInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 import { saveAs } from 'file-saver';
 import {
   WaterRightsSearchCriteria,
@@ -57,9 +57,9 @@ export const getWaterRightSiteLocations = async (allocationUuid: string) => {
 
 export const getWaterRightOverlayInfoList = async (
   allocationUuid: string,
-): Promise<WaterRightsInfoListItem[]> => {
+): Promise<OverlayInfoListItem[]> => {
   const api = await westDaatApi();
-  const { data } = await api.get<WaterRightsInfoListItem[]>(`WaterRights/${allocationUuid}/Overlays`);
+  const { data } = await api.get<OverlayInfoListItem[]>(`WaterRights/${allocationUuid}/Overlays`);
   return data;
 };
 

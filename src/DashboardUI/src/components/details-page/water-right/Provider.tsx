@@ -3,14 +3,13 @@ import { useParams } from 'react-router-dom';
 import { createContext, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
-  useWaterRightDetails,
-  useWaterRightsInfoListByAllocationUuid,
+  useWaterRightDetails, useWaterRightOverlyInfoList,
   useWaterRightSiteInfoList,
   useWaterRightSiteLocations,
   useWaterRightSourceInfoList,
 } from '../../../hooks/queries';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, WaterRightsInfoListItem } from '@data-contracts';
+import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, OverlayInfoListItem } from '@data-contracts';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -21,7 +20,7 @@ export interface HostData {
   siteLocationsQuery: Query<FeatureCollection<Geometry, GeoJsonProperties>>;
   siteInfoListQuery: Query<SiteInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
-  waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
+  overlayInfoListQuery: Query<OverlayInfoListItem[]>;
 }
 
 export type ActiveTabType = 'site' | 'source' | 'rights' | 'timeSeries';
@@ -42,7 +41,7 @@ const defaultState: WaterRightDetailsPageContextState = {
     siteLocationsQuery: defaultQuery,
     siteInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
-    waterRightsInfoListQuery: defaultQuery,
+    overlayInfoListQuery: defaultQuery,
   },
 };
 
@@ -65,7 +64,7 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
   const sourceInfoListQuery = useWaterRightSourceInfoList(allocationUuid, {
     enabled: activeTab === 'source',
   });
-  const waterRightsInfoListQuery = useWaterRightsInfoListByAllocationUuid(allocationUuid, {
+  const overlayInfoListQuery = useWaterRightOverlyInfoList(allocationUuid, {
     enabled: activeTab === 'rights',
   });
 
@@ -78,7 +77,7 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
       siteLocationsQuery,
       siteInfoListQuery,
       sourceInfoListQuery,
-      waterRightsInfoListQuery,
+      overlayInfoListQuery,
     },
   };
 

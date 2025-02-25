@@ -1,10 +1,9 @@
 import { useQuery } from 'react-query';
 import {
   getOverlayDetails, getOverlayDigests,
-  getOverlayInfoById,
-  getWaterRightsInfoListByReportingUnitUuid,
+  getOverlayInfoList, getOverlayWaterRightInfoList,
 } from '../../accessors/overlaysAccessor';
-import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
+import { OverlayDetails, OverlayTableEntry, OverlayInfoListItem } from '@data-contracts';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
 
 export function useOverlayDetails(
@@ -13,7 +12,7 @@ export function useOverlayDetails(
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled !== false && !!overlayUuid,
+    enabled: options?.enabled && !!overlayUuid,
   };
 
   return useQuery(['overlay.Details', overlayUuid], async () => await getOverlayDetails(overlayUuid!), setOptions);
@@ -25,30 +24,30 @@ export function useOverlayDigests(overlayUuid: string | undefined) {
   });
 }
 
-export function useOverlayInfoById(
+export function useOverlayWaterRightInfoList(
   overlayUuid: string | undefined,
   options?: UseQueryOptionsParameter<undefined, OverlayTableEntry[]>,
 ) {
   const setOptions = {
     ...options,
-    enabled: options?.enabled !== false && !!overlayUuid,
+    enabled: options?.enabled && !!overlayUuid,
   };
 
-  return useQuery(['overlay.Rights', overlayUuid], async () => await getOverlayInfoById(overlayUuid!), setOptions);
+  return useQuery(['overlay.Rights', overlayUuid], async () => await getOverlayWaterRightInfoList(overlayUuid!), setOptions);
 }
 
-export function useWaterRightsInfoListByReportingUnitUuid(
+export function useOverlayInfoList(
   reportingUnitUuid: string | undefined,
-  options?: UseQueryOptionsParameter<undefined, WaterRightsInfoListItem[]>,
+  options?: UseQueryOptionsParameter<undefined, OverlayInfoListItem[]>,
 ) {
   const setOptions = {
     ...options,
-    enabled: !!reportingUnitUuid,
+    enabled: options?.enabled && !!reportingUnitUuid,
   };
 
   return useQuery(
     ['overlay.LegalInfoList', reportingUnitUuid],
-    async () => await getWaterRightsInfoListByReportingUnitUuid(reportingUnitUuid!),
+    async () => await getOverlayInfoList(reportingUnitUuid!),
     setOptions,
   );
 }

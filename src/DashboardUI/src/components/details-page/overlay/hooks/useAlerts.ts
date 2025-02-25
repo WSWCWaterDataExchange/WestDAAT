@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import useProgressIndicator from '../../../../hooks/useProgressIndicator';
 import { useOverlayDetailsContext } from '../Provider';
@@ -7,39 +7,47 @@ export function useAlerts() {
   const {
     hostData: {
       detailsQuery: { isLoading: detailsIsLoading, isError: detailsIsError },
-      overlayInfoListQuery: { isLoading: overlayInfoListIsLoading, isError: overlayInfoListIsError },
-      waterRightsInfoListByReportingUnitQuery: {
-        isLoading: waterRightsInfoListByReportingUnitIsLoading,
-        isError: waterRightsInfoListByReportingUnitIsError
+      waterRightInfoListQuery: { isLoading: waterRightInfoIsLoading, isError: waterRightInfoIsError },
+      overlayInfoListQuery: {
+        isLoading: overlayInfoIsLoading, isError: overlayInfoIsError
       },
-      waterRightsInfoListByAllocationQuery: {
-        isLoading: waterRightsInfoListByAllocationIsLoading,
-        isError: waterRightsInfoListByAllocationIsError
-      }
     },
   } = useOverlayDetailsContext();
 
-  const isError = useMemo(() => {
-    return detailsIsError ||
-      overlayInfoListIsError ||
-      waterRightsInfoListByReportingUnitIsError ||
-      waterRightsInfoListByAllocationIsError;
-  }, [detailsIsError]);
-
+  // Page load initial loading indicator
   useProgressIndicator([
     !detailsIsLoading,
-    !overlayInfoListIsLoading,
-    !waterRightsInfoListByReportingUnitIsLoading,
-    !waterRightsInfoListByAllocationIsLoading
+    !overlayInfoIsLoading,
   ], 'Loading Overlay Data');
 
-  useEffect(() => {
-    if (isError) {
-      toast.error('Error loading overlay data. Please try again.', {
+  // Other loading indicators
+  useProgressIndicator([!waterRightInfoIsLoading], 'Loading Water Rights Data');
+
+  const previousErrors = useRef({
+    detailsIsError: false,
+    overlayInfoIsError: false,
+    waterRightInfoIsError: false,
+  });
+
+  const handleErrorToast = (isError: boolean, message: string, previousError: boolean) => {
+    if (isError && !previousError) {
+      toast.error(message, {
         position: 'top-center',
         theme: 'colored',
         autoClose: false,
       });
     }
-  }, [isError]);
+  };
+
+  useEffect(() => {
+    handleErrorToast(detailsIsError, 'Error loading overlay data. Please try again.', previousErrors.current.detailsIsError);
+    handleErrorToast(overlayInfoIsError, 'Error loading overlay info. Please try again.', previousErrors.current.overlayInfoIsError);
+    handleErrorToast(waterRightInfoIsError, 'Error loading water rights data. Please try again.', previousErrors.current.waterRightInfoIsError);
+
+    previousErrors.current = {
+      detailsIsError,
+      overlayInfoIsError,
+      waterRightInfoIsError,
+    };
+  }, [detailsIsError, overlayInfoIsError, waterRightInfoIsError]);
 }

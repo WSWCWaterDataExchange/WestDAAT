@@ -17,7 +17,7 @@ import {
 } from '../../data-contracts/WaterRightsSearchCriteria';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
-import { SiteInfoListItem, WaterRightsInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
+import { SiteInfoListItem, OverlayInfoListItem, WaterSourceInfoListItem } from '@data-contracts';
 
 export function useWaterRightDetails(allocationUuid: string | undefined) {
   return useQuery(['waterRight.Details', allocationUuid], async () => await getWaterRightDetails(allocationUuid!), {
@@ -113,9 +113,9 @@ export function useWaterRightsDownload(searchCriteria: WaterRightsSearchCriteria
   });
 }
 
-export function useWaterRightsInfoListByAllocationUuid(
+export function useWaterRightOverlyInfoList(
   allocationUuid: string | undefined,
-  options?: UseQueryOptionsParameter<undefined, WaterRightsInfoListItem[]>,
+  options?: UseQueryOptionsParameter<undefined, OverlayInfoListItem[]>,
 ) {
   const setOptions = {
     ...options,

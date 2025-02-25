@@ -2,11 +2,9 @@ import React, { createContext, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   useOverlayDetails,
-  useOverlayInfoById,
-  useWaterRightsInfoListByAllocationUuid,
-  useWaterRightsInfoListByReportingUnitUuid,
+  useOverlayInfoList, useOverlayWaterRightInfoList,
 } from '../../../hooks/queries';
-import { OverlayDetails, OverlayTableEntry, WaterRightsInfoListItem } from '@data-contracts';
+import { OverlayDetails, OverlayTableEntry, OverlayInfoListItem } from '@data-contracts';
 import { UseQueryResult } from 'react-query';
 import { FeatureCollection } from 'geojson';
 
@@ -16,9 +14,8 @@ const defaultQuery = { data: undefined, isError: false, isLoading: false };
 
 export interface HostData {
   detailsQuery: Query<OverlayDetails>;
-  overlayInfoListQuery: Query<OverlayTableEntry[]>;
-  waterRightsInfoListByReportingUnitQuery: Query<WaterRightsInfoListItem[]>;
-  waterRightsInfoListByAllocationQuery: Query<WaterRightsInfoListItem[]>;
+  waterRightInfoListQuery: Query<OverlayTableEntry[]>;
+  overlayInfoListQuery: Query<OverlayInfoListItem[]>;
   geometryFeature: FeatureCollection | null;
 }
 
@@ -37,9 +34,8 @@ const defaultState: OverlayDetailsPageContextState = {
   setActiveTab: () => {},
   hostData: {
     detailsQuery: defaultQuery,
+    waterRightInfoListQuery: defaultQuery,
     overlayInfoListQuery: defaultQuery,
-    waterRightsInfoListByReportingUnitQuery: defaultQuery,
-    waterRightsInfoListByAllocationQuery: defaultQuery,
     geometryFeature: null,
   },
 };
@@ -55,11 +51,10 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
   const { id: overlayUuid } = useParams();
   const [activeTab, setActiveTab] = useState<ActiveTabType>(defaultState.activeTab);
   const detailsQuery = useOverlayDetails(overlayUuid);
-  const overlayInfoListQuery = useOverlayInfoById(overlayUuid);
-  const waterRightsInfoListByReportingUnitQuery = useWaterRightsInfoListByReportingUnitUuid(overlayUuid);
-  const waterRightsInfoListByAllocationQuery = useWaterRightsInfoListByAllocationUuid(overlayUuid, {
-    enabled: activeTab === 'right'
+  const waterRightInfoListQuery = useOverlayWaterRightInfoList(overlayUuid, {
+    enabled: activeTab === 'right',
   });
+  const overlayInfoListQuery = useOverlayInfoList(overlayUuid);
   const geometryFeature: FeatureCollection | null = detailsQuery.data?.geometry || null;
 
   const contextValue: OverlayDetailsPageContextState = {
@@ -68,9 +63,8 @@ export const OverlayDetailsProvider = ({ children }: OverlayDetailsProviderProps
     setActiveTab,
     hostData: {
       detailsQuery,
+      waterRightInfoListQuery,
       overlayInfoListQuery,
-      waterRightsInfoListByReportingUnitQuery,
-      waterRightsInfoListByAllocationQuery,
       geometryFeature,
     },
   };
