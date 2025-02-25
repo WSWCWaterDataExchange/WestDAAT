@@ -26,7 +26,9 @@ function EstimationToolTableView() {
   };
 
   return (
-    <div className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} `}>
+    <div
+      className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} d-flex flex-column position-absolute start-0 end-0 bottom-0`}
+    >
       <div className="estimation-tool-table-view-slide-content">
         <div className="d-flex flex-column flex-grow-1 h-100">
           <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || fields[0].fieldName)}>
