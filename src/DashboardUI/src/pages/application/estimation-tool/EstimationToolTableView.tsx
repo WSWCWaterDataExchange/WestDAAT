@@ -9,6 +9,7 @@ import './estimation-tool-table-view.scss';
 import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
+import { formatNumber } from '../../../utilities/valueFormatters';
 
 function EstimationToolTableView() {
   const { state } = useConservationApplicationContext();
@@ -45,7 +46,7 @@ function EstimationToolTableView() {
                       <div>
                         <span className="fw-bold">Total Area</span>
                         <br />
-                        <span>{getFieldAcres(field)} acres</span>
+                        <span>{formatNumber(getFieldAcres(field), 2)} acres</span>
                       </div>
                       <EstimationToolFieldDataTable datapoints={field.datapoints} />
                     </>
