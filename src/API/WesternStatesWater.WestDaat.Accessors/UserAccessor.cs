@@ -23,6 +23,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
             UserExistsRequest req => await GetUserExists(req),
             UserListRequest req => await ListUsers(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
+            UserProfileRequest req => await GetUserProfile(req),
             UserSearchRequest req => await SearchUsers(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -50,6 +51,23 @@ internal class UserAccessor : AccessorBase, IUserAccessor
                 OrganizationId = uo.OrganizationId,
                 Role = uor.Role
             })).ToArray()
+        };
+    }
+
+    public async Task<UserProfileResponse> GetUserProfile(UserProfileRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var user = await db.Users
+            .Where(u => u.Id == request.UserId)
+            .ProjectTo<UserProfile>(DtoMapper.Configuration)
+            .FirstOrDefaultAsync();
+
+        NotFoundException.ThrowIfNull(user, $"User not found for id {request.UserId}");
+
+        return new UserProfileResponse
+        {
+            UserProfile = user
         };
     }
 
