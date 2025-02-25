@@ -63,7 +63,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />
-      <EstimationToolTableView fields={['Field 1', 'Field 2']} />
+      {state.conservationApplication.polygonEtData.length > 0 && !props.isLoadingConsumptiveUseEstimate && (
+        <EstimationToolTableView />
+      )}
     </div>
   );
 }

@@ -7,14 +7,14 @@ import Tab from 'react-bootstrap/esm/Tab';
 
 import './estimation-tool-table-view.scss';
 import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
-interface EstimationToolTableViewProps {
-  fields: string[];
-}
+function EstimationToolTableView() {
+  const { state } = useConservationApplicationContext();
+  const fields = state.conservationApplication.polygonEtData;
 
-function EstimationToolTableView(props: EstimationToolTableViewProps) {
   const [show, setShow] = useState(false);
-  const [activeTab, setActiveTab] = useState(props.fields[0]);
+  const [activeTab, setActiveTab] = useState(fields[0].fieldName);
 
   const toggleshow = () => setShow(!show);
 
@@ -22,19 +22,28 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
     <div className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} `}>
       <div className="estimation-tool-table-view-slide-content">
         <div className="d-flex flex-column flex-grow-1">
-          <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || props.fields[0])}>
+          <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || fields[0].fieldName)}>
             <Nav variant="tabs" className="py-2 px-3">
-              {props.fields.map((field) => (
-                <Nav.Item key={field}>
-                  <Nav.Link eventKey={field}>{field}</Nav.Link>
+              {fields.map((field) => (
+                <Nav.Item key={field.fieldName}>
+                  <Nav.Link eventKey={field.fieldName}>{field.fieldName}</Nav.Link>
                 </Nav.Item>
               ))}
             </Nav>
 
             <Tab.Content className="flex-grow-1 overflow-y-auto p-3">
-              {props.fields.map((field) => (
-                <Tab.Pane eventKey={field} key={field} className="h-100">
-                  {show && activeTab === field && <EstimationToolFieldDataTable />}
+              {fields.map((field) => (
+                <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
+                  {show && activeTab === field.fieldName && (
+                    <EstimationToolFieldDataTable
+                      fieldAcreage={
+                        state.conservationApplication.selectedMapPolygons.find(
+                          (polygon) => polygon.polygonWkt === field.polygonWkt,
+                        )!.acreage
+                      }
+                      datapoints={field.datapoints}
+                    />
+                  )}
                 </Tab.Pane>
               ))}
             </Tab.Content>
