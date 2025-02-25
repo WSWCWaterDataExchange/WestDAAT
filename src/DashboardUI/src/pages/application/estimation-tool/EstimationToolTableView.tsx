@@ -20,9 +20,9 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
   return (
     <div className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} `}>
       <div className="estimation-tool-table-view-slide-content">
-        <div className="fields-tabs">
+        <div className="d-flex flex-column flex-grow-1">
           <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || props.fields[0])}>
-            <Nav variant="tabs">
+            <Nav variant="tabs" className="py-2 px-3">
               {props.fields.map((field) => (
                 <Nav.Item key={field}>
                   <Nav.Link eventKey={field}>{field}</Nav.Link>
@@ -30,9 +30,9 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
               ))}
             </Nav>
 
-            <Tab.Content>
+            <Tab.Content className="flex-grow-1 overflow-y-auto p-3">
               {props.fields.map((field) => (
-                <Tab.Pane eventKey={field} key={field}>
+                <Tab.Pane eventKey={field} key={field} className="h-100">
                   {show && activeTab === field && <div>{field}</div>}
                 </Tab.Pane>
               ))}

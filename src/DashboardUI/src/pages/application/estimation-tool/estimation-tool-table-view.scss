@@ -57,26 +57,4 @@
       background-color: darken($bs-gray-900, 5%);
     }
   }
-
-  .fields-tabs {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    min-height: 0;
-
-    .nav-tabs {
-      padding: 0.5rem 1rem;
-    }
-
-    .tab-content {
-      flex-grow: 1;
-      min-height: 0;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-
-    .tab-pane {
-      height: 100%;
-    }
-  }
 }
