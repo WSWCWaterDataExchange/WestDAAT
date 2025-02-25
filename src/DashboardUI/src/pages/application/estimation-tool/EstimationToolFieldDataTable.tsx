@@ -2,7 +2,6 @@ import Table from 'react-bootstrap/esm/Table';
 import { PolygonEtDatapoint } from '../../../data-contracts/PolygonEtDatapoint';
 
 interface EstimationToolFieldDataTableProps {
-  fieldAcreage: number;
   datapoints: PolygonEtDatapoint[];
 }
 
@@ -12,7 +11,6 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
       <thead>
         <tr>
           <th>Year</th>
-          <th>Total Area</th>
           <th>Total ET</th>
         </tr>
       </thead>
@@ -20,7 +18,6 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
         {props.datapoints.map((item) => (
           <tr key={item.year}>
             <td>{item.year}</td>
-            <td>{props.fieldAcreage}</td>
             <td>{item.etInInches}</td>
           </tr>
         ))}

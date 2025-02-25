@@ -8,6 +8,7 @@ import Tab from 'react-bootstrap/esm/Tab';
 import './estimation-tool-table-view.scss';
 import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
 
 function EstimationToolTableView() {
   const { state } = useConservationApplicationContext();
@@ -17,6 +18,11 @@ function EstimationToolTableView() {
   const [activeTab, setActiveTab] = useState(fields[0].fieldName);
 
   const toggleshow = () => setShow(!show);
+
+  const getFieldAcres = (field: PolygonEtDataCollection & { fieldName: string }): number => {
+    return state.conservationApplication.selectedMapPolygons.find((polygon) => polygon.polygonWkt === field.polygonWkt)!
+      .acreage;
+  };
 
   return (
     <div className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} `}>
@@ -35,14 +41,14 @@ function EstimationToolTableView() {
               {fields.map((field) => (
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
                   {show && activeTab === field.fieldName && (
-                    <EstimationToolFieldDataTable
-                      fieldAcreage={
-                        state.conservationApplication.selectedMapPolygons.find(
-                          (polygon) => polygon.polygonWkt === field.polygonWkt,
-                        )!.acreage
-                      }
-                      datapoints={field.datapoints}
-                    />
+                    <>
+                      <div>
+                        <span className="fw-bold">Total Area</span>
+                        <br />
+                        <span>{getFieldAcres(field)} acres</span>
+                      </div>
+                      <EstimationToolFieldDataTable datapoints={field.datapoints} />
+                    </>
                   )}
                 </Tab.Pane>
               ))}
