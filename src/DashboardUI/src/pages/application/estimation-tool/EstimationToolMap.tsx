@@ -9,6 +9,7 @@ import Spinner from 'react-bootstrap/esm/Spinner';
 import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
+import EstimationToolTableView from './EstimationToolTableView';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -62,6 +63,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />
+      <EstimationToolTableView fields={['Field 1', 'Field 2']} />
     </div>
   );
 }
