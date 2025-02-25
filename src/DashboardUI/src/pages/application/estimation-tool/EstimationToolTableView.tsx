@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/esm/Button';
 import Nav from 'react-bootstrap/esm/Nav';
 import Tab from 'react-bootstrap/esm/Tab';
 
+import './estimation-tool-table-view.scss';
+
 interface EstimationToolTableViewProps {
   fields: string[];
 }
@@ -16,8 +18,8 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
   const toggleshow = () => setShow(!show);
 
   return (
-    <div className={`xyz ${show ? 'expanded' : ''} `}>
-      <div className="abc">
+    <div className={`estimation-tool-table-view-container ${show ? 'expanded' : ''} `}>
+      <div className="estimation-tool-table-view-slide-content">
         <div className="fields-tabs">
           <Tab.Container activeKey={activeTab} onSelect={(tab) => setActiveTab(tab || props.fields[0])}>
             <Nav variant="tabs">
@@ -39,7 +41,7 @@ function EstimationToolTableView(props: EstimationToolTableViewProps) {
         </div>
       </div>
 
-      <Button type="button" className="xyz-btn" onClick={toggleshow}>
+      <Button type="button" className="estimation-tool-table-view-toggle-btn" variant="primary" onClick={toggleshow}>
         <span>DATA TABLE</span>
         <Icon path={show ? mdiChevronDown : mdiChevronUp} size={1} />
       </Button>
