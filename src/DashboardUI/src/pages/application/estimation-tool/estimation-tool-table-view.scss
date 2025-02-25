@@ -15,7 +15,9 @@
   pointer-events: auto;
 
   &.expanded {
-    transform: translateY(50%);
+    $dim-overlay-header-height: 48px; // approximate height
+    $data-table-btn-height: 40px;
+    transform: translateY(calc($dim-overlay-header-height + $data-table-btn-height));
   }
 
   .estimation-tool-table-view-slide-content {

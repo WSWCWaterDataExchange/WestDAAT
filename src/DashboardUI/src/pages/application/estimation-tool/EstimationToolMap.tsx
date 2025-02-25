@@ -1,4 +1,4 @@
-import { Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import Map from '../../../components/map/Map';
 import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
 import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
