@@ -44,15 +44,17 @@ describe('ConservationApplicationState reducer', () => {
         ...mockApplication,
         applicationId: 'application-guid-5',
         status: ConservationApplicationStatus.Approved,
-        compensationRateUnits: CompensationRateUnits.Acres
+        compensationRateUnits: CompensationRateUnits.Acres,
       },
     ];
 
     // Act
     const newState = reducer(state, {
       type: 'DASHBOARD_APPLICATION_FILTERS_CHANGED',
-      payload: { applicationIds: ['application-guid-2', 'application-guid-3', 'application-guid-4', 'application-guid-5'] },
-    })
+      payload: {
+        applicationIds: ['application-guid-2', 'application-guid-3', 'application-guid-4', 'application-guid-5'],
+      },
+    });
 
     // Assert
     expect(newState.dashboardApplicationsStatistics).toEqual({
@@ -62,7 +64,7 @@ describe('ConservationApplicationState reducer', () => {
       inReviewApplications: 1,
       cumulativeEstimatedSavingsAcreFeet: 300,
       totalObligationDollars: 400,
-    })
+    });
   });
 
   it('loading dashboard with zero applications should not error', () => {
@@ -85,7 +87,7 @@ describe('ConservationApplicationState reducer', () => {
       cumulativeEstimatedSavingsAcreFeet: 0,
       totalObligationDollars: 0,
     });
-  })
+  });
 
   const mockApplication: ApplicationDashboardListItem = {
     applicantFullName: 'Bobby Hill',
@@ -239,6 +241,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
     expect(newState.conservationApplication.polygonEtData.length).toEqual(1);
     expect(newState.conservationApplication.polygonEtData[0].datapoints.length).toEqual(1);
+    expect(newState.conservationApplication.polygonEtData[0].fieldName).toEqual('Field 1');
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
