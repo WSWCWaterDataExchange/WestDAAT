@@ -323,8 +323,7 @@ const mapsJson = {
       layout: {
         'text-field': ['get', 'title'],
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-        'text-radial-offset': 0.5,
-        'text-justify': 'auto',
+        'text-justify': 'center',
         'icon-image': ['get', 'icon'],
       },
     },
