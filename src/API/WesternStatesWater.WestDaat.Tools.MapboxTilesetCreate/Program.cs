@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,6 +52,7 @@ namespace WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate
 
             var dbFactory = services.Services.GetRequiredService<IDatabaseContextFactory>();
             var db = dbFactory.Create();
+            db.Database.SetCommandTimeout(int.MaxValue);
             await MapboxTileset.CreateTilesetFiles(db);
         }
     }
