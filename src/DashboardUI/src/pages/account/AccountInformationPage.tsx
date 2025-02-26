@@ -98,25 +98,27 @@ export function AccountInformationPage() {
       )}
 
       {!hasProfileLoadError && (
-        <div className="row">
-          {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
-          {labeledValue('Email', profile?.email)}
-          {labeledValue('User ID', profile?.userName)}
-          {labeledValue('State', profile?.state)}
-          {labeledValue('Country', profile?.country)}
-          {labeledValue('Phone', profile?.phoneNumber)}
-        </div>
+        <>
+          <div className="row">
+            {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
+            {labeledValue('Email', profile?.email)}
+            {labeledValue('User ID', profile?.userName)}
+            {labeledValue('State', profile?.state)}
+            {labeledValue('Country', profile?.country)}
+            {labeledValue('Phone', profile?.phoneNumber)}
+          </div>
+
+          <h2 className="fs-4">Address Information</h2>
+          <hr />
+          <NotImplementedPlaceholder />
+
+          <h2 className="fs-4">Organizations & Roles</h2>
+          <hr />
+
+          {isProfileLoading && organizationRolesPlaceholder}
+          {!isProfileLoading && organizationRolesTable()}
+        </>
       )}
-
-      <h2 className="fs-4">Address Information</h2>
-      <hr />
-      <NotImplementedPlaceholder />
-
-      <h2 className="fs-4">Organizations & Roles</h2>
-      <hr />
-
-      {isProfileLoading && organizationRolesPlaceholder}
-      {!isProfileLoading && organizationRolesTable()}
     </div>
   );
 }
