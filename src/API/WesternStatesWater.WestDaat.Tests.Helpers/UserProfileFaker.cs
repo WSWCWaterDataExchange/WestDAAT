@@ -8,7 +8,7 @@ public class UserProfileFaker : Faker<EFWD.UserProfile>
         RuleFor(up => up.LastName, f => f.Person.LastName);
         RuleFor(up => up.UserName, f => f.Person.UserName);
         RuleFor(up => up.State, f => f.Address.StateAbbr());
-        RuleFor(up => up.Country, f => f.Address.Country());
+        RuleFor(up => up.Country, f => f.Address.Country().PadRight(50)[..50]); // Avoid sql column truncation
         RuleFor(up => up.PhoneNumber, f => f.Person.Phone);
     }
 }
