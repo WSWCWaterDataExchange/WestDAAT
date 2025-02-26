@@ -78,12 +78,12 @@ export const convertWktToGeometry = (input: string): Geometry => {
   // example input: `SRID=4326;POINT(-44.3 60.1)`
   const parts = input.split(';');
   let geometryWkt = parts.pop()!;
-  const srid = (parts.shift() || '').split('=').pop();
+  const srid = (parts.shift() || '').split('=').pop()!;
 
   let i = 0;
 
   function $(re) {
-    const match = geometryWkt!.substring(i).match(re);
+    const match = geometryWkt.substring(i).match(re);
     if (!match) return null;
     else {
       i += match[0].length;
@@ -92,7 +92,7 @@ export const convertWktToGeometry = (input: string): Geometry => {
   }
 
   function crs(obj) {
-    if (obj && srid!.match(/\d+/)) {
+    if (obj && srid.match(/\d+/)) {
       obj.crs = {
         type: 'name',
         properties: {
@@ -111,7 +111,7 @@ export const convertWktToGeometry = (input: string): Geometry => {
   function multicoords() {
     white();
     let depth = 0;
-    const rings: number[] = [];
+    const rings: any = [];
     const stack = [rings];
     let pointer = rings;
     let elem;
@@ -120,22 +120,22 @@ export const convertWktToGeometry = (input: string): Geometry => {
       if (elem === '(') {
         stack.push(pointer);
         pointer = [];
-        stack[stack.length - 1].push(...pointer); // verify correct
+        stack[stack.length - 1].push(pointer);
         depth++;
       } else if (elem === ')') {
         // For the case: Polygon(), ...
         if (pointer.length === 0) return null;
 
-        pointer = stack.pop()!;
+        pointer = stack.pop();
         // the stack was empty, input was malformed
         if (!pointer) return null;
         depth--;
         if (depth === 0) break;
       } else if (elem === ',') {
         pointer = [];
-        stack[stack.length - 1].push(...pointer);
+        stack[stack.length - 1].push(pointer);
       } else if (!elem.split(/\s/g).some((x) => isNaN(Number(x)))) {
-        pointer.push(...elem.split(/\s/g).map(parseFloat));
+        Array.prototype.push.apply(pointer, elem.split(/\s/g).map(parseFloat));
       } else {
         return null;
       }
@@ -147,13 +147,13 @@ export const convertWktToGeometry = (input: string): Geometry => {
     return rings;
   }
 
-  function coords(): number[] | null {
-    const list: number[] = [];
+  function coords(): number[][] | null {
+    const list: number[][] = [];
     let item: number[] = [];
     let pt;
     while ((pt = $(tuples) || $(/^(,)/))) {
       if (pt === ',') {
-        list.push(...item);
+        list.push(item);
         item = [];
       } else if (!pt.split(/\s/g).some((x) => isNaN(Number(x)))) {
         if (!item) {
@@ -166,7 +166,7 @@ export const convertWktToGeometry = (input: string): Geometry => {
     }
 
     if (item) {
-      list.push(...item);
+      list.push(item);
     } else {
       return null;
     }
