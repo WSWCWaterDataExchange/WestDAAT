@@ -10,7 +10,8 @@ import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
-import centroid from '@turf/centroid';
+import centerOfMass from '@turf/center-of-mass';
+
 import { useMemo } from 'react';
 
 interface EstimationToolMapProps {
@@ -30,7 +31,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     const labelFeatures: Feature<Point, GeoJsonProperties>[] = state.conservationApplication.polygonEtData.map(
       (dataCollection) => {
         const polygonFeature = convertWktToGeometry(dataCollection.polygonWkt);
-        const labelLocation = centroid(polygonFeature);
+        const labelLocation = centerOfMass(polygonFeature);
         labelLocation.properties = {
           ...labelLocation.properties,
           title: dataCollection.fieldName,
