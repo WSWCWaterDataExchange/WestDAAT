@@ -84,11 +84,8 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
           onClick={props.handleEstimateConsumptiveUseClicked}
           disabled={!estimateButtonEnabled}
         >
-          {props.isLoadingConsumptiveUseEstimate ? (
-            <Spinner animation="border" size="sm" />
-          ) : (
-            'Estimate Consumptive Use for the Drawn Polygon(s)'
-          )}
+          {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
+          Estimate Consumptive Use for the Drawn Polygon(s)
         </Button>
       </div>
       <Map
