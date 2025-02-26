@@ -12,7 +12,7 @@ export default function WaterRightTabs() {
     hostData: {
       siteInfoListQuery: { data: siteInfoList },
       sourceInfoListQuery: { data: sourceInfoList },
-      waterRightsInfoListQuery: { data: waterRightsInfoList },
+      overlayInfoListQuery: { data: overlayInfoList },
     },
   } = useWaterRightDetailsContext();
 
@@ -91,7 +91,7 @@ export default function WaterRightTabs() {
         </div>
       </Tab>
       <Tab eventKey="rights" title="Administrative/Regulatory Overlay Info">
-        <OverlayDetailsTable waterRightsInfoList={waterRightsInfoList} />
+        <OverlayDetailsTable overlayInfoList={overlayInfoList} />
       </Tab>
     </Tabs>
   );

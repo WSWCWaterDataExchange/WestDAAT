@@ -1,4 +1,4 @@
-import { Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import Map from '../../../components/map/Map';
 import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
 import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
@@ -9,6 +9,7 @@ import Spinner from 'react-bootstrap/esm/Spinner';
 import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
+import EstimationToolTableView from './EstimationToolTableView';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -19,6 +20,12 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
+    if (polygons.length > 20) {
+      toast.error(
+        'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
+      );
+    }
+
     const doPolygonsOverlap = doPolygonsIntersect(polygons);
     if (doPolygonsOverlap) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
@@ -62,6 +69,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />
+      {state.conservationApplication.polygonEtData.length > 0 && !props.isLoadingConsumptiveUseEstimate && (
+        <EstimationToolTableView />
+      )}
     </div>
   );
 }

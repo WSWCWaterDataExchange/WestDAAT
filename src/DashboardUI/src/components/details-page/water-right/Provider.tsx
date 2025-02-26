@@ -3,16 +3,13 @@ import { useParams } from 'react-router-dom';
 import { createContext, useContext, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import {
-  useTimeSeriesRightsInfoList,
-  useWaterRightDetails,
-  useWaterRightsInfoListByAllocationUuid,
+  useWaterRightDetails, useWaterRightOverlyInfoList,
   useWaterRightSiteInfoList,
   useWaterRightSiteLocations,
   useWaterRightSourceInfoList,
 } from '../../../hooks/queries';
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, WaterRightsInfoListItem } from '@data-contracts';
-import { TimeSeriesListItem } from '../../../data-contracts/TimeSeriesListItem';
+import { WaterRightDetails, SiteInfoListItem, WaterSourceInfoListItem, OverlayInfoListItem } from '@data-contracts';
 
 type Query<T> = Pick<UseQueryResult<T, unknown>, 'data' | 'isError' | 'isLoading'>;
 
@@ -23,8 +20,7 @@ export interface HostData {
   siteLocationsQuery: Query<FeatureCollection<Geometry, GeoJsonProperties>>;
   siteInfoListQuery: Query<SiteInfoListItem[]>;
   sourceInfoListQuery: Query<WaterSourceInfoListItem[]>;
-  waterRightsInfoListQuery: Query<WaterRightsInfoListItem[]>;
-  timeSeriesInfoListQuery: Query<TimeSeriesListItem[]>;
+  overlayInfoListQuery: Query<OverlayInfoListItem[]>;
 }
 
 export type ActiveTabType = 'site' | 'source' | 'rights' | 'timeSeries';
@@ -45,8 +41,7 @@ const defaultState: WaterRightDetailsPageContextState = {
     siteLocationsQuery: defaultQuery,
     siteInfoListQuery: defaultQuery,
     sourceInfoListQuery: defaultQuery,
-    waterRightsInfoListQuery: defaultQuery,
-    timeSeriesInfoListQuery: defaultQuery,
+    overlayInfoListQuery: defaultQuery,
   },
 };
 
@@ -69,11 +64,8 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
   const sourceInfoListQuery = useWaterRightSourceInfoList(allocationUuid, {
     enabled: activeTab === 'source',
   });
-  const waterRightsInfoListQuery = useWaterRightsInfoListByAllocationUuid(allocationUuid, {
+  const overlayInfoListQuery = useWaterRightOverlyInfoList(allocationUuid, {
     enabled: activeTab === 'rights',
-  });
-  const timeSeriesInfoListQuery = useTimeSeriesRightsInfoList(allocationUuid, {
-    enabled: activeTab === 'timeSeries',
   });
 
   const filterContextProviderValue: WaterRightDetailsPageContextState = {
@@ -85,8 +77,7 @@ export const WaterRightDetailsProvider = ({ children }: WaterRightDetailsProvide
       siteLocationsQuery,
       siteInfoListQuery,
       sourceInfoListQuery,
-      waterRightsInfoListQuery,
-      timeSeriesInfoListQuery,
+      overlayInfoListQuery,
     },
   };
 
