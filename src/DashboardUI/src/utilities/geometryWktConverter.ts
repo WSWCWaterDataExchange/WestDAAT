@@ -85,7 +85,7 @@ export const convertWktToGeometry = (input: string): Geometry => {
 
   let i = 0;
 
-  function $(re) {
+  function $(re: any) {
     const match = geometryWkt.substring(i).match(re);
     if (!match) return null;
     else {
@@ -94,7 +94,7 @@ export const convertWktToGeometry = (input: string): Geometry => {
     }
   }
 
-  function crs(obj) {
+  function crs(obj: any) {
     if (obj && srid.match(/\d+/)) {
       obj.crs = {
         type: 'name',
