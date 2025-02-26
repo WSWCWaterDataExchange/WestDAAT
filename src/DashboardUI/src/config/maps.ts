@@ -1,3 +1,4 @@
+import { SymbolLayerSpecification } from 'mapbox-gl';
 import { nldi, pointSizes, waterRightsProperties } from './constants';
 
 export const mapLayerNames = {
@@ -323,10 +324,15 @@ const mapsJson = {
       layout: {
         'text-field': ['get', 'title'],
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-size': 20,
         'text-justify': 'center',
         'icon-image': ['get', 'icon'],
       },
-    },
+      paint: {
+        'text-halo-color': '#fff',
+        'text-halo-width': 0.75,
+      },
+    } as SymbolLayerSpecification,
   ],
 };
 
