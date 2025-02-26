@@ -4,6 +4,8 @@ import { useUserProfile } from '../../hooks/queries/useUserQuery';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
 import { mdiInformationOutline } from '@mdi/js';
+import { Role, RoleDisplayNames } from '../../config/role';
+import { NavLink } from 'react-router-dom';
 
 export function AccountInformationPage() {
   const {
@@ -36,8 +38,54 @@ export function AccountInformationPage() {
     );
   };
 
+  const organizationRolesPlaceholder = (
+    <Placeholder animation="glow" className="d-flex w-100 gap-3 fs-3">
+      <Placeholder xs={3} className="rounded" />
+      <Placeholder xs={4} className="rounded" />
+      <Placeholder xs={4} className="rounded" />
+    </Placeholder>
+  );
+
+  const organizationPageLink = (role: Role, organizationId: string) => {
+    if (role !== Role.OrganizationAdmin) {
+      return null;
+    }
+
+    return <NavLink to={`/admin/${organizationId}/users`}>View Organization Page</NavLink>;
+  };
+
+  const organizationRolesTable = () => {
+    return (
+      <table className="table table-borderless">
+        <thead>
+          <tr>
+            <th>Organization</th>
+            <th>Role</th>
+            <th>{/* Actions */}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {profile?.organizationMemberships.length === 0 && (
+            <tr>
+              <td colSpan={2} className="text-muted text-center">
+                No organizations found.
+              </td>
+            </tr>
+          )}
+          {profile?.organizationMemberships.map((membership) => (
+            <tr key={membership.organizationId}>
+              <td>{membership.organizationName}</td>
+              <td>{RoleDisplayNames[membership.role] ?? '-'}</td>
+              <td className="text-end">{organizationPageLink(membership.role, membership.organizationId)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   return (
-    <div className="container-fluid mt-3">
+    <div className="container mt-3">
       <h1 className="fw-bold fs-4 mb-4">My Account</h1>
       <h2 className="fs-4">Account Information</h2>
       <hr />
@@ -50,23 +98,27 @@ export function AccountInformationPage() {
       )}
 
       {!hasProfileLoadError && (
-        <div className="row">
-          {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
-          {labeledValue('Email', profile?.email)}
-          {labeledValue('User ID', profile?.userName)}
-          {labeledValue('State', profile?.state)}
-          {labeledValue('Country', profile?.country)}
-          {labeledValue('Phone', profile?.phoneNumber)}
-        </div>
+        <>
+          <div className="row">
+            {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
+            {labeledValue('Email', profile?.email)}
+            {labeledValue('User ID', profile?.userName)}
+            {labeledValue('State', profile?.state)}
+            {labeledValue('Country', profile?.country)}
+            {labeledValue('Phone', profile?.phoneNumber)}
+          </div>
+
+          <h2 className="fs-4">Address Information</h2>
+          <hr />
+          <NotImplementedPlaceholder />
+
+          <h2 className="fs-4">Organizations & Roles</h2>
+          <hr />
+
+          {isProfileLoading && organizationRolesPlaceholder}
+          {!isProfileLoading && organizationRolesTable()}
+        </>
       )}
-
-      <h2 className="fs-4">Address Information</h2>
-      <hr />
-      <NotImplementedPlaceholder />
-
-      <h2 className="fs-4">Organizations & Roles</h2>
-      <hr />
-      <NotImplementedPlaceholder />
     </div>
   );
 }
