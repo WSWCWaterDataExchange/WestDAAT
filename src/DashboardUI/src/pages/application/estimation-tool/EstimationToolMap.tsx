@@ -18,13 +18,6 @@ interface EstimationToolMapProps {
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
-//ETHAN
-// I think you're going about this wrong. check tomorrow.
-// the map is calling your generatePolygonLabelFeatures method *whenever the map is updated*, but that doesn't work.
-// when the map is updated it's way too late to generate the labels, because then we have to reset all our ET data (if it exists).
-
-// maybe what we can do instead is pass the generated label features as props to the map, and then the map can handle rendering them?
-
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
