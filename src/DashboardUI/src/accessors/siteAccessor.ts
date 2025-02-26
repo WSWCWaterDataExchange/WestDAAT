@@ -12,12 +12,6 @@ export const getSiteDigest = async (siteUuid: string): Promise<SiteDigest> => {
   return data;
 };
 
-export const getOverlayDigests = async (overlayUuid: string): Promise<OverlayDigest[]> => {
-  const api = await westDaatApi();
-  const { data } = await api.get<OverlayDigest[]>(`Overlays/${overlayUuid}/OverlayDigest`);
-  return data;
-};
-
 export const getWaterSiteLocation = async (siteUuid: string) => {
   const api = await westDaatApi();
   const { data } = await api.get<GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>(
@@ -41,12 +35,6 @@ export const getWaterRightInfoList = async (siteUuid: string) => {
 export const getTimeSeriesSiteInfoList = async (siteUuid: string) => {
   const api = await westDaatApi();
   const { data } = await api.get<TimeSeriesListItem[]>(`Sites/${siteUuid}/UsageTable`);
-  return data;
-};
-
-export const getTimeSeriesRightInfoList = async (allocationUuid: string) => {
-  const api = await westDaatApi();
-  const { data } = await api.get<TimeSeriesListItem[]>(`WaterRights/${allocationUuid}/UsageTable`);
   return data;
 };
 

@@ -8,7 +8,6 @@ import {
   getSiteUsage,
   getSiteVariableInfoList,
   getSiteMethodInfoList,
-  getOverlayDigests,
   getTimeSeriesSiteInfoList,
 } from '../../accessors/siteAccessor';
 import { UseQueryOptionsParameter } from '../../HelperTypes';
@@ -21,12 +20,6 @@ import { TimeSeriesListItem } from '../../data-contracts/TimeSeriesListItem';
 export function useSiteDigest(siteUuid: string) {
   return useQuery(['site.siteDigest', siteUuid], async () => await getSiteDigest(siteUuid), {
     enabled: !!siteUuid,
-  });
-}
-
-export function useOverlayDigests(overlayUuid: string | undefined) {
-  return useQuery(['overlay.Digests', overlayUuid], async () => await getOverlayDigests(overlayUuid!), {
-    enabled: !!overlayUuid,
   });
 }
 
@@ -111,5 +104,5 @@ export function useSiteMethodInfoList(siteUuid: string | undefined, options?: Me
     ...options,
     enabled: options?.enabled && !!siteUuid,
   };
-  return useQuery(['site.VariableInfoList', siteUuid], async () => await getSiteMethodInfoList(siteUuid!), setOptions);
+  return useQuery(['site.MethodInfoList', siteUuid], async () => await getSiteMethodInfoList(siteUuid!), setOptions);
 }
