@@ -59,6 +59,10 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
     }));
 
+    if (polygonData.some((p) => p.acreage > 50000)) {
+      toast.error('Polygons may not exceed 50,000 acres. Please redraw the polygons so they are smaller.');
+    }
+
     dispatch({
       type: 'MAP_POLYGONS_UPDATED',
       payload: {
