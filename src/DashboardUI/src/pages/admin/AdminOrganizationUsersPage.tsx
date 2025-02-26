@@ -7,13 +7,11 @@ import { RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import { RemoveOrganizationUserModal } from './RemoveOrganizationUserModal';
 
-import './admin-organization-users-page.scss';
-
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
-  const [removeUserId, setRemoveUserId] = useState('');
+  const [removeUserId, setRemoveUserId] = useState<string | null>(null);
 
   const {
     data: organizationListResponse,
@@ -68,13 +66,13 @@ export function AdminOrganizationsUsersPage() {
   };
 
   const openRemoveUserModal = (userId: string) => {
-    setShowRemoveUserModal(!showRemoveUserModal);
+    setShowRemoveUserModal(true);
     setRemoveUserId(userId);
   };
 
   const closeRemoveUserModal = () => {
     setShowRemoveUserModal(false);
-    setRemoveUserId('');
+    setRemoveUserId(null);
   };
 
   return (
@@ -92,14 +90,14 @@ export function AdminOrganizationsUsersPage() {
             isLoading={organizationListLoading || organizationUsersListLoading}
             isErrored={organizationListErrored || organizationUsersListErrored}
           >
-            <table className="w-100">
+            <table className="table">
               <thead>
                 <tr>
-                  <th className="px-2 py-1 border-bottom">User</th>
-                  <th className="px-2 py-1 border-bottom">Role</th>
-                  <th className="px-2 py-1 border-bottom">Email</th>
-                  <th className="px-2 py-1 border-bottom">User ID</th>
-                  <th className="px-2 py-1 border-bottom"></th>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Email</th>
+                  <th>User ID</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -107,27 +105,23 @@ export function AdminOrganizationsUsersPage() {
                   organizationUsersListResponse?.users.length > 0 &&
                   organizationUsersListResponse?.users.map((user) => (
                     <tr key={user.userId}>
-                      <td key={`${user.userId}-name`} className="px-2 py-1 border-bottom">
-                        {user.lastName}, {user.firstName}
+                      <td className="align-content-center">
+                        {user.firstName} {user.lastName}
                       </td>
-                      <td key={`${user.userId}-role`} className="px-2 py-1 border-bottom">
-                        {RoleDisplayNames[user.role]}
-                      </td>
-                      <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
-                        <Button variant="link" href={`mailto:${user.email}`} className="px-0 user-email-button-text">
+                      <td className="align-content-center">{RoleDisplayNames[user.role]}</td>
+                      <td className="align-content-center">
+                        <Button variant="link" href={`mailto:${user.email}`} className="px-0 text-dark">
                           {user.email}
                         </Button>
                       </td>
-                      <td key={`${user.userId}-userID`} className="px-2 py-1 border-bottom">
-                        {user.userName}
-                      </td>
-                      <td key={`${user.userId}-remove`} className="px-2 py-1 border-bottom text-center">
+                      <td className="align-content-center">{user.userName}</td>
+                      <td className="align-content-center text-center">
                         <Button
                           variant="link"
-                          className="px-3 py-1 remove-user-button-text"
+                          className="px-3 py-1 text-danger"
                           onClick={() => openRemoveUserModal(user.userId)}
                         >
-                          Remove from Org
+                          Remove from Organization
                         </Button>
                       </td>
                     </tr>

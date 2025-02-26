@@ -2,7 +2,7 @@ import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
 
 export interface RemoveOrganizationUserModalProps extends ModalProps {
-  userId: string;
+  userId: string | null;
   closeModal: () => void;
 }
 
