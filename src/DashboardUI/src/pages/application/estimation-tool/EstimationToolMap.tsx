@@ -1,7 +1,7 @@
-import { Feature, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
+import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import Map from '../../../components/map/Map';
 import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
-import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
+import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Button from 'react-bootstrap/esm/Button';
@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
 import centroid from '@turf/centroid';
+import { useMemo } from 'react';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -27,9 +28,7 @@ interface EstimationToolMapProps {
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
 
-  const generatePolygonLabelFeatures = (
-    polygons: Feature<Geometry, GeoJsonProperties>[],
-  ): Feature<Point, GeoJsonProperties>[] => {
+  const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
     if (!hasPerformedEstimation) {
       return [];
@@ -37,29 +36,18 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     const labelFeatures: Feature<Point, GeoJsonProperties>[] = state.conservationApplication.polygonEtData.map(
       (dataCollection) => {
-        // convert the polygonWkt into its geometry and compare with the features already displayed on the map
-        // we need to find the matching feature so we can determine the correct label text
-        const matchingMapPolygonFeature = polygons.find(
-          (feature) =>
-            feature.geometry.type === 'Polygon' && convertGeometryToWkt(feature.geometry) === dataCollection.polygonWkt,
-        );
-
-        if (!matchingMapPolygonFeature) {
-          throw new Error('We have ET data for a polygon that does not exist on the map.');
-        }
-
-        const labelLocation = centroid(matchingMapPolygonFeature);
-        return {
-          type: 'Feature',
-          geometry: labelLocation.geometry,
-          properties: {
-            title: dataCollection.fieldName,
-          },
+        const polygonFeature = convertWktToGeometry(dataCollection.polygonWkt);
+        const labelLocation = centroid(polygonFeature);
+        labelLocation.properties = {
+          ...labelLocation.properties,
+          title: dataCollection.fieldName,
         };
+        return labelLocation;
       },
     );
     return labelFeatures;
-  };
+  }, [state.conservationApplication.polygonEtData]);
+  console.log('label features', polygonLabelFeatures);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > 20) {
@@ -108,7 +96,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
-        generatePolygonLabelFeatures={generatePolygonLabelFeatures}
+        polygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />

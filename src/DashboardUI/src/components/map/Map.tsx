@@ -43,9 +43,7 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
-  generatePolygonLabelFeatures?: (
-    polygons: Feature<Geometry, GeoJsonProperties>[],
-  ) => Feature<Point, GeoJsonProperties>[];
+  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
 }
@@ -57,7 +55,7 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
-  generatePolygonLabelFeatures,
+  polygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
 }: mapProps) {
@@ -154,22 +152,6 @@ function Map({
 
     mapInstance.addControl(dc);
 
-    const updatePolygonLabels = () => {
-      const data = dc.getAll();
-
-      const labelFeatures = generatePolygonLabelFeatures!(data.features);
-
-      const source = mapInstance.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
-
-      source?.setData({
-        type: 'FeatureCollection',
-        features: labelFeatures,
-      });
-
-      // unsure why, but the layer visibility is being set to `none`. This is a workaround to set it back to `visible`
-      mapInstance.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
-    };
-
     const callback = () => {
       const features = dc.getAll().features;
       const polygon = features.find((f) => f.geometry.type === 'Polygon') as
@@ -180,10 +162,6 @@ function Map({
 
       if (handleMapDrawnPolygonChange) {
         handleMapDrawnPolygonChange(features);
-      }
-
-      if (generatePolygonLabelFeatures) {
-        updatePolygonLabels();
       }
     };
 
@@ -534,6 +512,20 @@ function Map({
       maxZoom: mapBoundSettings.maxZoom,
     });
   }, [map, mapBoundSettings]);
+
+  useEffect(() => {
+    if (!map || !polygonLabelFeatures) return;
+
+    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+
+    source?.setData({
+      type: 'FeatureCollection',
+      features: polygonLabelFeatures,
+    });
+
+    // unsure why, but the layer visibility is being set to `none`. This is a workaround to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+  }, [map, polygonLabelFeatures]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
