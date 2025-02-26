@@ -10,6 +10,9 @@ import {
   Position,
 } from 'geojson';
 
+// Implementations adapted from Mapbox library `wellknown`
+// Source: https://github.com/mapbox/wellknown/blob/master/index.js
+
 export const convertGeometryToWkt = (geometry: Geometry): string => {
   const pairWKT = (coord: Position) => {
     return `${coord[0]} ${coord[1]}`;
