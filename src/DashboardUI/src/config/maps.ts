@@ -326,6 +326,7 @@ const mapsJson = {
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
         'text-size': 20,
         'text-justify': 'center',
+        'text-letter-spacing': 0.1,
         'icon-image': ['get', 'icon'],
       },
       paint: {
