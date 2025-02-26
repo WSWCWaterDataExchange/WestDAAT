@@ -101,35 +101,44 @@ export function AdminOrganizationsUsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {organizationUsersListResponse?.users.map((user) => (
-                  <tr key={user.userId}>
-                    <td key={`${user.userId}-name`} className="px-2 py-1 border-bottom">
-                      {user.lastName}, {user.firstName}
-                    </td>
-                    <td key={`${user.userId}-role`} className="px-2 py-1 border-bottom">
-                      {RoleDisplayNames[user.role]}
-                    </td>
-                    <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
-                      // TODO: JN - is this the right way to link the email address?
-                      <Button variant="link" href={`mailto:${user.email}`}>
-                        {user.email}
-                      </Button>
-                    </td>
-                    <td key={`${user.userId}-userID`} className="px-2 py-1 border-bottom">
-                      {user.userName}
-                    </td>
-                    <td key={`${user.userId}-remove`} className="px-2 py-1 border-bottom text-center">
-                      {/* // TODO: JN - get to be link style and red color? */}
-                      <Button
-                        variant="outline-danger"
-                        className="px-3 py-1"
-                        onClick={() => openRemoveUserModal(user.userId)}
-                      >
-                        Remove from Org
-                      </Button>
+                {organizationUsersListResponse?.users &&
+                  organizationUsersListResponse?.users.length > 0 &&
+                  organizationUsersListResponse?.users.map((user) => (
+                    <tr key={user.userId}>
+                      <td key={`${user.userId}-name`} className="px-2 py-1 border-bottom">
+                        {user.lastName}, {user.firstName}
+                      </td>
+                      <td key={`${user.userId}-role`} className="px-2 py-1 border-bottom">
+                        {RoleDisplayNames[user.role]}
+                      </td>
+                      <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
+                        // TODO: JN - is this the right way to link the email address?
+                        <Button variant="link" href={`mailto:${user.email}`}>
+                          {user.email}
+                        </Button>
+                      </td>
+                      <td key={`${user.userId}-userID`} className="px-2 py-1 border-bottom">
+                        {user.userName}
+                      </td>
+                      <td key={`${user.userId}-remove`} className="px-2 py-1 border-bottom text-center">
+                        {/* // TODO: JN - get to be link style and red color? */}
+                        <Button
+                          variant="outline-danger"
+                          className="px-3 py-1"
+                          onClick={() => openRemoveUserModal(user.userId)}
+                        >
+                          Remove from Org
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                {organizationUsersListResponse?.users && organizationUsersListResponse?.users.length === 0 && (
+                  <tr key="noResults">
+                    <td colSpan={8} className="text-center py-2">
+                      No results found
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </TableLoading>
