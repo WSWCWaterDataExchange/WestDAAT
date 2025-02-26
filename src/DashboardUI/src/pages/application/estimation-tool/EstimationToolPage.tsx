@@ -71,8 +71,6 @@ export function EstimationToolPage() {
             dataCollections: result.dataCollections,
           },
         });
-
-        toast.success('Consumptive use estimated successfully.');
       }
     },
     onError: (error: Error) => {
