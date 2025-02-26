@@ -4,7 +4,6 @@ import mapboxgl, {
   GeoJSONSourceSpecification,
   LngLat,
   NavigationControl,
-  MapMouseEvent,
   GeoJSONSource,
 } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
