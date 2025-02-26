@@ -1,15 +1,15 @@
 import React from 'react';
 import QuickSearchToolbar from '../QuickSearchToolbar';
-import { WaterRightsInfoListItem } from '../../data-contracts';
+import { OverlayInfoListItem } from '../../data-contracts';
 import { GridColDef, DataGrid } from '@mui/x-data-grid';
 interface OverlayDetailsTableProps {
-  waterRightsInfoList: WaterRightsInfoListItem[] | undefined;
+  overlayInfoList: OverlayInfoListItem[] | undefined;
 }
 
 export default function OverlayDetailsTable(props: OverlayDetailsTableProps) {
-  const { waterRightsInfoList } = props;
+  const { overlayInfoList } = props;
 
-  const rows = (waterRightsInfoList ?? []).map((entry, index) => ({
+  const rows = (overlayInfoList ?? []).map((entry, index) => ({
     id: `waterRights-${entry.waDEOverlayUuid}-${index}`,
     ...entry,
   }));
