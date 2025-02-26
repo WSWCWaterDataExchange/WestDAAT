@@ -3,12 +3,15 @@ import Button from 'react-bootstrap/esm/Button';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
-import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import { RoleDisplayNames } from '../../config/role';
+import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
+import { RemoveOrganizationUserModal } from './RemoveOrganizationUserModal';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
   const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
+  const [removeUserId, setRemoveUserId] = useState('');
 
   const {
     data: organizationListResponse,
@@ -62,6 +65,16 @@ export function AdminOrganizationsUsersPage() {
     }
   };
 
+  const openRemoveUserModal = (userId: string) => {
+    setShowRemoveUserModal(!showRemoveUserModal);
+    setRemoveUserId(userId);
+  };
+
+  const closeRemoveUserModal = () => {
+    setShowRemoveUserModal(false);
+    setRemoveUserId('');
+  };
+
   return (
     <>
       <div className="overflow-y-auto h-100">
@@ -97,7 +110,10 @@ export function AdminOrganizationsUsersPage() {
                       {RoleDisplayNames[user.role]}
                     </td>
                     <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
-                      {user.email}
+                      // TODO: JN - is this the right way to link the email address?
+                      <Button variant="link" href={`mailto:${user.email}`}>
+                        {user.email}
+                      </Button>
                     </td>
                     <td key={`${user.userId}-userID`} className="px-2 py-1 border-bottom">
                       {user.userName}
@@ -107,7 +123,7 @@ export function AdminOrganizationsUsersPage() {
                       <Button
                         variant="outline-danger"
                         className="px-3 py-1"
-                        onClick={() => console.log(`Remove user ${user.userId}`)}
+                        onClick={() => openRemoveUserModal(user.userId)}
                       >
                         Remove from Org
                       </Button>
@@ -117,6 +133,11 @@ export function AdminOrganizationsUsersPage() {
               </tbody>
             </table>
           </TableLoading>
+          <RemoveOrganizationUserModal
+            show={showRemoveUserModal}
+            userId={removeUserId}
+            closeModal={closeRemoveUserModal}
+          ></RemoveOrganizationUserModal>
         </div>
       </div>
     </>
