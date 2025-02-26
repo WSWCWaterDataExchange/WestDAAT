@@ -4,6 +4,7 @@ import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
+import { RoleDisplayNames } from '../../config/role';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
@@ -25,7 +26,7 @@ export function AdminOrganizationsUsersPage() {
   const pageTitle = () => {
     if (organizationListLoading || organizationUsersListLoading) {
       return (
-        <Placeholder as="h1" animation="glow" className="fs-3 fw-bolder">
+        <Placeholder as="h1" animation="glow" className="fs-3">
           <Placeholder xs={4} className="rounded" />
         </Placeholder>
       );
@@ -38,7 +39,7 @@ export function AdminOrganizationsUsersPage() {
       }
     }
 
-    return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
+    return <h1 className="fs-3">{titleText}</h1>;
   };
 
   const addUserButton = () => {
@@ -67,8 +68,8 @@ export function AdminOrganizationsUsersPage() {
         <div className="m-3">
           {pageTitle()}
 
-          <div className="d-flex justify-content-between my-4">
-            <h2>Users</h2>
+          <div className="d-flex justify-content-between align-items-center my-4">
+            <h2 className="fs-5">Users</h2>
             {addUserButton()}
           </div>
 
@@ -76,7 +77,45 @@ export function AdminOrganizationsUsersPage() {
             isLoading={organizationListLoading || organizationUsersListLoading}
             isErrored={organizationListErrored || organizationUsersListErrored}
           >
-            (<pre>OrganizationUsers: {JSON.stringify(organizationUsersListResponse)}</pre>)
+            <table className="w-100">
+              <thead>
+                <tr>
+                  <th className="px-2 py-1 border-bottom">User</th>
+                  <th className="px-2 py-1 border-bottom">Role</th>
+                  <th className="px-2 py-1 border-bottom">Email</th>
+                  <th className="px-2 py-1 border-bottom">User ID</th>
+                  <th className="px-2 py-1 border-bottom"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {organizationUsersListResponse?.users.map((user) => (
+                  <tr key={user.userId}>
+                    <td key={`${user.userId}-name`} className="px-2 py-1 border-bottom">
+                      {user.lastName}, {user.firstName}
+                    </td>
+                    <td key={`${user.userId}-role`} className="px-2 py-1 border-bottom">
+                      {RoleDisplayNames[user.role]}
+                    </td>
+                    <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
+                      {user.email}
+                    </td>
+                    <td key={`${user.userId}-userID`} className="px-2 py-1 border-bottom">
+                      {user.userName}
+                    </td>
+                    <td key={`${user.userId}-remove`} className="px-2 py-1 border-bottom text-center">
+                      {/* // TODO: JN - get to be link style and red color? */}
+                      <Button
+                        variant="outline-danger"
+                        className="px-3 py-1"
+                        onClick={() => console.log(`Remove user ${user.userId}`)}
+                      >
+                        Remove from Org
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </TableLoading>
         </div>
       </div>
