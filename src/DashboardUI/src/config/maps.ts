@@ -323,10 +323,11 @@ const mapsJson = {
       source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       layout: {
         'text-field': ['get', 'title'],
+        'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
         'text-size': 20,
         'text-justify': 'center',
-        'text-letter-spacing': 0.1,
+        'text-letter-spacing': 0.05, // default is 0
         'icon-image': ['get', 'icon'],
       },
       paint: {
