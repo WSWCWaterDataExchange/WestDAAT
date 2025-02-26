@@ -1,5 +1,4 @@
 import Alert from 'react-bootstrap/esm/Alert';
-import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
 import { useUserProfile } from '../../hooks/queries/useUserQuery';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
@@ -18,7 +17,7 @@ export function AccountInformationPage() {
 
   const labeledValue = (label: string, value: string | undefined) => {
     return (
-      <div className="col-xxl-2 col-lg-3 col-md-4">
+      <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <div className="mb-4">
           {isProfileLoading && (
             <Placeholder animation="glow">
@@ -30,7 +29,7 @@ export function AccountInformationPage() {
           {!isProfileLoading && (
             <>
               <div className="text-muted">{label}</div>
-              <div>{value}</div>
+              <div className="text-break">{value}</div>
             </>
           )}
         </div>
@@ -107,10 +106,6 @@ export function AccountInformationPage() {
             {labeledValue('Country', profile?.country)}
             {labeledValue('Phone', profile?.phoneNumber)}
           </div>
-
-          <h2 className="fs-4">Address Information</h2>
-          <hr />
-          <NotImplementedPlaceholder />
 
           <h2 className="fs-4">Organizations & Roles</h2>
           <hr />
