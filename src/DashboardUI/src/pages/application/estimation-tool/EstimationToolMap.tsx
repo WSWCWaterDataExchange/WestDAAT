@@ -1,4 +1,4 @@
-import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import Map from '../../../components/map/Map';
 import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
 import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
@@ -8,11 +8,11 @@ import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
-import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
+import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
 import centerOfMass from '@turf/center-of-mass';
-
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useMapContext } from '../../../contexts/MapProvider';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -21,6 +21,42 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
+  const { setMapBoundSettings } = useMapContext();
+
+  useEffect(
+    function focusMapOnPolygonsAfterRetrievingEstimate() {
+      const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+      if (!hasPerformedEstimation) {
+        return;
+      }
+
+      const userDrawnPolygonGeometries = state.conservationApplication.polygonEtData.map(
+        (dataCollection) => convertWktToGeometry(dataCollection.polygonWkt) as Polygon,
+      );
+      const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
+        type: 'FeatureCollection',
+        features: userDrawnPolygonGeometries.map(
+          (geometry): Feature<Polygon, GeoJsonProperties> => ({
+            type: 'Feature',
+            geometry,
+            properties: {},
+          }),
+        ),
+      };
+
+      setMapBoundSettings({
+        LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
+        padding: 25,
+        maxZoom: 12,
+      });
+    },
+    [
+      state.conservationApplication.polygonEtData,
+      convertWktToGeometry,
+      getLatsLongsFromFeatureCollection,
+      setMapBoundSettings,
+    ],
+  );
 
   const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
