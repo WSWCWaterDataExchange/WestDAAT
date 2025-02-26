@@ -7,6 +7,8 @@ import { RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import { RemoveOrganizationUserModal } from './RemoveOrganizationUserModal';
 
+import './admin-organization-users-page.scss';
+
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -112,8 +114,7 @@ export function AdminOrganizationsUsersPage() {
                         {RoleDisplayNames[user.role]}
                       </td>
                       <td key={`${user.userId}-email`} className="px-2 py-1 border-bottom">
-                        // TODO: JN - is this the right way to link the email address?
-                        <Button variant="link" href={`mailto:${user.email}`}>
+                        <Button variant="link" href={`mailto:${user.email}`} className="px-0 user-email-button-text">
                           {user.email}
                         </Button>
                       </td>
@@ -121,10 +122,9 @@ export function AdminOrganizationsUsersPage() {
                         {user.userName}
                       </td>
                       <td key={`${user.userId}-remove`} className="px-2 py-1 border-bottom text-center">
-                        {/* // TODO: JN - get to be link style and red color? */}
                         <Button
-                          variant="outline-danger"
-                          className="px-3 py-1"
+                          variant="link"
+                          className="px-3 py-1 remove-user-button-text"
                           onClick={() => openRemoveUserModal(user.userId)}
                         >
                           Remove from Org
