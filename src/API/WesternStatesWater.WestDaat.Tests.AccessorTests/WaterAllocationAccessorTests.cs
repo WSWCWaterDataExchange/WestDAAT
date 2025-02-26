@@ -2384,6 +2384,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .SetAllocationPriorityDate(priorityDate)
                 .SetAllocationExpirationDate(expirationDate)
                 .SetPublishedDate(publishedDate)
+                .IncludeRandomConservationApplicationId()
                 .Generate();
             allocationAmount.VariableSpecific.AggregationInterval = 5.0M;
             allocationAmount.IrrigationMethodCV = irrigationMethod.Name;
@@ -2432,7 +2433,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
                 WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
-                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl
+                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl,
+                IsConservationApplicationEligible = allocationAmount.ConservationApplicationFundingOrganizationId.HasValue,
             };
 
             // Act

@@ -1,4 +1,4 @@
-export interface WaterRightsInfoListItem {
+export interface OverlayInfoListItem {
   waDEOverlayUuid: string;
   overlayNativeID: string;
   overlayName: string;

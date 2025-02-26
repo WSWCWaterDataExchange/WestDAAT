@@ -42,6 +42,7 @@
         public double? IrrigatedAcreage { get; set; }
         public string CropTypeCV { get; set; }
         public string WaDEIrrigationMethod { get; set; }
+        public bool IsConservationApplicationEligible { get; set; }
 
     }
 }
