@@ -40,7 +40,6 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     );
     return labelFeatures;
   }, [state.conservationApplication.polygonEtData]);
-  console.log('label features', polygonLabelFeatures);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > 20) {
