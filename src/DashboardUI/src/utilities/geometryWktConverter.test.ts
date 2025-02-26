@@ -159,6 +159,14 @@ describe('geometryWktConverter', () => {
       expect(convertWktToGeometry('POINT (0 0)')).toEqual(point);
     });
 
+    it('should convert Extended WKT to point', () => {
+      const convertedPoint = convertWktToGeometry('SRID=4326;POINT (0 0)') as Point;
+
+      expect(convertedPoint.type).toEqual(point.type);
+      expect(convertedPoint.coordinates).toEqual(point.coordinates);
+      expect((convertedPoint as any).crs).toEqual({ type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::4326' } });
+    });
+
     it('should convert WKT to linestring', () => {
       expect(convertWktToGeometry('LINESTRING (0 0, 0 1, 1 2)')).toEqual(lineString);
     });
