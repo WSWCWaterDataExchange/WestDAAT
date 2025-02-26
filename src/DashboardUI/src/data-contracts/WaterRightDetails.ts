@@ -39,4 +39,6 @@ export interface WaterRightDetails {
   irrigatedAcreage: number;
   cropTypeCV: string;
   waDEIrrigationMethod: string;
+
+  isConservationApplicationEligible: boolean;
 }

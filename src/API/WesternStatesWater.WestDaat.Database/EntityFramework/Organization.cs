@@ -21,7 +21,7 @@ public class Organization
 
     public int OpenEtDateRangeInYears { get; set; }
 
-    public string OpenEtCompensationRateModel { get; set; }
+    public string OpenEtCompensationRateModel { get; set; } = null!;
 
     public virtual ICollection<UserOrganization> UserOrganizations { get; set; }
 }
