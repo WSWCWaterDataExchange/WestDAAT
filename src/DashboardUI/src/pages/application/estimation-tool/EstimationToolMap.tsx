@@ -17,17 +17,12 @@ interface EstimationToolMapProps {
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
-const convertPolygonWktToFeature = (polygonWkt: string): Feature<Polygon, GeoJsonProperties> => {
-  // TODO - implement in `geometryWktConverter` and use here
-  return {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [],
-    },
-    properties: {},
-  };
-};
+//ETHAN
+// I think you're going about this wrong. check tomorrow.
+// the map is calling your generatePolygonLabelFeatures method *whenever the map is updated*, but that doesn't work.
+// when the map is updated it's way too late to generate the labels, because then we have to reset all our ET data (if it exists).
+
+// maybe what we can do instead is pass the generated label features as props to the map, and then the map can handle rendering them?
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
@@ -44,10 +39,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       (dataCollection) => {
         // convert the polygonWkt into its geometry and compare with the features already displayed on the map
         // we need to find the matching feature so we can determine the correct label text
-        const polygonFeature = convertPolygonWktToFeature(dataCollection.polygonWkt);
         const matchingMapPolygonFeature = polygons.find(
           (feature) =>
-            feature.geometry.type === 'Polygon' && feature.geometry.coordinates === polygonFeature.geometry.coordinates,
+            feature.geometry.type === 'Polygon' && convertGeometryToWkt(feature.geometry) === dataCollection.polygonWkt,
         );
 
         if (!matchingMapPolygonFeature) {
