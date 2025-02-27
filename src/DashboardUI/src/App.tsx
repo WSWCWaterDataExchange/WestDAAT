@@ -42,10 +42,10 @@ function App({ msalInstance }: AppProps) {
   queryClient.setDefaultOptions({
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnReconnect: false,
       cacheTime: 8600000,
-      staleTime: Infinity,
+      staleTime: 0,
     },
   });
 
