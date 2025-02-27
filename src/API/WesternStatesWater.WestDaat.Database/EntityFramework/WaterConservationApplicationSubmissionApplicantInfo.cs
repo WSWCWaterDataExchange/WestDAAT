@@ -4,7 +4,9 @@ public class WaterConservationApplicationSubmissionApplicantInfo
 {
     public Guid WaterConservationApplicationSubmissionId { get; set; }
 
-    public string LandownerName { get; set; } = null!;
+    public string LandownerFirstName { get; set; } = null!;
+
+    public string LandownerLastName { get; set; } = null!;
 
     public string LandownerEmail { get; set; } = null!;
 
