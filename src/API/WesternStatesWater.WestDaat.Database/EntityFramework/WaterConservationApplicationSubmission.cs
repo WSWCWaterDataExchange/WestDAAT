@@ -49,6 +49,8 @@ public class WaterConservationApplicationSubmission
 
     public int ConservationPlanFundingRequestDollarAmount { get; set; }
 
+    public Common.DataContracts.CompensationRateUnits ConservationPlanFundingRequestCompensationRateUnits { get; set; }
+
     public string ConservationPlanDescription { get; set; } = null!;
 
     public string ConservationPlanAdditionalInfo { get; set; } = null!;
