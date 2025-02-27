@@ -4,7 +4,7 @@ import mapboxgl, {
   GeoJSONSourceSpecification,
   LngLat,
   NavigationControl,
-  MapMouseEvent,
+  GeoJSONSource,
 } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
@@ -16,7 +16,7 @@ import {
   RenderedFeatureType,
   useMapContext,
 } from '../../contexts/MapProvider';
-import mapConfig from '../../config/maps';
+import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
 import { mdiAlert, mdiMapMarker } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
@@ -24,7 +24,7 @@ import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
 import { CustomShareControl } from './CustomShareControl';
 import { CustomFitControl } from './CustomFitControl';
 import ReactDOM from 'react-dom';
-import { FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
@@ -42,6 +42,7 @@ import './map.scss';
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
   handleMapFitChange?: () => void;
+  polygonLabelFeatures?: Feature<Point, GeoJsonProperties>[];
   isConsumptiveUseAlertEnabled: boolean;
   isGeocoderInputFeatureEnabled: boolean;
 }
@@ -53,6 +54,7 @@ const createMapMarkerIcon = (color: string) => {
 function Map({
   handleMapDrawnPolygonChange,
   handleMapFitChange,
+  polygonLabelFeatures,
   isConsumptiveUseAlertEnabled,
   isGeocoderInputFeatureEnabled,
 }: mapProps) {
@@ -509,6 +511,22 @@ function Map({
       maxZoom: mapBoundSettings.maxZoom,
     });
   }, [map, mapBoundSettings]);
+
+  useEffect(() => {
+    if (!map || !polygonLabelFeatures) {
+      return;
+    }
+
+    const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
+
+    source?.setData({
+      type: 'FeatureCollection',
+      features: polygonLabelFeatures,
+    });
+
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
+    map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
+  }, [map, polygonLabelFeatures]);
 
   const [, dropRef] = useDrop({
     accept: 'nldiMapPoint',
