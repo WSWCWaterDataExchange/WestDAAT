@@ -33,7 +33,7 @@ namespace WesternStatesWater.WestDaat.Utilities
         private readonly Dictionary<FeatureDataSource, string> _featureDataSourceStrings = new()
         {
             { FeatureDataSource.UsgsSurfaceWaterSites, "nwissite" },
-            { FeatureDataSource.EpaWaterQualitySite,   "WQP" },
+            { FeatureDataSource.EpaWaterQualitySite, "WQP" },
         };
 
         public async Task<FeatureCollection> GetFeatureByCoordinates(double latitude, double longitude)
@@ -71,7 +71,9 @@ namespace WesternStatesWater.WestDaat.Utilities
             FeatureDataSource featureDataSource,
             int distanceInKm)
         {
-            using (new TimerLogger($"Getting features [{comid}] [{navigationMode}] [{featureDataSource}] [{distanceInKm}]", _logger))
+            using (new TimerLogger(
+                       $"Getting features [{comid}] [{navigationMode}] [{featureDataSource}] [{distanceInKm}]",
+                       _logger))
             {
                 var query = new QueryBuilder();
                 query.Add("distance", distanceInKm.ToString());
@@ -112,7 +114,8 @@ namespace WesternStatesWater.WestDaat.Utilities
             if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync();
-                throw new WestDaatException($"Invalid NLDI Response: [{(int)response.StatusCode} - {response.ReasonPhrase}] [{body}]");
+                throw new WestDaatException(
+                    $"Invalid NLDI Response: [{(int)response.StatusCode} - {response.ReasonPhrase}] [{body}]");
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -121,6 +124,7 @@ namespace WesternStatesWater.WestDaat.Utilities
                 _logger.LogInformation("USGS NLDI Api returned a success status code but empty payload.");
                 return new FeatureCollection();
             }
+
             try
             {
                 return JsonSerializer.Deserialize<FeatureCollection>(responseContent) ?? new FeatureCollection();
