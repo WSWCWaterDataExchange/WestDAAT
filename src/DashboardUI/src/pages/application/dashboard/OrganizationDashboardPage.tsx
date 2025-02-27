@@ -121,12 +121,11 @@ export function OrganizationDashboardPage() {
   };
 
   const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
-    return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
+    return <NavLink to={`/details/right/${params.row.waterRightState}wr_WR${params.value}`}>{params.value}</NavLink>;
   };
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
-    const waterRightId = `${params.row.waterRightState}wr_WR${params.row.waterRightNativeId}`;
-    return <NavLink to={`/application/${waterRightId}/review`}>{params.value}</NavLink>;
+    return <NavLink to={`/application/${params.value}/review`}>{params.value}</NavLink>;
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
