@@ -71,14 +71,11 @@ public class WaterConservationApplicationSubmission
 
     public string CertificateNumber { get; set; } = null!;
 
-    // question: in the mockups this displays "share #'s"; will there be multiple share numbers? if so we may need another contract
     public string ShareNumber { get; set; } = null!;
 
     public string WaterRightState { get; set; } = null!;
 
     public string WaterUseDescription { get; set; } = null!;
-
-
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 }
