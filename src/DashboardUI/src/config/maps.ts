@@ -1,3 +1,4 @@
+import { SymbolLayerSpecification } from 'mapbox-gl';
 import { nldi, pointSizes, waterRightsProperties } from './constants';
 
 export const mapLayerNames = {
@@ -14,6 +15,7 @@ export const mapLayerNames = {
   nldiUsgsLocationLayer: 'nldi-usgs-location',
   timeSeriesPointsLayer: 'timeSeriesPoints',
   timeSeriesPolygonsLayer: 'timeSeriesPolygons',
+  userDrawnPolygonLabelsLayer: 'user-drawn-polygon-labels',
 };
 
 export const mapSourceNames = {
@@ -23,6 +25,7 @@ export const mapSourceNames = {
   nldiGeoJson: 'nldi-geojson',
   detailsMapGeoJson: 'details-map-geojson',
   riverBasinsGeoJson: 'river-basins-geojson',
+  userDrawnPolygonLabelsGeoJson: 'user-drawn-polygon-labels-geojson',
 };
 
 export const defaultPointCircleRadius = [
@@ -105,6 +108,14 @@ const mapsJson = {
     },
     {
       id: mapSourceNames.riverBasinsGeoJson,
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    },
+    {
+      id: mapSourceNames.userDrawnPolygonLabelsGeoJson,
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -306,6 +317,24 @@ const mapsJson = {
         'circle-opacity': 0.75,
       },
     },
+    {
+      id: mapLayerNames.userDrawnPolygonLabelsLayer,
+      type: 'symbol',
+      source: mapSourceNames.userDrawnPolygonLabelsGeoJson,
+      layout: {
+        'text-field': ['get', 'title'],
+        'text-font': ['Open Sans Bold'], // default is `Open Sans Regular`
+        'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-size': 20,
+        'text-justify': 'center',
+        'text-letter-spacing': 0.05, // default is 0
+        'icon-image': ['get', 'icon'],
+      },
+      paint: {
+        'text-halo-color': '#fff',
+        'text-halo-width': 0.75,
+      },
+    } as SymbolLayerSpecification,
   ],
 };
 
