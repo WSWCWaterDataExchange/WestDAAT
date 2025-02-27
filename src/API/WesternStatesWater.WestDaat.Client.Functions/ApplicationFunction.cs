@@ -61,4 +61,16 @@ public class ApplicationFunction : FunctionBase
         var results = await _applicationManager.Store<WaterConservationApplicationCreateRequest, WaterConservationApplicationCreateResponse>(request);
         return await CreateResponse(req, results);
     }
+
+    [Function(nameof(SubmitApplication))]
+    [OpenApiOperation(nameof(SubmitApplication))]
+    [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
+    public async Task<HttpResponseData> SubmitApplication(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Submit")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<WaterConservationApplicationSubmissionRequest>(req);
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(request);
+        return await CreateResponse(req, results);
+    }
 }
