@@ -5,7 +5,8 @@ import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
 import { RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
-import { RemoveOrganizationUserModal } from './RemoveOrganizationUserModal';
+import { RemoveOrganizationUserModal } from './RemoveUserModal';
+import AddUserModal from './AddUserModal';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
@@ -141,6 +142,7 @@ export function AdminOrganizationsUsersPage() {
             userId={removeUserId}
             closeModal={closeRemoveUserModal}
           ></RemoveOrganizationUserModal>
+          <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
         </div>
       </div>
     </>
