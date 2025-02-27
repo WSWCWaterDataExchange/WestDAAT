@@ -16,7 +16,7 @@ export function useMapLegend() {
   useEffect(() => {
     const legendContent = (
       <div>
-        {overlayLegendItems.length > 0 && (
+        {overlayLegendItems && overlayLegendItems.length > 0 && (
           <div className="mb-3">
             <h5>
               <strong>Overlay Info</strong>
