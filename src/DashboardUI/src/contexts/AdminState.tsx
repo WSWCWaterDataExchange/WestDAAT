@@ -2,17 +2,36 @@ import { produce } from 'immer';
 
 export interface AdminState {
   organizations: string[];
+  profileForm: null | {
+    firstName: string | null;
+    lastName: string | null;
+    state: string | null;
+    country: string | null;
+    phone: string | null;
+  };
 }
 
 export const defaultState = (): AdminState => ({
   organizations: [],
+  profileForm: null,
 });
 
-export type AdminAction = AdminOrganizationsLoadedAction;
+export type AdminAction = AdminOrganizationsLoadedAction | ProfileFormChangedAction;
 
-export interface AdminOrganizationsLoadedAction {
+interface AdminOrganizationsLoadedAction {
   type: 'ADMIN_ORGANIZATIONS_LOADED';
   payload: { organizations: string[] };
+}
+
+interface ProfileFormChangedAction {
+  type: 'PROFILE_FORM_CHANGED';
+  payload: {
+    firstName: string | null;
+    lastName: string | null;
+    state: string | null;
+    country: string | null;
+    phone: string | null;
+  };
 }
 
 export const reducer = (state: AdminState, action: AdminAction): AdminState => {
@@ -28,6 +47,8 @@ const reduce = (draftState: AdminState, action: AdminAction): AdminState => {
   switch (action.type) {
     case 'ADMIN_ORGANIZATIONS_LOADED':
       return onAdminOrganizationsLoaded(draftState, action);
+    case 'PROFILE_FORM_CHANGED':
+      return onProfileFormChanged(draftState, action);
     default:
       return draftState;
   }
@@ -35,5 +56,10 @@ const reduce = (draftState: AdminState, action: AdminAction): AdminState => {
 
 const onAdminOrganizationsLoaded = (draftState: AdminState, action: AdminOrganizationsLoadedAction): AdminState => {
   draftState.organizations = action.payload.organizations;
+  return draftState;
+};
+
+const onProfileFormChanged = (draftState: AdminState, action: ProfileFormChangedAction): AdminState => {
+  draftState.profileForm = action.payload;
   return draftState;
 };
