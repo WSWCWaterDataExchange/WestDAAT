@@ -30,26 +30,26 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private readonly Dictionary<NavigationMode, string> _directionNames = new()
         {
-            { NavigationMode.UpstreamMain,        "Upstream" },
+            { NavigationMode.UpstreamMain, "Upstream" },
             { NavigationMode.UpstreamTributaries, "Upstream" },
-            { NavigationMode.DownstreamMain,      "Downstream" },
-            { NavigationMode.DownstreamDiversions,"Downstream" }
+            { NavigationMode.DownstreamMain, "Downstream" },
+            { NavigationMode.DownstreamDiversions, "Downstream" }
         };
 
         private readonly Dictionary<NavigationMode, string> _channelTypes = new()
         {
-            { NavigationMode.UpstreamMain,        "Main" },
+            { NavigationMode.UpstreamMain, "Main" },
             { NavigationMode.UpstreamTributaries, "Arm" },
-            { NavigationMode.DownstreamMain,      "Main" },
-            { NavigationMode.DownstreamDiversions,"Arm" }
+            { NavigationMode.DownstreamMain, "Main" },
+            { NavigationMode.DownstreamDiversions, "Arm" }
         };
 
         private readonly Dictionary<FeatureDataSource, string> _pointFeatureDataSourceNames = new()
         {
             { FeatureDataSource.UsgsSurfaceWaterSites, "UsgsSurfaceWaterSite" },
-            { FeatureDataSource.EpaWaterQualitySite,   "EpaWaterQualitySite" },
-            { FeatureDataSource.WadeRights,            "WadeWaterRights" },
-            { FeatureDataSource.WadeTimeseries,        "WadeTimeseries" }
+            { FeatureDataSource.EpaWaterQualitySite, "EpaWaterQualitySite" },
+            { FeatureDataSource.WadeRights, "WadeWaterRights" },
+            { FeatureDataSource.WadeTimeseries, "WadeTimeseries" }
         };
 
         public async Task<FeatureCollection> GetNldiFeatures(
@@ -78,58 +78,79 @@ namespace WesternStatesWater.WestDaat.Accessors
                 if (directions.HasFlag(NldiDirections.Upsteam))
                 {
                     tasks.Add(GetFlowlines(comid, NavigationMode.UpstreamMain, _configuration.MaxUpstreamMainDistance));
-                    tasks.Add(GetFlowlines(comid, NavigationMode.UpstreamTributaries, _configuration.MaxUpstreamTributaryDistance));
+                    tasks.Add(GetFlowlines(comid, NavigationMode.UpstreamTributaries,
+                        _configuration.MaxUpstreamTributaryDistance));
 
                     if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxUpstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxUpstreamTributaryDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain,
+                            FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxUpstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries,
+                            FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxUpstreamTributaryDistance));
                     }
 
                     if (dataPoints.HasFlag(NldiDataPoints.Epa))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.EpaWaterQualitySite, _configuration.MaxUpstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.EpaWaterQualitySite, _configuration.MaxUpstreamTributaryDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain,
+                            FeatureDataSource.EpaWaterQualitySite, _configuration.MaxUpstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries,
+                            FeatureDataSource.EpaWaterQualitySite, _configuration.MaxUpstreamTributaryDistance));
                     }
 
                     if (dataPoints.HasFlag(NldiDataPoints.WadeRights))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeRights, _configuration.MaxUpstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.WadeRights, _configuration.MaxUpstreamTributaryDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeRights,
+                            _configuration.MaxUpstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries,
+                            FeatureDataSource.WadeRights, _configuration.MaxUpstreamTributaryDistance));
                     }
+
                     if (dataPoints.HasFlag(NldiDataPoints.WadeTimeseries))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeTimeseries, _configuration.MaxUpstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.WadeTimeseries, _configuration.MaxUpstreamTributaryDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeTimeseries,
+                            _configuration.MaxUpstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.UpstreamTributaries,
+                            FeatureDataSource.WadeTimeseries, _configuration.MaxUpstreamTributaryDistance));
                     }
                 }
 
                 if (directions.HasFlag(NldiDirections.Downsteam))
                 {
-                    tasks.Add(GetFlowlines(comid, NavigationMode.DownstreamMain, _configuration.MaxDownstreamMainDistance));
-                    tasks.Add(GetFlowlines(comid, NavigationMode.DownstreamDiversions, _configuration.MaxDownstreamDiversionDistance));
+                    tasks.Add(GetFlowlines(comid, NavigationMode.DownstreamMain,
+                        _configuration.MaxDownstreamMainDistance));
+                    tasks.Add(GetFlowlines(comid, NavigationMode.DownstreamDiversions,
+                        _configuration.MaxDownstreamDiversionDistance));
 
                     if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxDownstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxDownstreamDiversionDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain,
+                            FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxDownstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions,
+                            FeatureDataSource.UsgsSurfaceWaterSites, _configuration.MaxDownstreamDiversionDistance));
                     }
 
                     if (dataPoints.HasFlag(NldiDataPoints.Epa))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.EpaWaterQualitySite, _configuration.MaxDownstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.EpaWaterQualitySite, _configuration.MaxDownstreamDiversionDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain,
+                            FeatureDataSource.EpaWaterQualitySite, _configuration.MaxDownstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions,
+                            FeatureDataSource.EpaWaterQualitySite, _configuration.MaxDownstreamDiversionDistance));
                     }
 
                     if (dataPoints.HasFlag(NldiDataPoints.WadeRights))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.WadeRights, _configuration.MaxDownstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.WadeRights, _configuration.MaxDownstreamDiversionDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.WadeRights,
+                            _configuration.MaxDownstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions,
+                            FeatureDataSource.WadeRights, _configuration.MaxDownstreamDiversionDistance));
                     }
+
                     if (dataPoints.HasFlag(NldiDataPoints.WadeTimeseries))
                     {
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.WadeTimeseries, _configuration.MaxDownstreamMainDistance));
-                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.WadeTimeseries, _configuration.MaxDownstreamDiversionDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamMain,
+                            FeatureDataSource.WadeTimeseries, _configuration.MaxDownstreamMainDistance));
+                        tasks.Add(GetPointFeatures(comid, NavigationMode.DownstreamDiversions,
+                            FeatureDataSource.WadeTimeseries, _configuration.MaxDownstreamDiversionDistance));
                     }
                 }
 
@@ -143,14 +164,14 @@ namespace WesternStatesWater.WestDaat.Accessors
         private async Task<FeatureCollection> GetFlowlines(string comid, NavigationMode mode, int distanceInKm)
         {
             var directionName = _directionNames[mode];
-            var channelType   = _channelTypes[mode];
+            var channelType = _channelTypes[mode];
 
             var result = await _usgsNldiSdk.GetFlowlines(comid, mode, distanceInKm);
             result.Features.ForEach(a =>
             {
                 a.Properties["westdaat_featuredatatype"] = "Flowline";
-                a.Properties["westdaat_direction"]       = directionName;
-                a.Properties["westdaat_channeltype"]     = channelType;
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
             });
             return result;
         }
@@ -162,7 +183,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             int distanceInKm)
         {
             var directionName = _directionNames[mode];
-            var channelType   = _channelTypes[mode];
+            var channelType = _channelTypes[mode];
 
             var labelForPoints = _pointFeatureDataSourceNames[dataSource];
 
@@ -170,8 +191,8 @@ namespace WesternStatesWater.WestDaat.Accessors
             result.Features.ForEach(a =>
             {
                 a.Properties["westdaat_featuredatatype"] = "Point";
-                a.Properties["westdaat_direction"]       = directionName;
-                a.Properties["westdaat_channeltype"]     = channelType;
+                a.Properties["westdaat_direction"] = directionName;
+                a.Properties["westdaat_channeltype"] = channelType;
                 a.Properties["westdaat_pointdatasource"] = labelForPoints;
             });
             return result;
@@ -185,13 +206,13 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 var geoJsonlineString = JsonSerializer.Serialize(ls);
                 var g1 = GeometryHelpers.GetGeometryByGeoJson(geoJsonlineString)
-                         as NetTopologySuite.Geometries.LineString;
+                    as NetTopologySuite.Geometries.LineString;
 
                 var ll = NetTopologySuite.LinearReferencing.LengthLocationMap.GetLocation(g1, g1.Length / 2);
-                var c  = ll.GetCoordinate(g1);
+                var c = ll.GetCoordinate(g1);
 
                 result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
-                result.Features[0].Properties["westdaat_featuredatatype"]  = "Point";
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
                 result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
             }
             else
@@ -201,7 +222,7 @@ namespace WesternStatesWater.WestDaat.Accessors
 
                 var c = g1.Centroid;
                 result.Features.Add(new Feature(new Point(new Position(c.Y, c.X))));
-                result.Features[0].Properties["westdaat_featuredatatype"]  = "Point";
+                result.Features[0].Properties["westdaat_featuredatatype"] = "Point";
                 result.Features[0].Properties["westdaat_pointdatasource"] = "Location";
             }
 
