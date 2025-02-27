@@ -3,11 +3,16 @@ import Button from 'react-bootstrap/esm/Button';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
+import { RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
+import { RemoveOrganizationUserModal } from './RemoveUserModal';
+import AddUserModal from './AddUserModal';
 
 export function AdminOrganizationsUsersPage() {
   const { organizationId } = useParams();
   const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
+  const [removeUserId, setRemoveUserId] = useState<string | null>(null);
 
   const {
     data: organizationListResponse,
@@ -25,7 +30,7 @@ export function AdminOrganizationsUsersPage() {
   const pageTitle = () => {
     if (organizationListLoading || organizationUsersListLoading) {
       return (
-        <Placeholder as="h1" animation="glow" className="fs-3 fw-bolder">
+        <Placeholder as="h1" animation="glow" className="fs-3">
           <Placeholder xs={4} className="rounded" />
         </Placeholder>
       );
@@ -38,7 +43,7 @@ export function AdminOrganizationsUsersPage() {
       }
     }
 
-    return <h1 className="fs-3 fw-bolder">{titleText}</h1>;
+    return <h1 className="fs-3">{titleText}</h1>;
   };
 
   const addUserButton = () => {
@@ -61,14 +66,24 @@ export function AdminOrganizationsUsersPage() {
     }
   };
 
+  const openRemoveUserModal = (userId: string) => {
+    setShowRemoveUserModal(true);
+    setRemoveUserId(userId);
+  };
+
+  const closeRemoveUserModal = () => {
+    setShowRemoveUserModal(false);
+    setRemoveUserId(null);
+  };
+
   return (
     <>
       <div className="overflow-y-auto h-100">
         <div className="m-3">
           {pageTitle()}
 
-          <div className="d-flex justify-content-between my-4">
-            <h2>Users</h2>
+          <div className="d-flex justify-content-between align-items-center my-4">
+            <h2 className="fs-5">Users</h2>
             {addUserButton()}
           </div>
 
@@ -76,8 +91,58 @@ export function AdminOrganizationsUsersPage() {
             isLoading={organizationListLoading || organizationUsersListLoading}
             isErrored={organizationListErrored || organizationUsersListErrored}
           >
-            (<pre>OrganizationUsers: {JSON.stringify(organizationUsersListResponse)}</pre>)
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Email</th>
+                  <th>User ID</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {organizationUsersListResponse?.users &&
+                  organizationUsersListResponse?.users.length > 0 &&
+                  organizationUsersListResponse?.users.map((user) => (
+                    <tr key={user.userId}>
+                      <td className="align-content-center">
+                        {user.firstName} {user.lastName}
+                      </td>
+                      <td className="align-content-center">{RoleDisplayNames[user.role]}</td>
+                      <td className="align-content-center">
+                        <Button variant="link" href={`mailto:${user.email}`} className="px-0 text-dark">
+                          {user.email}
+                        </Button>
+                      </td>
+                      <td className="align-content-center">{user.userName}</td>
+                      <td className="align-content-center text-center">
+                        <Button
+                          variant="link"
+                          className="px-3 py-1 text-danger"
+                          onClick={() => openRemoveUserModal(user.userId)}
+                        >
+                          Remove from Organization
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                {organizationUsersListResponse?.users && organizationUsersListResponse?.users.length === 0 && (
+                  <tr key="noResults">
+                    <td colSpan={8} className="text-center py-2">
+                      No results found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </TableLoading>
+          <RemoveOrganizationUserModal
+            show={showRemoveUserModal}
+            userId={removeUserId}
+            closeModal={closeRemoveUserModal}
+          ></RemoveOrganizationUserModal>
+          <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
         </div>
       </div>
     </>
