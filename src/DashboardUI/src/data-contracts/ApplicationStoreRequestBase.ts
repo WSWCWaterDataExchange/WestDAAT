@@ -1,3 +1,1 @@
-export interface ApplicationStoreRequestBase {
-  fundingOrganizationId: string;
-}
+export interface ApplicationStoreRequestBase {}

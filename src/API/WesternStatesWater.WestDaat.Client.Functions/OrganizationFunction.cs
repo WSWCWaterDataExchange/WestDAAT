@@ -1,8 +1,8 @@
-using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
@@ -34,6 +34,7 @@ public class OrganizationFunction : FunctionBase
         {
             OrganizationDetailsListRequest request => await _organizationManager.Load<OrganizationDetailsListRequest, OrganizationDetailsListResponse>(request),
             OrganizationSummaryListRequest request => await _organizationManager.Load<OrganizationSummaryListRequest, OrganizationSummaryListResponse>(request),
+            OrganizationFundingDetailsRequest request => await _organizationManager.Load<OrganizationFundingDetailsRequest, OrganizationFundingDetailsResponse>(request),
             _ => throw new NotImplementedException($"Request type {organizationLoadRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);

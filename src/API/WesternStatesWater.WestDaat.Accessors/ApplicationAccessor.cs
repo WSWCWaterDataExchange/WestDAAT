@@ -59,6 +59,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var existingInProgressApplication = await db.WaterConservationApplications
+            .AsNoTracking()
             .Include(wca => wca.Submission)
             .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
                                          wca.WaterRightNativeId == request.WaterRightNativeId &&
@@ -76,6 +77,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var entities = await db.WaterConservationApplications
+            .AsNoTracking()
             .Where(app => app.ApplicationDisplayId.StartsWith(request.ApplicationDisplayIdStub))
             .ToArrayAsync();
 
@@ -119,6 +121,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var existingEntity = await db.WaterConservationApplicationEstimates
+            .AsNoTracking()
             .Include(estimate => estimate.Locations)
             .ThenInclude(location => location.ConsumptiveUses)
             .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);

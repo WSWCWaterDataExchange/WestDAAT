@@ -15,9 +15,9 @@ import { CompensationRateUnits } from '../../../data-contracts/CompensationRateU
 import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
+import { toast } from 'react-toastify';
 
 import './estimation-tool-page.scss';
-import { toast } from 'react-toastify';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -54,10 +54,6 @@ export function EstimationToolPage() {
       const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
-        fundingOrganizationId: fields.fundingOrganizationId!,
-        dateRangeStart: fields.dateRangeStart!,
-        dateRangeEnd: fields.dateRangeEnd!,
-        model: fields.model!,
         polygonWkts: fields.polygonWkts!,
         compensationRateDollars: fields.compensationRateDollars,
         units: fields.units,
@@ -86,10 +82,6 @@ export function EstimationToolPage() {
     await estimateConsumptiveUseMutation.mutateAsync({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      fundingOrganizationId: state.conservationApplication.fundingOrganizationId,
-      model: 1,
-      dateRangeStart: state.conservationApplication.dateRangeStart,
-      dateRangeEnd: state.conservationApplication.dateRangeEnd,
       polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
       units: state.conservationApplication.desiredCompensationUnits,
@@ -114,7 +106,7 @@ export function EstimationToolPage() {
               />
             </div>
 
-            <div className="flex-grow-1 d-flex flex-column overflow-y-auto">
+            <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
               <EstimationToolMapHeader />
               <EstimationToolMap
                 handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
@@ -131,10 +123,6 @@ export function EstimationToolPage() {
 interface EstimateConsumptiveUseApiCallFields {
   waterConservationApplicationId: string | undefined;
   waterRightNativeId: string | undefined;
-  fundingOrganizationId: string | undefined;
-  model: number | undefined;
-  dateRangeStart: Date | undefined;
-  dateRangeEnd: Date | undefined;
   polygonWkts: string[] | undefined;
   compensationRateDollars: number | undefined;
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
@@ -144,10 +132,6 @@ const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
   const isValid: boolean =
     !!fields.waterConservationApplicationId &&
     !!fields.waterRightNativeId &&
-    !!fields.fundingOrganizationId &&
-    !!fields.model &&
-    !!fields.dateRangeStart &&
-    !!fields.dateRangeEnd &&
     !!fields.polygonWkts &&
     fields.polygonWkts.length > 0; // compensation rate is optional
   if (!isValid) {

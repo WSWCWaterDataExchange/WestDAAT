@@ -39,4 +39,16 @@ public class UserFunction : FunctionBase
         };
         return await CreateResponse(req, result);
     }
+
+    [Function(nameof(UserProfile))]
+    [OpenApiOperation(nameof(UserProfile))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(UserProfileResponse))]
+    public async Task<HttpResponseData> UserProfile(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Profile")]
+        HttpRequestData req, Guid? userId)
+    {
+        var userProfileRequest = await ParseRequestBody<UserProfileRequest>(req);
+        var result = await _userManager.Load<UserProfileRequest, UserProfileResponse>(userProfileRequest);
+        return await CreateResponse(req, result);
+    }
 }

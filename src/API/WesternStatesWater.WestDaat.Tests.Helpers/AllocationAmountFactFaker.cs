@@ -29,7 +29,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                     .RuleFor(a => a.Date, () => dateValue)
                     .Generate();
             }
-       
+
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
                 .RuleFor(a => a.AllocationPriorityDateNavigation, () => date);
             return faker;
@@ -75,7 +75,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                     .Generate();
             }
             faker.RuleFor(a => a.DataPublicationDateId, () => date.DateId)
-                .RuleFor(a => a.DataPublicationDate , () => date);
+                .RuleFor(a => a.DataPublicationDate, () => date);
             return faker;
         }
 
@@ -127,6 +127,13 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.AllocationLegalStatusCvNavigation,
                     (faker, allocationAmountFact) => new LegalStatusCVFaker()
                         .RuleFor(legalStatusCV => legalStatusCV.Name, f => allocationAmountFact.AllocationLegalStatusCv));
+
+            return faker;
+        }
+
+        public static Faker<AllocationAmountsFact> IncludeRandomConservationApplicationId(this Faker<AllocationAmountsFact> faker)
+        {
+            faker.RuleFor(a => a.ConservationApplicationFundingOrganizationId, f => f.Random.Guid());
 
             return faker;
         }

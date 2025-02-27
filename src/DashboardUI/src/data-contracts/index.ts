@@ -10,4 +10,4 @@ export * from './WaterSourceInfoListItem';
 export * from './OverlayDetails';
 export * from './OverlayDigest';
 export * from './OverlayTableEntry';
-export * from './WaterRightsInfoListItem';
+export * from './OverlayInfoListItem';

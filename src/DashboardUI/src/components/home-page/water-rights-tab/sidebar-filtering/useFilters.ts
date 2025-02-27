@@ -46,6 +46,10 @@ export function useFilters() {
         filter: overlaysMapFilters,
       },
       {
+        layer: mapLayerNames.overlayTypesPolygonsBorderLayer,
+        filter: overlaysMapFilters,
+      },
+      {
         layer: mapLayerNames.timeSeriesPointsLayer,
         filter: combinedTimeSeriesFilter,
       },

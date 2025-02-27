@@ -70,6 +70,15 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.UserSearchResult, ClientContracts.UserSearchResult>();
+
+            CreateMap<ClientContracts.Requests.Admin.UserProfileRequest, CommonContracts.UserProfileRequest>();
+
+            CreateMap<CommonContracts.UserProfileResponse, ClientContracts.Responses.Admin.UserProfileResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<CommonContracts.UserProfile, ClientContracts.UserProfile>();
+
+            CreateMap<CommonContracts.OrganizationMembership, ClientContracts.OrganizationMembership>();
         }
 
         private void AddOrganizationMappings()
@@ -103,6 +112,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.UserListResult, ClientContracts.UserListResult>();
+
+            CreateMap<CommonContracts.WaterRightFundingOrgDetails, CommonContracts.OrganizationFundingDetailsRequest>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId));
+
+            CreateMap<CommonContracts.OrganizationFundingDetails, ClientContracts.OrganizationFundingDetails>();
+
+            CreateMap<CommonContracts.OrganizationFundingDetailsResponse, ClientContracts.Responses.Admin.OrganizationFundingDetailsResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         private void AddApplicationMappings()
@@ -129,7 +146,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
-            CreateMap<ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest, CommonContracts.MultiPolygonYearlyEtRequest>();
+            CreateMap<
+                    (ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
+                    CommonContracts.MultiPolygonYearlyEtRequest>()
+                .ForMember(dest => dest.Polygons, opt => opt.MapFrom(src => src.Request.Polygons))
+                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
+                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
+                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd));
 
             CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
                     CommonContracts.EstimateConservationPaymentRequest>()
@@ -159,15 +182,16 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<(
                     ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request,
+                    CommonContracts.OrganizationFundingDetails Organization,
                     CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
                     CommonContracts.EstimateConservationPaymentResponse PaymentResponse
                     ),
                     CommonContracts.ApplicationEstimateStoreRequest
                 >()
                 .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.MapFrom(src => src.Request.WaterConservationApplicationId))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Request.Model))
-                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Request.DateRangeStart))
-                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Request.DateRangeEnd))
+                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
+                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
+                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd))
                 .ForMember(dest => dest.DesiredCompensationDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars.Value))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))

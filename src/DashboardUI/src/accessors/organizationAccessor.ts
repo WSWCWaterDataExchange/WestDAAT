@@ -6,6 +6,8 @@ import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationS
 import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
 import { OrganizationMemberAddRequest } from '../data-contracts/OrganizationMemberAddRequest';
 import { OrganizationMemberAddResponse } from '../data-contracts/OrganizationMemberAddResponse';
+import { OrganizationFundingDetailsResponse } from '../data-contracts/OrganizationFundingDetailsResponse';
+import { OrganizationFundingDetailsRequest } from '../data-contracts/OrganizationFundingDetailsRequest';
 
 export const getOrganizationDetailsList = async (
   msalContext: IMsalContext,
@@ -29,6 +31,20 @@ export const getOrganizationSummaryList = async (
     $type: 'OrganizationSummaryListRequest',
   };
 
+  const { data } = await api.post('Organizations/Search', request);
+  return data;
+};
+
+export const getOrganizationFundingDetails = async (
+  msalContext: IMsalContext,
+  waterRightNativeId: string,
+): Promise<OrganizationFundingDetailsResponse> => {
+  const request: OrganizationFundingDetailsRequest = {
+    $type: 'OrganizationFundingDetailsRequest',
+    waterRightNativeId,
+  };
+
+  const api = await westDaatApi(msalContext);
   const { data } = await api.post('Organizations/Search', request);
   return data;
 };
