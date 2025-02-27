@@ -23,40 +23,37 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
   const { setMapBoundSettings } = useMapContext();
 
-  useEffect(
-    function focusMapOnPolygonsAfterRetrievingEstimate() {
-      const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
-      if (!hasPerformedEstimation) {
-        return;
-      }
+  useEffect(() => {
+    const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+    if (!hasPerformedEstimation) {
+      return;
+    }
 
-      const userDrawnPolygonGeometries = state.conservationApplication.polygonEtData.map(
-        (dataCollection) => convertWktToGeometry(dataCollection.polygonWkt) as Polygon,
-      );
-      const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
-        type: 'FeatureCollection',
-        features: userDrawnPolygonGeometries.map(
-          (geometry): Feature<Polygon, GeoJsonProperties> => ({
-            type: 'Feature',
-            geometry,
-            properties: {},
-          }),
-        ),
-      };
+    const userDrawnPolygonGeometries = state.conservationApplication.polygonEtData.map(
+      (dataCollection) => convertWktToGeometry(dataCollection.polygonWkt) as Polygon,
+    );
+    const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: userDrawnPolygonGeometries.map(
+        (geometry): Feature<Polygon, GeoJsonProperties> => ({
+          type: 'Feature',
+          geometry,
+          properties: {},
+        }),
+      ),
+    };
 
-      setMapBoundSettings({
-        LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
-        padding: 25,
-        maxZoom: 12,
-      });
-    },
-    [
-      state.conservationApplication.polygonEtData,
-      convertWktToGeometry,
-      getLatsLongsFromFeatureCollection,
-      setMapBoundSettings,
-    ],
-  );
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
+      padding: 25,
+      maxZoom: 12,
+    });
+  }, [
+    state.conservationApplication.polygonEtData,
+    convertWktToGeometry,
+    getLatsLongsFromFeatureCollection,
+    setMapBoundSettings,
+  ]);
 
   const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;

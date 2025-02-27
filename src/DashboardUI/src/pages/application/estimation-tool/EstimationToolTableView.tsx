@@ -19,21 +19,18 @@ function EstimationToolTableView() {
 
   const toggleShow = () => setShow(!show);
 
-  useEffect(
-    function showDataTableOnceDataIsAvailable() {
-      const hasPerformedEstimation = fields.length > 0;
-      if (!hasPerformedEstimation) {
-        return;
-      }
+  useEffect(() => {
+    const hasPerformedEstimation = fields.length > 0;
+    if (!hasPerformedEstimation) {
+      return;
+    }
 
-      setTimeout(() => {
-        // wait a few seconds to allow the user to notice the map zooming in
-        setActiveTab(fields[0].fieldName);
-        setShow(true);
-      }, 1000);
-    },
-    [fields],
-  );
+    setTimeout(() => {
+      // wait a few seconds to allow the user to notice the map zooming in
+      setActiveTab(fields[0].fieldName);
+      setShow(true);
+    }, 1000);
+  }, [fields]);
 
   const getFieldAcres = (field: PolygonEtDataCollection & { fieldName: string }): number => {
     return state.conservationApplication.selectedMapPolygons.find((polygon) => polygon.polygonWkt === field.polygonWkt)!
