@@ -36,8 +36,9 @@ export interface AppProps {
   msalInstance: IPublicClientApplication;
 }
 
+const queryClient = new QueryClient();
+
 function App({ msalInstance }: AppProps) {
-  const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
       refetchOnWindowFocus: false,

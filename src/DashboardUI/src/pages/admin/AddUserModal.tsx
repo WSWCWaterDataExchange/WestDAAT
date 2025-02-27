@@ -38,7 +38,7 @@ function AddUserModal(props: AddUserModalProps) {
       return await addOrganizationMemeber(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries('organizationMembers');
+      queryClient.invalidateQueries('organizationUsers');
       props.onHide?.();
       toast.success('User added to organization', {
         position: 'top-center',
