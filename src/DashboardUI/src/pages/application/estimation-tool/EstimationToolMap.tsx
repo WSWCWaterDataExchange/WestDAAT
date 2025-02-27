@@ -1,15 +1,18 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import Map from '../../../components/map/Map';
 import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
-import { convertGeometryToWkt } from '../../../utilities/geometryWktConverter';
+import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
-import { doPolygonsIntersect } from '../../../utilities/geometryHelpers';
+import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
+import centerOfMass from '@turf/center-of-mass';
+import { useEffect, useMemo } from 'react';
+import { useMapContext } from '../../../contexts/MapProvider';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -18,6 +21,59 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
+  const { setMapBoundSettings } = useMapContext();
+
+  useEffect(() => {
+    const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+    if (!hasPerformedEstimation) {
+      return;
+    }
+
+    const userDrawnPolygonGeometries = state.conservationApplication.polygonEtData.map(
+      (dataCollection) => convertWktToGeometry(dataCollection.polygonWkt) as Polygon,
+    );
+    const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
+      type: 'FeatureCollection',
+      features: userDrawnPolygonGeometries.map(
+        (geometry): Feature<Polygon, GeoJsonProperties> => ({
+          type: 'Feature',
+          geometry,
+          properties: {},
+        }),
+      ),
+    };
+
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
+      padding: 25,
+      maxZoom: 12,
+    });
+  }, [
+    state.conservationApplication.polygonEtData,
+    convertWktToGeometry,
+    getLatsLongsFromFeatureCollection,
+    setMapBoundSettings,
+  ]);
+
+  const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
+    const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+    if (!hasPerformedEstimation) {
+      return [];
+    }
+
+    const labelFeatures: Feature<Point, GeoJsonProperties>[] = state.conservationApplication.polygonEtData.map(
+      (dataCollection) => {
+        const polygonFeature = convertWktToGeometry(dataCollection.polygonWkt);
+        const labelLocation = centerOfMass(polygonFeature);
+        labelLocation.properties = {
+          ...labelLocation.properties,
+          title: dataCollection.fieldName,
+        };
+        return labelLocation;
+      },
+    );
+    return labelFeatures;
+  }, [state.conservationApplication.polygonEtData]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > 20) {
@@ -35,6 +91,10 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
       acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
     }));
+
+    if (polygonData.some((p) => p.acreage > 50000)) {
+      toast.error('Polygons may not exceed 50,000 acres.');
+    }
 
     dispatch({
       type: 'MAP_POLYGONS_UPDATED',
@@ -57,21 +117,17 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
           onClick={props.handleEstimateConsumptiveUseClicked}
           disabled={!estimateButtonEnabled}
         >
-          {props.isLoadingConsumptiveUseEstimate ? (
-            <Spinner animation="border" size="sm" />
-          ) : (
-            'Estimate Consumptive Use for the Drawn Polygon(s)'
-          )}
+          {props.isLoadingConsumptiveUseEstimate && <Spinner animation="border" size="sm" className="me-2" />}
+          Estimate Consumptive Use for the Drawn Polygon(s)
         </Button>
       </div>
       <Map
         handleMapDrawnPolygonChange={handleMapDrawnPolygonChange}
+        polygonLabelFeatures={polygonLabelFeatures}
         isConsumptiveUseAlertEnabled={false}
         isGeocoderInputFeatureEnabled={false}
       />
-      {state.conservationApplication.polygonEtData.length > 0 && !props.isLoadingConsumptiveUseEstimate && (
-        <EstimationToolTableView />
-      )}
+      <EstimationToolTableView />
     </div>
   );
 }
