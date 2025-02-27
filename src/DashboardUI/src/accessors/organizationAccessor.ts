@@ -49,7 +49,7 @@ export const getOrganizationFundingDetails = async (
   return data;
 };
 
-export const addOrganizationMemeber = async (
+export const addOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
