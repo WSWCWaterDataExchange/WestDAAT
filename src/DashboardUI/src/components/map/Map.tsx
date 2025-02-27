@@ -513,7 +513,9 @@ function Map({
   }, [map, mapBoundSettings]);
 
   useEffect(() => {
-    if (!map || !polygonLabelFeatures) return;
+    if (!map || !polygonLabelFeatures) {
+      return;
+    }
 
     const source = map.getSource<GeoJSONSource>(mapSourceNames.userDrawnPolygonLabelsGeoJson);
 
@@ -522,7 +524,7 @@ function Map({
       features: polygonLabelFeatures,
     });
 
-    // unsure why, but the layer visibility is being set to `none`. This is a workaround to set it back to `visible`
+    // another useEffect sets this layer's visibility is being set to `none`. Here we override that to set it back to `visible`
     map.setLayoutProperty(mapLayerNames.userDrawnPolygonLabelsLayer, 'visibility', 'visible');
   }, [map, polygonLabelFeatures]);
 
