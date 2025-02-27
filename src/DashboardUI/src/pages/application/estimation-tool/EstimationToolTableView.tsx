@@ -15,7 +15,7 @@ function EstimationToolTableView() {
   const fields = state.conservationApplication.polygonEtData;
 
   const [show, setShow] = useState(false);
-  const [activeTab, setActiveTab] = useState('');
+  const [activeTab, setActiveTab] = useState<string | undefined>();
 
   const toggleShow = () => setShow(!show);
 
@@ -45,7 +45,7 @@ function EstimationToolTableView() {
         <div className="d-flex flex-column flex-grow-1 h-100">
           <Tab.Container
             activeKey={activeTab}
-            onSelect={(tab) => setActiveTab(tab || (fields.length > 0 ? fields[0].fieldName : ''))}
+            onSelect={(tab) => setActiveTab(tab || (fields.length > 0 ? fields[0].fieldName : undefined))}
           >
             <Nav variant="tabs" className="py-2 px-3">
               {fields.map((field) => (
