@@ -4,5 +4,5 @@ public class WaterConservationApplicationSubmissionEstimationInfo
 {
     public Guid WaterConservationApplicationSubmissionId { get; set; }
 
-    public string EstimationSupplementaryDetails { get; set; }
+    public string EstimationSupplementaryDetails { get; set; } = null!;
 }
