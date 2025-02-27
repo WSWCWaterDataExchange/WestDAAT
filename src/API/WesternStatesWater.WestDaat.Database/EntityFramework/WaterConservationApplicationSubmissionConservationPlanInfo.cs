@@ -8,8 +8,6 @@ public class WaterConservationApplicationSubmissionConservationPlanInfo
     // and instead use the value WaterConservationApplicationEstimate.EstimatedCompensationDollars?
     public int FundingRequestDollarAmount { get; set; }
 
-    public string FundingRequestJustification { get; set; } = null!;
-
     public string ConservationPlanDescription { get; set; } = null!;
 
     public string ConservationPlanAdditionalInfo { get; set; } = null!;
