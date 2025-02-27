@@ -10,7 +10,7 @@ import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
 import Alert from 'react-bootstrap/esm/Alert';
-import { addOrganizationMemeber } from '../../accessors/organizationAccessor';
+import { addOrganizationMember } from '../../accessors/organizationAccessor';
 import { toast } from 'react-toastify';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
@@ -33,9 +33,9 @@ function AddUserModal(props: AddUserModalProps) {
   const msalContext = useMsal();
   const { user } = useAuthenticationContext();
 
-  const addOrganizationMemeberMutation = useMutation({
+  const addOrganizationMemberMutation = useMutation({
     mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
-      return await addOrganizationMemeber(msalContext, params.organizationId, params.userId, params.role);
+      return await addOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
       queryClient.invalidateQueries('organizationUsers');
@@ -115,7 +115,7 @@ function AddUserModal(props: AddUserModalProps) {
       return;
     }
 
-    addOrganizationMemeberMutation.mutate({
+    addOrganizationMemberMutation.mutate({
       organizationId: props.organization?.organizationId ?? '',
       userId: selectedUser.value,
       role: selectedRole,
@@ -137,7 +137,7 @@ function AddUserModal(props: AddUserModalProps) {
           </Alert>
         )}
         <AsyncSelect
-          isDisabled={addOrganizationMemeberMutation.isLoading}
+          isDisabled={addOrganizationMemberMutation.isLoading}
           cacheOptions
           loadOptions={loadUserOptions}
           onChange={handleUserChange}
@@ -162,7 +162,7 @@ function AddUserModal(props: AddUserModalProps) {
           }}
         />
         <Select
-          isDisabled={addOrganizationMemeberMutation.isLoading}
+          isDisabled={addOrganizationMemberMutation.isLoading}
           options={roleOptions}
           onChange={handleRoleChange}
           placeholder="Select Role"
@@ -173,12 +173,12 @@ function AddUserModal(props: AddUserModalProps) {
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onHide} disabled={addOrganizationMemeberMutation.isLoading}>
+        <Button variant="secondary" onClick={props.onHide} disabled={addOrganizationMemberMutation.isLoading}>
           Cancel
         </Button>
         <Button
           onClick={handleAddUserClick}
-          disabled={!selectedUser || !selectedRole || addOrganizationMemeberMutation.isLoading}
+          disabled={!selectedUser || !selectedRole || addOrganizationMemberMutation.isLoading}
         >
           Add User
         </Button>
