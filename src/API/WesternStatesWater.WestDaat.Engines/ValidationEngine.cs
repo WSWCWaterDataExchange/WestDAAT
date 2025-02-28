@@ -252,7 +252,27 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationMemberRemoveRequest(OrganizationMemberRemoveRequest request, ContextBase context)
     {
-        throw new NotImplementedException();
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        
+        if (userContext.UserId == request.UserId)
+        {
+            return CreateForbiddenError(request, context);
+        }
+        
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+        
+        if (!permissions.Contains(Permissions.OrganizationMemberRemove) &&
+            !orgPermissions.Contains(Permissions.OrganizationMemberRemove))
+        {
+            return CreateForbiddenError(request, context);
+        }
+        
+        return null;
     }
 
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
