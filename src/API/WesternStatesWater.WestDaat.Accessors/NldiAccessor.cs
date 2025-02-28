@@ -70,7 +70,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 var comid = (comidVal as JsonElement?)?.GetString();
                 if (string.IsNullOrWhiteSpace(comid))
                 {
-                    throw new WestDaatException($"No valid COMID found for [{latitude}, {longitude}]");
+                    throw new WestDaatException($"Unable to find comid for coordinates [{latitude}, {longitude}]");
                 }
 
                 var tasks = new List<Task<FeatureCollection>>();
@@ -157,16 +157,16 @@ namespace WesternStatesWater.WestDaat.Accessors
                 tasks.Add(GetMainPoint(coordinateFeatures));
 
                 var featureCollections = await Task.WhenAll(tasks);
-                return new FeatureCollection(featureCollections.SelectMany(fc => fc.Features).ToList());
+                return new FeatureCollection(featureCollections.SelectMany(a => a.Features).ToList());
             }
         }
 
-        private async Task<FeatureCollection> GetFlowlines(string comid, NavigationMode mode, int distanceInKm)
+        private async Task<FeatureCollection> GetFlowlines(string comid, NavigationMode navigationMode, int distanceInKm)
         {
-            var directionName = _directionNames[mode];
-            var channelType = _channelTypes[mode];
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
 
-            var result = await _usgsNldiSdk.GetFlowlines(comid, mode, distanceInKm);
+            var result = await _usgsNldiSdk.GetFlowlines(comid, navigationMode, distanceInKm);
             result.Features.ForEach(a =>
             {
                 a.Properties["westdaat_featuredatatype"] = "Flowline";
@@ -178,16 +178,16 @@ namespace WesternStatesWater.WestDaat.Accessors
 
         private async Task<FeatureCollection> GetPointFeatures(
             string comid,
-            NavigationMode mode,
+            NavigationMode navigationMode,
             FeatureDataSource dataSource,
             int distanceInKm)
         {
-            var directionName = _directionNames[mode];
-            var channelType = _channelTypes[mode];
+            var directionName = _directionNames[navigationMode];
+            var channelType = _channelTypes[navigationMode];
 
             var labelForPoints = _pointFeatureDataSourceNames[dataSource];
 
-            var result = await _usgsNldiSdk.GetFeatures(comid, mode, dataSource, distanceInKm);
+            var result = await _usgsNldiSdk.GetFeatures(comid, navigationMode, dataSource, distanceInKm);
             result.Features.ForEach(a =>
             {
                 a.Properties["westdaat_featuredatatype"] = "Point";
