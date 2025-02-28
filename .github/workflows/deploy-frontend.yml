@@ -54,6 +54,18 @@ on:
       react-app-feature-conservation-estimation-tool:
         required: false
         type: string
+      # REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL
+      react-app-water-rights-vector-tile-url:
+        required: true
+        type: string
+      # REACT_APP_OVERLAY_VECTOR_TILE_URL
+      react-app-overlay-vector-tile-url:
+        required: true
+        type: string
+      # REACT_APP_TIME_SERIES_VECTOR_TILE_URL
+      react-app-time-series-vector-tile-url:
+        required: true
+        type: string
 
     secrets:
       azure-cli-credentials:
@@ -85,6 +97,9 @@ jobs:
           echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
           echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
           echo "REACT_APP_FEATURE_CONSERVATION_ESTIMATION_TOOL=${{ inputs.react-app-feature-conservation-estimation-tool }}" >> $GITHUB_ENV
+          echo "REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL=${{ inputs.react-app-water-rights-vector-tile-url }}" >> $GITHUB_ENV
+          echo "REACT_APP_OVERLAY_VECTOR_TILE_URL=${{ inputs.react-app-overlay-vector-tile-url }}" >> $GITHUB_ENV
+          echo "REACT_APP_TIME_SERIES_VECTOR_TILE_URL=${{ inputs.react-app-time-series-vector-tile-url }}" >> $GITHUB_ENV
 
       - run: npm ci
       - run: npm run build
