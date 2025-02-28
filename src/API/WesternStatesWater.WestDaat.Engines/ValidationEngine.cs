@@ -102,6 +102,7 @@ internal class ValidationEngine : IValidationEngine
         {
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
+            WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -152,6 +153,31 @@ internal class ValidationEngine : IValidationEngine
     private async Task<ErrorBase> ValidateWaterConservationApplicationCreateRequest(WaterConservationApplicationCreateRequest request, ContextBase context)
     {
         await Task.CompletedTask;
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationSubmissionRequest(WaterConservationApplicationSubmissionRequest request, ContextBase context)
+    {
+        // verify user creating the submission is linking it to an application they own
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        {
+            ApplicantUserId = userContext.UserId,
+            WaterRightNativeId = request.WaterRightNativeId
+        });
+
+        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
+        if (applicationNotFound)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        var applicationLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        if (applicationLinkedToIncorrectApplication)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
         return null;
     }
 
