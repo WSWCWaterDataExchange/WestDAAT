@@ -11,10 +11,17 @@ import { countries } from '../../config/countries';
 import { useAdminContext } from '../../contexts/AdminProvider';
 import { OrganizationRolesSection } from './OrganizationRolesSection';
 import { useMutation } from 'react-query';
+import { useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import { useMsal } from '@azure/msal-react';
+import { saveProfileInformation } from '../../accessors/userAccessor';
 
 export function AccountInformationPage() {
+  const msalContext = useMsal();
+  const queryClient = useQueryClient();
   const { state, dispatch } = useAdminContext();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -30,15 +37,37 @@ export function AccountInformationPage() {
 
   const saveProfileMutation = useMutation({
     mutationFn: () => {
-      // Call the API to save the
+      setIsSavingProfile(true);
+      return saveProfileInformation(msalContext);
     },
     onSuccess: () => {
-      // Handle success
+      queryClient.setQueryData(['user-profile', profile?.userId], {
+        userProfile: {
+          ...profile,
+          firstName: state.profileForm?.firstName,
+          lastName: state.profileForm?.lastName,
+          state: state.profileForm?.state,
+          country: state.profileForm?.country,
+          phoneNumber: state.profileForm?.phone,
+        },
+      });
+
+      setIsEditingProfile(false);
+
+      toast.success('Your profile information has been saved.', {
+        autoClose: 1000,
+      });
     },
     onError: () => {
-      // Handle
+      toast.error('There was an error saving your profile information. Please try again.', {
+        position: 'top-center',
+        theme: 'colored',
+      });
     },
-  })
+    onSettled: () => {
+      setIsSavingProfile(false);
+    },
+  });
 
   const profile = profileResponse?.userProfile;
 
@@ -46,14 +75,14 @@ export function AccountInformationPage() {
     return (
       <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <div className="mb-4">
-          {isProfileLoading && (
+          {!profile && (
             <Placeholder animation="glow">
               <Placeholder xs={6} className="rounded" />
               <Placeholder xs={10} className="rounded" />
             </Placeholder>
           )}
 
-          {!isProfileLoading && (
+          {profile && (
             <>
               <div className="fw-bold">{label}</div>
               <div className="text-break">{value}</div>
@@ -86,6 +115,7 @@ export function AccountInformationPage() {
           maxLength={255}
           defaultValue={profile?.firstName}
           ref={firstNameRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
 
@@ -96,12 +126,13 @@ export function AccountInformationPage() {
           maxLength={255}
           defaultValue={profile?.lastName}
           ref={lastNameRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">State</Form.Label>
-        <Form.Select ref={stateRef} defaultValue={profile?.state}>
+        <Form.Select ref={stateRef} defaultValue={profile?.state} disabled={isSavingProfile}>
           <option value={''}>Select a state</option>
           {states.map((state) => (
             <option key={state.value} value={state.value}>
@@ -113,7 +144,7 @@ export function AccountInformationPage() {
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">Country</Form.Label>
-        <Form.Select ref={countryRef} defaultValue={profile?.country}>
+        <Form.Select ref={countryRef} defaultValue={profile?.country} disabled={isSavingProfile}>
           <option value={''}>Select a country</option>
           {countries.map((country) => (
             <option key={country.value} value={country.value}>
@@ -130,6 +161,7 @@ export function AccountInformationPage() {
           maxLength={50}
           defaultValue={profile?.phoneNumber}
           ref={phoneRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
     </Form>
@@ -142,7 +174,7 @@ export function AccountInformationPage() {
     // populate the form with profile data
     if (profileResponse && !state.profileForm) {
       dispatch({
-        type: 'PROFILE_FORM_CHANGED',
+        type: 'PROFILE_EDIT_STARTED',
         payload: {
           firstName: profile?.firstName ?? null,
           lastName: profile?.lastName ?? null,
@@ -155,9 +187,7 @@ export function AccountInformationPage() {
   };
 
   const handleSaveClicked = () => {
-    alert(JSON.stringify(state.profileForm, null, 2));
-
-    setIsEditingProfile(false);
+    saveProfileMutation.mutate();
   };
 
   return (
@@ -175,10 +205,20 @@ export function AccountInformationPage() {
 
         {isEditingProfile && (
           <div>
-            <Button variant="secondary" className="px-3" onClick={() => setIsEditingProfile(false)}>
+            <Button
+              variant="secondary"
+              className="px-3"
+              onClick={() => setIsEditingProfile(false)}
+              disabled={isSavingProfile}
+            >
               Cancel
             </Button>
-            <Button className="ms-2 px-3" variant="primary" onClick={() => handleSaveClicked()}>
+            <Button
+              className="ms-2 px-3"
+              variant="primary"
+              onClick={() => handleSaveClicked()}
+              disabled={isSavingProfile}
+            >
               Save Changes
             </Button>
           </div>

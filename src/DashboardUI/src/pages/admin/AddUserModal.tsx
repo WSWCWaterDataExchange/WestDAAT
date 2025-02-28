@@ -41,8 +41,6 @@ function AddUserModal(props: AddUserModalProps) {
       queryClient.invalidateQueries('organizationUsers');
       props.onHide?.();
       toast.success('User added to organization', {
-        position: 'top-center',
-        theme: 'colored',
         autoClose: 1000,
       });
     },
