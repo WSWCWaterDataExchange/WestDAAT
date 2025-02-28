@@ -18,8 +18,8 @@ public class WaterConservationApplicationSubmissionRequestHandler : IRequestHand
     public async Task<ApplicationStoreResponseBase> Handle(WaterConservationApplicationSubmissionRequest request)
     {
         var dtoRequest = request.Map<Common.DataContracts.WaterConservationApplicationSubmissionRequest>();
-        var dtoResponse = await _applicationAccessor.Store(dtoRequest);
+        await _applicationAccessor.Store(dtoRequest);
 
-        return dtoResponse.Map<ApplicationStoreResponseBase>();
+        return new ApplicationStoreResponseBase();
     }
 }
