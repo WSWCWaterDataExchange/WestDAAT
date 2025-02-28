@@ -14,7 +14,7 @@ export function AdminOrganizationsPage() {
   } = useQuery('admin-organizations', () => getOrganizationDetailsList(msalContext));
 
   return (
-    <div>
+    <div className="container">
       <h1 className="fs-3">All Organizations</h1>
 
       <TableLoading isLoading={isLoading} isErrored={isError}>

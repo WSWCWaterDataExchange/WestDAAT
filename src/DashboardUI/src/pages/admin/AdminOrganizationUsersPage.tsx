@@ -77,74 +77,70 @@ export function AdminOrganizationsUsersPage() {
   };
 
   return (
-    <>
-      <div className="overflow-y-auto h-100">
-        <div className="m-3">
-          {pageTitle()}
+    <div className="container">
+      {pageTitle()}
 
-          <div className="d-flex justify-content-between align-items-center my-4">
-            <h2 className="fs-5">Users</h2>
-            {addUserButton()}
-          </div>
-
-          <TableLoading
-            isLoading={organizationListLoading || organizationUsersListLoading}
-            isErrored={organizationListErrored || organizationUsersListErrored}
-          >
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th>Email</th>
-                  <th>User ID</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {organizationUsersListResponse?.users &&
-                  organizationUsersListResponse?.users.length > 0 &&
-                  organizationUsersListResponse?.users.map((user) => (
-                    <tr key={user.userId}>
-                      <td className="align-content-center">
-                        {user.firstName} {user.lastName}
-                      </td>
-                      <td className="align-content-center">{RoleDisplayNames[user.role]}</td>
-                      <td className="align-content-center">
-                        <Button variant="link" href={`mailto:${user.email}`} className="px-0 text-dark">
-                          {user.email}
-                        </Button>
-                      </td>
-                      <td className="align-content-center">{user.userName}</td>
-                      <td className="align-content-center text-center">
-                        <Button
-                          variant="link"
-                          className="px-3 py-1 text-danger"
-                          onClick={() => openRemoveUserModal(user.userId)}
-                        >
-                          Remove from Organization
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                {organizationUsersListResponse?.users && organizationUsersListResponse?.users.length === 0 && (
-                  <tr key="noResults">
-                    <td colSpan={8} className="text-center py-2">
-                      No results found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </TableLoading>
-          <RemoveOrganizationUserModal
-            show={showRemoveUserModal}
-            userId={removeUserId}
-            closeModal={closeRemoveUserModal}
-          ></RemoveOrganizationUserModal>
-          <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
-        </div>
+      <div className="d-flex justify-content-between align-items-center my-4">
+        <h2 className="fs-5">Users</h2>
+        {addUserButton()}
       </div>
-    </>
+
+      <TableLoading
+        isLoading={organizationListLoading || organizationUsersListLoading}
+        isErrored={organizationListErrored || organizationUsersListErrored}
+      >
+        <table className="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>User ID</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {organizationUsersListResponse?.users &&
+              organizationUsersListResponse?.users.length > 0 &&
+              organizationUsersListResponse?.users.map((user) => (
+                <tr key={user.userId}>
+                  <td className="align-content-center">
+                    {user.firstName} {user.lastName}
+                  </td>
+                  <td className="align-content-center">{RoleDisplayNames[user.role]}</td>
+                  <td className="align-content-center">
+                    <Button variant="link" href={`mailto:${user.email}`} className="px-0 text-dark">
+                      {user.email}
+                    </Button>
+                  </td>
+                  <td className="align-content-center">{user.userName}</td>
+                  <td className="align-content-center text-center">
+                    <Button
+                      variant="link"
+                      className="px-3 py-1 text-danger"
+                      onClick={() => openRemoveUserModal(user.userId)}
+                    >
+                      Remove from Organization
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            {organizationUsersListResponse?.users && organizationUsersListResponse?.users.length === 0 && (
+              <tr key="noResults">
+                <td colSpan={8} className="text-center py-2">
+                  No results found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </TableLoading>
+      <RemoveOrganizationUserModal
+        show={showRemoveUserModal}
+        userId={removeUserId}
+        closeModal={closeRemoveUserModal}
+      ></RemoveOrganizationUserModal>
+      <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
+    </div>
   );
 }
