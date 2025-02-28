@@ -34,8 +34,10 @@
    - Requires NPM version 8+
       - For Windows download the Node installer here: https://nodejs.org/en/download/
          - this installer includes NPM update
-   - Start React App
-     - From the DashboardUI directory: `npm run start`
+7. Update React App [.env](./src/DashboardUI/.env)
+   - Set query string `key` value on the Vector Tile URLs. Talk to the project administrator about obtaining this key.
+8. Start React App
+   - From the DashboardUI directory: `npm run start`
    
 
 ## CORS errors
