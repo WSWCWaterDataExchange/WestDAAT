@@ -11,8 +11,10 @@ import Form from 'react-bootstrap/esm/Form';
 import { states } from '../../config/states';
 import { countries } from '../../config/countries';
 import { useAdminContext } from '../../contexts/AdminProvider';
+import { useQueryClient } from 'react-query';
 
 export function AccountInformationPage() {
+  const queryClient = useQueryClient();
   const { state, dispatch } = useAdminContext();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
@@ -176,7 +178,7 @@ export function AccountInformationPage() {
     // populate the form with profile data
     if (profileResponse && !state.profileForm) {
       dispatch({
-        type: 'PROFILE_FORM_CHANGED',
+        type: 'PROFILE_EDIT_STARTED',
         payload: {
           firstName: profile?.firstName ?? null,
           lastName: profile?.lastName ?? null,
@@ -189,7 +191,17 @@ export function AccountInformationPage() {
   };
 
   const handleSaveClicked = () => {
-    alert(JSON.stringify(state.profileForm, null, 2));
+    // On success, update the profile query cache (which updates UI)
+    queryClient.setQueryData(['user-profile', profile?.userId], {
+      userProfile: {
+        ...profile,
+        firstName: state.profileForm?.firstName,
+        lastName: state.profileForm?.lastName,
+        state: state.profileForm?.state,
+        country: state.profileForm?.country,
+        phoneNumber: state.profileForm?.phone,
+      },
+    });
 
     setIsEditingProfile(false);
   };
