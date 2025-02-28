@@ -252,7 +252,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationMemberRemoveRequest(OrganizationMemberRemoveRequest request, ContextBase context)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
