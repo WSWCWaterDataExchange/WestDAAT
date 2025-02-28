@@ -605,11 +605,11 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Act
         var response = await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request);
         
+        // Assert
         var userOrg = await _dbContext.UserOrganizations
             .Include(uo => uo.UserOrganizationRoles)
             .FirstOrDefaultAsync(uo => uo.UserId == userToRemove.Id && uo.OrganizationId == organization.Id);
         
-        // Assert
         userOrg.Should().BeNull();
         response.Error.Should().BeNull();
         response.Should().BeOfType(typeof(OrganizationMemberRemoveResponse));
