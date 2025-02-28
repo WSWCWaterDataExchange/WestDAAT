@@ -4,13 +4,13 @@ import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
 import { mdiInformationOutline } from '@mdi/js';
 import { Role, RoleDisplayNames } from '../../config/role';
-import { NavLink } from 'react-router-dom';
 import Button from 'react-bootstrap/esm/Button';
 import { useRef, useState } from 'react';
 import Form from 'react-bootstrap/esm/Form';
 import { states } from '../../config/states';
 import { countries } from '../../config/countries';
 import { useAdminContext } from '../../contexts/AdminProvider';
+import { OrganizationRolesSection } from './OrganizationRolesSection';
 
 export function AccountInformationPage() {
   const { state, dispatch } = useAdminContext();
@@ -50,22 +50,6 @@ export function AccountInformationPage() {
         </div>
       </div>
     );
-  };
-
-  const organizationRolesPlaceholder = (
-    <Placeholder animation="glow" className="d-flex w-100 gap-3 fs-3">
-      <Placeholder xs={3} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-    </Placeholder>
-  );
-
-  const organizationPageLink = (role: Role, organizationId: string) => {
-    if (role !== Role.OrganizationAdmin) {
-      return null;
-    }
-
-    return <NavLink to={`/admin/${organizationId}/users`}>View Organization Page</NavLink>;
   };
 
   const handleProfileFormChange = () => {
@@ -138,36 +122,6 @@ export function AccountInformationPage() {
       </Form.Group>
     </Form>
   );
-
-  const organizationRolesTable = () => {
-    return (
-      <table className="table table-borderless">
-        <thead>
-          <tr>
-            <th>Organization</th>
-            <th>Role</th>
-            <th>{/* Actions */}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profile?.organizationMemberships.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-muted text-center">
-                No organizations found.
-              </td>
-            </tr>
-          )}
-          {profile?.organizationMemberships.map((membership) => (
-            <tr key={membership.organizationId}>
-              <td>{membership.organizationName}</td>
-              <td>{RoleDisplayNames[membership.role] ?? '-'}</td>
-              <td className="text-end">{organizationPageLink(membership.role, membership.organizationId)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
 
   const handleEditClicked = () => {
     setIsEditingProfile(true);
@@ -244,11 +198,7 @@ export function AccountInformationPage() {
 
           {isEditingProfile && editForm}
 
-          <h2 className="fs-4">Organizations & Roles</h2>
-          <hr />
-
-          {isProfileLoading && organizationRolesPlaceholder}
-          {!isProfileLoading && organizationRolesTable()}
+          <OrganizationRolesSection profile={profile} isProfileLoading={isProfileLoading} />
         </>
       )}
     </div>
