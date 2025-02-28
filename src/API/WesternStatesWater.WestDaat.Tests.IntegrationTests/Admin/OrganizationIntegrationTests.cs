@@ -399,7 +399,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<ForbiddenError>();
+        response.Error.Should().BeOfType<ValidationError>();
     }
 
     [TestMethod]
@@ -479,7 +479,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<ForbiddenError>();
+        response.Error.Should().BeOfType<ValidationError>();
     }
 
     [DataTestMethod]

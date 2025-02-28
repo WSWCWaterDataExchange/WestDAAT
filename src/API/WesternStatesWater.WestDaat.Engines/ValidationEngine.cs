@@ -245,7 +245,7 @@ internal class ValidationEngine : IValidationEngine
         // Cannot add yourself to an organization since a user can only be in a single organization.
         if (request.UserId == userContext.UserId)
         {
-            return CreateForbiddenError(request, context);
+            return CreateValidationError(request, "UserId", "User is not allowed to add themselves to an organization since a user can only be in a single organization.");
         }
 
         var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
@@ -282,7 +282,7 @@ internal class ValidationEngine : IValidationEngine
         
         if (userContext.UserId == request.UserId)
         {
-            return CreateForbiddenError(request, context);
+            return CreateValidationError(request, "UserId", "User is not allowed to remove themselves from an organization.");
         }
         
         var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
