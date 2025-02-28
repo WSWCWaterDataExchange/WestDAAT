@@ -205,6 +205,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             OrganizationMemberAddRequest req => await ValidateOrganizationMemberAddRequest(req, context),
+            OrganizationMemberRemoveRequest req => ValidateOrganizationMemberRemoveRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -246,6 +247,11 @@ internal class ValidationEngine : IValidationEngine
             return CreateConflictError(request, context, nameof(UserOrganization), request.UserId, request.OrganizationId);
         }
 
+        return null;
+    }
+
+    private ErrorBase ValidateOrganizationMemberRemoveRequest(OrganizationMemberRemoveRequest request, ContextBase context)
+    {
         return null;
     }
 
