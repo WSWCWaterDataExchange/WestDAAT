@@ -3,7 +3,6 @@ import { useUserProfile } from '../../hooks/queries/useUserQuery';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
 import { mdiInformationOutline } from '@mdi/js';
-import { Role, RoleDisplayNames } from '../../config/role';
 import Button from 'react-bootstrap/esm/Button';
 import { useRef, useState } from 'react';
 import Form from 'react-bootstrap/esm/Form';
@@ -11,6 +10,7 @@ import { states } from '../../config/states';
 import { countries } from '../../config/countries';
 import { useAdminContext } from '../../contexts/AdminProvider';
 import { OrganizationRolesSection } from './OrganizationRolesSection';
+import { useMutation } from 'react-query';
 
 export function AccountInformationPage() {
   const { state, dispatch } = useAdminContext();
@@ -27,6 +27,18 @@ export function AccountInformationPage() {
     isLoading: isProfileLoading,
     isError: hasProfileLoadError,
   } = useUserProfile();
+
+  const saveProfileMutation = useMutation({
+    mutationFn: () => {
+      // Call the API to save the
+    },
+    onSuccess: () => {
+      // Handle success
+    },
+    onError: () => {
+      // Handle
+    },
+  })
 
   const profile = profileResponse?.userProfile;
 
