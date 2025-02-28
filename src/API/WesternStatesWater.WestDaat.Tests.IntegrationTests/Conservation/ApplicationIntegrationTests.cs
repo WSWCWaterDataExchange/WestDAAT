@@ -559,4 +559,114 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .SingleOrDefaultAsync(application => application.Id == response.WaterConservationApplicationId);
         dbApplication.Should().NotBeNull();
     }
+
+    [DataTestMethod]
+    [DataRow(false, null, null, null, false, typeof(NotFoundError), DisplayName = "Application DNE -> should throw")]
+    [DataRow(true, false, null, null, false, typeof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
+    [DataRow(true, true, false, false, false, typeof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
+    [DataRow(true, true, false, true, true, null, DisplayName = "User has an in-progress Application for this water right, and they attempted to create a Submission for the correct Application -> should succeed")]
+    public async Task Store_SubmitApplication_Success(
+        bool doesApplicationExist,
+        bool? doesUserOwnApplication,
+        bool? doesApplicationAlreadyHaveASubmission,
+        bool? doesProvidedApplicationIdMatch,
+        bool shouldSucceed,
+        Type expectedErrorType
+        )
+    {
+        // Arrange
+        const string waterRightNativeId = "1234";
+
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+
+        WaterConservationApplication application = null;
+        if (doesApplicationExist)
+        {
+            var applicationOwner = doesUserOwnApplication == true
+                ? user
+                : new UserFaker().Generate();
+
+            application = new WaterConservationApplicationFaker(applicationOwner, organization)
+                .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
+                .Generate();
+            await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            if (doesApplicationAlreadyHaveASubmission == true)
+            {
+                var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+                await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+            }
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        var request = new WaterConservationApplicationSubmissionRequestFaker()
+            .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
+            .RuleFor(req => req.WaterConservationApplicationId, () => doesProvidedApplicationIdMatch == true ? application!.Id : Guid.NewGuid())
+            .Generate();
+
+        // Act
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        if (shouldSucceed)
+        {
+            response.Error.Should().BeNull();
+
+            var dbApplication = await _dbContext.WaterConservationApplications
+                .Include(application => application.Submission)
+                .SingleOrDefaultAsync(application => application.Id == request.WaterConservationApplicationId);
+
+            dbApplication.Should().NotBeNull();
+            dbApplication.Submission.Should().NotBeNull();
+
+            // all properties on the request should be saved as a Submission record, excluding a couple which are found on the parent Application.
+            dbApplication.Submission.Should().BeEquivalentTo(request, options => options
+                .Excluding(submission => submission.WaterConservationApplicationId)
+                .Excluding(submission => submission.WaterRightNativeId));
+        }
+        else
+        {
+            response.Error.Should().NotBeNull();
+            response.Error.Should().BeOfType(expectedErrorType);
+        }
+    }
+
+    [TestMethod]
+    public async Task Store_SubmitApplication_AsAnonymous_ShouldThrow()
+    {
+        // Arrange
+        var request = new WaterConservationApplicationSubmissionRequestFaker()
+            .RuleFor(req => req.WaterRightNativeId, () => "1234")
+            .RuleFor(req => req.WaterConservationApplicationId, () => Guid.NewGuid())
+            .Generate();
+
+        UseAnonymousContext();
+
+        // Act
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+
+        ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
 }
