@@ -62,7 +62,6 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
 
         RuleFor(x => x.FacilityDitchName).NotEmpty().MaximumLength(255);
 
-        // potential todo: validate date input. is there a minimum?
         RuleFor(x => x.PriorityDate).NotEmpty();
 
         RuleFor(x => x.CertificateNumber).NotEmpty().MaximumLength(255);
