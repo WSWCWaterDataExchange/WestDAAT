@@ -98,6 +98,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return request switch
             {
                 OrganizationMemberAddRequest req => await AddOrganizationMember(req),
+                OrganizationMemberRemoveRequest req => await RemoveOrganizationMember(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
             };
@@ -124,6 +125,12 @@ namespace WesternStatesWater.WestDaat.Accessors
             await db.SaveChangesAsync();
 
             return new OrganizationMemberAddResponse();
+        }
+
+        private async Task<OrganizationMemberRemoveResponse> RemoveOrganizationMember(OrganizationMemberRemoveRequest request)
+        {
+            await Task.CompletedTask;
+            return new OrganizationMemberRemoveResponse();
         }
     }
 }
