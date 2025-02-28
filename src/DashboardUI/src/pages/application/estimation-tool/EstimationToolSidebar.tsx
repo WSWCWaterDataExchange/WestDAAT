@@ -13,6 +13,7 @@ import { useRef } from 'react';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { SidebarElement } from './SidebarElement';
 import Button from 'react-bootstrap/esm/Button';
+import { useNavigate } from 'react-router-dom';
 
 interface EstimationToolSidebarProps {
   isLoading: boolean;
@@ -21,6 +22,7 @@ interface EstimationToolSidebarProps {
 
 export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
   const { state, dispatch } = useConservationApplicationContext();
+  const navigate = useNavigate();
   const desiredDollarsRef = useRef<HTMLInputElement>(null);
   const desiredUnitsRef = useRef<HTMLSelectElement>(null);
 
@@ -37,6 +39,10 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
         desiredCompensationUnits: desiredUnits,
       },
     });
+  };
+
+  const navigateToCreateApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
   };
 
   // assumes all polygons are not intersecting
@@ -227,9 +233,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
               variant="primary"
               className="w-100"
               disabled={!state.canContinueToApplication}
-              onClick={() => {
-                alert('not implemented');
-              }}
+              onClick={navigateToCreateApplicationPage}
             >
               Continue to Application
             </Button>
