@@ -130,25 +130,16 @@ namespace WesternStatesWater.WestDaat.Accessors
         private async Task<OrganizationMemberRemoveResponse> RemoveOrganizationMember(OrganizationMemberRemoveRequest request)
         {
             await using var db = _westDaatDatabaseContextFactory.Create();
-            
+
             var userOrganization = await db.UserOrganizations
+                .AsNoTracking()
+                .Include(uo => uo.UserOrganizationRoles)
                 .FirstOrDefaultAsync(uo => uo.UserId == request.UserId && uo.OrganizationId == request.OrganizationId);
-            
-            if (userOrganization != null)
-            {
-                var userOrganizationRoles = await db.UserOrganizationRoles
-                    .Where(uor => uor.UserOrganizationId == userOrganization.Id)
-                    .ToArrayAsync();
-            
-                if (userOrganizationRoles.Length > 0)
-                {
-                    db.UserOrganizationRoles.RemoveRange(userOrganizationRoles);
-                }
-            
-                db.UserOrganizations.Remove(userOrganization);
-            
-                await db.SaveChangesAsync();
-            }
+
+            db.UserOrganizationRoles.RemoveRange(userOrganization.UserOrganizationRoles);
+            db.UserOrganizations.Remove(userOrganization);
+
+            await db.SaveChangesAsync();
 
             return new OrganizationMemberRemoveResponse();
         }
