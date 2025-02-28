@@ -3,20 +3,25 @@ import { useUserProfile } from '../../hooks/queries/useUserQuery';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
 import { mdiInformationOutline } from '@mdi/js';
-import { Role, RoleDisplayNames } from '../../config/role';
-import { NavLink } from 'react-router-dom';
 import Button from 'react-bootstrap/esm/Button';
 import { useRef, useState } from 'react';
 import Form from 'react-bootstrap/esm/Form';
 import { states } from '../../config/states';
 import { countries } from '../../config/countries';
 import { useAdminContext } from '../../contexts/AdminProvider';
+import { OrganizationRolesSection } from './OrganizationRolesSection';
+import { useMutation } from 'react-query';
 import { useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import { useMsal } from '@azure/msal-react';
+import { saveProfileInformation } from '../../accessors/userAccessor';
 
 export function AccountInformationPage() {
+  const msalContext = useMsal();
   const queryClient = useQueryClient();
   const { state, dispatch } = useAdminContext();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -29,6 +34,40 @@ export function AccountInformationPage() {
     isLoading: isProfileLoading,
     isError: hasProfileLoadError,
   } = useUserProfile();
+
+  const saveProfileMutation = useMutation({
+    mutationFn: () => {
+      setIsSavingProfile(true);
+      return saveProfileInformation(msalContext);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['user-profile', profile?.userId], {
+        userProfile: {
+          ...profile,
+          firstName: state.profileForm?.firstName,
+          lastName: state.profileForm?.lastName,
+          state: state.profileForm?.state,
+          country: state.profileForm?.country,
+          phoneNumber: state.profileForm?.phone,
+        },
+      });
+
+      setIsEditingProfile(false);
+
+      toast.success('Your profile information has been saved.', {
+        autoClose: 1000,
+      });
+    },
+    onError: () => {
+      toast.error('There was an error saving your profile information. Please try again.', {
+        position: 'top-center',
+        theme: 'colored',
+      });
+    },
+    onSettled: () => {
+      setIsSavingProfile(false);
+    },
+  });
 
   const profile = profileResponse?.userProfile;
 
@@ -54,22 +93,6 @@ export function AccountInformationPage() {
     );
   };
 
-  const organizationRolesPlaceholder = (
-    <Placeholder animation="glow" className="d-flex w-100 gap-3 fs-3">
-      <Placeholder xs={3} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-    </Placeholder>
-  );
-
-  const organizationPageLink = (role: Role, organizationId: string) => {
-    if (role !== Role.OrganizationAdmin) {
-      return null;
-    }
-
-    return <NavLink to={`/admin/${organizationId}/users`}>View Organization Page</NavLink>;
-  };
-
   const handleProfileFormChange = () => {
     dispatch({
       type: 'PROFILE_FORM_CHANGED',
@@ -92,6 +115,7 @@ export function AccountInformationPage() {
           maxLength={255}
           defaultValue={profile?.firstName}
           ref={firstNameRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
 
@@ -102,12 +126,13 @@ export function AccountInformationPage() {
           maxLength={255}
           defaultValue={profile?.lastName}
           ref={lastNameRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">State</Form.Label>
-        <Form.Select ref={stateRef} defaultValue={profile?.state}>
+        <Form.Select ref={stateRef} defaultValue={profile?.state} disabled={isSavingProfile}>
           <option value={''}>Select a state</option>
           {states.map((state) => (
             <option key={state.value} value={state.value}>
@@ -119,7 +144,7 @@ export function AccountInformationPage() {
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">Country</Form.Label>
-        <Form.Select ref={countryRef} defaultValue={profile?.country}>
+        <Form.Select ref={countryRef} defaultValue={profile?.country} disabled={isSavingProfile}>
           <option value={''}>Select a country</option>
           {countries.map((country) => (
             <option key={country.value} value={country.value}>
@@ -136,40 +161,11 @@ export function AccountInformationPage() {
           maxLength={50}
           defaultValue={profile?.phoneNumber}
           ref={phoneRef}
+          disabled={isSavingProfile}
         />
       </Form.Group>
     </Form>
   );
-
-  const organizationRolesTable = () => {
-    return (
-      <table className="table table-borderless">
-        <thead>
-          <tr>
-            <th>Organization</th>
-            <th>Role</th>
-            <th>{/* Actions */}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profile?.organizationMemberships.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-muted text-center">
-                No organizations found.
-              </td>
-            </tr>
-          )}
-          {profile?.organizationMemberships.map((membership) => (
-            <tr key={membership.organizationId}>
-              <td>{membership.organizationName}</td>
-              <td>{RoleDisplayNames[membership.role] ?? '-'}</td>
-              <td className="text-end">{organizationPageLink(membership.role, membership.organizationId)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
 
   const handleEditClicked = () => {
     setIsEditingProfile(true);
@@ -191,19 +187,7 @@ export function AccountInformationPage() {
   };
 
   const handleSaveClicked = () => {
-    // On success, update the profile query cache (which updates UI)
-    queryClient.setQueryData(['user-profile', profile?.userId], {
-      userProfile: {
-        ...profile,
-        firstName: state.profileForm?.firstName,
-        lastName: state.profileForm?.lastName,
-        state: state.profileForm?.state,
-        country: state.profileForm?.country,
-        phoneNumber: state.profileForm?.phone,
-      },
-    });
-
-    setIsEditingProfile(false);
+    saveProfileMutation.mutate();
   };
 
   return (
@@ -221,10 +205,20 @@ export function AccountInformationPage() {
 
         {isEditingProfile && (
           <div>
-            <Button variant="secondary" className="px-3" onClick={() => setIsEditingProfile(false)}>
+            <Button
+              variant="secondary"
+              className="px-3"
+              onClick={() => setIsEditingProfile(false)}
+              disabled={isSavingProfile}
+            >
               Cancel
             </Button>
-            <Button className="ms-2 px-3" variant="primary" onClick={() => handleSaveClicked()}>
+            <Button
+              className="ms-2 px-3"
+              variant="primary"
+              onClick={() => handleSaveClicked()}
+              disabled={isSavingProfile}
+            >
               Save Changes
             </Button>
           </div>
@@ -256,11 +250,7 @@ export function AccountInformationPage() {
 
           {isEditingProfile && editForm}
 
-          <h2 className="fs-4">Organizations & Roles</h2>
-          <hr />
-
-          {isProfileLoading && organizationRolesPlaceholder}
-          {!isProfileLoading && organizationRolesTable()}
+          <OrganizationRolesSection profile={profile} isProfileLoading={isProfileLoading} />
         </>
       )}
     </div>

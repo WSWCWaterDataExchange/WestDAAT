@@ -45,3 +45,10 @@ export const getUserProfile = async (msalContext: IMsalContext, userId: string):
   const { data } = await api.post('Users/Profile', request);
   return data;
 };
+
+export const saveProfileInformation = async (msalContext: IMsalContext): Promise<void> => {
+  const api = await westDaatApi(msalContext);
+
+  // Simulate a save operation
+  await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+};
