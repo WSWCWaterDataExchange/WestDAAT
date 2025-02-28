@@ -92,6 +92,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationMemberAddRequest, CommonContracts.OrganizationMemberAddRequest>();
+            
+            CreateMap<ClientContracts.Requests.Admin.OrganizationMemberRemoveRequest, CommonContracts.OrganizationMemberRemoveRequest>();
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationSummaryListRequest, CommonContracts.OrganizationDetailsListRequest>();
 
@@ -101,6 +103,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationSummaryItem>();
 
             CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+            
+            CreateMap<CommonContracts.OrganizationMemberRemoveResponse, ClientContracts.Responses.Admin.OrganizationMemberRemoveResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationUserListRequest, CommonContracts.UserListRequest>();
@@ -197,6 +202,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
                 .ForMember(dest => dest.TotalAverageYearlyEtAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyEtInAcreFeet)));
+
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

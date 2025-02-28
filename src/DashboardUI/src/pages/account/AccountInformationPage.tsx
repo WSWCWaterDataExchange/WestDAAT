@@ -1,36 +1,91 @@
 import Alert from 'react-bootstrap/esm/Alert';
-import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
 import { useUserProfile } from '../../hooks/queries/useUserQuery';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import Icon from '@mdi/react';
 import { mdiInformationOutline } from '@mdi/js';
-import { Role, RoleDisplayNames } from '../../config/role';
-import { NavLink } from 'react-router-dom';
+import Button from 'react-bootstrap/esm/Button';
+import { useRef, useState } from 'react';
+import Form from 'react-bootstrap/esm/Form';
+import { states } from '../../config/states';
+import { countries } from '../../config/countries';
+import { useAdminContext } from '../../contexts/AdminProvider';
+import { OrganizationRolesSection } from './OrganizationRolesSection';
+import { useMutation } from 'react-query';
+import { useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import { useMsal } from '@azure/msal-react';
+import { saveProfileInformation } from '../../accessors/userAccessor';
 
 export function AccountInformationPage() {
+  const msalContext = useMsal();
+  const queryClient = useQueryClient();
+  const { state, dispatch } = useAdminContext();
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const stateRef = useRef<HTMLSelectElement>(null);
+  const countryRef = useRef<HTMLSelectElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+
   const {
     data: profileResponse, //
     isLoading: isProfileLoading,
     isError: hasProfileLoadError,
   } = useUserProfile();
 
+  const saveProfileMutation = useMutation({
+    mutationFn: () => {
+      setIsSavingProfile(true);
+      return saveProfileInformation(msalContext);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['user-profile', profile?.userId], {
+        userProfile: {
+          ...profile,
+          firstName: state.profileForm?.firstName,
+          lastName: state.profileForm?.lastName,
+          state: state.profileForm?.state,
+          country: state.profileForm?.country,
+          phoneNumber: state.profileForm?.phone,
+        },
+      });
+
+      setIsEditingProfile(false);
+
+      toast.success('Your profile information has been saved.', {
+        autoClose: 1000,
+      });
+    },
+    onError: () => {
+      toast.error('There was an error saving your profile information. Please try again.', {
+        position: 'top-center',
+        theme: 'colored',
+      });
+    },
+    onSettled: () => {
+      setIsSavingProfile(false);
+    },
+  });
+
   const profile = profileResponse?.userProfile;
 
   const labeledValue = (label: string, value: string | undefined) => {
     return (
-      <div className="col-xxl-2 col-lg-3 col-md-4">
+      <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <div className="mb-4">
-          {isProfileLoading && (
+          {!profile && (
             <Placeholder animation="glow">
               <Placeholder xs={6} className="rounded" />
               <Placeholder xs={10} className="rounded" />
             </Placeholder>
           )}
 
-          {!isProfileLoading && (
+          {profile && (
             <>
-              <div className="text-muted">{label}</div>
-              <div>{value}</div>
+              <div className="fw-bold">{label}</div>
+              <div className="text-break">{value}</div>
             </>
           )}
         </div>
@@ -38,55 +93,138 @@ export function AccountInformationPage() {
     );
   };
 
-  const organizationRolesPlaceholder = (
-    <Placeholder animation="glow" className="d-flex w-100 gap-3 fs-3">
-      <Placeholder xs={3} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-      <Placeholder xs={4} className="rounded" />
-    </Placeholder>
-  );
-
-  const organizationPageLink = (role: Role, organizationId: string) => {
-    if (role !== Role.OrganizationAdmin) {
-      return null;
-    }
-
-    return <NavLink to={`/admin/${organizationId}/users`}>View Organization Page</NavLink>;
+  const handleProfileFormChange = () => {
+    dispatch({
+      type: 'PROFILE_FORM_CHANGED',
+      payload: {
+        firstName: firstNameRef.current?.value ?? null,
+        lastName: lastNameRef.current?.value ?? null,
+        state: stateRef.current?.value ?? null,
+        country: countryRef.current?.value ?? null,
+        phone: phoneRef.current?.value ?? null,
+      },
+    });
   };
 
-  const organizationRolesTable = () => {
-    return (
-      <table className="table table-borderless">
-        <thead>
-          <tr>
-            <th>Organization</th>
-            <th>Role</th>
-            <th>{/* Actions */}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profile?.organizationMemberships.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-muted text-center">
-                No organizations found.
-              </td>
-            </tr>
-          )}
-          {profile?.organizationMemberships.map((membership) => (
-            <tr key={membership.organizationId}>
-              <td>{membership.organizationName}</td>
-              <td>{RoleDisplayNames[membership.role] ?? '-'}</td>
-              <td className="text-end">{organizationPageLink(membership.role, membership.organizationId)}</td>
-            </tr>
+  const editForm = (
+    <Form className="row mb-3" onChange={() => handleProfileFormChange()}>
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">First name</Form.Label>
+        <Form.Control
+          placeholder="Enter first name"
+          maxLength={255}
+          defaultValue={profile?.firstName}
+          ref={firstNameRef}
+          disabled={isSavingProfile}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">Last name</Form.Label>
+        <Form.Control
+          placeholder="Enter last name"
+          maxLength={255}
+          defaultValue={profile?.lastName}
+          ref={lastNameRef}
+          disabled={isSavingProfile}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">State</Form.Label>
+        <Form.Select ref={stateRef} defaultValue={profile?.state} disabled={isSavingProfile}>
+          <option value={''}>Select a state</option>
+          {states.map((state) => (
+            <option key={state.value} value={state.value}>
+              {state.label}
+            </option>
           ))}
-        </tbody>
-      </table>
-    );
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">Country</Form.Label>
+        <Form.Select ref={countryRef} defaultValue={profile?.country} disabled={isSavingProfile}>
+          <option value={''}>Select a country</option>
+          {countries.map((country) => (
+            <option key={country.value} value={country.value}>
+              {country.label}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">Phone</Form.Label>
+        <Form.Control
+          placeholder="Enter phone number"
+          maxLength={50}
+          defaultValue={profile?.phoneNumber}
+          ref={phoneRef}
+          disabled={isSavingProfile}
+        />
+      </Form.Group>
+    </Form>
+  );
+
+  const handleEditClicked = () => {
+    setIsEditingProfile(true);
+
+    // If profile is loaded and form is not initialized
+    // populate the form with profile data
+    if (profileResponse && !state.profileForm) {
+      dispatch({
+        type: 'PROFILE_EDIT_STARTED',
+        payload: {
+          firstName: profile?.firstName ?? null,
+          lastName: profile?.lastName ?? null,
+          state: profile?.state ?? null,
+          country: profile?.country ?? null,
+          phone: profile?.phoneNumber ?? null,
+        },
+      });
+    }
+  };
+
+  const handleSaveClicked = () => {
+    saveProfileMutation.mutate();
   };
 
   return (
     <div className="container mt-3">
-      <h1 className="fw-bold fs-4 mb-4">My Account</h1>
+      <div className="d-flex justify-content-between">
+        <h1 className="fw-bold fs-4 mb-4">My Account</h1>
+
+        {!isEditingProfile && (
+          <div>
+            <Button variant="link" className="text-decoration-none fw-bold" onClick={() => handleEditClicked()}>
+              Edit Account Details
+            </Button>
+          </div>
+        )}
+
+        {isEditingProfile && (
+          <div>
+            <Button
+              variant="secondary"
+              className="px-3"
+              onClick={() => setIsEditingProfile(false)}
+              disabled={isSavingProfile}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="ms-2 px-3"
+              variant="primary"
+              onClick={() => handleSaveClicked()}
+              disabled={isSavingProfile}
+            >
+              Save Changes
+            </Button>
+          </div>
+        )}
+      </div>
+
       <h2 className="fs-4">Account Information</h2>
       <hr />
 
@@ -99,24 +237,20 @@ export function AccountInformationPage() {
 
       {!hasProfileLoadError && (
         <>
-          <div className="row">
-            {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
-            {labeledValue('Email', profile?.email)}
-            {labeledValue('User ID', profile?.userName)}
-            {labeledValue('State', profile?.state)}
-            {labeledValue('Country', profile?.country)}
-            {labeledValue('Phone', profile?.phoneNumber)}
-          </div>
+          {!isEditingProfile && (
+            <div className="row">
+              {labeledValue('Name', profile?.firstName + ' ' + profile?.lastName)}
+              {labeledValue('Email', profile?.email)}
+              {labeledValue('User ID', profile?.userName)}
+              {labeledValue('State', profile?.state)}
+              {labeledValue('Country', profile?.country)}
+              {labeledValue('Phone', profile?.phoneNumber)}
+            </div>
+          )}
 
-          <h2 className="fs-4">Address Information</h2>
-          <hr />
-          <NotImplementedPlaceholder />
+          {isEditingProfile && editForm}
 
-          <h2 className="fs-4">Organizations & Roles</h2>
-          <hr />
-
-          {isProfileLoading && organizationRolesPlaceholder}
-          {!isProfileLoading && organizationRolesTable()}
+          <OrganizationRolesSection profile={profile} isProfileLoading={isProfileLoading} />
         </>
       )}
     </div>

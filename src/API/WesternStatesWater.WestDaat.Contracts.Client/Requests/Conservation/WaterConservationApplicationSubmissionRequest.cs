@@ -1,21 +1,10 @@
-﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework;
+﻿namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-public class WaterConservationApplicationSubmission
+public class WaterConservationApplicationSubmissionRequest : ApplicationStoreRequestBase
 {
-    public WaterConservationApplicationSubmission()
-    {
-
-    }
-
-    public Guid Id { get; set; }
-
     public Guid WaterConservationApplicationId { get; set; }
 
-    public DateTimeOffset SubmittedDate { get; set; }
-
-    public DateTimeOffset? AcceptedDate { get; set; }
-
-    public DateTimeOffset? RejectedDate { get; set; }
+    public string WaterRightNativeId { get; set; } = null!;
 
     public string AgentFirstName { get; set; } = null!;
 
@@ -79,5 +68,4 @@ public class WaterConservationApplicationSubmission
 
     public string WaterUseDescription { get; set; } = null!;
 
-    public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 }
