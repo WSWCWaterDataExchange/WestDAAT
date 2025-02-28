@@ -1,13 +1,25 @@
 ﻿using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationSubmissionRequestHandler : IRequestHandler<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>
 {
-    public Task<ApplicationStoreResponseBase> Handle(WaterConservationApplicationSubmissionRequest request)
+    private readonly IApplicationAccessor _applicationAccessor;
+
+    public WaterConservationApplicationSubmissionRequestHandler(IApplicationAccessor applicationAccessor)
     {
-        throw new NotImplementedException();
+        _applicationAccessor = applicationAccessor;
+    }
+
+    public async Task<ApplicationStoreResponseBase> Handle(WaterConservationApplicationSubmissionRequest request)
+    {
+        var dtoRequest = request.Map<Common.DataContracts.WaterConservationApplicationSubmissionRequest>();
+        var dtoResponse = await _applicationAccessor.Store(dtoRequest);
+
+        return dtoResponse.Map<ApplicationStoreResponseBase>();
     }
 }
