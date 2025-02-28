@@ -607,7 +607,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         
         // Assert
         response.Error.Should().BeNull();
-        response.Should().BeOfType(typeof(OrganizationMemberRemoveRequest));
+        response.Should().BeOfType(typeof(OrganizationMemberRemoveResponse));
         response.Should().BeEquivalentTo(new OrganizationMemberRemoveResponse());
     }
 }
