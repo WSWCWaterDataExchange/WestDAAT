@@ -646,4 +646,27 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.Error.Should().BeOfType(expectedErrorType);
         }
     }
+
+    [TestMethod]
+    public async Task Store_SubmitApplication_AsAnonymous_ShouldThrow()
+    {
+        // Arrange
+        var request = new WaterConservationApplicationSubmissionRequestFaker()
+            .RuleFor(req => req.WaterRightNativeId, () => "1234")
+            .RuleFor(req => req.WaterConservationApplicationId, () => Guid.NewGuid())
+            .Generate();
+
+        UseAnonymousContext();
+
+        // Act
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+
+        ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
 }
