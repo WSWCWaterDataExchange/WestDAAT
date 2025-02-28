@@ -4,5 +4,7 @@ public class UnsubmittedApplicationExistsLoadResponse : ApplicationLoadResponseB
 {
     public Guid? InProgressApplicationId { get; set; }
 
+    public string InProgressApplicationDisplayId { get; set; }
+
     public Guid? FundingOrganizationId { get; set; }
 }

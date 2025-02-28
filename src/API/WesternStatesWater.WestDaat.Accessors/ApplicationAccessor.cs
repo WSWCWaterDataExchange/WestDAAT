@@ -157,6 +157,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new WaterConservationApplicationCreateResponse
         {
             WaterConservationApplicationId = entity.Id,
+            WaterConservationApplicationDisplayId = entity.ApplicationDisplayId,
         };
     }
 
