@@ -36,14 +36,14 @@ export function AccountInformationPage() {
     return (
       <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <div className="mb-4">
-          {isProfileLoading && (
+          {!profile && (
             <Placeholder animation="glow">
               <Placeholder xs={6} className="rounded" />
               <Placeholder xs={10} className="rounded" />
             </Placeholder>
           )}
 
-          {!isProfileLoading && (
+          {profile && (
             <>
               <div className="fw-bold">{label}</div>
               <div className="text-break">{value}</div>
