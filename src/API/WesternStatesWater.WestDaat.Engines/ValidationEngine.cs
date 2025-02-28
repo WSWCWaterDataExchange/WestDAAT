@@ -158,7 +158,7 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateWaterConservationApplicationSubmissionRequest(WaterConservationApplicationSubmissionRequest request, ContextBase context)
     {
-        // verify user requesting an estimate is linking it to an application they own
+        // verify user creating the submission is linking it to an application they own
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
         var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
         {
