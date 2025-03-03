@@ -31,6 +31,7 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
     riverBasinNames,
     allocationOwner,
     states,
+    isWaterRightsFilterActive,
   } = filters;
 
   const searchCriteria: WaterRightsSearchCriteria = useMemo(() => {
@@ -51,6 +52,7 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
       allocationOwner: allocationOwner,
       states: states,
       wadeSitesUuids: nldiIds,
+      isWaterRightsFilterActive: isWaterRightsFilterActive,
     };
   }, [
     beneficialUseNames,
@@ -69,6 +71,7 @@ export function useWaterRightsSearchCriteriaWithoutContext({ filters, nldiIds }:
     allocationOwner,
     states,
     nldiIds,
+    isWaterRightsFilterActive
   ]);
 
   return { searchCriteria };
