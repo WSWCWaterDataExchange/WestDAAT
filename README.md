@@ -35,7 +35,7 @@
       - For Windows download the Node installer here: https://nodejs.org/en/download/
          - this installer includes NPM update
    - Start React App
-      - From the DashboardUI directory: `npm run start`
+     - From the DashboardUI directory: `npm run start`
    
 
 ## CORS errors
