@@ -48,12 +48,8 @@ public class UserFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Profile")]
         HttpRequestData req)
     {
-        var requestBase = await ParseRequestBody<UserLoadRequestBase>(req);
-        ResponseBase result = requestBase switch
-        {
-            UserProfileRequest request => await _userManager.Load<UserProfileRequest, UserProfileResponse>(request),
-            _ => throw new NotImplementedException($"Request type {requestBase.GetType()} is not implemented.")
-        };
+        var userProfileRequest = await ParseRequestBody<UserProfileRequest>(req);
+        var result = await _userManager.Load<UserProfileRequest, UserProfileResponse>(userProfileRequest);
         return await CreateResponse(req, result);
     }
 
