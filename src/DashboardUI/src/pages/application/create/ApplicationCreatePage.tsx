@@ -62,43 +62,43 @@ function ApplicationCreatePageForm() {
         <FormSection title="Applicant Information">
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerFirstName" label="Landowner First Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerLastName" label="Landowner Last Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerEmail" label="Email Address">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerPhoneNumber" label="Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerAddress" label="Address">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerCity" label="City">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerState" label="State">
-              <Form.Select>
+              <Form.Select required>
                 <option value={''}>Select a state</option>
                 {states.map((state) => (
                   <option key={state.value} value={state.value}>
@@ -111,7 +111,7 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerZipCode" label="Zip Code">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={10} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={10} required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
@@ -119,25 +119,25 @@ function ApplicationCreatePageForm() {
         <FormSection title="Agent Information">
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="agentFirstName" label="Agent First Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="agentLastName" label="Agent Last Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="agentEmail" label="Agent Email">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="agentPhoneNumber" label="Agent Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
@@ -146,25 +146,25 @@ function ApplicationCreatePageForm() {
           <FormSection title="Property & Land Area Information" className="col-6">
             <Form.Group className="col-12 mb-4">
               <FloatingLabel controlId="projectLocation" label="Project Location">
-                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
               </FloatingLabel>
             </Form.Group>
 
             <Form.Group className="col-12 mb-4">
               <FloatingLabel controlId="propertyAdditionalDetails" label="Additional Details">
-                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} />
+                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
               </FloatingLabel>
             </Form.Group>
 
             <Form.Group className="col-12 mb-4">
               <FloatingLabel controlId="diversionPoint" label="Diversion Point">
-                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
               </FloatingLabel>
             </Form.Group>
 
             <Form.Group className="col-12 mb-4">
               <FloatingLabel controlId="diversionPointDetails" label="Diversion Point Details">
-                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} />
+                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
               </FloatingLabel>
             </Form.Group>
           </FormSection>
@@ -178,19 +178,19 @@ function ApplicationCreatePageForm() {
         <FormSection title="Canal Company / Irrigation District">
           <Form.Group className="col-12 mb-4">
             <FloatingLabel controlId="canalOrIrrigationEntityName" label="Entity Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-6 mb-4">
             <FloatingLabel controlId="canalOrIrrigationEntityEmail" label="Entity Email">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-6 mb-4">
             <FloatingLabel controlId="canalOrIrrigationEntityPhoneNumber" label="Entity Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={50} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={50} required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
@@ -198,37 +198,37 @@ function ApplicationCreatePageForm() {
         <FormSection title="Water Right Information">
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="permitNumber" label="Permit #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="facilityDitchName" label="Facility (Ditch) Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="priorityDate" label="Priority Date">
-              <Form.Control placeholder={emptyStringPlaceholder} type="date" />
+              <Form.Control placeholder={emptyStringPlaceholder} type="date" required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="certificateNumber" label="Certificate #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="shareNumber" label="Share #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="waterRightState" label="State">
-              <Form.Select>
+              <Form.Select required>
                 <option value={''}>Select a state</option>
                 {states.map((state) => (
                   <option key={state.value} value={state.value}>
@@ -241,7 +241,7 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className="col-12 mb-4">
             <FloatingLabel controlId="waterUseDescription" label="Description of Water Use">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} />
+              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
@@ -290,7 +290,7 @@ function ApplicationCreatePageForm() {
               controlId="estimationSupplementaryDetails"
               label="Do you have supplementary data that can help in reviewing this estimate? If so, provide that here."
             >
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" />
+              <Form.Control placeholder={emptyStringPlaceholder} type="text" required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
@@ -298,25 +298,25 @@ function ApplicationCreatePageForm() {
         <FormSection title="Conservation Plan">
           <Form.Group className="col-6 mb-4">
             <FloatingLabel controlId="conservationPlanFundingRequestDollarAmount" label="Funding Request $ Amount">
-              <Form.Control placeholder={emptyStringPlaceholder} type="number" />
+              <Form.Control placeholder={emptyStringPlaceholder} type="number" required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-6 mb-4">
             <FloatingLabel controlId="conservationPlanFundingRequestCompensationRateUnits" label="Units">
-              <Form.Control placeholder={emptyStringPlaceholder} />
+              <Form.Control placeholder={emptyStringPlaceholder} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-12 mb-4">
             <FloatingLabel controlId="conservationPlanDescription" label="Describe your Conservation Plan.">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} />
+              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} required />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-12 mb-4">
             <FloatingLabel controlId="conservationPlanAdditionalInfo" label="Additional Information">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} />
+              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} required />
             </FloatingLabel>
           </Form.Group>
         </FormSection>
