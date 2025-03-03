@@ -1,9 +1,11 @@
-import Modal, { ModalProps } from 'react-bootstrap/Modal';
-import { NotImplementedPlaceholder } from '../../components/NotImplementedAlert';
-import { useMutation } from 'react-query';
-import { removeOrganizationMember } from '../../accessors/organizationAccessor';
 import { useMsal } from '@azure/msal-react';
 import Button from 'react-bootstrap/esm/Button';
+import Modal, { ModalProps } from 'react-bootstrap/Modal';
+import { useMutation, useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import { removeOrganizationMember } from '../../accessors/organizationAccessor';
+import { UserListResponse } from '../../data-contracts/UserListResponse';
+import { UserListResult } from '../../data-contracts/UserListResult';
 
 export interface RemoveOrganizationUserModalProps extends ModalProps {
   organizationId: string | null | undefined;
@@ -13,21 +15,35 @@ export interface RemoveOrganizationUserModalProps extends ModalProps {
 
 export function RemoveOrganizationUserModal(props: RemoveOrganizationUserModalProps) {
   const msalContext = useMsal();
+  const queryClient = useQueryClient();
 
   const removeOrganizationMemberMutation = useMutation({
     mutationFn: async (params: { organizationId: string; userId: string }) => {
       return await removeOrganizationMember(msalContext, params.organizationId, params.userId);
     },
     onSuccess: () => {
-      console.log('inside remove organization member onSuccess');
-      // trigger success toast notification
-      // remove the user from the query cache
-      // close the modal
+      toast.success('User removed from organization', {
+        autoClose: 1000,
+      });
+      const previousUsers = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]);
+      const updatedUsers = previousUsers?.users.filter((user: UserListResult) => user.userId !== props.userId);
+      queryClient.setQueryData(['organizationUsers', props.organizationId], { users: updatedUsers });
+      props.closeModal();
     },
-    onError: () => {
-      console.log('inside remove organization member onError');
-      // trigger error toast notification
-      // (keep the modal open)
+    onError: (error: { status?: number }) => {
+      if (error?.status === 400) {
+        toast.error('You cannot remove yourself from an organization', {
+          position: 'top-center',
+          theme: 'colored',
+          autoClose: 3000,
+        });
+      } else {
+        toast.error('Error removing user from organization', {
+          position: 'top-center',
+          theme: 'colored',
+          autoClose: 3000,
+        });
+      }
     },
   });
 
@@ -49,7 +65,6 @@ export function RemoveOrganizationUserModal(props: RemoveOrganizationUserModalPr
         <Modal.Title>Remove User</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <NotImplementedPlaceholder />
         <Button onClick={handleRemoveUserClick}>Remove</Button>
       </Modal.Body>
     </Modal>
