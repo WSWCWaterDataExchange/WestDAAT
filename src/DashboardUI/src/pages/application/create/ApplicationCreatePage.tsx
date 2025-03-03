@@ -8,9 +8,11 @@ import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
 import {
-  CompensationRateUnitsLabels,
+  CompensationRateUnitsLabelsPlural,
+  CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
+import { formatNumber } from '../../../utilities/valueFormatters';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -45,6 +47,16 @@ export function ApplicationCreatePage() {
 const emptyStringPlaceholder = '';
 function ApplicationCreatePageForm() {
   const { state } = useConservationApplicationContext();
+
+  // assumes all polygons are not intersecting
+  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
+    (sum, polygon) => sum + polygon.acreage,
+    0,
+  );
+  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
+    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
+    0,
+  );
 
   return (
     <div className="flex-grow-1 overflow-y-auto p-4">
@@ -268,7 +280,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Irrigated Field Area</span>
               </div>
               <div>
-                <span>x Acres</span>
+                <span>{formatNumber(acreageSum, 2)} Acres</span>
               </div>
             </div>
 
@@ -277,7 +289,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Consumptive Use</span>
               </div>
               <div>
-                <span>x Acre-Feet</span>
+                <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
               </div>
             </div>
 
@@ -286,7 +298,10 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Compensation Rate</span>
               </div>
               <div>
-                <span>$x/Acre-Feet</span>
+                <span>
+                  ${state.conservationApplication.desiredCompensationDollars}/
+                  {CompensationRateUnitsLabelsSingular[state.conservationApplication.desiredCompensationUnits!]}
+                </span>
               </div>
             </div>
 
@@ -295,7 +310,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Requested Total ($)</span>
               </div>
               <div>
-                <span>$x</span>
+                <span>${formatNumber(state.conservationApplication.conservationPayment, 0)}</span>
               </div>
             </div>
           </div>
@@ -323,7 +338,7 @@ function ApplicationCreatePageForm() {
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
                   <option key={value} value={value}>
-                    {CompensationRateUnitsLabels[value]}
+                    {CompensationRateUnitsLabelsPlural[value]}
                   </option>
                 ))}
               </Form.Select>

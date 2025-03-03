@@ -4,12 +4,18 @@ export enum CompensationRateUnits {
   Acres = 2,
 }
 
-export const CompensationRateUnitsLabels: Record<CompensationRateUnits, string> = {
+export const CompensationRateUnitsLabelsPlural: Record<CompensationRateUnits, string> = {
   [CompensationRateUnits.None]: 'None',
   [CompensationRateUnits.AcreFeet]: 'Acre-Feet',
   [CompensationRateUnits.Acres]: 'Acres',
 };
 
-export const CompensationRateUnitsOptions = Object.keys(CompensationRateUnitsLabels)
+export const CompensationRateUnitsLabelsSingular: Record<CompensationRateUnits, string> = {
+  [CompensationRateUnits.None]: 'None',
+  [CompensationRateUnits.AcreFeet]: 'Acre-Foot',
+  [CompensationRateUnits.Acres]: 'Acre',
+};
+
+export const CompensationRateUnitsOptions = Object.keys(CompensationRateUnitsLabelsPlural)
   .map((key) => Number(key) as CompensationRateUnits)
   .filter((value) => value !== CompensationRateUnits.None);

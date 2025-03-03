@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
 import {
   CompensationRateUnits,
-  CompensationRateUnitsLabels,
+  CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -178,7 +178,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
                   <option key={value} value={value}>
-                    {CompensationRateUnitsLabels[value]}
+                    {CompensationRateUnitsLabelsPlural[value]}
                   </option>
                 ))}
               </Form.Select>
