@@ -156,11 +156,13 @@ describe('ConservationApplicationState reducer', () => {
       type: 'APPLICATION_CREATED',
       payload: {
         waterConservationApplicationId: 'application-guid',
+        waterConservationApplicationDisplayId: 'display-id',
       },
     });
 
     // Assert
     expect(newState.conservationApplication.waterConservationApplicationId).toEqual('application-guid');
+    expect(newState.conservationApplication.waterConservationApplicationDisplayId).toEqual('display-id');
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
@@ -282,6 +284,7 @@ describe('ConservationApplicationState reducer', () => {
         type: 'APPLICATION_CREATED',
         payload: {
           waterConservationApplicationId: 'application-guid',
+          waterConservationApplicationDisplayId: 'display-id',
         },
       });
 
@@ -328,6 +331,7 @@ describe('ConservationApplicationState reducer', () => {
         type: 'APPLICATION_CREATED',
         payload: {
           waterConservationApplicationId: 'application-guid',
+          waterConservationApplicationDisplayId: 'display-id',
         },
       });
 
@@ -381,6 +385,7 @@ describe('ConservationApplicationState reducer', () => {
         type: 'APPLICATION_CREATED',
         payload: {
           waterConservationApplicationId: 'application-guid',
+          waterConservationApplicationDisplayId: 'display-id',
         },
       });
 

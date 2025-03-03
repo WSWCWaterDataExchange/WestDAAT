@@ -152,17 +152,10 @@ function Map({
     mapInstance.addControl(dc);
 
     const callback = () => {
-      const features = dc.getAll().features;
-      const polygon = features.find((f) => f.geometry.type === 'Polygon') as
-        | GeoJSON.Feature<GeoJSON.Polygon>
-        | undefined;
-
-      setDrawPolygon(polygon ?? null);
-
       if (handleMapDrawnPolygonChange) {
-        handleMapDrawnPolygonChange(features);
+        handleMapDrawnPolygonChange(dc.getAll().features);
       }
-    };
+    }
 
     mapInstance.on('draw.create', callback);
     mapInstance.on('draw.update', callback);

@@ -554,6 +554,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Should().NotBeNull();
         response.WaterConservationApplicationId.Should().NotBeEmpty();
+        response.WaterConservationApplicationDisplayId.Should().NotBeNullOrEmpty();
 
         var dbApplication = await _dbContext.WaterConservationApplications
             .SingleOrDefaultAsync(application => application.Id == response.WaterConservationApplicationId);
