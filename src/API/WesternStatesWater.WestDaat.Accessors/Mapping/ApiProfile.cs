@@ -318,6 +318,13 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
                 .ForMember(dest => dest.Submission, opt => opt.Ignore());
+
+            CreateMap<WaterConservationApplicationSubmissionRequest, EFWD.WaterConservationApplicationSubmission>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
+                .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
         }
     }
 }

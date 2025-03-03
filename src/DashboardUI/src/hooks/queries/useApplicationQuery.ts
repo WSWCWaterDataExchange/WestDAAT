@@ -41,6 +41,7 @@ export function useCreateWaterConservationApplicationQuery(fields: {
             type: 'APPLICATION_CREATED',
             payload: {
               waterConservationApplicationId: result.waterConservationApplicationId,
+              waterConservationApplicationDisplayId: result.waterConservationApplicationDisplayId,
             },
           });
         }

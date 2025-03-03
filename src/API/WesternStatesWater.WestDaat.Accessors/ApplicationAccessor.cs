@@ -111,6 +111,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
+            WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -156,6 +157,19 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new WaterConservationApplicationCreateResponse
         {
             WaterConservationApplicationId = entity.Id,
+            WaterConservationApplicationDisplayId = entity.ApplicationDisplayId,
         };
+    }
+
+    private async Task<ApplicationStoreResponseBase> SubmitApplication(WaterConservationApplicationSubmissionRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var entity = request.Map<EFWD.WaterConservationApplicationSubmission>();
+
+        await db.WaterConservationApplicationSubmissions.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
     }
 }

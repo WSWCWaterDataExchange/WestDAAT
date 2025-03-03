@@ -46,5 +46,8 @@ jobs:
       react-app-auth-known-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com
       react-app-ga-id: G-KFL0TGM4B8
       react-app-feature-conservation-estimation-tool: disabled
+      react-app-water-rights-vector-tile-url: https://api.maptiler.com/tiles/441a16bb-0a9e-4e71-8c84-da267d516a09/tiles.json?key=8QhUrRdYizgLYetLDiy7
+      react-app-overlay-vector-tile-url: https://api.maptiler.com/tiles/2470c0d3-dee8-445d-95be-a48dd617d038/tiles.json?key=8QhUrRdYizgLYetLDiy7
+      react-app-time-series-vector-tile-url: https://api.maptiler.com/tiles/d3e78141-41c6-4456-ab91-7117b3ded924/tiles.json?key=8QhUrRdYizgLYetLDiy7
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_STAGING }}

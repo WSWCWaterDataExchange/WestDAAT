@@ -1,11 +1,9 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class WaterConservationApplicationSubmissionFaker : Faker<EFWD.WaterConservationApplicationSubmission>
+public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionRequest>
 {
-    public WaterConservationApplicationSubmissionFaker(EFWD.WaterConservationApplication application = null)
+    public WaterConservationApplicationSubmissionRequestFaker()
     {
-        RuleFor(wcas => wcas.SubmittedDate, f => f.Date.PastOffset(1, DateTimeOffset.UtcNow));
-
         RuleFor(wcas => wcas.AgentFirstName, f => f.Person.FirstName);
 
         RuleFor(wcas => wcas.AgentLastName, f => f.Person.LastName);
@@ -68,9 +66,5 @@ public class WaterConservationApplicationSubmissionFaker : Faker<EFWD.WaterConse
 
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
 
-        if (application != null)
-        {
-            RuleFor(wcas => wcas.WaterConservationApplication, () => application);
-        }
     }
 }

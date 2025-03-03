@@ -40,11 +40,11 @@ public class OrganizationFunction : FunctionBase
         return await CreateResponse(req, result);
     }
 
-    [Function(nameof(OrganizationMembers))]
-    [OpenApiOperation(nameof(OrganizationMembers))]
+    [Function(nameof(AddOrganizationMembers))]
+    [OpenApiOperation(nameof(AddOrganizationMembers))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OrganizationStoreResponseBase))]
     [OpenApiParameter("organizationId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
-    public async Task<HttpResponseData> OrganizationMembers(
+    public async Task<HttpResponseData> AddOrganizationMembers(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/{{organizationId}}/Members")]
         HttpRequestData req, Guid organizationId)
     {
@@ -55,6 +55,25 @@ public class OrganizationFunction : FunctionBase
         var result = organizationStoreRequest switch
         {
             OrganizationMemberAddRequest request => await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(request),
+            _ => throw new NotImplementedException($"Request type {organizationStoreRequest.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(RemoveOrganizationMembers))]
+    [OpenApiOperation(nameof(RemoveOrganizationMembers))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OrganizationStoreResponseBase))]
+    [OpenApiParameter("organizationId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
+    public async Task<HttpResponseData> RemoveOrganizationMembers(
+        [HttpTrigger(AuthorizationLevel.Function, "delete", Route = $"{RouteBase}/{{organizationId}}/Members")]
+        HttpRequestData req, Guid organizationId)
+    {
+        var organizationStoreRequest = await ParseRequestBody<OrganizationStoreRequestBase>(req,
+            new Dictionary<string, object> { { "OrganizationId", organizationId } });
+
+        var result = organizationStoreRequest switch
+        {
+            OrganizationMemberRemoveRequest request => await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request),
             _ => throw new NotImplementedException($"Request type {organizationStoreRequest.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
