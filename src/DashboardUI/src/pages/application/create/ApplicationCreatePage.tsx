@@ -30,6 +30,13 @@ export function ApplicationCreatePage() {
         />
 
         <ApplicationCreatePageForm />
+
+        <hr className="m-0" />
+        <div className="d-flex justify-content-end p-3">
+          <Button variant="success" onClick={() => alert('Not Implemented.')}>
+            Review & Submit
+          </Button>
+        </div>
       </div>
     </MapProvider>
   );
@@ -179,7 +186,11 @@ function ApplicationCreatePageForm() {
           </div>
         </div>
 
-        <FormSection title="Canal Company / Irrigation District">
+        <FormSection
+          title="Canal Company / Irrigation District"
+          subtitle="Is your water right part of a canal company or irrigation district? If yes, please provide their contact
+              information."
+        >
           <Form.Group className="col-12 mb-4">
             <FloatingLabel controlId="canalOrIrrigationEntityName" label="Entity Name">
               <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
@@ -346,6 +357,7 @@ function ApplicationCreatePageForm() {
 
 interface FormSectionProps {
   title: string;
+  subtitle?: string;
   className?: string;
   children: React.ReactNode | undefined;
 }
@@ -354,7 +366,15 @@ function FormSection(props: FormSectionProps) {
   return (
     <div className={props.className}>
       <div className="mb-4">
-        <span className="fs-5">{props.title}</span>
+        <div>
+          <span className="fs-5">{props.title}</span>
+        </div>
+
+        {props.subtitle && (
+          <div>
+            <span className="text-muted">{props.subtitle}</span>
+          </div>
+        )}
       </div>
 
       <div className="row">{props.children}</div>
