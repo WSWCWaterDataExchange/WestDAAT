@@ -56,64 +56,74 @@ function AnalyticsDataTable() {
   return (
     <Table>
       <thead>
-        <tr>
-          <th>Allocation UUID</th>
-          <th>Priority Date</th>
-          <th>WaDE Owner Classification</th>
-          <th>Owner</th>
-          <th>WaDE Legal Status</th>
-          <th>Allocation Flow (CFS)</th>
-          <th>Allocation Volume (AF)</th>
-          <th>WaDE Beneficial Use</th>
-        </tr>
+      <tr>
+        <th>Allocation UUID</th>
+        <th>Priority Date</th>
+        <th>WaDE Owner Classification</th>
+        <th>Owner</th>
+        <th>WaDE Legal Status</th>
+        <th>Allocation Flow (CFS)</th>
+        <th>Allocation Volume (AF)</th>
+        <th>WaDE Beneficial Use</th>
+      </tr>
       </thead>
       <tbody>
-        {waterRightsSearchResults.waterRightsDetails?.length > 0 &&
-          waterRightsSearchResults?.waterRightsDetails.map((waterRightDetail) => {
-            return (
-              <tr key={waterRightDetail.allocationUuid}>
-                <td>
-                  <a
-                    href={`/details/right/${waterRightDetail.allocationUuid}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {waterRightDetail.allocationUuid}
-                  </a>
-                </td>
-                <td>
-                  <FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate>
-                </td>
-                <td>{waterRightDetail.ownerClassification}</td>
-                <td>{waterRightDetail.allocationOwner}</td>
-                <td>{waterRightDetail.allocationLegalStatus}</td>
-                <td>{formatNumber(waterRightDetail.allocationFlowCfs)}</td>
-                <td>{formatNumber(waterRightDetail.allocationVolumeAf)}</td>
-                <td>{waterRightDetail.beneficialUses.join(', ')}</td>
-              </tr>
-            );
-          })}
-        {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetchingTableData && (
-          <tr key="noResults">
-            <td colSpan={8} align="center">
-              No results found
-            </td>
-          </tr>
-        )}
-        {hasMoreResults && !isFetchingTableData && (
-          <tr>
-            <td colSpan={8} align="center">
-              <Button onClick={handleLoadMoreResults}>Load more results</Button>
-            </td>
-          </tr>
-        )}
-        {isFetchingTableData && (
-          <tr>
-            <td colSpan={8} align="center">
-              Loading... <ProgressBar animated now={100} />
-            </td>
-          </tr>
-        )}
+      {searchCriteria.isWaterRightsFilterActive ? (
+        <>
+          {waterRightsSearchResults.waterRightsDetails?.length > 0 &&
+            waterRightsSearchResults?.waterRightsDetails.map((waterRightDetail) => {
+              return (
+                <tr key={waterRightDetail.allocationUuid}>
+                  <td>
+                    <a
+                      href={`/details/right/${waterRightDetail.allocationUuid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {waterRightDetail.allocationUuid}
+                    </a>
+                  </td>
+                  <td>
+                    <FormattedDate>{waterRightDetail.allocationPriorityDate}</FormattedDate>
+                  </td>
+                  <td>{waterRightDetail.ownerClassification}</td>
+                  <td>{waterRightDetail.allocationOwner}</td>
+                  <td>{waterRightDetail.allocationLegalStatus}</td>
+                  <td>{formatNumber(waterRightDetail.allocationFlowCfs)}</td>
+                  <td>{formatNumber(waterRightDetail.allocationVolumeAf)}</td>
+                  <td>{waterRightDetail.beneficialUses.join(', ')}</td>
+                </tr>
+              );
+            })}
+          {waterRightsSearchResults.waterRightsDetails?.length === 0 && !isFetchingTableData && (
+            <tr key="noResults">
+              <td colSpan={8} align="center">
+                No results found
+              </td>
+            </tr>
+          )}
+          {hasMoreResults && !isFetchingTableData && (
+            <tr>
+              <td colSpan={8} align="center">
+                <Button onClick={handleLoadMoreResults}>Load more results</Button>
+              </td>
+            </tr>
+          )}
+          {isFetchingTableData && (
+            <tr>
+              <td colSpan={8} align="center">
+                Loading... <ProgressBar animated now={100}/>
+              </td>
+            </tr>
+          )}
+        </>
+      ) : (
+        <tr key="noResults">
+          <td colSpan={8} align="center">
+            No results found. Water rights must be enabled.
+          </td>
+        </tr>
+      )}
       </tbody>
     </Table>
   );

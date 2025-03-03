@@ -5,7 +5,7 @@ import HC_Data from 'highcharts/modules/export-data';
 import AnnotationsModule from 'highcharts/modules/annotations';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo } from 'react';
-import { Col, Container, Nav, ProgressBar, Row, Tab } from 'react-bootstrap';
+import { ButtonGroup, Col, Container, Nav, ProgressBar, Row, Tab, ToggleButton } from 'react-bootstrap';
 import { useGetAnalyticsSummaryInfo } from '../../../../../hooks/queries';
 import { useColorMappings } from '../hooks/useColorMappings';
 import { useWaterRightsSearchCriteria } from '../hooks/useWaterRightsSearchCriteria';
@@ -138,6 +138,7 @@ interface ChartsProps {
 
 function Charts(props: ChartsProps) {
   const { searchCriteria } = useWaterRightsSearchCriteria();
+
   const request: WaterRightsSearchCriteriaWithGrouping = {
     ...searchCriteria,
     groupValue: Number(props.selectedDropdownOption?.value),
@@ -186,64 +187,96 @@ function Charts(props: ChartsProps) {
 
   return (
     <div>
-      <div className="my-3 d-flex justify-content-center">
-        <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank" rel="noopener noreferrer">
-          Learn about WestDAAT analytics
-        </a>
-      </div>
-
       <Container fluid={true}>
         <Row>
-          <Col lg="3">
-            <div>
-              <span>Chart Type</span>
+          <Col>
+            <div className="d-flex">
+              <div className="d-flex flex-column">
+                <span>Bar Selection</span>
+                <ButtonGroup>
+                  <ToggleButton
+                    className="zindexzero"
+                    key="pieChart"
+                    id={`barSelection-pieChart`}
+                    type="radio"
+                    variant="outline-primary"
+                    name="barSelectionType"
+                    value={"pieChart"}
+                    checked={chartType === "pieChart"}
+                    onChange={() => setChartType("pieChart")}
+                  >
+                    Pie Chart
+                  </ToggleButton>
+                  <ToggleButton
+                    className="zindexzero"
+                    key="barChart"
+                    id={`barSelection-barChart`}
+                    type="radio"
+                    variant="outline-primary"
+                    name="barSelectionType"
+                    value={"barChart"}
+                    checked={chartType === "barChart"}
+                    onChange={() => setChartType("barChart")}
+                  >
+                    Bar Graph
+                  </ToggleButton>
+                </ButtonGroup>
+              </div>
+
+              <div className="ms-3" style={{ minWidth: '350px' }}>
+                <AnalyticsInfoGroupingDropdown
+                  isFetching={isFetching}
+                  analyticsSummaryInformationResponse={chartSearchResults}
+                  selectedDropdownOption={props.selectedDropdownOption}
+                  setSelectedDropdownOption={props.setSelectedDropdownOption}
+                />
+              </div>
             </div>
-            <Tab.Container activeKey={chartType} onSelect={(tab) => setChartType(tab as SupportedSeriesChartTypes)}>
-              <Nav variant="pills" defaultActiveKey="pieChart">
-                <Nav.Item>
-                  <Nav.Link eventKey="pieChart">Pie Chart</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="barChart">Bar Graph</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            </Tab.Container>
           </Col>
-          <Col lg="9">
-            <AnalyticsInfoGroupingDropdown
-              isFetching={isFetching}
-              analyticsSummaryInformationResponse={chartSearchResults}
-              selectedDropdownOption={props.selectedDropdownOption}
-              setSelectedDropdownOption={props.setSelectedDropdownOption}
-            />
+        </Row>
+        <Row>
+          <Col lg={12}>
+            <div className="my-3 d-flex">
+              <a href="https://westernstateswater.org/wade/westdaat-analytics" target="_blank"
+                 rel="noopener noreferrer">
+                Learn about WestDAAT analytics
+              </a>
+            </div>
           </Col>
         </Row>
       </Container>
 
-      {chartSearchResults?.analyticsSummaryInformation &&
-        chartSearchResults?.analyticsSummaryInformation?.length > 0 && (
-          <Container fluid={true}>
-            <Row>
-              <Col lg="4">
-                <SeriesChart name="count" data={pointData} chartType={chartType} />
-              </Col>
-              <Col lg="4">
-                <SeriesChart name="flow" data={flowData} chartType={chartType} />
-              </Col>
-              <Col lg="4">
-                <SeriesChart name="volume" data={volumeData} chartType={chartType} />
-              </Col>
-            </Row>
-          </Container>
-        )}
-      {chartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
-        <div className="d-flex justify-content-center">No results found</div>
-      )}
-      {isFetching && (
-        <div>
-          <div className="d-flex justify-content-center">Loading... </div>
-          <ProgressBar animated now={100} />
-        </div>
+      {searchCriteria.isWaterRightsFilterActive ? (
+        <>
+          {chartSearchResults?.analyticsSummaryInformation &&
+            chartSearchResults?.analyticsSummaryInformation?.length > 0 &&
+            searchCriteria.isWaterRightsFilterActive && (
+              <Container fluid={true}>
+                <Row>
+                  <Col lg="4">
+                    <SeriesChart name="count" data={pointData} chartType={chartType}/>
+                  </Col>
+                  <Col lg="4">
+                    <SeriesChart name="flow" data={flowData} chartType={chartType}/>
+                  </Col>
+                  <Col lg="4">
+                    <SeriesChart name="volume" data={volumeData} chartType={chartType}/>
+                  </Col>
+                </Row>
+              </Container>
+            )}
+          {chartSearchResults?.analyticsSummaryInformation?.length === 0 && !isFetching && (
+            <div className="d-flex justify-content-center">No results found</div>
+          )}
+          {isFetching && (
+            <div>
+              <div className="d-flex justify-content-center">Loading...</div>
+              <ProgressBar animated now={100}/>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="d-flex justify-content-center">No results found. Water rights must be enabled.</div>
       )}
     </div>
   );
@@ -312,8 +345,10 @@ function SeriesChart(props: {
   }, [chartOptionsBase, subTitle, highchartsChartType, sortedData]);
 
   return data.data.length > 0 ? (
-    <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-  ) : (
-    <div className="d-flex justify-content-center align-items-center h-100">No {props.name} data found</div>
-  );
+      <HighchartsReact highcharts={Highcharts} options={chartOptions}/>
+    )
+    :
+    (
+      <div className="d-flex justify-content-center align-items-center h-100">No {props.name} data found</div>
+    );
 }

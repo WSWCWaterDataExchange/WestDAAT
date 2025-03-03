@@ -15,6 +15,7 @@ export interface WaterRightsSearchCriteria {
   podOrPou?: string;
   minimumPriorityDate?: Date;
   maximumPriorityDate?: Date;
+  isWaterRightsFilterActive: boolean;
 }
 
 export interface WaterRightsSearchCriteriaWithPaging extends WaterRightsSearchCriteria {
