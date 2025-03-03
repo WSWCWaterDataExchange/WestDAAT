@@ -32,13 +32,6 @@ export function ApplicationCreatePage() {
         />
 
         <ApplicationCreatePageForm />
-
-        <hr className="m-0" />
-        <div className="d-flex justify-content-end p-3">
-          <Button variant="success" onClick={() => alert('Not Implemented.')}>
-            Review & Submit
-          </Button>
-        </div>
       </div>
     </MapProvider>
   );
@@ -366,6 +359,13 @@ function ApplicationCreatePageForm() {
           </div>
         </FormSection>
       </Form>
+
+      <hr className="m-0" />
+      <div className="d-flex justify-content-end p-3">
+        <Button variant="success" onClick={() => alert('Not Implemented.')}>
+          Review & Submit
+        </Button>
+      </div>
     </div>
   );
 }
