@@ -12,4 +12,9 @@ public interface IUserManager : IServiceContractBase
     Task<TResponse> Load<TRequest, TResponse>(TRequest request)
         where TRequest : UserLoadRequestBase
         where TResponse : UserLoadResponseBase;
+
+    // Store
+    Task<TResponse> Store<TRequest, TResponse>(TRequest request)
+        where TRequest : UserStoreRequestBase
+        where TResponse : UserStoreResponseBase;
 }
