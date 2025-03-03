@@ -7,6 +7,10 @@ import { NotImplementedPlaceholder } from '../../../components/NotImplementedAle
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
+import {
+  CompensationRateUnitsLabels,
+  CompensationRateUnitsOptions,
+} from '../../../data-contracts/CompensationRateUnits';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -304,7 +308,14 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className="col-6 mb-4">
             <FloatingLabel controlId="conservationPlanFundingRequestCompensationRateUnits" label="Units">
-              <Form.Control placeholder={emptyStringPlaceholder} required />
+              <Form.Select required>
+                <option value={0}>Select an option</option>
+                {CompensationRateUnitsOptions.map((value) => (
+                  <option key={value} value={value}>
+                    {CompensationRateUnitsLabels[value]}
+                  </option>
+                ))}
+              </Form.Select>
             </FloatingLabel>
           </Form.Group>
 
