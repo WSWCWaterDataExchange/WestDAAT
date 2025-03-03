@@ -3,6 +3,7 @@ import MapProvider from '../../../contexts/MapProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Form from 'react-bootstrap/esm/Form';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -58,9 +59,16 @@ function ApplicationCreatePageForm() {
           <Form.Group></Form.Group>
         </FormSection>
 
-        <FormSection title="Property & Land Area Information">
-          <Form.Group></Form.Group>
-        </FormSection>
+        <div className="d-flex justify-content-between">
+          <FormSection title="Property & Land Area Information">
+            <Form.Group></Form.Group>
+          </FormSection>
+
+          <div>
+            Static map here
+            <NotImplementedPlaceholder />
+          </div>
+        </div>
 
         <FormSection title="Canal Company / Irrigation District">
           <Form.Group></Form.Group>
