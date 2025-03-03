@@ -13,7 +13,6 @@ public interface IUserManager : IServiceContractBase
         where TRequest : UserLoadRequestBase
         where TResponse : UserLoadResponseBase;
 
-    // Store
     Task<TResponse> Store<TRequest, TResponse>(TRequest request)
         where TRequest : UserStoreRequestBase
         where TResponse : UserStoreResponseBase;
