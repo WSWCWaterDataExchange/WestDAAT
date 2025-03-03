@@ -36,19 +36,21 @@ function ApplicationCreatePageForm() {
 
   return (
     <div className="flex-grow-1 overflow-y-auto p-4">
-      <div>
-        <span>New Application</span>
+      <div className="mb-3">
+        <span className="fs-4 fw-bold">New Application</span>
       </div>
 
-      <div className="d-flex gap-3">
-        <span>Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
+      <div className="d-flex gap-3 mb-4">
+        <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
 
-        <span>Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}</span>
+        <span className="fw-bold">
+          Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
+        </span>
 
-        <span>Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
+        <span className="fw-bold">Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
       </div>
 
-      <div>
+      <div className="mb-4">
         <span>
           Complete the below fields in order to submit your application to your state agency for verification. Be sure
           everything is filled out accurately and truthfully.
