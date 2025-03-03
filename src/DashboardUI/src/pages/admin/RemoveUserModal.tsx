@@ -16,6 +16,9 @@ export interface RemoveOrganizationUserModalProps extends ModalProps {
 export function RemoveOrganizationUserModal(props: RemoveOrganizationUserModalProps) {
   const msalContext = useMsal();
   const queryClient = useQueryClient();
+  const user = queryClient
+    .getQueryData<UserListResponse>(['organizationUsers', props.organizationId])
+    ?.users.find((user) => user.userId === props.userId);
 
   const removeOrganizationMemberMutation = useMutation({
     mutationFn: async (params: { organizationId: string; userId: string }) => {
@@ -64,9 +67,19 @@ export function RemoveOrganizationUserModal(props: RemoveOrganizationUserModalPr
       <Modal.Header closeButton onClick={() => props.closeModal()}>
         <Modal.Title>Remove User</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Button onClick={handleRemoveUserClick}>Remove</Button>
-      </Modal.Body>
+      <Modal.Body>{`Are you sure you want to remove ${user ? `${user.firstName} ${user.lastName}` : 'this user'} from this organization?`}</Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="secondary"
+          onClick={() => props.closeModal()}
+          disabled={removeOrganizationMemberMutation.isLoading}
+        >
+          Cancel
+        </Button>
+        <Button variant="danger" onClick={handleRemoveUserClick} disabled={removeOrganizationMemberMutation.isLoading}>
+          Remove
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 }
