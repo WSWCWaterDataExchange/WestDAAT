@@ -32,6 +32,8 @@ export function ApplicationCreatePage() {
 
 const emptyStringPlaceholder = '';
 function ApplicationCreatePageForm() {
+  const { state } = useConservationApplicationContext();
+
   return (
     <div className="flex-grow-1 overflow-y-auto p-4">
       <div>
@@ -39,11 +41,11 @@ function ApplicationCreatePageForm() {
       </div>
 
       <div className="d-flex gap-3">
-        <span>Water Right Native ID:</span>
+        <span>Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
 
-        <span>Application ID: </span>
+        <span>Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}</span>
 
-        <span>Funding Organization :</span>
+        <span>Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
       </div>
 
       <div>
