@@ -55,19 +55,25 @@ function ApplicationCreatePageForm() {
       <Form>
         <FormSection title="Applicant Information">
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerName" label="Landowner Name">
+            <FloatingLabel controlId="landownerFirstName" label="Landowner First Name">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="emailAddress" label="Email Address">
+            <FloatingLabel controlId="landownerLastName" label="Landowner Last Name">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="phoneNumber" label="Phone">
+            <FloatingLabel controlId="landownerEmail" label="Email Address">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="landownerPhoneNumber" label="Phone">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
@@ -99,7 +105,29 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <FormSection title="Agent Information">
-          <Form.Group></Form.Group>
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="agentFirstName" label="Agent First Name">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="agentLastName" label="Agent Last Name">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="agentEmail" label="Agent Email">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="agentPhoneNumber" label="Agent Phone">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <div className="d-flex justify-content-between">
