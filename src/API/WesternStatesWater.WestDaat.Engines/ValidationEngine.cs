@@ -45,6 +45,7 @@ internal class ValidationEngine : IValidationEngine
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
+            UserStoreRequestBase req => ValidateUserStoreRequest(req),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -245,7 +246,7 @@ internal class ValidationEngine : IValidationEngine
         // Cannot add yourself to an organization since a user can only be in a single organization.
         if (request.UserId == userContext.UserId)
         {
-            return CreateForbiddenError(request, context);
+            return CreateValidationError(request, "UserId", "User is not allowed to add themselves to an organization since a user can only be in a single organization.");
         }
 
         var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
@@ -278,7 +279,27 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationMemberRemoveRequest(OrganizationMemberRemoveRequest request, ContextBase context)
     {
-        throw new NotImplementedException();
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        if (userContext.UserId == request.UserId)
+        {
+            return CreateValidationError(request, "UserId", "User is not allowed to remove themselves from an organization.");
+        }
+
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.OrganizationMemberRemove) &&
+            !orgPermissions.Contains(Permissions.OrganizationMemberRemove))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
     }
 
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
@@ -362,6 +383,25 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateForbiddenError(new UserSearchRequest(), context);
         }
+
+        return null;
+    }
+
+    private ErrorBase ValidateUserStoreRequest(UserStoreRequestBase request)
+    {
+        return request switch
+        {
+            UserProfileUpdateRequest => ValidateUserProfileUpdateRequest(),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateUserProfileUpdateRequest()
+    {
+        // Must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
 
         return null;
     }

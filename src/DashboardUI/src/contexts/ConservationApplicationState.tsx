@@ -14,6 +14,7 @@ export interface ConservationApplicationState {
   conservationApplication: {
     waterRightNativeId: string | undefined;
     waterConservationApplicationId: string | undefined;
+    waterConservationApplicationDisplayId: string | undefined;
     fundingOrganizationId: string | undefined;
     fundingOrganizationName: string | undefined;
     openEtModelName: string | undefined;
@@ -45,6 +46,7 @@ export const defaultState = (): ConservationApplicationState => ({
   conservationApplication: {
     waterRightNativeId: undefined,
     waterConservationApplicationId: undefined,
+    waterConservationApplicationDisplayId: undefined,
     fundingOrganizationId: undefined,
     fundingOrganizationName: undefined,
     openEtModelName: undefined,
@@ -126,6 +128,7 @@ export interface ApplicationCreatedAction {
   type: 'APPLICATION_CREATED';
   payload: {
     waterConservationApplicationId: string;
+    waterConservationApplicationDisplayId: string;
   };
 }
 
@@ -248,6 +251,8 @@ const onApplicationCreated = (
   { payload }: ApplicationCreatedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
+  draftState.conservationApplication.waterConservationApplicationDisplayId =
+    payload.waterConservationApplicationDisplayId;
 
   checkCanEstimateConsumptiveUse(draftState);
 

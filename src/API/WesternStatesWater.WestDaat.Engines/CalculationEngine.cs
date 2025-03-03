@@ -47,18 +47,15 @@ internal class CalculationEngine : ICalculationEngine
 
     private EstimateConservationPaymentResponse EstimateConservationPaymentInAcreFeet(EstimateConservationPaymentRequest request)
     {
-        var totalAreaInAcres = request.DataCollections
-            .Select(dc => GeometryHelpers.GetGeometryByWkt(dc.PolygonWkt))
-            .Sum(GeometryHelpers.GetGeometryAreaInAcres);
+        double estimatedCompensation = 0;
 
-        var totalAverageEtInInches = request.DataCollections
-            .Sum(dc => dc.AverageYearlyEtInInches);
-
-        var totalAverageEtInFeet = totalAverageEtInInches / 12;
-
-        var totalVolumeInAcreFeet = totalAreaInAcres * totalAverageEtInFeet;
-
-        var estimatedCompensation = totalVolumeInAcreFeet * request.CompensationRateDollars;
+        foreach (var collection in request.DataCollections)
+        {
+            var acreage = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(collection.PolygonWkt));
+            var averageEtInFeet = collection.AverageYearlyEtInInches / 12;
+            var averageEtInAcreFeet = averageEtInFeet * acreage;
+            estimatedCompensation += averageEtInAcreFeet * request.CompensationRateDollars;
+        }
 
         return new EstimateConservationPaymentResponse
         {

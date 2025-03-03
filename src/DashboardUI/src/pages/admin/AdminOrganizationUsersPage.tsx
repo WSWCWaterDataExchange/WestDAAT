@@ -1,3 +1,5 @@
+import { mdiPencilOutline, mdiTrashCanOutline } from '@mdi/js';
+import Icon from '@mdi/react';
 import { useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
@@ -5,10 +7,12 @@ import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
 import { RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
-import { RemoveOrganizationUserModal } from './RemoveUserModal';
+import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 import AddUserModal from './AddUserModal';
+import { RemoveOrganizationUserModal } from './RemoveUserModal';
 
 export function AdminOrganizationsUsersPage() {
+  const { user: currentUser } = useAuthenticationContext();
   const { organizationId } = useParams();
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
@@ -115,13 +119,20 @@ export function AdminOrganizationsUsersPage() {
                   </td>
                   <td className="align-content-center">{user.userName}</td>
                   <td className="align-content-center text-center">
-                    <Button
-                      variant="link"
-                      className="px-3 py-1 text-danger"
-                      onClick={() => openRemoveUserModal(user.userId)}
-                    >
-                      Remove from Organization
-                    </Button>
+                    {currentUser?.userId !== user.userId && (
+                      <>
+                        <Button variant="link" className="px-1 py-1">
+                          <Icon path={mdiPencilOutline} size="1.5em" aria-label="Edit user button"></Icon>
+                        </Button>
+                        <Button
+                          variant="link"
+                          className="px-1 py-1 text-danger"
+                          onClick={() => openRemoveUserModal(user.userId)}
+                        >
+                          <Icon path={mdiTrashCanOutline} size="1.5em" aria-label="Remove user button"></Icon>
+                        </Button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -138,6 +149,7 @@ export function AdminOrganizationsUsersPage() {
       <RemoveOrganizationUserModal
         show={showRemoveUserModal}
         userId={removeUserId}
+        organizationId={organizationId}
         closeModal={closeRemoveUserModal}
       ></RemoveOrganizationUserModal>
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />

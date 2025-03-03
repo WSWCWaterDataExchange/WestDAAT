@@ -41,8 +41,8 @@ jobs:
       react-app-auth-known-authority: https://westdaat.b2clogin.com/westdaat.onmicrosoft.com
       react-app-ga-id: G-GENEQGNY1Q
       react-app-feature-conservation-estimation-tool: disabled
-      react-app-water-rights-vector-tile-url: https://api.maptiler.com/tiles/a190c617-ed1a-47fd-81fa-c4b923d40c32/tiles.json?key=IauIQDaqjd29nJc5kJse
-      react-app-overlay-vector-tile-url: https://api.maptiler.com/tiles/80e72552-5c97-43f7-8116-99ef175bb6c1/tiles.json?key=IauIQDaqjd29nJc5kJse
-      react-app-time-series-vector-tile-url: https://api.maptiler.com/tiles/022512af-0ba3-4b82-944a-cadc9db77772/tiles.json?key=IauIQDaqjd29nJc5kJse
+      react-app-water-rights-vector-tile-url: https://api.maptiler.com/tiles/a190c617-ed1a-47fd-81fa-c4b923d40c32/tiles.json?key=8QhUrRdYizgLYetLDiy7
+      react-app-overlay-vector-tile-url: https://api.maptiler.com/tiles/80e72552-5c97-43f7-8116-99ef175bb6c1/tiles.json?key=8QhUrRdYizgLYetLDiy7
+      react-app-time-series-vector-tile-url: https://api.maptiler.com/tiles/022512af-0ba3-4b82-944a-cadc9db77772/tiles.json?key=8QhUrRdYizgLYetLDiy7
     secrets:
       azure-cli-credentials: ${{ secrets.AZURE_AZ_CLI_CREDENTIALS_PROD }}

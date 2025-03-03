@@ -1,8 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common.Context;
-using System.Data.Entity;
 using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
@@ -564,5 +564,79 @@ public class UserIntegrationTests : IntegrationTestBase
         result.UserProfile.OrganizationMemberships.First().OrganizationId.Should().Be(organization.Id);
         result.UserProfile.OrganizationMemberships.First().OrganizationName.Should().Be(organization.Name);
         result.UserProfile.OrganizationMemberships.First().Role.Should().Be(userOrganizationRole.Role);
+    }
+
+    [TestMethod]
+    public async Task Store_UpdateUserProfileRequest_ShouldUpdate()
+    {
+        // Arrange
+        var currentUser = new UserFaker().Generate();
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+            }
+        );
+
+        // Act
+        await _userManager.Store<CLI.Requests.Admin.UserProfileUpdateRequest, CLI.Responses.Admin.UserStoreResponseBase>(
+            new CLI.Requests.Admin.UserProfileUpdateRequest
+            {
+                FirstName = "Testie",
+                LastName = "McTesterson",
+                State = "NE",
+                Country = "Canada",
+                PhoneNumber = "123-456-7890",
+            }
+        );
+
+        // Assert
+        var updatedUser = await _dbContext.Users
+            .Include(u => u.UserProfile)
+            .SingleAsync(u => u.Id == currentUser.Id);
+
+        updatedUser.UserProfile.FirstName.Should().Be("Testie");
+        updatedUser.UserProfile.LastName.Should().Be("McTesterson");
+        updatedUser.UserProfile.State.Should().Be("NE");
+        updatedUser.UserProfile.Country.Should().Be("Canada");
+        updatedUser.UserProfile.PhoneNumber.Should().Be("123-456-7890");
+    }
+
+    [TestMethod]
+    public async Task Store_UpdateUserProfileRequest_NoProfile_ShouldThrow()
+    {
+        // Arrange
+        var currentUser = new UserFaker()
+            .RuleFor(u => u.UserProfile, _ => null)
+            .Generate();
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+            }
+        );
+
+        // Act
+        var result = await _userManager.Store<CLI.Requests.Admin.UserProfileUpdateRequest, CLI.Responses.Admin.UserStoreResponseBase>(
+            new CLI.Requests.Admin.UserProfileUpdateRequest
+            {
+                FirstName = "Testie",
+                LastName = "McTesterson",
+                State = "NE",
+                Country = "Canada",
+                PhoneNumber = "123-456-7890",
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeOfType<InternalError>();
+        result.Error.LogMessage.Should().Contain($"User profile not found for id {currentUser.Id}");
     }
 }

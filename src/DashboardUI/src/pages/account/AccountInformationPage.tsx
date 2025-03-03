@@ -22,7 +22,9 @@ export function AccountInformationPage() {
   const { state, dispatch } = useAdminContext();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [validated, setValidated] = useState(false);
 
+  const formRef = useRef<HTMLFormElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const stateRef = useRef<HTMLSelectElement>(null);
@@ -107,7 +109,13 @@ export function AccountInformationPage() {
   };
 
   const editForm = (
-    <Form className="row mb-3" onChange={() => handleProfileFormChange()}>
+    <Form
+      noValidate
+      validated={validated}
+      className="row mb-3"
+      onChange={() => handleProfileFormChange()}
+      ref={formRef}
+    >
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">First name</Form.Label>
         <Form.Control
@@ -116,7 +124,9 @@ export function AccountInformationPage() {
           defaultValue={profile?.firstName}
           ref={firstNameRef}
           disabled={isSavingProfile}
+          required
         />
+        <Form.Control.Feedback type="invalid">First name is required.</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
@@ -127,12 +137,14 @@ export function AccountInformationPage() {
           defaultValue={profile?.lastName}
           ref={lastNameRef}
           disabled={isSavingProfile}
+          required
         />
+        <Form.Control.Feedback type="invalid">Last name is required.</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">State</Form.Label>
-        <Form.Select ref={stateRef} defaultValue={profile?.state} disabled={isSavingProfile}>
+        <Form.Select ref={stateRef} defaultValue={profile?.state} disabled={isSavingProfile} required>
           <option value={''}>Select a state</option>
           {states.map((state) => (
             <option key={state.value} value={state.value}>
@@ -140,11 +152,12 @@ export function AccountInformationPage() {
             </option>
           ))}
         </Form.Select>
+        <Form.Control.Feedback type="invalid">State is required.</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
         <Form.Label className="fw-bold">Country</Form.Label>
-        <Form.Select ref={countryRef} defaultValue={profile?.country} disabled={isSavingProfile}>
+        <Form.Select ref={countryRef} defaultValue={profile?.country} disabled={isSavingProfile} required>
           <option value={''}>Select a country</option>
           {countries.map((country) => (
             <option key={country.value} value={country.value}>
@@ -152,6 +165,7 @@ export function AccountInformationPage() {
             </option>
           ))}
         </Form.Select>
+        <Form.Control.Feedback type="invalid">Country is required.</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
@@ -162,13 +176,16 @@ export function AccountInformationPage() {
           defaultValue={profile?.phoneNumber}
           ref={phoneRef}
           disabled={isSavingProfile}
+          required
         />
+        <Form.Control.Feedback type="invalid">Phone number is required.</Form.Control.Feedback>
       </Form.Group>
     </Form>
   );
 
   const handleEditClicked = () => {
     setIsEditingProfile(true);
+    setValidated(false);
 
     // If profile is loaded and form is not initialized
     // populate the form with profile data
@@ -187,7 +204,13 @@ export function AccountInformationPage() {
   };
 
   const handleSaveClicked = () => {
-    saveProfileMutation.mutate();
+    const formIsValid = formRef.current?.checkValidity();
+
+    setValidated(true);
+
+    if (formIsValid) {
+      saveProfileMutation.mutate();
+    }
   };
 
   return (

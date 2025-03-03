@@ -40,7 +40,8 @@ public class WaterConservationApplicationCreateRequestHandler :
         {
             return new WaterConservationApplicationCreateResponse
             {
-                WaterConservationApplicationId = inProgressWcaResponse.InProgressApplicationId.Value
+                WaterConservationApplicationId = inProgressWcaResponse.InProgressApplicationId.Value,
+                WaterConservationApplicationDisplayId = inProgressWcaResponse.InProgressApplicationDisplayId
             };
         }
 

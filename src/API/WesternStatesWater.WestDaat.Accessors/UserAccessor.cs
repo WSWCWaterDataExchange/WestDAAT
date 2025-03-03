@@ -139,6 +139,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return request switch
         {
             UserStoreCreateRequest req => await CreateUser(req),
+            UserProfileUpdateRequest req => await UpdateUserProfile(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -151,6 +152,23 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         var entity = DtoMapper.Map<EFWD.User>(request);
 
         await db.Users.AddAsync(entity);
+        await db.SaveChangesAsync();
+
+        return new UserStoreResponseBase();
+    }
+
+    public async Task<UserStoreResponseBase> UpdateUserProfile(UserProfileUpdateRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var user = await db.Users
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+        NotFoundException.ThrowIfNull(user?.UserProfile, $"User profile not found for id {request.UserId}");
+
+        DtoMapper.Map(request, user!.UserProfile);
+
         await db.SaveChangesAsync();
 
         return new UserStoreResponseBase();
