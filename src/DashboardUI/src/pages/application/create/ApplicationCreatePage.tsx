@@ -325,8 +325,8 @@ interface FormSectionProps {
 function FormSection(props: FormSectionProps) {
   return (
     <div className={props.className}>
-      <div>
-        <span>{props.title}</span>
+      <div className="mb-4">
+        <span className="fs-5">{props.title}</span>
       </div>
 
       <div className="row">{props.children}</div>
