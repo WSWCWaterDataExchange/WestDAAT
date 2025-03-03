@@ -1,2 +1,3 @@
+import { OrganizationStoreResponseBase } from "./OrganizationStoreResponseBase";
 
-export interface OrganizationMemberAddResponse { }
+export interface OrganizationMemberAddResponse extends OrganizationStoreResponseBase { }
