@@ -66,6 +66,7 @@ function WaterRightHeader() {
                     variant="primary"
                     onClick={consumptiveUseBtnClickHandler}
                     disabled={isLoadingDetails || !details?.isConservationApplicationEligible}
+                    className="estimate-consumptive-use-btn"
                   >
                     Estimate Consumptive Use
                   </Button>

@@ -6,4 +6,11 @@
       background-color: $card-header-color-red;
     }
   }
+
+  .estimate-consumptive-use-btn {
+    &:disabled {
+      background-color: $bs-gray-600;
+      border-color: $bs-gray-800;
+    }
+  }
 }
