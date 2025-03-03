@@ -164,11 +164,68 @@ function ApplicationCreatePageForm() {
         </div>
 
         <FormSection title="Canal Company / Irrigation District">
-          <Form.Group></Form.Group>
+          <Form.Group className="col-12 mb-4">
+            <FloatingLabel controlId="canalOrIrrigationEntityName" label="Entity Name">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-6 mb-4">
+            <FloatingLabel controlId="canalOrIrrigationEntityEmail" label="Entity Email">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-6 mb-4">
+            <FloatingLabel controlId="canalOrIrrigationEntityPhoneNumber" label="Entity Phone">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <FormSection title="Water Right Information">
-          <Form.Group></Form.Group>
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="permitNumber" label="Permit #">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="facilityDitchName" label="Facility (Ditch) Name">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="priorityDate" label="Priority Date">
+              <Form.Control placeholder={emptyStringPlaceholder} type="date" />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="certificateNumber" label="Certificate #">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="shareNumber" label="Share #">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          {/* todo: form select */}
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="waterRightState" label="State">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-12 mb-4">
+            <FloatingLabel controlId="waterUseDescription" label="Description of Water Use">
+              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <FormSection title="Estimation Summary">
