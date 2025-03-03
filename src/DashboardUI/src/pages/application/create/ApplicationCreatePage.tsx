@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/esm/Form';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
+import { states } from '../../../config/states';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -95,10 +96,16 @@ function ApplicationCreatePageForm() {
             </FloatingLabel>
           </Form.Group>
 
-          {/* todo: form select */}
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerState" label="State">
-              <Form.Control placeholder={emptyStringPlaceholder} />
+              <Form.Select>
+                <option value={''}>Select a state</option>
+                {states.map((state) => (
+                  <option key={state.value} value={state.value}>
+                    {state.label}
+                  </option>
+                ))}
+              </Form.Select>
             </FloatingLabel>
           </Form.Group>
 
@@ -219,10 +226,16 @@ function ApplicationCreatePageForm() {
             </FloatingLabel>
           </Form.Group>
 
-          {/* todo: form select */}
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="waterRightState" label="State">
-              <Form.Control placeholder={emptyStringPlaceholder} />
+              <Form.Select>
+                <option value={''}>Select a state</option>
+                {states.map((state) => (
+                  <option key={state.value} value={state.value}>
+                    {state.label}
+                  </option>
+                ))}
+              </Form.Select>
             </FloatingLabel>
           </Form.Group>
 
