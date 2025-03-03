@@ -23,14 +23,14 @@ export function TimeSeriesVariableTypeSelect() {
 
   return (
     <div className="mb-3">
-      <label htmlFor="time-series-variable-type">Variable Type</label>
+      <label htmlFor="time-series-variable-type">Time Series Variable Type</label>
       <Select
         id="time-series-variable-type"
         isMulti
         options={options}
         onChange={handleChange}
         closeMenuOnSelect={false}
-        placeholder="Select Variable Type"
+        placeholder="Select Time Series Variable Type"
         value={selectedValues}
       />
     </div>
