@@ -138,6 +138,7 @@ export function AdminOrganizationsUsersPage() {
       <RemoveOrganizationUserModal
         show={showRemoveUserModal}
         userId={removeUserId}
+        organizationId={organizationId}
         closeModal={closeRemoveUserModal}
       ></RemoveOrganizationUserModal>
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />

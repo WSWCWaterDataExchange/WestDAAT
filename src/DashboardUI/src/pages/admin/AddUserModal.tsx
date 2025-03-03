@@ -120,6 +120,7 @@ function AddUserModal(props: AddUserModalProps) {
     });
   };
 
+  // TODO: JN - add an aria-label to this modal
   return (
     <Modal show={props.show} centered onHide={props.onHide} className="add-user-modal">
       <Modal.Header closeButton>
