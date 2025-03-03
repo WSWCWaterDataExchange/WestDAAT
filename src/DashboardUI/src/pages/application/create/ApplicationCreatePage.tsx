@@ -8,11 +8,14 @@ import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
 import {
+  CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
+import { useRef } from 'react';
+import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -40,6 +43,87 @@ export function ApplicationCreatePage() {
 const emptyStringPlaceholder = '';
 function ApplicationCreatePageForm() {
   const { state } = useConservationApplicationContext();
+
+  const landownerFirstNameRef = useRef<HTMLInputElement>(null);
+  const landownerLastNameRef = useRef<HTMLInputElement>(null);
+  const landownerEmailRef = useRef<HTMLInputElement>(null);
+  const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const landownerAddressRef = useRef<HTMLInputElement>(null);
+  const landownerCityRef = useRef<HTMLInputElement>(null);
+  const landownerStateRef = useRef<HTMLSelectElement>(null);
+  const landownerZipCodeRef = useRef<HTMLInputElement>(null);
+  const agentFirstNameRef = useRef<HTMLInputElement>(null);
+  const agentLastNameRef = useRef<HTMLInputElement>(null);
+  const agentEmailRef = useRef<HTMLInputElement>(null);
+  const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const projectLocationRef = useRef<HTMLInputElement>(null);
+  const propertyAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const diversionPointRef = useRef<HTMLInputElement>(null);
+  const diversionPointDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const permitNumberRef = useRef<HTMLInputElement>(null);
+  const facilityDitchNameRef = useRef<HTMLInputElement>(null);
+  const priorityDateRef = useRef<HTMLInputElement>(null);
+  const certificateNumberRef = useRef<HTMLInputElement>(null);
+  const shareNumberRef = useRef<HTMLInputElement>(null);
+  const waterRightStateRef = useRef<HTMLSelectElement>(null);
+  const waterUseDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const estimationSupplementaryDetailsRef = useRef<HTMLInputElement>(null);
+  const conservationPlanFundingRequestDollarAmountRef = useRef<HTMLInputElement>(null);
+  const conservationPlanFundingRequestCompensationRateUnitsRef = useRef<HTMLSelectElement>(null);
+  const conservationPlanDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
+
+  const onFormChanged = () => {
+    const conservationPlanFundingRequestDollarAmount = Number(
+      conservationPlanFundingRequestDollarAmountRef.current?.value,
+    );
+
+    const cpfrcruValueAsEnum = Number(
+      conservationPlanFundingRequestCompensationRateUnitsRef.current?.value,
+    ) as CompensationRateUnits;
+    const conservationPlanFundingRequestCompensationUnits:
+      | Exclude<CompensationRateUnits, CompensationRateUnits.None>
+      | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
+
+    const form: ApplicationSubmissionForm = {
+      landownerFirstName: landownerFirstNameRef.current?.value,
+      landownerLastName: landownerLastNameRef.current?.value,
+      landownerEmail: landownerEmailRef.current?.value,
+      landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
+      landownerAddress: landownerAddressRef.current?.value,
+      landownerCity: landownerCityRef.current?.value,
+      landownerState: landownerStateRef.current?.value,
+      landownerZipCode: landownerZipCodeRef.current?.value,
+      agentFirstName: agentFirstNameRef.current?.value,
+      agentLastName: agentLastNameRef.current?.value,
+      agentEmail: agentEmailRef.current?.value,
+      agentPhoneNumber: agentPhoneNumberRef.current?.value,
+      projectLocation: projectLocationRef.current?.value,
+      propertyAdditionalDetails: propertyAdditionalDetailsRef.current?.value,
+      diversionPoint: diversionPointRef.current?.value,
+      diversionPointDetails: diversionPointDetailsRef.current?.value,
+      canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
+      canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
+      canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
+      permitNumber: permitNumberRef.current?.value,
+      facilityDitchName: facilityDitchNameRef.current?.value,
+      priorityDate: priorityDateRef.current?.value,
+      certificateNumber: certificateNumberRef.current?.value,
+      shareNumber: shareNumberRef.current?.value,
+      waterRightState: waterRightStateRef.current?.value,
+      waterUseDescription: waterUseDescriptionRef.current?.value,
+      estimationSupplementaryDetails: estimationSupplementaryDetailsRef.current?.value,
+      conservationPlanFundingRequestDollarAmount: conservationPlanFundingRequestDollarAmount,
+      conservationPlanFundingRequestCompensationRateUnits: conservationPlanFundingRequestCompensationUnits,
+      conservationPlanDescription: conservationPlanDescriptionRef.current?.value,
+      conservationPlanAdditionalInfo: conservationPlanAdditionalInfoRef.current?.value,
+    };
+
+    console.log('form', form);
+  };
 
   // assumes all polygons are not intersecting
   const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
@@ -74,7 +158,7 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form>
+      <Form onChange={onFormChanged} noValidate>
         <FormSection title="Applicant Information">
           <Form.Group className="col-4 mb-4">
             <FloatingLabel controlId="landownerFirstName" label="Landowner First Name">
