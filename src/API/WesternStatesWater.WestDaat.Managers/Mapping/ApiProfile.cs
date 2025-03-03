@@ -79,6 +79,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.UserProfile, ClientContracts.UserProfile>();
 
             CreateMap<CommonContracts.OrganizationMembership, ClientContracts.OrganizationMembership>();
+
+            CreateMap<ClientContracts.Requests.Admin.UserProfileUpdateRequest, CommonContracts.UserProfileUpdateRequest>();
         }
 
         private void AddOrganizationMappings()
@@ -92,7 +94,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationListItem, ClientContracts.OrganizationListItem>();
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationMemberAddRequest, CommonContracts.OrganizationMemberAddRequest>();
-            
+
             CreateMap<ClientContracts.Requests.Admin.OrganizationMemberRemoveRequest, CommonContracts.OrganizationMemberRemoveRequest>();
 
             CreateMap<ClientContracts.Requests.Admin.OrganizationSummaryListRequest, CommonContracts.OrganizationDetailsListRequest>();
@@ -104,7 +106,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.OrganizationMemberAddResponse, ClientContracts.Responses.Admin.OrganizationMemberAddResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            
+
             CreateMap<CommonContracts.OrganizationMemberRemoveResponse, ClientContracts.Responses.Admin.OrganizationMemberRemoveResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
