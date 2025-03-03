@@ -5,6 +5,7 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import Form from 'react-bootstrap/esm/Form';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
+import Button from 'react-bootstrap/esm/Button';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -229,15 +230,86 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <FormSection title="Estimation Summary">
-          <Form.Group></Form.Group>
+          <div className="row mb-4">
+            <div className="col-3 d-flex flex-column">
+              <div>
+                <span className="fw-bold">Irrigated Field Area</span>
+              </div>
+              <div>
+                <span>x Acres</span>
+              </div>
+            </div>
+
+            <div className="col-3 d-flex flex-column">
+              <div>
+                <span className="fw-bold">Consumptive Use</span>
+              </div>
+              <div>
+                <span>x Acre-Feet</span>
+              </div>
+            </div>
+
+            <div className="col-3 d-flex flex-column">
+              <div>
+                <span className="fw-bold">Compensation Rate</span>
+              </div>
+              <div>
+                <span>$x/Acre-Feet</span>
+              </div>
+            </div>
+
+            <div className="col-3 d-flex flex-column">
+              <div>
+                <span className="fw-bold">Requested Total ($)</span>
+              </div>
+              <div>
+                <span>$x</span>
+              </div>
+            </div>
+          </div>
+
+          <Form.Group className="col-12 mb-4">
+            <FloatingLabel
+              controlId="estimationSupplementaryDetails"
+              label="Do you have supplementary data that can help in reviewing this estimate? If so, provide that here."
+            >
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <FormSection title="Conservation Plan">
-          <Form.Group></Form.Group>
+          <Form.Group className="col-6 mb-4">
+            <FloatingLabel controlId="conservationPlanFundingRequestDollarAmount" label="Funding Request $ Amount">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-6 mb-4">
+            <FloatingLabel controlId="conservationPlanFundingRequestCompensationRateUnits" label="Units">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-12 mb-4">
+            <FloatingLabel controlId="conservationPlanDescription" label="Describe your Conservation Plan.">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-12 mb-4">
+            <FloatingLabel controlId="conservationPlanAdditionalInfo" label="Additional Information">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <FormSection title="Supporting Documents (Optional)">
-          <Form.Group></Form.Group>
+          <div className="col mb-4">
+            <Button variant="outline-primary" onClick={() => alert('Not Implemented.')}>
+              Upload
+            </Button>
+          </div>
         </FormSection>
       </Form>
     </div>
