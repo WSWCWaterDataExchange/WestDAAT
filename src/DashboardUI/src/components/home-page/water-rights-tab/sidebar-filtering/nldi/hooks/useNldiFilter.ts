@@ -61,11 +61,16 @@ export function useNldiFilter() {
 
   useEffect(() => {
     if (!isTimeSeriesFilterActive) {
-      setGeoJsonData(mapSourceNames.nldiGeoJson, emptyGeoJsonData);
-    } else if (nldiGeoJsonData) {
-      setGeoJsonData(mapSourceNames.nldiGeoJson, nldiGeoJsonData);
+      const filteredGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
+        type: 'FeatureCollection',
+        features:
+          nldiGeoJsonData?.features.filter(
+            (feature) => feature.properties?.westdaat_pointdatasource !== 'WadeTimeseries',
+          ) ?? [],
+      };
+      setGeoJsonData(mapSourceNames.nldiGeoJson, filteredGeoJsonData);
     } else {
-      setGeoJsonData(mapSourceNames.nldiGeoJson, emptyGeoJsonData);
+      setGeoJsonData(mapSourceNames.nldiGeoJson, nldiGeoJsonData || emptyGeoJsonData);
     }
   }, [nldiGeoJsonData, setGeoJsonData, isTimeSeriesFilterActive]);
 
