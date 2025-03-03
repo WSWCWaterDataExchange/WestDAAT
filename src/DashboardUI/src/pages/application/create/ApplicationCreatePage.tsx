@@ -4,6 +4,7 @@ import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Form from 'react-bootstrap/esm/Form';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -28,6 +29,7 @@ export function ApplicationCreatePage() {
   );
 }
 
+const emptyStringPlaceholder = '';
 function ApplicationCreatePageForm() {
   return (
     <div className="flex-grow-1 overflow-y-auto p-4">
@@ -52,7 +54,48 @@ function ApplicationCreatePageForm() {
 
       <Form>
         <FormSection title="Applicant Information">
-          <Form.Group>todo</Form.Group>
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="landownerName" label="Landowner Name">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="emailAddress" label="Email Address">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="phoneNumber" label="Phone">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="address" label="Address">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="city" label="City">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          {/* todo: form select */}
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="state" label="State">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className="col-4 mb-4">
+            <FloatingLabel controlId="zipCode" label="Zip Code">
+              <Form.Control placeholder={emptyStringPlaceholder} />
+            </FloatingLabel>
+          </Form.Group>
         </FormSection>
 
         <FormSection title="Agent Information">
@@ -106,7 +149,7 @@ function FormSection(props: FormSectionProps) {
         <span>{props.title}</span>
       </div>
 
-      <div>{props.children}</div>
+      <div className="row">{props.children}</div>
     </div>
   );
 }
