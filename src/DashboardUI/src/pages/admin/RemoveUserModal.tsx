@@ -33,26 +33,17 @@ export function RemoveOrganizationUserModal(props: RemoveOrganizationUserModalPr
       queryClient.setQueryData(['organizationUsers', props.organizationId], { users: updatedUsers });
       props.closeModal();
     },
-    onError: (error: { status?: number }) => {
-      if (error?.status === 400) {
-        toast.error('You cannot remove yourself from an organization', {
-          position: 'top-center',
-          theme: 'colored',
-          autoClose: 3000,
-        });
-      } else {
-        toast.error('Error removing user from organization', {
-          position: 'top-center',
-          theme: 'colored',
-          autoClose: 3000,
-        });
-      }
+    onError: () => {
+      toast.error('Error removing user from organization', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
     },
   });
 
   const handleRemoveUserClick = () => {
     if (!props.organizationId || !props.userId) {
-      // TODO: JN - error toast if no organizationId or userId? shouldn't ever be possible
       return;
     }
 
