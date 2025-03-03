@@ -399,11 +399,11 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<ForbiddenError>();
+        response.Error.Should().BeOfType<ValidationError>();
     }
 
     [TestMethod]
-    public async Task Store_OrganizationMemberAddRequest_AddingMemeberToSecondOrganization_ShouldNotAllow()
+    public async Task Store_OrganizationMemberAddRequest_AddingMemberToSecondOrganization_ShouldNotAllow()
     {
         // Arrange
         var organizationOne = new OrganizationFaker().Generate();
@@ -435,5 +435,184 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ConflictError>();
+    }
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberRemoveRequest_ShouldNotAllowRemovingSelf()
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var userToRemoveProfile = new UserProfileFaker().Generate();
+        var userToRemove = new UserFaker(userToRemoveProfile).Generate();
+        var userToRemoveOrg = new UserOrganizationFaker(userToRemove, organization).Generate();
+        var userToRemoveOrgRole = new UserOrganizationRoleFaker(userToRemoveOrg).Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(userToRemove);
+        await _dbContext.UserProfiles.AddAsync(userToRemoveProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToRemoveOrg);
+        await _dbContext.UserOrganizationRoles.AddAsync(userToRemoveOrgRole);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = userToRemove.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.OrganizationAdmin]
+                }
+            ]
+        });
+
+        var request = new OrganizationMemberRemoveRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToRemove.Id
+        };
+        
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+    }
+
+    [DataTestMethod]
+    [DataRow(Roles.Member, true, DisplayName = "Members should not be allowed to remove other users")]
+    [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Technical Reviewers should not be allowed to remove other users")]
+    [DataRow(Roles.OrganizationAdmin, false, DisplayName = "Organization Admins should not be allowed to remove users that belong to a different organization")]
+    public async Task Store_OrganizationMemberRemoveRequest_InsufficientPermissions_ShouldNotAllow(string role, bool isPartOfSameOrg)
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var userToRemoveProfile = new UserProfileFaker().Generate();
+        var userToRemove = new UserFaker(userToRemoveProfile).Generate();
+        var userToRemoveOrg = new UserOrganizationFaker(userToRemove, organization).Generate();
+        var userToRemoveOrgRole = new UserOrganizationRoleFaker(userToRemoveOrg).Generate();
+        var requestingUser = new UserFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.Users.AddRangeAsync(userToRemove, requestingUser);
+        await _dbContext.UserProfiles.AddAsync(userToRemoveProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToRemoveOrg);
+        await _dbContext.UserOrganizationRoles.AddAsync(userToRemoveOrgRole);
+        await _dbContext.SaveChangesAsync();
+        
+        UseUserContext(new UserContext
+        {
+            UserId = requestingUser.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = isPartOfSameOrg ? organization.Id : diffOrganization.Id,
+                    RoleNames = [role]
+                }
+            ]
+        });
+
+        var request = new OrganizationMemberRemoveRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToRemove.Id
+        };
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+    }
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberRemoveRequest_InsufficientRequestData_ShouldNotAllow()
+    {
+        // Arrange
+        var request = new OrganizationMemberRemoveRequest
+        {
+            OrganizationId = new Guid(),
+            UserId = new Guid()
+        };
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+    }
+    
+    [DataTestMethod]
+    [DataRow(Roles.OrganizationAdmin, DisplayName="Organization Admins should be allowed to remove users from their organization")]
+    [DataRow(Roles.GlobalAdmin, DisplayName="Global Admins should be allowed to remove users from any organization")]
+    public async Task Store_OrganizationMemberRemoveRequest_Success(string role)
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var userToRemoveProfile = new UserProfileFaker().Generate();
+        var userToRemove = new UserFaker(userToRemoveProfile).Generate();
+        var userToRemoveOrg = new UserOrganizationFaker(userToRemove, organization).Generate();
+        var userToRemoveOrgRole = new UserOrganizationRoleFaker(userToRemoveOrg).Generate();
+        var requestingUser = new UserFaker().Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddRangeAsync(userToRemove, requestingUser);
+        await _dbContext.UserProfiles.AddAsync(userToRemoveProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToRemoveOrg);
+        await _dbContext.UserOrganizationRoles.AddAsync(userToRemoveOrgRole);
+        await _dbContext.SaveChangesAsync();
+
+        if (role == Roles.GlobalAdmin)
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = requestingUser.Id,
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = []
+            });
+        }
+        else
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = requestingUser.Id,
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [role]
+                    }
+                ]
+            });
+        }
+
+        var request = new OrganizationMemberRemoveRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToRemove.Id
+        };
+        
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberRemoveRequest, OrganizationMemberRemoveResponse>(request);
+        
+        // Assert
+        var userOrg = await _dbContext.UserOrganizations
+            .Include(uo => uo.UserOrganizationRoles)
+            .FirstOrDefaultAsync(uo => uo.UserId == userToRemove.Id && uo.OrganizationId == organization.Id);
+        
+        userOrg.Should().BeNull();
+        response.Error.Should().BeNull();
+        response.Should().BeOfType(typeof(OrganizationMemberRemoveResponse));
+        response.Should().BeEquivalentTo(new OrganizationMemberRemoveResponse());
     }
 }
