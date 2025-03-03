@@ -1,4 +1,8 @@
 # WaDE
+[![Deploy Prod](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/manual-deploy-prod.yml/badge.svg?branch=master)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/manual-deploy-prod.yml)
+<br />
+[![Deploy Staging](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-master.yml/badge.svg?branch=master)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-master.yml)
+<br />
 [![Deploy QA](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml/badge.svg)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml)
 
 ## Getting Started
