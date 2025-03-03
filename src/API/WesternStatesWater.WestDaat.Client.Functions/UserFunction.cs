@@ -48,10 +48,25 @@ public class UserFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Profile")]
         HttpRequestData req)
     {
-        var requestBase = await ParseRequestBody<RequestBase>(req);
+        var requestBase = await ParseRequestBody<UserLoadRequestBase>(req);
         ResponseBase result = requestBase switch
         {
             UserProfileRequest request => await _userManager.Load<UserProfileRequest, UserProfileResponse>(request),
+            _ => throw new NotImplementedException($"Request type {requestBase.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(UpdateUserProfile))]
+    [OpenApiOperation(nameof(UpdateUserProfile))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(UserStoreResponseBase))]
+    public async Task<HttpResponseData> UpdateUserProfile(
+        [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/Profile")]
+        HttpRequestData req)
+    {
+        var requestBase = await ParseRequestBody<UserStoreRequestBase>(req);
+        ResponseBase result = requestBase switch
+        {
             UserProfileUpdateRequest request => await _userManager.Store<UserProfileUpdateRequest, UserStoreResponseBase>(request),
             _ => throw new NotImplementedException($"Request type {requestBase.GetType()} is not implemented.")
         };
