@@ -1,4 +1,5 @@
 # WaDE
+[![Deploy QA](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml/badge.svg)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml)
 
 ## Getting Started
 
