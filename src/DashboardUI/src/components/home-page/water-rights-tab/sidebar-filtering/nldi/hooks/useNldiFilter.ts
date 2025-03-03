@@ -8,6 +8,7 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { useMapContext } from '../../../../../../contexts/MapProvider';
 import { mapLayerNames, mapSourceNames } from '../../../../../../config/maps';
 import { useDebounce } from '@react-hook/debounce';
+import { useTimeSeriesContext } from '../../TimeSeriesProvider';
 
 const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   type: 'FeatureCollection',
@@ -43,6 +44,7 @@ export function useNldiFilter() {
     setFilters,
     setNldiIds,
   } = useWaterRightsContext();
+  const { isTimeSeriesFilterActive } = useTimeSeriesContext();
 
   const [debouncedCoords, setDebouncedCoords] = useDebounce(
     [nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null],
@@ -58,12 +60,14 @@ export function useNldiFilter() {
   const { data: nldiGeoJsonData } = nldiFeaturesQuery;
 
   useEffect(() => {
-    if (nldiGeoJsonData) {
+    if (!isTimeSeriesFilterActive) {
+      setGeoJsonData(mapSourceNames.nldiGeoJson, emptyGeoJsonData);
+    } else if (nldiGeoJsonData) {
       setGeoJsonData(mapSourceNames.nldiGeoJson, nldiGeoJsonData);
     } else {
       setGeoJsonData(mapSourceNames.nldiGeoJson, emptyGeoJsonData);
     }
-  }, [nldiGeoJsonData, setGeoJsonData]);
+  }, [nldiGeoJsonData, setGeoJsonData, isTimeSeriesFilterActive]);
 
   const nldiWadeSiteIds = useMemo(() => {
     if (!isNldiFilterActive || !nldiGeoJsonData || !nldiFilterData) {
