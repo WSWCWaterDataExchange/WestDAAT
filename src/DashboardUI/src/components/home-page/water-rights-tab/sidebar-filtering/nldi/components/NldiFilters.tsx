@@ -8,9 +8,16 @@ import Icon from '@mdi/react';
 import './nldi-filters.scss';
 import { defaultNldiFilters } from '../../WaterRightsProvider';
 import { useNldiFilter } from '../hooks/useNldiFilter';
+import { useWaterRightsContext } from '../../WaterRightsProvider';
+import { useTimeSeriesContext } from '../../TimeSeriesProvider';
+import { InformationTooltip } from '../../../../../InfomationTooltip';
 
 export function NldiFilters() {
   const { nldiFilterData, setDataPoints, setDirections, setLatLong } = useNldiFilter();
+  const {
+    filters: { isWaterRightsFilterActive },
+  } = useWaterRightsContext();
+  const { isTimeSeriesFilterActive } = useTimeSeriesContext();
 
   const nldiFilters = useMemo(() => {
     return nldiFilterData ?? defaultNldiFilters;
@@ -147,25 +154,38 @@ export function NldiFilters() {
       </div>
       <div className="mb-3">
         <label className="form-label fw-bolder">Scope of Query</label>
-        <Form.Group>
-          <Form.Check
-            className="toggle"
-            type="switch"
-            id="nldiWadeRights"
-            checked={(nldiFilters.dataPoints & DataPoints.WadeRights) > 0}
-            onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeRights)}
-            label="WaDE Rights"
-          />
+        <Form.Group className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center flex-grow-1">
+            <Form.Check
+              className="toggle m-0 flex-grow-1"
+              type="switch"
+              id="nldiWadeRights"
+              checked={isWaterRightsFilterActive && (nldiFilters.dataPoints & DataPoints.WadeRights) > 0}
+              disabled={!isWaterRightsFilterActive}
+              onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeRights)}
+              label="WaDE Rights"
+            />
+          </div>
+          {!isWaterRightsFilterActive && (
+            <InformationTooltip tooltipContents={<span>Main Water Rights filter must be active</span>} />
+          )}
         </Form.Group>
-        <Form.Group>
-          <Form.Check
-            className="toggle"
-            type="switch"
-            id="nldiWadeTimeseries"
-            checked={(nldiFilters.dataPoints & DataPoints.WadeTimeseries) > 0}
-            onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeTimeseries)}
-            label="WaDE Timeseries"
-          />
+
+        <Form.Group className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center flex-grow-1">
+            <Form.Check
+              className="toggle m-0 flex-grow-1"
+              type="switch"
+              id="nldiWadeTimeseries"
+              checked={isTimeSeriesFilterActive && (nldiFilters.dataPoints & DataPoints.WadeTimeseries) > 0}
+              disabled={!isTimeSeriesFilterActive}
+              onChange={(e) => handleDataPointsChanged(e, DataPoints.WadeTimeseries)}
+              label="WaDE Timeseries"
+            />
+          </div>
+          {!isTimeSeriesFilterActive && (
+            <InformationTooltip tooltipContents={<span>Main Time Series filter must be active</span>} />
+          )}
         </Form.Group>
 
         <Form.Group>
