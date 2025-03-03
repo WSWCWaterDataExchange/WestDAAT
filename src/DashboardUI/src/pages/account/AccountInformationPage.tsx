@@ -185,6 +185,7 @@ export function AccountInformationPage() {
 
   const handleEditClicked = () => {
     setIsEditingProfile(true);
+    setValidated(false);
 
     // If profile is loaded and form is not initialized
     // populate the form with profile data
