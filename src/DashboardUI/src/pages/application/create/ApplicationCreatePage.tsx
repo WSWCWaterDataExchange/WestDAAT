@@ -79,26 +79,26 @@ function ApplicationCreatePageForm() {
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="address" label="Address">
+            <FloatingLabel controlId="landownerAddress" label="Address">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="city" label="City">
+            <FloatingLabel controlId="landownerCity" label="City">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
 
           {/* todo: form select */}
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="state" label="State">
+            <FloatingLabel controlId="landownerState" label="State">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
 
           <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="zipCode" label="Zip Code">
+            <FloatingLabel controlId="landownerZipCode" label="Zip Code">
               <Form.Control placeholder={emptyStringPlaceholder} />
             </FloatingLabel>
           </Form.Group>
@@ -130,12 +130,34 @@ function ApplicationCreatePageForm() {
           </Form.Group>
         </FormSection>
 
-        <div className="d-flex justify-content-between">
-          <FormSection title="Property & Land Area Information">
-            <Form.Group></Form.Group>
+        <div className="row">
+          <FormSection title="Property & Land Area Information" className="col-6">
+            <Form.Group className="col-12 mb-4">
+              <FloatingLabel controlId="projectLocation" label="Project Location">
+                <Form.Control placeholder={emptyStringPlaceholder} />
+              </FloatingLabel>
+            </Form.Group>
+
+            <Form.Group className="col-12 mb-4">
+              <FloatingLabel controlId="propertyAdditionalDetails" label="Additional Details">
+                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} />
+              </FloatingLabel>
+            </Form.Group>
+
+            <Form.Group className="col-12 mb-4">
+              <FloatingLabel controlId="diversionPoint" label="Diversion Point">
+                <Form.Control placeholder={emptyStringPlaceholder} />
+              </FloatingLabel>
+            </Form.Group>
+
+            <Form.Group className="col-12 mb-4">
+              <FloatingLabel controlId="diversionPointDetails" label="Diversion Point Details">
+                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} />
+              </FloatingLabel>
+            </Form.Group>
           </FormSection>
 
-          <div>
+          <div className="col-6">
             Static map here
             <NotImplementedPlaceholder />
           </div>
@@ -167,12 +189,13 @@ function ApplicationCreatePageForm() {
 
 interface FormSectionProps {
   title: string;
+  className?: string;
   children: React.ReactNode | undefined;
 }
 
 function FormSection(props: FormSectionProps) {
   return (
-    <div>
+    <div className={props.className}>
       <div>
         <span>{props.title}</span>
       </div>
