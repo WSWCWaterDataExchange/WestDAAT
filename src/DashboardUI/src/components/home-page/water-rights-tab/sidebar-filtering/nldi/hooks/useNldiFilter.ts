@@ -137,7 +137,13 @@ export function useNldiFilter() {
     setLayerFilters([
       {
         layer: mapLayerNames.nldiUsgsPointsLayer,
-        filter: ['all', ['==', ['get', 'westdaat_featuredatatype'], 'Point'], pointsTypeFilters, directionFilters],
+        filter: [
+          'all',
+          ['==', ['get', 'westdaat_featuredatatype'], 'Point'],
+          ['!=', ['get', 'westdaat_pointdatasource'], 'WadeWaterRights'],
+          pointsTypeFilters,
+          directionFilters,
+        ],
       },
       {
         layer: mapLayerNames.nldiFlowlinesLayer,
