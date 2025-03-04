@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import MapProvider from '../../../contexts/MapProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Form from 'react-bootstrap/esm/Form';
@@ -22,17 +21,15 @@ export function ApplicationCreatePage() {
   };
 
   return (
-    <MapProvider>
-      <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
-        <ApplicationNavbar
-          navigateBack={navigateToEstimationToolPage}
-          backButtonText="Back to Estimator"
-          centerText="Water Conservation Estimation Tool"
-        />
+    <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
+      <ApplicationNavbar
+        navigateBack={navigateToEstimationToolPage}
+        backButtonText="Back to Estimator"
+        centerText="Water Conservation Estimation Tool"
+      />
 
-        <ApplicationCreatePageForm />
-      </div>
-    </MapProvider>
+      <ApplicationCreatePageForm />
+    </div>
   );
 }
 
