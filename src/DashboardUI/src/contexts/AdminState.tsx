@@ -26,6 +26,7 @@ interface ProfileFormFields {
   state: string | null;
   country: string | null;
   phone: string | null;
+  affiliatedOrganization: string | null;
 }
 
 interface ProfileEditStartedAction {
