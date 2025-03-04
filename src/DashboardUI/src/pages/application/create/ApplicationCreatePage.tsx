@@ -51,7 +51,7 @@ function ApplicationCreatePageForm() {
   );
 
   return (
-    <div className="flex-grow-1 overflow-y-auto p-4">
+    <div className="container">
       <div className="mb-3">
         <span className="fs-4 fw-bold">New Application</span>
       </div>
