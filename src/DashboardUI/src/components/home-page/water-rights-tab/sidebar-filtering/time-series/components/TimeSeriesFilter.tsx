@@ -8,9 +8,9 @@ import TimeSeriesWaterSourceTypeSelect from './TimeSeriesWaterSourceTypeSelect';
 export function TimeSeriesFilter() {
   return (
     <div className="position-relative flex-grow-1">
+      <TimeSeriesVariableTypeSelect />
       <TimeSeriesSiteTypeSelect />
       <TimeSeriesPrimaryUseCategorySelect />
-      <TimeSeriesVariableTypeSelect />
       <TimeSeriesWaterSourceTypeSelect />
       <TimeSeriesDateRange />
     </div>

@@ -18,7 +18,7 @@ function Layout() {
     hostData: { siteLocationsQuery },
   } = useWaterRightDetailsContext();
 
-  useSiteDigestMapPopup('site');
+  useSiteDigestMapPopup();
   useMapLegend();
 
   if (siteLocationsQuery.isLoading || !siteLocationsQuery.data) return null;

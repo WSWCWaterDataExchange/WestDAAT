@@ -193,6 +193,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SiteName, opt => opt.MapFrom(src => src.SiteName))
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(src => src.SiteTypeCv))
                 .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Any()))
+                .ForMember(dest => dest.TimeSeriesVariableTypes, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Select(ts => ts.VariableSpecific.VariableCv).Distinct()))
                 .ForMember(dest => dest.WaterRightsDigests,
                     opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Select(ab => ab.AllocationAmount)));
 
@@ -241,6 +242,17 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationId))
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserOrganizationRoles.Single().Role));
+
+            CreateMap<UserProfileUpdateRequest, EFWD.User>()
+                .ForMember(dest => dest.UserProfile, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Email, opt => opt.Ignore())
+                .ForMember(dest => dest.ExternalAuthId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UserRoles, opt => opt.Ignore())
+                .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
+
+            CreateMap<UserProfileUpdateRequest, EFWD.UserProfile>(MemberList.Source);
         }
 
         private void AddOrganizationMappings()
