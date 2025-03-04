@@ -153,7 +153,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Include(uo => uo.UserOrganizationRoles)
                 .FirstOrDefaultAsync(uo => uo.UserId == request.UserId && uo.OrganizationId == request.OrganizationId);
 
-            var userOrganizationRole = userOrganization.UserOrganizationRoles.First();
+            var userOrganizationRole = userOrganization.UserOrganizationRoles.Single();
 
             userOrganizationRole.Role = request.Role;
 

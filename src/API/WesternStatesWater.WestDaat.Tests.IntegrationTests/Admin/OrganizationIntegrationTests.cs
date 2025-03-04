@@ -697,29 +697,53 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }  
     
     [DataTestMethod]
-    public async Task Store_OrganizationMemberUpdateRequest_InsufficientRequestData_ShouldNotAllow()
+    public async Task Store_OrganizationMemberUpdateRequest_AlreadyHasMultipleOrganizationRoles_ShouldThrowError()
     {
         // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var userToEditProfile = new UserProfileFaker().Generate();
+        var userToEdit = new UserFaker(userToEditProfile).Generate();
+        var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
+        var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
+            .RuleFor(x => x.Role, () => Roles.Member).Generate();
+        var anotherOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
+            .RuleFor(x => x.Role, () => Roles.TechnicalReviewer).Generate();
+        var requestingUser = new UserFaker().Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddRangeAsync(userToEdit, requestingUser);
+        await _dbContext.UserProfiles.AddAsync(userToEditProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToEditOrg);
+        await _dbContext.UserOrganizationRoles.AddRangeAsync(userToEditOrgRole, anotherOrgRole);
+        await _dbContext.SaveChangesAsync();
+
         UseUserContext(new UserContext
         {
-            UserId = Guid.NewGuid(),
+            UserId = requestingUser.Id,
             Roles = [Roles.GlobalAdmin],
             OrganizationRoles = []
         });
-
+    
         var request = new OrganizationMemberUpdateRequest
         {
-            OrganizationId = new Guid(),
-            UserId = new Guid(),
-            Role = ""
+            OrganizationId = organization.Id,
+            UserId = userToEdit.Id,
+            Role = Roles.OrganizationAdmin
         };
         
         // Act
         var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
-
+    
         // Assert
+        var userOrg = await _dbContext.UserOrganizations
+            .AsNoTracking()
+            .Include(uo => uo.UserOrganizationRoles)
+            .FirstOrDefaultAsync(uo => uo.UserId == userToEdit.Id && uo.OrganizationId == organization.Id);
+        userOrg.UserOrganizationRoles.Should().HaveCount(2);
+        userOrg.UserOrganizationRoles.Select(x => x.Role).Should().NotContain(Roles.OrganizationAdmin);
+        
         response.Error.Should().NotBeNull();
-        response.Error.Should().BeOfType<ValidationError>();
+        response.Error.Should().BeOfType<InternalError>();
     }
     
     [DataTestMethod]
