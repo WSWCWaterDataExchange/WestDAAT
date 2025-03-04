@@ -99,6 +99,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             {
                 OrganizationMemberAddRequest req => await AddOrganizationMember(req),
                 OrganizationMemberRemoveRequest req => await RemoveOrganizationMember(req),
+                OrganizationMemberUpdateRequest req => await UpdateOrganizationMember(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
             };
@@ -142,6 +143,23 @@ namespace WesternStatesWater.WestDaat.Accessors
             await db.SaveChangesAsync();
 
             return new OrganizationMemberRemoveResponse();
+        }
+        
+        private async Task<OrganizationMemberUpdateResponse> UpdateOrganizationMember(OrganizationMemberUpdateRequest request)
+        {
+            await using var db = _westDaatDatabaseContextFactory.Create();
+
+            var userOrganization = await db.UserOrganizations
+                .Include(uo => uo.UserOrganizationRoles)
+                .FirstOrDefaultAsync(uo => uo.UserId == request.UserId && uo.OrganizationId == request.OrganizationId);
+
+            var userOrganizationRole = userOrganization.UserOrganizationRoles.First();
+
+            userOrganizationRole.Role = request.Role;
+
+            await db.SaveChangesAsync();
+
+            return new OrganizationMemberUpdateResponse();
         }
     }
 }
