@@ -615,4 +615,86 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Should().BeOfType(typeof(OrganizationMemberRemoveResponse));
         response.Should().BeEquivalentTo(new OrganizationMemberRemoveResponse());
     }
+
+    
+    
+    [TestMethod]
+    public async Task Store_OrganizationMemberUpdateRequest_ShouldNotAllowEditingSelf()
+    {
+        // Arrange
+        // request - user id is same as the requesting user id
+        // request - org id is any guid
+        // request - user roles = global admin
+        
+        // Act
+        // call OrganizationManager.Store
+        
+        // Assert
+        // should have Error
+        // should be ValidationError type
+    }  
+    
+    [DataTestMethod]
+    [DataRow(Roles.Member, true, DisplayName = "Members should not be allowed to edit other users")]
+    [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Technical Reviewers should not be allowed to edit other users")]
+    [DataRow(Roles.OrganizationAdmin, false, DisplayName = "Organization Admins should not be allowed to edit users that belong to a different organization")]
+    public async Task Store_OrganizationMemberUpdateRequest_InsufficientPermissions_ShouldNotAllow(string role, bool isPartOfSameOrg)
+    {
+        // Arrange
+        // organization
+        // user to edit - User
+        // user to edit - UserProfile
+        // user to edit - UserOrganization
+        // user to edit - UserOrganizationRole (role = Member)
+        // request - user id is different
+        // request - org id matches organization.id
+        // request - user organization role = role from parameters, different org id if isPartOfSameOrg is false
+
+        // Act
+        // call OrganizationManager.Store
+        
+        // Assert
+        // should have Error
+        // should be ForbiddenError type
+    }  
+    
+    [DataTestMethod]
+    public async Task Store_OrganizationMemberUpdateRequest_InsufficientRequestData_ShouldNotAllow()
+    {
+        // Arrange
+        // request - no user id or org id or role
+        // request - user roles = global admin
+        
+        // Act
+        // call OrganizationManager.Store
+        
+        // Assert
+        // should have Error
+        // should be ValidationError type
+    }
+    
+    [DataTestMethod]
+    [DataRow(Roles.OrganizationAdmin, DisplayName="Organization Admins should be allowed to edit users that belong to their organization")]
+    [DataRow(Roles.GlobalAdmin, DisplayName="Global Admins should be allowed to edit users that belong to any organization")]
+    public async Task Store_OrganizationMemberUpdateRequest_Success()
+    {
+        // Arrange
+        // organization
+        // user to edit - User
+        // user to edit - UserProfile
+        // user to edit - UserOrganization
+        // user to edit - UserOrganizationRole (role = Member)
+        // request - user id is different
+        // request - org id matches organization.id
+        // request - role = TechnicalReviewer
+        // request - user organization role = role from parameters, org id = organization.id
+
+        // Act
+        // call OrganizationManager.Store
+        
+        // Assert
+        // Error should be null
+        // response object should be empty {}
+        // check that role on database is now Technical Reviewer and not Member        
+    }
 }
