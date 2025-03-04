@@ -305,6 +305,70 @@ public class CalculationEngineTests : EngineTestBase
                 ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
                 break;
         }
+    }
 
+    [TestMethod]
+    public async Task Calculate_EstimateConservationPayment_MultiplePolygons_MultipleETs_Success()
+    {
+        var firstCorner = "-96.70537000 40.82014318";
+        var memorialStadium = "POLYGON ((" +
+            firstCorner + ", " +
+            "-96.70537429129318 40.82112749428667, " +
+            "-96.70595069212823 40.82113037830751, " +
+            "-96.70595263797125 40.82014685607426, " +
+            firstCorner +
+            "))";
+
+        var zeroToOneSquare = "POLYGON ((0 0, 0.1 0, 0.1 0.1, 0 0.1, 0 0))";
+
+        var compensationRateDollars = 350;
+
+        var request = new EstimateConservationPaymentRequest
+        {
+            CompensationRateDollars = compensationRateDollars,
+            CompensationRateUnits = CompensationRateUnits.AcreFeet,
+            DataCollections = [
+                new()
+                {
+                    PolygonWkt = memorialStadium,
+                    AverageYearlyEtInInches = 12,
+                    Datapoints = []
+                },
+                new()
+                {
+                    PolygonWkt = zeroToOneSquare,
+                    AverageYearlyEtInInches = 12,
+                    Datapoints = []
+                },
+                new()
+                {
+                    PolygonWkt = memorialStadium,
+                    AverageYearlyEtInInches = 120,
+                    Datapoints = []
+                },
+                new()
+                {
+                    PolygonWkt = zeroToOneSquare,
+                    AverageYearlyEtInInches = 120,
+                    Datapoints = []
+                },
+            ]
+        };
+
+        // Act
+        var response = (EstimateConservationPaymentResponse)await _calculationEngine.Calculate(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        // collection 1: 1ft ET * 1.32 acres * $350 = $462
+        // collection 2: 1ft ET * 30621.33 acres * $350 = $10717465.5
+        // collection 3: 10ft ET * 1.32 acres * $350 = $4620
+        // collection 4: 10ft ET * 30621.33 acres * $350 = $107174655
+        // sum: 462 + 10717465.5 + 4620 + 107174655 = 117897202.5
+
+        var expectedCompensation = 117897202.5;
+        var onePercentMarginOfError = expectedCompensation * 0.01;
+        ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
     }
 }
