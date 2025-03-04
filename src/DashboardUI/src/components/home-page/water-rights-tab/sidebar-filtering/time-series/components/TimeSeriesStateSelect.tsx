@@ -25,7 +25,7 @@ export function TimeSeriesStateSelect() {
     <div className="mb-3">
       <label htmlFor="time-series-state-filter">State</label>
       <Select
-        id="time-series-state-filter"
+        inputId="time-series-state-filter"
         isMulti
         options={options}
         onChange={handleStateChange}

@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 import { useDashboardFilters } from '../../../../hooks/queries';
 
-interface TimeSeriesContextValue {
+export interface TimeSeriesContextValue {
   timeSeries: string[];
   isTimeSeriesFilterActive: boolean;
   siteTypes: string[];
@@ -28,7 +28,7 @@ interface TimeSeriesContextValue {
   setStates: (states: string[] | undefined) => void;
 }
 
-const TimeSeriesContext = createContext<TimeSeriesContextValue>({
+export const TimeSeriesContext = createContext<TimeSeriesContextValue>({
   timeSeries: [],
   isTimeSeriesFilterActive: false,
   siteTypes: [],
