@@ -3,21 +3,25 @@ import Icon from '@mdi/react';
 import Nav from 'react-bootstrap/esm/Nav';
 import Navbar from 'react-bootstrap/esm/Navbar';
 
-interface EstimationToolNavbarProps {
-  navigateToWaterRightLandingPage: () => void;
+import './application-navbar.scss';
+
+interface ApplicationNavbarProps {
+  navigateBack: () => void;
+  backButtonText: string;
+  centerText: string;
 }
 
-export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
+export function ApplicationNavbar(props: ApplicationNavbarProps) {
   return (
-    <Navbar className="estimate-tool-navbar p-0">
+    <Navbar className="application-navbar p-0">
       <div className="container-fluid">
         <Nav>
-          <Nav.Item onClick={props.navigateToWaterRightLandingPage}>
+          <Nav.Item onClick={props.navigateBack}>
             {/* render as <button> instead of <a role="button"> */}
             <Nav.Link as="button" className="text-dark">
               <div className="d-flex align-items-center gap-2">
                 <Icon path={mdiArrowLeft} size="1em" />
-                <span>Back to Water Right Landing Page</span>
+                <span>{props.backButtonText}</span>
               </div>
             </Nav.Link>
           </Nav.Item>
@@ -25,8 +29,8 @@ export function EstimationToolNavbar(props: EstimationToolNavbarProps) {
 
         <Navbar.Brand>
           <div className="d-flex align-items-center gap-2">
-            <Icon path={mdiWater} size="1.25em" className="estimate-tool-water-icon" />
-            <span className="fw-bold">Water Conservation Estimation Tool</span>
+            <Icon path={mdiWater} size="1.25em" className="application-water-icon" />
+            <span className="fw-bold">{props.centerText}</span>
           </div>
         </Navbar.Brand>
 

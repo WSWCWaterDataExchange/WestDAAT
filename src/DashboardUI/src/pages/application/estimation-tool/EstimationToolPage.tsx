@@ -3,7 +3,6 @@ import { EstimationToolSidebar } from './EstimationToolSidebar';
 import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
 import MapProvider from '../../../contexts/MapProvider';
-import { EstimationToolNavbar } from './EstimationToolNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
 import {
@@ -16,6 +15,7 @@ import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
 import { toast } from 'react-toastify';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 import './estimation-tool-page.scss';
 
@@ -95,7 +95,11 @@ export function EstimationToolPage() {
   return (
     <MapProvider>
       <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
-        <EstimationToolNavbar navigateToWaterRightLandingPage={navigateToWaterRightLandingPage} />
+        <ApplicationNavbar
+          navigateBack={navigateToWaterRightLandingPage}
+          backButtonText="Back to Water Right Landing Page"
+          centerText="Water Conservation Estimation Tool"
+        />
 
         <div className="flex-grow-1 overflow-y-auto">
           <div className="h-100 d-flex overflow-y-auto align-items-stretch">
