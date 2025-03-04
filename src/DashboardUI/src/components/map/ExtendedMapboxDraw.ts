@@ -11,7 +11,7 @@ export type DrawBarButton = {
   title: string;
   action: () => void;
   classes?: string[];
-  content: HTMLElement;
+  buttonIconPath: string;
 };
 
 export type ConstructorProps = {
@@ -49,7 +49,8 @@ export class ExtendedMapboxDraw extends MapboxDraw {
           elButton.classList.add(buttonClass);
         });
       }
-      elButton.appendChild(button.content);
+      const buttonContent = createSvgElementWithIconPath(button.buttonIconPath);
+      elButton.appendChild(buttonContent);
       elButton.addEventListener(button.on, button.action);
 
       this._container?.prepend(elButton, this._container.firstChild!);
@@ -57,3 +58,20 @@ export class ExtendedMapboxDraw extends MapboxDraw {
     return this._container;
   }
 }
+
+const createSvgElementWithIconPath = (icon: string) => {
+  const xmlns = 'http://www.w3.org/2000/svg';
+
+  const path = document.createElementNS(xmlns, 'path');
+  path.setAttributeNS(null, 'd', icon);
+  path.setAttributeNS(null, 'style', 'fill: #000000');
+  const svg = document.createElementNS(xmlns, 'svg');
+
+  svg.setAttributeNS(null, 'viewbox', '0 0 24 24');
+  svg.setAttributeNS(null, 'style', 'width: 25px; height: 25px;');
+  svg.appendChild(path);
+
+  const container = document.createElement('span');
+  container.appendChild(svg);
+  return container;
+};
