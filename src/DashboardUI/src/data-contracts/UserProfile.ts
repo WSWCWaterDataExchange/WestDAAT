@@ -10,5 +10,6 @@ export interface UserProfile {
   state: string;
   country: string;
   phoneNumber: string;
+  affiliatedOrganization: string | null;
   organizationMemberships: OrganizationMembership[];
 }
