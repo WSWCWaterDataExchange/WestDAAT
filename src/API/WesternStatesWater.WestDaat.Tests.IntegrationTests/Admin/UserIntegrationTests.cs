@@ -590,6 +590,7 @@ public class UserIntegrationTests : IntegrationTestBase
                 State = "NE",
                 Country = "Canada",
                 PhoneNumber = "123-456-7890",
+                AffiliatedOrganization = "DPL"
             }
         );
 
@@ -603,6 +604,7 @@ public class UserIntegrationTests : IntegrationTestBase
         updatedUser.UserProfile.State.Should().Be("NE");
         updatedUser.UserProfile.Country.Should().Be("Canada");
         updatedUser.UserProfile.PhoneNumber.Should().Be("123-456-7890");
+        updatedUser.UserProfile.AffiliatedOrganization.Should().Be("DPL");
     }
 
     [TestMethod]
@@ -631,7 +633,7 @@ public class UserIntegrationTests : IntegrationTestBase
                 LastName = "McTesterson",
                 State = "NE",
                 Country = "Canada",
-                PhoneNumber = "123-456-7890",
+                PhoneNumber = "123-456-7890"
             }
         );
 
