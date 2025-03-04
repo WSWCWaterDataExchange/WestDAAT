@@ -622,16 +622,29 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public async Task Store_OrganizationMemberUpdateRequest_ShouldNotAllowEditingSelf()
     {
         // Arrange
-        // request - user id is same as the requesting user id
-        // request - org id is any guid
-        // request - user roles = global admin
+        var userToEditId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
+        
+        UseUserContext(new UserContext
+        {
+            UserId = userToEditId,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = organizationId,
+            UserId = userToEditId,
+            Role = Roles.TechnicalReviewer
+        };
         
         // Act
-        // call OrganizationManager.Store
-        
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+
         // Assert
-        // should have Error
-        // should be ValidationError type
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
     }  
     
     [DataTestMethod]
@@ -641,60 +654,141 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public async Task Store_OrganizationMemberUpdateRequest_InsufficientPermissions_ShouldNotAllow(string role, bool isPartOfSameOrg)
     {
         // Arrange
-        // organization
-        // user to edit - User
-        // user to edit - UserProfile
-        // user to edit - UserOrganization
-        // user to edit - UserOrganizationRole (role = Member)
-        // request - user id is different
-        // request - org id matches organization.id
-        // request - user organization role = role from parameters, different org id if isPartOfSameOrg is false
+        var organization = new OrganizationFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+        var userToEditProfile = new UserProfileFaker().Generate();
+        var userToEdit = new UserFaker(userToEditProfile).Generate();
+        var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
+        var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
+            .RuleFor(x => x.Role, () => Roles.Member).Generate();
 
-        // Act
-        // call OrganizationManager.Store
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.Users.AddAsync(userToEdit);
+        await _dbContext.UserProfiles.AddAsync(userToEditProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToEditOrg);
+        await _dbContext.UserOrganizationRoles.AddAsync(userToEditOrgRole);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = isPartOfSameOrg ? organization.Id : diffOrganization.Id,
+                    RoleNames = [role]
+                }
+            ]
+        });
+
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToEdit.Id,
+            Role = Roles.TechnicalReviewer
+        };
         
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+
         // Assert
-        // should have Error
-        // should be ForbiddenError type
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
     }  
     
     [DataTestMethod]
     public async Task Store_OrganizationMemberUpdateRequest_InsufficientRequestData_ShouldNotAllow()
     {
         // Arrange
-        // request - no user id or org id or role
-        // request - user roles = global admin
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = new Guid(),
+            UserId = new Guid(),
+            Role = ""
+        };
         
         // Act
-        // call OrganizationManager.Store
-        
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+
         // Assert
-        // should have Error
-        // should be ValidationError type
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
     }
     
     [DataTestMethod]
     [DataRow(Roles.OrganizationAdmin, DisplayName="Organization Admins should be allowed to edit users that belong to their organization")]
     [DataRow(Roles.GlobalAdmin, DisplayName="Global Admins should be allowed to edit users that belong to any organization")]
-    public async Task Store_OrganizationMemberUpdateRequest_Success()
+    public async Task Store_OrganizationMemberUpdateRequest_Success(string role)
     {
         // Arrange
-        // organization
-        // user to edit - User
-        // user to edit - UserProfile
-        // user to edit - UserOrganization
-        // user to edit - UserOrganizationRole (role = Member)
-        // request - user id is different
-        // request - org id matches organization.id
-        // request - role = TechnicalReviewer
-        // request - user organization role = role from parameters, org id = organization.id
+        var organization = new OrganizationFaker().Generate();
+        var userToEditProfile = new UserProfileFaker().Generate();
+        var userToEdit = new UserFaker(userToEditProfile).Generate();
+        var userToEditOrg = new UserOrganizationFaker(userToEdit, organization).Generate();
+        var userToEditOrgRole = new UserOrganizationRoleFaker(userToEditOrg)
+            .RuleFor(x => x.Role, () => Roles.Member).Generate();
 
-        // Act
-        // call OrganizationManager.Store
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(userToEdit);
+        await _dbContext.UserProfiles.AddAsync(userToEditProfile);
+        await _dbContext.UserOrganizations.AddAsync(userToEditOrg);
+        await _dbContext.UserOrganizationRoles.AddAsync(userToEditOrgRole);
+        await _dbContext.SaveChangesAsync();
+
+        if (role == Roles.GlobalAdmin)
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles =[]
+            });
+        }
+        else
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [role]
+                    }
+                ]
+            });
+        }
+
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToEdit.Id,
+            Role = Roles.TechnicalReviewer
+        };
         
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+
         // Assert
-        // Error should be null
-        // response object should be empty {}
-        // check that role on database is now Technical Reviewer and not Member        
+        var userOrg = await _dbContext.UserOrganizations
+            .Include(uo => uo.UserOrganizationRoles)
+            .FirstOrDefaultAsync(uo => uo.UserId == userToEdit.Id && uo.OrganizationId == organization.Id);
+        
+        userOrg.UserOrganizationRoles.Should().HaveCount(1);
+        userOrg.UserOrganizationRoles.First().Role.Should().BeEquivalentTo(Roles.TechnicalReviewer);
+        response.Error.Should().BeNull();
+        response.Should().BeOfType(typeof(OrganizationMemberUpdateResponse));
+        response.Should().BeEquivalentTo(new OrganizationMemberUpdateResponse());
     }
 }
