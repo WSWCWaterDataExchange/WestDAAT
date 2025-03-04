@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -29,15 +29,14 @@ import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
-import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
-import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
 
 import './map.scss';
+import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -90,10 +89,11 @@ function Map({
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [coords, setCoords] = useState<LngLat | null>(null);
   const [drawControl, setDrawControl] = useState<MapboxDraw | null>(null);
-  const { setDrawPolygon } = useMapContext();
   const [styleFlag, setStyleFlag] = useState(0);
   const [styleLoadRequired, setStyleLoadRequired] = useState(false);
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
+
+  const drawControlStateRef = useRef<MapboxDraw | null>(null);
 
   const geocoderControl = useRef(
     new MapboxGeocoder({
@@ -133,20 +133,45 @@ function Map({
     }
   };
 
-  const mapboxDrawControl = (mapInstance: mapboxgl.Map): MapboxDraw | null => {
-    if (!handleMapDrawnPolygonChange) return null;
-    const dc = new MapboxDraw({
-      displayControlsDefault: false,
-      controls: {
-        polygon: true,
-        trash: true,
+  const mapboxDrawControl = (mapInstance: mapboxgl.Map): void => {
+    if (!handleMapDrawnPolygonChange) {
+      return;
+    }
+    const dc = new ExtendedMapboxDraw({
+      props: {
+        displayControlsDefault: false,
+        controls: {
+          // These controls must be enabled to allow the custom draw modes to work.
+          // Enabling this functionality also has the side effect of adding the corresponding buttons to the draw bar
+          polygon: true,
+          trash: true,
+        },
+        modes: {
+          ...MapboxDraw.modes,
+          direct_select: CustomDirectSelectMode,
+          draw_circle: CustomCircleDrawMode,
+          draw_rectangle: CustomRectangleDrawMode,
+        },
       },
-      modes: {
-        ...MapboxDraw.modes,
-        direct_select: CustomDirectSelectMode,
-        draw_circle: CustomCircleDrawMode,
-        draw_rectangle: CustomRectangleDrawMode,
-      },
+      // these buttons are rendered in reverse order
+      buttons: [
+        {
+          on: 'click',
+          title: 'Rectangle tool',
+          buttonIconPath: mdiVectorRectangle,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_rectangle');
+          },
+        },
+        {
+          on: 'click',
+          title: 'Circle tool',
+          buttonIconPath: mdiVectorCircle,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_circle');
+          },
+        },
+      ],
     });
 
     mapInstance.addControl(dc);
@@ -155,14 +180,17 @@ function Map({
       if (handleMapDrawnPolygonChange) {
         handleMapDrawnPolygonChange(dc.getAll().features);
       }
-    }
+    };
 
     mapInstance.on('draw.create', callback);
     mapInstance.on('draw.update', callback);
     mapInstance.on('draw.delete', callback);
 
     setDrawControl(dc);
-    return dc;
+
+    // make stateRef always have the current drawControl.
+    // this is done so that the inline functions which reference drawControl can always have the latest reference
+    drawControlStateRef.current = dc;
   };
 
   const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
@@ -213,9 +241,7 @@ function Map({
       mapInstance.addControl(new CustomShareControl());
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
-      const dc = mapboxDrawControl(mapInstance);
-      mapInstance.addControl(new CustomCircleDrawModeControl(dc));
-      mapInstance.addControl(new CustomRectangleDrawModeControl(dc));
+      mapboxDrawControl(mapInstance);
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
