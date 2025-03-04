@@ -802,6 +802,32 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<InternalError>();
     }
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberUpdateRequest_CannotAssignGlobalAdmin_ShouldThrowError()
+    {
+        // Arrange
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = new Guid(),
+            UserId = new Guid(),
+            Role = Roles.GlobalAdmin
+        };
+        
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+    }
     
     [DataTestMethod]
     [DataRow(Roles.OrganizationAdmin, DisplayName="Organization Admins should be allowed to edit users that belong to their organization")]
