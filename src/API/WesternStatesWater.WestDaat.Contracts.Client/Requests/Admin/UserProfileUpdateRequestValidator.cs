@@ -15,5 +15,7 @@ public class UserProfileUpdateRequestValidator : AbstractValidator<UserProfileUp
         RuleFor(x => x.Country).NotEmpty().MaximumLength(50);
 
         RuleFor(x => x.PhoneNumber).NotEmpty().MaximumLength(50);
+        
+        RuleFor(x => x.AffiliatedOrganization).MaximumLength(100);
     }
 }
