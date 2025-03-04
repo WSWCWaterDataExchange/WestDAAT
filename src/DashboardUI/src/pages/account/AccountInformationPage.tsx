@@ -40,7 +40,13 @@ export function AccountInformationPage() {
   const saveProfileMutation = useMutation({
     mutationFn: () => {
       setIsSavingProfile(true);
-      return saveProfileInformation(msalContext);
+      return saveProfileInformation(msalContext, {
+        firstName: state.profileForm?.firstName ?? '',
+        lastName: state.profileForm?.lastName ?? '',
+        state: state.profileForm?.state ?? '',
+        country: state.profileForm?.country ?? '',
+        phoneNumber: state.profileForm?.phone ?? '',
+      });
     },
     onSuccess: () => {
       queryClient.setQueryData(['user-profile', profile?.userId], {
