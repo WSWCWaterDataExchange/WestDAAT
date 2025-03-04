@@ -68,8 +68,10 @@ const createSvgElementWithIconPath = (icon: string) => {
   path.setAttributeNS(null, 'style', 'fill: #000000');
   const svg = document.createElementNS(xmlns, 'svg');
 
-  svg.setAttributeNS(null, 'viewbox', '0 0 24 24');
-  svg.setAttributeNS(null, 'style', 'width: 25px; height: 25px;');
+  // assumes the icon is designed to be displayed at 24px x 24px
+  svg.setAttributeNS(null, 'viewBox', '0 0 24 24');
+  // adjust the padding to change the size of the icon
+  svg.setAttributeNS(null, 'style', 'width: 100%; height: 100%; padding: 4px');
   svg.appendChild(path);
 
   const container = document.createElement('span');
