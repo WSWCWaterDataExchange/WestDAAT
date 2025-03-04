@@ -7,4 +7,5 @@ export interface UserProfileUpdateRequest extends UserStoreRequestBase {
   state: string;
   country: string;
   phoneNumber: string;
+  affiliatedOrganization: string | null;
 }

@@ -55,6 +55,7 @@ export const saveProfileInformation = async (
     state: string;
     country: string;
     phoneNumber: string;
+    affiliatedOrganization: string | null;
   },
 ): Promise<void> => {
   const api = await westDaatApi(msalContext);
@@ -66,6 +67,7 @@ export const saveProfileInformation = async (
     state: fields.state,
     country: fields.country,
     phoneNumber: fields.phoneNumber,
+    affiliatedOrganization: fields.affiliatedOrganization,
   };
 
   await api.put('Users/Profile', request);
