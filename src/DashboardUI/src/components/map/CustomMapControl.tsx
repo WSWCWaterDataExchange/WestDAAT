@@ -16,7 +16,7 @@ export class CustomMapControl {
     path.setAttributeNS(null, 'style', 'fill: #000000');
 
     const svg = document.createElementNS(xmlns, 'svg');
-    svg.setAttributeNS(null, 'viewbox', '0 0 24 24');
+    svg.setAttributeNS(null, 'viewBox', '0 0 24 24');
     svg.setAttributeNS(null, 'style', 'width: 25px; height: 25px;');
     svg.appendChild(path);
 
