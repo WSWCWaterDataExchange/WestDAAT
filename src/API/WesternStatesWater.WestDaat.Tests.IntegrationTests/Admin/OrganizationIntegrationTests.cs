@@ -615,8 +615,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Should().BeOfType(typeof(OrganizationMemberRemoveResponse));
         response.Should().BeEquivalentTo(new OrganizationMemberRemoveResponse());
     }
-
-    
     
     [TestMethod]
     public async Task Store_OrganizationMemberUpdateRequest_ShouldNotAllowEditingSelf()
@@ -782,6 +780,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
 
         // Assert
         var userOrg = await _dbContext.UserOrganizations
+            .AsNoTracking()
             .Include(uo => uo.UserOrganizationRoles)
             .FirstOrDefaultAsync(uo => uo.UserId == userToEdit.Id && uo.OrganizationId == organization.Id);
         
