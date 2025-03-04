@@ -40,6 +40,7 @@ function WaterRightHeader() {
   };
 
   const shouldShowConsumptiveUseButton = isFeatureEnabled('conservationEstimationTool');
+  const isConsumptiveUseButtonDisabled = isLoadingDetails || !details?.isConservationApplicationEligible;
 
   return (
     <div className="d-flex flex-row align-items-center justify-content-between title-header">
@@ -63,10 +64,9 @@ function WaterRightHeader() {
 
                 {!isLoadingDetails && (
                   <Button
-                    variant="primary"
+                    variant={isConsumptiveUseButtonDisabled ? 'secondary' : 'primary'}
                     onClick={consumptiveUseBtnClickHandler}
-                    disabled={isLoadingDetails || !details?.isConservationApplicationEligible}
-                    className="estimate-consumptive-use-btn"
+                    disabled={isConsumptiveUseButtonDisabled}
                   >
                     Estimate Consumptive Use
                   </Button>
