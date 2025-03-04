@@ -320,7 +320,10 @@ function ApplicationCreatePageForm() {
 
         <FormSection title="Supporting Documents (Optional)">
           <div className="col mb-4">
-            <Button variant="outline-primary" onClick={() => alert('Not Implemented.')}>
+            <Button
+              variant="outline-primary"
+              onClick={() => alert('This feature will be implemented in a future release.')}
+            >
               Upload
             </Button>
           </div>
@@ -329,7 +332,7 @@ function ApplicationCreatePageForm() {
 
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={() => alert('Not Implemented.')}>
+        <Button variant="success" onClick={() => alert('This feature will be implemented in a future release.')}>
           Review & Submit
         </Button>
       </div>
