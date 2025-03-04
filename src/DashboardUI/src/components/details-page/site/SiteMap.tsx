@@ -28,7 +28,7 @@ function Layout() {
     };
   }, [locationsQuery.data]);
 
-  useSiteDigestMapPopup('waterRight');
+  useSiteDigestMapPopup();
   useMapLegend();
 
   if (locationsQuery.isLoading || !featureCollection) return null;
