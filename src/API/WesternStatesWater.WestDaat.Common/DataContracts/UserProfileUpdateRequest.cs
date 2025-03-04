@@ -13,4 +13,6 @@ public class UserProfileUpdateRequest : UserStoreRequestBase
     public string Country { get; set; } = null!;
 
     public string PhoneNumber { get; set; } = null!;
+    
+    public string AffiliatedOrganization { get; set; } = null!;
 }
