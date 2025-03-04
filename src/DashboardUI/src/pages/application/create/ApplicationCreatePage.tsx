@@ -4,7 +4,6 @@ import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Form from 'react-bootstrap/esm/Form';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
 import {
