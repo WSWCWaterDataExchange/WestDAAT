@@ -32,9 +32,9 @@ function StyleButton({ style, friendlyName }: StyleButtonProps) {
   }, [isActive, style]);
 
   const onClickAction = useCallback(() => {
-    if (!isMapLoaded || isMapRendering || isActive) return undefined;
+    if (isActive) return undefined;
     return setMapStyle(style);
-  }, [isMapLoaded, isMapRendering, isActive, style, setMapStyle]);
+  }, [isActive, style, setMapStyle]);
 
   const tabIndex = useMemo(() => {
     return isActive ? -1 : undefined;
@@ -49,6 +49,7 @@ function StyleButton({ style, friendlyName }: StyleButtonProps) {
       tabIndex={tabIndex}
       onClick={onClickAction}
       className={classes}
+      disabled={!isMapLoaded || isMapRendering}
     ></button>
   );
 }
