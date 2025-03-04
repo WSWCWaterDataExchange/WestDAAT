@@ -6,6 +6,7 @@ export function useTimeSeriesFilter() {
     timeSeries,
     isTimeSeriesFilterActive,
     selectedSiteTypes,
+    selectedStates,
     selectedPrimaryUseCategories,
     selectedVariableTypes,
     selectedWaterSourceTypes,
@@ -45,6 +46,12 @@ export function useTimeSeriesFilter() {
     ];
   }, [selectedWaterSourceTypes]);
 
+  const stateFilters = useMemo(() => {
+    if (!selectedStates || selectedStates.length === 0) return null;
+    const result = ['any', ...selectedStates.map((state) => ['==', ['get', 'state'], state])];
+    return result;
+  }, [selectedStates]);
+
   const dateFilters = useMemo(() => {
     if (minDate === undefined && maxDate === undefined) return null;
 
@@ -74,6 +81,7 @@ export function useTimeSeriesFilter() {
     if (primaryUseCategoryFilters) filters.push(primaryUseCategoryFilters);
     if (variableTypeFilters) filters.push(variableTypeFilters);
     if (waterSourceTypeFilters) filters.push(waterSourceTypeFilters);
+    if (stateFilters) filters.push(stateFilters);
     if (dateFilters) filters.push(dateFilters);
 
     return filters.length > 1 ? filters : null;
@@ -84,6 +92,7 @@ export function useTimeSeriesFilter() {
     primaryUseCategoryFilters,
     variableTypeFilters,
     waterSourceTypeFilters,
+    stateFilters,
     dateFilters,
   ]);
 
@@ -94,6 +103,7 @@ export function useTimeSeriesFilter() {
     selectedPrimaryUseCategories,
     selectedVariableTypes,
     selectedWaterSourceTypes,
+    selectedStates,
     minDate,
     maxDate,
     mapFilters: combinedFilters,
