@@ -12,7 +12,6 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { useState } from 'react';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -20,23 +19,6 @@ export function ApplicationCreatePage() {
 
   const navigateToEstimationToolPage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/estimation`);
-  };
-
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-
-  setInterval(() => {
-    setScreenWidth(window.innerWidth);
-  }, 500);
-
-  const screenWidthDisplay = () => {
-    const width = screenWidth;
-    if (width < 768) {
-      return 'xs/sm';
-    } else if (width < 992) {
-      return 'md';
-    }
-
-    return 'lg/xl';
   };
 
   return (
@@ -47,10 +29,6 @@ export function ApplicationCreatePage() {
           backButtonText="Back to Estimator"
           centerText="Water Conservation Estimation Tool"
         />
-
-        <div className="w-100 d-flex justify-content-center p-4">
-          <span className="fs-3">screen width: {screenWidthDisplay()}</span>
-        </div>
 
         <ApplicationCreatePageForm />
       </div>
