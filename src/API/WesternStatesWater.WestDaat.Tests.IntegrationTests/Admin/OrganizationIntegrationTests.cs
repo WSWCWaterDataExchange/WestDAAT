@@ -368,7 +368,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         }
     }
 
-
     [TestMethod]
     public async Task Store_OrganizationMemberAddRequest_ShouldNotAllowAddingSelf()
     {
@@ -696,7 +695,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Error.Should().BeOfType<ForbiddenError>();
     }  
     
-    [DataTestMethod]
+    [TestMethod]
     public async Task Store_OrganizationMemberUpdateRequest_AlreadyHasMultipleOrganizationRoles_ShouldThrowError()
     {
         // Arrange
@@ -741,6 +740,64 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             .FirstOrDefaultAsync(uo => uo.UserId == userToEdit.Id && uo.OrganizationId == organization.Id);
         userOrg.UserOrganizationRoles.Should().HaveCount(2);
         userOrg.UserOrganizationRoles.Select(x => x.Role).Should().NotContain(Roles.OrganizationAdmin);
+        
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<InternalError>();
+    }
+    
+    [DataTestMethod]
+    [DataRow(false, DisplayName="User to edit is not associated with the organization")]
+    [DataRow(true, DisplayName="User to edit does not have a role associated with the organization")]
+    public async Task Store_OrganizationMemberUpdateRequest_MissingUserOrgRoleData_ShouldThrowError(bool isPartOfOrg)
+    {
+        // Arrange
+        var organization = new OrganizationFaker().Generate();
+        var userToEditProfile = new UserProfileFaker().Generate();
+        var userToEdit = new UserFaker(userToEditProfile).Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(userToEdit);
+        await _dbContext.UserProfiles.AddAsync(userToEditProfile);
+
+        if (isPartOfOrg)
+        {
+            var userOrganization = new UserOrganizationFaker(userToEdit, organization).Generate();
+            await _dbContext.UserOrganizations.AddAsync(userOrganization);
+        }
+        
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+    
+        var request = new OrganizationMemberUpdateRequest
+        {
+            OrganizationId = organization.Id,
+            UserId = userToEdit.Id,
+            Role = Roles.OrganizationAdmin
+        };
+        
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request);
+    
+        // Assert
+        var userOrg = await _dbContext.UserOrganizations
+            .AsNoTracking()
+            .Include(uo => uo.UserOrganizationRoles)
+            .FirstOrDefaultAsync(uo => uo.UserId == userToEdit.Id && uo.OrganizationId == organization.Id);
+
+        if (!isPartOfOrg)
+        {
+            userOrg.Should().BeNull();
+        }
+        else
+        {
+            userOrg.UserOrganizationRoles.Should().BeEmpty();
+        }
         
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<InternalError>();

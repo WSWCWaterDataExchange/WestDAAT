@@ -153,6 +153,13 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .Include(uo => uo.UserOrganizationRoles)
                 .FirstOrDefaultAsync(uo => uo.UserId == request.UserId && uo.OrganizationId == request.OrganizationId);
 
+            NotFoundException.ThrowIfNull(userOrganization, $"User organization not found for user id {request.UserId} and organization id {request.OrganizationId}");
+
+            if (userOrganization.UserOrganizationRoles.Count == 0)
+            {
+                throw new NotFoundException($"User organization role not found for user id {request.UserId} and organization id {request.OrganizationId}");
+            }
+
             var userOrganizationRole = userOrganization.UserOrganizationRoles.Single();
 
             userOrganizationRole.Role = request.Role;
