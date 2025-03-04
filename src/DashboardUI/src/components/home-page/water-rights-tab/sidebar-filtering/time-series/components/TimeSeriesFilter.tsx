@@ -4,6 +4,7 @@ import TimeSeriesDateRange from './TimeSeriesDateRange';
 import TimeSeriesPrimaryUseCategorySelect from './TimeSeriesPrimaryUseCategorySelect';
 import TimeSeriesVariableTypeSelect from './TimeSeriesVariableTypeSelect';
 import TimeSeriesWaterSourceTypeSelect from './TimeSeriesWaterSourceTypeSelect';
+import TimeSeriesStateSelect from './TimeSeriesStateSelect';
 
 export function TimeSeriesFilter() {
   return (
@@ -11,6 +12,7 @@ export function TimeSeriesFilter() {
       <TimeSeriesVariableTypeSelect />
       <TimeSeriesSiteTypeSelect />
       <TimeSeriesPrimaryUseCategorySelect />
+      <TimeSeriesStateSelect />
       <TimeSeriesWaterSourceTypeSelect />
       <TimeSeriesDateRange />
     </div>

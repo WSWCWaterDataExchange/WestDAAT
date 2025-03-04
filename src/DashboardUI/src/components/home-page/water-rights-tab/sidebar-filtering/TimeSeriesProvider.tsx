@@ -23,6 +23,9 @@ interface TimeSeriesContextValue {
   setVariableTypes: (types: string[] | undefined) => void;
   setWaterSourceTypes: (types: string[] | undefined) => void;
   resetTimeSeriesOptions: () => void;
+  states: string[];
+  selectedStates?: string[];
+  setStates: (states: string[] | undefined) => void;
 }
 
 const TimeSeriesContext = createContext<TimeSeriesContextValue>({
@@ -47,6 +50,9 @@ const TimeSeriesContext = createContext<TimeSeriesContextValue>({
   setVariableTypes: () => {},
   setWaterSourceTypes: () => {},
   resetTimeSeriesOptions: () => {},
+  states: [],
+  selectedStates: [],
+  setStates: () => {},
 });
 
 export function TimeSeriesProvider({ children }: { children: React.ReactNode }) {
@@ -56,6 +62,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
   const primaryUseCategories = dashboardFiltersQuery.data?.beneficialUses.map((use) => use.beneficialUseName) ?? [];
   const variableTypes = dashboardFiltersQuery.data?.variableTypes ?? [];
   const waterSourceTypes = dashboardFiltersQuery.data?.waterSources ?? [];
+  const states = dashboardFiltersQuery.data?.states ?? [];
 
   const [timeSeries, setTimeSeries] = useState<string[]>([]);
   const [selectedSiteTypes, setSelectedSiteTypes] = useState<string[] | undefined>(undefined);
@@ -65,6 +72,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
   const [isTimeSeriesFilterActive, setTimeSeriesFilterActive] = useState<boolean>(false);
   const [minDate, setMinDate] = useState<number | undefined>(undefined);
   const [maxDate, setMaxDate] = useState<number | undefined>(undefined);
+  const [selectedStates, setSelectedStates] = useState<string[] | undefined>(undefined);
 
   const resetTimeSeriesOptions = useCallback(() => {
     setTimeSeries([]);
@@ -75,6 +83,7 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
     setMinDate(undefined);
     setMaxDate(undefined);
     setTimeSeriesFilterActive(false);
+    setSelectedStates(undefined);
   }, []);
 
   const toggleTimeSeries = useCallback((seriesKey: string, enable: boolean) => {
@@ -106,6 +115,9 @@ export function TimeSeriesProvider({ children }: { children: React.ReactNode }) 
     setVariableTypes: setSelectedVariableTypes,
     setWaterSourceTypes: setSelectedWaterSourceTypes,
     resetTimeSeriesOptions,
+    states,
+    selectedStates,
+    setStates: setSelectedStates,
   };
 
   return <TimeSeriesContext.Provider value={value}>{children}</TimeSeriesContext.Provider>;
