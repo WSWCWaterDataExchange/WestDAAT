@@ -96,8 +96,8 @@ export const defaultWaterRightsFilters: WaterRightsFilters = {
 export const defaultNldiFilters = {
   latitude: null as number | null,
   longitude: null as number | null,
-  directions: Directions.Upsteam | (Directions.Downsteam as Directions),
-  dataPoints: DataPoints.Usgs | DataPoints.Epa | (DataPoints.Wade as DataPoints),
+  directions: Directions.Upstream | Directions.Downstream,
+  dataPoints: DataPoints.Usgs | DataPoints.Epa | DataPoints.WadeRights | DataPoints.WadeTimeseries,
 };
 
 export const defaultState: WaterRightsContextState = {

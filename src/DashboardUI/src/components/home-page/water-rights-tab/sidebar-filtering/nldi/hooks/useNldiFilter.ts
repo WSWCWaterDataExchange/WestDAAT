@@ -8,32 +8,43 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { useMapContext } from '../../../../../../contexts/MapProvider';
 import { mapLayerNames, mapSourceNames } from '../../../../../../config/maps';
 import { useDebounce } from '@react-hook/debounce';
+import { useTimeSeriesContext } from '../../TimeSeriesProvider';
 
 const emptyGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
   type: 'FeatureCollection',
   features: [],
 };
-type DataPointType = DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa;
-const pointFeatureDataSourceNameKeys: DataPointType[] = [DataPoints.Wade, DataPoints.Usgs, DataPoints.Epa];
+
+type DataPointType = DataPoints.WadeRights | DataPoints.WadeTimeseries | DataPoints.Usgs | DataPoints.Epa;
+
+const pointFeatureDataSourceNameKeys: DataPointType[] = [
+  DataPoints.WadeRights,
+  DataPoints.WadeTimeseries,
+  DataPoints.Usgs,
+  DataPoints.Epa,
+];
+
 const pointFeatureDataSourceNames: Record<DataPointType, string> = {
-  [DataPoints.Wade]: 'Wade',
+  [DataPoints.WadeRights]: 'WadeWaterRights',
+  [DataPoints.WadeTimeseries]: 'WadeTimeseries',
   [DataPoints.Usgs]: 'UsgsSurfaceWaterSite',
   [DataPoints.Epa]: 'EpaWaterQualitySite',
 };
 
-type DirectionsType = Directions.Upsteam | Directions.Downsteam;
-const directionNameKeys: DirectionsType[] = [Directions.Upsteam, Directions.Downsteam];
+type DirectionsType = Directions.Upstream | Directions.Downstream;
+const directionNameKeys: DirectionsType[] = [Directions.Upstream, Directions.Downstream];
 const directionNames: Record<DirectionsType, string> = {
-  [Directions.Upsteam]: 'Upstream',
-  [Directions.Downsteam]: 'Downstream',
+  [Directions.Upstream]: 'Upstream',
+  [Directions.Downstream]: 'Downstream',
 };
 export function useNldiFilter() {
-  const { setGeoJsonData, setLayerFilters: setMapLayerFilters } = useMapContext();
+  const { setGeoJsonData, setLayerFilters } = useMapContext();
   const {
     filters: { nldiFilterData, isNldiFilterActive },
     setFilters,
     setNldiIds,
   } = useWaterRightsContext();
+  const { isTimeSeriesFilterActive } = useTimeSeriesContext();
 
   const [debouncedCoords, setDebouncedCoords] = useDebounce(
     [nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null],
@@ -44,48 +55,70 @@ export function useNldiFilter() {
 
   useEffect(() => {
     setDebouncedCoords([nldiFilterData?.latitude ?? null, nldiFilterData?.longitude ?? null]);
-  }, [nldiFilterData?.latitude, nldiFilterData?.longitude]);
+  }, [nldiFilterData?.latitude, nldiFilterData?.longitude, setDebouncedCoords]);
   const nldiFeaturesQuery = useNldiFeatures(debouncedLatitude, debouncedLongitude);
   const { data: nldiGeoJsonData } = nldiFeaturesQuery;
 
   useEffect(() => {
-    if (nldiGeoJsonData) {
-      setGeoJsonData(mapSourceNames.nldiGeoJson, nldiGeoJsonData);
+    if (!isTimeSeriesFilterActive) {
+      const filteredGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
+        type: 'FeatureCollection',
+        features:
+          nldiGeoJsonData?.features.filter(
+            (feature) => feature.properties?.westdaat_pointdatasource !== 'WadeTimeseries',
+          ) ?? [],
+      };
+      setGeoJsonData(mapSourceNames.nldiGeoJson, filteredGeoJsonData);
     } else {
-      setGeoJsonData(mapSourceNames.nldiGeoJson, emptyGeoJsonData);
+      setGeoJsonData(mapSourceNames.nldiGeoJson, nldiGeoJsonData || emptyGeoJsonData);
     }
-  }, [nldiGeoJsonData, setGeoJsonData]);
+  }, [nldiGeoJsonData, setGeoJsonData, isTimeSeriesFilterActive]);
 
   const nldiWadeSiteIds = useMemo(() => {
-    if (!isNldiFilterActive || !nldiGeoJsonData || !nldiFilterData || !(nldiFilterData.dataPoints & DataPoints.Wade)) {
+    if (!isNldiFilterActive || !nldiGeoJsonData || !nldiFilterData) {
       return [];
     }
 
-    let arr = nldiGeoJsonData.features.filter(
-      (x) =>
-        x.properties?.westdaat_pointdatasource?.toLowerCase() === 'wade' ||
-        x.properties?.source?.toLowerCase() === 'wade',
-    );
+    const isWadeRights = Boolean(nldiFilterData.dataPoints & DataPoints.WadeRights);
+    const isWadeTimeseries = Boolean(nldiFilterData.dataPoints & DataPoints.WadeTimeseries);
 
-    if (nldiFilterData.directions & Directions.Upsteam && !(nldiFilterData.directions & Directions.Downsteam)) {
+    if (!isWadeRights && !isWadeTimeseries) {
+      return [];
+    }
+
+    const acceptableSources: string[] = [];
+    if (isWadeRights) {
+      acceptableSources.push('wadewaterrights');
+    }
+    if (isWadeTimeseries) {
+      acceptableSources.push('wadetimeseries');
+    }
+
+    let arr = nldiGeoJsonData.features.filter((feature) => {
+      const ds = feature.properties?.westdaat_pointdatasource?.toLowerCase();
+      return ds && acceptableSources.includes(ds);
+    });
+
+    if (nldiFilterData.directions & Directions.Upstream && !(nldiFilterData.directions & Directions.Downstream)) {
       arr = arr.filter((x) => x.properties?.westdaat_direction === 'Upstream');
-    } else if (!(nldiFilterData.directions & Directions.Upsteam) && nldiFilterData.directions & Directions.Downsteam) {
+    } else if (
+      !(nldiFilterData.directions & Directions.Upstream) &&
+      nldiFilterData.directions & Directions.Downstream
+    ) {
       arr = arr.filter((x) => x.properties?.westdaat_direction === 'Downstream');
     } else if (
-      !(nldiFilterData.directions & Directions.Upsteam) &&
-      !(nldiFilterData.directions & Directions.Downsteam)
+      !(nldiFilterData.directions & Directions.Upstream) &&
+      !(nldiFilterData.directions & Directions.Downstream)
     ) {
       return [];
     }
-    return arr
-      .filter((x) => x.properties?.identifier !== null && x.properties?.identifier !== undefined)
-      .map((a) => a.properties?.identifier);
+    return arr.filter((x) => x.properties?.identifier != null).map((x) => x.properties!.identifier);
   }, [nldiGeoJsonData, nldiFilterData, isNldiFilterActive]);
 
   useEffect(() => {
-    setNldiIds((previousState) => {
-      if (deepEqual(previousState, nldiWadeSiteIds)) {
-        return previousState;
+    setNldiIds((prev) => {
+      if (deepEqual(prev, nldiWadeSiteIds)) {
+        return prev;
       }
       return nldiWadeSiteIds;
     });
@@ -110,13 +143,13 @@ export function useNldiFilter() {
       }
     }
 
-    setMapLayerFilters([
+    setLayerFilters([
       {
         layer: mapLayerNames.nldiUsgsPointsLayer,
         filter: [
           'all',
           ['==', ['get', 'westdaat_featuredatatype'], 'Point'],
-          ['!=', ['get', 'westdaat_pointdatasource'], 'Wade'],
+          ['!=', ['get', 'westdaat_pointdatasource'], 'WadeWaterRights'],
           pointsTypeFilters,
           directionFilters,
         ],
@@ -126,7 +159,7 @@ export function useNldiFilter() {
         filter: ['all', ['==', ['get', 'westdaat_featuredatatype'], 'Flowline'], directionFilters],
       },
     ]);
-  }, [nldiFilterData?.dataPoints, nldiFilterData?.directions, setMapLayerFilters]);
+  }, [nldiFilterData?.dataPoints, nldiFilterData?.directions, setLayerFilters]);
 
   const mapFilters = useMemo((): any[] | undefined => {
     if (isNldiFilterActive && nldiWadeSiteIds !== undefined) {

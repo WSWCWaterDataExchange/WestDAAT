@@ -9,8 +9,8 @@ export function useNldiFeatures(latitude: number | null, longitude: number | nul
       getNldiFeatures(
         latitude ?? 0,
         longitude ?? 0,
-        Directions.Upsteam | Directions.Downsteam,
-        DataPoints.Usgs | DataPoints.Epa | DataPoints.Wade,
+        Directions.Upstream | Directions.Downstream,
+        DataPoints.Usgs | DataPoints.Epa | DataPoints.WadeRights | DataPoints.WadeTimeseries,
       ),
     {
       enabled: !!latitude && !!longitude,

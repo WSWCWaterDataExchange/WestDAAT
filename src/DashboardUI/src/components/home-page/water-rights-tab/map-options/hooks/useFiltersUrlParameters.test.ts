@@ -43,8 +43,8 @@ const filtersWithDefinedNldiActive = {
 const populatedNldiFilterData: NldiFilters = {
   latitude: 40,
   longitude: -100,
-  dataPoints: DataPoints.Wade | DataPoints.Usgs | DataPoints.Epa,
-  directions: Directions.Upsteam | Directions.Downsteam,
+  dataPoints: DataPoints.WadeTimeseries | DataPoints.WadeRights | DataPoints.Usgs | DataPoints.Epa,
+  directions: Directions.Upstream | Directions.Downstream,
 };
 
 const geoJsonDataNew: GeoJSON.Feature<GeoJSON.Geometry> = {
@@ -329,7 +329,7 @@ describe('getParameter', () => {
           {
             latitude: 40,
             longitude: -110,
-            directions: Directions.Downsteam,
+            directions: Directions.Downstream,
             dataPoints: DataPoints.Usgs,
           },
         ],
