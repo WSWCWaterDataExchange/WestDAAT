@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
@@ -45,10 +46,26 @@ public class UserFunction : FunctionBase
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(UserProfileResponse))]
     public async Task<HttpResponseData> UserProfile(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Profile")]
-        HttpRequestData req, Guid? userId)
+        HttpRequestData req)
     {
         var userProfileRequest = await ParseRequestBody<UserProfileRequest>(req);
         var result = await _userManager.Load<UserProfileRequest, UserProfileResponse>(userProfileRequest);
+        return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(UpdateUserProfile))]
+    [OpenApiOperation(nameof(UpdateUserProfile))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(UserStoreResponseBase))]
+    public async Task<HttpResponseData> UpdateUserProfile(
+        [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/Profile")]
+        HttpRequestData req)
+    {
+        var requestBase = await ParseRequestBody<UserStoreRequestBase>(req);
+        ResponseBase result = requestBase switch
+        {
+            UserProfileUpdateRequest request => await _userManager.Store<UserProfileUpdateRequest, UserStoreResponseBase>(request),
+            _ => throw new NotImplementedException($"Request type {requestBase.GetType()} is not implemented.")
+        };
         return await CreateResponse(req, result);
     }
 }

@@ -8,4 +8,9 @@ public sealed partial class AdminManager : IUserManager
     {
         return await ExecuteAsync<TRequest, TResponse>(request);
     }
+
+    async Task<TResponse> IUserManager.Store<TRequest, TResponse>(TRequest request)
+    {
+        return await ExecuteAsync<TRequest, TResponse>(request);
+    }
 }
