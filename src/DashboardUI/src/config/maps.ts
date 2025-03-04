@@ -1,5 +1,5 @@
 import { SymbolLayerSpecification } from 'mapbox-gl';
-import { nldi, pointSizes, waterRightsProperties } from './constants';
+import { nldi, pointSizes, timeSeriesColor, waterRightsProperties } from './constants';
 
 export const mapLayerNames = {
   waterRightsPointsLayer: 'waterRightsPoints',
@@ -255,7 +255,9 @@ const mapsJson = {
           nldi.colors.usgs,
           ['==', ['get', 'westdaat_pointdatasource'], 'EpaWaterQualitySite'],
           nldi.colors.epa,
-          ['==', ['get', 'westdaat_pointdatasource'], 'Wade'],
+          ['==', ['get', 'westdaat_pointdatasource'], 'WadeTimeseries'],
+          timeSeriesColor,
+          ['==', ['get', 'westdaat_pointdatasource'], 'WadeWaterRights'],
           nldi.colors.wade,
           nldi.colors.unknown,
         ],
