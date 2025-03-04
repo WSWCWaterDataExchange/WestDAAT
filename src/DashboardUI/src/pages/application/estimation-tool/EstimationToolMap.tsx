@@ -12,7 +12,7 @@ import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../..
 import EstimationToolTableView from './EstimationToolTableView';
 import centerOfMass from '@turf/center-of-mass';
 import { useEffect, useMemo } from 'react';
-import { useMapContext } from '../../../contexts/MapProvider';
+import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 
 interface EstimationToolMapProps {
   handleEstimateConsumptiveUseClicked: () => void;
@@ -21,7 +21,14 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { setMapBoundSettings } = useMapContext();
+  const { isMapLoaded, setMapBoundSettings, setMapStyle } = useMapContext();
+
+  useEffect(() => {
+    if (!isMapLoaded) {
+      return;
+    }
+    setMapStyle(MapStyle.Satellite);
+  }, [isMapLoaded, setMapStyle]);
 
   useEffect(() => {
     const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
