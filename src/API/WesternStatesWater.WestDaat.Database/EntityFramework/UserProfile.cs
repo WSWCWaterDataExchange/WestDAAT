@@ -18,5 +18,7 @@ public class UserProfile
 
     public string PhoneNumber { get; set; } = null!;
 
+    public string? AffiliatedOrganization { get; set; } = null!;
+
     public virtual User User { get; set; } = null!;
 }

@@ -1,4 +1,4 @@
-import { UserLoadRequestBase } from "./UserLoadRequestBase";
+import { UserLoadRequestBase } from './UserLoadRequestBase';
 
 export interface OrganizationUserListRequest extends UserLoadRequestBase {
   $type: 'OrganizationUserListRequest';
