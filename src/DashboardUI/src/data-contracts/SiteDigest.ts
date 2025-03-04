@@ -6,6 +6,7 @@ interface SiteDigest {
   siteType: string;
   siteName: string;
   hasTimeSeriesData: boolean;
+  timeSeriesVariableTypes: string[];
   waterRightsDigests: WaterRightDigest[];
 }
 

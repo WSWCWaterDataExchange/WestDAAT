@@ -193,6 +193,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SiteName, opt => opt.MapFrom(src => src.SiteName))
                 .ForMember(dest => dest.SiteType, opt => opt.MapFrom(src => src.SiteTypeCv))
                 .ForMember(dest => dest.HasTimeSeriesData, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Any()))
+                .ForMember(dest => dest.TimeSeriesVariableTypes, opt => opt.MapFrom(src => src.SiteVariableAmountsFact.Select(ts => ts.VariableSpecific.VariableCv).Distinct()))
                 .ForMember(dest => dest.WaterRightsDigests,
                     opt => opt.MapFrom(src => src.AllocationBridgeSitesFact.Select(ab => ab.AllocationAmount)));
 
