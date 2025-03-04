@@ -22,17 +22,27 @@ export function useTimeSeriesFilter() {
 
   const primaryUseCategoryFilters = useMemo(() => {
     if (!selectedPrimaryUseCategories || selectedPrimaryUseCategories.length === 0) return null;
-    return ['any', ...selectedPrimaryUseCategories.map((category) => ['==', ['get', 'primaryUseCategory'], category])];
+    return [
+      'any',
+      ...selectedPrimaryUseCategories.map((category) => [
+        '>=',
+        ['index-of', category, ['get', 'primaryUseCategory']],
+        0,
+      ]),
+    ];
   }, [selectedPrimaryUseCategories]);
 
   const variableTypeFilters = useMemo(() => {
     if (!selectedVariableTypes || selectedVariableTypes.length === 0) return null;
-    return ['any', ...selectedVariableTypes.map((type) => ['==', ['get', 'variableType'], type])];
+    return ['any', ...selectedVariableTypes.map((type) => ['>=', ['index-of', type, ['get', 'variableType']], 0])];
   }, [selectedVariableTypes]);
 
   const waterSourceTypeFilters = useMemo(() => {
     if (!selectedWaterSourceTypes || selectedWaterSourceTypes.length === 0) return null;
-    return ['any', ...selectedWaterSourceTypes.map((type) => ['==', ['get', 'waterSourceType'], type])];
+    return [
+      'any',
+      ...selectedWaterSourceTypes.map((type) => ['>=', ['index-of', type, ['get', 'waterSourceType']], 0]),
+    ];
   }, [selectedWaterSourceTypes]);
 
   const dateFilters = useMemo(() => {
