@@ -21,7 +21,7 @@ interface StyleButtonProps {
   friendlyName: string;
 }
 function StyleButton({ style, friendlyName }: StyleButtonProps) {
-  const { mapStyle, setMapStyle } = useMapContext();
+  const { isMapLoaded, isMapRendering, mapStyle, setMapStyle } = useMapContext();
 
   const isActive = useMemo(() => {
     return style === mapStyle;
@@ -32,9 +32,9 @@ function StyleButton({ style, friendlyName }: StyleButtonProps) {
   }, [isActive, style]);
 
   const onClickAction = useCallback(() => {
-    if (isActive) return undefined;
+    if (!isMapLoaded || isMapRendering || isActive) return undefined;
     return setMapStyle(style);
-  }, [isActive, style, setMapStyle]);
+  }, [isMapLoaded, isMapRendering, isActive, style, setMapStyle]);
 
   const tabIndex = useMemo(() => {
     return isActive ? -1 : undefined;
