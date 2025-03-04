@@ -20,5 +20,7 @@ public class UserProfile
 
     public string? AffiliatedOrganization { get; set; } = null!;
 
+    public bool IsSignupComplete { get; set; }
+    
     public virtual User User { get; set; } = null!;
 }
