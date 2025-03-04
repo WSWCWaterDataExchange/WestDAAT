@@ -17,6 +17,8 @@ public class UserProfile
     public string Country { get; set; }
 
     public string PhoneNumber { get; set; }
+    
+    public string AffiliatedOrganization { get; set; } = null!;
 
     public OrganizationMembership[] OrganizationMemberships { get; set; }
 }
