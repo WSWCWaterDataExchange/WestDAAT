@@ -40,6 +40,7 @@ export class ExtendedMapboxDraw extends MapboxDraw {
     // the default buttons
     this._container = this.parentOnAdd(map);
     // adding each new button to Draw Bar
+    // buttons are rendered in reverse order
     this._newButtons.forEach((button) => {
       const elButton = document.createElement('button');
       elButton.className = 'mapbox-gl-draw_ctrl-draw-btn';

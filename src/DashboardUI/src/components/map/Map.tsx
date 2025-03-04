@@ -17,7 +17,7 @@ import {
   useMapContext,
 } from '../../contexts/MapProvider';
 import mapConfig, { mapLayerNames, mapSourceNames } from '../../config/maps';
-import { mdiAlert, mdiMapMarker, mdiVectorCircle } from '@mdi/js';
+import { mdiAlert, mdiMapMarker, mdiVectorCircle, mdiVectorRectangle } from '@mdi/js';
 import { Canvg, presets } from 'canvg';
 import { useDrop } from 'react-dnd';
 import { useDebounce, useDebounceCallback } from '@react-hook/debounce';
@@ -29,9 +29,7 @@ import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
-import { CustomCircleDrawModeControl } from './CustomCircleDrawModeControl';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
-import { CustomRectangleDrawModeControl } from './CustomRectangleDrawModeControl';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
@@ -135,8 +133,10 @@ function Map({
     }
   };
 
-  const mapboxDrawControl = (mapInstance: mapboxgl.Map): MapboxDraw | null => {
-    if (!handleMapDrawnPolygonChange) return null;
+  const mapboxDrawControl = (mapInstance: mapboxgl.Map): void => {
+    if (!handleMapDrawnPolygonChange) {
+      return;
+    }
     const dc = new ExtendedMapboxDraw({
       props: {
         displayControlsDefault: false,
@@ -155,6 +155,14 @@ function Map({
       },
       // these buttons are rendered in reverse order
       buttons: [
+        {
+          on: 'click',
+          title: 'Rectangle tool',
+          buttonIconPath: mdiVectorRectangle,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_rectangle');
+          },
+        },
         {
           on: 'click',
           title: 'Circle tool',
@@ -183,7 +191,6 @@ function Map({
     // make stateRef always have the current drawControl.
     // this is done so that the inline functions which reference drawControl can always have the latest reference
     drawControlStateRef.current = dc;
-    return dc;
   };
 
   const uploadGeoJsonToMapbox = (geoJsonData: FeatureCollection<Geometry, GeoJsonProperties>) => {
@@ -234,9 +241,7 @@ function Map({
       mapInstance.addControl(new CustomShareControl());
       mapInstance.addControl(new mapboxgl.ScaleControl());
 
-      const dc = mapboxDrawControl(mapInstance);
-      mapInstance.addControl(new CustomCircleDrawModeControl(dc));
-      mapInstance.addControl(new CustomRectangleDrawModeControl(dc));
+      mapboxDrawControl(mapInstance);
 
       mapInstance.on('render', () => {
         setIsMapRenderingDebounce(true);
