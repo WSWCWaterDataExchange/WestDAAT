@@ -179,6 +179,7 @@ function ApplicationCreatePageForm() {
               ref={landownerFirstNameRef}
               value={stateForm.landownerFirstName}
             />
+            <Form.Control.Feedback type="invalid">Landowner First Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerLastName">
@@ -190,6 +191,7 @@ function ApplicationCreatePageForm() {
               ref={landownerLastNameRef}
               value={stateForm.landownerLastName}
             />
+            <Form.Control.Feedback type="invalid">Landowner Last Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerEmail">
@@ -201,6 +203,7 @@ function ApplicationCreatePageForm() {
               ref={landownerEmailRef}
               value={stateForm.landownerEmail}
             />
+            <Form.Control.Feedback type="invalid">Email Address is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerPhoneNumber">
@@ -212,6 +215,7 @@ function ApplicationCreatePageForm() {
               ref={landownerPhoneNumberRef}
               value={stateForm.landownerPhoneNumber}
             />
+            <Form.Control.Feedback type="invalid">Phone is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerAddress">
@@ -223,11 +227,13 @@ function ApplicationCreatePageForm() {
               ref={landownerAddressRef}
               value={stateForm.landownerAddress}
             />
+            <Form.Control.Feedback type="invalid">Address is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerCity">
             <Form.Label>City</Form.Label>
             <Form.Control type="text" maxLength={100} required ref={landownerCityRef} value={stateForm.landownerCity} />
+            <Form.Control.Feedback type="invalid">City is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerState">
@@ -240,6 +246,7 @@ function ApplicationCreatePageForm() {
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">State is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerZipCode">
@@ -251,6 +258,7 @@ function ApplicationCreatePageForm() {
               ref={landownerZipCodeRef}
               value={stateForm.landownerZipCode}
             />
+            <Form.Control.Feedback type="invalid">Zip Code is required.</Form.Control.Feedback>
           </Form.Group>
         </FormSection>
 
@@ -295,6 +303,7 @@ function ApplicationCreatePageForm() {
                 ref={projectLocationRef}
                 value={stateForm.projectLocation}
               />
+              <Form.Control.Feedback type="invalid">Project Location is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
@@ -306,6 +315,7 @@ function ApplicationCreatePageForm() {
                 ref={propertyAdditionalDetailsRef}
                 value={stateForm.propertyAdditionalDetails}
               />
+              <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPoint">
@@ -317,6 +327,7 @@ function ApplicationCreatePageForm() {
                 ref={diversionPointRef}
                 value={stateForm.diversionPoint}
               />
+              <Form.Control.Feedback type="invalid">Diversion Point is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPointDetails">
@@ -328,6 +339,7 @@ function ApplicationCreatePageForm() {
                 ref={diversionPointDetailsRef}
                 value={stateForm.diversionPointDetails}
               />
+              <Form.Control.Feedback type="invalid">Diversion Point Details is required.</Form.Control.Feedback>
             </Form.Group>
           </FormSection>
 
@@ -347,7 +359,6 @@ function ApplicationCreatePageForm() {
             <Form.Control
               type="text"
               maxLength={255}
-              required
               ref={canalOrIrrigationEntityNameRef}
               value={stateForm.canalOrIrrigationEntityName}
             />
@@ -358,7 +369,6 @@ function ApplicationCreatePageForm() {
             <Form.Control
               type="email"
               maxLength={255}
-              required
               ref={canalOrIrrigationEntityEmailRef}
               value={stateForm.canalOrIrrigationEntityEmail}
             />
@@ -372,7 +382,6 @@ function ApplicationCreatePageForm() {
             <Form.Control
               type="text"
               maxLength={50}
-              required
               ref={canalOrIrrigationEntityPhoneNumberRef}
               value={stateForm.canalOrIrrigationEntityPhoneNumber}
             />
@@ -393,6 +402,7 @@ function ApplicationCreatePageForm() {
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="permitNumber">
             <Form.Label>Permit #</Form.Label>
             <Form.Control type="text" maxLength={255} required ref={permitNumberRef} value={stateForm.permitNumber} />
+            <Form.Control.Feedback type="invalid">Permit # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="facilityDitchName">
@@ -404,11 +414,13 @@ function ApplicationCreatePageForm() {
               ref={facilityDitchNameRef}
               value={stateForm.facilityDitchName}
             />
+            <Form.Control.Feedback type="invalid">Facility (Ditch) Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
             <Form.Control type="date" required ref={priorityDateRef} value={stateForm.priorityDate} />
+            <Form.Control.Feedback type="invalid">Priority Date is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="certificateNumber">
@@ -420,11 +432,13 @@ function ApplicationCreatePageForm() {
               ref={certificateNumberRef}
               value={stateForm.certificateNumber}
             />
+            <Form.Control.Feedback type="invalid">Certificate # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="shareNumber">
             <Form.Label>Share #</Form.Label>
             <Form.Control type="text" maxLength={255} required ref={shareNumberRef} value={stateForm.shareNumber} />
+            <Form.Control.Feedback type="invalid">Share # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="waterRightState">
@@ -437,6 +451,7 @@ function ApplicationCreatePageForm() {
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">State is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="waterUseDescription">
@@ -448,6 +463,7 @@ function ApplicationCreatePageForm() {
               ref={waterUseDescriptionRef}
               value={stateForm.waterUseDescription}
             />
+            <Form.Control.Feedback type="invalid">Description of Water Use is required.</Form.Control.Feedback>
           </Form.Group>
         </FormSection>
 
@@ -499,7 +515,6 @@ function ApplicationCreatePageForm() {
             </Form.Label>
             <Form.Control
               type="text"
-              required
               ref={estimationSupplementaryDetailsRef}
               value={stateForm.estimationSupplementaryDetails}
             />
@@ -518,6 +533,7 @@ function ApplicationCreatePageForm() {
               ref={conservationPlanFundingRequestDollarAmountRef}
               value={stateForm.conservationPlanFundingRequestDollarAmount}
             />
+            <Form.Control.Feedback type="invalid">Funding Request $ Amount is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group
@@ -537,6 +553,7 @@ function ApplicationCreatePageForm() {
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">Units is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanDescription">
@@ -547,13 +564,13 @@ function ApplicationCreatePageForm() {
               ref={conservationPlanDescriptionRef}
               value={stateForm.conservationPlanDescription}
             />
+            <Form.Control.Feedback type="invalid">Conservation Plan is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanAdditionalInfo">
             <Form.Label>Additional Information</Form.Label>
             <Form.Control
               as="textarea"
-              required
               ref={conservationPlanAdditionalInfoRef}
               value={stateForm.conservationPlanAdditionalInfo}
             />
