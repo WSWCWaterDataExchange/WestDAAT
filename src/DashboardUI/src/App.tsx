@@ -17,13 +17,14 @@ import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
+import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
 import { ApplicationGuard } from './pages/application/ApplicationGuard';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
 import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
-import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
-import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { SignupPage } from './pages/account/SignupPage';
+import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -32,7 +33,6 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
-import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
