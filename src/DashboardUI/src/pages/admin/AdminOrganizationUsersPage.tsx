@@ -20,7 +20,6 @@ export function AdminOrganizationsUsersPage() {
   const [removeUserId, setRemoveUserId] = useState<string | null>(null);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
-  const [editUserRole, setEditUserRole] = useState<Role | null>(null);
 
   const {
     data: organizationListResponse,
@@ -87,13 +86,11 @@ export function AdminOrganizationsUsersPage() {
   const openEditUserModal = (userId: string, role: Role) => {
     setShowEditUserModal(true);
     setEditUserId(userId);
-    setEditUserRole(role);
   };
 
   const closeEditUserModal = () => {
     setShowEditUserModal(false);
     setEditUserId(null);
-    setEditUserRole(null);
   };
 
   return (
@@ -176,7 +173,6 @@ export function AdminOrganizationsUsersPage() {
         show={showEditUserModal}
         userId={editUserId}
         organizationId={organizationId}
-        role={editUserRole}
         closeModal={closeEditUserModal}
       ></EditOrganizationUserModal>
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
