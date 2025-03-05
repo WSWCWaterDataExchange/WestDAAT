@@ -106,7 +106,6 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [state.conservationApplication.polygonEtData]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
-    console.log('handle map drawn polygon change', polygons);
     if (polygons.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',

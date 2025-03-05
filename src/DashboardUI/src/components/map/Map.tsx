@@ -451,13 +451,26 @@ function Map({
   }, [map, geoJsonData]);
 
   useEffect(() => {
-    if (!map || !drawControl) {
+    if (!map || !drawControl || isMapRendering) {
       return;
     }
-    userDrawnPolygonData.forEach((poly) => {
-      drawControl.add(poly);
+
+    const existingPolygons = drawControl?.getAll() ?? [];
+    const newPolygons = userDrawnPolygonData.filter(
+      (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
+    );
+
+    map.once('load', () => {
+      newPolygons.forEach((poly) => {
+        // do not re-add a polygon if it already exists
+        if (existingPolygons.features.some((f) => f.id === poly.id)) {
+          return;
+        }
+        console.log('add polygon', poly);
+        drawControl.add(poly);
+      });
     });
-  }, [map, drawControl, userDrawnPolygonData]);
+  }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
   useEffect(() => {
     if (!map) return;
