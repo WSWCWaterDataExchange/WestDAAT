@@ -1,9 +1,9 @@
-import React from 'react';
-import { useMemo } from 'react';
-import { nldi } from '../../../../../config/constants';
+import React, { useMemo } from 'react';
+import { nldi, timeSeriesColor } from '../../../../../config/constants';
 import { useWaterRightsContext } from '../../sidebar-filtering/WaterRightsProvider';
 import { DataPoints } from '../../../../../data-contracts/nldi';
 import { MapLegendCircleItem, MapLegendItem, MapLegendMarkerItem } from '../../../../map/MapLegendItem';
+import { useTimeSeriesContext } from '../../sidebar-filtering/TimeSeriesProvider';
 
 export function useNldiMapLegend() {
   const {
@@ -15,10 +15,11 @@ export function useNldiMapLegend() {
     },
   } = useWaterRightsContext();
 
+  const { isTimeSeriesFilterActive } = useTimeSeriesContext();
+
   const legendItems = useMemo(() => {
-    if (!isNldiFilterActive) {
-      return undefined;
-    }
+    if (!isNldiFilterActive) return undefined;
+
     return (
       <div className="legend-nldi">
         <MapLegendMarkerItem color={nldi.colors.mapMarker}>Starting Point of Interest</MapLegendMarkerItem>
@@ -46,8 +47,13 @@ export function useNldiMapLegend() {
             <br /> Sites OSM Standard
           </MapLegendCircleItem>
         )}
+
+        {isTimeSeriesFilterActive && !!((nldiDataPoints ?? DataPoints.None) & DataPoints.WadeTimeseries) && (
+          <MapLegendCircleItem color={timeSeriesColor}>NLDI Time Series Sites</MapLegendCircleItem>
+        )}
       </div>
     );
-  }, [isNldiFilterActive, nldiDataPoints]);
+  }, [isNldiFilterActive, nldiDataPoints, isTimeSeriesFilterActive]);
+
   return { legendItems };
 }
