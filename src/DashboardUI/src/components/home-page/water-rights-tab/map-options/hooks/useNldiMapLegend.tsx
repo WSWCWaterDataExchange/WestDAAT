@@ -49,7 +49,7 @@ export function useNldiMapLegend() {
         )}
 
         {isTimeSeriesFilterActive && !!((nldiDataPoints ?? DataPoints.None) & DataPoints.WadeTimeseries) && (
-          <MapLegendCircleItem color={timeSeriesColor}>NLDI Time Series Sites</MapLegendCircleItem>
+          <MapLegendCircleItem color={timeSeriesColor}>Time Series Sites</MapLegendCircleItem>
         )}
       </div>
     );
