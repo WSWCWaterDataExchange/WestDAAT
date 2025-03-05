@@ -23,6 +23,7 @@ import { ApplicationReviewPage } from './pages/application/dashboard/Application
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+import { SignupPage } from './pages/account/SignupPage';
 import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -31,7 +32,6 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
-import { SignupPage } from './pages/account/SignupPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
