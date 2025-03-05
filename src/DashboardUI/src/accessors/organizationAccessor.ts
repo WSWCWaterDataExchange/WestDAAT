@@ -101,15 +101,17 @@ export const editOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
-  role: Role
+  role: string
 ): Promise<{ data: OrganizationMemberUpdateResponse, status: number }> => {
   const api = await westDaatApi(msalContext);
 
+  console.log(`editOrganizationMember: ${organizationId}, ${userId}, ${role}`);
+
   const request: OrganizationMemberUpdateRequest = {
     $type: 'OrganizationMemberUpdateRequest',
-    organizationId,
-    userId,
-    role
+    organizationId: "73f00bd4-3708-42d0-96ef-278932db459d",
+    userId: "695e4d17-f37a-47bf-b5bd-1728cfe1b0d7",
+    role: "Member"
   }
 
   const { data, status } = await api.put<OrganizationMemberUpdateResponse>(

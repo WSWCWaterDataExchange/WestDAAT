@@ -23,6 +23,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
     { value: Role.OrganizationAdmin, label: RoleDisplayNames[Role.OrganizationAdmin] },
   ];
   const roleRef = useRef<HTMLSelectElement>(null);
+
   const msalContext = useMsal();
   const queryClient = useQueryClient();
   const user = queryClient
@@ -30,41 +31,42 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
     ?.users.find((user) => user.userId === props.userId);
 
   const editOrganizationMemberMutation = useMutation({
-    mutationFn: async (params: { organizationId: string; userId: string; role: Role }) => {
+    mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
       return await editOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
-      // TODO: JN
-      // toast success
-      // set query data
-      // close modal
+      toast.success('User removed from organization', {
+        autoClose: 1000,
+      });
+      const previousUsers = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]);
+      const otherUsers = previousUsers?.users.filter((user: UserListResult) => user.userId !== props.userId) ?? [];
+      const updatedUser = { ...user, role: roleRef.current?.value };
+      queryClient.setQueryData(['organizationUsers', props.organizationId], { users: [...otherUsers, updatedUser] });
+      props.closeModal();
     },
     onError: () => {
-      // TODO: JN
-      // toast error
-      //  don't close modal
+      toast.error('Error saving changes to user', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
     },
   });
 
-  const handleRoleChange = (option: { value: Role } | null) => {
-    // if (!option || !option.value) {
-    //   setCurrentRole(null);
-    // } else {
-    //   setCurrentRole(option.value);
-    // }
-  };
-
   const handleSaveChangesClick = () => {
-    console.log('inside save changes click', roleRef.current?.value);
-    // if (!props.organizationId || !props.userId) {
-    //   return;
-    // }
-    // // TODO: JN - if role hasn't changed or is undefined, also return
-    // editOrganizationMemberMutation.mutate({
-    //   organizationId: props.organizationId,
-    //   userId: props.userId,
-    //   role: props.role as Role,
-    // });
+    if (!props.organizationId || !props.userId) {
+      return;
+    }
+
+    if (roleRef.current?.value && roleRef.current?.value !== user?.role) {
+      editOrganizationMemberMutation.mutate({
+        organizationId: props.organizationId,
+        userId: props.userId,
+        role: roleRef.current?.value,
+      });
+    } else {
+      props.closeModal();
+    }
   };
 
   return (
