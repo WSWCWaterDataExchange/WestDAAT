@@ -12,16 +12,45 @@ import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../..
 import EstimationToolTableView from './EstimationToolTableView';
 import centerOfMass from '@turf/center-of-mass';
 import { useEffect, useMemo } from 'react';
-import { useMapContext } from '../../../contexts/MapProvider';
+import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
+import { useWaterRightSiteLocations } from '../../../hooks/queries';
+import { mapLayerNames, mapSourceNames } from '../../../config/maps';
 
 interface EstimationToolMapProps {
+  waterRightNativeId: string | undefined;
   handleEstimateConsumptiveUseClicked: () => void;
   isLoadingConsumptiveUseEstimate: boolean;
 }
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { setMapBoundSettings } = useMapContext();
+  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData } = useMapContext();
+
+  useEffect(() => {
+    if (!isMapLoaded) {
+      return;
+    }
+    setMapStyle(MapStyle.Satellite);
+  }, [isMapLoaded, setMapStyle]);
+
+  const siteLocationsQuery = useWaterRightSiteLocations(props.waterRightNativeId);
+
+  useEffect(() => {
+    if (!isMapLoaded || siteLocationsQuery.isLoading) {
+      return;
+    }
+
+    // render the site location point on the map
+    setVisibleLayers([mapLayerNames.siteLocationsPointsLayer]);
+    setGeoJsonData(mapSourceNames.detailsMapGeoJson, siteLocationsQuery.data!);
+
+    // zoom to the site location point
+    setMapBoundSettings({
+      LngLatBounds: getLatsLongsFromFeatureCollection(siteLocationsQuery.data!),
+      padding: 25,
+      maxZoom: 16,
+    });
+  }, [isMapLoaded, siteLocationsQuery.data, siteLocationsQuery.isLoading]);
 
   useEffect(() => {
     const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
@@ -46,7 +75,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
     setMapBoundSettings({
       LngLatBounds: getLatsLongsFromFeatureCollection(userDrawnPolygonFeatureCollection),
       padding: 25,
-      maxZoom: 12,
+      maxZoom: 16,
     });
   }, [
     state.conservationApplication.polygonEtData,
