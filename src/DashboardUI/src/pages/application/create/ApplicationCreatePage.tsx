@@ -82,9 +82,9 @@ function ApplicationCreatePageForm() {
   const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
 
   const onFormChanged = () => {
-    const conservationPlanFundingRequestDollarAmount = Number(
-      conservationPlanFundingRequestDollarAmountRef.current?.value,
-    );
+    const conservationPlanFundingRequestDollarAmount = conservationPlanFundingRequestDollarAmountRef.current?.value
+      ? Number(conservationPlanFundingRequestDollarAmountRef.current?.value)
+      : undefined;
 
     const cpfrcruValueAsEnum = Number(
       conservationPlanFundingRequestCompensationRateUnitsRef.current?.value,
@@ -562,7 +562,7 @@ function ApplicationCreatePageForm() {
               ref={conservationPlanFundingRequestCompensationRateUnitsRef}
               value={stateForm.conservationPlanFundingRequestCompensationRateUnits}
             >
-              <option value={0}>Select an option</option>
+              <option value={''}>Select an option</option>
               {CompensationRateUnitsOptions.map((value) => (
                 <option key={value} value={value}>
                   {CompensationRateUnitsLabelsPlural[value]}
