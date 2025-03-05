@@ -43,7 +43,7 @@ const responsiveOneHalfWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveFullWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
 
   const landownerFirstNameRef = useRef<HTMLInputElement>(null);
   const landownerLastNameRef = useRef<HTMLInputElement>(null);
@@ -90,7 +90,7 @@ function ApplicationCreatePageForm() {
       | Exclude<CompensationRateUnits, CompensationRateUnits.None>
       | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
 
-    const form: ApplicationSubmissionForm = {
+    const formValues: ApplicationSubmissionForm = {
       landownerFirstName: landownerFirstNameRef.current?.value,
       landownerLastName: landownerLastNameRef.current?.value,
       landownerEmail: landownerEmailRef.current?.value,
@@ -125,7 +125,12 @@ function ApplicationCreatePageForm() {
       conservationPlanAdditionalInfo: conservationPlanAdditionalInfoRef.current?.value,
     };
 
-    console.log('form', form);
+    dispatch({
+      type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+      payload: {
+        formValues,
+      },
+    });
   };
 
   // assumes all polygons are not intersecting

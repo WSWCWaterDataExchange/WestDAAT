@@ -109,7 +109,8 @@ export type ApplicationAction =
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction;
+  | ConsumptiveUseEstimatedAction
+  | ApplicationSubmissionFormUpdatedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -177,6 +178,13 @@ export interface ConsumptiveUseEstimatedAction {
   };
 }
 
+export interface ApplicationSubmissionFormUpdatedAction {
+  type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
+  payload: {
+    formValues: ApplicationSubmissionForm;
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -207,6 +215,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
       return onConsumptiveUseEstimated(draftState, action);
+    case 'APPLICATION_SUBMISSION_FORM_UPDATED':
+      return onApplicationFormUpdated(draftState, action);
   }
 };
 
@@ -337,6 +347,18 @@ const onConsumptiveUseEstimated = (
   }));
 
   checkCanContinueToApplication(draftState);
+
+  return draftState;
+};
+
+const onApplicationFormUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationSubmissionFormUpdatedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.applicationSubmissionForm = {
+    ...draftState.conservationApplication.applicationSubmissionForm,
+    ...payload.formValues,
+  };
 
   return draftState;
 };
