@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import MapProvider from '../../../contexts/MapProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Form from 'react-bootstrap/esm/Form';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel';
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
 import {
@@ -26,21 +24,22 @@ export function ApplicationCreatePage() {
   };
 
   return (
-    <MapProvider>
-      <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
-        <ApplicationNavbar
-          navigateBack={navigateToEstimationToolPage}
-          backButtonText="Back to Estimator"
-          centerText="Water Conservation Estimation Tool"
-        />
+    <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
+      <ApplicationNavbar
+        navigateBack={navigateToEstimationToolPage}
+        backButtonText="Back to Estimator"
+        centerText="Water Conservation Estimation Tool"
+      />
 
-        <ApplicationCreatePageForm />
-      </div>
-    </MapProvider>
+      <ApplicationCreatePageForm />
+    </div>
   );
 }
 
-const emptyStringPlaceholder = '';
+const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-6';
+const responsiveOneHalfWidthDefault = 'col-lg-4 col-md-6 col-12';
+const responsiveFullWidthDefault = 'col-lg-6 col-12';
+
 function ApplicationCreatePageForm() {
   const { state } = useConservationApplicationContext();
 
@@ -136,7 +135,7 @@ function ApplicationCreatePageForm() {
   );
 
   return (
-    <div className="flex-grow-1 overflow-y-auto p-4">
+    <div className="container">
       <div className="mb-3">
         <span className="fs-4 fw-bold">New Application</span>
       </div>
@@ -160,112 +159,96 @@ function ApplicationCreatePageForm() {
 
       <Form onChange={onFormChanged} noValidate>
         <FormSection title="Applicant Information">
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerFirstName" label="Landowner First Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerFirstName">
+            <Form.Label>Landowner First Name</Form.Label>
+            <Form.Control type="text" maxLength={100} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerLastName" label="Landowner Last Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerLastName">
+            <Form.Label>Landowner Last Name</Form.Label>
+            <Form.Control type="text" maxLength={100} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerEmail" label="Email Address">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerEmail">
+            <Form.Label>Email Address</Form.Label>
+            <Form.Control type="email" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerPhoneNumber" label="Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerPhoneNumber">
+            <Form.Label>Phone</Form.Label>
+            <Form.Control type="tel" maxLength={50} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerAddress" label="Address">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerAddress">
+            <Form.Label>Address</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerCity" label="City">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerCity">
+            <Form.Label>City</Form.Label>
+            <Form.Control type="text" maxLength={100} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerState" label="State">
-              <Form.Select required>
-                <option value={''}>Select a state</option>
-                {states.map((state) => (
-                  <option key={state.value} value={state.value}>
-                    {state.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerState">
+            <Form.Label>State</Form.Label>
+            <Form.Select required>
+              <option value={''}>Select a state</option>
+              {states.map((state) => (
+                <option key={state.value} value={state.value}>
+                  {state.label}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="landownerZipCode" label="Zip Code">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={10} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerZipCode">
+            <Form.Label>Zip Code</Form.Label>
+            <Form.Control type="text" maxLength={10} required />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Agent Information">
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="agentFirstName" label="Agent First Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentFirstName">
+            <Form.Label>Agent First Name</Form.Label>
+            <Form.Control type="text" maxLength={100} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="agentLastName" label="Agent Last Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={100} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentLastName">
+            <Form.Label>Agent Last Name</Form.Label>
+            <Form.Control type="text" maxLength={100} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="agentEmail" label="Agent Email">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentEmail">
+            <Form.Label>Agent Email</Form.Label>
+            <Form.Control type="email" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="agentPhoneNumber" label="Agent Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="tel" maxLength={50} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentPhoneNumber">
+            <Form.Label>Agent Phone</Form.Label>
+            <Form.Control type="tel" maxLength={50} required />
           </Form.Group>
         </FormSection>
 
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-6">
-            <Form.Group className="col-12 mb-4">
-              <FloatingLabel controlId="projectLocation" label="Project Location">
-                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-              </FloatingLabel>
+            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
+              <Form.Label> Project Location</Form.Label>
+              <Form.Control type="text" maxLength={255} required />
             </Form.Group>
 
-            <Form.Group className="col-12 mb-4">
-              <FloatingLabel controlId="propertyAdditionalDetails" label="Additional Details">
-                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
-              </FloatingLabel>
+            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
+              <Form.Label>Additional Details</Form.Label>
+              <Form.Control as="textarea" maxLength={4000} required />
             </Form.Group>
 
-            <Form.Group className="col-12 mb-4">
-              <FloatingLabel controlId="diversionPoint" label="Diversion Point">
-                <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-              </FloatingLabel>
+            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPoint">
+              <Form.Label>Diversion Point</Form.Label>
+              <Form.Control type="text" maxLength={255} required />
             </Form.Group>
 
-            <Form.Group className="col-12 mb-4">
-              <FloatingLabel controlId="diversionPointDetails" label="Diversion Point Details">
-                <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
-              </FloatingLabel>
+            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPointDetails">
+              <Form.Label>Diversion Point Details</Form.Label>
+              <Form.Control as="textarea" maxLength={4000} required />
             </Form.Group>
           </FormSection>
 
@@ -280,73 +263,66 @@ function ApplicationCreatePageForm() {
           subtitle="Is your water right part of a canal company or irrigation district? If yes, please provide their contact
               information."
         >
-          <Form.Group className="col-12 mb-4">
-            <FloatingLabel controlId="canalOrIrrigationEntityName" label="Entity Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationEntityName">
+            <Form.Label>Entity Name</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-6 mb-4">
-            <FloatingLabel controlId="canalOrIrrigationEntityEmail" label="Entity Email">
-              <Form.Control placeholder={emptyStringPlaceholder} type="email" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneHalfWidthDefault} mb-4`} controlId="canalOrIrrigationEntityEmail">
+            <Form.Label>Entity Email</Form.Label>
+            <Form.Control type="email" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-6 mb-4">
-            <FloatingLabel controlId="canalOrIrrigationEntityPhoneNumber" label="Entity Phone">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={50} required />
-            </FloatingLabel>
+          <Form.Group
+            className={`${responsiveOneHalfWidthDefault} mb-4`}
+            controlId="canalOrIrrigationEntityPhoneNumber"
+          >
+            <Form.Label>Entity Phone</Form.Label>
+            <Form.Control type="text" maxLength={50} required />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Water Right Information">
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="permitNumber" label="Permit #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="permitNumber">
+            <Form.Label>Permit #</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="facilityDitchName" label="Facility (Ditch) Name">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="facilityDitchName">
+            <Form.Label>Facility (Ditch) Name</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="priorityDate" label="Priority Date">
-              <Form.Control placeholder={emptyStringPlaceholder} type="date" required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="priorityDate">
+            <Form.Label>Priority Date</Form.Label>
+            <Form.Control type="date" required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="certificateNumber" label="Certificate #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="certificateNumber">
+            <Form.Label>Certificate #</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="shareNumber" label="Share #">
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" maxLength={255} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="shareNumber">
+            <Form.Label>Share #</Form.Label>
+            <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
-          <Form.Group className="col-4 mb-4">
-            <FloatingLabel controlId="waterRightState" label="State">
-              <Form.Select required>
-                <option value={''}>Select a state</option>
-                {states.map((state) => (
-                  <option key={state.value} value={state.value}>
-                    {state.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="waterRightState">
+            <Form.Label>State</Form.Label>
+            <Form.Select required>
+              <option value={''}>Select a state</option>
+              {states.map((state) => (
+                <option key={state.value} value={state.value}>
+                  {state.label}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
 
-          <Form.Group className="col-12 mb-4">
-            <FloatingLabel controlId="waterUseDescription" label="Description of Water Use">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} maxLength={4000} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="waterUseDescription">
+            <Form.Label>Description of Water Use</Form.Label>
+            <Form.Control as="textarea" maxLength={4000} required />
           </Form.Group>
         </FormSection>
 
@@ -392,52 +368,55 @@ function ApplicationCreatePageForm() {
             </div>
           </div>
 
-          <Form.Group className="col-12 mb-4">
-            <FloatingLabel
-              controlId="estimationSupplementaryDetails"
-              label="Do you have supplementary data that can help in reviewing this estimate? If so, provide that here."
-            >
-              <Form.Control placeholder={emptyStringPlaceholder} type="text" required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="estimationSupplementaryDetails">
+            <Form.Label>
+              Do you have supplementary data that can help in reviewing this estimate? If so, provide that here.
+            </Form.Label>
+            <Form.Control type="text" required />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Conservation Plan">
-          <Form.Group className="col-6 mb-4">
-            <FloatingLabel controlId="conservationPlanFundingRequestDollarAmount" label="Funding Request $ Amount">
-              <Form.Control placeholder={emptyStringPlaceholder} type="number" required />
-            </FloatingLabel>
+          <Form.Group
+            className={`${responsiveOneHalfWidthDefault} mb-4`}
+            controlId="conservationPlanFundingRequestDollarAmount"
+          >
+            <Form.Label>Funding Request $ Amount</Form.Label>
+            <Form.Control type="number" required />
           </Form.Group>
 
-          <Form.Group className="col-6 mb-4">
-            <FloatingLabel controlId="conservationPlanFundingRequestCompensationRateUnits" label="Units">
-              <Form.Select required>
-                <option value={0}>Select an option</option>
-                {CompensationRateUnitsOptions.map((value) => (
-                  <option key={value} value={value}>
-                    {CompensationRateUnitsLabelsPlural[value]}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
+          <Form.Group
+            className={`${responsiveOneHalfWidthDefault} mb-4`}
+            controlId="conservationPlanFundingRequestCompensationRateUnits"
+          >
+            <Form.Label>Units</Form.Label>
+            <Form.Select required>
+              <option value={0}>Select an option</option>
+              {CompensationRateUnitsOptions.map((value) => (
+                <option key={value} value={value}>
+                  {CompensationRateUnitsLabelsPlural[value]}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
 
-          <Form.Group className="col-12 mb-4">
-            <FloatingLabel controlId="conservationPlanDescription" label="Describe your Conservation Plan.">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanDescription">
+            <Form.Label>Describe your Conservation Plan.</Form.Label>
+            <Form.Control as="textarea" required />
           </Form.Group>
 
-          <Form.Group className="col-12 mb-4">
-            <FloatingLabel controlId="conservationPlanAdditionalInfo" label="Additional Information">
-              <Form.Control as="textarea" placeholder={emptyStringPlaceholder} required />
-            </FloatingLabel>
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanAdditionalInfo">
+            <Form.Label>Additional Information</Form.Label>
+            <Form.Control as="textarea" required />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Supporting Documents (Optional)">
           <div className="col mb-4">
-            <Button variant="outline-primary" onClick={() => alert('Not Implemented.')}>
+            <Button
+              variant="outline-primary"
+              onClick={() => alert('This feature will be implemented in a future release.')}
+            >
               Upload
             </Button>
           </div>
@@ -446,7 +425,7 @@ function ApplicationCreatePageForm() {
 
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={() => alert('Not Implemented.')}>
+        <Button variant="success" onClick={() => alert('This feature will be implemented in a future release.')}>
           Review & Submit
         </Button>
       </div>

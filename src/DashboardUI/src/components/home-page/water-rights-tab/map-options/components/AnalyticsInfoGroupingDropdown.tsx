@@ -31,7 +31,7 @@ function AnalyticsInfoGroupingDropdown(props: AnalyticsInfoGroupingDropdownProps
   }, [response]);
 
   return (
-    <div className="mb-3 col-4">
+    <div className="mb-3 w-100">
       <label htmlFor="grouping-dropdown">Select Grouping</label>
       <Select<DropdownOption>
         id="grouping-dropdown"

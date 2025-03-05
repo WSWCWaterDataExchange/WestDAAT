@@ -4,13 +4,15 @@ import TimeSeriesDateRange from './TimeSeriesDateRange';
 import TimeSeriesPrimaryUseCategorySelect from './TimeSeriesPrimaryUseCategorySelect';
 import TimeSeriesVariableTypeSelect from './TimeSeriesVariableTypeSelect';
 import TimeSeriesWaterSourceTypeSelect from './TimeSeriesWaterSourceTypeSelect';
+import TimeSeriesStateSelect from './TimeSeriesStateSelect';
 
 export function TimeSeriesFilter() {
   return (
     <div className="position-relative flex-grow-1">
+      <TimeSeriesVariableTypeSelect />
       <TimeSeriesSiteTypeSelect />
       <TimeSeriesPrimaryUseCategorySelect />
-      <TimeSeriesVariableTypeSelect />
+      <TimeSeriesStateSelect />
       <TimeSeriesWaterSourceTypeSelect />
       <TimeSeriesDateRange />
     </div>

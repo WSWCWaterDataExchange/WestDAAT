@@ -4,6 +4,7 @@
     {
         UsgsSurfaceWaterSites,
         EpaWaterQualitySite,
-        Wade
+        WadeRights,
+        WadeTimeseries
     }
 }

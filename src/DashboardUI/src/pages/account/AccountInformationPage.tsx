@@ -30,6 +30,7 @@ export function AccountInformationPage() {
   const stateRef = useRef<HTMLSelectElement>(null);
   const countryRef = useRef<HTMLSelectElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const affiliatedOrganizationRef = useRef<HTMLInputElement>(null);
 
   const {
     data: profileResponse, //
@@ -40,7 +41,24 @@ export function AccountInformationPage() {
   const saveProfileMutation = useMutation({
     mutationFn: () => {
       setIsSavingProfile(true);
-      return saveProfileInformation(msalContext);
+
+      const {
+        firstName, //
+        lastName,
+        state: _state,
+        country,
+        phone,
+        affiliatedOrganization,
+      } = state.profileForm!;
+
+      return saveProfileInformation(msalContext, {
+        firstName: firstName ?? '',
+        lastName: lastName ?? '',
+        state: _state ?? '',
+        country: country ?? '',
+        phoneNumber: phone ?? '',
+        affiliatedOrganization: affiliatedOrganization ?? null,
+      });
     },
     onSuccess: () => {
       queryClient.setQueryData(['user-profile', profile?.userId], {
@@ -51,6 +69,7 @@ export function AccountInformationPage() {
           state: state.profileForm?.state,
           country: state.profileForm?.country,
           phoneNumber: state.profileForm?.phone,
+          affiliatedOrganization: state.profileForm?.affiliatedOrganization,
         },
       });
 
@@ -87,7 +106,7 @@ export function AccountInformationPage() {
           {profile && (
             <>
               <div className="fw-bold">{label}</div>
-              <div className="text-break">{value}</div>
+              <div className="text-break">{value || '-'}</div>
             </>
           )}
         </div>
@@ -104,6 +123,7 @@ export function AccountInformationPage() {
         state: stateRef.current?.value ?? null,
         country: countryRef.current?.value ?? null,
         phone: phoneRef.current?.value ?? null,
+        affiliatedOrganization: affiliatedOrganizationRef.current?.value ?? null,
       },
     });
   };
@@ -180,11 +200,23 @@ export function AccountInformationPage() {
         />
         <Form.Control.Feedback type="invalid">Phone number is required.</Form.Control.Feedback>
       </Form.Group>
+
+      <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <Form.Label className="fw-bold">Affiliated Organization</Form.Label>
+        <Form.Control
+          placeholder="Enter affiliated organization"
+          maxLength={100}
+          defaultValue={profile?.affiliatedOrganization ?? undefined}
+          ref={affiliatedOrganizationRef}
+          disabled={isSavingProfile}
+        />
+      </Form.Group>
     </Form>
   );
 
   const handleEditClicked = () => {
     setIsEditingProfile(true);
+    setValidated(false);
 
     // If profile is loaded and form is not initialized
     // populate the form with profile data
@@ -197,6 +229,7 @@ export function AccountInformationPage() {
           state: profile?.state ?? null,
           country: profile?.country ?? null,
           phone: profile?.phoneNumber ?? null,
+          affiliatedOrganization: profile?.affiliatedOrganization ?? null,
         },
       });
     }
@@ -267,6 +300,7 @@ export function AccountInformationPage() {
               {labeledValue('State', profile?.state)}
               {labeledValue('Country', profile?.country)}
               {labeledValue('Phone', profile?.phoneNumber)}
+              {labeledValue('Affiliated Organization', profile?.affiliatedOrganization ?? undefined)}
             </div>
           )}
 

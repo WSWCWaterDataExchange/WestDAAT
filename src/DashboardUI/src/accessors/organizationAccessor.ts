@@ -8,6 +8,8 @@ import { OrganizationMemberAddRequest } from '../data-contracts/OrganizationMemb
 import { OrganizationMemberAddResponse } from '../data-contracts/OrganizationMemberAddResponse';
 import { OrganizationFundingDetailsResponse } from '../data-contracts/OrganizationFundingDetailsResponse';
 import { OrganizationFundingDetailsRequest } from '../data-contracts/OrganizationFundingDetailsRequest';
+import { OrganizationMemberRemoveResponse } from '../data-contracts/OrganizationMemberRemoveResponse';
+import { OrganizationMemberRemoveRequest } from '../data-contracts/OrganizationMemberRemoveRequest';
 
 export const getOrganizationDetailsList = async (
   msalContext: IMsalContext,
@@ -70,3 +72,24 @@ export const addOrganizationMember = async (
 
   return { data, status };
 };
+
+export const removeOrganizationMember = async (
+  msalContext: IMsalContext,
+  organizationId: string,
+  userId: string,
+): Promise<{ data: OrganizationMemberRemoveResponse; status: number }> => {
+  const api = await westDaatApi(msalContext);
+
+  const request: OrganizationMemberRemoveRequest = {
+    $type: 'OrganizationMemberRemoveRequest',
+    organizationId,
+    userId,
+  }
+
+  const { data, status } = await api.delete<OrganizationMemberRemoveResponse>(
+    `Organizations/${organizationId}/Members`,
+    { data: request }
+  );
+
+  return { data, status };
+}

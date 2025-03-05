@@ -1,12 +1,13 @@
 export enum Directions {
   None = 0,
-  Upsteam = 1,
-  Downsteam = 2,
+  Upstream = 1,
+  Downstream = 2,
 }
 
 export enum DataPoints {
   None = 0,
-  Wade = 1,
-  Usgs = 2,
-  Epa = 4,
+  WadeRights = 1,
+  WadeTimeseries = 2,
+  Usgs = 4,
+  Epa = 8,
 }
