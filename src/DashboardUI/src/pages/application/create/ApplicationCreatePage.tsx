@@ -137,16 +137,18 @@ function ApplicationCreatePageForm() {
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    const form = event.currentTarget;
+    // event default causes page to refresh
+    event.preventDefault();
+    event.stopPropagation();
 
+    const form = event.currentTarget;
     const isFormValid = form.checkValidity();
-    if (!isFormValid) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
 
     setFormValidated(true);
-    alert('This feature will be implemented in a future release.');
+
+    if (isFormValid) {
+      alert('This feature will be implemented in a future release.');
+    }
   };
 
   // assumes all polygons are not intersecting
