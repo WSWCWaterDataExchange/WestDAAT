@@ -209,25 +209,33 @@ function ApplicationCreatePageForm() {
           </Form.Group>
         </FormSection>
 
-        <FormSection title="Agent Information">
+        <FormSection
+          title="Representative / Agent Contact Information"
+          subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
+        >
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentFirstName">
             <Form.Label>Agent First Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentLastName">
             <Form.Label>Agent Last Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentEmail">
-            <Form.Label>Agent Email</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" maxLength={255} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentPhoneNumber">
-            <Form.Label>Agent Phone</Form.Label>
-            <Form.Control type="tel" maxLength={50} required />
+            <Form.Label>Phone</Form.Label>
+            <Form.Control type="tel" maxLength={50} />
+          </Form.Group>
+
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="agentOrOrgAdditionalDetails">
+            <Form.Label>Additional Details</Form.Label>
+            <Form.Control as="textarea" maxLength={4000} />
           </Form.Group>
         </FormSection>
 
