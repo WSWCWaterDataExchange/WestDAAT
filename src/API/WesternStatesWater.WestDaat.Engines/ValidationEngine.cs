@@ -233,6 +233,7 @@ internal class ValidationEngine : IValidationEngine
         {
             OrganizationMemberAddRequest req => await ValidateOrganizationMemberAddRequest(req, context),
             OrganizationMemberRemoveRequest req => ValidateOrganizationMemberRemoveRequest(req, context),
+            OrganizationMemberUpdateRequest req => ValidateOrganizationMemberUpdateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -302,6 +303,32 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private ErrorBase ValidateOrganizationMemberUpdateRequest(OrganizationMemberUpdateRequest request, ContextBase context)
+    {
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // Cannot edit your own organization roles.
+        if (request.UserId == userContext.UserId)
+        {
+            return CreateValidationError(request, "UserId", "User is not allowed to modify their own organization role.");
+        }
+
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = request.OrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.OrganizationMemberUpdate) &&
+            !orgPermissions.Contains(Permissions.OrganizationMemberUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+    
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
     {
         return request switch
