@@ -24,7 +24,8 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData } = useMapContext();
+  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
+    useMapContext();
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -105,6 +106,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [state.conservationApplication.polygonEtData]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
+    console.log('handle map drawn polygon change', polygons);
     if (polygons.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
@@ -132,6 +134,8 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         doPolygonsOverlap,
       },
     });
+
+    setUserDrawnPolygonData(polygons);
   };
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;

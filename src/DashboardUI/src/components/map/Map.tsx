@@ -65,6 +65,7 @@ function Map({
     mapStyle,
     visibleLayers,
     geoJsonData,
+    userDrawnPolygonData,
     filters,
     circleColors,
     circleRadii,
@@ -448,6 +449,15 @@ function Map({
       }
     });
   }, [map, geoJsonData]);
+
+  useEffect(() => {
+    if (!map || !drawControl) {
+      return;
+    }
+    userDrawnPolygonData.forEach((poly) => {
+      drawControl.add(poly);
+    });
+  }, [map, drawControl, userDrawnPolygonData]);
 
   useEffect(() => {
     if (!map) return;
