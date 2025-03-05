@@ -78,4 +78,23 @@ public class OrganizationFunction : FunctionBase
         };
         return await CreateResponse(req, result);
     }
+    
+    [Function(nameof(UpdateOrganizationMembers))]
+    [OpenApiOperation(nameof(UpdateOrganizationMembers))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(OrganizationStoreResponseBase))]
+    [OpenApiParameter("organizationId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
+    public async Task<HttpResponseData> UpdateOrganizationMembers(
+        [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/{{organizationId}}/Members")]
+        HttpRequestData req, Guid organizationId)
+    {
+        var organizationStoreRequest = await ParseRequestBody<OrganizationStoreRequestBase>(req,
+            new Dictionary<string, object> { { "OrganizationId", organizationId } });
+
+        var result = organizationStoreRequest switch
+        {
+            OrganizationMemberUpdateRequest request => await _organizationManager.Store<OrganizationMemberUpdateRequest, OrganizationMemberUpdateResponse>(request),
+            _ => throw new NotImplementedException($"Request type {organizationStoreRequest.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
+    }
 }
