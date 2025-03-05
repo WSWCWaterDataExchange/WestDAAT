@@ -35,7 +35,7 @@ function NldiSiteCard(props: NldiSiteMapPopupProps) {
                 <strong>Identifier:</strong>
               </div>
               <div>
-                <a href={uri} target="_blank" rel="noopener noreferrer">
+                <a href={`/details/site/${identifier}`} target="_blank" rel="noopener noreferrer">
                   {identifier} <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
                 </a>
               </div>

@@ -32,6 +32,7 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
+import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -107,7 +108,8 @@ function App({ msalInstance }: AppProps) {
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>
                     <Route path=":applicationId">
-                      <Route path="review" element={<ApplicationReviewPage />}></Route>
+                      <Route path="create" element={<ApplicationCreatePage />} />
+                      <Route path="review" element={<ApplicationReviewPage />} />
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>

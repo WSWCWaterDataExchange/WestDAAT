@@ -68,6 +68,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new UnsubmittedApplicationExistsLoadResponse
         {
             InProgressApplicationId = existingInProgressApplication?.Id,
+            InProgressApplicationDisplayId = existingInProgressApplication?.ApplicationDisplayId,
             FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
         };
     }
