@@ -214,7 +214,7 @@ function ApplicationCreatePageForm() {
           subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
         >
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentName">
-            <Form.Label>Agent Name</Form.Label>
+            <Form.Label>Name / Organization</Form.Label>
             <Form.Control type="text" maxLength={100} />
           </Form.Group>
 
@@ -228,7 +228,7 @@ function ApplicationCreatePageForm() {
             <Form.Control type="tel" maxLength={50} />
           </Form.Group>
 
-          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="agentOrOrgAdditionalDetails">
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="agentAdditionalDetails">
             <Form.Label>Additional Details</Form.Label>
             <Form.Control as="textarea" maxLength={4000} />
           </Form.Group>
@@ -269,12 +269,12 @@ function ApplicationCreatePageForm() {
               information."
         >
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationEntityName">
-            <Form.Label>Entity Name</Form.Label>
+            <Form.Label>Name / Organization</Form.Label>
             <Form.Control type="text" maxLength={255} required />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneHalfWidthDefault} mb-4`} controlId="canalOrIrrigationEntityEmail">
-            <Form.Label>Entity Email</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control type="email" maxLength={255} required />
           </Form.Group>
 
@@ -282,8 +282,13 @@ function ApplicationCreatePageForm() {
             className={`${responsiveOneHalfWidthDefault} mb-4`}
             controlId="canalOrIrrigationEntityPhoneNumber"
           >
-            <Form.Label>Entity Phone</Form.Label>
+            <Form.Label>Phone</Form.Label>
             <Form.Control type="text" maxLength={50} required />
+          </Form.Group>
+
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationAdditionalDetails">
+            <Form.Label>Additional Details</Form.Label>
+            <Form.Control as="textarea" maxLength={4000} />
           </Form.Group>
         </FormSection>
 
