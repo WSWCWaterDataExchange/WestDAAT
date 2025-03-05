@@ -17,7 +17,7 @@ export function SignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const { user } = useAuthenticationContext();
+  const { user, authenticationComplete } = useAuthenticationContext();
 
   const formRef = useRef<HTMLFormElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -27,8 +27,16 @@ export function SignupPage() {
   const phoneRef = useRef<HTMLInputElement>(null);
   const affiliatedOrganizationRef = useRef<HTMLInputElement>(null);
 
+  // Location state becomes null after the first render
+  const [prevRoute] = useState(location.state?.from);
   const [validated, setValidated] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Redirect to home page if user is not logged in
+  if (authenticationComplete && !user) {
+    setTimeout(() => navigate('/'), 0);
+    return null;
+  }
 
   const saveProfileMutation = useMutation({
     mutationFn: () => {
@@ -62,8 +70,7 @@ export function SignupPage() {
 
       queryClient.setQueryData(['user-profile', user?.userId], newCacheData);
 
-      // Redirect to the previous route or home if no previous route
-      const previousRoute = location.state?.from || '/';
+      const previousRoute = prevRoute ?? '/';
       navigate(previousRoute);
     },
     onError: () => {
