@@ -12,7 +12,7 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 
 export function ApplicationCreatePage() {
@@ -44,8 +44,9 @@ const responsiveFullWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
   const { state, dispatch } = useConservationApplicationContext();
-
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+
+  const [formValidated, setFormValidated] = useState(false);
 
   const landownerFirstNameRef = useRef<HTMLInputElement>(null);
   const landownerLastNameRef = useRef<HTMLInputElement>(null);
@@ -135,6 +136,19 @@ function ApplicationCreatePageForm() {
     });
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+
+    const isFormValid = form.checkValidity();
+    if (!isFormValid) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    setFormValidated(true);
+    alert('This feature will be implemented in a future release.');
+  };
+
   // assumes all polygons are not intersecting
   const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
     (sum, polygon) => sum + polygon.acreage,
@@ -168,7 +182,7 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form onChange={onFormChanged} noValidate>
+      <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
         <FormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerFirstName">
             <Form.Label>Landowner First Name</Form.Label>
@@ -587,14 +601,14 @@ function ApplicationCreatePageForm() {
             </Button>
           </div>
         </FormSection>
-      </Form>
 
-      <hr className="m-0" />
-      <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={() => alert('This feature will be implemented in a future release.')}>
-          Review & Submit
-        </Button>
-      </div>
+        <hr className="m-0" />
+        <div className="d-flex justify-content-end p-3">
+          <Button variant="success" type="submit">
+            Review & Submit
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 }
