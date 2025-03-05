@@ -5,11 +5,12 @@ import Button from 'react-bootstrap/esm/Button';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
 import { useParams } from 'react-router-dom';
 import { TableLoading } from '../../components/TableLoading';
-import { RoleDisplayNames } from '../../config/role';
+import { Role, RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 import AddUserModal from './AddUserModal';
 import { RemoveOrganizationUserModal } from './RemoveUserModal';
+import { EditOrganizationUserModal } from './EditUserModal';
 
 export function AdminOrganizationsUsersPage() {
   const { user: currentUser } = useAuthenticationContext();
@@ -17,6 +18,9 @@ export function AdminOrganizationsUsersPage() {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
   const [removeUserId, setRemoveUserId] = useState<string | null>(null);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editUserId, setEditUserId] = useState<string | null>(null);
+  const [editUserRole, setEditUserRole] = useState<Role | null>(null);
 
   const {
     data: organizationListResponse,
@@ -80,6 +84,18 @@ export function AdminOrganizationsUsersPage() {
     setRemoveUserId(null);
   };
 
+  const openEditUserModal = (userId: string, role: Role) => {
+    setShowEditUserModal(true);
+    setEditUserId(userId);
+    setEditUserRole(role);
+  };
+
+  const closeEditUserModal = () => {
+    setShowEditUserModal(false);
+    setEditUserId(null);
+    setEditUserRole(null);
+  };
+
   return (
     <div className="container">
       {pageTitle()}
@@ -121,7 +137,11 @@ export function AdminOrganizationsUsersPage() {
                   <td className="align-content-center text-center">
                     {currentUser?.userId !== user.userId && (
                       <>
-                        <Button variant="link" className="px-1 py-1">
+                        <Button
+                          variant="link"
+                          className="px-1 py-1"
+                          onClick={() => openEditUserModal(user.userId, user.role)}
+                        >
                           <Icon path={mdiPencilOutline} size="1.5em" aria-label="Edit user button"></Icon>
                         </Button>
                         <Button
@@ -152,6 +172,13 @@ export function AdminOrganizationsUsersPage() {
         organizationId={organizationId}
         closeModal={closeRemoveUserModal}
       ></RemoveOrganizationUserModal>
+      <EditOrganizationUserModal
+        show={showEditUserModal}
+        userId={editUserId}
+        organizationId={organizationId}
+        role={editUserRole}
+        closeModal={closeEditUserModal}
+      ></EditOrganizationUserModal>
       <AddUserModal organization={organization} show={showAddUserModal} onHide={() => setShowAddUserModal(false)} />
     </div>
   );
