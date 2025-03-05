@@ -31,7 +31,9 @@ export function ApplicationCreatePage() {
         centerText="Water Conservation Estimation Tool"
       />
 
-      <ApplicationCreatePageForm />
+      <div className="overflow-y-auto">
+        <ApplicationCreatePageForm />
+      </div>
     </div>
   );
 }
