@@ -31,6 +31,7 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
+import { SignupPage } from './pages/account/SignupPage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -96,6 +97,7 @@ function App({ msalInstance }: AppProps) {
                 <Route path="account">
                   <Route element={<AccountLayout />}>
                     <Route index element={<AccountInformationPage />} />
+                    <Route path="signup" element={<SignupPage />} />
                   </Route>
                 </Route>
                 <Route path="application" element={<ApplicationGuard />}>
