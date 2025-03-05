@@ -238,7 +238,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.UserProfile.Country))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.UserProfile.PhoneNumber))
                 .ForMember(dest => dest.AffiliatedOrganization, opt => opt.MapFrom(src => src.UserProfile.AffiliatedOrganization))
-                .ForMember(dest => dest.IsSignupComplete, opt => opt.MapFrom(src => src.UserProfile.IsSignupComplete));
+                .ForMember(dest => dest.IsSignupComplete, opt => opt.MapFrom(src => src.UserProfile != null && src.UserProfile.IsSignupComplete));
 
             CreateMap<EFWD.UserOrganization, OrganizationMembership>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.OrganizationId))
