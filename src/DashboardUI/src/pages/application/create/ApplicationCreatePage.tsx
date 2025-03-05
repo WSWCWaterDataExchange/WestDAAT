@@ -53,7 +53,7 @@ function ApplicationCreatePageForm() {
   const landownerCityRef = useRef<HTMLInputElement>(null);
   const landownerStateRef = useRef<HTMLSelectElement>(null);
   const landownerZipCodeRef = useRef<HTMLInputElement>(null);
-  const agentFirstNameRef = useRef<HTMLInputElement>(null);
+  const agentNameRef = useRef<HTMLInputElement>(null);
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
@@ -99,7 +99,7 @@ function ApplicationCreatePageForm() {
       landownerCity: landownerCityRef.current?.value,
       landownerState: landownerStateRef.current?.value,
       landownerZipCode: landownerZipCodeRef.current?.value,
-      agentName: agentFirstNameRef.current?.value,
+      agentName: agentNameRef.current?.value,
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
@@ -165,37 +165,37 @@ function ApplicationCreatePageForm() {
         <FormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerFirstName">
             <Form.Label>Landowner First Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} required ref={landownerFirstNameRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerLastName">
             <Form.Label>Landowner Last Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} required ref={landownerLastNameRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerEmail">
             <Form.Label>Email Address</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Control type="email" maxLength={255} required ref={landownerEmailRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerPhoneNumber">
             <Form.Label>Phone</Form.Label>
-            <Form.Control type="tel" maxLength={50} required />
+            <Form.Control type="tel" maxLength={50} required ref={landownerPhoneNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerAddress">
             <Form.Label>Address</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={landownerAddressRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerCity">
             <Form.Label>City</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} required ref={landownerCityRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerState">
             <Form.Label>State</Form.Label>
-            <Form.Select required>
+            <Form.Select required ref={landownerStateRef}>
               <option value={''}>Select a state</option>
               {states.map((state) => (
                 <option key={state.value} value={state.value}>
@@ -207,7 +207,7 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerZipCode">
             <Form.Label>Zip Code</Form.Label>
-            <Form.Control type="text" maxLength={10} required />
+            <Form.Control type="text" maxLength={10} required ref={landownerZipCodeRef} />
           </Form.Group>
         </FormSection>
 
@@ -217,22 +217,22 @@ function ApplicationCreatePageForm() {
         >
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentName">
             <Form.Label>Name / Organization</Form.Label>
-            <Form.Control type="text" maxLength={100} />
+            <Form.Control type="text" maxLength={100} ref={agentNameRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentEmail">
             <Form.Label>Email</Form.Label>
-            <Form.Control type="email" maxLength={255} />
+            <Form.Control type="email" maxLength={255} ref={agentEmailRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentPhoneNumber">
             <Form.Label>Phone</Form.Label>
-            <Form.Control type="tel" maxLength={50} />
+            <Form.Control type="tel" maxLength={50} ref={agentPhoneNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="agentAdditionalDetails">
             <Form.Label>Additional Details</Form.Label>
-            <Form.Control as="textarea" maxLength={4000} />
+            <Form.Control as="textarea" maxLength={4000} ref={agentAdditionalDetailsRef} />
           </Form.Group>
         </FormSection>
 
@@ -240,22 +240,22 @@ function ApplicationCreatePageForm() {
           <FormSection title="Property & Land Area Information" className="col-6">
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
               <Form.Label> Project Location</Form.Label>
-              <Form.Control type="text" maxLength={255} required />
+              <Form.Control type="text" maxLength={255} required ref={projectLocationRef} />
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
               <Form.Label>Additional Details</Form.Label>
-              <Form.Control as="textarea" maxLength={4000} required />
+              <Form.Control as="textarea" maxLength={4000} required ref={propertyAdditionalDetailsRef} />
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPoint">
               <Form.Label>Diversion Point</Form.Label>
-              <Form.Control type="text" maxLength={255} required />
+              <Form.Control type="text" maxLength={255} required ref={diversionPointRef} />
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPointDetails">
               <Form.Label>Diversion Point Details</Form.Label>
-              <Form.Control as="textarea" maxLength={4000} required />
+              <Form.Control as="textarea" maxLength={4000} required ref={diversionPointDetailsRef} />
             </Form.Group>
           </FormSection>
 
@@ -272,12 +272,12 @@ function ApplicationCreatePageForm() {
         >
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationEntityName">
             <Form.Label>Name / Organization</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={canalOrIrrigationEntityNameRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneHalfWidthDefault} mb-4`} controlId="canalOrIrrigationEntityEmail">
             <Form.Label>Email</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Control type="email" maxLength={255} required ref={canalOrIrrigationEntityEmailRef} />
           </Form.Group>
 
           <Form.Group
@@ -285,44 +285,44 @@ function ApplicationCreatePageForm() {
             controlId="canalOrIrrigationEntityPhoneNumber"
           >
             <Form.Label>Phone</Form.Label>
-            <Form.Control type="text" maxLength={50} required />
+            <Form.Control type="text" maxLength={50} required ref={canalOrIrrigationEntityPhoneNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationAdditionalDetails">
             <Form.Label>Additional Details</Form.Label>
-            <Form.Control as="textarea" maxLength={4000} />
+            <Form.Control as="textarea" maxLength={4000} ref={canalOrIrrigationAdditionalDetailsRef} />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Water Right Information">
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="permitNumber">
             <Form.Label>Permit #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={permitNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="facilityDitchName">
             <Form.Label>Facility (Ditch) Name</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={facilityDitchNameRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
-            <Form.Control type="date" required />
+            <Form.Control type="date" required ref={priorityDateRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="certificateNumber">
             <Form.Label>Certificate #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={certificateNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="shareNumber">
             <Form.Label>Share #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={shareNumberRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="waterRightState">
             <Form.Label>State</Form.Label>
-            <Form.Select required>
+            <Form.Select required ref={waterRightStateRef}>
               <option value={''}>Select a state</option>
               {states.map((state) => (
                 <option key={state.value} value={state.value}>
@@ -334,7 +334,7 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="waterUseDescription">
             <Form.Label>Description of Water Use</Form.Label>
-            <Form.Control as="textarea" maxLength={4000} required />
+            <Form.Control as="textarea" maxLength={4000} required ref={waterUseDescriptionRef} />
           </Form.Group>
         </FormSection>
 
@@ -384,7 +384,7 @@ function ApplicationCreatePageForm() {
             <Form.Label>
               Do you have supplementary data that can help in reviewing this estimate? If so, provide that here.
             </Form.Label>
-            <Form.Control type="text" required />
+            <Form.Control type="text" required ref={estimationSupplementaryDetailsRef} />
           </Form.Group>
         </FormSection>
 
@@ -394,7 +394,7 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestDollarAmount"
           >
             <Form.Label>Funding Request $ Amount</Form.Label>
-            <Form.Control type="number" required />
+            <Form.Control type="number" required ref={conservationPlanFundingRequestDollarAmountRef} />
           </Form.Group>
 
           <Form.Group
@@ -402,7 +402,7 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestCompensationRateUnits"
           >
             <Form.Label>Units</Form.Label>
-            <Form.Select required>
+            <Form.Select required ref={conservationPlanFundingRequestCompensationRateUnitsRef}>
               <option value={0}>Select an option</option>
               {CompensationRateUnitsOptions.map((value) => (
                 <option key={value} value={value}>
@@ -414,12 +414,12 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanDescription">
             <Form.Label>Describe your Conservation Plan.</Form.Label>
-            <Form.Control as="textarea" required />
+            <Form.Control as="textarea" required ref={conservationPlanDescriptionRef} />
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanAdditionalInfo">
             <Form.Label>Additional Information</Form.Label>
-            <Form.Control as="textarea" required />
+            <Form.Control as="textarea" required ref={conservationPlanAdditionalInfoRef} />
           </Form.Group>
         </FormSection>
 
