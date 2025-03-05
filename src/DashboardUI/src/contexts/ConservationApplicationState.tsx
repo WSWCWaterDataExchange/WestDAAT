@@ -30,6 +30,7 @@ export interface ConservationApplicationState {
     doPolygonsOverlap: boolean;
     polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
     applicationSubmissionForm: ApplicationSubmissionForm;
+    isApplicationSubmissionFormValid: boolean;
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -96,6 +97,7 @@ export const defaultState = (): ConservationApplicationState => ({
       conservationPlanDescription: undefined,
       conservationPlanAdditionalInfo: undefined,
     },
+    isApplicationSubmissionFormValid: false,
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -360,6 +362,8 @@ const onApplicationFormUpdated = (
     ...payload.formValues,
   };
 
+  checkIsApplicationSubmissionFormValid(draftState);
+
   return draftState;
 };
 
@@ -404,4 +408,32 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
   draftState.conservationApplication.conservationPayment = undefined;
   draftState.conservationApplication.polygonEtData = [];
   draftState.canContinueToApplication = false;
+};
+
+const checkIsApplicationSubmissionFormValid = (draftState: ConservationApplicationState): void => {
+  const form = draftState.conservationApplication.applicationSubmissionForm;
+
+  draftState.conservationApplication.isApplicationSubmissionFormValid =
+    !!form.landownerFirstName &&
+    !!form.landownerLastName &&
+    !!form.landownerEmail &&
+    !!form.landownerPhoneNumber &&
+    !!form.landownerAddress &&
+    !!form.landownerCity &&
+    !!form.landownerState &&
+    !!form.landownerZipCode &&
+    !!form.projectLocation &&
+    !!form.propertyAdditionalDetails &&
+    !!form.diversionPoint &&
+    !!form.diversionPointDetails &&
+    !!form.permitNumber &&
+    !!form.facilityDitchName &&
+    !!form.priorityDate &&
+    !!form.certificateNumber &&
+    !!form.shareNumber &&
+    !!form.waterRightState &&
+    !!form.waterUseDescription &&
+    !!form.conservationPlanFundingRequestDollarAmount &&
+    !!form.conservationPlanFundingRequestCompensationRateUnits &&
+    !!form.conservationPlanDescription;
 };
