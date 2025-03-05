@@ -9,10 +9,10 @@ export interface ApplicationSubmissionForm {
   landownerCity: string | undefined;
   landownerState: string | undefined;
   landownerZipCode: string | undefined;
-  agentFirstName: string | undefined;
-  agentLastName: string | undefined;
+  agentName: string | undefined;
   agentEmail: string | undefined;
   agentPhoneNumber: string | undefined;
+  agentAdditionalDetails: string | undefined;
   projectLocation: string | undefined;
   propertyAdditionalDetails: string | undefined;
   diversionPoint: string | undefined;

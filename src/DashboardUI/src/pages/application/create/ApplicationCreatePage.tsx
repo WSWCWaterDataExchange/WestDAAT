@@ -54,9 +54,9 @@ function ApplicationCreatePageForm() {
   const landownerStateRef = useRef<HTMLSelectElement>(null);
   const landownerZipCodeRef = useRef<HTMLInputElement>(null);
   const agentFirstNameRef = useRef<HTMLInputElement>(null);
-  const agentLastNameRef = useRef<HTMLInputElement>(null);
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
   const projectLocationRef = useRef<HTMLInputElement>(null);
   const propertyAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
   const diversionPointRef = useRef<HTMLInputElement>(null);
@@ -98,10 +98,10 @@ function ApplicationCreatePageForm() {
       landownerCity: landownerCityRef.current?.value,
       landownerState: landownerStateRef.current?.value,
       landownerZipCode: landownerZipCodeRef.current?.value,
-      agentFirstName: agentFirstNameRef.current?.value,
-      agentLastName: agentLastNameRef.current?.value,
+      agentName: agentFirstNameRef.current?.value,
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
+      agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
       projectLocation: projectLocationRef.current?.value,
       propertyAdditionalDetails: propertyAdditionalDetailsRef.current?.value,
       diversionPoint: diversionPointRef.current?.value,
@@ -213,13 +213,8 @@ function ApplicationCreatePageForm() {
           title="Representative / Agent Contact Information"
           subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
         >
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentFirstName">
-            <Form.Label>Agent First Name</Form.Label>
-            <Form.Control type="text" maxLength={100} />
-          </Form.Group>
-
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentLastName">
-            <Form.Label>Agent Last Name</Form.Label>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentName">
+            <Form.Label>Agent Name</Form.Label>
             <Form.Control type="text" maxLength={100} />
           </Form.Group>
 
