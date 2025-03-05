@@ -64,6 +64,7 @@ function ApplicationCreatePageForm() {
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
   const permitNumberRef = useRef<HTMLInputElement>(null);
   const facilityDitchNameRef = useRef<HTMLInputElement>(null);
   const priorityDateRef = useRef<HTMLInputElement>(null);
@@ -109,6 +110,7 @@ function ApplicationCreatePageForm() {
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
       canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
       canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
+      canalOrIrrigationAdditionalDetails: canalOrIrrigationAdditionalDetailsRef.current?.value,
       permitNumber: permitNumberRef.current?.value,
       facilityDitchName: facilityDitchNameRef.current?.value,
       priorityDate: priorityDateRef.current?.value,

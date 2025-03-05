@@ -20,6 +20,7 @@ export interface ApplicationSubmissionForm {
   canalOrIrrigationEntityName: string | undefined;
   canalOrIrrigationEntityEmail: string | undefined;
   canalOrIrrigationEntityPhoneNumber: string | undefined;
+  canalOrIrrigationAdditionalDetails: string | undefined;
   permitNumber: string | undefined;
   facilityDitchName: string | undefined;
   priorityDate: string | undefined;
