@@ -12,10 +12,10 @@ function Layout() {
   // Force the user to complete their profile if they haven't already
   const isProfileEnabled = isFeatureEnabled('conservationEstimationTool');
   const requiresSignup = userProfileResponse?.userProfile.isSignupComplete === false;
-  if (isProfileEnabled && requiresSignup) {
-    setTimeout(() => {
-      navigate('/account/signup');
-    }, 0);
+  const signupRoute = '/account/signup';
+  const currentRoute = window.location.pathname;
+  if (isProfileEnabled && requiresSignup && currentRoute !== signupRoute) {
+    navigate(signupRoute, { state: { from: currentRoute } });
   }
 
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(!localStorage.getItem('disclaimer'));

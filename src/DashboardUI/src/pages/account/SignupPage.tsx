@@ -3,8 +3,22 @@ import Form from 'react-bootstrap/esm/Form';
 import { states } from '../../config/states';
 import { countries } from '../../config/countries';
 import Button from 'react-bootstrap/esm/Button';
+import { toast } from 'react-toastify';
+import { useMsal } from '@azure/msal-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from 'react-query';
+import { createProfile } from '../../accessors/userAccessor';
+import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
+import { UserProfileResponse } from '../../data-contracts/UserProfileResponse';
+import { produce } from 'immer';
 
 export function SignupPage() {
+  const msalContext = useMsal();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
+  const { user } = useAuthenticationContext();
+
   const formRef = useRef<HTMLFormElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -15,6 +29,59 @@ export function SignupPage() {
 
   const [validated, setValidated] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  const saveProfileMutation = useMutation({
+    mutationFn: () => {
+      setIsSavingProfile(true);
+
+      return createProfile(msalContext, {
+        firstName: firstNameRef.current?.value ?? '',
+        lastName: lastNameRef.current?.value ?? '',
+        state: stateRef.current?.value ?? '',
+        country: countryRef.current?.value ?? '',
+        phoneNumber: phoneRef.current?.value ?? '',
+        affiliatedOrganization: affiliatedOrganizationRef.current?.value ?? null,
+      });
+    },
+    onSuccess: () => {
+      const existingProfile: UserProfileResponse | undefined = queryClient.getQueryData(['user-profile', user?.userId]);
+
+      const newCacheData = produce(existingProfile, (draft) => {
+        if (draft?.userProfile) {
+          // Important to avoid redirecting to this page again
+          draft.userProfile.isSignupComplete = true;
+
+          draft.userProfile.firstName = firstNameRef.current?.value ?? '';
+          draft.userProfile.lastName = lastNameRef.current?.value ?? '';
+          draft.userProfile.state = stateRef.current?.value ?? '';
+          draft.userProfile.country = countryRef.current?.value ?? '';
+          draft.userProfile.phoneNumber = phoneRef.current?.value ?? '';
+          draft.userProfile.affiliatedOrganization = affiliatedOrganizationRef.current?.value ?? null;
+        }
+      });
+
+      queryClient.setQueryData(['user-profile', user?.userId], newCacheData);
+
+      // Redirect to the previous route or home if no previous route
+      const previousRoute = location.state?.from || '/';
+      navigate(previousRoute);
+    },
+    onError: () => {
+      toast.error('There was an error saving your profile information. Please try again.', {
+        position: 'top-center',
+        theme: 'colored',
+      });
+      setIsSavingProfile(false);
+    },
+  });
+
+  const handleContinueClick = () => {
+    if (formRef.current?.checkValidity()) {
+      saveProfileMutation.mutate();
+    } else {
+      setValidated(true);
+    }
+  };
 
   const editForm = (
     <Form noValidate validated={validated} className="row mb-3" ref={formRef}>
@@ -98,7 +165,9 @@ export function SignupPage() {
       <p className="m-0 mb-4">This can be changed later in your account profile.</p>
       {editForm}
 
-      <Button className="fs-5 my-3 py-3 w-100">Continue</Button>
+      <Button className="fs-5 my-3 py-3 w-100" disabled={isSavingProfile} onClick={() => handleContinueClick()}>
+        Continue
+      </Button>
     </div>
   );
 }
