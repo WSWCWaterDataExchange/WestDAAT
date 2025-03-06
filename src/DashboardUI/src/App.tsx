@@ -18,7 +18,7 @@ import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
 import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
-import { ApplicationGuard } from './pages/application/ApplicationGuard';
+import { AuthGuard } from './pages/application/AuthGuard';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
 import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
@@ -95,13 +95,13 @@ function App({ msalInstance }: AppProps) {
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
                 </Route>
-                <Route path="account">
+                <Route path="account" element={<AuthGuard />}>
                   <Route element={<AccountLayout />}>
                     <Route index element={<AccountInformationPage />} />
                     <Route path="signup" element={<SignupPage />} />
                   </Route>
                 </Route>
-                <Route path="application" element={<ApplicationGuard />}>
+                <Route path="application" element={<AuthGuard />}>
                   <Route element={<ApplicationLayout />}>
                     <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">
