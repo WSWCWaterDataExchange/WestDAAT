@@ -24,7 +24,7 @@ export function ApplicationCreatePage() {
   };
 
   return (
-    <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
+    <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
         navigateBack={navigateToEstimationToolPage}
         backButtonText="Back to Estimator"
