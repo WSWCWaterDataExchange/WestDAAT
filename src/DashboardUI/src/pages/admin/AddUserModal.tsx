@@ -34,7 +34,7 @@ function AddUserModal(props: AddUserModalProps) {
   const { user } = useAuthenticationContext();
 
   const addOrganizationMemberMutation = useMutation({
-    mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
+    mutationFn: async (params: { organizationId: string; userId: string; role: Role }) => {
       return await addOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
