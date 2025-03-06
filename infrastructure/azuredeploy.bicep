@@ -31,6 +31,7 @@ var b2cOrigins = {
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
 var azureServiceBusDataSenderRoleDefinitionName = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
 var azureServiceBusReceiverRoleDefinitionName = '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
+var azureStorageBlobDataContributorRoleDefinitionName = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 
 var activeDirectoryObjectIds = {
   qa: ['5c18b0c3-d95d-4720-86f6-f292f2e3c243', 'WestDAAT - QA - Access']
@@ -561,6 +562,21 @@ resource serviceBusRoleAssignmentFnAppReceiver 'Microsoft.Authorization/roleAssi
   properties: {
     principalId: sites_fn_resource.identity.principalId
     roleDefinitionId: azureServiceBusReceiverRoleDefinition.id
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource azureStorageBlobDataContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: azureStorageBlobDataContributorRoleDefinitionName
+}
+
+resource storageAccountRoleAssignmentFnApp 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: Microsoft_Storage_storageAccounts
+  name: guid('${Microsoft_Storage_storageAccounts.id}-data-contributor')
+  properties: {
+    principalId: sites_fn_resource.identity.principalId
+    roleDefinitionId: azureStorageBlobDataContributorRoleDefinition.id
     principalType: 'ServicePrincipal'
   }
 }
