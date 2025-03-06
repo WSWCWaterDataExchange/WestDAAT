@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 import { editOrganizationMember } from '../../accessors/organizationAccessor';
 import { Role, RoleDisplayNames } from '../../config/role';
 import { UserListResponse } from '../../data-contracts/UserListResponse';
-import { UserListResult } from '../../data-contracts/UserListResult';
 
 export interface EditOrganizationUserModalProps extends ModalProps {
   organizationId: string | null | undefined;
@@ -26,11 +25,11 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
 
   const msalContext = useMsal();
   const queryClient = useQueryClient();
-  const user = queryClient
-    .getQueryData<UserListResponse>(['organizationUsers', props.organizationId])
-    ?.users.find((user) => user.userId === props.userId);
+  const usersList = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]);
+  const userIndex = usersList?.users.findIndex((user) => user.userId === props.userId);
+  const user = userIndex !== undefined ? usersList?.users[userIndex] : undefined;
 
-  const successfulUpdateActions = () => {
+  const triggerSuccessfulUpdateActions = () => {
     toast.success('User successfully updated', {
       autoClose: 1000,
     });
@@ -42,16 +41,11 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       return await editOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
-      // TODO: JN - do I need to re-get the list of users here? could it have changed since the component was mounted?
-      const usersList = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]); // ?? []
-      const editedUserIndex = usersList?.users.findIndex((user: UserListResult) => user.userId === props.userId);
-
-      // TODO: JN - how to handle all these pesky "possibly" undefineds? if statement or ! overrides?
-      if (usersList && editedUserIndex !== undefined && roleRef.current) {
-        usersList.users[editedUserIndex].role = roleRef.current.value as Role;
+      if (usersList && userIndex !== undefined && roleRef.current) {
+        usersList.users[userIndex].role = roleRef.current.value as Role;
         queryClient.setQueryData(['organizationUsers', props.organizationId], usersList);
       }
-      successfulUpdateActions();
+      triggerSuccessfulUpdateActions();
     },
     onError: () => {
       toast.error('Error saving changes to user', {
@@ -74,7 +68,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
         role: roleRef.current?.value,
       });
     } else {
-      successfulUpdateActions();
+      triggerSuccessfulUpdateActions();
     }
   };
 
