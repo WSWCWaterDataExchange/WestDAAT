@@ -137,7 +137,7 @@ export function AccountInformationPage() {
       ref={formRef}
     >
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
-        <Form.Label className="fw-bold">First name</Form.Label>
+        <Form.Label className="fw-bold">First Name</Form.Label>
         <Form.Control
           placeholder="Enter first name"
           maxLength={255}
@@ -150,7 +150,7 @@ export function AccountInformationPage() {
       </Form.Group>
 
       <Form.Group className="mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-6">
-        <Form.Label className="fw-bold">Last name</Form.Label>
+        <Form.Label className="fw-bold">Last Name</Form.Label>
         <Form.Control
           placeholder="Enter last name"
           maxLength={255}

@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 
-public class UserProfileUpdateRequestValidator : AbstractValidator<UserProfileUpdateRequest>
+public class UserProfileCreateRequestValidator : AbstractValidator<UserProfileCreateRequest>
 {
-    public UserProfileUpdateRequestValidator()
+    public UserProfileCreateRequestValidator()
     {
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(255);
 

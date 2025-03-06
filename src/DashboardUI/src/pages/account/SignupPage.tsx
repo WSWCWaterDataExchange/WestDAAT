@@ -93,7 +93,7 @@ export function SignupPage() {
   const editForm = (
     <Form noValidate validated={validated} className="row mb-3" ref={formRef}>
       <Form.Group className="mb-2 col-12">
-        <Form.Label className="fw-bold">First name</Form.Label>
+        <Form.Label className="fw-bold">First Name</Form.Label>
         <Form.Control
           placeholder="Enter first name"
           maxLength={255}
@@ -105,7 +105,7 @@ export function SignupPage() {
       </Form.Group>
 
       <Form.Group className="mb-2 col-12">
-        <Form.Label className="fw-bold">Last name</Form.Label>
+        <Form.Label className="fw-bold">Last Name</Form.Label>
         <Form.Control
           placeholder="Enter last name"
           maxLength={255}
