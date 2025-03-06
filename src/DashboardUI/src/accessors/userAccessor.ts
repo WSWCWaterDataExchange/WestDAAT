@@ -72,3 +72,20 @@ export const saveProfileInformation = async (
 
   await api.put('Users/Profile', request);
 };
+
+export const createProfile = async (
+  msalContext: IMsalContext,
+  fields: {
+    firstName: string;
+    lastName: string;
+    state: string;
+    country: string;
+    phoneNumber: string;
+    affiliatedOrganization: string | null;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(msalContext);
+
+  // Simulate successful call
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};

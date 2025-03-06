@@ -567,6 +567,39 @@ public class UserIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task Load_UserProfileRequest_NoProfile_ShouldNotThrow()
+    {
+        // Arrange
+        var currentUser = new UserFaker()
+            .RuleFor(u => u.UserProfile, _ => null)
+            .Generate();
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+                Roles = [],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserProfileRequest, CLI.Responses.Admin.UserProfileResponse>(
+            new CLI.Requests.Admin.UserProfileRequest
+            {
+                UserId = currentUser.Id // Same as current user, should succeed
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeNull();
+        result.UserProfile.IsSignupComplete.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task Store_UpdateUserProfileRequest_ShouldUpdate()
     {
         // Arrange
@@ -640,5 +673,87 @@ public class UserIntegrationTests : IntegrationTestBase
         // Assert
         result.Error.Should().BeOfType<InternalError>();
         result.Error.LogMessage.Should().Contain($"User profile not found for id {currentUser.Id}");
+    }
+
+    [TestMethod]
+    public async Task Store_UserProfileCreateRequest_Success()
+    {
+        // Arrange
+        var currentUser = new UserFaker()
+            .RuleFor(u => u.UserProfile, _ => null)
+            .Generate();
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+            }
+        );
+
+        // Act
+        var result = await _userManager.Store<CLI.Requests.Admin.UserProfileCreateRequest, CLI.Responses.Admin.UserStoreResponseBase>(
+            new CLI.Requests.Admin.UserProfileCreateRequest
+            {
+                FirstName = "Testie",
+                LastName = "McTesterson",
+                State = "NE",
+                Country = "Canada",
+                PhoneNumber = "123-456-7890",
+                AffiliatedOrganization = "DPL"
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeNull();
+
+        var updatedUser = await _dbContext.Users
+            .Include(u => u.UserProfile)
+            .SingleAsync(u => u.Id == currentUser.Id);
+
+        updatedUser.UserProfile.FirstName.Should().Be("Testie");
+        updatedUser.UserProfile.LastName.Should().Be("McTesterson");
+        updatedUser.UserProfile.UserName.Should().NotBeNullOrEmpty();
+        updatedUser.UserProfile.State.Should().Be("NE");
+        updatedUser.UserProfile.Country.Should().Be("Canada");
+        updatedUser.UserProfile.PhoneNumber.Should().Be("123-456-7890");
+        updatedUser.UserProfile.AffiliatedOrganization.Should().Be("DPL");
+        updatedUser.UserProfile.IsSignupComplete.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Store_UserProfileCreateRequest_ProfileAlreadyExists_ShouldThrow()
+    {
+        // Arrange
+        var currentUser = new UserFaker().Generate();
+        currentUser.UserProfile.Should().NotBeNull();
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+            }
+        );
+
+        // Act
+        var result = await _userManager.Store<CLI.Requests.Admin.UserProfileCreateRequest, CLI.Responses.Admin.UserStoreResponseBase>(
+            new CLI.Requests.Admin.UserProfileCreateRequest
+            {
+                FirstName = "Testie",
+                LastName = "McTesterson",
+                State = "NE",
+                Country = "Canada",
+                PhoneNumber = "123-456-7890",
+                AffiliatedOrganization = "DPL"
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeOfType<InternalError>();
+        result.Error.LogMessage.Should().Contain($"User profile already exists for user id {currentUser.Id}");
     }
 }

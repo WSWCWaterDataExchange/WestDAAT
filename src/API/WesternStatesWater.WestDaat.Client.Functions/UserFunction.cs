@@ -63,6 +63,7 @@ public class UserFunction : FunctionBase
         var requestBase = await ParseRequestBody<UserStoreRequestBase>(req);
         ResponseBase result = requestBase switch
         {
+            UserProfileCreateRequest request => await _userManager.Store<UserProfileCreateRequest, UserStoreResponseBase>(request),
             UserProfileUpdateRequest request => await _userManager.Store<UserProfileUpdateRequest, UserStoreResponseBase>(request),
             _ => throw new NotImplementedException($"Request type {requestBase.GetType()} is not implemented.")
         };

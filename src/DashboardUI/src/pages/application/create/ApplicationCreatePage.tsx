@@ -14,6 +14,7 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -24,7 +25,7 @@ export function ApplicationCreatePage() {
   };
 
   return (
-    <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
+    <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
         navigateBack={navigateToEstimationToolPage}
         backButtonText="Back to Estimator"
@@ -38,7 +39,7 @@ export function ApplicationCreatePage() {
   );
 }
 
-const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-6';
+const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneHalfWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveFullWidthDefault = 'col-lg-6 col-12';
 
@@ -309,7 +310,7 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-6">
+          <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
               <Form.Label>Project Location</Form.Label>
               <Form.Control
@@ -359,7 +360,7 @@ function ApplicationCreatePageForm() {
             </Form.Group>
           </FormSection>
 
-          <div className="col-6">
+          <div className="col-md-6 col-12">
             Static map here
             <NotImplementedPlaceholder />
           </div>
@@ -543,12 +544,16 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestDollarAmount"
           >
             <Form.Label>Funding Request $ Amount</Form.Label>
-            <Form.Control
-              type="number"
-              required
-              ref={conservationPlanFundingRequestDollarAmountRef}
-              value={stateForm.conservationPlanFundingRequestDollarAmount}
-            />
+            <InputGroup>
+              <InputGroup.Text>$</InputGroup.Text>
+              <Form.Control
+                type="number"
+                required
+                ref={conservationPlanFundingRequestDollarAmountRef}
+                value={stateForm.conservationPlanFundingRequestDollarAmount}
+              />
+            </InputGroup>
+
             <Form.Control.Feedback type="invalid">Funding Request $ Amount is required.</Form.Control.Feedback>
           </Form.Group>
 
