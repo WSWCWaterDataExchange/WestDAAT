@@ -7,6 +7,7 @@ import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollecti
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
+import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -28,6 +29,8 @@ export interface ConservationApplicationState {
     selectedMapPolygons: EstimationFormMapPolygon[];
     doPolygonsOverlap: boolean;
     polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
+    applicationSubmissionForm: ApplicationSubmissionForm;
+    isApplicationSubmissionFormValid: boolean;
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -60,6 +63,41 @@ export const defaultState = (): ConservationApplicationState => ({
     selectedMapPolygons: [],
     doPolygonsOverlap: false,
     polygonEtData: [],
+    applicationSubmissionForm: {
+      landownerFirstName: undefined,
+      landownerLastName: undefined,
+      landownerEmail: undefined,
+      landownerPhoneNumber: undefined,
+      landownerAddress: undefined,
+      landownerCity: undefined,
+      landownerState: undefined,
+      landownerZipCode: undefined,
+      agentName: undefined,
+      agentEmail: undefined,
+      agentPhoneNumber: undefined,
+      agentAdditionalDetails: undefined,
+      projectLocation: undefined,
+      propertyAdditionalDetails: undefined,
+      diversionPoint: undefined,
+      diversionPointDetails: undefined,
+      canalOrIrrigationEntityName: undefined,
+      canalOrIrrigationEntityEmail: undefined,
+      canalOrIrrigationEntityPhoneNumber: undefined,
+      canalOrIrrigationAdditionalDetails: undefined,
+      permitNumber: undefined,
+      facilityDitchName: undefined,
+      priorityDate: undefined,
+      certificateNumber: undefined,
+      shareNumber: undefined,
+      waterRightState: undefined,
+      waterUseDescription: undefined,
+      estimationSupplementaryDetails: undefined,
+      conservationPlanFundingRequestDollarAmount: undefined,
+      conservationPlanFundingRequestCompensationRateUnits: undefined,
+      conservationPlanDescription: undefined,
+      conservationPlanAdditionalInfo: undefined,
+    },
+    isApplicationSubmissionFormValid: false,
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -73,7 +111,8 @@ export type ApplicationAction =
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction;
+  | ConsumptiveUseEstimatedAction
+  | ApplicationSubmissionFormUpdatedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -141,6 +180,13 @@ export interface ConsumptiveUseEstimatedAction {
   };
 }
 
+export interface ApplicationSubmissionFormUpdatedAction {
+  type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
+  payload: {
+    formValues: ApplicationSubmissionForm;
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -171,6 +217,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
       return onConsumptiveUseEstimated(draftState, action);
+    case 'APPLICATION_SUBMISSION_FORM_UPDATED':
+      return onApplicationFormUpdated(draftState, action);
   }
 };
 
@@ -301,6 +349,18 @@ const onConsumptiveUseEstimated = (
   }));
 
   checkCanContinueToApplication(draftState);
+
+  return draftState;
+};
+
+const onApplicationFormUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationSubmissionFormUpdatedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.applicationSubmissionForm = {
+    ...draftState.conservationApplication.applicationSubmissionForm,
+    ...payload.formValues,
+  };
 
   return draftState;
 };

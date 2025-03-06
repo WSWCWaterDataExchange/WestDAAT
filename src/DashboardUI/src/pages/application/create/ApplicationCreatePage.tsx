@@ -6,11 +6,15 @@ import { NotImplementedPlaceholder } from '../../../components/NotImplementedAle
 import Button from 'react-bootstrap/esm/Button';
 import { states } from '../../../config/states';
 import {
+  CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
+import { useRef, useState } from 'react';
+import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -21,24 +25,132 @@ export function ApplicationCreatePage() {
   };
 
   return (
-    <div className="application-create-page d-flex flex-column flex-grow-1 h-100">
+    <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
         navigateBack={navigateToEstimationToolPage}
         backButtonText="Back to Estimator"
         centerText="Water Conservation Estimation Tool"
       />
 
-      <ApplicationCreatePageForm />
+      <div className="overflow-y-auto">
+        <ApplicationCreatePageForm />
+      </div>
     </div>
   );
 }
 
-const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-6';
+const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneHalfWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveFullWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
+  const stateForm = state.conservationApplication.applicationSubmissionForm;
+
+  const [formValidated, setFormValidated] = useState(false);
+
+  const landownerFirstNameRef = useRef<HTMLInputElement>(null);
+  const landownerLastNameRef = useRef<HTMLInputElement>(null);
+  const landownerEmailRef = useRef<HTMLInputElement>(null);
+  const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const landownerAddressRef = useRef<HTMLInputElement>(null);
+  const landownerCityRef = useRef<HTMLInputElement>(null);
+  const landownerStateRef = useRef<HTMLSelectElement>(null);
+  const landownerZipCodeRef = useRef<HTMLInputElement>(null);
+  const agentNameRef = useRef<HTMLInputElement>(null);
+  const agentEmailRef = useRef<HTMLInputElement>(null);
+  const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const projectLocationRef = useRef<HTMLInputElement>(null);
+  const propertyAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const diversionPointRef = useRef<HTMLInputElement>(null);
+  const diversionPointDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
+  const canalOrIrrigationAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const permitNumberRef = useRef<HTMLInputElement>(null);
+  const facilityDitchNameRef = useRef<HTMLInputElement>(null);
+  const priorityDateRef = useRef<HTMLInputElement>(null);
+  const certificateNumberRef = useRef<HTMLInputElement>(null);
+  const shareNumberRef = useRef<HTMLInputElement>(null);
+  const waterRightStateRef = useRef<HTMLSelectElement>(null);
+  const waterUseDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const estimationSupplementaryDetailsRef = useRef<HTMLInputElement>(null);
+  const conservationPlanFundingRequestDollarAmountRef = useRef<HTMLInputElement>(null);
+  const conservationPlanFundingRequestCompensationRateUnitsRef = useRef<HTMLSelectElement>(null);
+  const conservationPlanDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
+
+  const onFormChanged = () => {
+    const conservationPlanFundingRequestDollarAmount = conservationPlanFundingRequestDollarAmountRef.current?.value
+      ? Number(conservationPlanFundingRequestDollarAmountRef.current?.value)
+      : undefined;
+
+    const cpfrcruValueAsEnum = Number(
+      conservationPlanFundingRequestCompensationRateUnitsRef.current?.value,
+    ) as CompensationRateUnits;
+    const conservationPlanFundingRequestCompensationUnits:
+      | Exclude<CompensationRateUnits, CompensationRateUnits.None>
+      | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
+
+    const formValues: ApplicationSubmissionForm = {
+      landownerFirstName: landownerFirstNameRef.current?.value,
+      landownerLastName: landownerLastNameRef.current?.value,
+      landownerEmail: landownerEmailRef.current?.value,
+      landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
+      landownerAddress: landownerAddressRef.current?.value,
+      landownerCity: landownerCityRef.current?.value,
+      landownerState: landownerStateRef.current?.value,
+      landownerZipCode: landownerZipCodeRef.current?.value,
+      agentName: agentNameRef.current?.value,
+      agentEmail: agentEmailRef.current?.value,
+      agentPhoneNumber: agentPhoneNumberRef.current?.value,
+      agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
+      projectLocation: projectLocationRef.current?.value,
+      propertyAdditionalDetails: propertyAdditionalDetailsRef.current?.value,
+      diversionPoint: diversionPointRef.current?.value,
+      diversionPointDetails: diversionPointDetailsRef.current?.value,
+      canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
+      canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
+      canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
+      canalOrIrrigationAdditionalDetails: canalOrIrrigationAdditionalDetailsRef.current?.value,
+      permitNumber: permitNumberRef.current?.value,
+      facilityDitchName: facilityDitchNameRef.current?.value,
+      priorityDate: priorityDateRef.current?.value,
+      certificateNumber: certificateNumberRef.current?.value,
+      shareNumber: shareNumberRef.current?.value,
+      waterRightState: waterRightStateRef.current?.value,
+      waterUseDescription: waterUseDescriptionRef.current?.value,
+      estimationSupplementaryDetails: estimationSupplementaryDetailsRef.current?.value,
+      conservationPlanFundingRequestDollarAmount: conservationPlanFundingRequestDollarAmount,
+      conservationPlanFundingRequestCompensationRateUnits: conservationPlanFundingRequestCompensationUnits,
+      conservationPlanDescription: conservationPlanDescriptionRef.current?.value,
+      conservationPlanAdditionalInfo: conservationPlanAdditionalInfoRef.current?.value,
+    };
+
+    dispatch({
+      type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+      payload: {
+        formValues,
+      },
+    });
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // event default causes page to refresh
+    event.preventDefault();
+    event.stopPropagation();
+
+    const form = event.currentTarget;
+    const isFormValid = form.checkValidity();
+
+    setFormValidated(true);
+
+    if (isFormValid) {
+      alert('This feature will be implemented in a future release.');
+    }
+  };
 
   // assumes all polygons are not intersecting
   const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
@@ -73,41 +185,77 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form>
+      <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
         <FormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerFirstName">
             <Form.Label>Landowner First Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control
+              type="text"
+              maxLength={100}
+              required
+              ref={landownerFirstNameRef}
+              value={stateForm.landownerFirstName}
+            />
+            <Form.Control.Feedback type="invalid">Landowner First Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerLastName">
             <Form.Label>Landowner Last Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control
+              type="text"
+              maxLength={100}
+              required
+              ref={landownerLastNameRef}
+              value={stateForm.landownerLastName}
+            />
+            <Form.Control.Feedback type="invalid">Landowner Last Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerEmail">
             <Form.Label>Email Address</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Control
+              type="email"
+              maxLength={255}
+              required
+              ref={landownerEmailRef}
+              value={stateForm.landownerEmail}
+            />
+            <Form.Control.Feedback type="invalid">Email Address is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerPhoneNumber">
             <Form.Label>Phone</Form.Label>
-            <Form.Control type="tel" maxLength={50} required />
+            <Form.Control
+              type="tel"
+              maxLength={50}
+              required
+              ref={landownerPhoneNumberRef}
+              value={stateForm.landownerPhoneNumber}
+            />
+            <Form.Control.Feedback type="invalid">Phone is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerAddress">
             <Form.Label>Address</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control
+              type="text"
+              maxLength={255}
+              required
+              ref={landownerAddressRef}
+              value={stateForm.landownerAddress}
+            />
+            <Form.Control.Feedback type="invalid">Address is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerCity">
             <Form.Label>City</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+            <Form.Control type="text" maxLength={100} required ref={landownerCityRef} value={stateForm.landownerCity} />
+            <Form.Control.Feedback type="invalid">City is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerState">
             <Form.Label>State</Form.Label>
-            <Form.Select required>
+            <Form.Select required ref={landownerStateRef} value={stateForm.landownerState}>
               <option value={''}>Select a state</option>
               {states.map((state) => (
                 <option key={state.value} value={state.value}>
@@ -115,60 +263,104 @@ function ApplicationCreatePageForm() {
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">State is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerZipCode">
             <Form.Label>Zip Code</Form.Label>
-            <Form.Control type="text" maxLength={10} required />
+            <Form.Control
+              type="text"
+              maxLength={10}
+              required
+              ref={landownerZipCodeRef}
+              value={stateForm.landownerZipCode}
+            />
+            <Form.Control.Feedback type="invalid">Zip Code is required.</Form.Control.Feedback>
           </Form.Group>
         </FormSection>
 
-        <FormSection title="Agent Information">
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentFirstName">
-            <Form.Label>Agent First Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
-          </Form.Group>
-
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentLastName">
-            <Form.Label>Agent Last Name</Form.Label>
-            <Form.Control type="text" maxLength={100} required />
+        <FormSection
+          title="Representative / Agent Contact Information"
+          subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
+        >
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentName">
+            <Form.Label>Name / Organization</Form.Label>
+            <Form.Control type="text" maxLength={100} ref={agentNameRef} value={stateForm.agentName} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentEmail">
-            <Form.Label>Agent Email</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" maxLength={255} ref={agentEmailRef} value={stateForm.agentEmail} />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="agentPhoneNumber">
-            <Form.Label>Agent Phone</Form.Label>
-            <Form.Control type="tel" maxLength={50} required />
+            <Form.Label>Phone</Form.Label>
+            <Form.Control type="tel" maxLength={50} ref={agentPhoneNumberRef} value={stateForm.agentPhoneNumber} />
+          </Form.Group>
+
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="agentAdditionalDetails">
+            <Form.Label>Additional Details</Form.Label>
+            <Form.Control
+              as="textarea"
+              maxLength={4000}
+              ref={agentAdditionalDetailsRef}
+              value={stateForm.agentAdditionalDetails}
+            />
           </Form.Group>
         </FormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-6">
+          <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
-              <Form.Label> Project Location</Form.Label>
-              <Form.Control type="text" maxLength={255} required />
+              <Form.Label>Project Location</Form.Label>
+              <Form.Control
+                type="text"
+                maxLength={255}
+                required
+                ref={projectLocationRef}
+                value={stateForm.projectLocation}
+              />
+              <Form.Control.Feedback type="invalid">Project Location is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
               <Form.Label>Additional Details</Form.Label>
-              <Form.Control as="textarea" maxLength={4000} required />
+              <Form.Control
+                as="textarea"
+                maxLength={4000}
+                required
+                ref={propertyAdditionalDetailsRef}
+                value={stateForm.propertyAdditionalDetails}
+              />
+              <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPoint">
               <Form.Label>Diversion Point</Form.Label>
-              <Form.Control type="text" maxLength={255} required />
+              <Form.Control
+                type="text"
+                maxLength={255}
+                required
+                ref={diversionPointRef}
+                value={stateForm.diversionPoint}
+              />
+              <Form.Control.Feedback type="invalid">Diversion Point is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPointDetails">
               <Form.Label>Diversion Point Details</Form.Label>
-              <Form.Control as="textarea" maxLength={4000} required />
+              <Form.Control
+                as="textarea"
+                maxLength={4000}
+                required
+                ref={diversionPointDetailsRef}
+                value={stateForm.diversionPointDetails}
+              />
+              <Form.Control.Feedback type="invalid">Diversion Point Details is required.</Form.Control.Feedback>
             </Form.Group>
           </FormSection>
 
-          <div className="col-6">
+          <div className="col-md-6 col-12">
             Static map here
             <NotImplementedPlaceholder />
           </div>
@@ -180,53 +372,95 @@ function ApplicationCreatePageForm() {
               information."
         >
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationEntityName">
-            <Form.Label>Entity Name</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Label>Name / Organization</Form.Label>
+            <Form.Control
+              type="text"
+              maxLength={255}
+              ref={canalOrIrrigationEntityNameRef}
+              value={stateForm.canalOrIrrigationEntityName}
+            />
           </Form.Group>
 
           <Form.Group className={`${responsiveOneHalfWidthDefault} mb-4`} controlId="canalOrIrrigationEntityEmail">
-            <Form.Label>Entity Email</Form.Label>
-            <Form.Control type="email" maxLength={255} required />
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              maxLength={255}
+              ref={canalOrIrrigationEntityEmailRef}
+              value={stateForm.canalOrIrrigationEntityEmail}
+            />
           </Form.Group>
 
           <Form.Group
             className={`${responsiveOneHalfWidthDefault} mb-4`}
             controlId="canalOrIrrigationEntityPhoneNumber"
           >
-            <Form.Label>Entity Phone</Form.Label>
-            <Form.Control type="text" maxLength={50} required />
+            <Form.Label>Phone</Form.Label>
+            <Form.Control
+              type="text"
+              maxLength={50}
+              ref={canalOrIrrigationEntityPhoneNumberRef}
+              value={stateForm.canalOrIrrigationEntityPhoneNumber}
+            />
+          </Form.Group>
+
+          <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="canalOrIrrigationAdditionalDetails">
+            <Form.Label>Additional Details</Form.Label>
+            <Form.Control
+              as="textarea"
+              maxLength={4000}
+              ref={canalOrIrrigationAdditionalDetailsRef}
+              value={stateForm.canalOrIrrigationAdditionalDetails}
+            />
           </Form.Group>
         </FormSection>
 
         <FormSection title="Water Right Information">
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="permitNumber">
             <Form.Label>Permit #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={permitNumberRef} value={stateForm.permitNumber} />
+            <Form.Control.Feedback type="invalid">Permit # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="facilityDitchName">
             <Form.Label>Facility (Ditch) Name</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control
+              type="text"
+              maxLength={255}
+              required
+              ref={facilityDitchNameRef}
+              value={stateForm.facilityDitchName}
+            />
+            <Form.Control.Feedback type="invalid">Facility (Ditch) Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
-            <Form.Control type="date" required />
+            <Form.Control type="date" required ref={priorityDateRef} value={stateForm.priorityDate} />
+            <Form.Control.Feedback type="invalid">Priority Date is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="certificateNumber">
             <Form.Label>Certificate #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control
+              type="text"
+              maxLength={255}
+              required
+              ref={certificateNumberRef}
+              value={stateForm.certificateNumber}
+            />
+            <Form.Control.Feedback type="invalid">Certificate # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="shareNumber">
             <Form.Label>Share #</Form.Label>
-            <Form.Control type="text" maxLength={255} required />
+            <Form.Control type="text" maxLength={255} required ref={shareNumberRef} value={stateForm.shareNumber} />
+            <Form.Control.Feedback type="invalid">Share # is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="waterRightState">
             <Form.Label>State</Form.Label>
-            <Form.Select required>
+            <Form.Select required ref={waterRightStateRef} value={stateForm.waterRightState}>
               <option value={''}>Select a state</option>
               {states.map((state) => (
                 <option key={state.value} value={state.value}>
@@ -234,11 +468,19 @@ function ApplicationCreatePageForm() {
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">State is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="waterUseDescription">
             <Form.Label>Description of Water Use</Form.Label>
-            <Form.Control as="textarea" maxLength={4000} required />
+            <Form.Control
+              as="textarea"
+              maxLength={4000}
+              required
+              ref={waterUseDescriptionRef}
+              value={stateForm.waterUseDescription}
+            />
+            <Form.Control.Feedback type="invalid">Description of Water Use is required.</Form.Control.Feedback>
           </Form.Group>
         </FormSection>
 
@@ -288,7 +530,11 @@ function ApplicationCreatePageForm() {
             <Form.Label>
               Do you have supplementary data that can help in reviewing this estimate? If so, provide that here.
             </Form.Label>
-            <Form.Control type="text" required />
+            <Form.Control
+              type="text"
+              ref={estimationSupplementaryDetailsRef}
+              value={stateForm.estimationSupplementaryDetails}
+            />
           </Form.Group>
         </FormSection>
 
@@ -298,7 +544,17 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestDollarAmount"
           >
             <Form.Label>Funding Request $ Amount</Form.Label>
-            <Form.Control type="number" required />
+            <InputGroup>
+              <InputGroup.Text>$</InputGroup.Text>
+              <Form.Control
+                type="number"
+                required
+                ref={conservationPlanFundingRequestDollarAmountRef}
+                value={stateForm.conservationPlanFundingRequestDollarAmount}
+              />
+            </InputGroup>
+
+            <Form.Control.Feedback type="invalid">Funding Request $ Amount is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group
@@ -306,24 +562,39 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestCompensationRateUnits"
           >
             <Form.Label>Units</Form.Label>
-            <Form.Select required>
-              <option value={0}>Select an option</option>
+            <Form.Select
+              required
+              ref={conservationPlanFundingRequestCompensationRateUnitsRef}
+              value={stateForm.conservationPlanFundingRequestCompensationRateUnits}
+            >
+              <option value={''}>Select an option</option>
               {CompensationRateUnitsOptions.map((value) => (
                 <option key={value} value={value}>
                   {CompensationRateUnitsLabelsPlural[value]}
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">Units is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanDescription">
             <Form.Label>Describe your Conservation Plan.</Form.Label>
-            <Form.Control as="textarea" required />
+            <Form.Control
+              as="textarea"
+              required
+              ref={conservationPlanDescriptionRef}
+              value={stateForm.conservationPlanDescription}
+            />
+            <Form.Control.Feedback type="invalid">Conservation Plan is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="conservationPlanAdditionalInfo">
             <Form.Label>Additional Information</Form.Label>
-            <Form.Control as="textarea" required />
+            <Form.Control
+              as="textarea"
+              ref={conservationPlanAdditionalInfoRef}
+              value={stateForm.conservationPlanAdditionalInfo}
+            />
           </Form.Group>
         </FormSection>
 
@@ -337,14 +608,14 @@ function ApplicationCreatePageForm() {
             </Button>
           </div>
         </FormSection>
-      </Form>
 
-      <hr className="m-0" />
-      <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={() => alert('This feature will be implemented in a future release.')}>
-          Review & Submit
-        </Button>
-      </div>
+        <hr className="m-0" />
+        <div className="d-flex justify-content-end p-3">
+          <Button variant="success" type="submit">
+            Review & Submit
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 }
