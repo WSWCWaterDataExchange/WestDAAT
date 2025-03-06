@@ -68,10 +68,6 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
                 "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
-            {
-                $"{ConfigurationRootNames.Blob}:{nameof(BlobStorageConfiguration.ConnectionString)}",
-                "UseDevelopmentStorage=true"
-            }
         };
 
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)

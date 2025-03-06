@@ -11,8 +11,11 @@ namespace WesternStatesWater.WestDaat.Utilities
 
         public BlobStorageSdk(BlobStorageConfiguration configuration)
         {
-            _client = new BlobServiceClient(configuration.ConnectionString);
+            _client = configuration.Uri != null
+                ? new BlobServiceClient(configuration.Uri) // If Azure
+                : new BlobServiceClient("UseDevelopmentStorage=true"); // If local
         }
+
         async Task IBlobStorageSdk.CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);
@@ -27,7 +30,7 @@ namespace WesternStatesWater.WestDaat.Utilities
             var blobClient = blobContainerClient.GetBlobClient(blobName);
             await blobClient.UploadAsync(content, overwrite);
         }
-        
+
         async Task<Stream> IBlobStorageSdk.GetBlobStream(string container, string blobName, bool overwrite)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);

@@ -21,6 +21,12 @@ var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA'
 
 var westdaatdbname = 'WestDAAT'
 
+var b2cOrigins = {
+  qa: 'https://westdaatqa.b2clogin.com'
+  staging: 'https://westdaatstaging.b2clogin.com'
+  prod: 'https://westdaat.b2clogin.com'
+}
+
 // Role Definitions (Different per tenant). 
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
 var azureServiceBusDataSenderRoleDefinitionName = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
@@ -74,7 +80,7 @@ resource resource_name_dashes 'microsoft.insights/components@2018-05-01-preview'
   }
 }
 
-resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
+resource Microsoft_Storage_storageAccounts 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: resource_name_var
   location: location
   sku: {
@@ -108,6 +114,53 @@ resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/stor
     accessTier: 'Hot'
   }
 }
+
+resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@2020-08-01-preview' = {
+  parent: Microsoft_Storage_storageAccounts
+  name: 'default'
+  properties: {
+    cors: {
+      corsRules: [
+        {
+          allowedHeaders: [
+            '*'
+          ]
+          allowedMethods: [
+            'GET'
+            'POST'
+            'PUT'
+            'OPTIONS'
+            'HEAD'
+          ]
+          allowedOrigins: [
+            b2cOrigins[Environment]
+          ]
+          exposedHeaders: [
+            '*'
+          ]
+          maxAgeInSeconds: 600
+        }
+      ]
+    }
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 365
+    }
+    isVersioningEnabled: true
+  }
+}
+
+// List of containers to create
+var containers = [
+  'application-documents'
+]
+
+resource storage_account_containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [
+  for container in containers: {
+    parent: storage_account_blob
+    name: container
+  }
+]
 
 resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-15' = {
   parent: resource_name
@@ -145,7 +198,7 @@ resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-1
 }
 
 resource Microsoft_Storage_storageAccounts_queueServices_resource_name_default 'Microsoft.Storage/storageAccounts/queueServices@2020-08-01-preview' = {
-  parent: Microsoft_Storage_storageAccounts_resource_name
+  parent: Microsoft_Storage_storageAccounts
   name: 'default'
   properties: {
     cors: {
@@ -155,7 +208,7 @@ resource Microsoft_Storage_storageAccounts_queueServices_resource_name_default '
 }
 
 resource Microsoft_Storage_storageAccounts_tableServices_resource_name_default 'Microsoft.Storage/storageAccounts/tableServices@2020-08-01-preview' = {
-  parent: Microsoft_Storage_storageAccounts_resource_name
+  parent: Microsoft_Storage_storageAccounts
   name: 'default'
   properties: {
     cors: {
@@ -209,7 +262,7 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
     type: 'SystemAssigned'
   }
   dependsOn: [
-    Microsoft_Storage_storageAccounts_resource_name
+    Microsoft_Storage_storageAccounts
   ]
   properties: {
     enabled: true
@@ -249,6 +302,7 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
 }
 
 var fnAppSettings = {
+  'BlobStorage:Uri': 'https://${Microsoft_Storage_storageAccounts.name}.blob.${environment().suffixes.storage}'
   'Database:AccessTokenDatabaseResource': 'https://database.windows.net/'
   'Database:AccessTokenDatabaseTenantId': subscription().tenantId
   'Database:WadeConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
@@ -264,10 +318,10 @@ var fnAppSettings = {
   'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
   APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
   AzureWebJobsSecretStorageType: 'files'
-  AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
+  AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
   FUNCTIONS_EXTENSION_VERSION: '~4'
   FUNCTIONS_WORKER_RUNTIME: 'dotnet-isolated'
-  WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
+  WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
   WEBSITE_CONTENTSHARE: 'westdaat-qa-1234'
 }
 
