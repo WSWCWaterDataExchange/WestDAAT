@@ -5,5 +5,5 @@ export interface OrganizationMemberUpdateRequest extends OrganizationStoreReques
   $type: 'OrganizationMemberUpdateRequest';
   organizationId: string;
   userId: string;
-  role: string;
+  role: Role;
 }

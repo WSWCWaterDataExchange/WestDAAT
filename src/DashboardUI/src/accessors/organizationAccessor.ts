@@ -58,7 +58,7 @@ export const addOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
-  role: string,
+  role: Role,
 ): Promise<{ data: OrganizationMemberAddResponse; status: number }> => {
   const api = await westDaatApi(msalContext);
 
@@ -101,7 +101,7 @@ export const editOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
-  role: string
+  role: Role
 ): Promise<{ data: OrganizationMemberUpdateResponse, status: number }> => {
   const api = await westDaatApi(msalContext);
 

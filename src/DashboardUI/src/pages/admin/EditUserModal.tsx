@@ -37,7 +37,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
   };
 
   const editOrganizationMemberMutation = useMutation({
-    mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
+    mutationFn: async (params: { organizationId: string; userId: string; role: Role }) => {
       return await editOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
@@ -65,7 +65,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       editOrganizationMemberMutation.mutate({
         organizationId: props.organizationId,
         userId: props.userId,
-        role: roleRef.current?.value,
+        role: roleRef.current?.value as Role,
       });
     } else {
       triggerSuccessfulUpdateActions();
