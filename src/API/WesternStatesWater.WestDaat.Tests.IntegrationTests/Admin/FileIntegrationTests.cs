@@ -18,7 +18,7 @@ public class FileIntegrationTests : IntegrationTestBase
 
     [Ignore("Local test to verify emulator is working as expected")]
     [TestMethod]
-    public async Task BlobStorageSdk_CanConnect()
+    public async Task BlobStorageSdk_UploadAsync_SmokeTest()
     {
         // Arrange
         var stream = new MemoryStream("Hello, World!"u8.ToArray());
