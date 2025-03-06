@@ -27,7 +27,7 @@ namespace WesternStatesWater.WestDaat.Utilities
             var blobClient = blobContainerClient.GetBlobClient(blobName);
             await blobClient.UploadAsync(content, overwrite);
         }
-
+        
         async Task<Stream> IBlobStorageSdk.GetBlobStream(string container, string blobName, bool overwrite)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);

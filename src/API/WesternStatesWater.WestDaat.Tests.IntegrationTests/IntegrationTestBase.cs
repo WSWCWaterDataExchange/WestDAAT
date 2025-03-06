@@ -68,6 +68,10 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
                 "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
+            {
+                $"{ConfigurationRootNames.Blob}:{nameof(BlobStorageConfiguration.ConnectionString)}",
+                "UseDevelopmentStorage=true"
+            }
         };
 
         private void RegisterConfigurationServices(IServiceCollection serviceCollection)
@@ -83,6 +87,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
             serviceCollection.AddScoped(_ => config.GetPerformanceConfiguration());
+            serviceCollection.AddScoped(_ => config.GetBlobStorageConfiguration());
         }
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)
@@ -138,6 +143,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             OpenEtSdkMock = new Mock<IOpenEtSdk>(MockBehavior.Strict);
             serviceCollection.AddScoped(_ => OpenEtSdkMock.Object);
+
+            serviceCollection.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         }
 
         [TestCleanup]
