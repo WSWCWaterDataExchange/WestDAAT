@@ -30,14 +30,18 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
     .getQueryData<UserListResponse>(['organizationUsers', props.organizationId])
     ?.users.find((user) => user.userId === props.userId);
 
+  const successfulUpdateActions = () => {
+    toast.success('User successfully updated', {
+      autoClose: 1000,
+    });
+    props.closeModal();
+  };
+
   const editOrganizationMemberMutation = useMutation({
     mutationFn: async (params: { organizationId: string; userId: string; role: string }) => {
       return await editOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
-      toast.success('User successfully updated', {
-        autoClose: 1000,
-      });
       // TODO: JN - do I need to re-get the list of users here? could it have changed since the component was mounted?
       const usersList = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]); // ?? []
       const editedUserIndex = usersList?.users.findIndex((user: UserListResult) => user.userId === props.userId);
@@ -47,7 +51,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
         usersList.users[editedUserIndex].role = roleRef.current.value as Role;
         queryClient.setQueryData(['organizationUsers', props.organizationId], usersList);
       }
-      props.closeModal();
+      successfulUpdateActions();
     },
     onError: () => {
       toast.error('Error saving changes to user', {
@@ -70,7 +74,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
         role: roleRef.current?.value,
       });
     } else {
-      props.closeModal();
+      successfulUpdateActions();
     }
   };
 
