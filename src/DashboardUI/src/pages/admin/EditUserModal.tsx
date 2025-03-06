@@ -1,14 +1,14 @@
 import { useMsal } from '@azure/msal-react';
+import { useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
+import Form from 'react-bootstrap/esm/Form';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
-import { useQueryClient, useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
 import { editOrganizationMember } from '../../accessors/organizationAccessor';
 import { Role, RoleDisplayNames } from '../../config/role';
 import { UserListResponse } from '../../data-contracts/UserListResponse';
-import { toast } from 'react-toastify';
 import { UserListResult } from '../../data-contracts/UserListResult';
-import { useEffect, useRef, useState } from 'react';
-import Form from 'react-bootstrap/esm/Form';
 
 export interface EditOrganizationUserModalProps extends ModalProps {
   organizationId: string | null | undefined;
@@ -38,10 +38,15 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       toast.success('User successfully updated', {
         autoClose: 1000,
       });
-      const previousUsers = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]);
-      const otherUsers = previousUsers?.users.filter((user: UserListResult) => user.userId !== props.userId) ?? [];
-      const updatedUser = { ...user, role: roleRef.current?.value };
-      queryClient.setQueryData(['organizationUsers', props.organizationId], { users: [...otherUsers, updatedUser] });
+      // TODO: JN - do I need to re-get the list of users here? could it have changed since the component was mounted?
+      const usersList = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]); // ?? []
+      const editedUserIndex = usersList?.users.findIndex((user: UserListResult) => user.userId === props.userId);
+
+      // TODO: JN - how to handle all these pesky "possibly" undefineds? if statement or ! overrides?
+      if (usersList && editedUserIndex !== undefined && roleRef.current) {
+        usersList.users[editedUserIndex].role = roleRef.current.value as Role;
+        queryClient.setQueryData(['organizationUsers', props.organizationId], usersList);
+      }
       props.closeModal();
     },
     onError: () => {
@@ -58,7 +63,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       return;
     }
 
-    if (roleRef.current?.value && roleRef.current?.value !== user?.role) {
+    if (roleRef.current?.value && roleRef.current.value === user?.role) {
       editOrganizationMemberMutation.mutate({
         organizationId: props.organizationId,
         userId: props.userId,
@@ -75,7 +80,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
         <Modal.Title>Edit User</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="d-flex fs-6 m-0 mt-2">
+        <div className="d-flex fs-6 m-0 my-2">
           <div className="fw-bold">{`${user?.firstName} ${user?.lastName}`}</div>
           <div className="px-3">{user?.userName}</div>
         </div>
@@ -99,7 +104,6 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
         >
           Cancel
         </Button>
-        {/* TODO: JN - disable button if role hasn't changed? */}
         <Button variant="primary" onClick={handleSaveChangesClick} disabled={editOrganizationMemberMutation.isLoading}>
           Save Changes
         </Button>
