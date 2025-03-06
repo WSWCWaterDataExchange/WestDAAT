@@ -81,7 +81,7 @@ resource resource_name_dashes 'microsoft.insights/components@2018-05-01-preview'
   }
 }
 
-resource Microsoft_Storage_storageAccounts 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
+resource Microsoft_Storage_storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: resource_name_var
   location: location
   sku: {
@@ -116,7 +116,7 @@ resource Microsoft_Storage_storageAccounts 'Microsoft.Storage/storageAccounts@20
   }
 }
 
-resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@2020-08-01-preview' = {
+resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
   parent: Microsoft_Storage_storageAccounts
   name: 'default'
   properties: {
