@@ -405,7 +405,11 @@ function Map({
 
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${style}`);
+        map.setStyle(`mapbox://styles/mapbox/${style}`, {
+          diff: false,
+          localIdeographFontFamily: 'Roboto',
+          localFontFamily: 'Roboto',
+        });
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
@@ -460,7 +464,7 @@ function Map({
       (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
     );
 
-    map.once('load', () => {
+    map.once('styledata', () => {
       newPolygons.forEach((poly) => {
         // do not re-add a polygon if it already exists
         if (existingPolygons.features.some((f) => f.id === poly.id)) {
