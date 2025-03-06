@@ -16,8 +16,7 @@ public class FileIntegrationTests : IntegrationTestBase
         _blobStorageSdk = Services.GetRequiredService<IBlobStorageSdk>();
     }
 
-    // TODO uncomment
-    // [Ignore("Local test to verify emulator is working as expected")]
+    [Ignore("Local test to verify emulator is working as expected")]
     [TestMethod]
     public async Task BlobStorageSdk_UploadAsync_SmokeTest()
     {
