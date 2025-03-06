@@ -328,7 +328,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
     {
         return request switch
@@ -425,7 +425,7 @@ internal class ValidationEngine : IValidationEngine
             )
         };
     }
-    
+
     private ErrorBase ValidateUserProfileCreateRequest()
     {
         // Must be logged in

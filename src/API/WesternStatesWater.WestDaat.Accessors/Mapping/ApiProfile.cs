@@ -255,8 +255,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.UserOrganizations, opt => opt.Ignore());
 
             CreateMap<UserProfileCreateRequest, EFWD.UserProfile>()
-                .ForMember(dest => dest.IsSignupComplete, opt => opt.MapFrom(_ => true))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(_ => Guid.NewGuid())); // Will be computed in upcoming PR
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.IsSignupComplete, opt => opt.MapFrom(_ => true));
 
             CreateMap<UserProfileUpdateRequest, EFWD.UserProfile>(MemberList.Source);
         }
