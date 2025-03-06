@@ -63,7 +63,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       return;
     }
 
-    if (roleRef.current?.value && roleRef.current.value === user?.role) {
+    if (roleRef.current?.value && roleRef.current.value !== user?.role) {
       editOrganizationMemberMutation.mutate({
         organizationId: props.organizationId,
         userId: props.userId,
