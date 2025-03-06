@@ -35,7 +35,7 @@ export function EditOrganizationUserModal(props: EditOrganizationUserModalProps)
       return await editOrganizationMember(msalContext, params.organizationId, params.userId, params.role);
     },
     onSuccess: () => {
-      toast.success('User removed from organization', {
+      toast.success('User successfully updated', {
         autoClose: 1000,
       });
       const previousUsers = queryClient.getQueryData<UserListResponse>(['organizationUsers', props.organizationId]);

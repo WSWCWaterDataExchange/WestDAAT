@@ -105,18 +105,16 @@ export const editOrganizationMember = async (
 ): Promise<{ data: OrganizationMemberUpdateResponse, status: number }> => {
   const api = await westDaatApi(msalContext);
 
-  console.log(`editOrganizationMember: ${organizationId}, ${userId}, ${role}`);
-
   const request: OrganizationMemberUpdateRequest = {
     $type: 'OrganizationMemberUpdateRequest',
-    organizationId: "73f00bd4-3708-42d0-96ef-278932db459d",
-    userId: "695e4d17-f37a-47bf-b5bd-1728cfe1b0d7",
-    role: "Member"
+    organizationId,
+    userId,
+    role
   }
 
   const { data, status } = await api.put<OrganizationMemberUpdateResponse>(
     `Organizations/${organizationId}/Members`,
-    { data: request }
+    request
   );
 
   return { data, status };

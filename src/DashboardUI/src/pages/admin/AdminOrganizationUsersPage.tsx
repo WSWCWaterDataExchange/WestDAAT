@@ -9,8 +9,8 @@ import { Role, RoleDisplayNames } from '../../config/role';
 import { useOrganizationQuery, useOrganizationUsersQuery } from '../../hooks/queries';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 import AddUserModal from './AddUserModal';
-import { RemoveOrganizationUserModal } from './RemoveUserModal';
 import { EditOrganizationUserModal } from './EditUserModal';
+import { RemoveOrganizationUserModal } from './RemoveUserModal';
 
 export function AdminOrganizationsUsersPage() {
   const { user: currentUser } = useAuthenticationContext();
