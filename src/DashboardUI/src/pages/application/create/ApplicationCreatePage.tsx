@@ -38,7 +38,7 @@ export function ApplicationCreatePage() {
   );
 }
 
-const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-6';
+const responsiveOneThirdWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneHalfWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveFullWidthDefault = 'col-lg-6 col-12';
 
@@ -309,7 +309,7 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-6">
+          <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
               <Form.Label>Project Location</Form.Label>
               <Form.Control
@@ -359,7 +359,7 @@ function ApplicationCreatePageForm() {
             </Form.Group>
           </FormSection>
 
-          <div className="col-6">
+          <div className="col-md-6 col-12">
             Static map here
             <NotImplementedPlaceholder />
           </div>
