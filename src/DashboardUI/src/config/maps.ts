@@ -1,4 +1,9 @@
-import { SymbolLayerSpecification } from 'mapbox-gl';
+import {
+  CircleLayerSpecification,
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+  SourceSpecification,
+} from 'mapbox-gl';
 import { nldi, pointSizes, timeSeriesColor, waterRightsProperties } from './constants';
 
 export const mapLayerNames = {
@@ -28,7 +33,7 @@ export const mapSourceNames = {
   userDrawnPolygonLabelsGeoJson: 'user-drawn-polygon-labels-geojson',
 };
 
-export const defaultPointCircleRadius = [
+export const defaultPointCircleRadius: DataDrivenPropertyValueSpecification<number> = [
   'interpolate',
   ['linear'],
   ['zoom'],
@@ -38,7 +43,7 @@ export const defaultPointCircleRadius = [
   pointSizes.maxPointSize,
 ];
 
-const defaultPointPaintConfiguration = {
+const defaultPointPaintConfiguration: CircleLayerSpecification['paint'] = {
   'circle-radius': defaultPointCircleRadius,
   'circle-stroke-width': 1,
   'circle-stroke-opacity': [
@@ -54,23 +59,38 @@ const defaultPointPaintConfiguration = {
   'circle-opacity': 0.75,
 };
 
-export const defaultPointCircleSortKey = ['-', 0, ['get', waterRightsProperties.minPriorityDate]];
-export const flowPointCircleSortKey = ['-', 0, ['get', waterRightsProperties.maxFlowRate]];
-export const volumePointCircleSortKey = ['-', 0, ['get', waterRightsProperties.maxVolume]];
-export const siteLocationPolygonFillColor = [
+export const defaultPointCircleSortKey: DataDrivenPropertyValueSpecification<number> = [
+  '-',
+  0,
+  ['get', waterRightsProperties.minPriorityDate],
+];
+export const flowPointCircleSortKey: DataDrivenPropertyValueSpecification<number> = [
+  '-',
+  0,
+  ['get', waterRightsProperties.maxFlowRate],
+];
+export const volumePointCircleSortKey: DataDrivenPropertyValueSpecification<number> = [
+  '-',
+  0,
+  ['get', waterRightsProperties.maxVolume],
+];
+export const siteLocationPolygonFillColor: DataDrivenPropertyValueSpecification<string> = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
   nldi.colors.sitePOD,
   nldi.colors.sitePOU,
 ];
-export const siteLocationPointsIconImage = [
+export const siteLocationPointsIconImage: DataDrivenPropertyValueSpecification<string> = [
   'case',
   ['==', ['get', 'podOrPou'], 'POD'],
   `mapMarker${nldi.colors.sitePOD}`,
   `mapMarker${nldi.colors.sitePOU}`,
 ];
 
-const mapsJson = {
+const mapsJson: {
+  sources: (SourceSpecification & { id: string })[];
+  layers: (LayerSpecification & { friendlyName?: string })[];
+} = {
   sources: [
     {
       id: mapSourceNames.waterRightsVectorTiles,
@@ -336,7 +356,7 @@ const mapsJson = {
         'text-halo-color': '#fff',
         'text-halo-width': 0.75,
       },
-    } as SymbolLayerSpecification,
+    },
   ],
 };
 
