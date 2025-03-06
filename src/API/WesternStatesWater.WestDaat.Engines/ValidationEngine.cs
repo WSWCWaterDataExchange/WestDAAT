@@ -328,7 +328,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ErrorBase ValidateUserLoadRequest(UserLoadRequestBase request, ContextBase context)
     {
         return request switch
@@ -418,11 +418,20 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
+            UserProfileCreateRequest => ValidateUserProfileCreateRequest(),
             UserProfileUpdateRequest => ValidateUserProfileUpdateRequest(),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
         };
+    }
+
+    private ErrorBase ValidateUserProfileCreateRequest()
+    {
+        // Must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
+
+        return null;
     }
 
     private ErrorBase ValidateUserProfileUpdateRequest()

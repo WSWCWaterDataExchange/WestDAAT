@@ -54,7 +54,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         };
     }
 
-    public async Task<UserProfileResponse> GetUserProfile(UserProfileRequest request)
+    private async Task<UserProfileResponse> GetUserProfile(UserProfileRequest request)
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 
@@ -139,13 +139,14 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return request switch
         {
             UserStoreCreateRequest req => await CreateUser(req),
+            UserProfileCreateRequest req => await CreateUserProfile(req),
             UserProfileUpdateRequest req => await UpdateUserProfile(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
     }
 
-    public async Task<UserStoreResponseBase> CreateUser(UserStoreCreateRequest request)
+    private async Task<UserStoreResponseBase> CreateUser(UserStoreCreateRequest request)
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 
@@ -157,7 +158,29 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         return new UserStoreResponseBase();
     }
 
-    public async Task<UserStoreResponseBase> UpdateUserProfile(UserProfileUpdateRequest request)
+    private async Task<UserStoreResponseBase> CreateUserProfile(UserProfileCreateRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var user = await db.Users
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+        if (user.UserProfile != null)
+        {
+            throw new InvalidOperationException($"User profile already exists for user id {request.UserId}");
+        }
+
+        var entity = DtoMapper.Map<EFWD.UserProfile>(request);
+
+        user!.UserProfile = entity;
+
+        await db.SaveChangesAsync();
+
+        return new UserStoreResponseBase();
+    }
+
+    private async Task<UserStoreResponseBase> UpdateUserProfile(UserProfileUpdateRequest request)
     {
         await using var db = _westdaatDatabaseContextFactory.Create();
 

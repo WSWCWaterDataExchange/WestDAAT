@@ -1,12 +1,14 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class UserProfileUpdateRequest : UserStoreRequestBase
+public class UserProfileCreateRequest : UserStoreRequestBase
 {
     public Guid UserId { get; set; }
 
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
+
+    public string UserName { get; set; } = null!;
 
     public string State { get; set; } = null!;
 
