@@ -567,6 +567,39 @@ public class UserIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task Load_UserProfileRequest_NoProfile_ShouldNotThrow()
+    {
+        // Arrange
+        var currentUser = new UserFaker()
+            .RuleFor(u => u.UserProfile, _ => null)
+            .Generate();
+
+        await _dbContext.Users.AddAsync(currentUser);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(
+            new UserContext
+            {
+                UserId = currentUser.Id,
+                Roles = [],
+                OrganizationRoles = []
+            }
+        );
+
+        // Act
+        var result = await _userManager.Load<CLI.Requests.Admin.UserProfileRequest, CLI.Responses.Admin.UserProfileResponse>(
+            new CLI.Requests.Admin.UserProfileRequest
+            {
+                UserId = currentUser.Id // Same as current user, should succeed
+            }
+        );
+
+        // Assert
+        result.Error.Should().BeNull();
+        result.UserProfile.IsSignupComplete.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task Store_UpdateUserProfileRequest_ShouldUpdate()
     {
         // Arrange

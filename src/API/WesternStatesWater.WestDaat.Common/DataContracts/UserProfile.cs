@@ -18,7 +18,9 @@ public class UserProfile
 
     public string PhoneNumber { get; set; }
     
-    public string AffiliatedOrganization { get; set; } = null!;
+    public string AffiliatedOrganization { get; set; }
+    
+    public bool IsSignupComplete { get; set; }
 
     public OrganizationMembership[] OrganizationMemberships { get; set; }
 }
