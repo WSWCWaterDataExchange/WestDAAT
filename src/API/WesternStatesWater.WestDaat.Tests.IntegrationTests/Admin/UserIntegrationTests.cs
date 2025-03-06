@@ -719,6 +719,7 @@ public class UserIntegrationTests : IntegrationTestBase
         updatedUser.UserProfile.Country.Should().Be("Canada");
         updatedUser.UserProfile.PhoneNumber.Should().Be("123-456-7890");
         updatedUser.UserProfile.AffiliatedOrganization.Should().Be("DPL");
+        updatedUser.UserProfile.IsSignupComplete.Should().BeTrue();
     }
 
     [TestMethod]
