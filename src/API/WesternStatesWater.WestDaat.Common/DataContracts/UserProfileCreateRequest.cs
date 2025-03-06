@@ -1,9 +1,7 @@
-namespace WesternStatesWater.WestDaat.Database.EntityFramework;
+namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class UserProfile
+public class UserProfileCreateRequest : UserStoreRequestBase
 {
-    public Guid Id { get; set; }
-
     public Guid UserId { get; set; }
 
     public string FirstName { get; set; } = null!;
@@ -18,9 +16,5 @@ public class UserProfile
 
     public string PhoneNumber { get; set; } = null!;
 
-    public string? AffiliatedOrganization { get; set; }
-
-    public bool IsSignupComplete { get; set; }
-
-    public virtual User User { get; set; } = null!;
+    public string AffiliatedOrganization { get; set; } = null!;
 }

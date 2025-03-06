@@ -1,9 +1,7 @@
-namespace WesternStatesWater.WestDaat.Common.DataContracts;
+namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 
-public class UserProfileUpdateRequest : UserStoreRequestBase
+public class UserProfileCreateRequest : UserStoreRequestBase
 {
-    public Guid UserId { get; set; }
-
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;

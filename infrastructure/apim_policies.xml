@@ -7,7 +7,7 @@
                 var url = context.Operation.UrlTemplate.ToLower();
                 return !(
                     url.Equals("/_admin/enrichjwt") ||
-                    url.Equals("/nldifeatures/@{latitude}{longitude}") ||
+                    url.Equals("/nldifeatures/@{latitude},{longitude}") ||
                     url.Equals("/overlays/{overlayuuid}") ||
                     url.Equals("/overlays/{overlayuuid}/legal") ||
                     url.Equals("/overlays/{overlayuuid}/overlaydigest") ||
