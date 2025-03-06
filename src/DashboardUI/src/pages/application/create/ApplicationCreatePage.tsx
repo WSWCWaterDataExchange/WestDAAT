@@ -14,6 +14,7 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -543,12 +544,16 @@ function ApplicationCreatePageForm() {
             controlId="conservationPlanFundingRequestDollarAmount"
           >
             <Form.Label>Funding Request $ Amount</Form.Label>
-            <Form.Control
-              type="number"
-              required
-              ref={conservationPlanFundingRequestDollarAmountRef}
-              value={stateForm.conservationPlanFundingRequestDollarAmount}
-            />
+            <InputGroup>
+              <InputGroup.Text>$</InputGroup.Text>
+              <Form.Control
+                type="number"
+                required
+                ref={conservationPlanFundingRequestDollarAmountRef}
+                value={stateForm.conservationPlanFundingRequestDollarAmount}
+              />
+            </InputGroup>
+
             <Form.Control.Feedback type="invalid">Funding Request $ Amount is required.</Form.Control.Feedback>
           </Form.Group>
 
