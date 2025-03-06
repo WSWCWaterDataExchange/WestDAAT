@@ -25,11 +25,11 @@ msalInstance.addEventCallback((event: EventMessage) => {
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
-  // <React.StrictMode>
-  <BrowserRouter>
-    <App msalInstance={msalInstance} />
-  </BrowserRouter>,
-  // </React.StrictMode>,
+  <React.StrictMode>
+    <BrowserRouter>
+      <App msalInstance={msalInstance} />
+    </BrowserRouter>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function
