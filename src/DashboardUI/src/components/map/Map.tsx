@@ -405,11 +405,12 @@ function Map({
 
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${style}`, {
+
+        // cast to `any` is necessary because of an property being incorrectly required on the actual type
+        const mapOptions = {
           diff: false,
-          localIdeographFontFamily: 'Roboto',
-          localFontFamily: 'Roboto',
-        });
+        } as any;
+        map.setStyle(`mapbox://styles/mapbox/${style}`, mapOptions);
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
