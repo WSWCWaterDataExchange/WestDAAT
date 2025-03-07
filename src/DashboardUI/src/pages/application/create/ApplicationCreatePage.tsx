@@ -330,7 +330,7 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
+          <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             {userDrawnFields.map((field) => (
               <div className="row">
                 <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="fieldName">
@@ -366,7 +366,7 @@ function ApplicationCreatePageForm() {
             </Form.Group>
           </FormSection>
 
-          <div className="col-md-6 col-12">
+          <div className="col-lg-6 col-12">
             Static map here
             <NotImplementedPlaceholder />
           </div>
