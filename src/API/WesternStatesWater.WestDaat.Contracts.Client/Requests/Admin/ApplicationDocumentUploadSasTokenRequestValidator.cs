@@ -7,5 +7,6 @@ public class ApplicationDocumentUploadSasTokenRequestValidator : AbstractValidat
     public ApplicationDocumentUploadSasTokenRequestValidator()
     {
         RuleFor(x => x.FileUploadCount).GreaterThan(0);
+        RuleFor(x => x.FileUploadCount).LessThanOrEqualTo(10);
     }
 }
