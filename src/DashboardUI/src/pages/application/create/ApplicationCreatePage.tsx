@@ -322,11 +322,11 @@ function ApplicationCreatePageForm() {
                   <span>{field.fieldName}</span>
                 </div>
                 <div className="col-3">
-                  <span className="fw-bold">Acres: &nbsp;</span>
+                  <span className="fw-bold">Acres: </span>
                   <span>{formatNumber(field.acreage, 2)}</span>
                 </div>
                 <div className="col-6">
-                  <span className="fw-bold">Location: &nbsp;</span>
+                  <span className="fw-bold">Location: </span>
                   <span>
                     ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
                   </span>
