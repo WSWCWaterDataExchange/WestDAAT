@@ -80,5 +80,10 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             return values;
         }
+        
+        string IBlobStorageSdk.BlobServiceHostname()
+        {
+            return _client.Uri.ToString().TrimEnd('/');
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace WesternStatesWater.WestDaat.Utilities
         Task CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite = false);
         Task<Stream> GetBlobStream(string container, string blobName, bool overwrite = false);
         Task<Dictionary<string, Uri>> GetSasUris(string container, string[] blobNames, TimeSpan duration, BlobContainerSasPermissions blobContainerSasPermissions);
+        string BlobServiceHostname();
     }
 }

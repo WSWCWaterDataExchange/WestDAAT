@@ -1,4 +1,5 @@
 using WesternStatesWater.Shared.Resolver;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Admin;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Admin;
@@ -26,24 +27,24 @@ public class ApplicationDocumentUploadSasTokenRequestHandler : IRequestHandler<A
             .Select(_ => $"{userId}/{Guid.NewGuid()}")
             .ToArray();
     
-        var sasUris = await _blobStorageSdk.GetSasUris(AzureNames.ApplicationDocuments, blobNames,
+        var sasUris = await _blobStorageSdk.GetSasUris(Containers.ApplicationDocuments, blobNames,
             TimeSpan.FromMinutes(10), Azure.Storage.Sas.BlobContainerSasPermissions.Create);
     
         var hostname = _blobStorageSdk.BlobServiceHostname();
     
         var details = blobNames.Select(blobName =>
         {
-            return new CLI.SasTokenDetails
+            return new SasTokenDetails
             {
                 Blobname = blobName,
                 SasToken = sasUris[blobName].ToString(),
-                Hostname = hostname.ToString()
+                Hostname = hostname
             };
         }).ToArray();
     
-        return new CLI.FileUploadSasTokensResponse
+        return new ApplicationDocumentUploadSasTokenResponse
         {
-            TokenDetails = details
+            SasTokens = details
         };
     }
 }
