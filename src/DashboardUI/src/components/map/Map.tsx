@@ -466,7 +466,7 @@ function Map({
     );
 
     map.once('styledata', () => {
-      newPolygons.forEach(drawControl.add);
+      newPolygons.forEach((polygon) => drawControl.add(polygon));
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
