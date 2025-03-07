@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             _client = _useStorageEmulator
                 ? new BlobServiceClient("UseDevelopmentStorage=true") // If local
-                : new BlobServiceClient(configuration.Uri); // If Azure
+                : new BlobServiceClient(configuration.Uri, ConfigurationHelper.TokenCredential); // If Azure
         }
 
         async Task IBlobStorageSdk.CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite)
