@@ -75,7 +75,7 @@ export const defaultState = (): ConservationApplicationState => ({
       agentEmail: undefined,
       agentPhoneNumber: undefined,
       agentAdditionalDetails: undefined,
-      propertyAdditionalDetails: undefined,
+      fieldDetails: [],
       canalOrIrrigationEntityName: undefined,
       canalOrIrrigationEntityEmail: undefined,
       canalOrIrrigationEntityPhoneNumber: undefined,

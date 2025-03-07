@@ -12,7 +12,7 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { useMemo, useRef, useState } from 'react';
+import { createRef, useMemo, useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
 import { Point } from 'geojson';
@@ -24,6 +24,7 @@ interface FieldData {
   fieldName: string;
   acreage: number;
   centerPoint: Point;
+  polygonWkt: string;
 }
 
 export function ApplicationCreatePage() {
@@ -70,6 +71,7 @@ function ApplicationCreatePageForm() {
       return {
         acreage: polygon.acreage,
         fieldName: polygonEtData.fieldName,
+        polygonWkt: polygon.polygonWkt,
         centerPoint,
       };
     });
@@ -86,7 +88,7 @@ function ApplicationCreatePageForm() {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
+  const propertyAdditionalDetailsRef = useRef(userDrawnFields.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -128,7 +130,10 @@ function ApplicationCreatePageForm() {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      propertyAdditionalDetails: propertyAdditionalDetailsRef.current?.value,
+      fieldDetails: userDrawnFields.map((field, index) => ({
+        polygonWkt: field.polygonWkt,
+        additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
+      })),
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
       canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
       canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
@@ -311,7 +316,7 @@ function ApplicationCreatePageForm() {
 
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            {userDrawnFields.map((field) => (
+            {userDrawnFields.map((field, index) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
                   <span>{field.fieldName}</span>
@@ -326,19 +331,19 @@ function ApplicationCreatePageForm() {
                     ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
                   </span>
                 </div>
+                <Form.Group className={`col-12 mb-4`} controlId={`propertyAdditionalDetails-${index}`}>
+                  <Form.Label>Additional Details</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    maxLength={4000}
+                    required
+                    ref={propertyAdditionalDetailsRef.current[index] as any}
+                    value={stateForm.fieldDetails[index].additionalDetails}
+                  />
+                  <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
+                </Form.Group>
               </div>
             ))}
-            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
-              <Form.Label>Additional Details</Form.Label>
-              <Form.Control
-                as="textarea"
-                maxLength={4000}
-                required
-                ref={propertyAdditionalDetailsRef}
-                value={stateForm.propertyAdditionalDetails}
-              />
-              <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
-            </Form.Group>
           </FormSection>
 
           <div className="col-lg-6 col-12">
