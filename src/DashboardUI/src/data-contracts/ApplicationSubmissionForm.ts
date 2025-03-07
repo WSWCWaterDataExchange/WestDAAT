@@ -1,8 +1,7 @@
 import { CompensationRateUnits } from './CompensationRateUnits';
 
 export interface ApplicationSubmissionForm {
-  landownerFirstName: string | undefined;
-  landownerLastName: string | undefined;
+  landownerName: string | undefined;
   landownerEmail: string | undefined;
   landownerPhoneNumber: string | undefined;
   landownerAddress: string | undefined;

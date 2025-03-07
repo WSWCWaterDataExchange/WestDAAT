@@ -75,8 +75,7 @@ function ApplicationCreatePageForm() {
     });
   }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
 
-  const landownerFirstNameRef = useRef<HTMLInputElement>(null);
-  const landownerLastNameRef = useRef<HTMLInputElement>(null);
+  const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
   const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
   const landownerAddressRef = useRef<HTMLInputElement>(null);
@@ -118,8 +117,7 @@ function ApplicationCreatePageForm() {
       | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
 
     const formValues: ApplicationSubmissionForm = {
-      landownerFirstName: landownerFirstNameRef.current?.value,
-      landownerLastName: landownerLastNameRef.current?.value,
+      landownerName: landownerNameRef.current?.value,
       landownerEmail: landownerEmailRef.current?.value,
       landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
       landownerAddress: landownerAddressRef.current?.value,
@@ -207,28 +205,10 @@ function ApplicationCreatePageForm() {
 
       <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
         <FormSection title="Applicant Information">
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerFirstName">
-            <Form.Label>Landowner First Name</Form.Label>
-            <Form.Control
-              type="text"
-              maxLength={100}
-              required
-              ref={landownerFirstNameRef}
-              value={stateForm.landownerFirstName}
-            />
-            <Form.Control.Feedback type="invalid">Landowner First Name is required.</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerLastName">
-            <Form.Label>Landowner Last Name</Form.Label>
-            <Form.Control
-              type="text"
-              maxLength={100}
-              required
-              ref={landownerLastNameRef}
-              value={stateForm.landownerLastName}
-            />
-            <Form.Control.Feedback type="invalid">Landowner Last Name is required.</Form.Control.Feedback>
+          <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerName">
+            <Form.Label>Landowner Name</Form.Label>
+            <Form.Control type="text" maxLength={100} required ref={landownerNameRef} value={stateForm.landownerName} />
+            <Form.Control.Feedback type="invalid">Landowner Name is required.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className={`${responsiveOneThirdWidthDefault} mb-4`} controlId="landownerEmail">

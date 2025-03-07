@@ -64,8 +64,7 @@ export const defaultState = (): ConservationApplicationState => ({
     doPolygonsOverlap: false,
     polygonEtData: [],
     applicationSubmissionForm: {
-      landownerFirstName: undefined,
-      landownerLastName: undefined,
+      landownerName: undefined,
       landownerEmail: undefined,
       landownerPhoneNumber: undefined,
       landownerAddress: undefined,
