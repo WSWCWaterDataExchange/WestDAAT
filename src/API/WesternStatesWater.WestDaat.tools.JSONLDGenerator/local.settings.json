@@ -6,9 +6,6 @@
   "Database": {
     "ConnectionString": "Server=host.docker.internal, 1433;Initial Catalog=WaDe2;User Id=youruser;Password=yourpassword;TrustServerCertificate=True"
   },
-  "BlobStorage": {
-    "ConnectionString": "UseDevelopmentStorage=true"
-  },
   "Performance": {
     "WaterRightsSearchPageSize": 10
   }

@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
     <PackageReference Include="CsvHelper" Version="28.0.0" />
     <PackageReference Include="GeoJSON.Text" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
