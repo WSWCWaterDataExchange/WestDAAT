@@ -29,7 +29,12 @@ public class FileFunction : FunctionBase
         HttpRequestData req)
     {
         var fileSasTokenRequest = await ParseRequestBody<FileSasTokenRequestBase>(req);
-        var result = await _fileManager.GenerateFileSasToken<FileSasTokenRequestBase, FileSasTokenResponseBase>(fileSasTokenRequest);
+        var result = fileSasTokenRequest switch
+        {
+            ApplicationDocumentUploadSasTokenRequest request => await _fileManager
+                .GenerateFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request),
+            _ => throw new NotImplementedException($"Request type {fileSasTokenRequest.GetType().FullName} is not implemented.")
+        };
         return await CreateResponse(req, result);
     }
 }
