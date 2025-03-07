@@ -61,10 +61,7 @@ function ApplicationCreatePageForm() {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const projectLocationRef = useRef<HTMLInputElement>(null);
   const propertyAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const diversionPointRef = useRef<HTMLInputElement>(null);
-  const diversionPointDetailsRef = useRef<HTMLTextAreaElement>(null);
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -107,10 +104,7 @@ function ApplicationCreatePageForm() {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      projectLocation: projectLocationRef.current?.value,
       propertyAdditionalDetails: propertyAdditionalDetailsRef.current?.value,
-      diversionPoint: diversionPointRef.current?.value,
-      diversionPointDetails: diversionPointDetailsRef.current?.value,
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
       canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
       canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
@@ -311,18 +305,6 @@ function ApplicationCreatePageForm() {
 
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
-            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="projectLocation">
-              <Form.Label>Project Location</Form.Label>
-              <Form.Control
-                type="text"
-                maxLength={255}
-                required
-                ref={projectLocationRef}
-                value={stateForm.projectLocation}
-              />
-              <Form.Control.Feedback type="invalid">Project Location is required.</Form.Control.Feedback>
-            </Form.Group>
-
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
               <Form.Label>Additional Details</Form.Label>
               <Form.Control
@@ -333,30 +315,6 @@ function ApplicationCreatePageForm() {
                 value={stateForm.propertyAdditionalDetails}
               />
               <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPoint">
-              <Form.Label>Diversion Point</Form.Label>
-              <Form.Control
-                type="text"
-                maxLength={255}
-                required
-                ref={diversionPointRef}
-                value={stateForm.diversionPoint}
-              />
-              <Form.Control.Feedback type="invalid">Diversion Point is required.</Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="diversionPointDetails">
-              <Form.Label>Diversion Point Details</Form.Label>
-              <Form.Control
-                as="textarea"
-                maxLength={4000}
-                required
-                ref={diversionPointDetailsRef}
-                value={stateForm.diversionPointDetails}
-              />
-              <Form.Control.Feedback type="invalid">Diversion Point Details is required.</Form.Control.Feedback>
             </Form.Group>
           </FormSection>
 

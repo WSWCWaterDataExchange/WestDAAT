@@ -13,10 +13,7 @@ export interface ApplicationSubmissionForm {
   agentEmail: string | undefined;
   agentPhoneNumber: string | undefined;
   agentAdditionalDetails: string | undefined;
-  projectLocation: string | undefined;
   propertyAdditionalDetails: string | undefined;
-  diversionPoint: string | undefined;
-  diversionPointDetails: string | undefined;
   canalOrIrrigationEntityName: string | undefined;
   canalOrIrrigationEntityEmail: string | undefined;
   canalOrIrrigationEntityPhoneNumber: string | undefined;
