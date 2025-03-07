@@ -347,7 +347,8 @@ function ApplicationCreatePageForm() {
                   <Form.Label>Center of Field</Form.Label>
                   <Form.Control
                     type="text"
-                    value={`(${field.centerPoint.coordinates[0]}, ${field.centerPoint.coordinates[1]})`}
+                    // (latitude, longitude)
+                    value={`(${field.centerPoint.coordinates[1]}, ${field.centerPoint.coordinates[0]})`}
                     readOnly
                   />
                 </Form.Group>
