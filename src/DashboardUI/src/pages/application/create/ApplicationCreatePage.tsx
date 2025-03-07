@@ -12,9 +12,19 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { Point } from 'geojson';
+import center from '@turf/center';
+import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
+import truncate from '@turf/truncate';
+
+interface FieldData {
+  fieldName: string;
+  acreage: number;
+  centerPoint: Point;
+}
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -48,6 +58,22 @@ function ApplicationCreatePageForm() {
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
+
+  const userDrawnFields: FieldData[] = useMemo(() => {
+    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
+      const polygonEtData = state.conservationApplication.polygonEtData.find(
+        (etData) => etData.polygonWkt === polygon.polygonWkt,
+      )!;
+
+      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
+
+      return {
+        acreage: polygon.acreage,
+        fieldName: polygonEtData.fieldName,
+        centerPoint,
+      };
+    });
+  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
 
   const landownerFirstNameRef = useRef<HTMLInputElement>(null);
   const landownerLastNameRef = useRef<HTMLInputElement>(null);
@@ -305,6 +331,28 @@ function ApplicationCreatePageForm() {
 
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-md-6 col-12">
+            {userDrawnFields.map((field) => (
+              <div className="row">
+                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="fieldName">
+                  <Form.Label>Field Name</Form.Label>
+                  <Form.Control type="text" value={field.fieldName} readOnly />
+                </Form.Group>
+
+                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="acreage">
+                  <Form.Label>Field Acreage</Form.Label>
+                  <Form.Control type="text" value={formatNumber(field.acreage, 2)} readOnly />
+                </Form.Group>
+
+                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="centerPoint">
+                  <Form.Label>Center of Field</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={`(${field.centerPoint.coordinates[0]}, ${field.centerPoint.coordinates[1]})`}
+                    readOnly
+                  />
+                </Form.Group>
+              </div>
+            ))}
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
               <Form.Label>Additional Details</Form.Label>
               <Form.Control
