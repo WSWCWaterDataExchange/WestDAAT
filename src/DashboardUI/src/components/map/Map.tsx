@@ -466,14 +466,7 @@ function Map({
     );
 
     map.once('styledata', () => {
-      newPolygons.forEach((poly) => {
-        // do not re-add a polygon if it already exists
-        if (existingPolygons.features.some((f) => f.id === poly.id)) {
-          return;
-        }
-        console.log('add polygon', poly);
-        drawControl.add(poly);
-      });
+      newPolygons.forEach(drawControl.add);
     });
   }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
