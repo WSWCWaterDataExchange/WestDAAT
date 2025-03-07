@@ -312,26 +312,20 @@ function ApplicationCreatePageForm() {
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             {userDrawnFields.map((field) => (
-              <div className="row">
-                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="fieldName">
-                  <Form.Label>Field Name</Form.Label>
-                  <Form.Control type="text" value={field.fieldName} readOnly />
-                </Form.Group>
-
-                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="acreage">
-                  <Form.Label>Field Acreage</Form.Label>
-                  <Form.Control type="text" value={formatNumber(field.acreage, 2)} readOnly />
-                </Form.Group>
-
-                <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="centerPoint">
-                  <Form.Label>Center of Field</Form.Label>
-                  <Form.Control
-                    type="text"
-                    // (latitude, longitude)
-                    value={`(${field.centerPoint.coordinates[1]}, ${field.centerPoint.coordinates[0]})`}
-                    readOnly
-                  />
-                </Form.Group>
+              <div className="row mb-4" key={field.fieldName}>
+                <div className="col-3">
+                  <span>{field.fieldName}</span>
+                </div>
+                <div className="col-3">
+                  <span className="fw-bold">Acres: &nbsp;</span>
+                  <span>{formatNumber(field.acreage, 2)}</span>
+                </div>
+                <div className="col-6">
+                  <span className="fw-bold">Location: &nbsp;</span>
+                  <span>
+                    ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
+                  </span>
+                </div>
               </div>
             ))}
             <Form.Group className={`${responsiveFullWidthDefault} mb-4`} controlId="propertyAdditionalDetails">
