@@ -456,7 +456,10 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateApplicationDocumentUploadSasTokenRequest(ApplicationDocumentUploadSasTokenRequest request, ContextBase context)
     {
-        throw new NotImplementedException("Made it to the validation engine for ApplicationDocumentUploadSasTokenRequest");
+        // User must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
+
+        return null;
     }
     
     private ConflictError CreateConflictError(

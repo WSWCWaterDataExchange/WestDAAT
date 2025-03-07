@@ -35,6 +35,28 @@ public class FileIntegrationTests : IntegrationTestBase
 
         // Assert (Manually verify the file exists)
     }
+
+    [TestMethod]
+    public async Task GenerateFileSasToken_AnonymousUser_ShouldThrow()
+    {
+        // Arrange
+        // Not using the IntegrationTestBase UseAnonymousContext setup because we want the ContextUtility's GetRequiredContext to do its real job here 
+        ContextUtilityMock
+            .Setup(mock => mock.GetContext())
+            .Returns(new AnonymousContext());
+        
+        var request = new ApplicationDocumentUploadSasTokenRequest
+        {
+            FileUploadCount = 1
+        };
+
+        // Act
+        // TODO: JN - why you no work
+        Func<Task> call = async () => await _fileManager.GenerateFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request);
+
+        // Assert
+        await call.Should().ThrowAsync<InvalidOperationException>();
+    }
     
     [DataTestMethod]
     [DataRow(-1, DisplayName = "Should not allow a negative file count")]
@@ -57,7 +79,6 @@ public class FileIntegrationTests : IntegrationTestBase
         ((ValidationError)response.Error)?.Errors.Should().ContainKey("FileUploadCount");
     }
     
-    // test happy path (currently dies in validation engine)
     [TestMethod]
     public async Task GenerateFileSasToken_ShouldReturnSasToken()
     {

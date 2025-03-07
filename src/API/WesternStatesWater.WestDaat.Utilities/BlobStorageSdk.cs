@@ -1,6 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System.IO;
+using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using WesternStatesWater.WestDaat.Common.Configuration;
 
 namespace WesternStatesWater.WestDaat.Utilities
@@ -37,6 +39,46 @@ namespace WesternStatesWater.WestDaat.Utilities
             var blobClient = blobContainerClient.GetBlobClient(blobName);
 
             return await blobClient.OpenWriteAsync(overwrite, options: new BlobOpenWriteOptions());
+        }
+        
+        async Task<Dictionary<string, Uri>> IBlobStorageSdk.GetSasUris(string container, string[] blobNames, TimeSpan duration,
+            BlobContainerSasPermissions blobContainerSasPermissions)
+        {
+            var blobContainerClient = _client.GetBlobContainerClient(container);
+            var userDelegationKey = await _client.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
+                DateTimeOffset.UtcNow.Add(duration));
+
+            var values = new Dictionary<string, Uri>(blobNames.Length);
+
+            foreach (var blobName in blobNames)
+            {
+                var blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
+                var blobSasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = container,
+                    BlobName = blobName,
+                    Resource = "b",
+                    StartsOn = DateTimeOffset.UtcNow,
+                    ExpiresOn = DateTimeOffset.UtcNow.Add(duration),
+                };
+
+                blobSasBuilder.SetPermissions(blobContainerSasPermissions);
+
+                var uriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
+                {
+                    Sas = blobSasBuilder.ToSasQueryParameters(
+                        userDelegationKey,
+                        blockBlobClient
+                            .GetParentBlobContainerClient()
+                            .GetParentBlobServiceClient()
+                            .AccountName
+                    )
+                };
+
+                values.Add(blobName, uriBuilder.ToUri());
+            }
+
+            return values;
         }
     }
 }
