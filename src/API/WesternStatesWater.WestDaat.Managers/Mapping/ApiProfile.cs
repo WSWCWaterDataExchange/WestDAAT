@@ -81,7 +81,6 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationMembership, ClientContracts.OrganizationMembership>();
 
             CreateMap<ClientContracts.Requests.Admin.UserProfileCreateRequest, CommonContracts.UserProfileCreateRequest>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(_ => Guid.NewGuid())) // Will be computed
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Admin.UserProfileUpdateRequest, CommonContracts.UserProfileUpdateRequest>()

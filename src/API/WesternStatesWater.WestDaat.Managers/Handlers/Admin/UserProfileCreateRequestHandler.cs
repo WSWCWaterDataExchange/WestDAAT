@@ -24,6 +24,9 @@ public class UserProfileCreateRequestHandler : IRequestHandler<UserProfileCreate
     {
         var accessorRequest = request.Map<Common.DataContracts.UserProfileCreateRequest>();
         accessorRequest.UserId = ContextUtility.GetRequiredContext<UserContext>().UserId;
+        
+               
+        
         await UserAccessor.Store(accessorRequest);
         return new UserStoreResponseBase();
     }
