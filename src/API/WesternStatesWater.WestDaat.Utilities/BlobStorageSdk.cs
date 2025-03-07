@@ -45,8 +45,6 @@ namespace WesternStatesWater.WestDaat.Utilities
             BlobContainerSasPermissions blobContainerSasPermissions)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);
-            var userDelegationKey = await _client.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
-                DateTimeOffset.UtcNow.Add(duration));
 
             var values = new Dictionary<string, Uri>(blobNames.Length);
 
@@ -61,24 +59,14 @@ namespace WesternStatesWater.WestDaat.Utilities
                     StartsOn = DateTimeOffset.UtcNow,
                     ExpiresOn = DateTimeOffset.UtcNow.Add(duration),
                 };
-
                 blobSasBuilder.SetPermissions(blobContainerSasPermissions);
 
-                var uriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
-                {
-                    Sas = blobSasBuilder.ToSasQueryParameters(
-                        userDelegationKey,
-                        blockBlobClient
-                            .GetParentBlobContainerClient()
-                            .GetParentBlobServiceClient()
-                            .AccountName
-                    )
-                };
+                var uri = blockBlobClient.GenerateSasUri(blobSasBuilder);
 
-                values.Add(blobName, uriBuilder.ToUri());
+                values.Add(blobName, uri);
             }
 
-            return values;
+            return await Task.FromResult(values);        
         }
         
         string IBlobStorageSdk.BlobServiceHostname()
