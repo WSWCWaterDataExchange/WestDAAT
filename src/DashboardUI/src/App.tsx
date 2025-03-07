@@ -17,12 +17,14 @@ import { AdminGuard } from './pages/admin/AdminGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
-import { ApplicationGuard } from './pages/application/ApplicationGuard';
+import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
+import { AuthGuard } from './pages/application/AuthGuard';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
 import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
-import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
-import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
+import { SignupPage } from './pages/account/SignupPage';
+import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -31,7 +33,6 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
-import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -94,12 +95,13 @@ function App({ msalInstance }: AppProps) {
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
                   <Route path="overlay/:id" element={<OverlayDetailsPage />} />
                 </Route>
-                <Route path="account">
+                <Route path="account" element={<AuthGuard />}>
                   <Route element={<AccountLayout />}>
                     <Route index element={<AccountInformationPage />} />
+                    <Route path="signup" element={<SignupPage />} />
                   </Route>
                 </Route>
-                <Route path="application" element={<ApplicationGuard />}>
+                <Route path="application" element={<AuthGuard />}>
                   <Route element={<ApplicationLayout />}>
                     <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">

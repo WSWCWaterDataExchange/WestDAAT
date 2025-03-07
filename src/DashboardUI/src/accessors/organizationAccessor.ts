@@ -1,15 +1,18 @@
 import { IMsalContext } from '@azure/msal-react';
+import { Role } from '../config/role';
 import { OrganizationDetailsListRequest } from '../data-contracts/OrganizationDetailsListRequest';
-import westDaatApi from './westDaatApi';
 import { OrganizationDetailsListResponse } from '../data-contracts/OrganizationDetailsListResponse';
-import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationSummaryListResponse';
-import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
+import { OrganizationFundingDetailsRequest } from '../data-contracts/OrganizationFundingDetailsRequest';
+import { OrganizationFundingDetailsResponse } from '../data-contracts/OrganizationFundingDetailsResponse';
 import { OrganizationMemberAddRequest } from '../data-contracts/OrganizationMemberAddRequest';
 import { OrganizationMemberAddResponse } from '../data-contracts/OrganizationMemberAddResponse';
-import { OrganizationFundingDetailsResponse } from '../data-contracts/OrganizationFundingDetailsResponse';
-import { OrganizationFundingDetailsRequest } from '../data-contracts/OrganizationFundingDetailsRequest';
-import { OrganizationMemberRemoveResponse } from '../data-contracts/OrganizationMemberRemoveResponse';
 import { OrganizationMemberRemoveRequest } from '../data-contracts/OrganizationMemberRemoveRequest';
+import { OrganizationMemberRemoveResponse } from '../data-contracts/OrganizationMemberRemoveResponse';
+import { OrganizationMemberUpdateRequest } from '../data-contracts/OrganizationMemberUpdateRequest';
+import { OrganizationMemberUpdateResponse } from '../data-contracts/OrganizationMemberUpdateResponse';
+import { OrganizationSummaryListRequest } from '../data-contracts/OrganizationSummaryListRequest';
+import { OrganizationSummaryListResponse } from '../data-contracts/OrganizationSummaryListResponse';
+import westDaatApi from './westDaatApi';
 
 export const getOrganizationDetailsList = async (
   msalContext: IMsalContext,
@@ -55,7 +58,7 @@ export const addOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
-  role: string,
+  role: Role,
 ): Promise<{ data: OrganizationMemberAddResponse; status: number }> => {
   const api = await westDaatApi(msalContext);
 
@@ -89,6 +92,29 @@ export const removeOrganizationMember = async (
   const { data, status } = await api.delete<OrganizationMemberRemoveResponse>(
     `Organizations/${organizationId}/Members`,
     { data: request }
+  );
+
+  return { data, status };
+}
+
+export const editOrganizationMember = async (
+  msalContext: IMsalContext,
+  organizationId: string,
+  userId: string,
+  role: Role
+): Promise<{ data: OrganizationMemberUpdateResponse, status: number }> => {
+  const api = await westDaatApi(msalContext);
+
+  const request: OrganizationMemberUpdateRequest = {
+    $type: 'OrganizationMemberUpdateRequest',
+    organizationId,
+    userId,
+    role
+  }
+
+  const { data, status } = await api.put<OrganizationMemberUpdateResponse>(
+    `Organizations/${organizationId}/Members`,
+    request
   );
 
   return { data, status };

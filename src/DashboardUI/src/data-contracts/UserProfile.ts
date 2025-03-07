@@ -11,5 +11,6 @@ export interface UserProfile {
   country: string;
   phoneNumber: string;
   affiliatedOrganization: string | null;
+  isSignupComplete: boolean;
   organizationMemberships: OrganizationMembership[];
 }
