@@ -17,7 +17,7 @@ export function SignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const { user, authenticationComplete } = useAuthenticationContext();
+  const { user } = useAuthenticationContext();
 
   const formRef = useRef<HTMLFormElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -31,12 +31,6 @@ export function SignupPage() {
   const [prevRoute] = useState(location.state?.from);
   const [validated, setValidated] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-
-  // Redirect to home page if user is not logged in
-  if (authenticationComplete && !user) {
-    setTimeout(() => navigate('/'), 0);
-    return null;
-  }
 
   const saveProfileMutation = useMutation({
     mutationFn: () => {

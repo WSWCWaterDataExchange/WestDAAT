@@ -1,9 +1,9 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../contexts/AppProvider';
 
-export const ApplicationGuard = () => {
+export const AuthGuard = () => {
   const {
-    authenticationContext: { authenticationComplete, isAuthenticated, user },
+    authenticationContext: { authenticationComplete, isAuthenticated },
   } = useAppContext();
   const navigate = useNavigate();
 

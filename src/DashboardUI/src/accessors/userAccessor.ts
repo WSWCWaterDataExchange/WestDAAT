@@ -7,6 +7,7 @@ import westDaatApi from './westDaatApi';
 import { UserProfileResponse } from '../data-contracts/UserProfileResponse';
 import { UserProfileRequest } from '../data-contracts/UserProfileRequest';
 import { UserProfileUpdateRequest } from '../data-contracts/UserProfileUpdateRequest';
+import { UserProfileCreateRequest } from '../data-contracts/UserProfileCreateRequest';
 
 export const searchUsers = async (msalContext: IMsalContext, searchTerm: string): Promise<UserSearchResponse> => {
   const api = await westDaatApi(msalContext);
@@ -86,6 +87,15 @@ export const createProfile = async (
 ): Promise<void> => {
   const api = await westDaatApi(msalContext);
 
-  // Simulate successful call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const request: UserProfileCreateRequest = {
+    $type: 'UserProfileCreateRequest',
+    firstName: fields.firstName,
+    lastName: fields.lastName,
+    state: fields.state,
+    country: fields.country,
+    phoneNumber: fields.phoneNumber,
+    affiliatedOrganization: fields.affiliatedOrganization,
+  };
+
+  await api.put('Users/Profile', request);
 };
