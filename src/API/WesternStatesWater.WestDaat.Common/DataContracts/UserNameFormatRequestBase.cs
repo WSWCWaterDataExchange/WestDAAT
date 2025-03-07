@@ -1,5 +1,5 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public abstract class UsernameFormatResponseBase
+public abstract class UserNameFormatRequestBase
 {
 }

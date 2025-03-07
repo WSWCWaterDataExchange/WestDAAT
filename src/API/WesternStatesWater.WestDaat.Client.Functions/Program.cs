@@ -75,6 +75,7 @@ var host = new HostBuilder()
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
+        services.AddTransient<IUserNameFormattingEngine, FormattingEngine>();
         services.AddTransient<IValidationEngine, ValidationEngine>();
 
         // Accessors

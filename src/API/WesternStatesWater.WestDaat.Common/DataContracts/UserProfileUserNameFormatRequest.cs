@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class UserProfileUsernameFormatRequest : UsernameFormatRequestBase
+public class UserProfileUserNameFormatRequest : UserNameFormatRequestBase
 {
     public string FirstName { get; set; }
 

@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class UsernameExistsResponse : UserLoadResponseBase
+public class UserNameExistsResponse : UserLoadResponseBase
 {
     required public bool Exists { get; set; }
 }
