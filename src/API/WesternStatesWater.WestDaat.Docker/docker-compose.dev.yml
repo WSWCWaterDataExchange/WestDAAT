@@ -1,4 +1,5 @@
-version: "3.3"
+name: westdaat
+
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -19,3 +20,31 @@ services:
       SQL_SERVER: mssql
       MSSQL_SA_PASSWORD: DevP@ssw0rd!
       ACCEPT_EULA: "Y"
+  azurite:
+    container_name: azurite
+    restart: no
+    image: mcr.microsoft.com/azure-storage/azurite:3.34.0
+    command: "azurite --blobHost 0.0.0.0 --loose"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    healthcheck:
+      test: nc 127.0.0.1 10000 -z
+      interval: 1s
+      retries: 30
+  azurite-init:
+    image: mcr.microsoft.com/azure-cli:latest
+    container_name: azurite-init
+    command:
+      - /bin/sh
+      - -c
+      - |
+        az storage container create --name application-documents
+        az storage cors add --origins '*' --services 'b' --methods GET POST PUT OPTIONS HEAD --allowed-headers '*'
+    depends_on:
+      azurite:
+        condition: service_healthy
+    environment:
+      # https://github.com/Azure/Azurite/blob/main/README.md#usage-with-azure-storage-sdks-or-tools
+      AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;

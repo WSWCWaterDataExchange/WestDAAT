@@ -2,6 +2,6 @@
 {
     public class BlobStorageConfiguration
     {
-        public string ConnectionString { get; set; }
+        public Uri Uri { get; set; }
     }
 }
