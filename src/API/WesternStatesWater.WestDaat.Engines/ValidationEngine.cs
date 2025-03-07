@@ -42,6 +42,7 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
+            FileSasTokenRequestBase req => ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -442,6 +443,22 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private ErrorBase ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateApplicationDocumentUploadSasTokenRequest(ApplicationDocumentUploadSasTokenRequest request, ContextBase context)
+    {
+        throw new NotImplementedException("Made it to the validation engine for ApplicationDocumentUploadSasTokenRequest");
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,
