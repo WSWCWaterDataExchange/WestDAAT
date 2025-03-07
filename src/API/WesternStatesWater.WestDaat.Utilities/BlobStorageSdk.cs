@@ -11,11 +11,15 @@ namespace WesternStatesWater.WestDaat.Utilities
     {
         private readonly BlobServiceClient _client;
 
+        private readonly bool _useStorageEmulator;
+
         public BlobStorageSdk(BlobStorageConfiguration configuration)
         {
-            _client = configuration.Uri != null
-                ? new BlobServiceClient(configuration.Uri) // If Azure
-                : new BlobServiceClient("UseDevelopmentStorage=true"); // If local
+            _useStorageEmulator = configuration.Uri == null;
+
+            _client = _useStorageEmulator
+                ? new BlobServiceClient("UseDevelopmentStorage=true") // If local
+                : new BlobServiceClient(configuration.Uri); // If Azure
         }
 
         async Task IBlobStorageSdk.CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite)
@@ -40,8 +44,16 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             return await blobClient.OpenWriteAsync(overwrite, options: new BlobOpenWriteOptions());
         }
-        
+
         async Task<Dictionary<string, Uri>> IBlobStorageSdk.GetSasUris(string container, string[] blobNames, TimeSpan duration,
+            BlobContainerSasPermissions blobContainerSasPermissions)
+        {
+            return _useStorageEmulator
+                ? await GetSasUrisForAzurite(container, blobNames, duration, blobContainerSasPermissions)
+                : await GetSasUrisForAzure(container, blobNames, duration, blobContainerSasPermissions);
+        }
+
+        private async Task<Dictionary<string, Uri>> GetSasUrisForAzurite(string container, string[] blobNames, TimeSpan duration,
             BlobContainerSasPermissions blobContainerSasPermissions)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);
@@ -66,9 +78,49 @@ namespace WesternStatesWater.WestDaat.Utilities
                 values.Add(blobName, uri);
             }
 
-            return await Task.FromResult(values);        
+            return await Task.FromResult(values);
         }
-        
+
+        private async Task<Dictionary<string, Uri>> GetSasUrisForAzure(string container, string[] blobNames, TimeSpan duration,
+            BlobContainerSasPermissions blobContainerSasPermissions)
+        {
+            var blobContainerClient = _client.GetBlobContainerClient(container);
+            var userDelegationKey = await _client.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
+                DateTimeOffset.UtcNow.Add(duration));
+
+            var values = new Dictionary<string, Uri>(blobNames.Length);
+
+            foreach (var blobName in blobNames)
+            {
+                var blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
+                var blobSasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = container,
+                    BlobName = blobName,
+                    Resource = "b",
+                    StartsOn = DateTimeOffset.UtcNow,
+                    ExpiresOn = DateTimeOffset.UtcNow.Add(duration),
+                };
+
+                blobSasBuilder.SetPermissions(blobContainerSasPermissions);
+
+                var uriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
+                {
+                    Sas = blobSasBuilder.ToSasQueryParameters(
+                        userDelegationKey,
+                        blockBlobClient
+                            .GetParentBlobContainerClient()
+                            .GetParentBlobServiceClient()
+                            .AccountName
+                    )
+                };
+
+                values.Add(blobName, uriBuilder.ToUri());
+            }
+
+            return values;
+        }
+
         string IBlobStorageSdk.BlobServiceHostname()
         {
             return _client.Uri.ToString().TrimEnd('/');
