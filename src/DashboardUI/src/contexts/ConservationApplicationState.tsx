@@ -3,11 +3,12 @@ import {
   ApplicationDashboardListItem,
   ApplicationDashboardStatistics,
 } from '../data-contracts/ApplicationDashboardListItem';
-import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
-import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
-import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
-import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
+import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
+import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
+import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
+import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -31,6 +32,7 @@ export interface ConservationApplicationState {
     polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
     applicationSubmissionForm: ApplicationSubmissionForm;
     isApplicationSubmissionFormValid: boolean;
+    supportingDocuments: ApplicationDocument[];
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -94,6 +96,7 @@ export const defaultState = (): ConservationApplicationState => ({
       conservationPlanAdditionalInfo: undefined,
     },
     isApplicationSubmissionFormValid: false,
+    supportingDocuments: [],
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -108,7 +111,9 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction
-  | ApplicationSubmissionFormUpdatedAction;
+  | ApplicationSubmissionFormUpdatedAction
+  | ApplicationDocumentUploadedAction
+  | ApplicationDocumentRemovedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -183,6 +188,20 @@ export interface ApplicationSubmissionFormUpdatedAction {
   };
 }
 
+export interface ApplicationDocumentUploadedAction {
+  type: 'APPLICATION_DOCUMENT_UPLOADED';
+  payload: {
+    uploadedDocuments: ApplicationDocument[];
+  };
+}
+
+export interface ApplicationDocumentRemovedAction {
+  type: 'APPLICATION_DOCUMENT_REMOVED';
+  payload: {
+    removedDocument: string;
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -215,6 +234,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
+    case 'APPLICATION_DOCUMENT_UPLOADED':
+      return onApplicationDocumentUploaded(draftState, action);
+    case 'APPLICATION_DOCUMENT_REMOVED':
+      return onApplicationDocumentRemoved(draftState, action);
   }
 };
 
@@ -358,6 +381,28 @@ const onApplicationFormUpdated = (
     ...payload.formValues,
   };
 
+  return draftState;
+};
+
+const onApplicationDocumentUploaded = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentUploadedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.supportingDocuments = [
+    ...draftState.conservationApplication.supportingDocuments,
+    ...payload.uploadedDocuments,
+  ];
+  return draftState;
+};
+
+const onApplicationDocumentRemoved = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentRemovedAction,
+): ConservationApplicationState => {
+  const filteredDocuments = draftState.conservationApplication.supportingDocuments.filter(
+    (doc) => doc.blobName !== payload.removedDocument,
+  );
+  draftState.conservationApplication.supportingDocuments = filteredDocuments;
   return draftState;
 };
 

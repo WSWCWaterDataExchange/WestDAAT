@@ -1,8 +1,9 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
-import { reducer, defaultState, ConservationApplicationState } from './ConservationApplicationState';
+import { ConservationApplicationState, defaultState, reducer } from './ConservationApplicationState';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -249,6 +250,54 @@ describe('ConservationApplicationState reducer', () => {
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
   });
+
+  it('uploading documents should update state', () => {
+    // Arrange
+    const uploadedDocument: ApplicationDocument = {
+      fileName: 'document_1.docx',
+      blobName: 'my-blob-guid',
+      description: 'Description for supporting documents entered by the user'
+    };
+
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_DOCUMENT_UPLOADED',
+      payload: { uploadedDocuments: [uploadedDocument] },
+    });
+
+    // Assert
+    expect(newState.conservationApplication.supportingDocuments.length).toEqual(1);
+    expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(uploadedDocument.fileName);
+    expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(uploadedDocument.blobName);
+    expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(uploadedDocument.description);
+  })
+
+  it('removing an existing document should update state', () => {
+    // Arrange
+    const existingDocument: ApplicationDocument = {
+      fileName: 'document_1.docx',
+      blobName: 'my-blob-guid',
+      description: 'Description for supporting documents entered by the user'
+    };
+    const anotherDocument: ApplicationDocument = {
+      fileName: 'document_2.docx',
+      blobName: 'my-blob-guid-2',
+      description: 'Description for a different supporting document'
+    };
+    state.conservationApplication.supportingDocuments = [existingDocument, anotherDocument];
+
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_DOCUMENT_REMOVED',
+      payload: { removedDocument: existingDocument.blobName },
+    });
+
+    // Assert
+    expect(newState.conservationApplication.supportingDocuments.length).toEqual(1);
+    expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(anotherDocument.fileName);
+    expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(anotherDocument.blobName);
+    expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
+  })
 
   describe('Estimation Tool Page Use Cases', () => {
     it('estimate consumptive use should be disabled when no data is present', () => {
