@@ -562,9 +562,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(false, null, null, null, false, typeof(NotFoundError), DisplayName = "Application DNE -> should throw")]
-    [DataRow(true, false, null, null, false, typeof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
-    [DataRow(true, true, false, false, false, typeof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
+    [DataRow(false, null, null, null, false, nameof(NotFoundError), DisplayName = "Application DNE -> should throw")]
+    [DataRow(true, false, null, null, false, nameof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
+    [DataRow(true, true, false, false, false, nameof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
     [DataRow(true, true, false, true, true, null, DisplayName = "User has an in-progress Application for this water right, and they attempted to create a Submission for the correct Application -> should succeed")]
     public async Task Store_SubmitApplication_Success(
         bool doesApplicationExist,
@@ -572,7 +572,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         bool? doesApplicationAlreadyHaveASubmission,
         bool? doesProvidedApplicationIdMatch,
         bool shouldSucceed,
-        Type expectedErrorType
+        string expectedErrorTypeName
         )
     {
         // Arrange
@@ -584,6 +584,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddAsync(organization);
 
         WaterConservationApplication application = null;
+        WaterConservationApplicationEstimateLocation[] estimateLocations = null;
         if (doesApplicationExist)
         {
             var applicationOwner = doesUserOwnApplication == true
@@ -594,6 +595,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
                 .Generate();
             await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+            estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+            await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
 
             if (doesApplicationAlreadyHaveASubmission == true)
             {
@@ -615,6 +622,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new WaterConservationApplicationSubmissionRequestFaker()
             .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
             .RuleFor(req => req.WaterConservationApplicationId, () => doesProvidedApplicationIdMatch == true ? application!.Id : Guid.NewGuid())
+            .RuleFor(req => req.FieldDetails, () => estimateLocations?.Select(location => new CLI.ApplicationSubmissionFieldDetail
+            {
+                WaterConservationApplicationEstimateLocationId = location.Id,
+                AdditionalDetails = "Some additional details"
+            }).ToArray() ?? [])
             .Generate();
 
         // Act
@@ -631,6 +643,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             var dbApplication = await _dbContext.WaterConservationApplications
                 .Include(application => application.Submission)
+                .Include(application => application.Estimate)
+                .ThenInclude(estimate => estimate.Locations)
                 .SingleOrDefaultAsync(application => application.Id == request.WaterConservationApplicationId);
 
             dbApplication.Should().NotBeNull();
@@ -639,12 +653,25 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // all properties on the request should be saved as a Submission record, excluding a couple which are found on the parent Application.
             dbApplication.Submission.Should().BeEquivalentTo(request, options => options
                 .Excluding(submission => submission.WaterConservationApplicationId)
-                .Excluding(submission => submission.WaterRightNativeId));
+                .Excluding(submission => submission.WaterRightNativeId)
+                .Excluding(submission => submission.FieldDetails));
+
+            if (request.FieldDetails.Any())
+            {
+                foreach (var detail in request.FieldDetails)
+                {
+                    var dbEstimateLocation = dbApplication.Estimate.Locations
+                        .SingleOrDefault(location => location.Id == detail.WaterConservationApplicationEstimateLocationId);
+                    dbEstimateLocation.Should().NotBeNull();
+                    dbEstimateLocation.Should().BeEquivalentTo(detail, options => options
+                        .Excluding(location => location.WaterConservationApplicationEstimateLocationId));
+                }
+            }
         }
         else
         {
             response.Error.Should().NotBeNull();
-            response.Error.Should().BeOfType(expectedErrorType);
+            response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
         }
     }
 

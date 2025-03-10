@@ -15,6 +15,8 @@ public class WaterConservationApplicationEstimateLocationFaker : Faker<EFWD.Wate
 
         RuleFor(wcael => wcael.PolygonAreaInAcres, f => f.Random.Number(10, 1000));
 
+        RuleFor(wcael => wcael.AdditionalDetails, f => f.Lorem.Sentence());
+
         if (estimate != null)
         {
             RuleFor(wcaep => wcaep.Estimate, () => estimate);
