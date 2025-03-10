@@ -622,9 +622,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new WaterConservationApplicationSubmissionRequestFaker()
             .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
             .RuleFor(req => req.WaterConservationApplicationId, () => doesProvidedApplicationIdMatch == true ? application!.Id : Guid.NewGuid())
-            .RuleFor(req => req.FieldDetails, () => estimateLocations?.Select(l => new CLI.ApplicationSubmissionFieldDetail
+            .RuleFor(req => req.FieldDetails, () => estimateLocations?.Select(location => new CLI.ApplicationSubmissionFieldDetail
             {
-                PolygonWkt = l.PolygonWkt,
+                WaterConservationApplicationEstimateLocationId = location.Id,
                 AdditionalDetails = "Some additional details"
             }).ToArray() ?? [])
             .Generate();
@@ -661,9 +661,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 foreach (var detail in request.FieldDetails)
                 {
                     var dbEstimateLocation = dbApplication.Estimate.Locations
-                        .SingleOrDefault(location => location.PolygonWkt == detail.PolygonWkt);
+                        .SingleOrDefault(location => location.Id == detail.WaterConservationApplicationEstimateLocationId);
                     dbEstimateLocation.Should().NotBeNull();
-                    dbEstimateLocation.Should().BeEquivalentTo(detail);
+                    dbEstimateLocation.Should().BeEquivalentTo(detail, options => options
+                        .Excluding(location => location.WaterConservationApplicationEstimateLocationId));
                 }
             }
         }

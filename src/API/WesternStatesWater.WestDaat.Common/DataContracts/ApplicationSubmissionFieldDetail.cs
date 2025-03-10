@@ -2,7 +2,7 @@
 
 public class ApplicationSubmissionFieldDetail
 {
-    public string PolygonWkt { get; set; } = null!;
+    public Guid WaterConservationApplicationEstimateLocationId { get; set; }
 
     public string AdditionalDetails { get; set; } = null!;
 }

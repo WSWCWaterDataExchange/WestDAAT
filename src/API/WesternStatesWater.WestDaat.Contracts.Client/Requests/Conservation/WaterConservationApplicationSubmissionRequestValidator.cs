@@ -66,7 +66,7 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
 
         RuleFor(x => x.FieldDetails).NotNull().ForEach(item => item.ChildRules(detailValidator =>
         {
-            detailValidator.RuleFor(detail => detail.PolygonWkt).NotEmpty();
+            detailValidator.RuleFor(detail => detail.WaterConservationApplicationEstimateLocationId).NotEmpty();
             detailValidator.RuleFor(detail => detail.AdditionalDetails).NotEmpty().MaximumLength(4000);
         }));
     }

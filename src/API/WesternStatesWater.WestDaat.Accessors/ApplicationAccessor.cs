@@ -181,7 +181,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         foreach (var details in request.FieldDetails)
         {
             var existingEstimateLocation = existingApplication.Estimate.Locations
-                .SingleOrDefault(location => location.PolygonWkt == details.PolygonWkt);
+                .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
 
             if (existingEstimateLocation == null)
             {
