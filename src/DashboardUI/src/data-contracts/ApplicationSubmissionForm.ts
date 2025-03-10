@@ -1,8 +1,7 @@
 import { CompensationRateUnits } from './CompensationRateUnits';
 
 export interface ApplicationSubmissionForm {
-  landownerFirstName: string | undefined;
-  landownerLastName: string | undefined;
+  landownerName: string | undefined;
   landownerEmail: string | undefined;
   landownerPhoneNumber: string | undefined;
   landownerAddress: string | undefined;
@@ -13,10 +12,10 @@ export interface ApplicationSubmissionForm {
   agentEmail: string | undefined;
   agentPhoneNumber: string | undefined;
   agentAdditionalDetails: string | undefined;
-  projectLocation: string | undefined;
-  propertyAdditionalDetails: string | undefined;
-  diversionPoint: string | undefined;
-  diversionPointDetails: string | undefined;
+  fieldDetails: {
+    polygonWkt: string;
+    additionalDetails: string;
+  }[];
   canalOrIrrigationEntityName: string | undefined;
   canalOrIrrigationEntityEmail: string | undefined;
   canalOrIrrigationEntityPhoneNumber: string | undefined;
