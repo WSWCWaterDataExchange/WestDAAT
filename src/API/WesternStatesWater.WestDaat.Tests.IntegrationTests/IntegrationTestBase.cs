@@ -83,6 +83,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             serviceCollection.AddScoped(_ => config.GetDatabaseConfiguration());
             serviceCollection.AddScoped(_ => config.GetPerformanceConfiguration());
+            serviceCollection.AddScoped(_ => config.GetBlobStorageConfiguration());
         }
 
         private void RegisterManagerServices(IServiceCollection serviceCollection)
@@ -138,6 +139,8 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
 
             OpenEtSdkMock = new Mock<IOpenEtSdk>(MockBehavior.Strict);
             serviceCollection.AddScoped(_ => OpenEtSdkMock.Object);
+
+            serviceCollection.AddTransient<IBlobStorageSdk, BlobStorageSdk>();
         }
 
         [TestCleanup]
