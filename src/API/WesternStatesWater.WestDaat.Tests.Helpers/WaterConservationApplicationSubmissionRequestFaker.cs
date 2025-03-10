@@ -1,20 +1,19 @@
-﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
+﻿using WesternStatesWater.WestDaat.Contracts.Client;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
+
+namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
 public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionRequest>
 {
-    public WaterConservationApplicationSubmissionRequestFaker()
+    public WaterConservationApplicationSubmissionRequestFaker(WaterConservationApplicationEstimateLocation[] locations = null)
     {
-        RuleFor(wcas => wcas.AgentFirstName, f => f.Person.FirstName);
-
-        RuleFor(wcas => wcas.AgentLastName, f => f.Person.LastName);
+        RuleFor(wcas => wcas.AgentName, f => f.Person.FullName);
 
         RuleFor(wcas => wcas.AgentEmail, f => f.Person.Email);
 
         RuleFor(wcas => wcas.AgentPhoneNumber, f => f.Phone.PhoneNumber());
 
-        RuleFor(wcas => wcas.LandownerFirstName, f => f.Person.FirstName);
-
-        RuleFor(wcas => wcas.LandownerLastName, f => f.Person.LastName);
+        RuleFor(wcas => wcas.LandownerName, f => f.Person.FullName);
 
         RuleFor(wcas => wcas.LandownerEmail, f => f.Person.Email);
 
@@ -44,14 +43,6 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.EstimationSupplementaryDetails, f => f.Lorem.Sentence());
 
-        RuleFor(wcas => wcas.ProjectLocation, f => f.Address.FullAddress());
-
-        RuleFor(wcas => wcas.PropertyAdditionalDetails, f => f.Lorem.Sentence());
-
-        RuleFor(wcas => wcas.DiversionPoint, f => f.Address.FullAddress());
-
-        RuleFor(wcas => wcas.DiversionPointDetails, f => f.Lorem.Sentence());
-
         RuleFor(wcas => wcas.PermitNumber, f => f.Random.Number(100000000, 1000000000).ToString());
 
         RuleFor(wcas => wcas.FacilityDitchName, f => f.Company.CompanyName());
@@ -66,5 +57,16 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
 
+        if (locations != null)
+        {
+            RuleFor(wcas => wcas.FieldDetails, f =>
+                locations.Select(l => new ApplicationSubmissionFieldDetail
+                {
+                    PolygonWkt = l.PolygonWkt,
+                    AdditionalDetails = f.Lorem.Sentence(),
+                })
+                .ToArray()
+            );
+        }
     }
 }
