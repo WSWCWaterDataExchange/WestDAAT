@@ -9,6 +9,19 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import Button from 'react-bootstrap/esm/Button';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { Point } from 'geojson';
+import { useMemo } from 'react';
+import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
+import center from '@turf/center';
+import truncate from '@turf/truncate';
+
+interface FieldData {
+  fieldName: string;
+  acreage: number;
+  centerPoint: Point;
+  polygonWkt: string;
+  additionalDetails: string | undefined;
+}
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -40,6 +53,28 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 function ApplicationReviewPageLayout() {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+
+  const userDrawnFields: FieldData[] = useMemo(() => {
+    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
+      const polygonEtData = state.conservationApplication.polygonEtData.find(
+        (etData) => etData.polygonWkt === polygon.polygonWkt,
+      )!;
+
+      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
+
+      const additionalDetails = state.conservationApplication.applicationSubmissionForm.fieldDetails.find(
+        (fieldData) => fieldData.polygonWkt === polygon.polygonWkt,
+      )?.additionalDetails;
+
+      return {
+        acreage: polygon.acreage,
+        fieldName: polygonEtData.fieldName,
+        polygonWkt: polygon.polygonWkt,
+        centerPoint,
+        additionalDetails,
+      };
+    });
+  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
 
   const submitApplication = () => {
     alert('not implemented.');
@@ -185,32 +220,31 @@ function ApplicationReviewPageLayout() {
 
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            <span>todo</span>
-            {/* {userDrawnFields.map((field, index) => (
+            {userDrawnFields.map((field) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
-                  <span>{field.fieldName}</span>
+                  <span className="text-muted">{field.fieldName}</span>
                 </div>
                 <div className="col-3">
-                  <span className="fw-bold">Acres: </span>
+                  <span className="text-muted">Acres: </span>
                   <span>{formatNumber(field.acreage, 2)}</span>
                 </div>
                 <div className="col-6">
-                  <span className="fw-bold">Location: </span>
+                  <span className="text-muted">Location: </span>
                   <span>
                     ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
-                  <div><span>Additional Details</span></div>
-                  <Form.Control
-
-
-                    value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
-                  />
+                  <div>
+                    <span className="text-muted">Additional Details</span>
+                  </div>
+                  <div>
+                    <span>{field.additionalDetails}</span>
+                  </div>
                 </div>
               </div>
-            ))} */}
+            ))}
           </FormSection>
 
           <div className="col-lg-6 col-12">
