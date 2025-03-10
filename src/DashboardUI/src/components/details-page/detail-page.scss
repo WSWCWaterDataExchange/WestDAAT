@@ -69,8 +69,8 @@
 
     > .map-container {
       height: 100%;
-      max-height: 80vh;
-      min-height: 750px;
+      max-height: calc(100vh - 175px);
+      min-height: 500px;
       padding: 5px;
     }
 

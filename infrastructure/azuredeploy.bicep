@@ -14,10 +14,18 @@ var resource_name_dashes_var = '${toLower(Product)}-${toLower(Environment)}'
 var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
 var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
-var wadedbserver = ((Environment == 'prod'))
-  ? 'wade-production-server.database.windows.net'
-  : 'wade-qa-server.database.windows.net'
-var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA'
+
+var wadeDatabaseServer = {
+  qa: 'wade-qa-server.database.windows.net'
+  staging: 'wade-production-server.database.windows.net' // yes, prod
+  prod: 'wade-production-server.database.windows.net'
+}
+
+var wadeDatabaseName = {
+  qa: 'WaDE_QA'
+  staging: 'wade_uat'
+  prod: 'wade_prod'
+}
 
 var westdaatdbname = 'WestDAAT'
 
@@ -306,7 +314,7 @@ var fnAppSettings = {
   'BlobStorage:Uri': 'https://${Microsoft_Storage_storageAccounts.name}.blob.${environment().suffixes.storage}'
   'Database:AccessTokenDatabaseResource': 'https://database.windows.net/'
   'Database:AccessTokenDatabaseTenantId': subscription().tenantId
-  'Database:WadeConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  'Database:WadeConnectionString': 'Server=tcp:${wadeDatabaseServer[Environment]},1433;Initial Catalog=${wadeDatabaseName[Environment]};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
   'Environment:IsDevelopment': false
   'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'

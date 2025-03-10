@@ -30,5 +30,8 @@
     <Compile Update="NotificationFormattingEngine.cs">
       <DependentUpon>FormattingEngine.cs</DependentUpon>
     </Compile>
+    <Compile Update="UserNameFormattingEngine.cs">
+      <DependentUpon>FormattingEngine.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

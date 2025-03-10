@@ -4,6 +4,7 @@ using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -714,7 +715,7 @@ public class UserIntegrationTests : IntegrationTestBase
 
         updatedUser.UserProfile.FirstName.Should().Be("Testie");
         updatedUser.UserProfile.LastName.Should().Be("McTesterson");
-        updatedUser.UserProfile.UserName.Should().NotBeNullOrEmpty();
+        updatedUser.UserProfile.UserName.Should().StartWith("TMcTesterson");
         updatedUser.UserProfile.State.Should().Be("NE");
         updatedUser.UserProfile.Country.Should().Be("Canada");
         updatedUser.UserProfile.PhoneNumber.Should().Be("123-456-7890");
