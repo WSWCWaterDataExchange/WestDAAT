@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -166,9 +167,30 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
+        // save submission to db
         var entity = request.Map<EFWD.WaterConservationApplicationSubmission>();
-
         await db.WaterConservationApplicationSubmissions.AddAsync(entity);
+
+        // update related estimate locations' details
+        var existingApplication = await db.WaterConservationApplications
+            .Include(wca => wca.Estimate)
+            .ThenInclude(estimate => estimate.Locations)
+            .Where(wca => wca.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+
+        foreach (var details in request.FieldDetails)
+        {
+            var existingEstimateLocation = existingApplication.Estimate.Locations
+                .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
+
+            if (existingEstimateLocation == null)
+            {
+                throw new WestDaatException("Estimate location not found.");
+            }
+
+            DtoMapper.Map(details, existingEstimateLocation);
+        }
+
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();
