@@ -79,5 +79,9 @@ public class FileIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeNull();
         response.Should().BeOfType<ApplicationDocumentUploadSasTokenResponse>();
+        response.SasTokens.Length.Should().Be(1);
+        response.SasTokens[0].Blobname.Should().NotBeNullOrEmpty();
+        response.SasTokens[0].SasToken.Should().NotBeNullOrEmpty();
+        response.SasTokens[0].Hostname.Should().NotBeNullOrEmpty();
     }
 }
