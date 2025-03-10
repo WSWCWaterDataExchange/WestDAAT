@@ -90,7 +90,10 @@ function ApplicationReviewPageLayout() {
     0,
   );
 
+  // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
+
+  const displayValueOrFallback = (value: any) => <>{value || 'No input provided.'}</>;
 
   return (
     <div className="container">
@@ -184,7 +187,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Name / Organization</span>
             </div>
             <div>
-              <span>{stateForm.agentName}</span>
+              <span>{displayValueOrFallback(stateForm.agentName)}</span>
             </div>
           </div>
 
@@ -193,7 +196,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Email</span>
             </div>
             <div>
-              <span>{stateForm.agentEmail}</span>
+              <span>{displayValueOrFallback(stateForm.agentEmail)}</span>
             </div>
           </div>
 
@@ -202,7 +205,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Phone</span>
             </div>
             <div>
-              <span>{stateForm.agentPhoneNumber}</span>
+              <span>{displayValueOrFallback(stateForm.agentPhoneNumber)}</span>
             </div>
           </div>
 
@@ -211,7 +214,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Details</span>
             </div>
             <div>
-              <span>{stateForm.agentAdditionalDetails}</span>
+              <span>{displayValueOrFallback(stateForm.agentAdditionalDetails)}</span>
             </div>
           </div>
         </FormSection>
@@ -240,7 +243,7 @@ function ApplicationReviewPageLayout() {
                     <span className="text-muted">Additional Details</span>
                   </div>
                   <div>
-                    <span>{field.additionalDetails}</span>
+                    <span>{displayValueOrFallback(field.additionalDetails)}</span>
                   </div>
                 </div>
               </div>
@@ -261,7 +264,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Name / Organization</span>
             </div>
             <div>
-              <span>{stateForm.canalOrIrrigationEntityName}</span>
+              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityName)}</span>
             </div>
           </div>
 
@@ -270,7 +273,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Email</span>
             </div>
             <div>
-              <span>{stateForm.canalOrIrrigationEntityEmail}</span>
+              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityEmail)}</span>
             </div>
           </div>
 
@@ -279,7 +282,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Phone</span>
             </div>
             <div>
-              <span>{stateForm.canalOrIrrigationEntityPhoneNumber}</span>
+              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityPhoneNumber)}</span>
             </div>
           </div>
 
@@ -288,7 +291,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Details</span>
             </div>
             <div>
-              <span>{stateForm.canalOrIrrigationAdditionalDetails}</span>
+              <span>{displayValueOrFallback(stateForm.canalOrIrrigationAdditionalDetails)}</span>
             </div>
           </div>
         </FormSection>
@@ -409,7 +412,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Supplementary Review Information</span>
             </div>
             <div>
-              <span>{stateForm.estimationSupplementaryDetails}</span>
+              <span>{displayValueOrFallback(stateForm.estimationSupplementaryDetails)}</span>
             </div>
           </div>
         </FormSection>
@@ -451,7 +454,7 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Information</span>
             </div>
             <div>
-              <span>{stateForm.conservationPlanAdditionalInfo}</span>
+              <span>{displayValueOrFallback(stateForm.conservationPlanAdditionalInfo)}</span>
             </div>
           </div>
         </FormSection>
