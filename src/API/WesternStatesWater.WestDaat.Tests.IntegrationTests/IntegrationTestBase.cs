@@ -111,6 +111,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
             serviceCollection.AddTransient<ITestEngine, TestEngine>();
+            serviceCollection.AddTransient<IUserNameFormattingEngine, FormattingEngine>();
             serviceCollection.AddTransient<IValidationEngine, ValidationEngine>();
         }
 
