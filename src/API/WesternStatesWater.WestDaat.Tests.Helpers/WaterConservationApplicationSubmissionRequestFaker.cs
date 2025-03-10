@@ -10,6 +10,8 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.AgentPhoneNumber, f => f.Phone.PhoneNumber());
 
+        RuleFor(wcas => wcas.AgentAdditionalDetails, f => f.Lorem.Sentence());
+
         RuleFor(wcas => wcas.LandownerName, f => f.Person.FullName);
 
         RuleFor(wcas => wcas.LandownerEmail, f => f.Person.Email);
@@ -29,6 +31,8 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
         RuleFor(wcas => wcas.CanalOrIrrigationEntityEmail, f => f.Person.Email);
 
         RuleFor(wcas => wcas.CanalOrIrrigationEntityPhoneNumber, f => f.Phone.PhoneNumber());
+
+        RuleFor(wcas => wcas.CanalOrIrrigationAdditionalDetails, f => f.Lorem.Sentence());
 
         RuleFor(wcas => wcas.ConservationPlanFundingRequestDollarAmount, f => f.Random.Number(100, 1000));
 
