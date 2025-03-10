@@ -1,0 +1,42 @@
+using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Engines;
+
+namespace WesternStatesWater.WestDaat.Tests.EngineTests.Formatting;
+
+[TestClass]
+public class NotificationFormattingEngineTests : EngineTestBase
+{
+    private INotificationFormattingEngine _notificationFormattingEngine;
+
+    private Mock<IApplicationAccessor> _applicationAccessorMock;
+
+    private Mock<IOrganizationAccessor> _organizationAccessorMock;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        _applicationAccessorMock = new Mock<IApplicationAccessor>();
+        _organizationAccessorMock = new Mock<IOrganizationAccessor>();
+
+        _notificationFormattingEngine = new FormattingEngine(
+            CreateLogger<FormattingEngine>(),
+            _applicationAccessorMock.Object,
+            _organizationAccessorMock.Object
+        );
+    }
+
+    [TestMethod]
+    public void Format_FakeFormatType_ShouldThrow()
+    {
+        // Arrange
+        var meta = new NotificationMetaBase[] { new FakeNotificationMeta() };
+
+        // Act + Assert
+        Assert.ThrowsException<NotImplementedException>(() => _notificationFormattingEngine.Format(meta));
+    }
+
+    private class FakeNotificationMeta : NotificationMetaBase
+    {
+    }
+}

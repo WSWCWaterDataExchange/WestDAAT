@@ -1,0 +1,21 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "westdaat",
+        "Queues": [
+          {
+            "Name": "smoke-test"
+          },
+          {
+            "Name": "conservation-application-submitted"
+          }
+        ],
+        "Topics": []
+      }
+    ],
+    "Logging": {
+      "Type": "File"
+    }
+  }
+}

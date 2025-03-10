@@ -1,16 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {
-    public class AllocationAmountFactFaker : Faker<AllocationAmountsFact>
+    public sealed class AllocationAmountFactFaker : Faker<AllocationAmountsFact>
     {
-        public DateDimFaker DateDimFaker { get; } = new DateDimFaker(); //use this to prevent collisions in Date_Dim table
-
         public AllocationAmountFactFaker(string primaryBeneficialUse = null)
         {
-            this.RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate())
-                .RuleFor(a => a.DataPublicationDate, b => DateDimFaker.Generate())
+            RuleFor(a => a.Organization, b => new OrganizationsDimFaker().Generate())
+                .RuleFor(a => a.DataPublicationDate, b => new DateDimFaker().Generate())
                 .RuleFor(a => a.Method, b => new MethodsDimFaker().Generate())
                 .RuleFor(a => a.VariableSpecific, b => new VariablesDimFaker().Generate())
                 .RuleFor(a => a.AllocationNativeId, f => f.Random.String(11, 'A', 'z'))
@@ -31,26 +29,16 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                     .RuleFor(a => a.Date, () => dateValue)
                     .Generate();
             }
+
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
                 .RuleFor(a => a.AllocationPriorityDateNavigation, () => date);
-            return faker;
-        }
-
-        public static Faker<AllocationAmountsFact> SetAllocationPriorityDate(this Faker<AllocationAmountsFact> faker, Func<DateTime?> dateGenerator)
-        {
-            var dateFaker = new DateDimFaker()
-                    .RuleFor(a => a.Date, dateGenerator);
-
-            faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
-                .RuleFor(a => a.AllocationPriorityDateNavigation, () => dateFaker.Generate());
-
             return faker;
         }
 
         public static Faker<AllocationAmountsFact> IncludeAllocationPriorityDate(this AllocationAmountFactFaker faker)
         {
             faker.RuleFor(a => a.AllocationPriorityDateID, () => null)
-                .RuleFor(a => a.AllocationPriorityDateNavigation, () => faker.DateDimFaker.Generate());
+                .RuleFor(a => a.AllocationPriorityDateNavigation, () => new DateDimFaker().Generate());
 
             return faker;
         }
@@ -87,7 +75,7 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                     .Generate();
             }
             faker.RuleFor(a => a.DataPublicationDateId, () => date.DateId)
-                .RuleFor(a => a.DataPublicationDate , () => date);
+                .RuleFor(a => a.DataPublicationDate, () => date);
             return faker;
         }
 
@@ -139,6 +127,13 @@ namespace WesternStatesWater.WestDaat.Tests.Helpers
                 .RuleFor(a => a.AllocationLegalStatusCvNavigation,
                     (faker, allocationAmountFact) => new LegalStatusCVFaker()
                         .RuleFor(legalStatusCV => legalStatusCV.Name, f => allocationAmountFact.AllocationLegalStatusCv));
+
+            return faker;
+        }
+
+        public static Faker<AllocationAmountsFact> IncludeRandomConservationApplicationId(this Faker<AllocationAmountsFact> faker)
+        {
+            faker.RuleFor(a => a.ConservationApplicationFundingOrganizationId, f => f.Random.Guid());
 
             return faker;
         }

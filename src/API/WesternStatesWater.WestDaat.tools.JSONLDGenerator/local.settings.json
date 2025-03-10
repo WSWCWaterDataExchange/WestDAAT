@@ -4,10 +4,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet"
   },
   "Database": {
-    "ConnectionString": "Server=host.docker.internal, 1433;Initial Catalog=WaDe2;User Id=youruser;Password=yourpassword;"
-  },
-  "BlobStorage": {
-    "ConnectionString": "UseDevelopmentStorage=true"
+    "ConnectionString": "Server=host.docker.internal, 1433;Initial Catalog=WaDe2;User Id=youruser;Password=yourpassword;TrustServerCertificate=True"
   },
   "Performance": {
     "WaterRightsSearchPageSize": 10

@@ -1,8 +1,9 @@
-import useSiteDigestMapPopup from "../../../hooks/map-popups/useSiteDigestMapPopup";
-import DetailsMap from "../DetailsMap";
-import { useWaterRightDetailsContext } from "./Provider";
-import MapProvider from "../../../contexts/MapProvider";
-import { useMapLegend } from "./hooks/useMapLegend";
+import React from 'react';
+import useSiteDigestMapPopup from '../../../hooks/map-popups/useSiteDigestMapPopup';
+import DetailsMap from '../DetailsMap';
+import { useWaterRightDetailsContext } from './Provider';
+import MapProvider from '../../../contexts/MapProvider';
+import { useMapLegend } from './hooks/useMapLegend';
 
 function WaterRightMap() {
   return (
@@ -13,8 +14,10 @@ function WaterRightMap() {
 }
 
 function Layout() {
-  const {hostData: {siteLocationsQuery}} = useWaterRightDetailsContext();
-  
+  const {
+    hostData: { siteLocationsQuery },
+  } = useWaterRightDetailsContext();
+
   useSiteDigestMapPopup();
   useMapLegend();
 

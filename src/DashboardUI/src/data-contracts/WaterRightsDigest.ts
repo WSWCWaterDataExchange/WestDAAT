@@ -1,8 +1,9 @@
 interface WaterRightDigest {
-  allocationUuid: string,
-  nativeId: string,
-  priorityDate: Date,
-  beneficialUses: string[]
+  allocationUuid: string;
+  nativeId: string;
+  priorityDate: Date;
+  beneficialUses: string[];
+  hasTimeSeriesData: boolean;
 }
 
-export default WaterRightDigest
+export default WaterRightDigest;

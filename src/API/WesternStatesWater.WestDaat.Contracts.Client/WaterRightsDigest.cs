@@ -6,5 +6,6 @@
         public string NativeId { get; set; }
         public List<string> BeneficialUses { get; set; }
         public DateTime? PriorityDate { get; set; }
+        public bool HasTimeSeriesData { get; set; }
     }
 }

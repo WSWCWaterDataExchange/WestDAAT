@@ -11,7 +11,6 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class NldiAccessorTests : AccessorTestBase
     {
         private readonly Mock<IUsgsNldiSdk> _usgsNldiSdkMock = new Mock<IUsgsNldiSdk>(MockBehavior.Strict);
@@ -20,35 +19,51 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         [DataRow(NldiDirections.None, NldiDataPoints.None)]
         [DataRow(NldiDirections.None, NldiDataPoints.Usgs)]
         [DataRow(NldiDirections.None, NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.None, NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.None, NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.None, NldiDataPoints.Epa | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Upsteam, NldiDataPoints.None)]
         [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs)]
         [DataRow(NldiDirections.Upsteam, NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Epa | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Downsteam, NldiDataPoints.None)]
         [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs)]
         [DataRow(NldiDirections.Downsteam, NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.None)]
         [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs)]
         [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.WadeRights)]
         [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa)]
-        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.Wade)]
-        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.Wade)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeRights)]
+        [DataRow(NldiDirections.None, NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.None, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
+        [DataRow(NldiDirections.Upsteam | NldiDirections.Downsteam, NldiDataPoints.Usgs | NldiDataPoints.Epa | NldiDataPoints.WadeTimeseries)]
         public async Task GetNldiFeatures_Successful(NldiDirections directions, NldiDataPoints dataPoints)
         {
             var faker = new Faker();
@@ -63,24 +78,25 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                             .ReturnsAsync(featureByCoordinatesResult)
                             .Verifiable();
 
-            var expectedFeatureCount = 1; //1 for main point
+            var expectedFeatureCount = 1; // 1 for main point
             var expectedFlowlineCount = 0;
-            var expectedPointCount = 1; //1 for main point
+            var expectedPointCount = 1; // 1 for main point
             var expectedMainCount = 0;
             var expectedArmCount = 0;
             var expectedUpstreamCount = 0;
             var expectedDownstreamCount = 0;
             var expectedUsgsCount = 0;
             var expectedEpaCount = 0;
-            var expectedWadeCount = 0;
+            var expectedWadeRightsCount = 0;
+            var expectedWadeTimeseriesCount = 0;
+
             if (directions.HasFlag(NldiDirections.Upsteam))
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamMain, config.MaxUpstreamMainDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(1))
+                                .ReturnsAsync(CreateFlowlinesResult(1, "Flowline"))
                                 .Verifiable();
-
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamTributaries, config.MaxUpstreamTributaryDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(5))
+                                .ReturnsAsync(CreateFlowlinesResult(5, "Flowline"))
                                 .Verifiable();
                 expectedFeatureCount += 6;
                 expectedFlowlineCount += 6;
@@ -91,10 +107,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxUpstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(6))
+                                    .ReturnsAsync(CreateFlowlinesResult(6, "UsgsSurfaceWaterSite"))
                                     .Verifiable();
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxUpstreamTributaryDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(7))
+                                    .ReturnsAsync(CreateFlowlinesResult(7, "UsgsSurfaceWaterSite"))
                                     .Verifiable();
                     expectedFeatureCount += 13;
                     expectedPointCount += 13;
@@ -106,10 +122,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 if (dataPoints.HasFlag(NldiDataPoints.Epa))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.EpaWaterQualitySite, config.MaxUpstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(8))
+                                    .ReturnsAsync(CreateFlowlinesResult(8, "EpaWaterQualitySite"))
                                     .Verifiable();
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.EpaWaterQualitySite, config.MaxUpstreamTributaryDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(9))
+                                    .ReturnsAsync(CreateFlowlinesResult(9, "EpaWaterQualitySite"))
                                     .Verifiable();
                     expectedFeatureCount += 17;
                     expectedPointCount += 17;
@@ -118,31 +134,45 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     expectedUpstreamCount += 17;
                     expectedEpaCount += 17;
                 }
-                if (dataPoints.HasFlag(NldiDataPoints.Wade))
+                if (dataPoints.HasFlag(NldiDataPoints.WadeRights))
                 {
-                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.Wade, config.MaxUpstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(10))
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeRights, config.MaxUpstreamMainDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(10, "WadeRights"))
                                     .Verifiable();
-                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.Wade, config.MaxUpstreamTributaryDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(11))
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.WadeRights, config.MaxUpstreamTributaryDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(11, "WadeRights"))
                                     .Verifiable();
                     expectedFeatureCount += 21;
                     expectedPointCount += 21;
                     expectedMainCount += 10;
                     expectedArmCount += 11;
                     expectedUpstreamCount += 21;
-                    expectedWadeCount += 21;
+                    expectedWadeRightsCount += 21;
+                }
+                if (dataPoints.HasFlag(NldiDataPoints.WadeTimeseries))
+                {
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamMain, FeatureDataSource.WadeTimeseries, config.MaxUpstreamMainDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(10, "WadeTimeseries"))
+                                    .Verifiable();
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.UpstreamTributaries, FeatureDataSource.WadeTimeseries, config.MaxUpstreamTributaryDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(11, "WadeTimeseries"))
+                                    .Verifiable();
+                    expectedFeatureCount += 21;
+                    expectedPointCount += 21;
+                    expectedMainCount += 10;
+                    expectedArmCount += 11;
+                    expectedUpstreamCount += 21;
+                    expectedWadeTimeseriesCount += 21;
                 }
             }
 
             if (directions.HasFlag(NldiDirections.Downsteam))
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamMain, config.MaxDownstreamMainDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(2))
+                                .ReturnsAsync(CreateFlowlinesResult(2, "Flowline"))
                                 .Verifiable();
-
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamDiversions, config.MaxDownstreamDiversionDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(3))
+                                .ReturnsAsync(CreateFlowlinesResult(3, "Flowline"))
                                 .Verifiable();
                 expectedFeatureCount += 5;
                 expectedFlowlineCount += 5;
@@ -153,10 +183,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 if (dataPoints.HasFlag(NldiDataPoints.Usgs))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxDownstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(12))
+                                    .ReturnsAsync(CreateFlowlinesResult(12, "UsgsSurfaceWaterSite"))
                                     .Verifiable();
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.UsgsSurfaceWaterSites, config.MaxDownstreamDiversionDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(13))
+                                    .ReturnsAsync(CreateFlowlinesResult(13, "UsgsSurfaceWaterSite"))
                                     .Verifiable();
                     expectedFeatureCount += 25;
                     expectedPointCount += 25;
@@ -168,10 +198,10 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 if (dataPoints.HasFlag(NldiDataPoints.Epa))
                 {
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.EpaWaterQualitySite, config.MaxDownstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(14))
+                                    .ReturnsAsync(CreateFlowlinesResult(14, "EpaWaterQualitySite"))
                                     .Verifiable();
                     _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.EpaWaterQualitySite, config.MaxDownstreamDiversionDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(15))
+                                    .ReturnsAsync(CreateFlowlinesResult(15, "EpaWaterQualitySite"))
                                     .Verifiable();
                     expectedFeatureCount += 29;
                     expectedPointCount += 29;
@@ -180,20 +210,35 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                     expectedDownstreamCount += 29;
                     expectedEpaCount += 29;
                 }
-                if (dataPoints.HasFlag(NldiDataPoints.Wade))
+                if (dataPoints.HasFlag(NldiDataPoints.WadeRights))
                 {
-                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.Wade, config.MaxDownstreamMainDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(16))
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.WadeRights, config.MaxDownstreamMainDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(16, "WadeRights"))
                                     .Verifiable();
-                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.Wade, config.MaxDownstreamDiversionDistance))
-                                    .ReturnsAsync(CreateFlowlinesResult(17))
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.WadeRights, config.MaxDownstreamDiversionDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(17, "WadeRights"))
                                     .Verifiable();
                     expectedFeatureCount += 33;
                     expectedPointCount += 33;
                     expectedMainCount += 16;
                     expectedArmCount += 17;
                     expectedDownstreamCount += 33;
-                    expectedWadeCount += 33;
+                    expectedWadeRightsCount += 33;
+                }
+                if (dataPoints.HasFlag(NldiDataPoints.WadeTimeseries))
+                {
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamMain, FeatureDataSource.WadeTimeseries, config.MaxDownstreamMainDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(16, "WadeTimeseries"))
+                                    .Verifiable();
+                    _usgsNldiSdkMock.Setup(a => a.GetFeatures(comid, NavigationMode.DownstreamDiversions, FeatureDataSource.WadeTimeseries, config.MaxDownstreamDiversionDistance))
+                                    .ReturnsAsync(CreateFlowlinesResult(17, "WadeTimeseries"))
+                                    .Verifiable();
+                    expectedFeatureCount += 33;
+                    expectedPointCount += 33;
+                    expectedMainCount += 16;
+                    expectedArmCount += 17;
+                    expectedDownstreamCount += 33;
+                    expectedWadeTimeseriesCount += 33;
                 }
             }
 
@@ -212,7 +257,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_channeltype") && a.Properties["westdaat_channeltype"] as string == "Arm").Should().Be(expectedArmCount);
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "UsgsSurfaceWaterSite").Should().Be(expectedUsgsCount);
             result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "EpaWaterQualitySite").Should().Be(expectedEpaCount);
-            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "Wade").Should().Be(expectedWadeCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "WadeWaterRights").Should().Be(expectedWadeRightsCount);
+            result.Features.Count(a => a.Properties.ContainsKey("westdaat_pointdatasource") && a.Properties["westdaat_pointdatasource"] as string == "WadeTimeseries").Should().Be(expectedWadeTimeseriesCount);
         }
 
         [DataTestMethod]
@@ -236,19 +282,16 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             if (!shouldError)
             {
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamMain, config.MaxUpstreamMainDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(1))
+                                .ReturnsAsync(CreateFlowlinesResult(1, "Flowline"))
                                 .Verifiable();
-
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.UpstreamTributaries, config.MaxUpstreamTributaryDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(5))
+                                .ReturnsAsync(CreateFlowlinesResult(5, "Flowline"))
                                 .Verifiable();
-
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamMain, config.MaxDownstreamMainDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(2))
+                                .ReturnsAsync(CreateFlowlinesResult(2, "Flowline"))
                                 .Verifiable();
-
                 _usgsNldiSdkMock.Setup(a => a.GetFlowlines(comid, NavigationMode.DownstreamDiversions, config.MaxDownstreamDiversionDistance))
-                                .ReturnsAsync(CreateFlowlinesResult(3))
+                                .ReturnsAsync(CreateFlowlinesResult(3, "Flowline"))
                                 .Verifiable();
             }
 
@@ -269,7 +312,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
         private FeatureCollection CreateFeatureByCoordinatesResult(string comid)
         {
-            var result = CreateFlowlinesResult(1);
+            var result = CreateFlowlinesResult(1, "Point");
             if (comid != null)
             {
                 result.Features[0].Properties.Add("comid", JsonSerializer.SerializeToElement(comid));
@@ -277,10 +320,26 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             return result;
         }
 
-        private FeatureCollection CreateFlowlinesResult(int featureCount)
+        private FeatureCollection CreateFlowlinesResult(int featureCount, string dataSource = null)
         {
             var features = Enumerable.Range(0, featureCount)
-                                     .Select(i => new Feature(new LineString(GetLineStringCoordinates(5))))
+                                     .Select(i =>
+                                     {
+                                         var feature = new Feature(new LineString(GetLineStringCoordinates(5)));
+                                         if (dataSource != null)
+                                         {
+                                             if (dataSource == "Flowline")
+                                             {
+                                                 feature.Properties["westdaat_featuredatatype"] = "Flowline";
+                                             }
+                                             else
+                                             {
+                                                 feature.Properties["westdaat_pointdatasource"] = dataSource;
+                                                 feature.Properties["westdaat_featuredatatype"] = "Point";
+                                             }
+                                         }
+                                         return feature;
+                                     })
                                      .ToList();
             return new FeatureCollection(features);
         }

@@ -2,9 +2,11 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   },
-  "Host": { "CORS": "http://localhost:3000" },
+  "Host": {
+    "CORS": "http://localhost:3000"
+  },
   "Logging": {
     "Console": {
       "LogLevel": {
@@ -21,5 +23,8 @@
     "LogLevel": {
       "Default": "Information"
     }
+  },
+  "Environment": {
+    "IsDevelopment": true
   }
 }

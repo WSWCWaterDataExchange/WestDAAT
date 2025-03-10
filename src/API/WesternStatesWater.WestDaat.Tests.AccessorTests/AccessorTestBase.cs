@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Transactions;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WaDE.Database.EntityFramework;
+using WesternStatesWater.WestDaat.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
@@ -13,17 +14,25 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         static AccessorTestBase()
         {
             Configuration = new ConfigurationBuilder()
-                                        .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
-                                        .AddInMemoryCollection(DefaultTestConfiguration)
-                                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-                                        .AddEnvironmentVariables()
-                                        .Build();
+                .AddInMemoryCollection(ConfigurationHelper.DefaultConfiguration)
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
         {
-            { $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.ConnectionString)}", "Server=.;Initial Catalog=WaDE2Test;Integrated Security=true;" },
+            {
+                $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WadeConnectionString)}",
+                "Server=localhost;Initial Catalog=WaDE2Test;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+            },
+            {
+                $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
+                "Server=localhost;Initial Catalog=WestDAATTest;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
+            },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "5" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "4" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamMainDistance)}", "3" },
@@ -71,6 +80,11 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             return new DatabaseContextFactory(Configuration.GetDatabaseConfiguration());
         }
 
+        internal IWestDaatDatabaseContextFactory CreateWestDaatDatabaseContextFactory()
+        {
+            return new WestDaatDatabaseContextFactory(Configuration.GetDatabaseConfiguration());
+        }
+
         internal PerformanceConfiguration CreatePerformanceConfiguration()
         {
             return new PerformanceConfiguration
@@ -79,8 +93,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 MaxRecordsDownload = 100000,
             };
         }
-
-        protected AmbientContext Context { get; } = new AmbientContext();
 
         protected virtual void Dispose(bool disposing)
         {

@@ -1,63 +1,51 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Data;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class SystemAccessor : AccessorBase, ISystemAccessor
     {
-        public SystemAccessor(ILogger<SystemAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
+
+        public SystemAccessor(ILogger<SystemAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory)
+            : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
-
-        async Task<List<BeneficialUseItem>> ISystemAccessor.GetAvailableBeneficialUseNormalizedNames()
+        async Task<DashboardFilters> ISystemAccessor.LoadFilters()
         {
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
+            return new DashboardFilters
+            {
+                AllocationTypes = await db.WaterAllocationType.GetControlledVocabularyNames(),
+                BeneficialUses = await GetBeneficialUseNames(db),
+                LegalStatuses = await db.LegalStatus.GetControlledVocabularyNames(),
+                Overlays = await db.RegulatoryOverlayType.GetControlledVocabularyNames(),
+                OwnerClassifications = await db.OwnerClassificationCv.GetControlledVocabularyNames(),
+                RiverBasins = RiverBasinConstants.RiverBasinNames.ToArray(),
+                SiteTypes = await db.SiteType.GetControlledVocabularyNames(),
+                States = await db.State.GetControlledVocabularyNames(),
+                WaterSources = await db.WaterSourceType.GetControlledVocabularyNames(),
+                VariableTypes = await db.Variable.GetControlledVocabularyNames(),
+            };
+        }
 
-            return await db.BeneficialUsesCV
+        private static Task<BeneficialUseItem[]> GetBeneficialUseNames(DatabaseContext db)
+        {
+            return db.BeneficialUsesCV
                 .ProjectTo<BeneficialUseItem>(DtoMapper.Configuration)
                 .Distinct()
                 .OrderBy(a => a.BeneficialUseName)
                 .GroupBy(a => a.BeneficialUseName)
                 .Select(g => g.OrderBy(c => c.ConsumptionCategory).LastOrDefault())
-                .ToListAsync();
-        }
-
-        async Task<List<string>> ISystemAccessor.GetAvailableWaterSourceTypeNormalizedNames()
-        {
-            using var db = _databaseContextFactory.Create();
-            return await db.WaterSourceType
-              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-              .Distinct()
-              .OrderBy(a => a)
-              .ToListAsync();
-        }
-
-        async Task<List<string>> ISystemAccessor.GetAvailableOwnerClassificationNormalizedNames()
-        {
-            using var db = _databaseContextFactory.Create();
-            return await db.OwnerClassificationCv
-              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-              .Distinct()
-              .OrderBy(a => a)
-              .ToListAsync();
-        }
-
-        async Task<List<string>> ISystemAccessor.GetAvailableStateNormalizedNames()
-        {
-            using var db = _databaseContextFactory.Create();
-            return await db.State
-              .Select(a => a.WaDEName.Length > 0 ? a.WaDEName : a.Name)
-              .Distinct()
-              .OrderBy(a => a)
-              .ToListAsync();
+                .ToArrayAsync();
         }
     }
 }

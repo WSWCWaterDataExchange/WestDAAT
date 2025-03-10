@@ -1,27 +1,21 @@
-import { useCallback, useEffect } from "react";
-import Map from "../map/Map";
-import { useMapContext } from "../../contexts/MapProvider";
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { mapLayerNames, mapSourceNames } from "../../config/maps";
-import { MapThemeSelector } from "../map/MapThemeSelector";
-import { getLatsLongsFromFeatureCollection } from "../../utilities/geometryHelpers";
+import React from 'react';
+import { useCallback, useEffect } from 'react';
+import Map from '../map/Map';
+import { useMapContext } from '../../contexts/MapProvider';
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import { mapLayerNames, mapSourceNames } from '../../config/maps';
+import { MapThemeSelector } from '../map/MapThemeSelector';
+import { getLatsLongsFromFeatureCollection } from '../../utilities/geometryHelpers';
 
 interface detailsMapProps {
   mapData: FeatureCollection<Geometry, GeoJsonProperties>;
 }
 
 function DetailsMap(props: detailsMapProps) {
-  const {
-    setVisibleLayers,
-    setGeoJsonData,
-    setMapBoundSettings: setMapBounds,
-  } = useMapContext();
+  const { setVisibleLayers, setGeoJsonData, setMapBoundSettings: setMapBounds } = useMapContext();
 
   useEffect(() => {
-    setVisibleLayers([
-      mapLayerNames.siteLocationsPointsLayer,
-      mapLayerNames.siteLocationsPolygonsLayer,
-    ]);
+    setVisibleLayers([mapLayerNames.siteLocationsPointsLayer, mapLayerNames.siteLocationsPolygonsLayer]);
   }, [setVisibleLayers]);
 
   useEffect(() => {
@@ -29,7 +23,7 @@ function DetailsMap(props: detailsMapProps) {
   }, [props.mapData, setGeoJsonData]);
 
   const handleMapFitChange = useCallback(() => {
-    if(props.mapData){
+    if (props.mapData) {
       setMapBounds({
         LngLatBounds: getLatsLongsFromFeatureCollection(props.mapData),
         maxZoom: 16,
@@ -45,7 +39,11 @@ function DetailsMap(props: detailsMapProps) {
   return (
     <div className="map-group h-100">
       <div className="map-container">
-        <Map handleMapFitChange={handleMapFitChange} />
+        <Map
+          handleMapFitChange={handleMapFitChange}
+          isConsumptiveUseAlertEnabled={false}
+          isGeocoderInputFeatureEnabled={true}
+        />
       </div>
       <div className="theme-selector-container pt-3 ps-3">
         <MapThemeSelector />

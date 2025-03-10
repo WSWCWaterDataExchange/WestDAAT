@@ -1,0 +1,56 @@
+# EditorConfig is awesome: https://editorconfig.org
+# This file helps maintain consistent coding styles for React/TypeScript projects.
+
+root = true
+
+[*]
+# General settings
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Indentation settings
+indent_style = space
+indent_size = 2
+
+[*.ts]
+# TypeScript-specific settings
+indent_style = space
+indent_size = 2
+max_line_length = 120
+quote_type = single
+
+[*.tsx]
+# React TypeScript-specific settings
+indent_style = space
+indent_size = 2
+max_line_length = 120
+quote_type = single
+
+[*.{js,jsx,mjs}]
+# JavaScript/React JavaScript settings
+indent_style = space
+indent_size = 2
+quote_type = single
+
+[*.json]
+# JSON files
+indent_style = space
+indent_size = 2
+
+[*.md]
+# Markdown files
+trim_trailing_whitespace = false
+
+[*.yml]
+# YAML files
+indent_style = space
+indent_size = 2
+
+[*.scss]
+# SCSS files
+indent_style = space
+indent_size = 2
+max_line_length = 120
+quote_type = single

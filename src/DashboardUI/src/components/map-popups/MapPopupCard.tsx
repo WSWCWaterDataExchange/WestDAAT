@@ -1,12 +1,12 @@
-import { ReactChild } from "react";
-import { Card } from "react-bootstrap";
-import CardHeader from "react-bootstrap/esm/CardHeader";
+import { ReactNode } from 'react';
+import { Card } from 'react-bootstrap';
+import CardHeader from 'react-bootstrap/esm/CardHeader';
 
 interface MapPopupCardProps {
   children: {
-    header?: ReactChild,
-    body?: ReactChild
-  },
+    header?: ReactNode;
+    body?: ReactNode;
+  };
   onClosePopup: () => void;
 }
 function MapPopupCard(props: MapPopupCardProps) {
@@ -18,9 +18,7 @@ function MapPopupCard(props: MapPopupCardProps) {
           <button type="button" onClick={props.onClosePopup} className="btn-close map-popup-close-btn"></button>
         </div>
       </CardHeader>
-      <div className="card-body">
-        {props.children.body}
-      </div>
+      <div className="card-body">{props.children.body}</div>
     </Card>
   );
 }

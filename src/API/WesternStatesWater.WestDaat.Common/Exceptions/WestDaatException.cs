@@ -1,8 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace WesternStatesWater.WestDaat.Common.Exceptions
 {
-    [Serializable]
     public class WestDaatException : Exception
     {
         public WestDaatException()
@@ -19,9 +18,12 @@ namespace WesternStatesWater.WestDaat.Common.Exceptions
         {
         }
 
-        protected WestDaatException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
+        public static void ThrowIfNull([NotNull] object @object, string message)
         {
+            if (@object is null)
+            {
+                throw new WestDaatException(message);
+            }
         }
     }
 }

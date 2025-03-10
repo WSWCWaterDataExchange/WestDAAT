@@ -1,8 +1,5 @@
-@description('Specifies the location for resources.')
-param location string = 'westus'
-
-@description('Product name. (Example \'tenzing\')')
-param Product string = 'WestDAAT'
+var location = 'westus'
+var Product = 'WestDAAT'
 
 @description('Used to determine naming convention for resources')
 @allowed([
@@ -13,15 +10,34 @@ param Product string = 'WestDAAT'
 ])
 param Environment string
 
-
 var resource_name_dashes_var = '${toLower(Product)}-${toLower(Environment)}'
 var resource_name_var = '${toLower(Product)}${toLower(Environment)}'
 var serverfarms_ASP_name = 'ASP-${Product}-${toUpper(Environment)}'
 
+var wadedbserver = ((Environment == 'prod'))
+  ? 'wade-production-server.database.windows.net'
+  : 'wade-qa-server.database.windows.net'
+var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA'
 
-var wadedbserver = ((Environment == 'prod')) ? 'wade-production-server.database.windows.net' : 'wade-qa-server.database.windows.net'
-var wadedbname = ((Environment == 'prod')) ? 'WaDE2' : 'WaDE_QA_Server'
+var westdaatdbname = 'WestDAAT'
 
+var b2cOrigins = {
+  qa: 'https://westdaatqa.b2clogin.com'
+  staging: 'https://westdaatstaging.b2clogin.com'
+  prod: 'https://westdaat.b2clogin.com'
+}
+
+// Role Definitions (Different per tenant). 
+// Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
+var azureServiceBusDataSenderRoleDefinitionName = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
+var azureServiceBusReceiverRoleDefinitionName = '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
+var azureStorageBlobDataContributorRoleDefinitionName = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+
+var activeDirectoryObjectIds = {
+  qa: ['5c18b0c3-d95d-4720-86f6-f292f2e3c243', 'WestDAAT - QA - Access']
+  staging: ['e4ca42c0-cfc7-4d1b-865f-e0ad5b136601', 'WestDAAT - Staging - Access']
+  prod: ['e90fc2e6-524a-4de2-bdce-82272c852c00', 'WestDAAT - Prod - Access']
+}
 
 resource resource_name 'Microsoft.Cdn/profiles@2020-04-15' = {
   name: resource_name_var
@@ -65,7 +81,7 @@ resource resource_name_dashes 'microsoft.insights/components@2018-05-01-preview'
   }
 }
 
-resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
+resource Microsoft_Storage_storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: resource_name_var
   location: location
   sku: {
@@ -99,6 +115,53 @@ resource Microsoft_Storage_storageAccounts_resource_name 'Microsoft.Storage/stor
     accessTier: 'Hot'
   }
 }
+
+resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: Microsoft_Storage_storageAccounts
+  name: 'default'
+  properties: {
+    cors: {
+      corsRules: [
+        {
+          allowedHeaders: [
+            '*'
+          ]
+          allowedMethods: [
+            'GET'
+            'POST'
+            'PUT'
+            'OPTIONS'
+            'HEAD'
+          ]
+          allowedOrigins: [
+            b2cOrigins[Environment]
+          ]
+          exposedHeaders: [
+            '*'
+          ]
+          maxAgeInSeconds: 600
+        }
+      ]
+    }
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 365
+    }
+    isVersioningEnabled: true
+  }
+}
+
+// List of containers to create
+var containers = [
+  'application-documents'
+]
+
+resource storage_account_containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [
+  for container in containers: {
+    parent: storage_account_blob
+    name: container
+  }
+]
 
 resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-15' = {
   parent: resource_name
@@ -136,7 +199,7 @@ resource resource_name_resource_name 'Microsoft.Cdn/profiles/endpoints@2020-04-1
 }
 
 resource Microsoft_Storage_storageAccounts_queueServices_resource_name_default 'Microsoft.Storage/storageAccounts/queueServices@2020-08-01-preview' = {
-  parent: Microsoft_Storage_storageAccounts_resource_name
+  parent: Microsoft_Storage_storageAccounts
   name: 'default'
   properties: {
     cors: {
@@ -146,7 +209,7 @@ resource Microsoft_Storage_storageAccounts_queueServices_resource_name_default '
 }
 
 resource Microsoft_Storage_storageAccounts_tableServices_resource_name_default 'Microsoft.Storage/storageAccounts/tableServices@2020-08-01-preview' = {
-  parent: Microsoft_Storage_storageAccounts_resource_name
+  parent: Microsoft_Storage_storageAccounts
   name: 'default'
   properties: {
     cors: {
@@ -200,7 +263,7 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
     type: 'SystemAssigned'
   }
   dependsOn: [
-    Microsoft_Storage_storageAccounts_resource_name
+    Microsoft_Storage_storageAccounts
   ]
   properties: {
     enabled: true
@@ -220,41 +283,9 @@ resource sites_fn_resource 'Microsoft.Web/sites@2021-03-01' = {
     reserved: false
     isXenon: false
     hyperV: false
-siteConfig: {
-      appSettings: [
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
-        }
-        {
-          name: 'AzureWebJobsSecretStorageType'
-          value: 'files'
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts_resource_name.id, '2019-06-01').keys[0].value}'
-        }
-        {
-          name: 'Database:AccessTokenDatabaseTenantId'
-          value: subscription().tenantId
-        }
-        {
-          name: 'Database:AccessTokenDatabaseResource'
-          value: 'https://database.windows.net/'
-        }
-        {
-          name: 'Database:ConnectionString'
-          value: 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-        }
-      ]
+    siteConfig: {
+      // Don't include the appSettings here. They will get merged in separate step
+      // Doing so will clobber existing app settings
     }
     scmSiteAlsoStopped: false
     clientAffinityEnabled: false
@@ -268,6 +299,39 @@ siteConfig: {
     redundancyMode: 'None'
     storageAccountRequired: false
     keyVaultReferenceIdentity: 'SystemAssigned'
+  }
+}
+
+var fnAppSettings = {
+  'BlobStorage:Uri': 'https://${Microsoft_Storage_storageAccounts.name}.blob.${environment().suffixes.storage}'
+  'Database:AccessTokenDatabaseResource': 'https://database.windows.net/'
+  'Database:AccessTokenDatabaseTenantId': subscription().tenantId
+  'Database:WadeConnectionString': 'Server=tcp:${wadedbserver},1433;Initial Catalog=${wadedbname};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
+  'Environment:IsDevelopment': false
+  'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
+  'Nldi:MaxDownstreamDiversionDistance': '500'
+  'Nldi:MaxDownstreamMainDistance': '500'
+  'Nldi:MaxUpstreamMainDistance': '500'
+  'Nldi:MaxUpstreamTributaryDistance': '500'
+  'Smtp:FeedbackFrom': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackTo:0': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
+  APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
+  AzureWebJobsSecretStorageType: 'files'
+  AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
+  FUNCTIONS_EXTENSION_VERSION: '~4'
+  FUNCTIONS_WORKER_RUNTIME: 'dotnet-isolated'
+  WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
+  WEBSITE_CONTENTSHARE: 'westdaat-qa-1234'
+}
+
+module appSettings 'appsettings.bicep' = {
+  name: 'functionAppSettings'
+  params: {
+    fnName: sites_fn_resource.name
+    currentAppSettings: list('${sites_fn_resource.id}/config/appsettings', '2020-12-01').properties
+    appSettings: fnAppSettings
   }
 }
 
@@ -335,6 +399,8 @@ resource sites_fn_web 'Microsoft.Web/sites/config@2021-03-01' = {
     cors: {
       allowedOrigins: [
         'https://portal.azure.com'
+        'https://westdaatqa.azureedge.net'
+        'https://westdaatqa.westernstateswater.org'
       ]
       supportCredentials: false
     }
@@ -376,7 +442,141 @@ resource sites_fn_sites_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@
   name: '${resource_name_dashes_var}.azurewebsites.net'
   location: location
   properties: {
-    siteName: 'wade-westdaat-qa-fn'
     hostNameType: 'Verified'
+  }
+}
+
+resource api_management 'Microsoft.ApiManagement/service@2024-05-01' = {
+  name: resource_name_var
+  location: location
+  sku: {
+    name: 'Consumption'
+    capacity: 0
+  }
+  properties: {
+    publisherEmail: 'rjames@wswc.utah.gov'
+    publisherName: 'Western States Water Council'
+  }
+}
+
+var sqlAdminActiveDirectoryObject = activeDirectoryObjectIds[Environment]
+
+resource sql_server 'Microsoft.Sql/servers@2021-11-01' = {
+  name: resource_name_dashes_var
+  location: location
+  properties: {
+    version: '12.0'
+    publicNetworkAccess: 'Enabled'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      azureADOnlyAuthentication: true
+      sid: sqlAdminActiveDirectoryObject[0]
+      login: sqlAdminActiveDirectoryObject[1]
+      principalType: 'Group'
+      tenantId: tenant().tenantId
+    }
+  }
+}
+
+resource sql_server_database 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
+  parent: sql_server
+  name: westdaatdbname
+  location: location
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 5
+  }
+  properties: {
+    collation: 'SQL_Latin1_General_CP1_CI_AS'
+    maxSizeBytes: 2147483648
+    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
+    zoneRedundant: false
+    readScale: 'Disabled'
+  }
+}
+
+resource allowAccessToAzureServices 'Microsoft.Sql/servers/firewallRules@2021-11-01' = {
+  parent: sql_server
+  name: 'allow-access-to-azure-services'
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
+  }
+}
+
+resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
+  name: resource_name_dashes_var
+  location: location
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {
+    disableLocalAuth: false
+    zoneRedundant: false
+    minimumTlsVersion: '1.2'
+  }
+}
+
+// Will need to match the following locations:
+//   AzureNames.Queues list
+//   sb-emulator.config.json
+var queueNames = [
+  'conservation-application-submitted'
+]
+
+resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = [
+  for queueName in queueNames: {
+    parent: service_bus
+    name: queueName
+  }
+]
+
+// Role Assignments
+// Note - You must be an Owner or User Access Administrator to assign roles.
+
+resource azureServiceBusDataSenderRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: azureServiceBusDataSenderRoleDefinitionName
+}
+
+resource serviceBusRoleAssignmentFnAppSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: service_bus
+  name: guid('${service_bus.id}-send')
+  properties: {
+    principalId: sites_fn_resource.identity.principalId
+    roleDefinitionId: azureServiceBusDataSenderRoleDefinition.id
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource azureServiceBusReceiverRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: azureServiceBusReceiverRoleDefinitionName
+}
+
+resource serviceBusRoleAssignmentFnAppReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: service_bus
+  name: guid('${service_bus.id}-receive')
+  properties: {
+    principalId: sites_fn_resource.identity.principalId
+    roleDefinitionId: azureServiceBusReceiverRoleDefinition.id
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource azureStorageBlobDataContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: azureStorageBlobDataContributorRoleDefinitionName
+}
+
+resource storageAccountRoleAssignmentFnApp 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: Microsoft_Storage_storageAccounts
+  name: guid('${Microsoft_Storage_storageAccounts.id}-data-contributor')
+  properties: {
+    principalId: sites_fn_resource.identity.principalId
+    roleDefinitionId: azureStorageBlobDataContributorRoleDefinition.id
+    principalType: 'ServicePrincipal'
   }
 }

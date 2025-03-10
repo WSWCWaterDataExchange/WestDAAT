@@ -1,26 +1,22 @@
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {
-    public class DateDimFaker : Faker<DateDim>
+    public sealed class DateDimFaker : Faker<DateDim>
     {
-        private List<DateOnly> _uniqueDates = new List<DateOnly>(); //use this to prevent collisions in the Date_Dim table
+        // avoid duplicate dates
+        private static DateTime _date = new(1900, 1, 1);
 
         public DateDimFaker()
         {
-            this.RuleFor(a => a.Date, GenerateDate)
-                .RuleFor(a => a.Year, (b, o) => o.Date.Year.ToString());
+            RuleFor(a => a.Date, NextDate)
+                .RuleFor(a => a.Year, (_, o) => o.Date.Year.ToString());
         }
 
-        public DateTime GenerateDate(Faker faker)
+        private static DateTime NextDate()
         {
-            var generatedDate = faker.Date.Past(100).Date;
-            while (_uniqueDates.Contains(DateOnly.FromDateTime(generatedDate))) 
-            {
-                generatedDate = faker.Date.Past(100).Date;
-            }
-            _uniqueDates.Add(DateOnly.FromDateTime(generatedDate));
-            return generatedDate;
+            _date = _date.AddDays(1);
+            return _date;
         }
     }
 }

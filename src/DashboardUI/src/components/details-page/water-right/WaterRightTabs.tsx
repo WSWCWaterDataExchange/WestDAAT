@@ -1,81 +1,98 @@
-import { Tab, Table, Tabs } from 'react-bootstrap';
-import { useWaterRightDetailsContext } from './Provider';
+import React from 'react';
+import { Tab, Tabs } from 'react-bootstrap';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { ActiveTabType, useWaterRightDetailsContext } from './Provider';
+import OverlayDetailsTable from '../OverlayDetailsTable';
+import QuickSearchToolbar from '../../QuickSearchToolbar';
 
-export enum WaterRightTab {
-  SiteInfo = 'SiteInfo',
-  WaterRightInfo = 'WaterRightInfo'
-}
-
-function WaterRightTabs() {
+export default function WaterRightTabs() {
   const {
     activeTab,
     setActiveTab,
-    hostData:{
-      siteInfoListQuery: {data: siteInfoList},
-      sourceInfoListQuery: {data: sourceInfoList}
-    }
+    hostData: {
+      siteInfoListQuery: { data: siteInfoList },
+      sourceInfoListQuery: { data: sourceInfoList },
+      overlayInfoListQuery: { data: overlayInfoList },
+    },
   } = useWaterRightDetailsContext();
 
-  return (
-    <>
-      <Tabs onSelect={a=>setActiveTab(a === 'site' ? a : 'source')} activeKey={activeTab} className="mb-3 custom-tabs">
-        <Tab eventKey="site" title="Site Info">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Site ID</th>
-                <th>Site Native ID</th>
-                <th>Site Name</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>County</th>
-                <th>Site Type</th>
-                <th>POD or POU</th>
-              </tr>
-            </thead>
-            <tbody>
-              {siteInfoList?.map((site) =>
-                <tr key={site.siteUuid}>
-                  <td><a href={`/details/site/${site.siteUuid}`} target="_blank" rel="noopener noreferrer">{site.siteUuid}</a></td>
-                  <td>{site.siteNativeId}</td>
-                  <td>{site.siteName}</td>
-                  <td>{site.latitude}</td>
-                  <td>{site.longitude}</td>
-                  <td>{site.county}</td>
-                  <td>{site.siteType}</td>
-                  <td>{site.poDorPOUSite}</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </Tab>
-        <Tab eventKey="source" title="Water Source Info">
-          <Table hover>
-            <thead>
-              <tr>
-                <th>WaDE Water Source ID</th>
-                <th>Water Source Native ID</th>
-                <th>Water Source Name</th>
-                <th>Water Source Type</th>
-                <th>GNIS ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sourceInfoList?.map((source) =>
-                <tr key={source.waterSourceUuid}>
-                  <td>{source.waterSourceUuid}</td>
-                  <td>{source.waterSourceNativeId}</td>
-                  <td>{source.waterSourceName}</td>
-                  <td>{source.waterSourceType}</td>
-                  <td>{source.gnisfeatureNameCv}</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </Tab>
-      </Tabs>
-    </>
-  )
-}
+  const siteRows = React.useMemo(() => {
+    if (!siteInfoList) return [];
+    return siteInfoList.map((site, index) => ({
+      id: `site-${site.siteUuid}-${index}`,
+      ...site,
+    }));
+  }, [siteInfoList]);
 
-export default WaterRightTabs;
+  const siteColumns: GridColDef[] = [
+    {
+      field: 'siteUuid',
+      headerName: 'WaDE Site ID',
+      flex: 1,
+      renderCell: (params) => (
+        <a href={`/details/site/${params.value}`} target="_blank" rel="noopener noreferrer">
+          {params.value}
+        </a>
+      ),
+    },
+    { field: 'siteNativeId', headerName: 'Site Native ID', flex: 1 },
+    { field: 'siteName', headerName: 'Site Name', flex: 1 },
+    { field: 'latitude', headerName: 'Latitude', flex: 1 },
+    { field: 'longitude', headerName: 'Longitude', flex: 1 },
+    { field: 'county', headerName: 'County', flex: 1 },
+    { field: 'siteType', headerName: 'Site Type', flex: 1 },
+    { field: 'poDorPOUSite', headerName: 'POD or POU', flex: 1 },
+  ];
+
+  const sourceRows = React.useMemo(() => {
+    if (!sourceInfoList) return [];
+    return sourceInfoList.map((src, index) => ({
+      id: `source-${src.waterSourceUuid}-${index}`,
+      ...src,
+    }));
+  }, [sourceInfoList]);
+
+  const sourceColumns: GridColDef[] = [
+    { field: 'waterSourceUuid', headerName: 'WaDE Water Source ID', flex: 1 },
+    { field: 'waterSourceNativeId', headerName: 'Water Source Native ID', flex: 1 },
+    { field: 'waterSourceName', headerName: 'Water Source Name', flex: 1 },
+    { field: 'waterSourceType', headerName: 'Water Source Type', flex: 1 },
+    { field: 'gnisfeatureNameCv', headerName: 'GNIS ID', flex: 1 },
+  ];
+
+  return (
+    <Tabs onSelect={(key) => setActiveTab(key as ActiveTabType)} activeKey={activeTab} className="mb-3 custom-tabs">
+      <Tab eventKey="site" title="Site Info">
+        <div style={{ width: '100%', height: 600 }}>
+          <DataGrid
+            rows={siteRows}
+            columns={siteColumns}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+            slots={{
+              toolbar: QuickSearchToolbar,
+            }}
+          />
+        </div>
+      </Tab>
+      <Tab eventKey="source" title="Water Source Info">
+        <div style={{ width: '100%', height: 600 }}>
+          <DataGrid
+            rows={sourceRows}
+            columns={sourceColumns}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 25, 50, 100, { value: -1, label: 'All' }]}
+            slots={{
+              toolbar: QuickSearchToolbar,
+            }}
+          />
+        </div>
+      </Tab>
+      <Tab eventKey="rights" title="Administrative/Regulatory Overlay Info">
+        <OverlayDetailsTable overlayInfoList={overlayInfoList} />
+      </Tab>
+    </Tabs>
+  );
+}

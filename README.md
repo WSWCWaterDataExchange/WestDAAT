@@ -1,4 +1,9 @@
 # WaDE
+[![Deploy Prod](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/manual-deploy-prod.yml/badge.svg?branch=master)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/manual-deploy-prod.yml)
+<br />
+[![Deploy Staging](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-master.yml/badge.svg?branch=master)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-master.yml)
+<br />
+[![Deploy QA](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml/badge.svg)](https://github.com/WSWCWaterDataExchange/WestDAAT/actions/workflows/on-merge-develop.yml)
 
 ## Getting Started
 
@@ -7,8 +12,8 @@
 3. Start SQL Server (Docker or Host machine)
    - If you already have a SQL Server container running, just use that as the Host machine no need for docker. 
    - To spin up a new SQL server docker container:
-      - `docker-compose` file supplied in `src/API/BackendServices/WesternStatesWater.WaDE.Docker/docker-compose.dev.yml`
-      - `docker-compose up -d`
+      - `docker compose` file supplied in `src/API/BackendServices/WesternStatesWater.WaDE.Docker/docker-compose.dev.yml`
+      - `docker compose up -d`
 4. Run DbUp project from WaDE2 repo 
    - **Note: No need to run DbUp if you imported bacpac files for the DBs** 
    - **Need two databases WaDE2 and WaDE2Test**
@@ -48,11 +53,17 @@
 
 1. Run MapboxTilesetCreate console app located in /tools
 2. Optional - Add personal.settings.json for connection string settings
-3. Allocations.Points.geojson and Allocations.Polygons.geojson files will be generated in geojson dir
-4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson"` This will take about 5 minutes
-5. Upload to mapbox studio
+3. Allocations.Points.geojson and Allocations.Polygons.geojson, Overlays.Polygons.geojson, and TimeSeries.Points.geojson files will be generated in geojson dir
+4. Run `tippecanoe -zg -o waterRights.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"Allocations.Points.geojson" -L polygons:"Allocations.Polygons.geojson"` to generate Water Right Map Tiles. This will take about 5 minutes
+5. Run `tippecanoe -zg -o overlays.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L polygons:"Overlays.Polygons.geojson"` to generate Overlay Map Tiles. This will take about 5 minutes
+6. Run `tippecanoe -zg -o timeSeries.mbtiles --read-parallel --drop-densest-as-needed --extend-zooms-if-still-dropping --generate-ids --force -L points:"TimeSeries.Points.geojson"` to generate Time Series Map Tiles. This will take about 5 minutes
+7. Upload to mapbox studio
 
 
 ## Deployment
 - Setting secrets for deployment: https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md
 - To set secret with Azure Credientials, there should already be app registrations for the github actions, so just need to renew secret and put the new secret in the json (need at least Application Administrator role)
+
+## OpenET Integration
+- The OpenET SDK requires an api key to function. For local development, you will want to use the Dev api key.
+- The api keys are listed on the OpenET website: https://account.etdata.org/settings/api

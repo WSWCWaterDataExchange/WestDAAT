@@ -1,105 +1,62 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.IO;
+﻿using System.Net;
+using GeoJSON.Text.Feature;
 using WesternStatesWater.WestDaat.Contracts.Client;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
     public class System : FunctionBase
     {
-        public System(ISystemManager systemManager, INotificationManager notificationManager, ILogger<WaterAllocation> logger)
+        public System(IWaterResourceManager waterResourceManager, INotificationManager notificationManager, ILogger<System> logger) : base(logger)
         {
-            _systemManager = systemManager;
+            _waterResourceManager = waterResourceManager;
             _notificationManager = notificationManager;
             _logger = logger;
         }
 
         private readonly INotificationManager _notificationManager;
-        private readonly ISystemManager _systemManager;
+        private readonly IWaterResourceManager _waterResourceManager;
         private readonly ILogger _logger;
 
-        [FunctionName(nameof(GetBeneficialUses))]
-        public async Task<IActionResult> GetBeneficialUses([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/beneficialuses")] HttpRequest req)
+        [Function(nameof(GetDashboardFilters))]
+        [OpenApiOperation(nameof(GetDashboardFilters))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(DashboardFilters))]
+        public async Task<HttpResponseData> GetDashboardFilters([HttpTrigger(AuthorizationLevel.Function, "get",
+                Route = "system/filters")]
+            HttpRequestData req)
         {
-            _logger.LogInformation("Getting Beneficial Uses");
-
-            var results = await _systemManager.GetAvailableBeneficialUseNormalizedNames();
-
-            return new OkObjectResult(results);
+            _logger.LogInformation("Loading filters");
+            var results = await _waterResourceManager.LoadFilters();
+            return await CreateOkResponse(req, results);
         }
 
-        [FunctionName(nameof(GetOwnerClassifications)), AllowAnonymous]
-        public async Task<IActionResult> GetOwnerClassifications([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/ownerclassifications")] HttpRequest request)
+        [Function(nameof(GetRiverBasinPolygonsByName))]
+        [OpenApiOperation(nameof(GetRiverBasinPolygonsByName))]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(FeatureCollection))]
+        public async Task<HttpResponseData> GetRiverBasinPolygonsByName(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "system/riverBasins")]
+            HttpRequestData request)
         {
-            _logger.LogInformation("Getting Owner Classifications");
+            var basinNames = await ParseRequestBody<string[]>(request);
+            _logger.LogInformation("Get River Basin Polygons by Names {RiverBasins}", string.Join(",", basinNames));
+            var result = _waterResourceManager.GetRiverBasinPolygonsByName(basinNames);
 
-            var results = await _systemManager.GetAvailableOwnerClassificationNormalizedNames();
-
-            return JsonResult(results);
+            return await CreateOkResponse(request, result);
         }
 
-        [FunctionName(nameof(GetWaterSourceTypes)), AllowAnonymous]
-        public async Task<IActionResult> GetWaterSourceTypes([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/watersourcetypes")] HttpRequest request)
+        [Function(nameof(PostFeedback))]
+        [OpenApiOperation(nameof(PostFeedback))]
+        [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
+        public async Task<HttpResponseData> PostFeedback(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "system/feedback")]
+            HttpRequestData request)
         {
-            _logger.LogInformation("Getting Water Source Types");
-
-            var results = await _systemManager.GetAvailableWaterSourceTypeNormalizedNames();
-
-            return JsonResult(results);
-        }
-
-        [FunctionName(nameof(GetStates)), AllowAnonymous]
-        public async Task<IActionResult> GetStates([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/states")] HttpRequest request)
-        {
-            _logger.LogInformation("Getting States");
-
-            var results = await _systemManager.GetAvailableStateNormalizedNames();
-
-            return JsonResult(results);
-        }
-
-        [FunctionName(nameof(GetRiverBasinNames)), AllowAnonymous]
-        public IActionResult GetRiverBasinNames([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "system/RiverBasins")] HttpRequest request)
-        {
-            var result = _systemManager.GetRiverBasinNames();
-
-            return new OkObjectResult(result);
-        }
-
-        [FunctionName(nameof(GetRiverBasinPolygonsByName)), AllowAnonymous]
-        public async Task<IActionResult> GetRiverBasinPolygonsByName([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/RiverBasins")] HttpRequest request)
-        {
-            string requestBody = String.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var basinNames = JsonConvert.DeserializeObject<string[]>(requestBody);
-
-            var result = _systemManager.GetRiverBasinPolygonsByName(basinNames);
-
-            return new OkObjectResult(JsonSerializer.Serialize(result));
-        }
-
-        [FunctionName(nameof(PostFeedback)), AllowAnonymous]
-        public async Task<IActionResult> PostFeedback([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "system/feedback")] HttpRequest request)
-        {
-            string requestBody = string.Empty;
-            using (StreamReader streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-            var feedbackRequest = JsonConvert.DeserializeObject<FeedbackRequest>(requestBody);
-
+            var feedbackRequest = await ParseRequestBody<FeedbackRequest>(request);
             await _notificationManager.SendFeedback(feedbackRequest);
 
-            return new OkResult();
+            return request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }

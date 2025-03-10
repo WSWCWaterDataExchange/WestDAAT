@@ -11,71 +11,70 @@
     padding: 10px;
     border-bottom: 1px solid $bs-gray-600;
   }
-  
-  .water-rights-card, .site-card {
-    .card-header{
+
+  .water-rights-card,
+  .site-card {
+    .card-header {
       font-size: 20px;
       color: $white;
       color: $white;
       padding: 10px;
       display: flex;
       align-items: center;
-      column-gap: .5rem;
+      column-gap: 0.5rem;
       > svg {
         flex-shrink: 0;
       }
       > span {
         line-height: 1;
       }
-      
     }
   }
 
-  
   .property-name {
     font-size: 14px;
     margin-top: 18px;
     color: $text-color-grey;
-    &:first-of-type{
+    &:first-of-type {
       margin-top: 0;
     }
   }
-  
+
   .property-value {
     font-size: 16px;
     font-weight: bold;
     color: $text-color-black;
-    display: flex;// For aligning correctly
-    &:empty{
+    display: flex; // For aligning correctly
+    &:empty {
       color: $text-color-grey;
-      &:before{
-        content: "Unknown";
+      &:before {
+        content: 'Unknown';
       }
     }
-    &.is-verbose{
+    &.is-verbose {
       font-weight: normal;
     }
   }
-  
-  .custom-tabs > .nav-item{
-    .nav-link.active{  
+
+  .custom-tabs > .nav-item {
+    .nav-link.active {
       background-color: $white;
       border-bottom: none;
     }
   }
-  
-  .map-group{
+
+  .map-group {
     display: flex;
     flex-direction: column;
-    
+
     > .map-container {
       height: 100%;
       max-height: calc(100vh - 175px);
       min-height: 500px;
       padding: 5px;
     }
-    
-    .theme-selector-container{ 
+
+    .theme-selector-container {
       position: absolute;
       .map-themes {
         flex-direction: column;
@@ -83,4 +82,3 @@
     }
   }
 }
-

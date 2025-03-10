@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
     internal class TestAccessor : AccessorBase, ITestAccessor
     {
-        public TestAccessor(ILogger<TestAccessor> logger, IDatabaseContextFactory databaseContextFactory) : base(logger)
+        public TestAccessor(ILogger<TestAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
         public override string TestMe(string input)
         {

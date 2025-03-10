@@ -1,0 +1,87 @@
+@import '../../../styles/_colors.scss';
+@import '../../../styles/sizes.scss';
+
+// side-panel class copied from `side-panel.scss` with some changes
+.estimation-tool-side-panel {
+  background-color: $bs-gray-100;
+  box-shadow: 0px 3px 6px #00000029;
+  // 1rem - width of scrollbar
+  min-width: calc(425px + 1rem);
+  max-width: calc(425px + 1rem);
+  z-index: 100;
+
+  .panel-content {
+    label {
+      display: block;
+      color: $bs-gray-800;
+      font-weight: $semi-bold;
+    }
+
+    .form-switch .form-check-input {
+      width: 2.5em;
+      height: 1.5em;
+      margin-right: 8px;
+    }
+  }
+
+  .map-info {
+    color: $text-color-light;
+    background-color: $bs-gray-600;
+  }
+
+  .btn-group {
+    label {
+      color: $primary-color;
+      &:hover {
+        color: $text-color-light;
+      }
+    }
+  }
+
+  .dropdown {
+    > button {
+      background-color: white;
+      border: 1px solid $border-color;
+    }
+
+    .btn-group {
+      width: 100%;
+    }
+
+    .dropdown-menu {
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+
+  .et-blue-text {
+    color: $primary-color;
+  }
+}
+
+.estimate-tool-conservation-estimate-text {
+  color: $estimate-tool-estimate-text-color;
+}
+
+.estimate-tool-map-dimmed-overlay {
+  z-index: 1000;
+  display: block;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.estimation-tool-sidebar-element {
+  $text-line-height: 24px;
+
+  .element-title {
+    line-height: $text-line-height;
+  }
+
+  .element-icon {
+    height: $text-line-height;
+  }
+}

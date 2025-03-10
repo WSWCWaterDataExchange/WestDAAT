@@ -1,18 +1,16 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Tests.Helpers;
-using EF = WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
-using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
-using WesternStatesWater.WestDaat.Utilities;
+using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Tests.Helpers.Geometry;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
-using WesternStatesWater.WestDaat.Accessors.CsvModels;
+using WesternStatesWater.WestDaat.Utilities;
+using CommonContracts = WesternStatesWater.WestDaat.Common.DataContracts;
+using EF = WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class WaterAllocationAccessorTests : AccessorTestBase
     {
         [TestMethod]
@@ -40,7 +38,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { }, Common.AnalyticsInformationGrouping.BeneficialUse);
 
             //Assert
             results.Length.Should().Be(uniquePrimaryUseCount);
@@ -82,30 +80,56 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { }, Common.AnalyticsInformationGrouping.BeneficialUse);
 
             //Assert
             results.First().Should().BeEquivalentTo(expected);
         }
 
+        [DataTestMethod]
+        [DataRow(Common.AnalyticsInformationGrouping.BeneficialUse)]
+        [DataRow(Common.AnalyticsInformationGrouping.WaterSourceType)]
+        [DataRow(Common.AnalyticsInformationGrouping.OwnerType)]
+        [DataRow(Common.AnalyticsInformationGrouping.AllocationType)]
+        [DataRow(Common.AnalyticsInformationGrouping.LegalStatus)]
+        [DataRow(Common.AnalyticsInformationGrouping.SiteType)]
+        public async Task GetAnalyticsSummaryInformation_ShouldSucceedForEachGroupValue(Common.AnalyticsInformationGrouping groupValue)
+        {
+            //Arrange
+            var allocationAmountFacts = new AllocationAmountFactFaker().Generate(3);
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var result = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), groupValue);
+
+            // Assert
+            result.Should().NotBeNull();
+        }
+
         [TestMethod]
-        public async Task GetAnalyticsSummary_CorrectSliceAndValues()
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForBeneficialUse()
         {
             //Arrange
             List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
 
             var primaryUse1Values = new AllocationAmountFactFaker()
-               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 1")
-               .RuleFor(a => a.AllocationFlow_CFS, () => 1)
-               .RuleFor(a => a.AllocationVolume_AF, () => 2)
-               .Generate(5);
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 1")
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
             allocationAmountFacts.AddRange(primaryUse1Values);
 
             var primaryUse2Values = new AllocationAmountFactFaker()
-               .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 2")
-               .RuleFor(a => a.AllocationFlow_CFS, () => 3)
-               .RuleFor(a => a.AllocationVolume_AF, () => 4)
-               .Generate(2);
+                .RuleFor(a => a.PrimaryBeneficialUseCategory, () => $"Primary Use 2")
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
 
             allocationAmountFacts.AddRange(primaryUse2Values);
 
@@ -129,14 +153,339 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
-                db.AllocationAmountsFact.AddRange(allocationAmountFacts);
-                db.SaveChanges();
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
             }
 
             //Act
             var accessor = CreateWaterAllocationAccessor();
 
-            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria { });
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.BeneficialUse);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForWaterSourceType()
+        {
+            //Arrange
+            var wadeNames = new string[] { "wadename1", "wadename2", "wadename3" };
+
+            var allocationAmountsFacts = wadeNames.Select((name, idx) =>
+            {
+                return new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                    .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                    .RuleFor(a => a.AllocationBridgeSitesFact, () => new AllocationBridgeSiteFactFaker()
+                        .RuleFor(absf => absf.Site, () => new SitesDimFaker()
+                            .RuleFor(site => site.WaterSourceBridgeSitesFact, () => new WaterSourceBridgeSiteFactFaker()
+                                .RuleFor(wsbsf => wsbsf.WaterSource, () => new WaterSourceDimFaker()
+                                    .RuleFor(ws => ws.WaterSourceTypeCvNavigation, () => new WaterSourceTypeFaker()
+                                        .RuleFor(wst => wst.WaDEName, () => name)
+                                        .Generate())
+                                    .Generate())
+                                .Generate(1))
+                            .Generate())
+                        .Generate(1)
+                    )
+                    .Generate(idx + 1);
+            })
+            .SelectMany(array => array)
+            .ToArray();
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename1",
+                    Flow = 1,
+                    Points = 1,
+                    Volume = 2,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename2",
+                    Flow = 2,
+                    Points = 2,
+                    Volume = 4,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "wadename3",
+                    Flow = 3,
+                    Points = 3,
+                    Volume = 6,
+                },
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountsFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.WaterSourceType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForOwnerType()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var ownerClassificationCvs = new EF.OwnerClassificationCv[]
+            {
+                new OwnerClassificationCvFaker()
+                    .RuleFor(occ => occ.Name, () => "Owner Type 1")
+                    .Generate(),
+                new OwnerClassificationCvFaker()
+                    .RuleFor(occ => occ.Name, () => "Owner Type 2")
+                    .Generate()
+            };
+
+            var primaryUse1Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.OwnerClassification, () => ownerClassificationCvs[0])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
+            allocationAmountFacts.AddRange(primaryUse1Values);
+
+            var primaryUse2Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.OwnerClassification, () => ownerClassificationCvs[1])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
+
+            allocationAmountFacts.AddRange(primaryUse2Values);
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Owner Type 1",
+                    Flow = 5,
+                    Points = 5,
+                    Volume = 10,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Owner Type 2",
+                    Flow = 6,
+                    Volume = 8,
+                    Points = 2,
+                }
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.OwnerType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForAllocationType()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var allocationTypes = new EF.WaterAllocationType[]
+            {
+                new WaterAllocationTypeCVFaker()
+                    .RuleFor(wat => wat.Name, () => "Allocation Type 1")
+                    .Generate(),
+                new WaterAllocationTypeCVFaker()
+                    .RuleFor(wat => wat.Name, () => "Allocation Type 2")
+                    .Generate()
+            };
+
+            var primaryUse1Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationTypeCvNavigation, () => allocationTypes[0])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
+            allocationAmountFacts.AddRange(primaryUse1Values);
+
+            var primaryUse2Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationTypeCvNavigation, () => allocationTypes[1])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
+
+            allocationAmountFacts.AddRange(primaryUse2Values);
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Allocation Type 1",
+                    Flow = 5,
+                    Points = 5,
+                    Volume = 10,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Allocation Type 2",
+                    Flow = 6,
+                    Volume = 8,
+                    Points = 2,
+                }
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.AllocationType);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForLegalStatus()
+        {
+            //Arrange
+            List<EF.AllocationAmountsFact> allocationAmountFacts = new List<EF.AllocationAmountsFact>();
+
+            var legalStatuses = new EF.LegalStatus[]
+            {
+                new LegalStatusCVFaker()
+                    .RuleFor(x => x.Name, "Legal Status 1")
+                    .Generate(),
+                new LegalStatusCVFaker()
+                    .RuleFor(x => x.Name, "Legal Status 2")
+                    .Generate(),
+            };
+
+            var primaryUse1Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationLegalStatusCvNavigation, () => legalStatuses[0])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                .Generate(5);
+            allocationAmountFacts.AddRange(primaryUse1Values);
+
+            var primaryUse2Values = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationLegalStatusCvNavigation, () => legalStatuses[1])
+                .RuleFor(a => a.AllocationFlow_CFS, () => 3)
+                .RuleFor(a => a.AllocationVolume_AF, () => 4)
+                .Generate(2);
+
+            allocationAmountFacts.AddRange(primaryUse2Values);
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Legal Status 1",
+                    Flow = 5,
+                    Points = 5,
+                    Volume = 10,
+                },
+                new AnalyticsSummaryInformation
+                {
+                    PrimaryUseCategoryName = "Legal Status 2",
+                    Flow = 6,
+                    Volume = 8,
+                    Points = 2,
+                }
+            };
+
+            using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.LegalStatus);
+
+            //Assert
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task GetAnalyticsSummary_CalculateAnalyticsCorrectlyForSiteType()
+        {
+            //Arrange
+            var siteTypes = new EF.SiteType[]
+            {
+                new SiteTypeFaker()
+                    .RuleFor(st => st.Name, () => "site name 1")
+                    .RuleFor(st => st.WaDEName, () => "wadename1")
+                    .Generate(),
+                new SiteTypeFaker()
+                    .RuleFor(st => st.Name, () => "site name 2")
+                    .RuleFor(st => st.WaDEName, () => "wadename2")
+                    .Generate(),
+            };
+
+            var allocationAmountsFacts = siteTypes.Select((siteType, idx) =>
+            {
+                return new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationFlow_CFS, () => 1)
+                    .RuleFor(a => a.AllocationVolume_AF, () => 2)
+                    .RuleFor(a => a.AllocationBridgeSitesFact, () => new AllocationBridgeSiteFactFaker()
+                        .RuleFor(absf => absf.Site, () => new SitesDimFaker()
+                            .RuleFor(site => site.SiteTypeCvNavigation, () => siteType)
+                            .Generate())
+                        .Generate(1)
+                    )
+                    .Generate(idx + 1);
+            })
+            .SelectMany(array => array)
+            .ToArray();
+
+            var expected = new AnalyticsSummaryInformation[]
+            {
+                new()
+                {
+                    PrimaryUseCategoryName = "wadename1",
+                    Flow = 1,
+                    Points = 1,
+                    Volume = 2,
+                },
+                new()
+                {
+                    PrimaryUseCategoryName = "wadename2",
+                    Flow = 2,
+                    Points = 2,
+                    Volume = 4,
+                },
+            };
+
+            await using (var db = CreateDatabaseContextFactory().Create())
+            {
+                await db.AllocationAmountsFact.AddRangeAsync(allocationAmountsFacts);
+                await db.SaveChangesAsync();
+            }
+
+            //Act
+            var accessor = CreateWaterAllocationAccessor();
+
+            var results = await accessor.GetAnalyticsSummaryInformation(new WaterRightsSearchCriteria(), Common.AnalyticsInformationGrouping.SiteType);
 
             //Assert
             results.Should().BeEquivalentTo(expected);
@@ -158,15 +507,15 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             for (var i = 0; i < allocationCount; i++)
             {
                 var allocations = new AllocationAmountFactFaker()
-                   .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
-                   .Generate();
+                    .LinkSites(sites.Skip(i * sitesPerAllocation).Take(sitesPerAllocation).ToArray())
+                    .Generate();
                 allocationAmountFacts.Add(allocations);
             }
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(allocationAmountFacts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             //Act
@@ -217,8 +566,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var accessor = CreateWaterAllocationAccessor();
 
             var results = await accessor.GetWaterRightsEnvelope(new WaterRightsSearchCriteria { });
-
-            Console.Write(results.ToString());
 
             //Assert
             results.Should().NotBeNull();
@@ -1232,7 +1579,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             {
                 result.WaterRightsDetails.Should().BeEmpty();
             }
-            
+
         }
 
         [TestMethod]
@@ -1558,19 +1905,19 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         {
             //Arrange
             var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f => $"{f.Random.String(1, 5)}{searchInput}{f.Random.String(0, 5)}")
+                .RuleFor(x => x.AllocationOwner, f => $"{f.Random.AlphaNumeric(5)}{searchInput}{f.Random.AlphaNumeric(5)}")
                 .Generate(expectedResultCount);
 
             //generate non-matching allocationAmounts
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
-                .RuleFor(x => x.AllocationOwner, f => f.Random.String(20, 'A', 'z'))
+                .RuleFor(x => x.AllocationOwner, f => f.Random.AlphaNumeric(20))
                 .Generate(totalRecordCount - expectedResultCount);
 
             using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
                 db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();
@@ -1816,37 +2163,32 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             DateTime? maximumPriorityDate = maximumPriorityDateString == null ? null : DateTime.Parse(maximumPriorityDateString);
 
             //Arrange
-            var rand = new Random();
+            var date = minimumPriorityDate ?? new DateTime(1901, 1, 1);
 
-            var dateFaker = new Faker().Date;
+            var matchedAllocationAmounts = Enumerable.Range(1, expectedResultCount)
+                .Select(i =>
+                {
+                    var dateDimFaker = new DateDimFaker().RuleFor(a => a.Date, date.AddDays(i));
+                    return new AllocationAmountFactFaker()
+                        .RuleFor(a => a.AllocationPriorityDateNavigation, _ => dateDimFaker)
+                        .RuleFor(a => a.AllocationPriorityDateID, () => null)
+                        .Generate();
+                })
+                .ToList();
 
-            var matchedAllocationAmounts = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(() => dateFaker.Between(minimumPriorityDate ?? DateTime.MinValue, maximumPriorityDate ?? DateTime.MaxValue))
-                .Generate(expectedResultCount);
-
-            DateTime nonMatchingDate;
-            if (minimumPriorityDate.HasValue)
-            {
-                nonMatchingDate = dateFaker.Past(1, minimumPriorityDate);
-            }
-            else if (maximumPriorityDate.HasValue)
-            {
-                nonMatchingDate = dateFaker.Future(1, maximumPriorityDate);
-            }
-            else
-            {
-                nonMatchingDate = default(DateTime);
-            }
+            var nonMatchingDate = minimumPriorityDate?.AddYears(-1)
+                                  ?? maximumPriorityDate?.AddYears(1)
+                                  ?? default;
 
             var nonMatchedAllocationAmounts = new AllocationAmountFactFaker()
                 .SetAllocationPriorityDate(nonMatchingDate)
                 .Generate(totalRecordCount - expectedResultCount);
 
-            using (var db = CreateDatabaseContextFactory().Create())
+            await using (var db = CreateDatabaseContextFactory().Create())
             {
                 db.AllocationAmountsFact.AddRange(matchedAllocationAmounts);
                 db.AllocationAmountsFact.AddRange(nonMatchedAllocationAmounts);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             var expectedAllocationUuids = matchedAllocationAmounts.Select(x => x.AllocationUuid).ToList();
@@ -2042,6 +2384,7 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 .SetAllocationPriorityDate(priorityDate)
                 .SetAllocationExpirationDate(expirationDate)
                 .SetPublishedDate(publishedDate)
+                .IncludeRandomConservationApplicationId()
                 .Generate();
             allocationAmount.VariableSpecific.AggregationInterval = 5.0M;
             allocationAmount.IrrigationMethodCV = irrigationMethod.Name;
@@ -2090,7 +2433,8 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
                 OwnerClassificationCV = allocationAmount.OwnerClassificationCV,
                 PrimaryBeneficialUseCategory = allocationAmount.PrimaryBeneficialUseCategory,
                 WaterAllocationNativeUrl = allocationAmount.WaterAllocationNativeUrl,
-                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl
+                WaDEDataMappingUrl = allocationAmount.Method.WaDEDataMappingUrl,
+                IsConservationApplicationEligible = allocationAmount.ConservationApplicationFundingOrganizationId.HasValue,
             };
 
             // Act
@@ -2270,135 +2614,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        public async Task GetWaterRightsDigestsBySite_Matches()
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            var date = new Faker().Date.Past(150);
-            var site = new SitesDimFaker().Generate();
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .SetAllocationPriorityDate(date)
-                .LinkSites(site)
-                .Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
-
-            // Assert
-            result.Should().NotBeNull().And
-                .BeEquivalentTo(new[]
-                {
-                    new CommonContracts.WaterRightsDigest
-                    {
-                        AllocationUuid = allocationAmount.AllocationUuid,
-                        NativeId = allocationAmount.AllocationNativeId,
-                        PriorityDate = date.Date,
-                        BeneficialUses = new List<string>()
-                    }
-                });
-        }
-
-        [DataTestMethod]
-        [DataRow(0)]
-        [DataRow(1)]
-        [DataRow(2)]
-        public async Task GetWaterRightsDigestsBySite_Multiples(int allocationCount)
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            var site = new SitesDimFaker().Generate();
-            db.SitesDim.Add(site);
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .LinkSites(site)
-                .Generate(allocationCount);
-            db.AllocationAmountsFact.AddRange(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
-
-            // Assert
-            var dbSites = db.SitesDim.ToList();
-            dbSites.Should().HaveCount(1).And
-                .AllSatisfy(a => a.SiteUuid.Should().Be(site.SiteUuid));
-            result.Select(a => a.AllocationUuid).Should()
-                .BeEquivalentTo(allocationAmount.Select(a => a.AllocationUuid));
-        }
-
-        [DataTestMethod]
-        [DataRow(0)]
-        [DataRow(1)]
-        [DataRow(2)]
-        public async Task GetWaterRightsDigestsBySite_BeneficialUses(int beneficialUseCount)
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            var site = new SitesDimFaker().Generate();
-            var beneficialUses = new BeneficialUsesCVFaker().Generate(beneficialUseCount);
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .LinkSites(site)
-                .LinkBeneficialUses(beneficialUses.ToArray())
-                .Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
-
-            // Assert
-            result
-                .Should().NotBeNull().And
-                .HaveCount(1);
-
-            result[0].BeneficialUses
-                .Should().NotBeNull().And
-                .BeEquivalentTo(beneficialUses.Select(a => a.Name));
-        }
-
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("2022-01-22")]
-        public async Task GetWaterRightsDigestsBySite_Dates(string dateValue)
-        {
-            // Arrange
-            using var db = CreateDatabaseContextFactory().Create();
-
-            var site = new SitesDimFaker().Generate();
-
-            DateTime? date = dateValue == null ? null : DateTime.Parse(dateValue);
-
-            var allocationAmount = new AllocationAmountFactFaker()
-                .LinkSites(site)
-                .SetAllocationPriorityDate(date)
-                .Generate();
-            db.AllocationAmountsFact.Add(allocationAmount);
-            db.SaveChanges();
-
-            // Act
-            var accessor = CreateWaterAllocationAccessor();
-            var result = await accessor.GetWaterRightsDigestsBySite(site.SiteUuid);
-
-            // Assert
-            result
-                .Should().NotBeNull().And
-                .HaveCount(1);
-
-            result[0].PriorityDate.Should().Be(date);
-        }
-
-        [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetWaterRightSiteLocationsById()
         {
             // Arrange
@@ -2431,7 +2646,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public async Task WaterAllocationAccessor_GetWaterRightSiteLocationsById_SkipNulls()
         {
             // Arrange
@@ -2638,7 +2852,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount()
         {
             // Arrange
@@ -2662,7 +2875,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount_Multiple()
         {
             // Arrange
@@ -2686,7 +2898,6 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
         }
 
         [TestMethod]
-        [TestCategory("Accessor Tests")]
         public void WaterAllocationAccessor_GetWaterRightsCount_FilterByExemptUse()
         {
             // Arrange
@@ -2719,6 +2930,53 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             var result = accessor.GetWaterRightsCount(searCriteria);
 
             result.Should().Be(50);
+        }
+
+        [DataTestMethod]
+        [DataRow(false, false, false, DisplayName = "Water right does not exist")]
+        [DataRow(true, false, false, DisplayName = "Water right does not have funding org")]
+        [DataRow(true, true, true, DisplayName = "Water right has funding org")]
+        public async Task WaterAllocationAccessor_GetWaterRightFundingOrgDetailsByNativeId_Success(
+            bool waterRightExists,
+            bool waterRightHasFundingOrg,
+            bool shouldSucceed
+        )
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            string nativeId = string.Empty;
+
+            if (waterRightExists)
+            {
+                var waterRightFaker = new AllocationAmountFactFaker();
+
+                if (waterRightHasFundingOrg)
+                {
+                    waterRightFaker.RuleFor(aaf => aaf.ConservationApplicationFundingOrganizationId, () => Guid.NewGuid());
+                }
+
+                var waterRight = waterRightFaker.Generate();
+                db.AllocationAmountsFact.Add(waterRight);
+                db.SaveChanges();
+
+                nativeId = waterRight.AllocationUuid;
+            }
+
+            // Act
+            var accessor = CreateWaterAllocationAccessor();
+            var call = async () => await accessor.GetWaterRightFundingOrgDetailsByUuid(nativeId);
+
+            // Assert
+            if (shouldSucceed)
+            {
+                var response = await call();
+                response.Should().NotBeNull();
+                response.FundingOrganizationId.Should().NotBeEmpty();
+            }
+            else
+            {
+                await call.Should().ThrowAsync<WestDaatException>();
+            }
         }
 
         private WaterAllocationAccessor CreateWaterAllocationAccessor()

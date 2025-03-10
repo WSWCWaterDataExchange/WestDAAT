@@ -1,46 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
+import React from 'react';
+import { useMemo } from 'react';
 import SiteFooter from '../SiteFooter';
-import SiteNavbar from '../SiteNavbar';
-import FeedbackModal from '../FeedbackModal';
-import { WaterRightsTab } from './water-rights-tab/WaterRightsTab';
+import { WaterRightsTab } from './water-rights-tab/map-options/components/WaterRightsTab';
 import { useHomePageContext } from './Provider';
-import { HomePageTab } from '../../pages/HomePage';
-
-import './home-page.scss'
+import './home-page.scss';
+import SiteNavbar from '../SiteNavbar';
 
 export function Layout() {
-  const { downloadModal, setShowDownloadModal } = useHomePageContext();
-  const [currentTab, setCurrentTab] = useState(HomePageTab.WaterRights);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-
-  const shouldShowFeedbackModal = (show: boolean) => {
-    setShowFeedbackModal(show);
-  };
-
-  useEffect(() => {
-    document.title = `WestDAAT - ${currentTab}`;
-  }, [currentTab]);
+  const { downloadModal, setShowDownloadModal, uploadModal, setShowUploadModal } = useHomePageContext();
 
   const currentTabElement = useMemo(() => {
-    return <WaterRightsTab />;
-  }, []);
+    return <WaterRightsTab showDownloadModal={setShowDownloadModal} showUploadModal={setShowUploadModal} />;
+  }, [setShowDownloadModal, setShowUploadModal]);
 
   return (
     <div className="home-page d-flex flex-column">
-      <SiteNavbar
-        onTabClick={setCurrentTab}
-        currentTab={currentTab}
-        showDownloadModal={setShowDownloadModal} />
-
-      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">
-        {currentTabElement}
-      </div>
-
-      <SiteFooter
-        showFeedbackModal={shouldShowFeedbackModal} />
-
-      <FeedbackModal show={showFeedbackModal} setShow={shouldShowFeedbackModal} />
+      <SiteNavbar />
+      <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">{currentTabElement}</div>
+      <SiteFooter />
       {downloadModal}
+      {uploadModal}
     </div>
   );
 }

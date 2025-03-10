@@ -1,16 +1,16 @@
-import { ReactChild } from "react";
-import { Card, CardProps } from "react-bootstrap";
-import CardHeader from "react-bootstrap/esm/CardHeader";
+import { ReactNode } from 'react';
+import { Card, CardProps } from 'react-bootstrap';
+import CardHeader from 'react-bootstrap/esm/CardHeader';
 
-import '../styles/no-map-results.scss'
+import '../styles/no-map-results.scss';
 
 export interface MapPopupCardProps {
   children: {
-    header?: ReactChild,
-    body?: ReactChild
-  },
-  onClosePopup: () => void,
-  cardProps?: CardProps
+    header?: ReactNode;
+    body?: ReactNode;
+  };
+  onClosePopup: () => void;
+  cardProps?: CardProps;
 }
 export function MapAlertCard(props: MapPopupCardProps) {
   return (
@@ -22,9 +22,7 @@ export function MapAlertCard(props: MapPopupCardProps) {
             <button type="button" onClick={props.onClosePopup} className="btn-close map-popup-close-btn"></button>
           </div>
         </CardHeader>
-        <div className="card-body">
-          {props.children.body}
-        </div>
+        <div className="card-body">{props.children.body}</div>
       </Card>
     </div>
   );

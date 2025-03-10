@@ -1,39 +1,55 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { IPublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
+import { clarity } from 'clarity-js';
+import { useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend'; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
+import ReactGA from 'react-ga4';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import AppProvider from './contexts/AppProvider';
+import { AccountInformationPage } from './pages/account/AccountInformationPage';
+import { AccountLayout } from './pages/account/AccountLayout';
+import { AdminGuard } from './pages/admin/AdminGuard';
+import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
+import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
+import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
+import { AuthGuard } from './pages/application/AuthGuard';
+import { ApplicationLayout } from './pages/application/ApplicationLayout';
+import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
+import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
+import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
+import { SignupPage } from './pages/account/SignupPage';
+import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
+import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from 'react-query/devtools';
-import DetailLayout from './pages/DetailLayout';
-import AppProvider from "./contexts/AppProvider";
-import { ToastContainer } from "react-toastify";
-import { DndProvider } from 'react-dnd'
-import { TouchBackend } from "react-dnd-touch-backend"; //We need to use the touch backend instead of HTML5 because drag and drop of the NLDI pin stops mouse events from raising
+import OverlayDetailsPage from './pages/OverlayDetailsPage';
+import SiteDetailsPage from './pages/SiteDetailsPage';
+import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
-import 'react-toastify/dist/ReactToastify.css';
-import { IPublicClientApplication } from "@azure/msal-browser";
-import { MsalProvider } from "@azure/msal-react";
-import { useEffect, useState } from "react";
-import ReactGA from 'react-ga4';
-import WaterRightDetailsPage from "./pages/WaterRightDetailsPage";
-import SiteDetailsPage from "./pages/SiteDetailsPage";
-import { clarity } from 'clarity-js'
 
 export interface AppProps {
-  msalInstance: IPublicClientApplication
+  msalInstance: IPublicClientApplication;
 }
 
+const queryClient = new QueryClient();
+
 function App({ msalInstance }: AppProps) {
-  const queryClient = new QueryClient();
   queryClient.setDefaultOptions({
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnReconnect: false,
       cacheTime: 8600000,
-      staleTime: Infinity
-    }
-  })
+      staleTime: 0,
+    },
+  });
 
   const [googleAnalyticsInitialized, setGoogleAnalyticsInitialized] = useState(false);
   const location = useLocation();
@@ -48,20 +64,23 @@ function App({ msalInstance }: AppProps) {
 
   useEffect(() => {
     if (googleAnalyticsInitialized) {
-      ReactGA.send({ hitType: 'pageview', page: `${location.pathname}${location.search}` });
+      ReactGA.send({
+        hitType: 'pageview',
+        page: `${location.pathname}${location.search}`,
+      });
     }
-  }, [googleAnalyticsInitialized, location])
+  }, [googleAnalyticsInitialized, location]);
 
   useEffect(() => {
-    if((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0){
+    if ((process.env.REACT_APP_CLARITY_ID?.length || 0) > 0) {
       clarity.start({
         projectId: process.env.REACT_APP_CLARITY_ID,
         upload: 'https://m.clarity.ms/collect',
         track: true,
-        content: true
-      })	
+        content: true,
+      });
     }
-  }, [])
+  }, []);
 
   return (
     <MsalProvider instance={msalInstance}>
@@ -74,11 +93,37 @@ function App({ msalInstance }: AppProps) {
                 <Route path="details" element={<DetailLayout />}>
                   <Route path="site/:id" element={<SiteDetailsPage />} />
                   <Route path="right/:id" element={<WaterRightDetailsPage />} />
+                  <Route path="overlay/:id" element={<OverlayDetailsPage />} />
+                </Route>
+                <Route path="account" element={<AuthGuard />}>
+                  <Route element={<AccountLayout />}>
+                    <Route index element={<AccountInformationPage />} />
+                    <Route path="signup" element={<SignupPage />} />
+                  </Route>
+                </Route>
+                <Route path="application" element={<AuthGuard />}>
+                  <Route element={<ApplicationLayout />}>
+                    <Route path="dashboard" element={<WaterUserDashboardPage />} />
+                    <Route path="organization">
+                      <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                    </Route>
+                    <Route path=":applicationId">
+                      <Route path="create" element={<ApplicationCreatePage />} />
+                      <Route path="review" element={<ApplicationReviewPage />} />
+                    </Route>
+                    <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
+                  </Route>
+                </Route>
+                <Route path="admin" element={<AdminGuard />}>
+                  <Route element={<AdminLayout />}>
+                    <Route path="organizations" element={<AdminOrganizationsPage />} />
+                    <Route path=":organizationId/users" element={<AdminOrganizationsUsersPage />} />
+                  </Route>
                 </Route>
               </Route>
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} />
-            <ToastContainer />
+            <ToastContainer containerId="app-toast-container" />
           </DndProvider>
         </QueryClientProvider>
       </AppProvider>

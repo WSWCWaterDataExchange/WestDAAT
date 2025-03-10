@@ -9,3 +9,4 @@ global using System.Threading.Tasks;
 using System.Resources;
 
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: TestCategory("Manager Tests")]

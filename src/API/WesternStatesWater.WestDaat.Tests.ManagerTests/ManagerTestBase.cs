@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Common.Configuration;
+using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Handlers;
 
 namespace WesternStatesWater.WestDaat.Tests.ManagerTests
 {
@@ -10,14 +13,20 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
         private ILoggerFactory _loggerFactory;
         public static IConfiguration Configuration { get; private set; }
 
+        public Mock<IManagerRequestHandlerResolver> ManagerRequestHandlerResolverMock { get; } =
+            new(MockBehavior.Strict);
+        
+        public Mock<IValidationEngine> ValidationEngineMock { get; } = new(MockBehavior.Strict);
+
         static ManagerTestBase()
         {
             Configuration = new ConfigurationBuilder()
-                                        .AddInMemoryCollection(DefaultTestConfiguration)
-                                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                        .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
-                                        .AddEnvironmentVariables()
-                                        .Build();
+                .AddInMemoryCollection(DefaultTestConfiguration)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("personal.settings.json", optional: true, reloadOnChange: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public static Dictionary<string, string> DefaultTestConfiguration => new()
@@ -25,15 +34,15 @@ namespace WesternStatesWater.WestDaat.Tests.ManagerTests
             { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackFrom)}", "test@test.com" },
             { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackTo)}:01", "test01@test.com" },
             { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.FeedbackTo)}:02", "test02@test.com" },
-            { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.MaxRecordsDownload)}", "100000"}
+            { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.MaxRecordsDownload)}", "100000" }
         };
 
         [TestInitialize]
         public virtual void BaseTestInitialize()
         {
             var services = new ServiceCollection()
-               .AddLogging(config => config.AddConsole())
-               .BuildServiceProvider();
+                .AddLogging(config => config.AddConsole())
+                .BuildServiceProvider();
 
             _loggerFactory = services.GetRequiredService<ILoggerFactory>();
         }

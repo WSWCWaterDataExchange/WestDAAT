@@ -1,6 +1,6 @@
-@import  'colors';
+@use 'colors';
 
-.no-map-results-alert{
+.no-map-results-alert {
   position: absolute;
   z-index: 3;
   margin-left: auto;
@@ -9,14 +9,14 @@
   right: 0;
   top: 30%;
   width: 450px;
-  .card{
-    svg{
+  .card {
+    svg {
       height: 24px;
       cursor: pointer;
     }
   }
-  .text-white{
-    .btn-close{
+  .text-white {
+    .btn-close {
       filter: invert(1) grayscale(100%) brightness(200%);
     }
   }

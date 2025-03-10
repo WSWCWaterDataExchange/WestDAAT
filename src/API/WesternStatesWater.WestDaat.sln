@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6. Common", "6. Common", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Common", "WesternStatesWater.WestDaat.Common\WesternStatesWater.WestDaat.Common.csproj", "{B4DB2035-1815-406B-9C93-74CA2AD618C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. Database", "7. Database", "{BC8B9A41-7FCD-4248-B608-AE11A5B5A372}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. Data", "7. Data", "{BC8B9A41-7FCD-4248-B608-AE11A5B5A372}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "9. Tests", "9. Tests", "{6312C581-2A47-430B-AEB9-B0FA1D83F751}"
 EndProject
@@ -50,6 +50,22 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.JSONLDGenerator", "WesternStatesWater.WestDaat.tools.JSONLDGenerator\WesternStatesWater.WestDaat.Tools.JSONLDGenerator.csproj", "{5E195A8E-3E0A-4D51-ADBF-F864668265BC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate", "WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate\WesternStatesWater.WestDaat.Tools.MapboxTilesetCreate.csproj", "{25C64908-689E-4D52-B814-A41021918B88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests", "WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests\WesternStatesWater.WestDaat.Tests.MapboxTilesetCreateTests.csproj", "{3BA6F160-1CE7-4328-B546-33274602BED5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WaDE.Database", "WesternStatesWater.WaDE.Database\WesternStatesWater.WaDE.Database.csproj", "{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "10. Shared", "10. Shared", "{0F6EE164-87A5-420B-9A7D-F168C4A5ED0E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.Shared", "WesternStatesWater.Shared\WesternStatesWater.Shared.csproj", "{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.Shared.Tests", "WesternStatesWater.Shared.Tests\WesternStatesWater.Shared.Tests.csproj", "{3506C59B-983D-4F13-A167-3D683437B7C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.Tests.FunctionTests", "WesternStatesWater.WestDaat.Tests.FunctionTests\WesternStatesWater.WestDaat.Tests.FunctionTests.csproj", "{87BD42D2-2A0B-4999-AAC1-FF56756A2297}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WesternStatesWater.WestDaat.DbUp", "WesternStatesWater.WestDaat.DbUp\WesternStatesWater.WestDaat.DbUp.csproj", "{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WesternStatesWater.WestDaat.Database", "WesternStatesWater.WestDaat.Database\WesternStatesWater.WestDaat.Database.csproj", "{788F6668-7B08-4D67-9D3D-9D93009247BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,6 +133,34 @@ Global
 		{25C64908-689E-4D52-B814-A41021918B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25C64908-689E-4D52-B814-A41021918B88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA6F160-1CE7-4328-B546-33274602BED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{932F01EB-A315-43E3-B3A1-C45DAD1D30DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD8780C-741E-4EE7-82B2-15B8259AE9D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3506C59B-983D-4F13-A167-3D683437B7C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3506C59B-983D-4F13-A167-3D683437B7C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3506C59B-983D-4F13-A167-3D683437B7C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3506C59B-983D-4F13-A167-3D683437B7C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87BD42D2-2A0B-4999-AAC1-FF56756A2297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87BD42D2-2A0B-4999-AAC1-FF56756A2297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87BD42D2-2A0B-4999-AAC1-FF56756A2297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87BD42D2-2A0B-4999-AAC1-FF56756A2297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{788F6668-7B08-4D67-9D3D-9D93009247BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{788F6668-7B08-4D67-9D3D-9D93009247BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{788F6668-7B08-4D67-9D3D-9D93009247BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{788F6668-7B08-4D67-9D3D-9D93009247BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +181,13 @@ Global
 		{AD76D1F4-188C-4923-A887-410B52FB1FA6} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
 		{5E195A8E-3E0A-4D51-ADBF-F864668265BC} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
 		{25C64908-689E-4D52-B814-A41021918B88} = {93C6F30C-6287-40F1-907C-8C0CFDA23482}
+		{3BA6F160-1CE7-4328-B546-33274602BED5} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{932F01EB-A315-43E3-B3A1-C45DAD1D30DB} = {BC8B9A41-7FCD-4248-B608-AE11A5B5A372}
+		{5AD8780C-741E-4EE7-82B2-15B8259AE9D7} = {0F6EE164-87A5-420B-9A7D-F168C4A5ED0E}
+		{3506C59B-983D-4F13-A167-3D683437B7C3} = {0F6EE164-87A5-420B-9A7D-F168C4A5ED0E}
+		{87BD42D2-2A0B-4999-AAC1-FF56756A2297} = {6312C581-2A47-430B-AEB9-B0FA1D83F751}
+		{1DBD2131-35F7-4FC7-8BBA-18B1EE97336F} = {BC8B9A41-7FCD-4248-B608-AE11A5B5A372}
+		{788F6668-7B08-4D67-9D3D-9D93009247BB} = {BC8B9A41-7FCD-4248-B608-AE11A5B5A372}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76EF2099-5BC9-4F48-8EBA-524560067EC3}

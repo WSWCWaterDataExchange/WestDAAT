@@ -1,12 +1,11 @@
 ﻿using WesternStatesWater.WestDaat.Accessors;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 {
     [TestClass]
-    [TestCategory("Accessor Tests")]
     public class SiteAccessorTests : AccessorTestBase
     {
         [TestMethod]
@@ -166,25 +165,25 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             // Assert
             await call.Should().ThrowAsync<Exception>();
         }
-
+        
         [TestMethod]
-        public async Task GetSiteDigestByUuid_Matches()
+        public async Task GetSiteDigestByUuid_ShouldReturnSiteWithWaterRights()
         {
             // Arrange
             using var db = CreateDatabaseContextFactory().Create();
             var site = new SitesDimFaker()
                 .RuleFor(a => a.CoordinateAccuracy, f => f.Random.AlphaNumeric(5))
                 .Generate();
-            db.SitesDim.Add(site);
-            db.SaveChanges();
 
-            var expectedResult = new Common.DataContracts.SiteDigest
-            {
-                SiteUuid = site.SiteUuid,
-                SiteName = site.SiteName,
-                SiteNativeId = site.SiteNativeId,
-                SiteType = site.SiteTypeCv,
-            };
+            var allocations = new AllocationAmountFactFaker()
+                .RuleFor(a => a.AllocationNativeId, f => f.Random.String(10, 'A', 'z'))
+                .RuleFor(a => a.AllocationUuid, f => Guid.NewGuid().ToString())
+                .LinkSites(site)
+                .Generate(3);
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.AddRange(allocations);
+            db.SaveChanges();
 
             // Act
             var accessor = CreateSiteAccessor();
@@ -192,9 +191,88 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeEquivalentTo(expectedResult);
+            result.SiteUuid.Should().Be(site.SiteUuid);
+            result.SiteName.Should().Be(site.SiteName);
+            result.SiteNativeId.Should().Be(site.SiteNativeId);
+            result.SiteType.Should().Be(site.SiteTypeCv);
+            result.WaterRightsDigests.Should().HaveCount(3);
+            result.WaterRightsDigests.Select(w => w.NativeId).Should().BeEquivalentTo(allocations.Select(a => a.AllocationNativeId));
         }
 
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_ShouldReturnSiteWithoutWaterRights()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            
+            db.SitesDim.Add(site);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.SiteUuid.Should().Be(site.SiteUuid);
+            result.WaterRightsDigests.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_WithBeneficialUses()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            
+            var beneficialUses = new BeneficialUsesCVFaker().Generate(2);
+            var allocation = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .LinkBeneficialUses(beneficialUses.ToArray())
+                .Generate();
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.Add(allocation);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDigests.Should().HaveCount(1);
+            result.WaterRightsDigests[0].BeneficialUses.Should().BeEquivalentTo(beneficialUses.Select(a => a.Name));
+        }
+
+        [TestMethod]
+        public async Task GetSiteDigestByUuid_WithPriorityDate()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            var site = new SitesDimFaker().Generate();
+            var priorityDate = new DateTime(1980, 5, 15);
+
+            var allocation = new AllocationAmountFactFaker()
+                .LinkSites(site)
+                .SetAllocationPriorityDate(priorityDate)
+                .Generate();
+
+            db.SitesDim.Add(site);
+            db.AllocationAmountsFact.Add(allocation);
+            db.SaveChanges();
+
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteDigestByUuid(site.SiteUuid);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.WaterRightsDigests.Should().HaveCount(1);
+            result.WaterRightsDigests[0].PriorityDate.Should().Be(priorityDate);
+        }
+       
         [TestMethod]
         public async Task SiteAccessor_GetWaterRightInfoListByUuid_Matches()
         {
@@ -405,7 +483,238 @@ namespace WesternStatesWater.WestDaat.Tests.AccessorTests
             result.Should().HaveCount(1);
             result[0].WaterSourceTypes.Should().BeEquivalentTo(new[] { expectedName1, expectedName2, expectedName3 } );
         }
+        
+        
+        [TestMethod]
+        public async Task SiteAccessor_GetSiteUsageBySiteUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            
+            var dates = new DateDimFaker().Generate(31);
+            db.DateDim.AddRange(dates);
+            await db.SaveChangesAsync();
 
+
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
+            await db.SaveChangesAsync();
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
+            
+            foreach (var siteDim in siteDims)
+            {
+                timeSeries.AddRange(
+                        new SiteVariableAmountsFactFaker()
+                            .RuleFor(r => r.SiteId, siteDim.SiteId)
+                            .RuleFor(r => r.Site, siteDim)
+                            .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                            .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                            .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                            .Generate(10)
+                );
+            }
+            
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+            
+            db.SiteVariableAmountsFact.Should().HaveCount(20);
+            
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetSiteUsageBySiteUuid(siteDims[0].SiteUuid);
+
+            // Assert
+            result.Should().HaveCount(10);
+            result.Should().BeInAscendingOrder(x => x.TimeFrameStartDate);
+        }
+        
+        [TestMethod]
+        public async Task SiteAccessor_GetSiteUsageInfoListBySiteUuid_WithAllocationJoin()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            
+            var dateFaker = new DateDimFaker();
+            var dateList = dateFaker.Generate(31).OrderBy(x => x.Date).ToList();
+            db.DateDim.AddRange(dateList);
+            await db.SaveChangesAsync();
+
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
+            await db.SaveChangesAsync();
+
+            var site = siteDims[0];
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
+            var validAllocationIds = new List<string>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                var dateRow = dateList[i];
+
+                var ts = new SiteVariableAmountsFactFaker()
+                    .RuleFor(r => r.SiteId, site.SiteId)
+                    .RuleFor(r => r.Site, site)
+                    .RuleFor(r => r.TimeframeStartID, dateRow.DateId)
+                    .RuleFor(r => r.TimeframeEndID, dateList[6].DateId)
+                    .RuleFor(r => r.DataPublicationDateID, dateList[6].DateId)
+                    .RuleFor(r => r.AllocationCropDutyAmount, f => f.Random.Double(1.0, 100.0))
+                    .RuleFor(r => r.PopulationServed, f => f.Random.Long(100, 10000))
+                    .Generate();
+
+                if (i < 5)
+                {
+                    string validId = "VALID_" + i;
+                    ts.AssociatedNativeAllocationIds = validId;
+                    validAllocationIds.Add(validId);
+                }
+                else
+                {
+                    ts.AssociatedNativeAllocationIds = (i % 2 == 0) ? null : "INVALID_" + i;
+                }
+
+                timeSeries.Add(ts);
+            }
+
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+
+            var allocations = validAllocationIds
+                .Select(validId => new AllocationAmountFactFaker()
+                    .RuleFor(a => a.AllocationNativeId, f => validId)
+                    .RuleFor(a => a.AllocationUuid, f => Guid.NewGuid().ToString())
+                    .Generate())
+                .ToList();
+
+            await db.AllocationAmountsFact.AddRangeAsync(allocations);
+            await db.SaveChangesAsync();
+
+            var accessor = CreateSiteAccessor();
+            var result = (await accessor.GetSiteUsageInfoListBySiteUuid(site.SiteUuid)).ToList();
+
+            // Assert
+            result.Should().HaveCount(10);
+            result.Should().BeInAscendingOrder(x => x.TimeframeStart);
+            foreach (var item in result)
+            {
+                if (!string.IsNullOrEmpty(item.AssociatedNativeAllocationId) &&
+                    item.AssociatedNativeAllocationId.StartsWith("VALID_"))
+                {
+                    item.AllocationUuid.Should().NotBeNullOrEmpty();
+                }
+                else
+                {
+                    item.AllocationUuid.Should().BeNull();
+                }
+            }
+        }
+
+        [TestMethod]
+        public async Task SiteAccessor_GetMethodInfoListBySiteUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+
+            var dates = new DateDimFaker().Generate(31);
+            db.DateDim.AddRange(dates);
+            await db.SaveChangesAsync();
+            
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
+            await db.SaveChangesAsync();
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
+            
+            foreach (var siteDim in siteDims)
+            {
+                var methodsDim = new MethodsDimFaker().Generate();
+                
+                timeSeries.AddRange(
+                    new SiteVariableAmountsFactFaker()
+                        .RuleFor(r => r.SiteId, siteDim.SiteId)
+                        .RuleFor(r => r.Site, siteDim)
+                        .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                        .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                        .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                        .RuleFor(r => r.Method, methodsDim)
+                        .Generate(10)
+                );
+            }
+            
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+            
+            db.SiteVariableAmountsFact.Should().HaveCount(20);
+            db.MethodsDim.Should().HaveCount(2);
+            
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetMethodInfoListByUuid(siteDims[0].SiteUuid);
+
+            // Assert
+            result.Should().HaveCount(1);
+        }
+        
+        [TestMethod]
+        public async Task WaterAllocationAccessor_GetVariableInfoListBySiteUuid()
+        {
+            // Arrange
+            using var db = CreateDatabaseContextFactory().Create();
+            
+            var dates = new DateDimFaker().Generate(31);
+            db.DateDim.AddRange(dates);
+            await db.SaveChangesAsync();
+
+
+            var siteDims = new SitesDimFaker().Generate(2);
+            db.SitesDim.AddRange(siteDims);
+            await db.SaveChangesAsync();
+
+            var timeSeries = new List<SiteVariableAmountsFact>();
+            
+            foreach (var siteDim in siteDims)
+            {
+                var variablesDim = new VariablesDimFaker().Generate();
+                timeSeries.AddRange(
+                    new SiteVariableAmountsFactFaker()
+                        .RuleFor(r => r.SiteId, siteDim.SiteId)
+                        .RuleFor(r => r.Site, siteDim)
+                        .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                        .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                        .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                        .RuleFor(r => r.VariableSpecific, _ => variablesDim)
+                        .Generate(5)
+                );
+                
+                var variablesDim2 = new VariablesDimFaker().Generate();
+                timeSeries.AddRange(
+                    new SiteVariableAmountsFactFaker()
+                        .RuleFor(r => r.SiteId, siteDim.SiteId)
+                        .RuleFor(r => r.Site, siteDim)
+                        .RuleFor(r => r.TimeframeStartID, f => dates[f.Random.Int(0,30)].DateId)
+                        .RuleFor(r => r.TimeframeEndID, dates[6].DateId)
+                        .RuleFor(r => r.DataPublicationDateID, dates[6].DateId)
+                        .RuleFor(r => r.VariableSpecific, _ => variablesDim2)
+                        .Generate(5)
+                );
+            }
+            
+            await db.SiteVariableAmountsFact.AddRangeAsync(timeSeries);
+            await db.SaveChangesAsync();
+            
+            db.SiteVariableAmountsFact.Should().HaveCount(20);
+            db.VariablesDim.Should().HaveCount(4);
+            
+            // Act
+            var accessor = CreateSiteAccessor();
+            var result = await accessor.GetVariableInfoListByUuid(siteDims[0].SiteUuid);
+
+            // Assert
+            result.Should().HaveCount(2);
+            result.Should().BeInAscendingOrder(x => x.WaDEVariableUuid, StringComparer.InvariantCulture);
+        }
+        
         private ISiteAccessor CreateSiteAccessor()
         {
             return new SiteAccessor(CreateLogger<SiteAccessor>(), CreateDatabaseContextFactory());

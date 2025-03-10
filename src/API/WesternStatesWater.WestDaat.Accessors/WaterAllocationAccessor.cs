@@ -4,15 +4,18 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
 using System.Collections.Concurrent;
-using System.Data;
 using System.Transactions;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Accessors.CsvModels;
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WestDaat.Accessors.Extensions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Utilities;
+using Organization = WesternStatesWater.WestDaat.Common.DataContracts.Organization;
 
 namespace WesternStatesWater.WestDaat.Accessors
 {
@@ -20,87 +23,193 @@ namespace WesternStatesWater.WestDaat.Accessors
     {
         private readonly PerformanceConfiguration _performanceConfiguration;
 
-        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
+        public WaterAllocationAccessor(ILogger<WaterAllocationAccessor> logger, EF.IDatabaseContextFactory databaseContextFactory, PerformanceConfiguration performanceConfiguration) : base(logger)
         {
             _databaseContextFactory = databaseContextFactory;
             _performanceConfiguration = performanceConfiguration;
         }
 
-        private readonly IDatabaseContextFactory _databaseContextFactory;
+        private readonly EF.IDatabaseContextFactory _databaseContextFactory;
 
-        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria)
+        public async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformation(WaterRightsSearchCriteria searchCriteria, Common.AnalyticsInformationGrouping groupValue)
         {
-            using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            using var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
-            var analyticsSummary = await db.AllocationAmountsFact
-                .AsNoTracking()
-                .Where(predicate)
-                // Distinct forces proper grouping by beneficialUse query
-                .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
-                .Distinct()
-                .GroupBy(a => a.PrimaryBeneficialUseCategory)
-                .Select(a => new AnalyticsSummaryInformation
-                {
-                    Flow = a.Sum(c => c.AllocationFlow_CFS),
-                    PrimaryUseCategoryName = a.Key,
-                    Points = a.Count(),
-                    Volume = a.Sum(c => c.AllocationVolume_AF),
-                })
-                .ToArrayAsync();
+            var analyticsSummary = await GetAnalyticsSummaryInformationWithGrouping(db, predicate, groupValue);
 
             ts.Complete();
 
             return analyticsSummary;
         }
 
+        private async Task<AnalyticsSummaryInformation[]> GetAnalyticsSummaryInformationWithGrouping(DatabaseContext db, ExpressionStarter<AllocationAmountsFact> predicate, Common.AnalyticsInformationGrouping groupBy)
+        {
+            switch (groupBy)
+            {
+                case Common.AnalyticsInformationGrouping.BeneficialUse:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.PrimaryBeneficialUseCategory, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.PrimaryBeneficialUseCategory)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.OwnerType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.OwnerClassificationCV, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.OwnerClassificationCV)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.AllocationType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationTypeCv, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.AllocationTypeCv)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.LegalStatus:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Select(a => new { a.AllocationFlow_CFS, a.AllocationVolume_AF, a.AllocationLegalStatusCv, a.AllocationAmountId })
+                        .Distinct()
+                        .GroupBy(a => a.AllocationLegalStatusCv)
+                        .Select(a => new AnalyticsSummaryInformation
+                        {
+                            Flow = a.Sum(c => c.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = a.Key,
+                            Points = a.Count(),
+                            Volume = a.Sum(c => c.AllocationVolume_AF),
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.SiteType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Join(db.AllocationBridgeSitesFact,
+                            aaf => aaf.AllocationAmountId,
+                            absf => absf.AllocationAmountId,
+                            (aaf, absf) => new { aaf, absf })
+                        .Join(db.SitesDim,
+                            combined => combined.absf.SiteId,
+                            sd => sd.SiteId,
+                            (combined, sd) => new { combined.aaf, sd })
+                        .Join(db.SiteType,
+                            cvst => cvst.sd.SiteTypeCv,
+                            st => st.Name,
+                            (cvst, st) => new { cvst.aaf, st })
+                        .GroupBy(x => x.st.WaDEName)
+                        .Select(g => new AnalyticsSummaryInformation
+                        {
+                            PrimaryUseCategoryName = g.Key,
+                            Flow = g.Sum(x => x.aaf.AllocationFlow_CFS),
+                            Volume = g.Sum(x => x.aaf.AllocationVolume_AF),
+                            Points = g.Count()
+                        })
+                        .ToArrayAsync();
+                case Common.AnalyticsInformationGrouping.WaterSourceType:
+                    return await db.AllocationAmountsFact
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .Join(db.AllocationBridgeSitesFact,
+                            aaf => aaf.AllocationAmountId,
+                            absf => absf.AllocationAmountId,
+                            (aaf, absf) => new { aaf, absf })
+                        .Join(db.SitesDim,
+                            combined => combined.absf.SiteId,
+                            sd => sd.SiteId,
+                            (combined, sd) => new { combined.aaf, sd })
+                        .Join(db.WaterSourceBridgeSitesFact,
+                            wsbridge => wsbridge.sd.SiteId,
+                            wsbridge => wsbridge.SiteId,
+                            (wsbridge, ws) => new { wsbridge.aaf, ws })
+                        .Join(db.WaterSourcesDim,
+                            ws => ws.ws.WaterSourceId,
+                            wsdim => wsdim.WaterSourceId,
+                            (ws, wsdim) => new { ws.aaf, wsdim })
+                        .Join(db.WaterSourceType,
+                            cvwst => cvwst.wsdim.WaterSourceTypeCv,
+                            wst => wst.Name,
+                            (cvwst, wst) => new { cvwst.aaf, wst })
+                        .GroupBy(x => x.wst.WaDEName)
+                        .Select(g => new AnalyticsSummaryInformation
+                        {
+                            Flow = g.Sum(x => x.aaf.AllocationFlow_CFS),
+                            PrimaryUseCategoryName = g.Key,
+                            Points = g.Count(),
+                            Volume = g.Sum(x => x.aaf.AllocationVolume_AF)
+                        })
+                        .ToArrayAsync();
+                default:
+                    throw new NotSupportedException($"Support for grouping by value {groupBy} is not implemented");
+            }
+        }
+
         public async Task<Geometry> GetWaterRightsEnvelope(WaterRightsSearchCriteria searchCriteria)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
-            //EF Core 7 is supposed to support geometry::EnvelopeAggregate (https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/whatsnew#spatial-aggregate-functions).
-            //It does work with the basic style that is referenced in the docs.
-            //However, as soon as you try to aggregate with a SelectMany or nested queries, it either fails to translate or pulls all records into memory and performs the aggregation locally (without erroring which is weird).
-            //Thus, we hack this together instead.  Hopefully EF gets better at translating these aggregates and we can go back to more native EF methods.
-            var siteIdsCommand = db.AllocationAmountsFact
+            // Get SiteIds based on search predicate
+            var siteIds = db.AllocationAmountsFact
                 .AsNoTracking()
                 .Where(predicate)
-                .SelectMany(a => a.AllocationBridgeSitesFact.Select(b => b.SiteId))
-                .CreateDbCommand();
+                .SelectMany(a => a.AllocationBridgeSitesFact.Select(b => b.SiteId));
 
-            siteIdsCommand.CommandText = "select geometry::EnvelopeAggregate(coalesce(geometry, sitepoint)).ToString() Geometry " +
-                                "from core.Sites_Dim sdf " +
-                                $"where sdf.SiteId in ({siteIdsCommand.CommandText})";
+            // Retrieve geometries based on the SiteIds
+            var geometries = db.SitesDim
+                .AsNoTracking()
+                .Where(sdf => siteIds.Contains(sdf.SiteId))
+                .Select(sdf => sdf.Geometry ?? sdf.SitePoint);
 
-            object[] parameters = new object[siteIdsCommand.Parameters.Count];
-            for (var i = 0; i < siteIdsCommand.Parameters.Count; i++)
-            {
-                parameters[i] = siteIdsCommand.Parameters[i];
-            }
-
-            var geometry = (await siteIdsCommand.ExecuteScalarAsync()) as string;
+            // Combine geometries using EnvelopeCombiner
+            var geometry = EnvelopeCombiner.CombineAsGeometry(geometries);
 
             ts.Complete();
 
-            return GeometryHelpers.GetGeometryByWkt(geometry);
+            return geometry.IsEmpty ? null : GeometryHelpers.GetGeometryByWkt(geometry.ToString());
         }
 
         public async Task<WaterRightsSearchResults> FindWaterRights(WaterRightsSearchCriteria searchCriteria, int pageNumber)
         {
             using var ts = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
-            using var db = _databaseContextFactory.Create();
+            await using var db = _databaseContextFactory.Create();
 
             // db.database does not pick up transaction from transactionScope if we do not open connection
-            db.Database.OpenConnection();
+            await db.Database.OpenConnectionAsync();
             var predicate = BuildWaterRightsSearchPredicate(searchCriteria, db);
 
             var waterRightDetails = await db.AllocationAmountsFact
@@ -123,9 +232,9 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildWaterRightsSearchPredicate(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>();
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>();
 
             predicate.And(BuildBeneficialUsesPredicate(searchCriteria));
 
@@ -144,117 +253,117 @@ namespace WesternStatesWater.WestDaat.Accessors
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildFromSiteUuids(WaterRightsSearchCriteria searchCriteria, DatabaseContext db)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.WadeSitesUuids != null && searchCriteria.WadeSitesUuids.Any())
             {
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempUuidTable);
 
-                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new TempUuid { Uuid = a }).ToList());
+                db.BulkInsert(searchCriteria.WadeSitesUuids.Select(a => new EF.TempUuid { Uuid = a }).ToList());
 
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.CreateTempIdTable);
                 db.Database.ExecuteSqlRaw(Scripts.Scripts.FindSiteIdsFromUuids);
 
-                predicate = predicate.And(AllocationAmountsFact.HasSitesUuids(db));
+                predicate = predicate.And(EF.AllocationAmountsFact.HasSitesUuids(db));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildBeneficialUsesPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.BeneficialUses != null && searchCriteria.BeneficialUses.Any())
             {
-                predicate = predicate.And(AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
+                predicate = predicate.And(EF.AllocationAmountsFact.HasBeneficialUses(searchCriteria.BeneficialUses.ToList()));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildDatePredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.MinimumPriorityDate != null || searchCriteria?.MaximumPriorityDate != null)
             {
-                predicate.And(AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
+                predicate.And(EF.AllocationAmountsFact.HasPriorityDateRange(searchCriteria.MinimumPriorityDate, searchCriteria.MaximumPriorityDate));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildVolumeAndFlowPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.ExemptOfVolumeFlowPriority != null)
             {
-                predicate.And(AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
+                predicate.And(EF.AllocationAmountsFact.IsExemptOfVolumeFlowPriority(searchCriteria.ExemptOfVolumeFlowPriority.Value));
             }
 
             if (searchCriteria?.MinimumFlow != null || searchCriteria?.MaximumFlow != null)
             {
-                predicate.And(AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
+                predicate.And(EF.AllocationAmountsFact.HasFlowRateRange(searchCriteria.MinimumFlow, searchCriteria.MaximumFlow));
             }
 
             if (searchCriteria?.MinimumVolume != null || searchCriteria?.MaximumVolume != null)
             {
-                predicate.And(AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
+                predicate.And(EF.AllocationAmountsFact.HasVolumeRange(searchCriteria.MinimumVolume, searchCriteria.MaximumVolume));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildOwnerSearchPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.OwnerClassifications != null && searchCriteria.OwnerClassifications.Any())
             {
-                predicate.And(AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasOwnerClassification(searchCriteria.OwnerClassifications.ToList()));
             }
 
             if (!string.IsNullOrWhiteSpace(searchCriteria?.AllocationOwner))
             {
-                predicate.And(AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
+                predicate.And(EF.AllocationAmountsFact.HasAllocationOwner(searchCriteria.AllocationOwner));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildSiteDetailsPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.WaterSourceTypes != null && searchCriteria.WaterSourceTypes.Any())
             {
-                predicate.And(AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasWaterSourceTypes(searchCriteria.WaterSourceTypes.ToList()));
             }
 
             if (searchCriteria?.States != null && searchCriteria.States.Any())
             {
-                predicate.And(AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
+                predicate.And(EF.AllocationAmountsFact.HasOrganizationStates(searchCriteria.States.ToList()));
             }
 
             if (!string.IsNullOrWhiteSpace(searchCriteria?.PodOrPou))
             {
-                predicate.And(AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
+                predicate.And(EF.AllocationAmountsFact.IsPodOrPou(searchCriteria.PodOrPou));
             }
 
             return predicate;
         }
 
-        private static ExpressionStarter<AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
+        private static ExpressionStarter<EF.AllocationAmountsFact> BuildGeometrySearchPredicate(WaterRightsSearchCriteria searchCriteria)
         {
-            var predicate = PredicateBuilder.New<AllocationAmountsFact>(true);
+            var predicate = PredicateBuilder.New<EF.AllocationAmountsFact>(true);
 
             if (searchCriteria?.FilterGeometry != null)
             {
-                predicate.And(AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
+                predicate.And(EF.AllocationAmountsFact.IsWithinGeometry(searchCriteria.FilterGeometry));
             }
 
             return predicate;
@@ -264,10 +373,10 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             var org = db.AllocationAmountsFact
-              .Where(a => a.AllocationAmountId == allocationAmountId)
-              .Select(a => a.Organization)
-              .ProjectTo<Organization>(DtoMapper.Configuration)
-              .Single();
+                .Where(a => a.AllocationAmountId == allocationAmountId)
+                .Select(a => a.Organization)
+                .ProjectTo<Organization>(DtoMapper.Configuration)
+                .Single();
 
             return org;
         }
@@ -285,21 +394,43 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                        .Select(x => x.Site)
-                        .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
-                        .ToListAsync();
+                .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(x => x.Site)
+                .ProjectTo<SiteInfoListItem>(DtoMapper.Configuration)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<SiteUsageListItem>> GetRightUsageInfoListByAllocationUuid(string allocationUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+
+            var siteIds = await db.AllocationBridgeSitesFact
+                .Where(absf => absf.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(absf => absf.SiteId)
+                .ToListAsync();
+
+            if (!siteIds.Any())
+            {
+                return new List<SiteUsageListItem>();
+            }
+
+            var usageInfo = await db.SiteVariableAmountsFact
+                .Where(sva => siteIds.Contains(sva.SiteId))
+                .ProjectTo<SiteUsageListItem>(DtoMapper.Configuration)
+                .ToListAsync();
+
+            return usageInfo;
         }
 
         public async Task<List<WaterSourceInfoListItem>> GetWaterRightSourceInfoById(string allocationUuid)
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact.Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                    .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
+                .SelectMany(x => x.Site.WaterSourceBridgeSitesFact
                     .Select(a => a.WaterSource))
-                    .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
-                    .Distinct()
-                    .ToListAsync();
+                .ProjectTo<WaterSourceInfoListItem>(DtoMapper.Configuration)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<List<AllocationAmount>> GetAllWaterAllocations()
@@ -317,21 +448,25 @@ namespace WesternStatesWater.WestDaat.Accessors
         {
             using var db = _databaseContextFactory.Create();
             return await db.AllocationBridgeSitesFact
-                        .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
-                        .Select(x => x.Site)
-                        .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
-                        .ProjectTo<SiteLocation>(DtoMapper.Configuration)
-                        .ToListAsync();
+                .Where(x => x.AllocationAmount.AllocationUuid == allocationUuid)
+                .Select(x => x.Site)
+                .Where(x => x.Longitude.HasValue && x.Latitude.HasValue)
+                .ProjectTo<SiteLocation>(DtoMapper.Configuration)
+                .ToListAsync();
         }
 
-        public async Task<List<WaterRightsDigest>> GetWaterRightsDigestsBySite(string siteUuid)
+        public async Task<List<OverlayDigest>> GetOverlayDigestsByUuid(string overlayUuid)
         {
-            using var db = _databaseContextFactory.Create();
-            db.Database.SetCommandTimeout(int.MaxValue);
-            return await db.AllocationAmountsFact
-                .Where(x => x.AllocationBridgeSitesFact.Any(y => y.Site.SiteUuid == siteUuid))
-                .ProjectTo<WaterRightsDigest>(DtoMapper.Configuration)
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var overlayDigests = await db.ReportingUnitsDim
+                .AsNoTracking()
+                .Where(r => r.ReportingUnitUuid == overlayUuid)
+                .ProjectTo<OverlayDigest>(DtoMapper.Configuration)
                 .ToListAsync();
+
+            return overlayDigests;
         }
 
         public int GetWaterRightsCount(WaterRightsSearchCriteria searchCriteria)
@@ -373,6 +508,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 yield return allocation.Map<WaterAllocations>();
             }
         }
+
         private async IAsyncEnumerable<Sites> BuildSitesModel(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
@@ -427,15 +563,14 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        internal IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
+        private IEnumerable<PodSiteToPouSiteRelationships> GetPodSiteToPouSiteRelationships(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, filteredSites) = GetFilteredSites(searchCriteria);
 
             return db.PODSiteToPOUSiteFact
                 .AsNoTracking()
-                .Where(a => filteredSites
-                    .Any(b => b.SiteId == a.PODSiteId)
-                    || filteredSites.Any(b => b.SiteId == a.POUSiteId))
+                .Where(a => filteredSites.Any(b => b.SiteId == a.PODSiteId)
+                            || filteredSites.Any(b => b.SiteId == a.POUSiteId))
                 .ProjectTo<PodSiteToPouSiteRelationships>(DtoMapper.Configuration)
                 .AsEnumerable();
         }
@@ -476,7 +611,7 @@ namespace WesternStatesWater.WestDaat.Accessors
                 .AsEnumerable();
         }
 
-        private (DatabaseContext DB, IQueryable<AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
+        private (DatabaseContext DB, IQueryable<EF.AllocationAmountsFact> AllocationAmounts) GetFilteredWaterAllocations(WaterRightsSearchCriteria searchCriteria)
         {
             var db = _databaseContextFactory.Create();
 
@@ -492,7 +627,7 @@ namespace WesternStatesWater.WestDaat.Accessors
             return (db, waterRightDetails);
         }
 
-        private (DatabaseContext DB, IQueryable<SitesDim> FilteredSites) GetFilteredSites(WaterRightsSearchCriteria searchCriteria)
+        private (DatabaseContext DB, IQueryable<EF.SitesDim> FilteredSites) GetFilteredSites(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, waterRightDetails) = GetFilteredWaterAllocations(searchCriteria);
 
@@ -563,6 +698,52 @@ namespace WesternStatesWater.WestDaat.Accessors
             return allRegulatoryUuids;
         }
 
+        public async Task<OverlayDetails> GetOverlayDetails(string overlayUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var overlay = await db.ReportingUnitsDim
+                .Include(r => r.RegulatoryReportingUnitsFact)
+                .ThenInclude(rr => rr.Organization)
+                .AsNoTracking()
+                .Where(r => r.ReportingUnitUuid == overlayUuid)
+                .ProjectTo<OverlayDetails>(DtoMapper.Configuration)
+                .SingleOrDefaultAsync();
+
+            return overlay;
+        }
+
+        public async Task<List<OverlayTableEntry>> GetOverlayInfoById(OverlayDetailsSearchCriteria searchCriteria)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var query = db.RegulatoryOverlayDim
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchCriteria.ReportingUnitUUID))
+            {
+                query = query
+                    .Where(ro => ro.RegulatoryReportingUnitsFact
+                        .Any(rr => rr.ReportingUnit.ReportingUnitUuid == searchCriteria.ReportingUnitUUID));
+            }
+            else if (!string.IsNullOrEmpty(searchCriteria.AllocationUUID))
+            {
+                query = query
+                    .Where(ro => ro.RegulatoryOverlayBridgeSitesFact
+                        .Any(robsf => robsf.Site.AllocationBridgeSitesFact
+                            .Any(absf => absf.AllocationAmount.AllocationUuid == searchCriteria.AllocationUUID)
+                        )
+                    );
+            }
+
+            return await query
+                .ProjectTo<OverlayTableEntry>(DtoMapper.Configuration)
+                .ToListAsync();
+        }
+
         private async Task<ConcurrentDictionary<long, ConcurrentBag<string>>> GetWaterSourcesForSites(WaterRightsSearchCriteria searchCriteria)
         {
             var (db, sites) = GetFilteredSites(searchCriteria);
@@ -580,6 +761,26 @@ namespace WesternStatesWater.WestDaat.Accessors
                 return ValueTask.CompletedTask;
             });
             return allRegulatoryUuids;
+        }
+
+        public async Task<WaterRightFundingOrgDetails> GetWaterRightFundingOrgDetailsByUuid(string allocationUuid)
+        {
+            await using var db = _databaseContextFactory.Create();
+            await db.Database.OpenConnectionAsync();
+
+            var allocationAmount = await db.AllocationAmountsFact
+                .AsNoTracking()
+                .SingleOrDefaultAsync(aaf => aaf.AllocationUuid == allocationUuid);
+
+            if (allocationAmount?.ConservationApplicationFundingOrganizationId == null)
+            {
+                throw new WestDaatException($"Allocation with UUID '{allocationUuid}' does not have a funding organization.");
+            }
+
+            return new WaterRightFundingOrgDetails
+            {
+                FundingOrganizationId = allocationAmount.ConservationApplicationFundingOrganizationId.Value,
+            };
         }
     }
 }

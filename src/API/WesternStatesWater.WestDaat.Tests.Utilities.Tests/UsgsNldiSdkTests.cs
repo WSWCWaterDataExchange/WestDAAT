@@ -10,8 +10,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
 {
     [TestClass]
-    [TestCategory("Utilities Tests")]
-    public class UsgsNldiSdkTests : UtilitiesTestBase
+    public class UsgsNldiSdkTests : UtilityTestBase
     {
         [DataTestMethod]
         [DataRow(38.4, 95.5, "coords=POINT%2895.5%2038.4%29")]
@@ -81,12 +80,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFeatureByCoordinates_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFeatureByCoordinates_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/position?coords=POINT%28-95.5%2038.4%29")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFeatureByCoordinates(38.4, -95.5);
@@ -157,12 +156,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFlowlines_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFlowlines_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/comidvalue/navigation/UM/flowlines?distance=50")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFlowlines("comidvalue", NavigationMode.UpstreamMain, 50);
@@ -172,7 +171,7 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataTestMethod]
         [DataRow("comidvalue", NavigationMode.UpstreamMain, FeatureDataSource.UsgsSurfaceWaterSites, 9, "linked-data/comid/comidvalue/navigation/UM/nwissite?distance=9")]
         [DataRow("<>", NavigationMode.UpstreamTributaries, FeatureDataSource.EpaWaterQualitySite, 0, "linked-data/comid/%3C%3E/navigation/UT/WQP?distance=0")]
-        [DataRow("<bananas&oranges>", NavigationMode.DownstreamMain, FeatureDataSource.Wade, -1, "linked-data/comid/%3Cbananas&oranges%3E/navigation/DM/wade?distance=-1")]
+        [DataRow("<bananas&oranges>", NavigationMode.DownstreamMain, FeatureDataSource.WadeRights, -1, "linked-data/comid/%3Cbananas&oranges%3E/navigation/DM/wade_rights?distance=-1")]
         [DataRow("@home", NavigationMode.DownstreamDiversions, FeatureDataSource.UsgsSurfaceWaterSites, 15, "linked-data/comid/@home/navigation/DD/nwissite?distance=15")]
         public async Task GetFeatures_Parametertizes(string comid, NavigationMode navigationMode, FeatureDataSource featureDataSource, int distanceInKm, string expectedUrl)
         {
@@ -232,12 +231,12 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
         [DataRow(HttpStatusCode.InternalServerError, null)]
         [DataRow(HttpStatusCode.InternalServerError, "")]
         [DataRow(HttpStatusCode.InternalServerError, "error message")]
-        public async Task GetFeatures_ReturnsError(HttpStatusCode statusCode, string bodyContent)
+        public async Task GetFeatures_ReturnsError(HttpStatusCode statusCode, string? bodyContent)
         {
             var mockHttp = new MockHttpMessageHandler();
             var content = bodyContent != null ? new StringContent(bodyContent) : null;
             mockHttp.When("https://fakeserver/path/linked-data/comid/comidvalue/navigation/UM/WQP?distance=50")
-                    .Respond(HttpStatusCode.BadRequest, content);
+                    .Respond(HttpStatusCode.BadRequest, content!);
 
             var sut = CreateUsgsNldiSdk(mockHttp.ToHttpClient());
             Func<Task> call = async () => await sut.GetFeatures("comidvalue", NavigationMode.UpstreamMain, FeatureDataSource.EpaWaterQualitySite, 50);
@@ -261,9 +260,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]), CleanupForDisplay((int[])data[2]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]!), CleanupForDisplay((int[])data?[1]!), CleanupForDisplay((int[])data?[2]!));
             }
         }
 
@@ -278,9 +277,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFlowlinesResponse, new[] { 3, 5, 4 }, new[] { 1, 1, 1 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]), CleanupForDisplay((int[])data[2]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]! ?? ""), CleanupForDisplay((int[])data?[1]!), CleanupForDisplay((int[])data?[2]!));
             }
         }
 
@@ -295,9 +294,9 @@ namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests
                 yield return new object[] { UsgsNldiResponses.UsgsNldiResponseResources.ValidGetFeaturesResponse, new[] { 10, 10, 10, 10 } };
             }
 
-            public string GetDisplayName(MethodInfo methodInfo, object[] data)
+            public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
             {
-                return string.Join(",", CleanupJsonForDisplay((string)data[0]), CleanupForDisplay((int[])data[1]));
+                return string.Join(",", CleanupJsonForDisplay((string)data?[0]!), CleanupForDisplay((int[])data?[1]!));
             }
         }
 

@@ -1,14 +1,29 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import DisclaimerModal from "../components/DisclaimerModal";
+import React from 'react';
+import { useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import DisclaimerModal from '../components/DisclaimerModal';
+import { useUserProfile } from '../hooks/queries/useUserQuery';
+import { isFeatureEnabled } from '../config/features';
 
 function Layout() {
-  const [showDisclaimerModal, setShowDisclaimerModal] = useState(!localStorage.getItem("disclaimer"));
+  const { data: userProfileResponse } = useUserProfile();
+  const navigate = useNavigate();
+
+  // Force the user to complete their profile if they haven't already
+  const isProfileEnabled = isFeatureEnabled('conservationEstimationTool');
+  const requiresSignup = userProfileResponse?.userProfile.isSignupComplete === false;
+  const signupRoute = '/account/signup';
+  const currentRoute = window.location.pathname;
+  if (isProfileEnabled && requiresSignup && currentRoute !== signupRoute) {
+    navigate(signupRoute, { state: { from: currentRoute } });
+  }
+
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(!localStorage.getItem('disclaimer'));
 
   const acceptDisclaimer = (today: Date) => {
-    localStorage.setItem("disclaimer", today.toUTCString());
+    localStorage.setItem('disclaimer', today.toUTCString());
     setShowDisclaimerModal(false);
-  }
+  };
 
   return (
     <>
@@ -21,7 +36,6 @@ function Layout() {
           so you can think about this <Outlet> as a placeholder for
           the child routes we defined above. */}
       <Outlet />
-
     </>
   );
 }

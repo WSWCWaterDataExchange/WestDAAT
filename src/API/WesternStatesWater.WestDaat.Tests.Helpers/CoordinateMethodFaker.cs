@@ -1,4 +1,4 @@
-using WesternStatesWater.WestDaat.Accessors.EntityFramework;
+using WesternStatesWater.WaDE.Database.EntityFramework;
 
 namespace WesternStatesWater.WestDaat.Tests.Helpers
 {

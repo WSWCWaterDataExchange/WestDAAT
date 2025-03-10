@@ -37,13 +37,20 @@ export enum waterRightsProperties {
   maxVolume = 'maxVol',
   minPriorityDate = 'minPri',
   maxPriorityDate = 'maxPri',
+  allocationTypes = 'allocType',
+  legalStatuses = 'ls',
+  siteTypes = 'sType',
+}
+
+export enum overlayProperties {
+  overlayType = 'oType',
 }
 
 export enum nldiSiteProperties {
   sourceName = 'sourceName',
   identifier = 'identifier',
   uri = 'uri',
-  name = 'name'
+  name = 'name',
 }
 
 export const colorList = [
@@ -74,3 +81,16 @@ export const colorList = [
   '#00A277',
   '#B11D6C',
 ];
+
+export const overlaysColorList = [
+  '#99FF99',
+  '#FF9999',
+  '#9999FF',
+  '#FF99FF',
+  '#FFFF99',
+  '#99FFFF',
+  '#FFB380',
+  '#C8A2C8',
+];
+
+export const timeSeriesColor = '#FF7F50';

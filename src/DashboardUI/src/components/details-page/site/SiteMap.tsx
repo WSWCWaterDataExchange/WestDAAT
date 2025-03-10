@@ -1,10 +1,11 @@
-import { useMemo } from "react";
-import DetailsMap from "../DetailsMap";
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import useWaterRightDigestMapPopup from "../../../hooks/map-popups/useWaterRightDigestMapPopup";
-import { useSiteDetailsContext } from "./Provider";
-import MapProvider from "../../../contexts/MapProvider";
-import { useMapLegend } from "./hooks/useMapLegend";
+import React from 'react';
+import { useMemo } from 'react';
+import DetailsMap from '../DetailsMap';
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import useSiteDigestMapPopup from '../../../hooks/map-popups/useSiteDigestMapPopup';
+import { useSiteDetailsContext } from './Provider';
+import MapProvider from '../../../contexts/MapProvider';
+import { useMapLegend } from './hooks/useMapLegend';
 
 function SiteMap() {
   return (
@@ -16,24 +17,22 @@ function SiteMap() {
 
 function Layout() {
   const {
-    hostData: {
-      locationsQuery
-    }
-  } = useSiteDetailsContext()
+    hostData: { locationsQuery },
+  } = useSiteDetailsContext();
 
   const featureCollection = useMemo<FeatureCollection<Geometry, GeoJsonProperties> | undefined>(() => {
     if (!locationsQuery.data) return undefined;
     return {
       features: [locationsQuery.data],
-      type: "FeatureCollection"
-    }
-  }, [locationsQuery.data])
+      type: 'FeatureCollection',
+    };
+  }, [locationsQuery.data]);
 
-  useWaterRightDigestMapPopup();
+  useSiteDigestMapPopup();
   useMapLegend();
 
   if (locationsQuery.isLoading || !featureCollection) return null;
-  return <DetailsMap mapData={featureCollection} />
+  return <DetailsMap mapData={featureCollection} />;
 }
 
 export default SiteMap;
