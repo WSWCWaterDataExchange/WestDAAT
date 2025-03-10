@@ -629,6 +629,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             response.Error.Should().BeNull();
 
+            // todo ethan - check estimate location for updated field details
             var dbApplication = await _dbContext.WaterConservationApplications
                 .Include(application => application.Submission)
                 .SingleOrDefaultAsync(application => application.Id == request.WaterConservationApplicationId);
@@ -639,7 +640,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // all properties on the request should be saved as a Submission record, excluding a couple which are found on the parent Application.
             dbApplication.Submission.Should().BeEquivalentTo(request, options => options
                 .Excluding(submission => submission.WaterConservationApplicationId)
-                .Excluding(submission => submission.WaterRightNativeId));
+                .Excluding(submission => submission.WaterRightNativeId)
+                .Excluding(submission => submission.FieldDetails));
+
+
         }
         else
         {
