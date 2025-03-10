@@ -88,7 +88,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Email Address</span>
+              <span className="text-muted">Email Address</span>
             </div>
             <div>
               <span>{stateForm.landownerEmail}</span>
@@ -97,7 +97,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Phone</span>
+              <span className="text-muted">Phone</span>
             </div>
             <div>
               <span>{stateForm.landownerPhoneNumber}</span>
@@ -106,7 +106,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Address</span>
+              <span className="text-muted">Address</span>
             </div>
             <div>
               <span>{stateForm.landownerAddress}</span>
@@ -115,7 +115,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>City</span>
+              <span className="text-muted">City</span>
             </div>
             <div>
               <span>{stateForm.landownerCity}</span>
@@ -124,7 +124,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>State</span>
+              <span className="text-muted">State</span>
             </div>
             <div>
               <span>{stateForm.landownerState}</span>
@@ -133,7 +133,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Zip Code</span>
+              <span className="text-muted">Zip Code</span>
             </div>
             <div>
               <span>{stateForm.landownerZipCode}</span>
@@ -143,13 +143,10 @@ function ApplicationReviewPageLayout() {
 
         {sectionRule}
 
-        <FormSection
-          title="Representative / Agent Contact Information"
-          subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
-        >
+        <FormSection title="Representative / Agent Contact Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Name / Organization</span>
+              <span className="text-muted">Name / Organization</span>
             </div>
             <div>
               <span>{stateForm.agentName}</span>
@@ -158,7 +155,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Email</span>
+              <span className="text-muted">Email</span>
             </div>
             <div>
               <span>{stateForm.agentEmail}</span>
@@ -167,7 +164,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Phone</span>
+              <span className="text-muted">Phone</span>
             </div>
             <div>
               <span>{stateForm.agentPhoneNumber}</span>
@@ -176,7 +173,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>Additional Details</span>
+              <span className="text-muted">Additional Details</span>
             </div>
             <div>
               <span>{stateForm.agentAdditionalDetails}</span>
@@ -224,14 +221,10 @@ function ApplicationReviewPageLayout() {
 
         {sectionRule}
 
-        <FormSection
-          title="Canal Company / Irrigation District"
-          subtitle="Is your water right part of a canal company or irrigation district? If yes, please provide their contact
-              information."
-        >
+        <FormSection title="Canal Company / Irrigation District">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
-              <span>Name / Organization</span>
+              <span className="text-muted">Name / Organization</span>
             </div>
             <div>
               <span>{stateForm.canalOrIrrigationEntityName}</span>
@@ -240,7 +233,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
-              <span>Email</span>
+              <span className="text-muted">Email</span>
             </div>
             <div>
               <span>{stateForm.canalOrIrrigationEntityEmail}</span>
@@ -249,7 +242,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
-              <span>Phone</span>
+              <span className="text-muted">Phone</span>
             </div>
             <div>
               <span>{stateForm.canalOrIrrigationEntityPhoneNumber}</span>
@@ -258,7 +251,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>Additional Details</span>
+              <span className="text-muted">Additional Details</span>
             </div>
             <div>
               <span>{stateForm.canalOrIrrigationAdditionalDetails}</span>
@@ -271,7 +264,7 @@ function ApplicationReviewPageLayout() {
         <FormSection title="Water Right Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Permit #</span>
+              <span className="text-muted">Permit #</span>
             </div>
             <div>
               <span>{stateForm.permitNumber}</span>
@@ -280,7 +273,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Facility (Ditch) Name</span>
+              <span className="text-muted">Facility (Ditch) Name</span>
             </div>
             <div>
               <span>{stateForm.facilityDitchName}</span>
@@ -289,7 +282,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Priority Date</span>
+              <span className="text-muted">Priority Date</span>
             </div>
             <div>
               <span>{stateForm.priorityDate}</span>
@@ -298,7 +291,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Certificate #</span>
+              <span className="text-muted">Certificate #</span>
             </div>
             <div>
               <span>{stateForm.certificateNumber}</span>
@@ -307,7 +300,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Share #</span>
+              <span className="text-muted">Share #</span>
             </div>
             <div>
               <span>{stateForm.shareNumber}</span>
@@ -316,7 +309,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>State</span>
+              <span className="text-muted">State</span>
             </div>
             <div>
               <span>{stateForm.waterRightState}</span>
@@ -325,7 +318,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>Description of Water Use</span>
+              <span className="text-muted">Description of Water Use</span>
             </div>
             <div>
               <span>{stateForm.waterUseDescription}</span>
@@ -339,7 +332,7 @@ function ApplicationReviewPageLayout() {
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
-                <span className="fw-bold">Irrigated Field Area</span>
+                <span className="text-muted">Irrigated Field Area</span>
               </div>
               <div>
                 <span>{formatNumber(acreageSum, 2)} Acres</span>
@@ -348,7 +341,7 @@ function ApplicationReviewPageLayout() {
 
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
-                <span className="fw-bold">Consumptive Use</span>
+                <span className="text-muted">Consumptive Use</span>
               </div>
               <div>
                 <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
@@ -357,7 +350,7 @@ function ApplicationReviewPageLayout() {
 
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
-                <span className="fw-bold">Compensation Rate</span>
+                <span className="text-muted">Compensation Rate</span>
               </div>
               <div>
                 <span>
@@ -369,7 +362,7 @@ function ApplicationReviewPageLayout() {
 
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
-                <span className="fw-bold">Requested Total ($)</span>
+                <span className="text-muted">Requested Total ($)</span>
               </div>
               <div>
                 <span>${formatNumber(state.conservationApplication.conservationPayment, 0)}</span>
@@ -379,9 +372,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>
-                Do you have supplementary data that can help in reviewing this estimate? If so, provide that here.
-              </span>
+              <span className="text-muted">Supplementary Review Information</span>
             </div>
             <div>
               <span>{stateForm.estimationSupplementaryDetails}</span>
@@ -394,7 +385,7 @@ function ApplicationReviewPageLayout() {
         <FormSection title="Conservation Plan">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
-              <span>Funding Request $ Amount</span>
+              <span className="text-muted">Funding Request $ Amount</span>
             </div>
             <div>
               <span>${stateForm.conservationPlanFundingRequestDollarAmount}</span>
@@ -403,7 +394,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
-              <span>Units</span>
+              <span className="text-muted">Units</span>
             </div>
             <div>
               <span>
@@ -414,7 +405,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>Describe your Conservation Plan.</span>
+              <span className="text-muted">Conservation Description</span>
             </div>
             <div>
               <span>{stateForm.conservationPlanDescription}</span>
@@ -423,7 +414,7 @@ function ApplicationReviewPageLayout() {
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <div>
-              <span>Additional Information</span>
+              <span className="text-muted">Additional Information</span>
             </div>
             <div>
               <span>{stateForm.conservationPlanAdditionalInfo}</span>
