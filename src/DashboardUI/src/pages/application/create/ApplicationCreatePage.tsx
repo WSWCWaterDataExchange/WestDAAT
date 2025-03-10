@@ -55,10 +55,15 @@ const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
+  const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
+
+  const navigateToReviewApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
+  };
 
   const userDrawnFields: FieldData[] = useMemo(() => {
     return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
@@ -171,7 +176,7 @@ function ApplicationCreatePageForm() {
     setFormValidated(true);
 
     if (isFormValid) {
-      alert('This feature will be implemented in a future release.');
+      navigateToReviewApplicationPage();
     }
   };
 
