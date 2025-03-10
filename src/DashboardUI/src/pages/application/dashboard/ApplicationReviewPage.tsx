@@ -55,10 +55,14 @@ function ApplicationReviewPageLayout() {
     0,
   );
 
+  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
+
   return (
     <div className="container">
       <div className="mb-3">
-        <span className="fs-4 fw-bold">New Application</span>
+        <span className="fs-4 fw-bold">
+          Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
+        </span>
       </div>
 
       <div className="d-flex gap-3 mb-4">
@@ -71,18 +75,11 @@ function ApplicationReviewPageLayout() {
         <span className="fw-bold">Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
       </div>
 
-      <div className="mb-4">
-        <span>
-          Complete the below fields in order to submit your application to your state agency for verification. Be sure
-          everything is filled out accurately and truthfully.
-        </span>
-      </div>
-
       <div>
         <FormSection title="Applicant Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <div>
-              <span>Landowner Name</span>
+              <span className="text-muted">Landowner Name</span>
             </div>
             <div>
               <span>{stateForm.landownerName}</span>
@@ -144,6 +141,8 @@ function ApplicationReviewPageLayout() {
           </div>
         </FormSection>
 
+        {sectionRule}
+
         <FormSection
           title="Representative / Agent Contact Information"
           subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
@@ -185,6 +184,8 @@ function ApplicationReviewPageLayout() {
           </div>
         </FormSection>
 
+        {sectionRule}
+
         <div className="row">
           <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             <span>todo</span>
@@ -220,6 +221,8 @@ function ApplicationReviewPageLayout() {
             <NotImplementedPlaceholder />
           </div>
         </div>
+
+        {sectionRule}
 
         <FormSection
           title="Canal Company / Irrigation District"
@@ -262,6 +265,8 @@ function ApplicationReviewPageLayout() {
             </div>
           </div>
         </FormSection>
+
+        {sectionRule}
 
         <FormSection title="Water Right Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
@@ -328,6 +333,8 @@ function ApplicationReviewPageLayout() {
           </div>
         </FormSection>
 
+        {sectionRule}
+
         <FormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
@@ -382,6 +389,8 @@ function ApplicationReviewPageLayout() {
           </div>
         </FormSection>
 
+        {sectionRule}
+
         <FormSection title="Conservation Plan">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <div>
@@ -421,6 +430,8 @@ function ApplicationReviewPageLayout() {
             </div>
           </div>
         </FormSection>
+
+        {sectionRule}
 
         <FormSection title="Supporting Documents (Optional)">
           <div className="col mb-4">
