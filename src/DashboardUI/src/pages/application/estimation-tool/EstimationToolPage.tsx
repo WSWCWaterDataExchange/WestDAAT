@@ -2,7 +2,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { EstimationToolSidebar } from './EstimationToolSidebar';
 import { EstimationToolMapHeader } from './EstimationToolMapHeader';
 import { EstimationToolMap } from './EstimationToolMap';
-import MapProvider from '../../../contexts/MapProvider';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useEffect } from 'react';
 import {
@@ -93,35 +92,33 @@ export function EstimationToolPage() {
   };
 
   return (
-    <MapProvider>
-      <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
-        <ApplicationNavbar
-          navigateBack={navigateToWaterRightLandingPage}
-          backButtonText="Back to Water Right Landing Page"
-          centerText="Water Conservation Estimation Tool"
-        />
+    <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
+      <ApplicationNavbar
+        navigateBack={navigateToWaterRightLandingPage}
+        backButtonText="Back to Water Right Landing Page"
+        centerText="Water Conservation Estimation Tool"
+      />
 
-        <div className="flex-grow-1 overflow-y-auto">
-          <div className="h-100 d-flex overflow-y-auto align-items-stretch">
-            <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
-              <EstimationToolSidebar
-                isLoading={isLoadingFundingOrganization || isLoadingApplication}
-                loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
-              />
-            </div>
+      <div className="flex-grow-1 overflow-y-auto">
+        <div className="h-100 d-flex overflow-y-auto align-items-stretch">
+          <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
+            <EstimationToolSidebar
+              isLoading={isLoadingFundingOrganization || isLoadingApplication}
+              loadFailed={fundingOrganizationLoadFailed || applicationLoadFailed}
+            />
+          </div>
 
-            <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
-              <EstimationToolMapHeader />
-              <EstimationToolMap
-                waterRightNativeId={waterRightNativeId}
-                handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
-                isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
-              />
-            </div>
+          <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
+            <EstimationToolMapHeader />
+            <EstimationToolMap
+              waterRightNativeId={waterRightNativeId}
+              handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
+              isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
+            />
           </div>
         </div>
       </div>
-    </MapProvider>
+    </div>
   );
 }
 

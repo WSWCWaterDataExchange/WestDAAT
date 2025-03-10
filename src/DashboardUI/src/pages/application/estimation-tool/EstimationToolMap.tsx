@@ -24,7 +24,8 @@ interface EstimationToolMapProps {
 
 export function EstimationToolMap(props: EstimationToolMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData } = useMapContext();
+  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
+    useMapContext();
 
   useEffect(() => {
     if (!isMapLoaded) {
@@ -132,6 +133,8 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
         doPolygonsOverlap,
       },
     });
+
+    setUserDrawnPolygonData(polygons);
   };
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
