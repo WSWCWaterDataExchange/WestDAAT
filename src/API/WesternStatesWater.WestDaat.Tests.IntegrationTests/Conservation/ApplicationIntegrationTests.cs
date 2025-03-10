@@ -626,7 +626,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             {
                 PolygonWkt = l.PolygonWkt,
                 AdditionalDetails = "Some additional details"
-            }).ToArray())
+            }).ToArray() ?? [])
             .Generate();
 
         // Act
