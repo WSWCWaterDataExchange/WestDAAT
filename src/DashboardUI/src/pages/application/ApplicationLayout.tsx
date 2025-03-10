@@ -2,6 +2,7 @@ import SiteNavbar from '../../components/SiteNavbar';
 import { Outlet } from 'react-router-dom';
 import SiteFooter from '../../components/SiteFooter';
 import { ConservationApplicationProvider } from '../../contexts/ConservationApplicationProvider';
+import MapProvider from '../../contexts/MapProvider';
 
 export function ApplicationLayout() {
   return (
@@ -10,7 +11,9 @@ export function ApplicationLayout() {
 
       <div className="flex-grow-1 overflow-hidden">
         <ConservationApplicationProvider>
-          <Outlet />
+          <MapProvider>
+            <Outlet />
+          </MapProvider>
         </ConservationApplicationProvider>
       </div>
 

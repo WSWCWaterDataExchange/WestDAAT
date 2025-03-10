@@ -19,7 +19,7 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             _client = _useStorageEmulator
                 ? new BlobServiceClient("UseDevelopmentStorage=true") // If local
-                : new BlobServiceClient(configuration.Uri); // If Azure
+                : new BlobServiceClient(configuration.Uri, ConfigurationHelper.TokenCredential); // If Azure
         }
 
         async Task IBlobStorageSdk.CreateAndUploadAsync(string container, string blobName, Stream content, bool overwrite)
@@ -85,37 +85,29 @@ namespace WesternStatesWater.WestDaat.Utilities
             BlobContainerSasPermissions blobContainerSasPermissions)
         {
             var blobContainerClient = _client.GetBlobContainerClient(container);
-            var userDelegationKey = await _client.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
-                DateTimeOffset.UtcNow.Add(duration));
+            var userDelegationKey =
+                await _client.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow.AddMinutes(-1),
+                    DateTimeOffset.UtcNow.Add(duration));
 
             var values = new Dictionary<string, Uri>(blobNames.Length);
 
             foreach (var blobName in blobNames)
             {
                 var blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
-                var blobSasBuilder = new BlobSasBuilder()
+
+                var blobSasBuilder = new BlobSasBuilder(blobContainerSasPermissions, DateTimeOffset.UtcNow.Add(duration))
                 {
                     BlobContainerName = container,
                     BlobName = blobName,
-                    Resource = "b",
-                    StartsOn = DateTimeOffset.UtcNow,
-                    ExpiresOn = DateTimeOffset.UtcNow.Add(duration),
+                    Resource = "b" // b for Blob
                 };
 
-                blobSasBuilder.SetPermissions(blobContainerSasPermissions);
-
-                var uriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
+                var blobUriBuilder = new BlobUriBuilder(blockBlobClient.Uri)
                 {
-                    Sas = blobSasBuilder.ToSasQueryParameters(
-                        userDelegationKey,
-                        blockBlobClient
-                            .GetParentBlobContainerClient()
-                            .GetParentBlobServiceClient()
-                            .AccountName
-                    )
+                    Sas = blobSasBuilder.ToSasQueryParameters(userDelegationKey, _client.AccountName)
                 };
 
-                values.Add(blobName, uriBuilder.ToUri());
+                values.Add(blobName, blobUriBuilder.ToUri());
             }
 
             return values;

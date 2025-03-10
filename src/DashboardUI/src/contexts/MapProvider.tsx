@@ -95,6 +95,8 @@ interface MapContextState {
     source: string,
     data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry> | string,
   ) => void;
+  userDrawnPolygonData: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[];
+  setUserDrawnPolygonData: (polygons: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[]) => void;
   vectorUrls: { source: string; url: string }[];
   setVectorUrl: (source: string, url: string) => void;
   visibleLayers: string[];
@@ -151,6 +153,8 @@ const defaultState: MapContextState = {
   setLayerIconImages: () => {},
   geoJsonData: [],
   setGeoJsonData: () => {},
+  userDrawnPolygonData: [],
+  setUserDrawnPolygonData: () => {},
   vectorUrls: [],
   setVectorUrl: () => {},
   visibleLayers: [],
@@ -321,6 +325,10 @@ const MapProvider = ({ children }: MapProviderProps) => {
     [setAllGeoJsonData],
   );
 
+  const [userDrawnPolygonData, setUserDrawnPolygonData] = useState<
+    GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[]
+  >([]);
+
   const [vectorUrls, setAllVectorUrls] = useState<{ source: string; url: string }[]>([]);
   const setVectorUrl = useCallback(
     (source: string, url: string) => {
@@ -393,7 +401,7 @@ const MapProvider = ({ children }: MapProviderProps) => {
 
   const [isMapRendering, setIsMapRendering] = useState<boolean>(false);
 
-  const mapContextProviderValue = {
+  const mapContextProviderValue: MapContextState = {
     isMapLoaded,
     setIsMapLoaded,
     mapStyle,
@@ -414,6 +422,8 @@ const MapProvider = ({ children }: MapProviderProps) => {
     setLayerIconImages,
     geoJsonData,
     setGeoJsonData,
+    userDrawnPolygonData,
+    setUserDrawnPolygonData,
     vectorUrls,
     setVectorUrl,
     visibleLayers,

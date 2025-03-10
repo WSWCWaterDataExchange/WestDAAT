@@ -2,6 +2,7 @@ import { circle } from '@turf/circle';
 import { distance } from '@turf/distance';
 import { featureCollection } from '@turf/helpers';
 import intersect from '@turf/intersect';
+import truncate from '@turf/truncate';
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Polygon, Position } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 
@@ -36,7 +37,10 @@ export const generateCircleWithRadiusFromCenterPointToEdgePoint = (
   const distanceFromCenterToEdgeInKm = distance(circleCenterPoint, circleEdgePoint, {
     units: 'kilometers',
   });
-  return circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
+  const circleFeature = circle(circleCenterPoint, distanceFromCenterToEdgeInKm, { steps: 100 });
+  // `circle` generates coordinates with up to 14 decimal places of precision.
+  // 7 decimals is worth up to 1.1cm of precision, which is more than enough for our purposes.
+  return truncate(circleFeature, { precision: 7 });
 };
 
 export const doPolygonsIntersect = (polygons: Feature<Geometry, GeoJsonProperties>[]): boolean => {

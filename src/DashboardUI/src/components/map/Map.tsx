@@ -65,6 +65,7 @@ function Map({
     mapStyle,
     visibleLayers,
     geoJsonData,
+    userDrawnPolygonData,
     filters,
     circleColors,
     circleRadii,
@@ -404,7 +405,12 @@ function Map({
 
           resolve(true);
         });
-        map.setStyle(`mapbox://styles/mapbox/${style}`);
+
+        // cast to `any` is necessary because of an property being incorrectly required on the actual type
+        const mapOptions = {
+          diff: false,
+        } as any;
+        map.setStyle(`mapbox://styles/mapbox/${style}`, mapOptions);
       });
     };
     const buildMap = async (map: mapboxgl.Map): Promise<void> => {
@@ -448,6 +454,21 @@ function Map({
       }
     });
   }, [map, geoJsonData]);
+
+  useEffect(() => {
+    if (!map || !drawControl || isMapRendering) {
+      return;
+    }
+
+    const existingPolygons = drawControl?.getAll() ?? [];
+    const newPolygons = userDrawnPolygonData.filter(
+      (polygon) => !existingPolygons.features.some((f) => f.id === polygon.id),
+    );
+
+    map.once('styledata', () => {
+      newPolygons.forEach((polygon) => drawControl.add(polygon));
+    });
+  }, [map, isMapRendering, drawControl, userDrawnPolygonData]);
 
   useEffect(() => {
     if (!map) return;
