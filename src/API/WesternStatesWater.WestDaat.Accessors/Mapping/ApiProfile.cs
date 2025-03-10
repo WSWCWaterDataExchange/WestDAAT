@@ -345,6 +345,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
+
+            CreateMap<ApplicationSubmissionFieldDetail, EFWD.WaterConservationApplicationEstimateLocation>(MemberList.Source)
+                .ForSourceMember(src => src.PolygonWkt, opt => opt.DoNotValidate())
+                .ForMember(dest => dest.AdditionalDetails, opt => opt.MapFrom(src => src.AdditionalDetails));
         }
     }
 }
