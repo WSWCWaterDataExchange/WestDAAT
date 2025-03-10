@@ -1,11 +1,8 @@
-﻿using WesternStatesWater.WestDaat.Contracts.Client;
-using WesternStatesWater.WestDaat.Database.EntityFramework;
-
-namespace WesternStatesWater.WestDaat.Tests.Helpers;
+﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
 public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionRequest>
 {
-    public WaterConservationApplicationSubmissionRequestFaker(WaterConservationApplicationEstimateLocation[] locations = null)
+    public WaterConservationApplicationSubmissionRequestFaker()
     {
         RuleFor(wcas => wcas.AgentName, f => f.Person.FullName);
 
@@ -56,17 +53,5 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
         RuleFor(wcas => wcas.WaterRightState, f => f.Address.StateAbbr());
 
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
-
-        if (locations != null)
-        {
-            RuleFor(wcas => wcas.FieldDetails, f =>
-                locations.Select(l => new ApplicationSubmissionFieldDetail
-                {
-                    PolygonWkt = l.PolygonWkt,
-                    AdditionalDetails = f.Lorem.Sentence(),
-                })
-                .ToArray()
-            );
-        }
     }
 }
