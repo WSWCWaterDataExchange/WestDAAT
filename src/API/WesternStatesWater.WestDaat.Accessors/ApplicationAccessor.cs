@@ -175,7 +175,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         var existingApplication = await db.WaterConservationApplications
             .Include(wca => wca.Estimate)
             .ThenInclude(estimate => estimate.Locations)
-            .AsNoTracking()
             .Where(wca => wca.Id == request.WaterConservationApplicationId)
             .SingleAsync();
 
