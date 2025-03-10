@@ -10,11 +10,11 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
 
         RuleFor(x => x.WaterRightNativeId).NotEmpty();
 
-        RuleFor(x => x.AgentName).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.AgentName).MaximumLength(255);
 
-        RuleFor(x => x.AgentEmail).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.AgentEmail).MaximumLength(255);
 
-        RuleFor(x => x.AgentPhoneNumber).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.AgentPhoneNumber).MaximumLength(50);
 
         RuleFor(x => x.AgentAdditionalDetails).MaximumLength(4000);
 
@@ -32,11 +32,11 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
 
         RuleFor(x => x.LandownerZipCode).NotEmpty().MaximumLength(10);
 
-        RuleFor(x => x.CanalOrIrrigationEntityName).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.CanalOrIrrigationEntityName).MaximumLength(255);
 
-        RuleFor(x => x.CanalOrIrrigationEntityEmail).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.CanalOrIrrigationEntityEmail).MaximumLength(255);
 
-        RuleFor(x => x.CanalOrIrrigationEntityPhoneNumber).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.CanalOrIrrigationEntityPhoneNumber).MaximumLength(50);
 
         RuleFor(x => x.CanalOrIrrigationAdditionalDetails).MaximumLength(4000);
 
@@ -46,9 +46,9 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
 
         RuleFor(x => x.ConservationPlanDescription).NotEmpty().MaximumLength(4000);
 
-        RuleFor(x => x.ConservationPlanAdditionalInfo).NotEmpty().MaximumLength(4000);
+        RuleFor(x => x.ConservationPlanAdditionalInfo).MaximumLength(4000);
 
-        RuleFor(x => x.EstimationSupplementaryDetails).NotEmpty().MaximumLength(4000);
+        RuleFor(x => x.EstimationSupplementaryDetails).MaximumLength(4000);
 
         RuleFor(x => x.PermitNumber).NotEmpty().MaximumLength(255);
 
