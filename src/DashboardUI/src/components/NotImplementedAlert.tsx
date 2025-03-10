@@ -6,7 +6,7 @@ export function NotImplementedPlaceholder() {
   return (
     <Alert className="m-3 fw-bold" variant="warning">
       <Icon path={mdiInformationOutline} size="2em" className="me-2" />
-      This page will be implemented in a future release.
+      This will be implemented in a future release.
     </Alert>
   );
 }
