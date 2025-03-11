@@ -3,6 +3,7 @@ import center from '@turf/center';
 import truncate from '@turf/truncate';
 import { Point } from 'geojson';
 import { createRef, useMemo, useRef, useState } from 'react';
+import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
@@ -24,8 +25,8 @@ import {
 import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/fileUploadHelpers';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
+import ApplicationFormSection from '../components/ApplicationFormSection';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import Alert from 'react-bootstrap/esm/Alert';
 
 interface FieldData {
   fieldName: string;
@@ -63,12 +64,17 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
   const msalContext = useMsal();
+  const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
   const [showUploadDocumentError, setShowUploadDocumentError] = useState(false);
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
+
+  const navigateToReviewApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
+  };
 
   const userDrawnFields: FieldData[] = useMemo(() => {
     return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
@@ -181,7 +187,7 @@ function ApplicationCreatePageForm() {
     setFormValidated(true);
 
     if (isFormValid) {
-      alert('This feature will be implemented in a future release.');
+      navigateToReviewApplicationPage();
     }
   };
 
@@ -301,7 +307,7 @@ function ApplicationCreatePageForm() {
       </div>
 
       <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
-        <FormSection title="Applicant Information">
+        <ApplicationFormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
             <Form.Label>Landowner Name</Form.Label>
             <Form.Control type="text" maxLength={100} required ref={landownerNameRef} value={stateForm.landownerName} />
@@ -374,9 +380,9 @@ function ApplicationCreatePageForm() {
             />
             <Form.Control.Feedback type="invalid">Zip Code is required.</Form.Control.Feedback>
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection
+        <ApplicationFormSection
           title="Representative / Agent Contact Information"
           subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
         >
@@ -404,10 +410,10 @@ function ApplicationCreatePageForm() {
               value={stateForm.agentAdditionalDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
+          <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             {userDrawnFields.map((field, index) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
@@ -429,12 +435,12 @@ function ApplicationCreatePageForm() {
                     as="textarea"
                     maxLength={4000}
                     ref={propertyAdditionalDetailsRef.current[index] as any}
-                    value={stateForm.fieldDetails[index].additionalDetails}
+                    value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
                   />
                 </Form.Group>
               </div>
             ))}
-          </FormSection>
+          </ApplicationFormSection>
 
           <div className="col-lg-6 col-12">
             Static map here
@@ -442,7 +448,7 @@ function ApplicationCreatePageForm() {
           </div>
         </div>
 
-        <FormSection
+        <ApplicationFormSection
           title="Canal Company / Irrigation District"
           subtitle="Is your water right part of a canal company or irrigation district? If yes, please provide their contact
               information."
@@ -489,9 +495,9 @@ function ApplicationCreatePageForm() {
               value={stateForm.canalOrIrrigationAdditionalDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Water Right Information">
+        <ApplicationFormSection title="Water Right Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="permitNumber">
             <Form.Label>Permit #</Form.Label>
             <Form.Control type="text" maxLength={255} required ref={permitNumberRef} value={stateForm.permitNumber} />
@@ -558,9 +564,9 @@ function ApplicationCreatePageForm() {
             />
             <Form.Control.Feedback type="invalid">Description of Water Use is required.</Form.Control.Feedback>
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Estimation Summary">
+        <ApplicationFormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
@@ -614,9 +620,9 @@ function ApplicationCreatePageForm() {
               value={stateForm.estimationSupplementaryDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Conservation Plan">
+        <ApplicationFormSection title="Conservation Plan">
           <Form.Group
             className={`${responsiveOneThirdWidthDefault} mb-4`}
             controlId="conservationPlanFundingRequestDollarAmount"
@@ -627,6 +633,7 @@ function ApplicationCreatePageForm() {
               <Form.Control
                 type="number"
                 required
+                min={1}
                 ref={conservationPlanFundingRequestDollarAmountRef}
                 value={stateForm.conservationPlanFundingRequestDollarAmount}
               />
@@ -674,9 +681,9 @@ function ApplicationCreatePageForm() {
               value={stateForm.conservationPlanAdditionalInfo}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Supporting Documents (Optional)">
+        <ApplicationFormSection title="Supporting Documents (Optional)">
           {showUploadDocumentError && (
             <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
               {uploadDocumentErrorMessage}
@@ -700,7 +707,7 @@ function ApplicationCreatePageForm() {
               Upload
             </Button>
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         <hr className="m-0" />
         <div className="d-flex justify-content-end p-3">
@@ -709,33 +716,6 @@ function ApplicationCreatePageForm() {
           </Button>
         </div>
       </Form>
-    </div>
-  );
-}
-
-interface FormSectionProps {
-  title: string;
-  subtitle?: string;
-  className?: string;
-  children: React.ReactNode | undefined;
-}
-
-function FormSection(props: FormSectionProps) {
-  return (
-    <div className={props.className}>
-      <div className="mb-4">
-        <div>
-          <span className="fs-5">{props.title}</span>
-        </div>
-
-        {props.subtitle && (
-          <div>
-            <span className="text-muted">{props.subtitle}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="row">{props.children}</div>
     </div>
   );
 }
