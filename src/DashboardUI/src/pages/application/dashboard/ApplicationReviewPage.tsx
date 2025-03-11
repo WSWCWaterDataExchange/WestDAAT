@@ -93,8 +93,6 @@ function ApplicationReviewPageLayout() {
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
-  const displayValueOrFallback = (value: any) => <>{value || 'No input provided.'}</>;
-
   return (
     <div className="container">
       <div className="mb-3">
@@ -187,7 +185,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Name / Organization</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.agentName)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.agentName} />
+              </span>
             </div>
           </div>
 
@@ -196,7 +196,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Email</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.agentEmail)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.agentEmail} />
+              </span>
             </div>
           </div>
 
@@ -205,7 +207,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Phone</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.agentPhoneNumber)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.agentPhoneNumber} />
+              </span>
             </div>
           </div>
 
@@ -214,7 +218,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Details</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.agentAdditionalDetails)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.agentAdditionalDetails} />
+              </span>
             </div>
           </div>
         </FormSection>
@@ -243,7 +249,9 @@ function ApplicationReviewPageLayout() {
                     <span className="text-muted">Additional Details</span>
                   </div>
                   <div>
-                    <span>{displayValueOrFallback(field.additionalDetails)}</span>
+                    <span>
+                      <DisplayValueOrFallback value={field.additionalDetails} />
+                    </span>
                   </div>
                 </div>
               </div>
@@ -264,7 +272,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Name / Organization</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityName)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityName} />
+              </span>
             </div>
           </div>
 
@@ -273,7 +283,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Email</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityEmail)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityEmail} />
+              </span>
             </div>
           </div>
 
@@ -282,7 +294,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Phone</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.canalOrIrrigationEntityPhoneNumber)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityPhoneNumber} />
+              </span>
             </div>
           </div>
 
@@ -291,7 +305,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Details</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.canalOrIrrigationAdditionalDetails)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.canalOrIrrigationAdditionalDetails} />
+              </span>
             </div>
           </div>
         </FormSection>
@@ -412,7 +428,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Supplementary Review Information</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.estimationSupplementaryDetails)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.estimationSupplementaryDetails} />
+              </span>
             </div>
           </div>
         </FormSection>
@@ -454,7 +472,9 @@ function ApplicationReviewPageLayout() {
               <span className="text-muted">Additional Information</span>
             </div>
             <div>
-              <span>{displayValueOrFallback(stateForm.conservationPlanAdditionalInfo)}</span>
+              <span>
+                <DisplayValueOrFallback value={stateForm.conservationPlanAdditionalInfo} />
+              </span>
             </div>
           </div>
         </FormSection>
@@ -501,4 +521,8 @@ function FormSection(props: FormSectionProps) {
       <div className="row">{props.children}</div>
     </div>
   );
+}
+
+function DisplayValueOrFallback(props: { value: any }) {
+  return <>{props.value || '-'}</>;
 }
