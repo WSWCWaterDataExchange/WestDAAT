@@ -114,66 +114,31 @@ function ApplicationReviewPageLayout() {
       <div>
         <FormSection title="Applicant Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Landowner Name</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerName}</span>
-            </div>
+            <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Email Address</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerEmail}</span>
-            </div>
+            <FormElement label="Email Address" displayValue={stateForm.landownerEmail} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Phone</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerPhoneNumber}</span>
-            </div>
+            <FormElement label="Phone" displayValue={stateForm.landownerPhoneNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Address</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerAddress}</span>
-            </div>
+            <FormElement label="Address" displayValue={stateForm.landownerAddress} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">City</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerCity}</span>
-            </div>
+            <FormElement label="City" displayValue={stateForm.landownerCity} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">State</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerState}</span>
-            </div>
+            <FormElement label="State" displayValue={stateForm.landownerState} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Zip Code</span>
-            </div>
-            <div>
-              <span>{stateForm.landownerZipCode}</span>
-            </div>
+            <FormElement label="Zip Code" displayValue={stateForm.landownerZipCode} />
           </div>
         </FormSection>
 
@@ -181,47 +146,19 @@ function ApplicationReviewPageLayout() {
 
         <FormSection title="Representative / Agent Contact Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Name / Organization</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.agentName} />
-              </span>
-            </div>
+            <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Email</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.agentEmail} />
-              </span>
-            </div>
+            <FormElement label="Email" displayValue={stateForm.agentEmail} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Phone</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.agentPhoneNumber} />
-              </span>
-            </div>
+            <FormElement label="Phone" displayValue={stateForm.agentPhoneNumber} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Additional Details</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.agentAdditionalDetails} />
-              </span>
-            </div>
+            <FormElement label="Additional Details" displayValue={stateForm.agentAdditionalDetails} />
           </div>
         </FormSection>
 
@@ -268,47 +205,19 @@ function ApplicationReviewPageLayout() {
 
         <FormSection title="Canal Company / Irrigation District">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Name / Organization</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityName} />
-              </span>
-            </div>
+            <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Email</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityEmail} />
-              </span>
-            </div>
+            <FormElement label="Email" displayValue={stateForm.canalOrIrrigationEntityEmail} />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Phone</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.canalOrIrrigationEntityPhoneNumber} />
-              </span>
-            </div>
+            <FormElement label="Phone" displayValue={stateForm.canalOrIrrigationEntityPhoneNumber} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Additional Details</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.canalOrIrrigationAdditionalDetails} />
-              </span>
-            </div>
+            <FormElement label="Additional Details" displayValue={stateForm.canalOrIrrigationAdditionalDetails} />
           </div>
         </FormSection>
 
@@ -316,66 +225,31 @@ function ApplicationReviewPageLayout() {
 
         <FormSection title="Water Right Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Permit #</span>
-            </div>
-            <div>
-              <span>{stateForm.permitNumber}</span>
-            </div>
+            <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Facility (Ditch) Name</span>
-            </div>
-            <div>
-              <span>{stateForm.facilityDitchName}</span>
-            </div>
+            <FormElement label="Facility (Ditch) Name" displayValue={stateForm.facilityDitchName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Priority Date</span>
-            </div>
-            <div>
-              <span>{stateForm.priorityDate}</span>
-            </div>
+            <FormElement label="Priority Date" displayValue={stateForm.priorityDate} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Certificate #</span>
-            </div>
-            <div>
-              <span>{stateForm.certificateNumber}</span>
-            </div>
+            <FormElement label="Certificate #" displayValue={stateForm.certificateNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Share #</span>
-            </div>
-            <div>
-              <span>{stateForm.shareNumber}</span>
-            </div>
+            <FormElement label="Share #" displayValue={stateForm.shareNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">State</span>
-            </div>
-            <div>
-              <span>{stateForm.waterRightState}</span>
-            </div>
+            <FormElement label="State" displayValue={stateForm.waterRightState} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Description of Water Use</span>
-            </div>
-            <div>
-              <span>{stateForm.waterUseDescription}</span>
-            </div>
+            <FormElement label="Description of Water Use" displayValue={stateForm.waterUseDescription} />
           </div>
         </FormSection>
 
@@ -384,54 +258,33 @@ function ApplicationReviewPageLayout() {
         <FormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
-              <div>
-                <span className="text-muted">Irrigated Field Area</span>
-              </div>
-              <div>
-                <span>{formatNumber(acreageSum, 2)} Acres</span>
-              </div>
+              <FormElement label="Irrigated Field Area" displayValue={formatNumber(acreageSum, 2) + ' Acres'} />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <div>
-                <span className="text-muted">Consumptive Use</span>
-              </div>
-              <div>
-                <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
-              </div>
+              <FormElement label="Consumptive Use" displayValue={formatNumber(etAcreFeet, 2) + ' Acre-Feet'} />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <div>
-                <span className="text-muted">Compensation Rate</span>
-              </div>
-              <div>
-                <span>
-                  ${state.conservationApplication.desiredCompensationDollars}/
-                  {CompensationRateUnitsLabelsSingular[state.conservationApplication.desiredCompensationUnits!]}
-                </span>
-              </div>
+              <FormElement
+                label="Compensation Rate"
+                displayValue={`$${state.conservationApplication.desiredCompensationDollars}/${CompensationRateUnitsLabelsSingular[state.conservationApplication.desiredCompensationUnits!]}`}
+              />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <div>
-                <span className="text-muted">Requested Total ($)</span>
-              </div>
-              <div>
-                <span>${formatNumber(state.conservationApplication.conservationPayment, 0)}</span>
-              </div>
+              <FormElement
+                label="Requested Total ($)"
+                displayValue={'$' + formatNumber(state.conservationApplication.conservationPayment, 0)}
+              />
             </div>
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Supplementary Review Information</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.estimationSupplementaryDetails} />
-              </span>
-            </div>
+            <FormElement
+              label="Supplementary Review Information"
+              displayValue={stateForm.estimationSupplementaryDetails}
+            />
           </div>
         </FormSection>
 
@@ -439,43 +292,27 @@ function ApplicationReviewPageLayout() {
 
         <FormSection title="Conservation Plan">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Funding Request $ Amount</span>
-            </div>
-            <div>
-              <span>${stateForm.conservationPlanFundingRequestDollarAmount}</span>
-            </div>
+            <FormElement
+              label="Funding Request $ Amount"
+              displayValue={'$' + stateForm.conservationPlanFundingRequestDollarAmount}
+            />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Units</span>
-            </div>
-            <div>
-              <span>
-                {CompensationRateUnitsLabelsPlural[stateForm.conservationPlanFundingRequestCompensationRateUnits!]}
-              </span>
-            </div>
+            <FormElement
+              label="Units"
+              displayValue={
+                CompensationRateUnitsLabelsPlural[stateForm.conservationPlanFundingRequestCompensationRateUnits!]
+              }
+            />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Conservation Description</span>
-            </div>
-            <div>
-              <span>{stateForm.conservationPlanDescription}</span>
-            </div>
+            <FormElement label="Conservation Description" displayValue={stateForm.conservationPlanDescription} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <div>
-              <span className="text-muted">Additional Information</span>
-            </div>
-            <div>
-              <span>
-                <DisplayValueOrFallback value={stateForm.conservationPlanAdditionalInfo} />
-              </span>
-            </div>
+            <FormElement label="Additional Information" displayValue={stateForm.conservationPlanAdditionalInfo} />
           </div>
         </FormSection>
 
@@ -520,6 +357,28 @@ function FormSection(props: FormSectionProps) {
 
       <div className="row">{props.children}</div>
     </div>
+  );
+}
+
+interface FormElementProps {
+  label: string;
+  displayValue: any;
+}
+
+function FormElement(props: FormElementProps) {
+  const { label, displayValue } = props;
+
+  return (
+    <>
+      <div>
+        <span className="text-muted">{label}</span>
+      </div>
+      <div>
+        <span>
+          <DisplayValueOrFallback value={displayValue} />
+        </span>
+      </div>
+    </>
   );
 }
 
