@@ -482,9 +482,7 @@ function ApplicationReviewPageLayout() {
         {sectionRule}
 
         <FormSection title="Supporting Documents (Optional)">
-          <div className="col mb-4">
-            <span>todo</span>
-          </div>
+          <NotImplementedPlaceholder />
         </FormSection>
 
         <hr className="m-0" />
