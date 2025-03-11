@@ -289,7 +289,7 @@ describe('ConservationApplicationState reducer', () => {
     // Act
     const newState = reducer(state, {
       type: 'APPLICATION_DOCUMENT_REMOVED',
-      payload: { removedDocument: existingDocument.blobName },
+      payload: { removedBlobName: existingDocument.blobName },
     });
 
     // Assert

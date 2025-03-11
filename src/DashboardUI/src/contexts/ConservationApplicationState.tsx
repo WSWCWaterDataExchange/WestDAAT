@@ -198,7 +198,7 @@ export interface ApplicationDocumentUploadedAction {
 export interface ApplicationDocumentRemovedAction {
   type: 'APPLICATION_DOCUMENT_REMOVED';
   payload: {
-    removedDocument: string;
+    removedBlobName: string;
   };
 }
 
@@ -400,7 +400,7 @@ const onApplicationDocumentRemoved = (
   { payload }: ApplicationDocumentRemovedAction,
 ): ConservationApplicationState => {
   const filteredDocuments = draftState.conservationApplication.supportingDocuments.filter(
-    (doc) => doc.blobName !== payload.removedDocument,
+    (doc) => doc.blobName !== payload.removedBlobName,
   );
   draftState.conservationApplication.supportingDocuments = filteredDocuments;
   return draftState;
