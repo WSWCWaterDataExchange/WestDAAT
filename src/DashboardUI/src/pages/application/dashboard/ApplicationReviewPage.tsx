@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import Form from 'react-bootstrap/esm/Form';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import {
   CompensationRateUnitsLabelsPlural,
@@ -9,20 +8,9 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import Button from 'react-bootstrap/esm/Button';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import { Point } from 'geojson';
 import { useMemo } from 'react';
-import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import center from '@turf/center';
-import truncate from '@turf/truncate';
 import ApplicationFormSection from '../components/ApplicationFormSection';
-
-interface FieldData {
-  fieldName: string;
-  acreage: number;
-  centerPoint: Point;
-  polygonWkt: string;
-  additionalDetails: string | undefined;
-}
+import { CombinedPolygonData } from '../../../data-contracts/CombinedPolygonData';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -54,42 +42,29 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 function ApplicationReviewPageLayout() {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+  const polygonData = state.conservationApplication.combinedPolygonData;
 
-  const userDrawnFields: FieldData[] = useMemo(() => {
-    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
-      const polygonEtData = state.conservationApplication.polygonEtData.find(
-        (etData) => etData.polygonWkt === polygon.polygonWkt,
-      )!;
-
-      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
-
-      const additionalDetails = state.conservationApplication.applicationSubmissionForm.fieldDetails.find(
-        (fieldData) => fieldData.polygonWkt === polygon.polygonWkt,
-      )?.additionalDetails;
+  const userDrawnFields: (CombinedPolygonData & { additionalDetails: string })[] = useMemo(() => {
+    return polygonData.map((polygon): CombinedPolygonData & { additionalDetails: string } => {
+      const additionalDetails =
+        state.conservationApplication.applicationSubmissionForm.fieldDetails.find(
+          (fieldData) => fieldData.polygonWkt === polygon.polygonWkt,
+        )?.additionalDetails ?? '';
 
       return {
-        acreage: polygon.acreage,
-        fieldName: polygonEtData.fieldName,
-        polygonWkt: polygon.polygonWkt,
-        centerPoint,
+        ...polygon,
         additionalDetails,
       };
     });
-  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
+  }, [polygonData]);
 
   const submitApplication = () => {
     alert('not implemented.');
   };
 
   // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
+  const acreageSum = polygonData.reduce((sum, polygon) => sum + polygon.acreage, 0);
+  const etAcreFeet = polygonData.reduce((sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet, 0);
 
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
