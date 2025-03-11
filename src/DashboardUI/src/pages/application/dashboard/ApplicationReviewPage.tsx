@@ -183,14 +183,7 @@ function ApplicationReviewPageLayout() {
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
-                  <div>
-                    <span className="text-muted">Additional Details</span>
-                  </div>
-                  <div>
-                    <span>
-                      <DisplayValueOrFallback value={field.additionalDetails} />
-                    </span>
-                  </div>
+                  <FormElement label="Additional Details" displayValue={field.additionalDetails} />
                 </div>
               </div>
             ))}
@@ -348,14 +341,8 @@ function FormElement(props: FormElementProps) {
         <span className="text-muted">{label}</span>
       </div>
       <div>
-        <span>
-          <DisplayValueOrFallback value={displayValue} />
-        </span>
+        <span>{displayValue || '-'}</span>
       </div>
     </>
   );
-}
-
-function DisplayValueOrFallback(props: { value: any }) {
-  return <>{props.value || '-'}</>;
 }
