@@ -541,6 +541,7 @@ function ApplicationCreatePageForm() {
               <Form.Control
                 type="number"
                 required
+                min={1}
                 ref={conservationPlanFundingRequestDollarAmountRef}
                 value={stateForm.conservationPlanFundingRequestDollarAmount}
               />
