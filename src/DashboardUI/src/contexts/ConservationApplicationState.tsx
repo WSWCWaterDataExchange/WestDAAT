@@ -324,6 +324,7 @@ const onMapPolygonsUpdated = (
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
   computeCombinedPolygonData(draftState);
+  resetApplicationFormLocationDetails(draftState);
 
   return draftState;
 };
@@ -417,6 +418,10 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
   draftState.conservationApplication.conservationPayment = undefined;
   draftState.conservationApplication.polygonEtData = [];
   draftState.canContinueToApplication = false;
+};
+
+const resetApplicationFormLocationDetails = (draftState: ConservationApplicationState): void => {
+  draftState.conservationApplication.applicationSubmissionForm.fieldDetails = [];
 };
 
 const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
