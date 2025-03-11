@@ -1,24 +1,26 @@
-import { useNavigate } from 'react-router-dom';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import Form from 'react-bootstrap/esm/Form';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { useMsal } from '@azure/msal-react';
+import center from '@turf/center';
+import truncate from '@turf/truncate';
+import { Point } from 'geojson';
+import { createRef, useMemo, useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
+import Form from 'react-bootstrap/esm/Form';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { useNavigate } from 'react-router-dom';
+import { generateSasTokens } from '../../../accessors/fileAccessor';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { formatNumber } from '../../../utilities/valueFormatters';
-import { createRef, useMemo, useRef, useState } from 'react';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
-import InputGroup from 'react-bootstrap/esm/InputGroup';
-import { Point } from 'geojson';
-import center from '@turf/center';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import truncate from '@turf/truncate';
+import { formatNumber } from '../../../utilities/valueFormatters';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 interface FieldData {
   fieldName: string;
@@ -55,6 +57,7 @@ const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
+  const msalContext = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
@@ -179,14 +182,16 @@ function ApplicationCreatePageForm() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.multiple = true;
-    fileInput.onchange = (e) => {
+    fileInput.onchange = async (e) => {
       // TODO: JN - clear any error alerts
       const fileList = (e.target as HTMLInputElement).files;
       if (fileList && fileList.length > 0) {
         const files = Array.from(fileList);
         if (canUploadDocument(files)) {
           // TODO: JN - call accessor to get sas key from api
-          // TODO: JN - upload files to blob storage
+          const sasTokens = await generateSasTokens(msalContext, files.length);
+          console.log(sasTokens);
+          // TODO: JN - upload files to blob storage (fileUploadHelpers - uploadFilesToBlobStorage)
           // TODO: JN - dispatch documents to update application state
         } else {
           // TODO: JN - set error alerts

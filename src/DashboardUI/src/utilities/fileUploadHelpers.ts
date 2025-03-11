@@ -21,14 +21,3 @@ export const uploadFilesToBlobStorage = async (
 
   return await Promise.all(uploadPromises);
 };
-
-/**
- * TODO: JN
- * upload accessor
- * 
- * 1. go get the sas tokens from the API
- * 2. use the sas tokens to upload the files to the blob storage
- * 
- * - this will be called from a useMutation from the component
- * - need to create this accessor
- */
