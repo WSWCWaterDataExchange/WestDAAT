@@ -3,7 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "ServiceBusConnection__fullyQualifiedNamespace": "sb://localhost"
+    "ServiceBusConnection": "Endpoint=sb://localhost;SharedAccessKeyName=FakeKey;SharedAccessKey=FakeValue;UseDevelopmentEmulator=true;"
   },
   "Host": {
     "CORS": "http://localhost:3000"

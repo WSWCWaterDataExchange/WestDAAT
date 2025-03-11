@@ -118,7 +118,7 @@ var host = new HostBuilder()
         });
         
         #if DEBUG
-        services.AddHostedService<ServiceBusEmulatorListener>();
+       // services.AddHostedService<ServiceBusEmulatorListener>();
         #endif
 
     })

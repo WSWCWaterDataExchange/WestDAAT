@@ -8,6 +8,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
@@ -40,6 +41,12 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             string messageJson)
         {
             await Task.CompletedTask;
+
+            // Test exception logging
+            if (messageJson.Contains("error"))
+            {
+                throw new WestDaatException("ServiceBusTest error message received.");
+            }
         }
     }
 }
