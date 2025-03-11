@@ -144,7 +144,11 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await db.WaterConservationApplicationEstimates.AddAsync(entity);
         await db.SaveChangesAsync();
 
-        return new ApplicationStoreResponseBase();
+        return new ApplicationEstimateStoreResponse
+        {
+            WaterConservationApplicationEstimateId = entity.Id,
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations)
+        };
     }
 
     private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)
