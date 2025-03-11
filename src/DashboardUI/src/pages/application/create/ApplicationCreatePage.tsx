@@ -67,7 +67,6 @@ function ApplicationCreatePageForm() {
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
-  const [showUploadDocumentError, setShowUploadDocumentError] = useState(false);
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
 
   const navigateToReviewApplicationPage = () => {
@@ -244,12 +243,10 @@ function ApplicationCreatePageForm() {
   };
 
   const setUploadDocumentError = (message: string) => {
-    setShowUploadDocumentError(true);
     setUploadDocumentErrorMessage(message);
   };
 
   const clearUploadDocumentError = () => {
-    setShowUploadDocumentError(false);
     setUploadDocumentErrorMessage(null);
   };
 
@@ -664,7 +661,7 @@ function ApplicationCreatePageForm() {
         </ApplicationFormSection>
 
         <ApplicationFormSection title="Supporting Documents (Optional)">
-          {showUploadDocumentError && (
+          {uploadDocumentErrorMessage !== null && (
             <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
               {uploadDocumentErrorMessage}
             </Alert>
