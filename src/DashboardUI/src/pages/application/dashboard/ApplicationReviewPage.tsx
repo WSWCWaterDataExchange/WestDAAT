@@ -312,7 +312,7 @@ function ApplicationReviewPageLayout() {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Supporting Documents (Optional)">
+        <ApplicationFormSection title="Supporting Documents">
           <NotImplementedPlaceholder />
         </ApplicationFormSection>
 
