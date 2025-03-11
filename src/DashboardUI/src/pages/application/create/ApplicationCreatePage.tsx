@@ -6,24 +6,25 @@ import { createRef, useMemo, useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { generateSasTokens } from '../../../accessors/fileAccessor';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import { BlobUpload } from '../../../data-contracts/BlobUpload';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
+import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/fileUploadHelpers';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/fileUploadHelpers';
-import { BlobUpload } from '../../../data-contracts/BlobUpload';
-import { useMutation } from 'react-query';
 
 interface FieldData {
   fieldName: string;
@@ -181,6 +182,44 @@ function ApplicationCreatePageForm() {
     }
   };
 
+  const uploadDocumentMutation = useMutation({
+    mutationFn: async (params: { files: File[] }) => {
+      const sasTokens = (await generateSasTokens(msalContext, params.files.length)).sasTokens;
+      const applicationDocuments: ApplicationDocument[] = [];
+      const blobUploads: BlobUpload[] = [];
+      params.files.forEach((file, index) => {
+        applicationDocuments.push({
+          fileName: file.name,
+          blobName: sasTokens[index].blobname,
+        });
+        blobUploads.push({
+          data: file,
+          contentLength: file.size,
+          blobname: sasTokens[index].blobname,
+          hostname: sasTokens[index].hostname,
+          sasToken: sasTokens[index].sasToken,
+        });
+      });
+      await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
+      blobUploads.forEach((b) => console.log(JSON.stringify(b, null, 2)));
+
+      applicationDocuments.forEach((b) => console.log(JSON.stringify(b, null, 2)));
+      return applicationDocuments;
+    },
+    onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
+      uploadedDocuments.forEach((b) => console.log('uploadedDocuments', JSON.stringify(b, null, 2)));
+      dispatch({
+        type: 'APPLICATION_DOCUMENT_UPLOADED',
+        payload: {
+          uploadedDocuments,
+        },
+      });
+    },
+    onError: () => {
+      // TODO: JN - set error alerts
+    },
+  });
+
   const handleUploadDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -191,18 +230,7 @@ function ApplicationCreatePageForm() {
       if (fileList && fileList.length > 0) {
         const files = Array.from(fileList);
         if (canUploadDocument(files)) {
-          const sasTokens = (await generateSasTokens(msalContext, files.length)).sasTokens;
-          const blobUploads: BlobUpload[] = files.map((file, index) => ({
-            data: file,
-            contentLength: file.size,
-            blobname: sasTokens[index].blobname,
-            hostname: sasTokens[index].hostname,
-            sasToken: sasTokens[index].sasToken,
-          }));
-          await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
-          // TODO: JN - dispatch documents to update application state
-        } else {
-          // TODO: JN - set error alerts
+          uploadDocumentMutation.mutate({ files });
         }
       }
     };
