@@ -6,10 +6,13 @@ using Azure.Core.Serialization;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using WesternStatesWater.Shared.DataContracts;
+using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Client.Functions
 {
-    public class Function1(ITestManager testManager, ILogger logger) : FunctionBase(logger)
+    public class Function1(ITestManager testManager, ILogger<Function1> logger) : FunctionBase(logger)
     {
         [Function("TestMe")]
         [OpenApiOperation("TestMe")]
@@ -30,6 +33,20 @@ namespace WesternStatesWater.WestDaat.Client.Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result, new JsonObjectSerializer());
             return data;
+        }
+
+        [Function(nameof(ServiceBusTest))]
+        public async Task ServiceBusTest(
+            [ServiceBusTrigger(queueName: Queues.SmokeTest, Connection = "ServiceBusConnection")]
+            string messageJson)
+        {
+            await Task.CompletedTask;
+
+            // Test exception logging
+            if (messageJson.Contains("error"))
+            {
+                throw new WestDaatException("ServiceBusTest error message received.");
+            }
         }
     }
 }
