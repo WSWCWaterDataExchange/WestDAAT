@@ -417,6 +417,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
                 dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations
+                response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+
                 dbEstimateLocationConsumptiveUses.All(consumptiveUse =>
                 {
                     var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
