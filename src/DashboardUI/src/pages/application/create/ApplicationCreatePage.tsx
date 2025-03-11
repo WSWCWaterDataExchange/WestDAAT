@@ -25,6 +25,7 @@ import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/file
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import Alert from 'react-bootstrap/esm/Alert';
 
 interface FieldData {
   fieldName: string;
@@ -66,6 +67,8 @@ function ApplicationCreatePageForm() {
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
+  const [showUploadDocumentError, setShowUploadDocumentError] = useState(false);
+  const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
 
   const userDrawnFields: FieldData[] = useMemo(() => {
     return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
@@ -201,13 +204,9 @@ function ApplicationCreatePageForm() {
         });
       });
       await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
-      blobUploads.forEach((b) => console.log(JSON.stringify(b, null, 2)));
-
-      applicationDocuments.forEach((b) => console.log(JSON.stringify(b, null, 2)));
       return applicationDocuments;
     },
     onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
-      uploadedDocuments.forEach((b) => console.log('uploadedDocuments', JSON.stringify(b, null, 2)));
       dispatch({
         type: 'APPLICATION_DOCUMENT_UPLOADED',
         payload: {
@@ -216,31 +215,56 @@ function ApplicationCreatePageForm() {
       });
     },
     onError: () => {
-      // TODO: JN - set error alerts
+      setUploadDocumentError('An error occurred while uploading the document(s). Please try again.');
     },
   });
 
-  const handleUploadDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
+  const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
+
+  const isOverMaxDocumentLimit = (files: File[]): boolean => {
+    return state.conservationApplication.supportingDocuments.length + files.length > MAX_NUMBER_UPLOADED_DOCUMENTS;
+  };
+
+  const isOverMaxSizeLimit = (files: File[]): boolean => {
+    return files.some((file) => file.size > UPLOADED_DOCUMENT_MAX_SIZE_MB * 1024 * 1024);
+  };
+
+  const handleUploadDocument = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.multiple = true;
     fileInput.onchange = async (e) => {
-      // TODO: JN - clear any error alerts
+      clearUploadDocumentError();
+
       const fileList = (e.target as HTMLInputElement).files;
       if (fileList && fileList.length > 0) {
         const files = Array.from(fileList);
-        if (canUploadDocument(files)) {
-          uploadDocumentMutation.mutate({ files });
+
+        if (isOverMaxDocumentLimit(files)) {
+          setUploadDocumentError('You can upload a total of 10 documents.');
+          return;
         }
+
+        if (isOverMaxSizeLimit(files)) {
+          setUploadDocumentError('Each file must be smaller than 25MB.');
+          return;
+        }
+
+        uploadDocumentMutation.mutate({ files });
       }
     };
     fileInput.click();
   };
 
-  const canUploadDocument = (files: File[]): boolean => {
-    // TODO: JN - make sure total number of documents doesn't exceed 10
-    // TODO: JN - verify each individual file size is less than 25MB
-    return true;
+  const setUploadDocumentError = (message: string) => {
+    setShowUploadDocumentError(true);
+    setUploadDocumentErrorMessage(message);
+  };
+
+  const clearUploadDocumentError = () => {
+    setShowUploadDocumentError(false);
+    setUploadDocumentErrorMessage(null);
   };
 
   // assumes all polygons are not intersecting
@@ -653,6 +677,11 @@ function ApplicationCreatePageForm() {
         </FormSection>
 
         <FormSection title="Supporting Documents (Optional)">
+          {showUploadDocumentError && (
+            <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
+              {uploadDocumentErrorMessage}
+            </Alert>
+          )}
           <div className="col mb-4">
             {state.conservationApplication.supportingDocuments.length > 0 && (
               <table className="table">
