@@ -21,6 +21,9 @@ import {
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/fileUploadHelpers';
+import { BlobUpload } from '../../../data-contracts/BlobUpload';
+import { useMutation } from 'react-query';
 
 interface FieldData {
   fieldName: string;
@@ -188,10 +191,15 @@ function ApplicationCreatePageForm() {
       if (fileList && fileList.length > 0) {
         const files = Array.from(fileList);
         if (canUploadDocument(files)) {
-          // TODO: JN - call accessor to get sas key from api
-          const sasTokens = await generateSasTokens(msalContext, files.length);
-          console.log(sasTokens);
-          // TODO: JN - upload files to blob storage (fileUploadHelpers - uploadFilesToBlobStorage)
+          const sasTokens = (await generateSasTokens(msalContext, files.length)).sasTokens;
+          const blobUploads: BlobUpload[] = files.map((file, index) => ({
+            data: file,
+            contentLength: file.size,
+            blobname: sasTokens[index].blobname,
+            hostname: sasTokens[index].hostname,
+            sasToken: sasTokens[index].sasToken,
+          }));
+          await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
           // TODO: JN - dispatch documents to update application state
         } else {
           // TODO: JN - set error alerts
@@ -618,6 +626,19 @@ function ApplicationCreatePageForm() {
 
         <FormSection title="Supporting Documents (Optional)">
           <div className="col mb-4">
+            {state.conservationApplication.supportingDocuments.length > 0 && (
+              <table className="table">
+                <tbody>
+                  {state.conservationApplication.supportingDocuments.map((file, index) => (
+                    <tr key={`${file.fileName}-${index}`}>
+                      <td>{file.fileName}</td>
+                      <td>(text area)</td>
+                      <td>(remove button)</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
             <Button variant="outline-primary" onClick={handleUploadDocument}>
               Upload
             </Button>
