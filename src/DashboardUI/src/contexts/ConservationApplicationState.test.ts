@@ -218,8 +218,24 @@ describe('ConservationApplicationState reducer', () => {
 
   it('estimating consumptive use should update state', () => {
     // Arrange
+
+    // this action's handler has a side effect which requires map polygons to be present
+    const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
+    let newState = reducer(state, {
+      type: 'MAP_POLYGONS_UPDATED',
+      payload: {
+        polygons: [
+          {
+            polygonWkt,
+            acreage: 1,
+          },
+        ],
+        doPolygonsOverlap: true,
+      },
+    });
+
     // Act
-    const newState = reducer(state, {
+    newState = reducer(newState, {
       type: 'CONSUMPTIVE_USE_ESTIMATED',
       payload: {
         totalAverageYearlyEtAcreFeet: 100,
@@ -227,7 +243,7 @@ describe('ConservationApplicationState reducer', () => {
         dataCollections: [
           {
             waterConservationApplicationEstimateLocationId: 'location-guid',
-            polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+            polygonWkt: polygonWkt,
             averageYearlyEtInAcreFeet: 50,
             averageYearlyEtInInches: 400,
             datapoints: [
