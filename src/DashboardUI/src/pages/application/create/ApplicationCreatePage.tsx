@@ -9,20 +9,18 @@ import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
 import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { generateSasTokens } from '../../../accessors/fileAccessor';
+import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
-import { BlobUpload } from '../../../data-contracts/BlobUpload';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { ContainerName, uploadFilesToBlobStorage } from '../../../utilities/fileUploadHelpers';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from '../components/ApplicationFormSection';
@@ -193,24 +191,8 @@ function ApplicationCreatePageForm() {
 
   const uploadDocumentMutation = useMutation({
     mutationFn: async (params: { files: File[] }) => {
-      const sasTokens = (await generateSasTokens(msalContext, params.files.length)).sasTokens;
-      const applicationDocuments: ApplicationDocument[] = [];
-      const blobUploads: BlobUpload[] = [];
-      params.files.forEach((file, index) => {
-        applicationDocuments.push({
-          fileName: file.name,
-          blobName: sasTokens[index].blobname,
-        });
-        blobUploads.push({
-          data: file,
-          contentLength: file.size,
-          blobname: sasTokens[index].blobname,
-          hostname: sasTokens[index].hostname,
-          sasToken: sasTokens[index].sasToken,
-        });
-      });
-      await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
-      return applicationDocuments;
+      clearUploadDocumentError();
+      return await uploadApplicationDocuments(msalContext, params.files);
     },
     onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
       dispatch({
@@ -241,8 +223,6 @@ function ApplicationCreatePageForm() {
     fileInput.type = 'file';
     fileInput.multiple = true;
     fileInput.onchange = async (e) => {
-      clearUploadDocumentError();
-
       const fileList = (e.target as HTMLInputElement).files;
       if (fileList && fileList.length > 0) {
         const files = Array.from(fileList);
