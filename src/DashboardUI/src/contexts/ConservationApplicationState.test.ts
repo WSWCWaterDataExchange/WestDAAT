@@ -1,4 +1,5 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { defaultApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
@@ -249,6 +250,24 @@ describe('ConservationApplicationState reducer', () => {
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
+  });
+
+  it('updating the application form should update state', () => {
+    // Arrange
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+      payload: {
+        formValues: {
+          ...defaultApplicationSubmissionForm(),
+          landownerName: 'Bobby Hill',
+        },
+      },
+    });
+
+    // Assert
+    const form = newState.conservationApplication.applicationSubmissionForm;
+    expect(form.landownerName).toEqual('Bobby Hill');
   });
 
   describe('Estimation Tool Page Use Cases', () => {
