@@ -14,6 +14,7 @@ import { useMemo } from 'react';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import center from '@turf/center';
 import truncate from '@turf/truncate';
+import ApplicationFormSection from '../components/ApplicationFormSection';
 
 interface FieldData {
   fieldName: string;
@@ -112,7 +113,7 @@ function ApplicationReviewPageLayout() {
       </div>
 
       <div>
-        <FormSection title="Applicant Information">
+        <ApplicationFormSection title="Applicant Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
@@ -140,11 +141,11 @@ function ApplicationReviewPageLayout() {
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Zip Code" displayValue={stateForm.landownerZipCode} />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
-        <FormSection title="Representative / Agent Contact Information">
+        <ApplicationFormSection title="Representative / Agent Contact Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
@@ -160,12 +161,12 @@ function ApplicationReviewPageLayout() {
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <FormElement label="Additional Details" displayValue={stateForm.agentAdditionalDetails} />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
+          <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
             {userDrawnFields.map((field) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
@@ -193,7 +194,7 @@ function ApplicationReviewPageLayout() {
                 </div>
               </div>
             ))}
-          </FormSection>
+          </ApplicationFormSection>
 
           <div className="col-lg-6 col-12">
             Static map here
@@ -203,7 +204,7 @@ function ApplicationReviewPageLayout() {
 
         {sectionRule}
 
-        <FormSection title="Canal Company / Irrigation District">
+        <ApplicationFormSection title="Canal Company / Irrigation District">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
@@ -219,11 +220,11 @@ function ApplicationReviewPageLayout() {
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <FormElement label="Additional Details" displayValue={stateForm.canalOrIrrigationAdditionalDetails} />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
-        <FormSection title="Water Right Information">
+        <ApplicationFormSection title="Water Right Information">
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
@@ -251,11 +252,11 @@ function ApplicationReviewPageLayout() {
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <FormElement label="Description of Water Use" displayValue={stateForm.waterUseDescription} />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
-        <FormSection title="Estimation Summary">
+        <ApplicationFormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement label="Irrigated Field Area" displayValue={formatNumber(acreageSum, 2) + ' Acres'} />
@@ -286,11 +287,11 @@ function ApplicationReviewPageLayout() {
               displayValue={stateForm.estimationSupplementaryDetails}
             />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
-        <FormSection title="Conservation Plan">
+        <ApplicationFormSection title="Conservation Plan">
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement
               label="Funding Request $ Amount"
@@ -314,13 +315,13 @@ function ApplicationReviewPageLayout() {
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
             <FormElement label="Additional Information" displayValue={stateForm.conservationPlanAdditionalInfo} />
           </div>
-        </FormSection>
+        </ApplicationFormSection>
 
         {sectionRule}
 
-        <FormSection title="Supporting Documents (Optional)">
+        <ApplicationFormSection title="Supporting Documents (Optional)">
           <NotImplementedPlaceholder />
-        </FormSection>
+        </ApplicationFormSection>
 
         <hr className="m-0" />
         <div className="d-flex justify-content-end p-3">
@@ -329,33 +330,6 @@ function ApplicationReviewPageLayout() {
           </Button>
         </div>
       </div>
-    </div>
-  );
-}
-
-interface FormSectionProps {
-  title: string;
-  subtitle?: string;
-  className?: string;
-  children: React.ReactNode | undefined;
-}
-
-function FormSection(props: FormSectionProps) {
-  return (
-    <div className={props.className}>
-      <div className="mb-4">
-        <div>
-          <span className="fs-5">{props.title}</span>
-        </div>
-
-        {props.subtitle && (
-          <div>
-            <span className="text-muted">{props.subtitle}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="row">{props.children}</div>
     </div>
   );
 }
