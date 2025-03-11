@@ -423,7 +423,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
 
   // build combined data with the ET data as the base because it is retrieved *after* the map data has been provided
   draftState.conservationApplication.combinedPolygonData = etData.map((polygonEtDatum): CombinedPolygonData => {
-    const matchingMapPolygon = mapData.find((mapPolygon) => mapPolygon.polygonWkt === polygonEtDatum.polygonWkt);
+    const matchingMapPolygon = mapData.find((mapPolygon) => mapPolygon.polygonWkt === polygonEtDatum.polygonWkt)!;
 
     const centerPoint = truncate(center(convertWktToGeometry(polygonEtDatum.polygonWkt))).geometry;
 
@@ -435,7 +435,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       averageYearlyEtInAcreFeet: polygonEtDatum.averageYearlyEtInAcreFeet,
       fieldName: polygonEtDatum.fieldName,
       datapoints: polygonEtDatum.datapoints,
-      acreage: matchingMapPolygon?.acreage ?? 0,
+      acreage: matchingMapPolygon.acreage,
     };
   });
 
