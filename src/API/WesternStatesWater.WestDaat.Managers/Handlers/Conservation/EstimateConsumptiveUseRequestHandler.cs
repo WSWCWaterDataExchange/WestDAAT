@@ -43,7 +43,6 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         var dataCollections = multiPolygonYearlyEtResponse.DataCollections.Map<Contracts.Client.PolygonEtDataCollection[]>();
 
         EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
-        ApplicationEstimateStoreResponse storeEstimateResponse = null;
         if (request.CompensationRateDollars.HasValue)
         {
             var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, multiPolygonYearlyEtResponse));
@@ -57,7 +56,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
                 estimateConservationPaymentResponse
             ));
 
-            storeEstimateResponse = (ApplicationEstimateStoreResponse)await ApplicationAccessor.Store(storeEstimateRequest);
+            var storeEstimateResponse = (ApplicationEstimateStoreResponse)await ApplicationAccessor.Store(storeEstimateRequest);
 
             // connect the EstimateLocation Ids to the ET data
             foreach (var collection in dataCollections)
