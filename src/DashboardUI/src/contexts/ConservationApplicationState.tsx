@@ -8,6 +8,10 @@ import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { CombinedPolygonData } from '../data-contracts/CombinedPolygonData';
+import { truncate } from '@turf/truncate';
+import center from '@turf/center';
+import { convertWktToGeometry } from '../utilities/geometryWktConverter';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -31,6 +35,7 @@ export interface ConservationApplicationState {
     polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
     applicationSubmissionForm: ApplicationSubmissionForm;
     isApplicationSubmissionFormValid: boolean;
+    combinedPolygonData: CombinedPolygonData[];
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -63,6 +68,7 @@ export const defaultState = (): ConservationApplicationState => ({
     selectedMapPolygons: [],
     doPolygonsOverlap: false,
     polygonEtData: [],
+    combinedPolygonData: [],
     applicationSubmissionForm: {
       landownerName: undefined,
       landownerEmail: undefined,
@@ -312,6 +318,7 @@ const onMapPolygonsUpdated = (
 
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
+  computeCombinedPolygonData(draftState);
 
   return draftState;
 };
@@ -345,6 +352,7 @@ const onConsumptiveUseEstimated = (
   }));
 
   checkCanContinueToApplication(draftState);
+  computeCombinedPolygonData(draftState);
 
   return draftState;
 };
@@ -402,4 +410,27 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
   draftState.conservationApplication.conservationPayment = undefined;
   draftState.conservationApplication.polygonEtData = [];
   draftState.canContinueToApplication = false;
+};
+
+const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
+  const mapData = draftState.conservationApplication.selectedMapPolygons;
+  const etData = draftState.conservationApplication.polygonEtData;
+
+  // build combined data with the ET data as the base because it is retrieved *after* the map data has been provided
+  draftState.conservationApplication.combinedPolygonData = etData.map((polygonEtDatum): CombinedPolygonData => {
+    const matchingMapPolygon = mapData.find((mapPolygon) => mapPolygon.polygonWkt === polygonEtDatum.polygonWkt);
+
+    const centerPoint = truncate(center(convertWktToGeometry(polygonEtDatum.polygonWkt))).geometry;
+
+    return {
+      waterConservationApplicationEstimateLocationId: polygonEtDatum.waterConservationApplicationEstimateLocationId,
+      polygonWkt: polygonEtDatum.polygonWkt,
+      centerPoint,
+      averageYearlyEtInInches: polygonEtDatum.averageYearlyEtInInches,
+      averageYearlyEtInAcreFeet: polygonEtDatum.averageYearlyEtInAcreFeet,
+      fieldName: polygonEtDatum.fieldName,
+      datapoints: polygonEtDatum.datapoints,
+      acreage: matchingMapPolygon?.acreage ?? 0,
+    };
+  });
 };
