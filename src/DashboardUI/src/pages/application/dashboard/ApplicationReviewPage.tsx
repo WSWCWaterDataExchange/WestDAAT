@@ -62,10 +62,6 @@ function ApplicationReviewPageLayout() {
     alert('not implemented.');
   };
 
-  // assumes all polygons are not intersecting
-  const acreageSum = polygonData.reduce((sum, polygon) => sum + polygon.acreage, 0);
-  const etAcreFeet = polygonData.reduce((sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet, 0);
-
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
@@ -227,11 +223,17 @@ function ApplicationReviewPageLayout() {
         <ApplicationFormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement label="Irrigated Field Area" displayValue={formatNumber(acreageSum, 2) + ' Acres'} />
+              <FormElement
+                label="Irrigated Field Area"
+                displayValue={formatNumber(state.conservationApplication.polygonAcreageSum, 2) + ' Acres'}
+              />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement label="Consumptive Use" displayValue={formatNumber(etAcreFeet, 2) + ' Acre-Feet'} />
+              <FormElement
+                label="Consumptive Use"
+                displayValue={formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2) + ' Acre-Feet'}
+              />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">

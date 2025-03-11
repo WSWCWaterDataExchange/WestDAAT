@@ -34,8 +34,11 @@ export interface ConservationApplicationState {
     doPolygonsOverlap: boolean;
     polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
     applicationSubmissionForm: ApplicationSubmissionForm;
+    // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     combinedPolygonData: CombinedPolygonData[];
+    polygonAcreageSum: number;
+    polygonEtAcreFeetSum: number;
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -68,7 +71,6 @@ export const defaultState = (): ConservationApplicationState => ({
     selectedMapPolygons: [],
     doPolygonsOverlap: false,
     polygonEtData: [],
-    combinedPolygonData: [],
     applicationSubmissionForm: {
       landownerName: undefined,
       landownerEmail: undefined,
@@ -100,6 +102,9 @@ export const defaultState = (): ConservationApplicationState => ({
       conservationPlanAdditionalInfo: undefined,
     },
     isApplicationSubmissionFormValid: false,
+    combinedPolygonData: [],
+    polygonAcreageSum: 0,
+    polygonEtAcreFeetSum: 0,
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -433,4 +438,15 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       acreage: matchingMapPolygon?.acreage ?? 0,
     };
   });
+
+  // assumes all polygons are not intersecting
+  draftState.conservationApplication.polygonAcreageSum = draftState.conservationApplication.combinedPolygonData.reduce(
+    (sum, polygon) => sum + polygon.acreage,
+    0,
+  );
+  draftState.conservationApplication.polygonEtAcreFeetSum =
+    draftState.conservationApplication.combinedPolygonData.reduce(
+      (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
+      0,
+    );
 };

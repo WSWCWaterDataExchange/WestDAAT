@@ -154,10 +154,6 @@ function ApplicationCreatePageForm() {
     }
   };
 
-  // assumes all polygons are not intersecting
-  const acreageSum = polygonData.reduce((sum, polygon) => sum + polygon.acreage, 0);
-  const etAcreFeet = polygonData.reduce((sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet, 0);
-
   return (
     <div className="container">
       <div className="mb-3">
@@ -448,7 +444,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Irrigated Field Area</span>
               </div>
               <div>
-                <span>{formatNumber(acreageSum, 2)} Acres</span>
+                <span>{formatNumber(state.conservationApplication.polygonAcreageSum, 2)} Acres</span>
               </div>
             </div>
 
@@ -457,7 +453,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Consumptive Use</span>
               </div>
               <div>
-                <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+                <span>{formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2)} Acre-Feet</span>
               </div>
             </div>
 
