@@ -8,9 +8,7 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import Button from 'react-bootstrap/esm/Button';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import { useMemo } from 'react';
 import ApplicationFormSection from '../components/ApplicationFormSection';
-import { CombinedPolygonData } from '../../../data-contracts/CombinedPolygonData';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -43,20 +41,6 @@ function ApplicationReviewPageLayout() {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.combinedPolygonData;
-
-  const userDrawnFields: (CombinedPolygonData & { additionalDetails: string })[] = useMemo(() => {
-    return polygonData.map((polygon): CombinedPolygonData & { additionalDetails: string } => {
-      const additionalDetails =
-        state.conservationApplication.applicationSubmissionForm.fieldDetails.find(
-          (fieldData) => fieldData.polygonWkt === polygon.polygonWkt,
-        )?.additionalDetails ?? '';
-
-      return {
-        ...polygon,
-        additionalDetails,
-      };
-    });
-  }, [polygonData]);
 
   const submitApplication = () => {
     alert('not implemented.');
@@ -138,7 +122,7 @@ function ApplicationReviewPageLayout() {
 
         <div className="row">
           <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            {userDrawnFields.map((field) => (
+            {polygonData.map((field) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
                   <span className="text-muted">{field.fieldName}</span>
@@ -154,7 +138,7 @@ function ApplicationReviewPageLayout() {
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
-                  <FormElement label="Additional Details" displayValue={field.additionalDetails} />
+                  <FormElement label="Additional Details" displayValue={field.additionalDetailsTrackedFormValue} />
                 </div>
               </div>
             ))}

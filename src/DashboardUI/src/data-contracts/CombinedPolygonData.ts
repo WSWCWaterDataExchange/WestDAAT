@@ -10,4 +10,5 @@ export interface CombinedPolygonData {
   averageYearlyEtInInches: number;
   averageYearlyEtInAcreFeet: number;
   datapoints: PolygonEtDatapoint[];
+  additionalDetailsTrackedFormValue: string;
 }

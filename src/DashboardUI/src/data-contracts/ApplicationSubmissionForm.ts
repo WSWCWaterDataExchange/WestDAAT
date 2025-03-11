@@ -13,7 +13,7 @@ export interface ApplicationSubmissionForm {
   agentPhoneNumber: string | undefined;
   agentAdditionalDetails: string | undefined;
   fieldDetails: {
-    polygonWkt: string;
+    waterConservationApplicationEstimateLocationId: string;
     additionalDetails: string;
   }[];
   canalOrIrrigationEntityName: string | undefined;

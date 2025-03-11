@@ -110,7 +110,7 @@ function ApplicationCreatePageForm() {
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
       fieldDetails: polygonData.map((field, index) => ({
-        polygonWkt: field.polygonWkt,
+        waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,

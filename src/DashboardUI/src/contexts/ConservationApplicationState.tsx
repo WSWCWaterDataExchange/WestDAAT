@@ -371,6 +371,8 @@ const onApplicationFormUpdated = (
     ...payload.formValues,
   };
 
+  computeCombinedPolygonData(draftState);
+
   return draftState;
 };
 
@@ -427,6 +429,14 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
 
     const centerPoint = truncate(center(convertWktToGeometry(polygonEtDatum.polygonWkt))).geometry;
 
+    // find the additional details for this polygon, which are provided by the user on the Application Create form
+    const additionalDetailsTrackedFormValue =
+      draftState.conservationApplication.applicationSubmissionForm.fieldDetails.find(
+        (fieldDetail) =>
+          fieldDetail.waterConservationApplicationEstimateLocationId ===
+          polygonEtDatum.waterConservationApplicationEstimateLocationId,
+      )?.additionalDetails ?? '';
+
     return {
       waterConservationApplicationEstimateLocationId: polygonEtDatum.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygonEtDatum.polygonWkt,
@@ -436,6 +446,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       fieldName: polygonEtDatum.fieldName,
       datapoints: polygonEtDatum.datapoints,
       acreage: matchingMapPolygon.acreage,
+      additionalDetailsTrackedFormValue,
     };
   });
 
