@@ -12,21 +12,10 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { createRef, useMemo, useRef, useState } from 'react';
+import { createRef, useRef, useState } from 'react';
 import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
-import { Point } from 'geojson';
-import center from '@turf/center';
-import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import truncate from '@turf/truncate';
 import ApplicationFormSection from '../components/ApplicationFormSection';
-
-interface FieldData {
-  fieldName: string;
-  acreage: number;
-  centerPoint: Point;
-  polygonWkt: string;
-}
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -59,29 +48,13 @@ function ApplicationCreatePageForm() {
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+  const polygonData = state.conservationApplication.combinedPolygonData;
 
   const [formValidated, setFormValidated] = useState(false);
 
   const navigateToReviewApplicationPage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
   };
-
-  const userDrawnFields: FieldData[] = useMemo(() => {
-    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
-      const polygonEtData = state.conservationApplication.polygonEtData.find(
-        (etData) => etData.polygonWkt === polygon.polygonWkt,
-      )!;
-
-      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
-
-      return {
-        acreage: polygon.acreage,
-        fieldName: polygonEtData.fieldName,
-        polygonWkt: polygon.polygonWkt,
-        centerPoint,
-      };
-    });
-  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
 
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
@@ -94,7 +67,7 @@ function ApplicationCreatePageForm() {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef(userDrawnFields.map(() => createRef()));
+  const propertyAdditionalDetailsRef = useRef(polygonData.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -136,7 +109,7 @@ function ApplicationCreatePageForm() {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      fieldDetails: userDrawnFields.map((field, index) => ({
+      fieldDetails: polygonData.map((field, index) => ({
         polygonWkt: field.polygonWkt,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
@@ -182,14 +155,8 @@ function ApplicationCreatePageForm() {
   };
 
   // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
+  const acreageSum = polygonData.reduce((sum, polygon) => sum + polygon.acreage, 0);
+  const etAcreFeet = polygonData.reduce((sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet, 0);
 
   return (
     <div className="container">
@@ -322,7 +289,7 @@ function ApplicationCreatePageForm() {
 
         <div className="row">
           <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            {userDrawnFields.map((field, index) => (
+            {polygonData.map((field, index) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
                   <span>{field.fieldName}</span>
