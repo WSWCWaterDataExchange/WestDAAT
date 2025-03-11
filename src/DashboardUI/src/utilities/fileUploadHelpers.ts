@@ -32,18 +32,3 @@ export const uploadFilesToBlobStorage = async (
  * - this will be called from a useMutation from the component
  * - need to create this accessor
  */
-
-/**
- * Upload button onClick calls this
- *   const selectFile = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (files && files.length > 0) {
-        setSelectedFile(files[0]);
-      }
-    };
-    fileInput.click();
-  };
- */

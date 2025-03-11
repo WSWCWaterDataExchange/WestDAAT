@@ -175,6 +175,33 @@ function ApplicationCreatePageForm() {
     }
   };
 
+  const handleUploadDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.onchange = (e) => {
+      // TODO: JN - clear any error alerts
+      const fileList = (e.target as HTMLInputElement).files;
+      if (fileList && fileList.length > 0) {
+        const files = Array.from(fileList);
+        if (canUploadDocument(files)) {
+          // TODO: JN - call accessor to get sas key from api
+          // TODO: JN - upload files to blob storage
+          // TODO: JN - dispatch documents to update application state
+        } else {
+          // TODO: JN - set error alerts
+        }
+      }
+    };
+    fileInput.click();
+  };
+
+  const canUploadDocument = (files: File[]): boolean => {
+    // TODO: JN - make sure total number of documents doesn't exceed 10
+    // TODO: JN - verify each individual file size is less than 25MB
+    return true;
+  };
+
   // assumes all polygons are not intersecting
   const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
     (sum, polygon) => sum + polygon.acreage,
@@ -586,10 +613,7 @@ function ApplicationCreatePageForm() {
 
         <FormSection title="Supporting Documents (Optional)">
           <div className="col mb-4">
-            <Button
-              variant="outline-primary"
-              onClick={() => alert('This feature will be implemented in a future release.')}
-            >
+            <Button variant="outline-primary" onClick={handleUploadDocument}>
               Upload
             </Button>
           </div>
