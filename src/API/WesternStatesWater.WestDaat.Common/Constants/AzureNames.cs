@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace WesternStatesWater.WestDaat.Common.Constants;
 
 /// <summary>
@@ -12,16 +10,6 @@ public static class Queues
 {
     public const string SmokeTest = "smoke-test"; // Local only
     public const string ConservationApplicationSubmitted = "conservation-application-submitted";
-
-    public static string[] GetQueueNames()
-    {
-        var queueNames = typeof(Queues)
-            .GetFields(BindingFlags.Static | BindingFlags.Public)
-            .Where(x => x is { IsLiteral: true, IsInitOnly: false })
-            .Select(x => x.GetValue(null)).Cast<string>().ToArray();
-
-        return queueNames;
-    }
 }
 
 /// <summary>
