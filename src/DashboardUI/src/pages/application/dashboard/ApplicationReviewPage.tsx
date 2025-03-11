@@ -35,7 +35,7 @@ export function ApplicationReviewPage() {
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
         navigateBack={navigateToApplicationCreatePage}
-        backButtonText="Back to Estimator"
+        backButtonText="Back to Application"
         centerText="Water Conservation Estimation Tool"
       />
 
@@ -489,7 +489,9 @@ function ApplicationReviewPageLayout() {
 
         <hr className="m-0" />
         <div className="d-flex justify-content-end p-3">
-          <Button variant="success">Submit</Button>
+          <Button variant="success" type="button" onClick={submitApplication}>
+            Submit
+          </Button>
         </div>
       </div>
     </div>
