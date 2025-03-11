@@ -116,6 +116,10 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
+        
+        #if DEBUG
+        services.AddHostedService<ServiceBusEmulatorListener>();
+        #endif
 
     })
     .Build();

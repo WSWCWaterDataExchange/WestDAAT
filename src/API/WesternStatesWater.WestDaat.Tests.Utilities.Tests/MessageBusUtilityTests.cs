@@ -18,6 +18,10 @@ public class MessageBusUtilityTests : UtilityTestBase
 
         try
         {
+            // Dispose the transaction so the message actually sends
+            // TODO remove
+            BaseTestCleanup();
+            
             // Act
             await messageBusUtility.SendMessageAsync(Queues.SmokeTest, messageObject);
         }
