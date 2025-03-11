@@ -13,6 +13,7 @@ services:
     container_name: "servicebus-emulator"
     image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
     volumes:
+      # If the config file changes you'll need to recreate the container
       - "./sb-emulator.config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
     ports:
       - "5672:5672"

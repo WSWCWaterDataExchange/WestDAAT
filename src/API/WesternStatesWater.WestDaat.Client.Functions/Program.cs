@@ -117,7 +117,6 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
-
     })
     .Build();
 
