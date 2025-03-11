@@ -225,6 +225,7 @@ describe('ConservationApplicationState reducer', () => {
         conservationPayment: 200,
         dataCollections: [
           {
+            waterConservationApplicationEstimateLocationId: 'location-guid',
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
             averageYearlyEtInAcreFeet: 50,
             averageYearlyEtInInches: 400,
@@ -417,6 +418,7 @@ describe('ConservationApplicationState reducer', () => {
           conservationPayment: 200,
           dataCollections: [
             {
+              waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
               averageYearlyEtInAcreFeet: 50,
               averageYearlyEtInInches: 400,
