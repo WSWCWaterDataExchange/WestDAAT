@@ -15,6 +15,7 @@ import { CombinedPolygonData } from '../data-contracts/CombinedPolygonData';
 import { truncate } from '@turf/truncate';
 import center from '@turf/center';
 import { convertWktToGeometry } from '../utilities/geometryWktConverter';
+import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -42,6 +43,7 @@ export interface ConservationApplicationState {
     combinedPolygonData: CombinedPolygonData[];
     polygonAcreageSum: number;
     polygonEtAcreFeetSum: number;
+    supportingDocuments: ApplicationDocument[];
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -79,6 +81,7 @@ export const defaultState = (): ConservationApplicationState => ({
     combinedPolygonData: [],
     polygonAcreageSum: 0,
     polygonEtAcreFeetSum: 0,
+    supportingDocuments: [],
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -93,7 +96,9 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction
-  | ApplicationSubmissionFormUpdatedAction;
+  | ApplicationSubmissionFormUpdatedAction
+  | ApplicationDocumentUploadedAction
+  | ApplicationDocumentRemovedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -168,6 +173,20 @@ export interface ApplicationSubmissionFormUpdatedAction {
   };
 }
 
+export interface ApplicationDocumentUploadedAction {
+  type: 'APPLICATION_DOCUMENT_UPLOADED';
+  payload: {
+    uploadedDocuments: ApplicationDocument[];
+  };
+}
+
+export interface ApplicationDocumentRemovedAction {
+  type: 'APPLICATION_DOCUMENT_REMOVED';
+  payload: {
+    removedBlobName: string;
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -200,6 +219,10 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
+    case 'APPLICATION_DOCUMENT_UPLOADED':
+      return onApplicationDocumentUploaded(draftState, action);
+    case 'APPLICATION_DOCUMENT_REMOVED':
+      return onApplicationDocumentRemoved(draftState, action);
   }
 };
 
@@ -348,6 +371,28 @@ const onApplicationFormUpdated = (
 
   computeCombinedPolygonData(draftState);
 
+  return draftState;
+};
+
+const onApplicationDocumentUploaded = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentUploadedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.supportingDocuments = [
+    ...draftState.conservationApplication.supportingDocuments,
+    ...payload.uploadedDocuments,
+  ];
+  return draftState;
+};
+
+const onApplicationDocumentRemoved = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentRemovedAction,
+): ConservationApplicationState => {
+  const filteredDocuments = draftState.conservationApplication.supportingDocuments.filter(
+    (doc) => doc.blobName !== payload.removedBlobName,
+  );
+  draftState.conservationApplication.supportingDocuments = filteredDocuments;
   return draftState;
 };
 

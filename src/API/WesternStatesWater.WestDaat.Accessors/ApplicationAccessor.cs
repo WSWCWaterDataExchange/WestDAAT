@@ -146,7 +146,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         return new ApplicationEstimateStoreResponse
         {
-            WaterConservationApplicationEstimateId = entity.Id,
             Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations)
         };
     }
