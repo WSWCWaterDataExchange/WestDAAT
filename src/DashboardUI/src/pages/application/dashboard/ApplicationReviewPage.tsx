@@ -365,7 +365,7 @@ interface SubmitApplicationConfirmationModalProps {
 
 function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmationModalProps) {
   return (
-    <Modal show={props.show} id="removeUserModal" centered>
+    <Modal show={props.show} centered>
       <Modal.Header closeButton onClick={() => props.cancelSubmission()}>
         <Modal.Title>Submit for Review?</Modal.Title>
       </Modal.Header>
