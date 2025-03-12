@@ -45,22 +45,14 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
   };
 
-  // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
-
   return (
     <div className="flex-grow-1 panel-content">
       <div className="container-fluid pt-3 px-3">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold et-blue-text">{formatNumber(acreageSum, 2)} Acres</span>
+            <span className="fs-5 fw-bold et-blue-text">
+              {formatNumber(state.conservationApplication.polygonAcreageSum, 2)} Acres
+            </span>
           </div>
 
           <div>
@@ -119,12 +111,14 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {etAcreFeet > 0 ? (
+            {state.conservationApplication.polygonEtAcreFeetSum > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
-                <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+                <span className="fs-5 fw-bold et-blue-text">
+                  {formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2)} Acre-Feet
+                </span>
               </>
             ) : (
               <span className="text-muted">

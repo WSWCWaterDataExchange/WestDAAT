@@ -1,8 +1,8 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
 import { defaultApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
-import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 import { reducer, defaultState, ConservationApplicationState } from './ConservationApplicationState';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
@@ -186,11 +186,11 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.selectedMapPolygons.length).toEqual(1);
-    expect(newState.conservationApplication.selectedMapPolygons[0].polygonWkt).toEqual(
+    expect(newState.conservationApplication.combinedPolygonData.length).toEqual(1);
+    expect(newState.conservationApplication.combinedPolygonData[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
-    expect(newState.conservationApplication.selectedMapPolygons[0].acreage).toEqual(1);
+    expect(newState.conservationApplication.combinedPolygonData[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
@@ -260,9 +260,9 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
-    expect(newState.conservationApplication.polygonEtData.length).toEqual(1);
-    expect(newState.conservationApplication.polygonEtData[0].datapoints.length).toEqual(1);
-    expect(newState.conservationApplication.polygonEtData[0].fieldName).toEqual('Field 1');
+    expect(newState.conservationApplication.combinedPolygonData.length).toEqual(1);
+    expect(newState.conservationApplication.combinedPolygonData[0].datapoints!.length).toEqual(1);
+    expect(newState.conservationApplication.combinedPolygonData[0].fieldName).toEqual('Field 1');
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
@@ -324,7 +324,7 @@ describe('ConservationApplicationState reducer', () => {
         },
       });
 
-      const polygon: EstimationFormMapPolygon = {
+      const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
         acreage: 1,
       };

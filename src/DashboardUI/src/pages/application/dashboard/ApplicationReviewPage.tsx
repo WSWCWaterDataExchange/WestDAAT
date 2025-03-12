@@ -134,7 +134,7 @@ function ApplicationReviewPageLayout() {
                 <div className="col-6">
                   <span className="text-muted">Location: </span>
                   <span>
-                    ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
+                    ({field.centerPoint!.coordinates[1]}, {field.centerPoint!.coordinates[0]})
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
