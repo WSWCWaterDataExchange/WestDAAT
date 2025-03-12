@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
+import { toast } from 'react-toastify';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -23,6 +24,10 @@ export function ApplicationReviewPage() {
 
   const navigateToApplicationCreatePage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
+  };
+
+  const navigateToWaterRightLandingPage = () => {
+    navigate(`/details/right/${state.conservationApplication.waterRightNativeId}`);
   };
 
   const presentConfirmationModal = () => {
@@ -38,11 +43,12 @@ export function ApplicationReviewPage() {
       });
     },
     onSuccess: () => {
-      console.log('success');
+      navigateToWaterRightLandingPage();
+      setTimeout(() => {
+        toast.success('Application submitted successfully.');
+      }, 1);
     },
-    onError: () => {
-      console.log('error');
-    },
+    onError: () => {},
   });
 
   const handleModalCancel = () => {
