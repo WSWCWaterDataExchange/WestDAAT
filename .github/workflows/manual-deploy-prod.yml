@@ -38,6 +38,7 @@ jobs:
       react-app-webapi-url: https://westdaatprod.azure-api.net/api/
       react-app-auth-client-id: 10beb81f-fdfd-43f3-91fd-bb463e331d41
       react-app-auth-authority: https://westdaat.b2clogin.com/westdaat.onmicrosoft.com/b2c_1_signupsignin
+      react-app-auth-authority-forgot-password: https://westdaat.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_passwordreset
       react-app-auth-known-authority: https://westdaat.b2clogin.com/westdaat.onmicrosoft.com
       react-app-ga-id: G-GENEQGNY1Q
       react-app-feature-conservation-estimation-tool: disabled
