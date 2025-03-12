@@ -120,6 +120,9 @@ function ApplicationCreatePageForm() {
   const conservationPlanFundingRequestCompensationRateUnitsRef = useRef<HTMLSelectElement>(null);
   const conservationPlanDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
+  // const supportingDocumentDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const supportingDocumentDescriptionsRefs = Array(10).fill(useRef<HTMLTextAreaElement>(null));
+  // const supportingDocumentDescriptions = Array<string>(10).fill('');
 
   const onFormChanged = () => {
     const conservationPlanFundingRequestDollarAmount = conservationPlanFundingRequestDollarAmountRef.current?.value
@@ -684,7 +687,22 @@ function ApplicationCreatePageForm() {
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
                     <tr key={`${file.fileName}-${index}`}>
                       <td className="align-content-center">{file.fileName}</td>
-                      <td className="align-content-center flex-grow-1">(text area)</td>
+                      <td className="align-content-center flex-grow-1">
+                        <Form.Group controlId={`supportingDocumentDescriptions-${index}`}>
+                          <Form.Control
+                            as="textarea"
+                            maxLength={4000}
+                            ref={supportingDocumentDescriptionsRefs[index]}
+                          ></Form.Control>
+                        </Form.Group>
+                        <Button
+                          onClick={() =>
+                            console.log(`${index + 1}: `, supportingDocumentDescriptionsRefs[index]?.current?.value)
+                          }
+                        >
+                          log
+                        </Button>
+                      </td>
                       <td className="align-content-center text-center">
                         <Button
                           variant="link"
@@ -697,6 +715,13 @@ function ApplicationCreatePageForm() {
                             aria-label="Remove supporting document button"
                           ></Icon>
                         </Button>
+                        {/* <Button
+                          onClick={() => {
+                            console.log(`${index + 1}: `, supportingDocumentDescriptionsRefs[index]?.current?.value);
+                          }}
+                        >
+                          Log
+                        </Button> */}
                       </td>
                     </tr>
                   ))}
