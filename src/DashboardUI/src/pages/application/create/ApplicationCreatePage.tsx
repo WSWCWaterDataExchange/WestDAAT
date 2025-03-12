@@ -1,4 +1,6 @@
 import { useMsal } from '@azure/msal-react';
+import { mdiTrashCanOutline } from '@mdi/js';
+import Icon from '@mdi/react';
 import center from '@turf/center';
 import truncate from '@turf/truncate';
 import { Point } from 'geojson';
@@ -248,6 +250,15 @@ function ApplicationCreatePageForm() {
 
   const clearUploadDocumentError = () => {
     setUploadDocumentErrorMessage(null);
+  };
+
+  const handleRemoveDocument = (blobName: string) => {
+    dispatch({
+      type: 'APPLICATION_DOCUMENT_REMOVED',
+      payload: {
+        removedBlobName: blobName,
+      },
+    });
   };
 
   // assumes all polygons are not intersecting
@@ -672,9 +683,21 @@ function ApplicationCreatePageForm() {
                 <tbody>
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
                     <tr key={`${file.fileName}-${index}`}>
-                      <td>{file.fileName}</td>
-                      <td>(text area)</td>
-                      <td>(remove button)</td>
+                      <td className="align-content-center">{file.fileName}</td>
+                      <td className="align-content-center flex-grow-1">(text area)</td>
+                      <td className="align-content-center text-center">
+                        <Button
+                          variant="link"
+                          className="px-1 py-1 text-danger"
+                          onClick={() => handleRemoveDocument(file.blobName)}
+                        >
+                          <Icon
+                            path={mdiTrashCanOutline}
+                            size="1.5em"
+                            aria-label="Remove supporting document button"
+                          ></Icon>
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
