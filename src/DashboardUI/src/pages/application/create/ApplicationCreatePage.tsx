@@ -458,7 +458,14 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
-            <Form.Control type="date" required ref={priorityDateRef} value={stateForm.priorityDate} />
+            <Form.Control
+              type="date"
+              required
+              ref={priorityDateRef}
+              value={stateForm.priorityDate}
+              // not sure on the actual min date, but this prevents users from entering the default value "0001-01-01"
+              min="1900-01-01"
+            />
             <Form.Control.Feedback type="invalid">Priority Date is required.</Form.Control.Feedback>
           </Form.Group>
 
