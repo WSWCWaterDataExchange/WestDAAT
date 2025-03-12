@@ -10,7 +10,7 @@ type FullPolygonData = {
   averageYearlyEtInInches: number;
   averageYearlyEtInAcreFeet: number;
   datapoints: PolygonEtDatapoint[];
-  additionalDetailsTrackedFormValue: string;
+  additionalDetails: string;
 };
 
 export type PartialPolygonData = Partial<FullPolygonData>;

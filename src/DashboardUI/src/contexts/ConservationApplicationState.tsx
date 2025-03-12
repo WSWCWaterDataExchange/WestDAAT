@@ -489,7 +489,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
 
     draftState.conservationApplication.estimateLocations[i] = {
       // incorporate computed/derived data
-      additionalDetailsTrackedFormValue,
+      additionalDetails: additionalDetailsTrackedFormValue,
       centerPoint,
       // carry over existing data
       waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,

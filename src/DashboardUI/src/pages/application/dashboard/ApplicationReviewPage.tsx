@@ -138,7 +138,7 @@ function ApplicationReviewPageLayout() {
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
-                  <FormElement label="Additional Details" displayValue={field.additionalDetailsTrackedFormValue} />
+                  <FormElement label="Additional Details" displayValue={field.additionalDetails} />
                 </div>
               </div>
             ))}
