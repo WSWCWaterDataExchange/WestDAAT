@@ -54,7 +54,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [isMapLoaded, siteLocationsQuery.data, siteLocationsQuery.isLoading]);
 
   useEffect(() => {
-    const polygonData = state.conservationApplication.combinedPolygonData;
+    const polygonData = state.conservationApplication.estimateLocations;
     const hasPerformedEstimation = polygonData.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return;
@@ -80,14 +80,14 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       maxZoom: 16,
     });
   }, [
-    state.conservationApplication.combinedPolygonData,
+    state.conservationApplication.estimateLocations,
     convertWktToGeometry,
     getLatsLongsFromFeatureCollection,
     setMapBoundSettings,
   ]);
 
   const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
-    const polygonData = state.conservationApplication.combinedPolygonData;
+    const polygonData = state.conservationApplication.estimateLocations;
     const hasPerformedEstimation = polygonData.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return [];
@@ -103,7 +103,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       return labelLocation;
     });
     return labelFeatures;
-  }, [state.conservationApplication.combinedPolygonData]);
+  }, [state.conservationApplication.estimateLocations]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > 20) {

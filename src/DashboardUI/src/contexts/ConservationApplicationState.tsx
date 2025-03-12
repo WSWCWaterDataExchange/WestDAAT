@@ -34,7 +34,7 @@ export interface ConservationApplicationState {
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionForm;
-    combinedPolygonData: PartialPolygonData[];
+    estimateLocations: PartialPolygonData[];
     doPolygonsOverlap: boolean;
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
@@ -71,7 +71,7 @@ export const defaultState = (): ConservationApplicationState => ({
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionForm(),
-    combinedPolygonData: [],
+    estimateLocations: [],
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
@@ -310,7 +310,7 @@ const onMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: MapPolygonsUpdatedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.combinedPolygonData = payload.polygons;
+  draftState.conservationApplication.estimateLocations = payload.polygons;
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
   resetConsumptiveUseEstimation(draftState);
@@ -346,8 +346,8 @@ const onConsumptiveUseEstimated = (
   application.conservationPayment = payload.conservationPayment;
 
   // combine polygon data
-  for (let i = 0; i < application.combinedPolygonData.length; i++) {
-    const polygon = application.combinedPolygonData[i];
+  for (let i = 0; i < application.estimateLocations.length; i++) {
+    const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
     polygon.fieldName = `Field ${i + 1}`;
@@ -409,10 +409,10 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.openEtModelName &&
     !!app.dateRangeStart &&
     !!app.dateRangeEnd &&
-    !!app.combinedPolygonData &&
-    app.combinedPolygonData.length > 0 &&
-    app.combinedPolygonData.length <= 20 &&
-    app.combinedPolygonData.every((p) => p.acreage! <= 50000) &&
+    !!app.estimateLocations &&
+    app.estimateLocations.length > 0 &&
+    app.estimateLocations.length <= 20 &&
+    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
     !app.doPolygonsOverlap;
 };
 
@@ -430,9 +430,9 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.desiredCompensationUnits &&
     !!app.totalAverageYearlyEtAcreFeet &&
     !!app.conservationPayment &&
-    !!app.combinedPolygonData &&
-    app.combinedPolygonData.length > 0 &&
-    app.combinedPolygonData.every((p) => p.acreage! <= 50000) &&
+    !!app.estimateLocations &&
+    app.estimateLocations.length > 0 &&
+    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
     !app.doPolygonsOverlap;
 };
 
@@ -446,7 +446,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
   // for the first case, all polygon data will be overwritten. nothing needs to happen here.
   // for the second case, any data on the map will remain the same, but the consumptive use data needs to be reset
-  const combinedPolygonDataCopy = [...draftState.conservationApplication.combinedPolygonData];
+  const combinedPolygonDataCopy = [...draftState.conservationApplication.estimateLocations];
   for (let i = 0; i < combinedPolygonDataCopy.length; i++) {
     const polygon = combinedPolygonDataCopy[i];
 
@@ -457,7 +457,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
     combinedPolygonDataCopy[i] = polygonPostMapSelection;
   }
-  draftState.conservationApplication.combinedPolygonData = combinedPolygonDataCopy;
+  draftState.conservationApplication.estimateLocations = combinedPolygonDataCopy;
 
   draftState.canContinueToApplication = false;
 };
@@ -469,9 +469,9 @@ const resetApplicationFormLocationDetails = (draftState: ConservationApplication
 const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
   let polygonAcreageSum = 0;
   let polygonEtAcreFeetSum = 0;
-  for (let i = 0; i < draftState.conservationApplication.combinedPolygonData.length; i++) {
+  for (let i = 0; i < draftState.conservationApplication.estimateLocations.length; i++) {
     // compute data on the polygon object
-    const polygon = draftState.conservationApplication.combinedPolygonData[i];
+    const polygon = draftState.conservationApplication.estimateLocations[i];
 
     // polygonWkt is guaranteed to exist because we get it from the map, not from the ET data
     const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt!))).geometry;
@@ -487,7 +487,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
         )?.additionalDetails ?? '';
     }
 
-    draftState.conservationApplication.combinedPolygonData[i] = {
+    draftState.conservationApplication.estimateLocations[i] = {
       // incorporate computed/derived data
       additionalDetailsTrackedFormValue,
       centerPoint,

@@ -187,11 +187,11 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.combinedPolygonData.length).toEqual(1);
-    expect(newState.conservationApplication.combinedPolygonData[0].polygonWkt).toEqual(
+    expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
-    expect(newState.conservationApplication.combinedPolygonData[0].acreage).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
@@ -261,9 +261,9 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
-    expect(newState.conservationApplication.combinedPolygonData.length).toEqual(1);
-    expect(newState.conservationApplication.combinedPolygonData[0].datapoints!.length).toEqual(1);
-    expect(newState.conservationApplication.combinedPolygonData[0].fieldName).toEqual('Field 1');
+    expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].fieldName).toEqual('Field 1');
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);

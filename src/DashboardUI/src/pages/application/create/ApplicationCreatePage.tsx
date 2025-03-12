@@ -54,7 +54,7 @@ function ApplicationCreatePageForm() {
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
-  const polygonData = state.conservationApplication.combinedPolygonData;
+  const polygonData = state.conservationApplication.estimateLocations;
 
   const [formValidated, setFormValidated] = useState(false);
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);

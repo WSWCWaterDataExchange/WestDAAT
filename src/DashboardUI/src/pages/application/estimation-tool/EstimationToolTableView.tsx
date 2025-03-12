@@ -11,7 +11,7 @@ import './estimation-tool-table-view.scss';
 
 function EstimationToolTableView() {
   const { state } = useConservationApplicationContext();
-  const polygons = state.conservationApplication.combinedPolygonData;
+  const polygons = state.conservationApplication.estimateLocations;
 
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>();

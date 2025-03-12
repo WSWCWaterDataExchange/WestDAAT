@@ -40,7 +40,7 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 function ApplicationReviewPageLayout() {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
-  const polygonData = state.conservationApplication.combinedPolygonData;
+  const polygonData = state.conservationApplication.estimateLocations;
 
   const submitApplication = () => {
     alert('not implemented.');
