@@ -1,7 +1,7 @@
 import { Point } from 'geojson';
 import { PolygonEtDatapoint } from './PolygonEtDatapoint';
 
-export interface CombinedPolygonData {
+type FullPolygonData = {
   waterConservationApplicationEstimateLocationId: string;
   polygonWkt: string;
   centerPoint: Point;
@@ -11,4 +11,8 @@ export interface CombinedPolygonData {
   averageYearlyEtInAcreFeet: number;
   datapoints: PolygonEtDatapoint[];
   additionalDetailsTrackedFormValue: string;
-}
+};
+
+export type PartialPolygonData = Partial<FullPolygonData>;
+
+export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'acreage'>;

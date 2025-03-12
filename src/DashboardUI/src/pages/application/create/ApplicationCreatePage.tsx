@@ -117,7 +117,7 @@ function ApplicationCreatePageForm() {
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
       fieldDetails: polygonData.map((field, index) => ({
-        waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId,
+        waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
@@ -366,7 +366,7 @@ function ApplicationCreatePageForm() {
                 <div className="col-6">
                   <span className="fw-bold">Location: </span>
                   <span>
-                    ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
+                    ({field.centerPoint!.coordinates[1]}, {field.centerPoint!.coordinates[0]})
                   </span>
                 </div>
                 <Form.Group className={`col-12 mb-4`} controlId={`propertyAdditionalDetails-${index}`}>

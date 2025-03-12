@@ -1,6 +1,5 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import Map from '../../../components/map/Map';
-import { EstimationFormMapPolygon } from '../../../data-contracts/EstimationFormMapPolygon';
 import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { area as areaInSquareMeters } from '@turf/area';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -15,6 +14,7 @@ import { useEffect, useMemo } from 'react';
 import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 import { useWaterRightSiteLocations } from '../../../hooks/queries';
 import { mapLayerNames, mapSourceNames } from '../../../config/maps';
+import { MapSelectionPolygonData } from '../../../data-contracts/CombinedPolygonData';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
@@ -54,13 +54,14 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [isMapLoaded, siteLocationsQuery.data, siteLocationsQuery.isLoading]);
 
   useEffect(() => {
-    const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+    const polygonData = state.conservationApplication.combinedPolygonData;
+    const hasPerformedEstimation = polygonData.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return;
     }
 
-    const userDrawnPolygonGeometries = state.conservationApplication.polygonEtData.map(
-      (dataCollection) => convertWktToGeometry(dataCollection.polygonWkt) as Polygon,
+    const userDrawnPolygonGeometries = polygonData.map(
+      (polygon) => convertWktToGeometry(polygon.polygonWkt!) as Polygon,
     );
     const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
       type: 'FeatureCollection',
@@ -79,31 +80,30 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       maxZoom: 16,
     });
   }, [
-    state.conservationApplication.polygonEtData,
+    state.conservationApplication.combinedPolygonData,
     convertWktToGeometry,
     getLatsLongsFromFeatureCollection,
     setMapBoundSettings,
   ]);
 
   const polygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
-    const hasPerformedEstimation = state.conservationApplication.polygonEtData.length > 0;
+    const polygonData = state.conservationApplication.combinedPolygonData;
+    const hasPerformedEstimation = polygonData.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return [];
     }
 
-    const labelFeatures: Feature<Point, GeoJsonProperties>[] = state.conservationApplication.polygonEtData.map(
-      (dataCollection) => {
-        const polygonFeature = convertWktToGeometry(dataCollection.polygonWkt);
-        const labelLocation = centerOfMass(polygonFeature);
-        labelLocation.properties = {
-          ...labelLocation.properties,
-          title: dataCollection.fieldName,
-        };
-        return labelLocation;
-      },
-    );
+    const labelFeatures: Feature<Point, GeoJsonProperties>[] = polygonData.map((polygon) => {
+      const polygonFeature = convertWktToGeometry(polygon.polygonWkt!);
+      const labelLocation = centerOfMass(polygonFeature);
+      labelLocation.properties = {
+        ...labelLocation.properties,
+        title: polygon.fieldName,
+      };
+      return labelLocation;
+    });
     return labelFeatures;
-  }, [state.conservationApplication.polygonEtData]);
+  }, [state.conservationApplication.combinedPolygonData]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
     if (polygons.length > 20) {
@@ -117,7 +117,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: EstimationFormMapPolygon[] = polygons.map((polygonFeature) => ({
+    const polygonData: MapSelectionPolygonData[] = polygons.map((polygonFeature) => ({
       polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
       acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
     }));
