@@ -44,6 +44,8 @@ export function ApplicationReviewPage() {
     },
     onSuccess: () => {
       navigateToWaterRightLandingPage();
+
+      // the notification doesn't appear unless it's delayed until after navigation
       setTimeout(() => {
         toast.success('Application submitted successfully.');
       }, 1);
