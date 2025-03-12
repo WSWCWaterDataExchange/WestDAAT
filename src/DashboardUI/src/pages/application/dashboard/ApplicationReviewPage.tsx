@@ -50,7 +50,9 @@ export function ApplicationReviewPage() {
         toast.success('Application submitted successfully.');
       }, 1);
     },
-    onError: () => {},
+    onError: (error) => {
+      toast.error('Failed to submit application. Please try again.');
+    },
   });
 
   const handleModalCancel = () => {
