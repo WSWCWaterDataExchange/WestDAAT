@@ -1,14 +1,17 @@
-import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
+import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
+import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
+import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
-import westDaatApi from './westDaatApi';
+import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
+import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
+import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
-import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
-import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
-import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
-import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { RasterTimeSeriesModel } from '../data-contracts/RasterTimeSeriesModel';
+import { ContainerName, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
+import { generateSasTokens } from './fileAccessor';
+import westDaatApi from './westDaatApi';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -69,4 +72,28 @@ export const estimateConsumptiveUse = async (
   const { data } = await api.post<EstimateConsumptiveUseResponse>('Applications/EstimateConsumptiveUse', request);
 
   return data;
+};
+
+export const uploadApplicationDocuments = async (
+  context: IMsalContext,
+  files: File[],
+): Promise<ApplicationDocument[]> => {
+  const sasTokens = (await generateSasTokens(context, files.length)).sasTokens;
+  const applicationDocuments: ApplicationDocument[] = [];
+  const blobUploads: BlobUpload[] = [];
+  files.forEach((file, index) => {
+    applicationDocuments.push({
+      fileName: file.name,
+      blobName: sasTokens[index].blobname,
+    });
+    blobUploads.push({
+      data: file,
+      contentLength: file.size,
+      blobname: sasTokens[index].blobname,
+      hostname: sasTokens[index].hostname,
+      sasToken: sasTokens[index].sasToken,
+    });
+  });
+  await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
+  return applicationDocuments;
 };

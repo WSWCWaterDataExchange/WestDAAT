@@ -56,6 +56,7 @@ var host = new HostBuilder()
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
+        services.AddTransient<IFileManager, AdminManager>();
         services.AddTransient<IOrganizationManager, AdminManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
@@ -116,7 +117,6 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
-
     })
     .Build();
 
