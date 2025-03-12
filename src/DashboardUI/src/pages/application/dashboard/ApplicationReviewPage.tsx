@@ -11,11 +11,15 @@ import { NotImplementedPlaceholder } from '../../../components/NotImplementedAle
 import ApplicationFormSection from '../components/ApplicationFormSection';
 import Modal from 'react-bootstrap/esm/Modal';
 import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { useMsal } from '@azure/msal-react';
+import { submitApplication } from '../../../accessors/applicationAccessor';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
   const [showSubmissionConfirmationModal, setShowSubmissionConfirmationModal] = useState(false);
   const navigate = useNavigate();
+  const context = useMsal();
 
   const navigateToApplicationCreatePage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
@@ -23,6 +27,30 @@ export function ApplicationReviewPage() {
 
   const presentConfirmationModal = () => {
     setShowSubmissionConfirmationModal(true);
+  };
+
+  const submitApplicationMutation = useMutation({
+    mutationFn: async () => {
+      return await submitApplication(context, {
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
+        waterRightNativeId: state.conservationApplication.waterRightNativeId!,
+        form: state.conservationApplication.applicationSubmissionForm,
+      });
+    },
+    onSuccess: () => {
+      console.log('success');
+    },
+    onError: () => {
+      console.log('error');
+    },
+  });
+
+  const handleModalCancel = () => {
+    setShowSubmissionConfirmationModal(false);
+  };
+
+  const handleModalConfirm = async () => {
+    await submitApplicationMutation.mutateAsync();
   };
 
   return (
@@ -39,8 +67,8 @@ export function ApplicationReviewPage() {
 
       <SubmitApplicationConfirmationModal
         show={showSubmissionConfirmationModal}
-        cancelSubmission={() => {}}
-        confirmSubmission={() => {}}
+        cancelSubmission={handleModalCancel}
+        confirmSubmission={handleModalConfirm}
       />
     </div>
   );
