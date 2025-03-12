@@ -1,25 +1,30 @@
-import { useNavigate } from 'react-router-dom';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import Form from 'react-bootstrap/esm/Form';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { useMsal } from '@azure/msal-react';
+import center from '@turf/center';
+import truncate from '@turf/truncate';
+import { Point } from 'geojson';
+import { createRef, useMemo, useRef, useState } from 'react';
+import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
+import Form from 'react-bootstrap/esm/Form';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { useMutation } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
+import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { formatNumber } from '../../../utilities/valueFormatters';
-import { createRef, useMemo, useRef, useState } from 'react';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
-import InputGroup from 'react-bootstrap/esm/InputGroup';
-import { Point } from 'geojson';
-import center from '@turf/center';
 import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import truncate from '@turf/truncate';
+import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from '../components/ApplicationFormSection';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 interface FieldData {
   fieldName: string;
@@ -56,11 +61,13 @@ const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
+  const msalContext = useMsal();
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
 
   const [formValidated, setFormValidated] = useState(false);
+  const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
 
   const navigateToReviewApplicationPage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
@@ -179,6 +186,68 @@ function ApplicationCreatePageForm() {
     if (isFormValid) {
       navigateToReviewApplicationPage();
     }
+  };
+
+  const uploadDocumentMutation = useMutation({
+    mutationFn: async (params: { files: File[] }) => {
+      clearUploadDocumentError();
+      return await uploadApplicationDocuments(msalContext, params.files);
+    },
+    onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
+      dispatch({
+        type: 'APPLICATION_DOCUMENT_UPLOADED',
+        payload: {
+          uploadedDocuments,
+        },
+      });
+    },
+    onError: () => {
+      setUploadDocumentError('An error occurred while uploading the document(s). Please try again.');
+    },
+  });
+
+  const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
+  const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
+
+  const isOverMaxDocumentLimit = (files: File[]): boolean => {
+    return state.conservationApplication.supportingDocuments.length + files.length > MAX_NUMBER_UPLOADED_DOCUMENTS;
+  };
+
+  const isOverMaxSizeLimit = (files: File[]): boolean => {
+    return files.some((file) => file.size > UPLOADED_DOCUMENT_MAX_SIZE_MB * 1024 * 1024);
+  };
+
+  const handleUploadDocument = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.onchange = async (e) => {
+      const fileList = (e.target as HTMLInputElement).files;
+      if (fileList && fileList.length > 0) {
+        const files = Array.from(fileList);
+
+        if (isOverMaxDocumentLimit(files)) {
+          setUploadDocumentError('You can upload a total of 10 documents.');
+          return;
+        }
+
+        if (isOverMaxSizeLimit(files)) {
+          setUploadDocumentError('Each file must be smaller than 25MB.');
+          return;
+        }
+
+        uploadDocumentMutation.mutate({ files });
+      }
+    };
+    fileInput.click();
+  };
+
+  const setUploadDocumentError = (message: string) => {
+    setUploadDocumentErrorMessage(message);
+  };
+
+  const clearUploadDocumentError = () => {
+    setUploadDocumentErrorMessage(null);
   };
 
   // assumes all polygons are not intersecting
@@ -592,11 +661,26 @@ function ApplicationCreatePageForm() {
         </ApplicationFormSection>
 
         <ApplicationFormSection title="Supporting Documents (Optional)">
+          {uploadDocumentErrorMessage !== null && (
+            <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
+              {uploadDocumentErrorMessage}
+            </Alert>
+          )}
           <div className="col mb-4">
-            <Button
-              variant="outline-primary"
-              onClick={() => alert('This feature will be implemented in a future release.')}
-            >
+            {state.conservationApplication.supportingDocuments.length > 0 && (
+              <table className="table">
+                <tbody>
+                  {state.conservationApplication.supportingDocuments.map((file, index) => (
+                    <tr key={`${file.fileName}-${index}`}>
+                      <td>{file.fileName}</td>
+                      <td>(text area)</td>
+                      <td>(remove button)</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <Button variant="outline-primary" onClick={handleUploadDocument}>
               Upload
             </Button>
           </div>
