@@ -1,7 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiTrashCanOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import { createRef, useRef, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
@@ -93,9 +93,7 @@ function ApplicationCreatePageForm() {
   const conservationPlanFundingRequestCompensationRateUnitsRef = useRef<HTMLSelectElement>(null);
   const conservationPlanDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
-  // const supportingDocumentDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const supportingDocumentDescriptionsRefs = Array(10).fill(useRef<HTMLTextAreaElement>(null));
-  // const supportingDocumentDescriptions = Array<string>(10).fill('');
+  const supportingDocumentsDescriptionRefs = useRef<HTMLTextAreaElement[]>([]);
 
   const onFormChanged = () => {
     const conservationPlanFundingRequestDollarAmount = conservationPlanFundingRequestDollarAmountRef.current?.value
@@ -149,6 +147,10 @@ function ApplicationCreatePageForm() {
         formValues,
       },
     });
+
+    // const supportingDocumentDescriptionValues = supportingDocumentsDescriptionRefs.map((ref) => {
+    //   ref.current?.value;
+    // });
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -237,6 +239,14 @@ function ApplicationCreatePageForm() {
     });
   };
 
+  const onSupportingDocumentFormChanged = () => {
+    // supportingDocumentsDescriptionRefs.forEach((ref) => {
+    //   console.log(ref.current?.value);
+    // });
+  };
+
+  // TODO: JN - validation for form for upload docs
+
   return (
     <div className="container">
       <div className="mb-3">
@@ -260,7 +270,7 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
+      <Form onChange={onFormChanged} validated={formValidated} noValidate>
         <ApplicationFormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
             <Form.Label>Landowner Name</Form.Label>
@@ -643,35 +653,31 @@ function ApplicationCreatePageForm() {
             />
           </Form.Group>
         </ApplicationFormSection>
+      </Form>
 
-        <ApplicationFormSection title="Supporting Documents (Optional)">
-          {uploadDocumentErrorMessage !== null && (
-            <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
-              {uploadDocumentErrorMessage}
-            </Alert>
-          )}
-          <div className="col mb-4">
-            {state.conservationApplication.supportingDocuments.length > 0 && (
+      <ApplicationFormSection title="Supporting Documents (Optional)">
+        {uploadDocumentErrorMessage !== null && (
+          <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
+            {uploadDocumentErrorMessage}
+          </Alert>
+        )}
+        <div className="col mb-4">
+          {state.conservationApplication.supportingDocuments.length > 0 && (
+            <Form onChange={onSupportingDocumentFormChanged}>
               <table className="table">
                 <tbody>
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
                     <tr key={`${file.fileName}-${index}`}>
                       <td className="align-content-center">{file.fileName}</td>
                       <td className="align-content-center flex-grow-1">
-                        <Form.Group controlId={`supportingDocumentDescriptions-${index}`}>
+                        <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
                           <Form.Control
                             as="textarea"
                             maxLength={4000}
-                            ref={supportingDocumentDescriptionsRefs[index]}
+                            // ref={supportingDocumentsDescriptionRefs[index]}
+                            value={file.description}
                           ></Form.Control>
                         </Form.Group>
-                        <Button
-                          onClick={() =>
-                            console.log(`${index + 1}: `, supportingDocumentDescriptionsRefs[index]?.current?.value)
-                          }
-                        >
-                          log
-                        </Button>
                       </td>
                       <td className="align-content-center text-center">
                         <Button
@@ -685,32 +691,26 @@ function ApplicationCreatePageForm() {
                             aria-label="Remove supporting document button"
                           ></Icon>
                         </Button>
-                        {/* <Button
-                          onClick={() => {
-                            console.log(`${index + 1}: `, supportingDocumentDescriptionsRefs[index]?.current?.value);
-                          }}
-                        >
-                          Log
-                        </Button> */}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            )}
-            <Button variant="outline-primary" onClick={handleUploadDocument}>
-              Upload
-            </Button>
-          </div>
-        </ApplicationFormSection>
-
-        <hr className="m-0" />
-        <div className="d-flex justify-content-end p-3">
-          <Button variant="success" type="submit">
-            Review & Submit
+            </Form>
+          )}
+          <Button variant="outline-primary" onClick={handleUploadDocument}>
+            Upload
           </Button>
         </div>
-      </Form>
+      </ApplicationFormSection>
+
+      <hr className="m-0" />
+      <div className="d-flex justify-content-end p-3">
+        <Button variant="success" type="submit">
+          {/* TODO: JN - onClick={handleSubmit} */}
+          Review & Submit
+        </Button>
+      </div>
     </div>
   );
 }
