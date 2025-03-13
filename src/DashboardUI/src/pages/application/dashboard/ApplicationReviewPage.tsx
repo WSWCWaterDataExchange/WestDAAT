@@ -372,11 +372,11 @@ function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmation
         <Modal.Title>Submit for Review?</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div>
+        <div className="mb-2">
           Are you sure you want to submit this application? Once submitted, the application cannot be edited or resent.
         </div>
 
-        <div>The following organizations will be able to see your application:</div>
+        <div className="mb-2">The following organizations will be able to see your application:</div>
 
         <div>
           <ol>
@@ -387,11 +387,7 @@ function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmation
           </ol>
         </div>
 
-        <div>
-          <span className="text-muted">
-            By submitting this application, I hereby declare that the information provided is true and correct
-          </span>
-        </div>
+        <div>By submitting this application, I hereby declare that the information provided is true and correct</div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={() => props.cancelSubmission()}>
