@@ -240,9 +240,9 @@ function ApplicationCreatePageForm() {
   };
 
   const onSupportingDocumentFormChanged = () => {
-    // supportingDocumentsDescriptionRefs.forEach((ref) => {
-    //   console.log(ref.current?.value);
-    // });
+    supportingDocumentsDescriptionRefs.current?.forEach((ref) => {
+      console.log(ref.value);
+    });
   };
 
   // TODO: JN - validation for form for upload docs
@@ -674,10 +674,18 @@ function ApplicationCreatePageForm() {
                           <Form.Control
                             as="textarea"
                             maxLength={4000}
+                            ref={(node: any) => {
+                              if (node) {
+                                supportingDocumentsDescriptionRefs.current[index] = node;
+                              }
+                            }}
                             // ref={supportingDocumentsDescriptionRefs[index]}
                             value={file.description}
                           ></Form.Control>
                         </Form.Group>
+                        <Button onClick={() => console.log(supportingDocumentsDescriptionRefs.current[index]?.value)}>
+                          log
+                        </Button>
                       </td>
                       <td className="align-content-center text-center">
                         <Button
