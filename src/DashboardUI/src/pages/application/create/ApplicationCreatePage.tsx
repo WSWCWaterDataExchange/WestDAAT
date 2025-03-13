@@ -222,7 +222,7 @@ function ApplicationCreatePageForm() {
     setUploadDocumentErrorMessage(null);
   };
 
-  const handleRemoveDocument = (blobName: string) => {
+  const handleRemoveDocument = (blobName: string, index: number) => {
     dispatch({
       type: 'APPLICATION_DOCUMENT_REMOVED',
       payload: {
@@ -659,6 +659,7 @@ function ApplicationCreatePageForm() {
         )}
         <div className="col mb-4">
           {state.conservationApplication.supportingDocuments.length > 0 && (
+<<<<<<< HEAD
             <table className="table">
               <tbody>
                 {state.conservationApplication.supportingDocuments.map((file, index) => (
@@ -691,6 +692,50 @@ function ApplicationCreatePageForm() {
                 ))}
               </tbody>
             </table>
+=======
+            <Form onChange={onSupportingDocumentFormChanged}>
+              <table className="table">
+                <tbody>
+                  {state.conservationApplication.supportingDocuments.map((file, index) => (
+                    <tr key={`${file.fileName}-${index}`}>
+                      <td className="align-content-center">{file.fileName}</td>
+                      <td className="align-content-center flex-grow-1">
+                        <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
+                          <Form.Control
+                            as="textarea"
+                            maxLength={4000}
+                            ref={(node: any) => {
+                              if (node) {
+                                supportingDocumentsDescriptionRefs.current[index] = node;
+                              }
+                            }}
+                            // ref={supportingDocumentsDescriptionRefs[index]}
+                            value={file.description}
+                          ></Form.Control>
+                        </Form.Group>
+                        <Button onClick={() => console.log(supportingDocumentsDescriptionRefs.current[index]?.value)}>
+                          log
+                        </Button>
+                      </td>
+                      <td className="align-content-center text-center">
+                        <Button
+                          variant="link"
+                          className="px-1 py-1 text-danger"
+                          onClick={() => handleRemoveDocument(file.blobName, index)}
+                        >
+                          <Icon
+                            path={mdiTrashCanOutline}
+                            size="1.5em"
+                            aria-label="Remove supporting document button"
+                          ></Icon>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Form>
+>>>>>>> e449c01090dac66585604489c5cb14f3b9c19ec1
           )}
           <Button variant="outline-primary" onClick={handleUploadDocument}>
             Upload
