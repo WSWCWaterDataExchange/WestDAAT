@@ -106,6 +106,60 @@ public class ApplicationAccessorTests : AccessorTestBase
     }
 
     [DataTestMethod]
+    [DataRow(false, false, false, DisplayName = "Application does not exist")]
+    [DataRow(true, false, false, DisplayName = "Application exists but has no submission")]
+    [DataRow(true, true, true, DisplayName = "Application exists and has submission")]
+    public async Task Load_CheckSubmittedApplicationExists_Success(
+        bool applicationExists,
+        bool applicationHasSubmission,
+        bool expectedExists)
+    {
+        // Arrange
+        WaterConservationApplication application = null;
+
+        if (applicationExists)
+        {
+            var user = new UserFaker().Generate();
+            var org = new OrganizationFaker().Generate();
+            var applicationFaker = new WaterConservationApplicationFaker(user, org);
+
+            if (applicationHasSubmission)
+            {
+                applicationFaker.RuleFor(app => app.Submission, () => new WaterConservationApplicationSubmissionFaker().Generate());
+            }
+
+            application = applicationFaker.Generate();
+
+            await _westDaatDb.WaterConservationApplications.AddAsync(application);
+            await _westDaatDb.SaveChangesAsync();
+        }
+
+
+        // Act
+        var request = new SubmittedApplicationExistsLoadRequest
+        {
+            ApplicationId = application?.Id ?? Guid.NewGuid()
+        };
+        var response = (SubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        response.ApplicationExists.Should().Be(expectedExists);
+
+        if (expectedExists)
+        {
+            response.ApplicantUserId.Should().Be(application.ApplicantUserId);
+            response.FundingOrganizationId.Should().Be(application.FundingOrganizationId);
+        }
+        else
+        {
+            response.ApplicantUserId.Should().BeNull();
+            response.FundingOrganizationId.Should().BeNull();
+        }
+    }
+
+    [DataTestMethod]
     [DataRow(null, 0, DisplayName = "Zero Applications exist -> return index 0")]
     // Application should not exist with id "<year>-<agencyId>-0000"
     [DataRow("0001", 1, DisplayName = "One Application exists -> return index 1")]
