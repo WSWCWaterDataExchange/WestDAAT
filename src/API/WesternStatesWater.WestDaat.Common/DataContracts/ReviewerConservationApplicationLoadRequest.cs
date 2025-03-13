@@ -1,6 +1,5 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class ReviewerConservationApplicationLoadRequest : ApplicationLoadRequestBase
+public class ReviewerConservationApplicationLoadRequest : ApplicationLoadSingleRequestBase
 {
-    public Guid ApplicationId { get; set; }
 }
