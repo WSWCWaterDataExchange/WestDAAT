@@ -222,8 +222,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicantConservationApplicationLoadRequest>();
             CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ReviewerConservationApplicationLoadRequest>();
 
-            CreateMap<CommonContracts.ApplicantConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>();
-            CreateMap<CommonContracts.ReviewerConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>();
+            CreateMap<CommonContracts.ApplicantConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+            CreateMap<CommonContracts.ReviewerConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
