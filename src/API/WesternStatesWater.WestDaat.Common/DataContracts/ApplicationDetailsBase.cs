@@ -19,5 +19,5 @@ public class ApplicationDetailsBase
 
     public SubmissionDetails Submission { get; set; } = null!;
 
-    public SupportingDocumentDetails[] Documents { get; set; } = null!;
+    public SupportingDocumentDetails[] SupportingDocuments { get; set; } = null!;
 }
