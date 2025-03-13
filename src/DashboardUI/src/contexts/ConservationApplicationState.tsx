@@ -3,12 +3,18 @@ import {
   ApplicationDashboardListItem,
   ApplicationDashboardStatistics,
 } from '../data-contracts/ApplicationDashboardListItem';
-import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
-import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
-import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
-import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollection';
+import {
+  ApplicationSubmissionForm,
+  defaultApplicationSubmissionForm,
+} from '../data-contracts/ApplicationSubmissionForm';
+import { truncate } from '@turf/truncate';
+import center from '@turf/center';
+import { convertWktToGeometry } from '../utilities/geometryWktConverter';
+import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
+import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -27,11 +33,13 @@ export interface ConservationApplicationState {
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
-    selectedMapPolygons: EstimationFormMapPolygon[];
-    doPolygonsOverlap: boolean;
-    polygonEtData: (PolygonEtDataCollection & { fieldName: string })[];
     applicationSubmissionForm: ApplicationSubmissionForm;
+    estimateLocations: PartialPolygonData[];
+    doPolygonsOverlap: boolean;
+    // derived/computed state
     isApplicationSubmissionFormValid: boolean;
+    polygonAcreageSum: number;
+    polygonEtAcreFeetSum: number;
     supportingDocuments: ApplicationDocument[];
   };
   canEstimateConsumptiveUse: boolean;
@@ -62,40 +70,12 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationUnits: undefined,
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
-    selectedMapPolygons: [],
+    applicationSubmissionForm: defaultApplicationSubmissionForm(),
+    estimateLocations: [],
     doPolygonsOverlap: false,
-    polygonEtData: [],
-    applicationSubmissionForm: {
-      landownerName: undefined,
-      landownerEmail: undefined,
-      landownerPhoneNumber: undefined,
-      landownerAddress: undefined,
-      landownerCity: undefined,
-      landownerState: undefined,
-      landownerZipCode: undefined,
-      agentName: undefined,
-      agentEmail: undefined,
-      agentPhoneNumber: undefined,
-      agentAdditionalDetails: undefined,
-      fieldDetails: [],
-      canalOrIrrigationEntityName: undefined,
-      canalOrIrrigationEntityEmail: undefined,
-      canalOrIrrigationEntityPhoneNumber: undefined,
-      canalOrIrrigationAdditionalDetails: undefined,
-      permitNumber: undefined,
-      facilityDitchName: undefined,
-      priorityDate: undefined,
-      certificateNumber: undefined,
-      shareNumber: undefined,
-      waterRightState: undefined,
-      waterUseDescription: undefined,
-      estimationSupplementaryDetails: undefined,
-      conservationPlanFundingRequestDollarAmount: undefined,
-      conservationPlanFundingRequestCompensationRateUnits: undefined,
-      conservationPlanDescription: undefined,
-      conservationPlanAdditionalInfo: undefined,
-    },
     isApplicationSubmissionFormValid: false,
+    polygonAcreageSum: 0,
+    polygonEtAcreFeetSum: 0,
     supportingDocuments: [],
   },
   canEstimateConsumptiveUse: false,
@@ -151,7 +131,7 @@ export interface FundingOrganizationLoadedAction {
 export interface MapPolygonsUpdatedAction {
   type: 'MAP_POLYGONS_UPDATED';
   payload: {
-    polygons: EstimationFormMapPolygon[];
+    polygons: MapSelectionPolygonData[];
     doPolygonsOverlap: boolean;
   };
 }
@@ -330,11 +310,13 @@ const onMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: MapPolygonsUpdatedAction,
 ): ConservationApplicationState => {
-  draftState.conservationApplication.selectedMapPolygons = payload.polygons;
+  draftState.conservationApplication.estimateLocations = payload.polygons;
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
+  computeCombinedPolygonData(draftState);
+  resetApplicationFormLocationDetails(draftState);
 
   return draftState;
 };
@@ -362,12 +344,22 @@ const onConsumptiveUseEstimated = (
 
   application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
   application.conservationPayment = payload.conservationPayment;
-  application.polygonEtData = payload.dataCollections.map((dataCollection, index) => ({
-    ...dataCollection,
-    fieldName: `Field ${index + 1}`,
-  }));
+
+  // combine polygon data
+  for (let i = 0; i < application.estimateLocations.length; i++) {
+    const polygon = application.estimateLocations[i];
+    const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
+
+    polygon.fieldName = `Field ${i + 1}`;
+    polygon.waterConservationApplicationEstimateLocationId =
+      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
+    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyEtInInches;
+    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyEtInAcreFeet;
+    polygon.datapoints = matchingConsumptiveUseData.datapoints;
+  }
 
   checkCanContinueToApplication(draftState);
+  computeCombinedPolygonData(draftState);
 
   return draftState;
 };
@@ -380,6 +372,8 @@ const onApplicationFormUpdated = (
     ...draftState.conservationApplication.applicationSubmissionForm,
     ...payload.formValues,
   };
+
+  computeCombinedPolygonData(draftState);
 
   return draftState;
 };
@@ -415,10 +409,10 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.openEtModelName &&
     !!app.dateRangeStart &&
     !!app.dateRangeEnd &&
-    !!app.selectedMapPolygons &&
-    app.selectedMapPolygons.length > 0 &&
-    app.selectedMapPolygons.length <= 20 &&
-    app.selectedMapPolygons.every((p) => p.acreage <= 50000) &&
+    !!app.estimateLocations &&
+    app.estimateLocations.length > 0 &&
+    app.estimateLocations.length <= 20 &&
+    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
     !app.doPolygonsOverlap;
 };
 
@@ -436,15 +430,85 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.desiredCompensationUnits &&
     !!app.totalAverageYearlyEtAcreFeet &&
     !!app.conservationPayment &&
-    !!app.selectedMapPolygons &&
-    app.selectedMapPolygons.length > 0 &&
-    app.selectedMapPolygons.every((p) => p.acreage <= 50000) &&
+    !!app.estimateLocations &&
+    app.estimateLocations.length > 0 &&
+    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
     !app.doPolygonsOverlap;
 };
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
   draftState.conservationApplication.totalAverageYearlyEtAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
-  draftState.conservationApplication.polygonEtData = [];
+
+  // this `reset` method is activated when the user:
+  // * updates polygons on the map
+  // * modifies a form value in the Estimation Tool sidebar
+
+  // for the first case, all polygon data will be overwritten. nothing needs to happen here.
+  // for the second case, any data on the map will remain the same, but the consumptive use data needs to be reset
+  const combinedPolygonDataCopy = [...draftState.conservationApplication.estimateLocations];
+  for (let i = 0; i < combinedPolygonDataCopy.length; i++) {
+    const polygon = combinedPolygonDataCopy[i];
+
+    const polygonPostMapSelection: MapSelectionPolygonData = {
+      polygonWkt: polygon.polygonWkt!,
+      acreage: polygon.acreage!,
+    };
+
+    combinedPolygonDataCopy[i] = polygonPostMapSelection;
+  }
+  draftState.conservationApplication.estimateLocations = combinedPolygonDataCopy;
+
   draftState.canContinueToApplication = false;
+};
+
+const resetApplicationFormLocationDetails = (draftState: ConservationApplicationState): void => {
+  draftState.conservationApplication.applicationSubmissionForm.fieldDetails = [];
+};
+
+const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
+  let polygonAcreageSum = 0;
+  let polygonEtAcreFeetSum = 0;
+  for (let i = 0; i < draftState.conservationApplication.estimateLocations.length; i++) {
+    // compute data on the polygon object
+    const polygon = draftState.conservationApplication.estimateLocations[i];
+
+    // polygonWkt is guaranteed to exist because we get it from the map, not from the ET data
+    const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt!))).geometry;
+
+    // find the additional details for this polygon, which are provided by the user on the Application Create form
+    let additionalDetailsTrackedFormValue = undefined;
+    if (polygon.waterConservationApplicationEstimateLocationId) {
+      additionalDetailsTrackedFormValue =
+        draftState.conservationApplication.applicationSubmissionForm.fieldDetails.find(
+          (fieldDetail) =>
+            fieldDetail.waterConservationApplicationEstimateLocationId ===
+            polygon.waterConservationApplicationEstimateLocationId,
+        )?.additionalDetails ?? '';
+    }
+
+    draftState.conservationApplication.estimateLocations[i] = {
+      // incorporate computed/derived data
+      additionalDetails: additionalDetailsTrackedFormValue,
+      centerPoint,
+      // carry over existing data
+      waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
+      polygonWkt: polygon.polygonWkt,
+      acreage: polygon.acreage,
+      averageYearlyEtInInches: polygon.averageYearlyEtInInches,
+      averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,
+      fieldName: polygon.fieldName,
+      datapoints: polygon.datapoints,
+    };
+
+    // compute data concerning all the polygons
+    // these calculations assume that none of the polygons intersect with each other
+    polygonAcreageSum += polygon.acreage!;
+    if (polygon.averageYearlyEtInAcreFeet) {
+      polygonEtAcreFeetSum += polygon.averageYearlyEtInAcreFeet;
+    }
+  }
+
+  draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
+  draftState.conservationApplication.polygonEtAcreFeetSum = polygonEtAcreFeetSum;
 };
