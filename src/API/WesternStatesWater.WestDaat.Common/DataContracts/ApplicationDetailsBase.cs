@@ -4,7 +4,7 @@ public class ApplicationDetailsBase
 {
     public Guid Id { get; set; }
 
-    public Guid ApplicantId { get; set; }
+    public Guid ApplicantUserId { get; set; }
 
     public Guid FundingOrganizationId { get; set; }
 
