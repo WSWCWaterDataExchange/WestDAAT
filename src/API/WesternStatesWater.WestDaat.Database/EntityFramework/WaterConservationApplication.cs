@@ -4,6 +4,7 @@ public class WaterConservationApplication
 {
     public WaterConservationApplication()
     {
+        SupportingDocuments = new HashSet<WaterConservationApplicationDocument>();
     }
 
     public Guid Id { get; set; }
@@ -23,4 +24,6 @@ public class WaterConservationApplication
     public virtual WaterConservationApplicationEstimate? Estimate { get; set; } = null!;
 
     public virtual WaterConservationApplicationSubmission? Submission { get; set; } = null!;
+    
+    public virtual ICollection<WaterConservationApplicationDocument> SupportingDocuments { get; set; } = null!;
 }

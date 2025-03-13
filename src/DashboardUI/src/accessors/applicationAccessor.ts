@@ -12,6 +12,8 @@ import { WaterConservationApplicationCreateResponse } from '../data-contracts/Wa
 import { ContainerName, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
+import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -96,4 +98,50 @@ export const uploadApplicationDocuments = async (
   });
   await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
   return applicationDocuments;
+};
+
+export const submitApplication = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    waterRightNativeId: string;
+    form: ApplicationSubmissionForm;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationSubmissionRequest = {
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    waterRightNativeId: data.waterRightNativeId,
+    agentName: data.form.agentName,
+    agentEmail: data.form.agentEmail,
+    agentPhoneNumber: data.form.agentPhoneNumber,
+    agentAdditionalDetails: data.form.agentAdditionalDetails,
+    landownerName: data.form.landownerName!,
+    landownerEmail: data.form.landownerEmail!,
+    landownerPhoneNumber: data.form.landownerPhoneNumber!,
+    landownerAddress: data.form.landownerAddress!,
+    landownerCity: data.form.landownerCity!,
+    landownerState: data.form.landownerState!,
+    landownerZipCode: data.form.landownerZipCode!,
+    canalOrIrrigationEntityName: data.form.canalOrIrrigationEntityName,
+    canalOrIrrigationEntityEmail: data.form.canalOrIrrigationEntityEmail,
+    canalOrIrrigationEntityPhoneNumber: data.form.canalOrIrrigationEntityPhoneNumber,
+    canalOrIrrigationAdditionalDetails: data.form.canalOrIrrigationAdditionalDetails,
+    conservationPlanFundingRequestDollarAmount: data.form.conservationPlanFundingRequestDollarAmount!,
+    conservationPlanFundingRequestCompensationRateUnits: data.form.conservationPlanFundingRequestCompensationRateUnits!,
+    conservationPlanDescription: data.form.conservationPlanDescription!,
+    conservationPlanAdditionalInfo: data.form.conservationPlanAdditionalInfo,
+    estimationSupplementaryDetails: data.form.estimationSupplementaryDetails,
+    permitNumber: data.form.permitNumber!,
+    facilityDitchName: data.form.facilityDitchName!,
+    priorityDate: data.form.priorityDate!,
+    certificateNumber: data.form.certificateNumber!,
+    shareNumber: data.form.shareNumber!,
+    waterRightState: data.form.waterRightState!,
+    waterUseDescription: data.form.waterUseDescription!,
+    fieldDetails: data.form.fieldDetails,
+  };
+
+  await api.post<void>('Applications/Submit', request);
 };

@@ -81,7 +81,7 @@ export function EstimationToolPage() {
     await estimateConsumptiveUseMutation.mutateAsync({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
+      polygonWkts: state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
       units: state.conservationApplication.desiredCompensationUnits,
     });

@@ -1,8 +1,5 @@
 import { useMsal } from '@azure/msal-react';
-import center from '@turf/center';
-import truncate from '@turf/truncate';
-import { Point } from 'geojson';
-import { createRef, useMemo, useRef, useState } from 'react';
+import { createRef, useRef, useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
@@ -21,17 +18,9 @@ import {
   CompensationRateUnitsLabelsSingular,
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
-import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from '../components/ApplicationFormSection';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-
-interface FieldData {
-  fieldName: string;
-  acreage: number;
-  centerPoint: Point;
-  polygonWkt: string;
-}
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -65,6 +54,7 @@ function ApplicationCreatePageForm() {
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+  const polygonData = state.conservationApplication.estimateLocations;
 
   const [formValidated, setFormValidated] = useState(false);
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
@@ -72,23 +62,6 @@ function ApplicationCreatePageForm() {
   const navigateToReviewApplicationPage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
   };
-
-  const userDrawnFields: FieldData[] = useMemo(() => {
-    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
-      const polygonEtData = state.conservationApplication.polygonEtData.find(
-        (etData) => etData.polygonWkt === polygon.polygonWkt,
-      )!;
-
-      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
-
-      return {
-        acreage: polygon.acreage,
-        fieldName: polygonEtData.fieldName,
-        polygonWkt: polygon.polygonWkt,
-        centerPoint,
-      };
-    });
-  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
 
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
@@ -101,7 +74,7 @@ function ApplicationCreatePageForm() {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef(userDrawnFields.map(() => createRef()));
+  const propertyAdditionalDetailsRef = useRef(polygonData.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -143,8 +116,8 @@ function ApplicationCreatePageForm() {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      fieldDetails: userDrawnFields.map((field, index) => ({
-        polygonWkt: field.polygonWkt,
+      fieldDetails: polygonData.map((field, index) => ({
+        waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
@@ -249,16 +222,6 @@ function ApplicationCreatePageForm() {
   const clearUploadDocumentError = () => {
     setUploadDocumentErrorMessage(null);
   };
-
-  // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
 
   return (
     <div className="container">
@@ -391,7 +354,7 @@ function ApplicationCreatePageForm() {
 
         <div className="row">
           <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            {userDrawnFields.map((field, index) => (
+            {polygonData.map((field, index) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
                   <span>{field.fieldName}</span>
@@ -403,7 +366,7 @@ function ApplicationCreatePageForm() {
                 <div className="col-6">
                   <span className="fw-bold">Location: </span>
                   <span>
-                    ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
+                    ({field.centerPoint!.coordinates[1]}, {field.centerPoint!.coordinates[0]})
                   </span>
                 </div>
                 <Form.Group className={`col-12 mb-4`} controlId={`propertyAdditionalDetails-${index}`}>
@@ -495,7 +458,14 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
-            <Form.Control type="date" required ref={priorityDateRef} value={stateForm.priorityDate} />
+            <Form.Control
+              type="date"
+              required
+              ref={priorityDateRef}
+              value={stateForm.priorityDate}
+              // not sure on the actual min date, but this prevents users from entering the default value "0001-01-01"
+              min="1900-01-01"
+            />
             <Form.Control.Feedback type="invalid">Priority Date is required.</Form.Control.Feedback>
           </Form.Group>
 
@@ -550,7 +520,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Irrigated Field Area</span>
               </div>
               <div>
-                <span>{formatNumber(acreageSum, 2)} Acres</span>
+                <span>{formatNumber(state.conservationApplication.polygonAcreageSum, 2)} Acres</span>
               </div>
             </div>
 
@@ -559,7 +529,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Consumptive Use</span>
               </div>
               <div>
-                <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+                <span>{formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2)} Acre-Feet</span>
               </div>
             </div>
 

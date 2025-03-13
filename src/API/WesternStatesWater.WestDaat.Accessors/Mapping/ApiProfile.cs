@@ -337,7 +337,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
-                .ForMember(dest => dest.Submission, opt => opt.Ignore());
+                .ForMember(dest => dest.Submission, opt => opt.Ignore())
+                .ForMember(dest => dest.SupportingDocuments, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionRequest, EFWD.WaterConservationApplicationSubmission>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
