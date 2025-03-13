@@ -15,6 +15,7 @@ import { useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useMsal } from '@azure/msal-react';
 import { saveProfileInformation } from '../../accessors/userAccessor';
+import { loginRequest } from '../../authConfig';
 
 export function AccountInformationPage() {
   const msalContext = useMsal();
@@ -214,6 +215,14 @@ export function AccountInformationPage() {
     </Form>
   );
 
+  const handleChangePasswordClicked = () => {
+    // Use b2c forgot password user flow
+    msalContext.instance.loginRedirect({
+      ...loginRequest,
+      authority: process.env.REACT_APP_AUTH_AUTHORITY_FORGOT_PASSWORD,
+    });
+  };
+
   const handleEditClicked = () => {
     setIsEditingProfile(true);
     setValidated(false);
@@ -252,6 +261,13 @@ export function AccountInformationPage() {
 
         {!isEditingProfile && (
           <div>
+            <Button
+              variant="link"
+              className="text-decoration-none fw-bold"
+              onClick={() => handleChangePasswordClicked()}
+            >
+              Change Password
+            </Button>
             <Button variant="link" className="text-decoration-none fw-bold" onClick={() => handleEditClicked()}>
               Edit Account Details
             </Button>
