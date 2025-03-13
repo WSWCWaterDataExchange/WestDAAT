@@ -43,7 +43,7 @@ jobs:
       react-app-webapi-url: https://westdaatstaging.azure-api.net/api/
       react-app-auth-client-id: a4db62cd-d2ef-425e-8c69-37f4349f925e
       react-app-auth-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com/b2c_1_signupsignin
-      react-app-auth-authority-forgot-password: https://westdaatstaging.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_passwordreset
+      react-app-auth-authority-forgot-password: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com/b2c_1_passwordreset
       react-app-auth-known-authority: https://westdaatstaging.b2clogin.com/westdaatstaging.onmicrosoft.com
       react-app-ga-id: G-KFL0TGM4B8
       react-app-feature-conservation-estimation-tool: disabled
