@@ -218,6 +218,12 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
+
+            CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicantConservationApplicationLoadRequest>();
+            CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ReviewerConservationApplicationLoadRequest>();
+
+            CreateMap<CommonContracts.ApplicantConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>();
+            CreateMap<CommonContracts.ReviewerConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>();
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

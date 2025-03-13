@@ -78,7 +78,7 @@ public class ApplicationFunction : FunctionBase
     [OpenApiOperation(nameof(GetApplication))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicationLoadResponseBase))]
     public async Task<HttpResponseData> GetApplication(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = $"{RouteBase}/Load")]
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Load")]
         HttpRequestData req)
     {
         var request = await ParseRequestBody<ApplicationLoadRequestBase>(req);
