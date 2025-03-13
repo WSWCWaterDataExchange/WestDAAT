@@ -42,7 +42,7 @@ public class SubmissionDetails
 
     public int ConservationPlanFundingRequestDollarAmount { get; set; }
 
-    public Common.DataContracts.CompensationRateUnits ConservationPlanFundingRequestCompensationRateUnits { get; set; }
+    public CompensationRateUnits ConservationPlanFundingRequestCompensationRateUnits { get; set; }
 
     public string ConservationPlanDescription { get; set; } = null!;
 
@@ -63,6 +63,4 @@ public class SubmissionDetails
     public string WaterRightState { get; set; } = null!;
 
     public string WaterUseDescription { get; set; } = null!;
-
-    public SupportingDocumentDetails[] Documents { get; set; } = null!;
 }

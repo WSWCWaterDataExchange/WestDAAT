@@ -18,4 +18,6 @@ public class ApplicationDetailsBase
     public EstimateDetails Estimate { get; set; } = null!;
 
     public SubmissionDetails Submission { get; set; } = null!;
+
+    public SupportingDocumentDetails[] Documents { get; set; } = null!;
 }
