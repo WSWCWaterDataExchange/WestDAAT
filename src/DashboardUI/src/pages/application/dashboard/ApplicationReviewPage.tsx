@@ -38,8 +38,17 @@ export function ApplicationReviewPage() {
 
   const submitApplicationMutation = useMutation({
     mutationFn: async () => {
+      const waterConservationApplicationId = state.conservationApplication.waterConservationApplicationId!;
+
+      let alertString = `Submitting application documents - not yet implemented.\n\n
+        Files being submitted:\n\n`;
+      state.conservationApplication.supportingDocuments.forEach((file, index) => {
+        alertString += `File #${index + 1}: ${file.fileName}\n   (description: '${file.description ?? '(no text entered)'}')\n\n`;
+      });
+      alert(alertString);
+
       return await submitApplication(context, {
-        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
+        waterConservationApplicationId,
         waterRightNativeId: state.conservationApplication.waterRightNativeId!,
         form: state.conservationApplication.applicationSubmissionForm,
       });
@@ -332,12 +341,12 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
               <table className="table">
                 <tbody>
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
-                    <tr key={`${file.fileName}-${index}`} className="d-flex">
-                      <td className="px-2 pe-md-5 align-content-center">
+                    <tr key={`${file.fileName}-${index}`}>
+                      <td className="align-content-center px-2">
                         <Icon path={mdiFileDocument} size="2em" className="primary p-1" color={'#007bff'}></Icon>
                         {file.fileName}
                       </td>
-                      <td className="align-content-center text-left flex-grow-1">{file.description}</td>
+                      <td className="align-content-center text-start">{file.description}</td>
                     </tr>
                   ))}
                 </tbody>
