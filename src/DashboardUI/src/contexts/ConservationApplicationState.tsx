@@ -92,6 +92,7 @@ export type ApplicationAction =
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
+  | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction;
 
@@ -168,6 +169,14 @@ export interface ApplicationSubmissionFormUpdatedAction {
   };
 }
 
+export interface ApplicationDocumentUpdatedAction {
+  type: 'APPLICATION_DOCUMENT_UPDATED';
+  payload: {
+    blobName: string;
+    description: string;
+  };
+}
+
 export interface ApplicationDocumentUploadedAction {
   type: 'APPLICATION_DOCUMENT_UPLOADED';
   payload: {
@@ -214,6 +223,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
+    case 'APPLICATION_DOCUMENT_UPDATED':
+      return onApplicationDocumentUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPLOADED':
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
@@ -374,6 +385,20 @@ const onApplicationFormUpdated = (
   };
 
   computeCombinedPolygonData(draftState);
+
+  return draftState;
+};
+
+const onApplicationDocumentUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentUpdatedAction,
+): ConservationApplicationState => {
+  const document = draftState.conservationApplication.supportingDocuments.find(
+    (doc) => doc.blobName === payload.blobName,
+  );
+  if (document) {
+    document.description = payload.description;
+  }
 
   return draftState;
 };

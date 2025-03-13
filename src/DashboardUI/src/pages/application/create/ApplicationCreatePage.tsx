@@ -1,7 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { mdiTrashCanOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import { createRef, useEffect, useRef, useState } from 'react';
+import { createRef, useRef, useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
@@ -65,6 +65,7 @@ function ApplicationCreatePageForm() {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
   };
 
+  const formRef = useRef<HTMLFormElement>(null);
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
   const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -93,7 +94,6 @@ function ApplicationCreatePageForm() {
   const conservationPlanFundingRequestCompensationRateUnitsRef = useRef<HTMLSelectElement>(null);
   const conservationPlanDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const conservationPlanAdditionalInfoRef = useRef<HTMLTextAreaElement>(null);
-  const supportingDocumentsDescriptionRefs = useRef<HTMLTextAreaElement[]>([]);
 
   const onFormChanged = () => {
     const conservationPlanFundingRequestDollarAmount = conservationPlanFundingRequestDollarAmountRef.current?.value
@@ -147,19 +147,11 @@ function ApplicationCreatePageForm() {
         formValues,
       },
     });
-
-    // const supportingDocumentDescriptionValues = supportingDocumentsDescriptionRefs.map((ref) => {
-    //   ref.current?.value;
-    // });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // event default causes page to refresh
-    event.preventDefault();
-    event.stopPropagation();
-
-    const form = event.currentTarget;
-    const isFormValid = form.checkValidity();
+  const handleSubmitClicked = () => {
+    const form = formRef.current;
+    const isFormValid = form!.checkValidity();
 
     setFormValidated(true);
 
@@ -239,13 +231,17 @@ function ApplicationCreatePageForm() {
     });
   };
 
-  const onSupportingDocumentFormChanged = () => {
-    // supportingDocumentsDescriptionRefs.forEach((ref) => {
-    //   console.log(ref.current?.value);
-    // });
-  };
-
   // TODO: JN - validation for form for upload docs
+
+  const handleDocumentDescriptionChanged = (blobName: string, description: string) => {
+    dispatch({
+      type: 'APPLICATION_DOCUMENT_UPDATED',
+      payload: {
+        blobName,
+        description,
+      },
+    });
+  };
 
   return (
     <div className="container">
@@ -270,7 +266,7 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form onChange={onFormChanged} validated={formValidated} noValidate>
+      <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
         <ApplicationFormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
             <Form.Label>Landowner Name</Form.Label>
@@ -663,40 +659,38 @@ function ApplicationCreatePageForm() {
         )}
         <div className="col mb-4">
           {state.conservationApplication.supportingDocuments.length > 0 && (
-            <Form onChange={onSupportingDocumentFormChanged}>
-              <table className="table">
-                <tbody>
-                  {state.conservationApplication.supportingDocuments.map((file, index) => (
-                    <tr key={`${file.fileName}-${index}`}>
-                      <td className="align-content-center">{file.fileName}</td>
-                      <td className="align-content-center flex-grow-1">
-                        <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
-                          <Form.Control
-                            as="textarea"
-                            maxLength={4000}
-                            // ref={supportingDocumentsDescriptionRefs[index]}
-                            value={file.description}
-                          ></Form.Control>
-                        </Form.Group>
-                      </td>
-                      <td className="align-content-center text-center">
-                        <Button
-                          variant="link"
-                          className="px-1 py-1 text-danger"
-                          onClick={() => handleRemoveDocument(file.blobName)}
-                        >
-                          <Icon
-                            path={mdiTrashCanOutline}
-                            size="1.5em"
-                            aria-label="Remove supporting document button"
-                          ></Icon>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Form>
+            <table className="table">
+              <tbody>
+                {state.conservationApplication.supportingDocuments.map((file, index) => (
+                  <tr key={`${file.fileName}-${index}`}>
+                    <td className="align-content-center">{file.fileName}</td>
+                    <td className="align-content-center flex-grow-1">
+                      <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
+                        <Form.Control
+                          as="textarea"
+                          maxLength={4000}
+                          value={file.description}
+                          onChange={(e) => handleDocumentDescriptionChanged(file.blobName, e.target.value)}
+                        ></Form.Control>
+                      </Form.Group>
+                    </td>
+                    <td className="align-content-center text-center">
+                      <Button
+                        variant="link"
+                        className="px-1 py-1 text-danger"
+                        onClick={() => handleRemoveDocument(file.blobName)}
+                      >
+                        <Icon
+                          path={mdiTrashCanOutline}
+                          size="1.5em"
+                          aria-label="Remove supporting document button"
+                        ></Icon>
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
           <Button variant="outline-primary" onClick={handleUploadDocument}>
             Upload
@@ -706,7 +700,7 @@ function ApplicationCreatePageForm() {
 
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
-        <Button variant="success" type="submit">
+        <Button variant="success" onClick={handleSubmitClicked}>
           {/* TODO: JN - onClick={handleSubmit} */}
           Review & Submit
         </Button>
