@@ -12,6 +12,11 @@ public class WaterConservationApplicationDocument
 
     public string BlobName { get; set; } = null!;
     
+    /// <summary>
+    /// The uploaded file name - used for displaying to the user.
+    /// </summary>
+    public string FileName { get; set; } = null!;
+    
     public string? Description { get; set; }
 
     public virtual WaterConservationApplication Application { get; set; } = null!;
