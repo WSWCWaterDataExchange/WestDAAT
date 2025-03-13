@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
@@ -239,6 +240,89 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
         });
+    }
+
+    [TestMethod]
+    public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var org = new OrganizationFaker().Generate();
+
+        var application = new WaterConservationApplicationFaker(user, org).Generate();
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(3);
+        await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(locations);
+
+        foreach (var location in locations)
+        {
+            var consumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(location).Generate(2);
+            await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
+        }
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id, // allows user to see Applicant view
+            Roles = [Roles.GlobalAdmin], // allows user to see Reviewer view
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var applicantRequest = new CLI.Requests.Conservation.ApplicantConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+        var reviewerRequest = new CLI.Requests.Conservation.ReviewerConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+
+        var applicantResponse = await _applicationManager.Load<CLI.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CLI.Responses.Conservation.ApplicantConservationApplicationLoadResponse>(applicantRequest);
+        var reviewerResponse = await _applicationManager.Load<CLI.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CLI.Responses.Conservation.ReviewerConservationApplicationLoadResponse>(reviewerRequest);
+
+        // Assert
+
+        // ExcludingMissingMembers is used to ignore properties that are intentionally not included in the response
+        // i.e. virtual navigation properties and parent id properties
+        applicantResponse.Should().NotBeNull();
+        applicantResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        // the following assertions are redundant given that `BeEquivalentTo` checks properties recursively,
+        // but are included for completeness just in case something changes in the future
+        applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+
+        reviewerResponse.Should().NotBeNull();
+        reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Notes.Should().BeNull(); // not implemented yet
+
+        // verify that all possible request types are accounted for
+        var requests = Assembly.GetAssembly(typeof(ApplicationLoadSingleRequestBase))?
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(ApplicationLoadSingleRequestBase)))
+            .ToArray();
+
+        requests.Length.Should().Be(2, because: "this test currently only accounts for the specified number of request types. If more request types are added, this test should then be updated.");
     }
 
     [DataTestMethod]
