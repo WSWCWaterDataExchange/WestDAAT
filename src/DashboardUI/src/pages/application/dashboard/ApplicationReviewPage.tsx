@@ -9,13 +9,58 @@ import {
 import Button from 'react-bootstrap/esm/Button';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import ApplicationFormSection from '../components/ApplicationFormSection';
+import Modal from 'react-bootstrap/esm/Modal';
+import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { useMsal } from '@azure/msal-react';
+import { submitApplication } from '../../../accessors/applicationAccessor';
+import { toast } from 'react-toastify';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
+  const [showSubmissionConfirmationModal, setShowSubmissionConfirmationModal] = useState(false);
   const navigate = useNavigate();
+  const context = useMsal();
 
   const navigateToApplicationCreatePage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
+  };
+
+  const navigateToWaterRightLandingPage = () => {
+    navigate(`/details/right/${state.conservationApplication.waterRightNativeId}`);
+  };
+
+  const presentConfirmationModal = () => {
+    setShowSubmissionConfirmationModal(true);
+  };
+
+  const submitApplicationMutation = useMutation({
+    mutationFn: async () => {
+      return await submitApplication(context, {
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
+        waterRightNativeId: state.conservationApplication.waterRightNativeId!,
+        form: state.conservationApplication.applicationSubmissionForm,
+      });
+    },
+    onSuccess: () => {
+      navigateToWaterRightLandingPage();
+
+      // the notification doesn't appear unless it's delayed until after navigation
+      setTimeout(() => {
+        toast.success('Application submitted successfully.');
+      }, 1);
+    },
+    onError: (error) => {
+      toast.error('Failed to submit application. Please try again.');
+    },
+  });
+
+  const handleModalCancel = () => {
+    setShowSubmissionConfirmationModal(false);
+  };
+
+  const handleModalConfirm = async () => {
+    await submitApplicationMutation.mutateAsync();
   };
 
   return (
@@ -27,8 +72,14 @@ export function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationReviewPageLayout />
+        <ApplicationReviewPageLayout submitApplication={presentConfirmationModal} />
       </div>
+
+      <SubmitApplicationConfirmationModal
+        show={showSubmissionConfirmationModal}
+        cancelSubmission={handleModalCancel}
+        confirmSubmission={handleModalConfirm}
+      />
     </div>
   );
 }
@@ -37,14 +88,14 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-function ApplicationReviewPageLayout() {
+interface ApplicationReviewPageLayoutProps {
+  submitApplication: () => void;
+}
+
+function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
-
-  const submitApplication = () => {
-    alert('not implemented.');
-  };
 
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
@@ -279,7 +330,7 @@ function ApplicationReviewPageLayout() {
 
         <hr className="m-0" />
         <div className="d-flex justify-content-end p-3">
-          <Button variant="success" type="button" onClick={submitApplication}>
+          <Button variant="success" type="button" onClick={props.submitApplication}>
             Submit
           </Button>
         </div>
@@ -305,5 +356,47 @@ function FormElement(props: FormElementProps) {
         <span>{displayValue || '-'}</span>
       </div>
     </>
+  );
+}
+
+interface SubmitApplicationConfirmationModalProps {
+  show: boolean;
+  cancelSubmission: () => void;
+  confirmSubmission: () => void;
+}
+
+function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmationModalProps) {
+  return (
+    <Modal show={props.show} centered>
+      <Modal.Header closeButton onClick={() => props.cancelSubmission()}>
+        <Modal.Title>Submit for Review?</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="mb-2">
+          Are you sure you want to submit this application? Once submitted, the application cannot be edited or resent.
+        </div>
+
+        <div className="mb-2">The following organizations will be able to see your application:</div>
+
+        <div>
+          <ol>
+            <li>Conservation Organization</li>
+            <li>Technical Reviewer</li>
+            <li>WestDAAT Admin (View Only)</li>
+            <li>Copy to You</li>
+          </ol>
+        </div>
+
+        <div>By submitting this application, I hereby declare that the information provided is true and correct</div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => props.cancelSubmission()}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={() => props.confirmSubmission()}>
+          Submit
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }
