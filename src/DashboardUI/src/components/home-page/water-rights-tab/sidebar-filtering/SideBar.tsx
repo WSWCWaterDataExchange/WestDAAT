@@ -159,6 +159,7 @@ function SideBar() {
                 type="switch"
                 id="overlayFilters"
                 label=""
+                aria-label="overlay filters"
                 checked={isOverlayFilterActive}
                 onChange={handleOverlaySwitchChange}
               />
@@ -174,6 +175,7 @@ function SideBar() {
                 type="switch"
                 id="waterRightSelection"
                 label=""
+                aria-label="water right selection toggle"
                 checked={isWaterRightsFilterActive}
                 onChange={handleWaterRightsSwitchChange}
               />
