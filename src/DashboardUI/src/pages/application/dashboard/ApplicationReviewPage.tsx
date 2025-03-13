@@ -15,6 +15,8 @@ import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
+import { mdiFileDocument } from '@mdi/js';
+import Icon from '@mdi/react';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -325,7 +327,23 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         {sectionRule}
 
         <ApplicationFormSection title="Supporting Documents">
-          <NotImplementedPlaceholder />
+          <div className="col mb-4">
+            {state.conservationApplication.supportingDocuments.length > 0 && (
+              <table className="table">
+                <tbody>
+                  {state.conservationApplication.supportingDocuments.map((file, index) => (
+                    <tr key={`${file.fileName}-${index}`} className="d-flex">
+                      <td className="px-2 pe-md-5 align-content-center">
+                        <Icon path={mdiFileDocument} size="2em" className="primary p-1" color={'#007bff'}></Icon>
+                        {file.fileName}
+                      </td>
+                      <td className="align-content-center text-left flex-grow-1">{file.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </ApplicationFormSection>
 
         <hr className="m-0" />
