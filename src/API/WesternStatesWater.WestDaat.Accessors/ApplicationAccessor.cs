@@ -117,10 +117,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var existingSubmittedApplication = await db.WaterConservationApplications
-            .AsNoTracking()
             .Include(wca => wca.Submission)
-            .SingleOrDefaultAsync(wca => wca.Id == request.ApplicationId &&
-                                         wca.Submission != null);
+            .Where(wca => wca.Id == request.ApplicationId && wca.Submission != null)
+            .AsNoTracking()
+            .SingleOrDefaultAsync();
 
         return new SubmittedApplicationExistsLoadResponse
         {
