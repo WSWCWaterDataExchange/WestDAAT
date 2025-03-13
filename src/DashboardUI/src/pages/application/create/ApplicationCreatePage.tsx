@@ -230,7 +230,8 @@ function ApplicationCreatePageForm() {
     setUploadDocumentErrorMessage(null);
   };
 
-  const handleRemoveDocument = (blobName: string) => {
+  const handleRemoveDocument = (blobName: string, index: number) => {
+    supportingDocumentsDescriptionRefs.current?.splice(index, 1);
     dispatch({
       type: 'APPLICATION_DOCUMENT_REMOVED',
       payload: {
@@ -240,8 +241,8 @@ function ApplicationCreatePageForm() {
   };
 
   const onSupportingDocumentFormChanged = () => {
-    supportingDocumentsDescriptionRefs.current?.forEach((ref) => {
-      console.log(ref.value);
+    supportingDocumentsDescriptionRefs.current?.forEach((ref, index) => {
+      console.log(`${index + 1}: ${ref.value}\n`);
     });
   };
 
@@ -691,7 +692,7 @@ function ApplicationCreatePageForm() {
                         <Button
                           variant="link"
                           className="px-1 py-1 text-danger"
-                          onClick={() => handleRemoveDocument(file.blobName)}
+                          onClick={() => handleRemoveDocument(file.blobName, index)}
                         >
                           <Icon
                             path={mdiTrashCanOutline}
