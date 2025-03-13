@@ -40,7 +40,7 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
-            ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
+            ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             FileSasTokenRequestBase req => ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
@@ -53,11 +53,13 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private ErrorBase ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
+    private async Task<ErrorBase> ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
     {
         return request switch
         {
             OrganizationApplicationDashboardLoadRequest req => ValidateOrganizationApplicationDashboardLoadRequest(req, context),
+            ApplicantConservationApplicationLoadRequest req => await ValidateApplicantConservationApplicationLoadRequest(req, context),
+            ReviewerConservationApplicationLoadRequest req => await ValidateReviewerConservationApplicationLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -90,6 +92,54 @@ internal class ValidationEngine : IValidationEngine
         });
 
         if (!orgPermissions.Contains(Permissions.OrganizationApplicationDashboardLoad))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateApplicantConservationApplicationLoadRequest(ApplicantConservationApplicationLoadRequest request, ContextBase context)
+    {
+        // Must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var submittedApplicationRequest = new DTO.SubmittedApplicationExistsLoadRequest
+        {
+            ApplicationId = request.ApplicationId
+        };
+        var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+
+        // deny if the application does not exist or the user is not the applicant
+        if (!submittedApplicationResponse.ApplicationExists ||
+            userContext.UserId != submittedApplicationResponse.ApplicantUserId)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateReviewerConservationApplicationLoadRequest(ReviewerConservationApplicationLoadRequest request, ContextBase context)
+    {
+        // Must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // allow global admins
+        if (userContext.Roles.Contains(Roles.GlobalAdmin))
+        {
+            return null;
+        }
+
+        var submittedApplicationRequest = new DTO.SubmittedApplicationExistsLoadRequest
+        {
+            ApplicationId = request.ApplicationId
+        };
+        var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+
+        // deny if the application does not exist or the user is not part of the linked Funding Organization
+        if (!submittedApplicationResponse.ApplicationExists ||
+            userContext.OrganizationRoles.All(orgRole => orgRole.OrganizationId != submittedApplicationResponse.FundingOrganizationId))
         {
             return CreateForbiddenError(request, context);
         }
@@ -461,7 +511,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,
