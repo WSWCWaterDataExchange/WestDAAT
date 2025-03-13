@@ -1,9 +1,10 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { defaultApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
-import { EstimationFormMapPolygon } from '../data-contracts/EstimationFormMapPolygon';
 import { ConservationApplicationState, defaultState, reducer } from './ConservationApplicationState';
+import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -186,11 +187,11 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.selectedMapPolygons.length).toEqual(1);
-    expect(newState.conservationApplication.selectedMapPolygons[0].polygonWkt).toEqual(
+    expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
-    expect(newState.conservationApplication.selectedMapPolygons[0].acreage).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
@@ -218,15 +219,32 @@ describe('ConservationApplicationState reducer', () => {
 
   it('estimating consumptive use should update state', () => {
     // Arrange
+
+    // this action's handler has a side effect which requires map polygons to be present
+    const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
+    let newState = reducer(state, {
+      type: 'MAP_POLYGONS_UPDATED',
+      payload: {
+        polygons: [
+          {
+            polygonWkt,
+            acreage: 1,
+          },
+        ],
+        doPolygonsOverlap: true,
+      },
+    });
+
     // Act
-    const newState = reducer(state, {
+    newState = reducer(newState, {
       type: 'CONSUMPTIVE_USE_ESTIMATED',
       payload: {
         totalAverageYearlyEtAcreFeet: 100,
         conservationPayment: 200,
         dataCollections: [
           {
-            polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+            waterConservationApplicationEstimateLocationId: 'location-guid',
+            polygonWkt: polygonWkt,
             averageYearlyEtInAcreFeet: 50,
             averageYearlyEtInInches: 400,
             datapoints: [
@@ -243,12 +261,30 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
-    expect(newState.conservationApplication.polygonEtData.length).toEqual(1);
-    expect(newState.conservationApplication.polygonEtData[0].datapoints.length).toEqual(1);
-    expect(newState.conservationApplication.polygonEtData[0].fieldName).toEqual('Field 1');
+    expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
+    expect(newState.conservationApplication.estimateLocations[0].fieldName).toEqual('Field 1');
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
+  });
+
+  it('updating the application form should update state', () => {
+    // Arrange
+    // Act
+    const newState = reducer(state, {
+      type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+      payload: {
+        formValues: {
+          ...defaultApplicationSubmissionForm(),
+          landownerName: 'Bobby Hill',
+        },
+      },
+    });
+
+    // Assert
+    const form = newState.conservationApplication.applicationSubmissionForm;
+    expect(form.landownerName).toEqual('Bobby Hill');
   });
 
   it('uploading documents should update state', () => {
@@ -256,7 +292,7 @@ describe('ConservationApplicationState reducer', () => {
     const uploadedDocument: ApplicationDocument = {
       fileName: 'document_1.docx',
       blobName: 'my-blob-guid',
-      description: 'Description for supporting documents entered by the user'
+      description: 'Description for supporting documents entered by the user',
     };
 
     // Act
@@ -270,19 +306,19 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(uploadedDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(uploadedDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(uploadedDocument.description);
-  })
+  });
 
   it('removing an existing document should update state', () => {
     // Arrange
     const existingDocument: ApplicationDocument = {
       fileName: 'document_1.docx',
       blobName: 'my-blob-guid',
-      description: 'Description for supporting documents entered by the user'
+      description: 'Description for supporting documents entered by the user',
     };
     const anotherDocument: ApplicationDocument = {
       fileName: 'document_2.docx',
       blobName: 'my-blob-guid-2',
-      description: 'Description for a different supporting document'
+      description: 'Description for a different supporting document',
     };
     state.conservationApplication.supportingDocuments = [existingDocument, anotherDocument];
 
@@ -297,7 +333,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(anotherDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(anotherDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
-  })
+  });
 
   describe('Estimation Tool Page Use Cases', () => {
     it('estimate consumptive use should be disabled when no data is present', () => {
@@ -337,7 +373,7 @@ describe('ConservationApplicationState reducer', () => {
         },
       });
 
-      const polygon: EstimationFormMapPolygon = {
+      const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
         acreage: 1,
       };
@@ -466,6 +502,7 @@ describe('ConservationApplicationState reducer', () => {
           conservationPayment: 200,
           dataCollections: [
             {
+              waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
               averageYearlyEtInAcreFeet: 50,
               averageYearlyEtInInches: 400,
@@ -482,6 +519,79 @@ describe('ConservationApplicationState reducer', () => {
 
       // Assert
       shouldBeAbleToContinueToApplication(newState, true);
+    });
+  });
+
+  describe('Additional Use Cases', () => {
+    it("should reset the Application Submission form's polygons' AdditionalDetails fields if the user updates their polygon selections.", () => {
+      // user selects map polygons
+      const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
+      let newState = reducer(state, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [
+            {
+              polygonWkt,
+              acreage: 1,
+            },
+          ],
+          doPolygonsOverlap: true,
+        },
+      });
+
+      // user then requests an estimate for said polygons
+      newState = reducer(newState, {
+        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        payload: {
+          totalAverageYearlyEtAcreFeet: 100,
+          conservationPayment: 200,
+          dataCollections: [
+            {
+              waterConservationApplicationEstimateLocationId: 'location-guid',
+              polygonWkt: polygonWkt,
+              averageYearlyEtInAcreFeet: 50,
+              averageYearlyEtInInches: 400,
+              datapoints: [
+                {
+                  year: 2025,
+                  etInInches: 400,
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      // user fills out part of the application submission form...
+      newState = reducer(newState, {
+        type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+        payload: {
+          formValues: {
+            ...defaultApplicationSubmissionForm(),
+            fieldDetails: [
+              {
+                waterConservationApplicationEstimateLocationId: 'location-guid',
+                additionalDetails: 'I, the user, have some things to say about this field.',
+              },
+            ],
+          },
+        },
+      });
+
+      expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toBeGreaterThan(0);
+
+      // user then goes back to change their polygon selections
+      newState = reducer(newState, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [],
+          doPolygonsOverlap: false,
+        },
+      });
+
+      // Assert
+      // their AdditionalDetails field should be reset
+      expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toEqual(0);
     });
   });
 });
