@@ -196,7 +196,14 @@ public class ValidationEngineTests : EngineTestBase
             if (isUserLoggedIn)
             {
                 var response = await call();
-                response.Should().BeOfType<ForbiddenError>();
+                if (applicationExists)
+                {
+                    response.Should().BeOfType<ForbiddenError>();
+                }
+                else
+                {
+                    response.Should().BeOfType<NotFoundError>();
+                }
             }
             else
             {
