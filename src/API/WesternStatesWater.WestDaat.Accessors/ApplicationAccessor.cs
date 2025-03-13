@@ -1,6 +1,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
@@ -25,6 +26,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
+            ApplicantConservationApplicationLoadRequest req => await GetApplicantConservationApplication(req),
+            ReviewerConservationApplicationLoadRequest req => await GetReviewerConservationApplication(req),
             UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
             SubmittedApplicationExistsLoadRequest req => await CheckSubmittedApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
@@ -53,6 +56,40 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationDashboardLoadResponse
         {
             Applications = applications.ToArray()
+        };
+    }
+
+    private async Task<TDetails> GetFullApplicationDetails<TDetails>(Expression<Func<EFWD.WaterConservationApplication, bool>> whereClause)
+        where TDetails : ApplicationDetailsBase
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var application = await db.WaterConservationApplications
+            .AsNoTracking()
+            .Where(whereClause)
+            .ProjectTo<TDetails>(DtoMapper.Configuration)
+            .SingleAsync();
+
+        return application;
+    }
+
+    private async Task<ApplicantConservationApplicationLoadResponse> GetApplicantConservationApplication(ApplicantConservationApplicationLoadRequest request)
+    {
+        var application = await GetFullApplicationDetails<ApplicationDetailsApplicantView>(app => app.Id == request.ApplicationId);
+
+        return new ApplicantConservationApplicationLoadResponse
+        {
+            Application = application
+        };
+    }
+
+    private async Task<ReviewerConservationApplicationLoadResponse> GetReviewerConservationApplication(ReviewerConservationApplicationLoadRequest request)
+    {
+        var application = await GetFullApplicationDetails<ApplicationDetailsReviewerView>(app => app.Id == request.ApplicationId);
+
+        return new ReviewerConservationApplicationLoadResponse
+        {
+            Application = application
         };
     }
 
