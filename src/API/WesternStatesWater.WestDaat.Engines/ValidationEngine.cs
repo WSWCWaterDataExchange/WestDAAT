@@ -125,21 +125,26 @@ internal class ValidationEngine : IValidationEngine
         // Must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
 
-        // allow global admins
-        if (userContext.Roles.Contains(Roles.GlobalAdmin))
-        {
-            return null;
-        }
-
         var submittedApplicationRequest = new DTO.SubmittedApplicationExistsLoadRequest
         {
             ApplicationId = request.ApplicationId
         };
         var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
 
-        // deny if the application does not exist or the user is not part of the linked Funding Organization
-        if (!submittedApplicationResponse.ApplicationExists ||
-            userContext.OrganizationRoles.All(orgRole => orgRole.OrganizationId != submittedApplicationResponse.FundingOrganizationId))
+        // deny if the application does not exist
+        if (!submittedApplicationResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
+        }
+
+        // allow global admins
+        if (userContext.Roles.Contains(Roles.GlobalAdmin))
+        {
+            return null;
+        }
+
+        // deny if the user is not part of the linked Funding Organization
+        if (userContext.OrganizationRoles.All(orgRole => orgRole.OrganizationId != submittedApplicationResponse.FundingOrganizationId))
         {
             return CreateForbiddenError(request, context);
         }
