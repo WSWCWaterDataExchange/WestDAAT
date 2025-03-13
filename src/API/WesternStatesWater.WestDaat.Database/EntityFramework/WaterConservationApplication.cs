@@ -4,6 +4,7 @@ public class WaterConservationApplication
 {
     public WaterConservationApplication()
     {
+        SupportingDocuments = new HashSet<WaterConservationApplicationDocument>();
     }
 
     public Guid Id { get; set; }
