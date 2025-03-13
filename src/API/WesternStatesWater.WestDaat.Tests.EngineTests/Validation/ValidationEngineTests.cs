@@ -159,7 +159,6 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
-        var applicationId = Guid.NewGuid();
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<SubmittedApplicationExistsLoadRequest>()));
         if (applicationExists)
         {
@@ -181,7 +180,7 @@ public class ValidationEngineTests : EngineTestBase
         // Act
         var request = new Contracts.Client.Requests.Conservation.ApplicantConservationApplicationLoadRequest
         {
-            ApplicationId = applicationId,
+            ApplicationId = Guid.NewGuid(),
         };
         var call = async () => await _validationEngine.Validate(request);
 
@@ -259,7 +258,6 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
-        var applicationId = Guid.NewGuid();
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<SubmittedApplicationExistsLoadRequest>()));
         if (applicationExists)
         {
@@ -281,7 +279,7 @@ public class ValidationEngineTests : EngineTestBase
         // Act
         var request = new Contracts.Client.Requests.Conservation.ReviewerConservationApplicationLoadRequest
         {
-            ApplicationId = applicationId,
+            ApplicationId = Guid.NewGuid(),
         };
         var call = async () => await _validationEngine.Validate(request);
 
