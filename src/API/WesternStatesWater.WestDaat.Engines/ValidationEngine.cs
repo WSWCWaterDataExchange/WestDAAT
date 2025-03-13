@@ -110,9 +110,13 @@ internal class ValidationEngine : IValidationEngine
         };
         var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
 
-        // deny if the application does not exist or the user is not the applicant
-        if (!submittedApplicationResponse.ApplicationExists ||
-            userContext.UserId != submittedApplicationResponse.ApplicantUserId)
+        if (!submittedApplicationResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
+        }
+
+        // deny if the user is not the applicant
+        if (userContext.UserId != submittedApplicationResponse.ApplicantUserId)
         {
             return CreateForbiddenError(request, context);
         }
