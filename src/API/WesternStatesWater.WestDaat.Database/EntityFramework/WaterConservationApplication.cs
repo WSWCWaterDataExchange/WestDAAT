@@ -24,5 +24,5 @@ public class WaterConservationApplication
 
     public virtual WaterConservationApplicationSubmission? Submission { get; set; } = null!;
     
-    public virtual ICollection<ApplicationDocument> SupportingDocuments { get; set; } = null!;
+    public virtual ICollection<WaterConservationApplicationDocument> SupportingDocuments { get; set; } = null!;
 }

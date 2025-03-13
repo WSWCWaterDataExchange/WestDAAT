@@ -1,8 +1,8 @@
 namespace WesternStatesWater.WestDaat.Database.EntityFramework;
 
-public class ApplicationDocument
+public class WaterConservationApplicationDocument
 {
-    public ApplicationDocument()
+    public WaterConservationApplicationDocument()
     {
     }
 
