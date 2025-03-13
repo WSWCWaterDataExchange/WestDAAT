@@ -26,6 +26,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
             UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
+            SubmittedApplicationExistsLoadRequest req => await CheckSubmittedApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -71,6 +72,24 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             InProgressApplicationId = existingInProgressApplication?.Id,
             InProgressApplicationDisplayId = existingInProgressApplication?.ApplicationDisplayId,
             FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
+        };
+    }
+
+    private async Task<SubmittedApplicationExistsLoadResponse> CheckSubmittedApplicationExists(SubmittedApplicationExistsLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingSubmittedApplication = await db.WaterConservationApplications
+            .AsNoTracking()
+            .Include(wca => wca.Submission)
+            .SingleOrDefaultAsync(wca => wca.Id == request.ApplicationId &&
+                                         wca.Submission != null);
+
+        return new SubmittedApplicationExistsLoadResponse
+        {
+            ApplicationExists = existingSubmittedApplication != null,
+            ApplicantUserId = existingSubmittedApplication?.ApplicantUserId,
+            FundingOrganizationId = existingSubmittedApplication?.FundingOrganizationId,
         };
     }
 
