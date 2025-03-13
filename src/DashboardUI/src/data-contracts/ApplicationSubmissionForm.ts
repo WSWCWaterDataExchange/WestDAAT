@@ -13,7 +13,7 @@ export interface ApplicationSubmissionForm {
   agentPhoneNumber: string | undefined;
   agentAdditionalDetails: string | undefined;
   fieldDetails: {
-    polygonWkt: string;
+    waterConservationApplicationEstimateLocationId: string;
     additionalDetails: string;
   }[];
   canalOrIrrigationEntityName: string | undefined;
@@ -35,3 +35,36 @@ export interface ApplicationSubmissionForm {
   conservationPlanDescription: string | undefined;
   conservationPlanAdditionalInfo: string | undefined;
 }
+
+export const defaultApplicationSubmissionForm = (): ApplicationSubmissionForm => {
+  return {
+    landownerName: undefined,
+    landownerEmail: undefined,
+    landownerPhoneNumber: undefined,
+    landownerAddress: undefined,
+    landownerCity: undefined,
+    landownerState: undefined,
+    landownerZipCode: undefined,
+    agentName: undefined,
+    agentEmail: undefined,
+    agentPhoneNumber: undefined,
+    agentAdditionalDetails: undefined,
+    fieldDetails: [],
+    canalOrIrrigationEntityName: undefined,
+    canalOrIrrigationEntityEmail: undefined,
+    canalOrIrrigationEntityPhoneNumber: undefined,
+    canalOrIrrigationAdditionalDetails: undefined,
+    permitNumber: undefined,
+    facilityDitchName: undefined,
+    priorityDate: undefined,
+    certificateNumber: undefined,
+    shareNumber: undefined,
+    waterRightState: undefined,
+    waterUseDescription: undefined,
+    estimationSupplementaryDetails: undefined,
+    conservationPlanFundingRequestDollarAmount: undefined,
+    conservationPlanFundingRequestCompensationRateUnits: undefined,
+    conservationPlanDescription: undefined,
+    conservationPlanAdditionalInfo: undefined,
+  };
+};
