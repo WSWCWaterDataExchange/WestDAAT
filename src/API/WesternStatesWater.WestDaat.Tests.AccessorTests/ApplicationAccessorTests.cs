@@ -51,6 +51,7 @@ public class ApplicationAccessorTests : AccessorTestBase
 
         // Assert
         response.Should().NotBeNull();
+        response.ApplicationExists.Should().BeTrue();
         response.ApplicationId.Should().Be(application.Id);
         response.ApplicationDisplayId.Should().Be(application.ApplicationDisplayId);
     }
@@ -79,6 +80,7 @@ public class ApplicationAccessorTests : AccessorTestBase
 
         // Assert
         response.Should().NotBeNull();
+        response.ApplicationExists.Should().BeFalse();
         response.ApplicationId.Should().BeNull();
         response.ApplicationDisplayId.Should().BeNull();
     }
@@ -104,6 +106,7 @@ public class ApplicationAccessorTests : AccessorTestBase
 
         // Assert
         response.Should().NotBeNull();
+        response.ApplicationExists.Should().BeFalse();
         response.ApplicationId.Should().BeNull();
         response.ApplicationDisplayId.Should().BeNull();
     }
