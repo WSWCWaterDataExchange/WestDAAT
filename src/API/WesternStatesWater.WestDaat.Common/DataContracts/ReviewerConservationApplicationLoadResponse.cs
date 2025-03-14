@@ -4,5 +4,5 @@ public class ReviewerConservationApplicationLoadResponse : ApplicationLoadRespon
 {
     public ApplicationDetails Application { get; set; } = null!;
 
-    public NoteDetails[] Notes { get; set; } = null!;
+    public ApplicationReviewNote[] Notes { get; set; } = null!;
 }

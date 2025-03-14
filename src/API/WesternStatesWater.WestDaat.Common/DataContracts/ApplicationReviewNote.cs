@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class NoteDetails
+public class ApplicationReviewNote
 {
     public Guid Id { get; set; }
 

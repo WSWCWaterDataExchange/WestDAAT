@@ -4,5 +4,5 @@ public class ReviewerConservationApplicationLoadResponse : ApplicationLoadRespon
 {
     public Common.DataContracts.ApplicationDetails Application { get; set; } = null!;
 
-    public Common.DataContracts.NoteDetails[] Notes { get; set; } = null!;
+    public Common.DataContracts.ApplicationReviewNote[] Notes { get; set; } = null!;
 }
