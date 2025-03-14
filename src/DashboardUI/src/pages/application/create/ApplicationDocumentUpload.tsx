@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
+import ProgressBar from 'react-bootstrap/esm/ProgressBar';
 import { useMutation } from 'react-query';
 import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -95,6 +96,8 @@ export function ApplicationDocumentUpload() {
     });
   };
 
+  uploadDocumentMutation.isLoading = true;
+  // TODO: JN - in PR, add note about aria-label for progress bar and link to this: https://github.com/react-bootstrap/react-bootstrap/pull/6739
   return (
     <>
       {uploadDocumentErrorMessage !== null && (
@@ -137,7 +140,16 @@ export function ApplicationDocumentUpload() {
             </tbody>
           </table>
         )}
-        <Button variant="outline-primary" onClick={handleUploadDocument}>
+        <div className="container mb-4">
+          <ProgressBar
+            animated
+            now={100}
+            visuallyHidden
+            label="Document upload in progress, please wait..."
+            aria-label="Document upload in progress, please wait..."
+          />
+        </div>
+        <Button variant="outline-primary" onClick={handleUploadDocument} disabled={uploadDocumentMutation.isLoading}>
           Upload
         </Button>
       </div>
