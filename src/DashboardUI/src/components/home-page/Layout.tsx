@@ -14,12 +14,12 @@ export function Layout() {
   }, [setShowDownloadModal, setShowUploadModal]);
 
   return (
-    <div className="home-page d-flex flex-column">
+    <main className="home-page d-flex flex-column">
       <SiteNavbar />
       <div className="d-inline-flex flex-grow-1 overflow-hidden align-items-stretch">{currentTabElement}</div>
       <SiteFooter />
       {downloadModal}
       {uploadModal}
-    </div>
+    </main>
   );
 }

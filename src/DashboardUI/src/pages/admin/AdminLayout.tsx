@@ -12,12 +12,14 @@ export function AdminLayout() {
 
       <div className="flex-grow-1 mx-4 mt-4">
         <AdminProvider>
-          <Outlet />
+          <main>
+            <Outlet />
+          </main>
         </AdminProvider>
       </div>
 
       <SiteFooter />
-      <ToastContainer  />
+      <ToastContainer />
     </div>
   );
 }
