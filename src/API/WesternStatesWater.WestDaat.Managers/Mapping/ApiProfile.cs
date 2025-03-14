@@ -145,7 +145,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.ApplicantUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.ApplicationDisplayId, opt => opt.Ignore());
 
-            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.UnsubmittedApplicationExistsLoadRequest>();
+            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.ApplicationExistsLoadRequest>()
+                .ForMember(dest => dest.HasSubmission, opt => opt.MapFrom(_ => false))
+                .ForMember(dest => dest.ApplicationId, opt => opt.Ignore());
 
             CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.ApplicationFormatDisplayIdRequest>();
 

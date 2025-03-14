@@ -104,11 +104,12 @@ internal class ValidationEngine : IValidationEngine
         // Must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
 
-        var submittedApplicationRequest = new DTO.SubmittedApplicationExistsLoadRequest
+        var submittedApplicationRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = true,
             ApplicationId = request.ApplicationId
         };
-        var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+        var submittedApplicationResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
 
         if (!submittedApplicationResponse.ApplicationExists)
         {
@@ -129,11 +130,12 @@ internal class ValidationEngine : IValidationEngine
         // Must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
 
-        var submittedApplicationRequest = new DTO.SubmittedApplicationExistsLoadRequest
+        var submittedApplicationRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = true,
             ApplicationId = request.ApplicationId
         };
-        var submittedApplicationResponse = (DTO.SubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+        var submittedApplicationResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
 
         // deny if the application does not exist
         if (!submittedApplicationResponse.ApplicationExists)
@@ -175,21 +177,22 @@ internal class ValidationEngine : IValidationEngine
     {
         // verify user requesting an estimate is linking it to an application they own
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        var inProgressApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = userContext.UserId,
             WaterRightNativeId = request.WaterRightNativeId
-        });
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressApplicationExistsRequest);
 
-        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
-        if (applicationNotFound)
+        if (!applicationExistsResponse.ApplicationExists)
         {
             return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
         }
 
         // user has an in-progress application for the requested water right
         // BUT user is attempting to link the estimate to a different application
-        var estimateLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        var estimateLinkedToIncorrectApplication = applicationExistsResponse.ApplicationId.Value != request.WaterConservationApplicationId;
         if (estimateLinkedToIncorrectApplication)
         {
             return CreateForbiddenError(request, context);
@@ -221,19 +224,20 @@ internal class ValidationEngine : IValidationEngine
     {
         // verify user creating the submission is linking it to an application they own
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        var inProgressApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = userContext.UserId,
             WaterRightNativeId = request.WaterRightNativeId
-        });
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressApplicationExistsRequest);
 
-        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
-        if (applicationNotFound)
+        if (!applicationExistsResponse.ApplicationExists)
         {
             return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
         }
 
-        var applicationLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        var applicationLinkedToIncorrectApplication = applicationExistsResponse.ApplicationId.Value != request.WaterConservationApplicationId;
         if (applicationLinkedToIncorrectApplication)
         {
             return CreateForbiddenError(request, context);

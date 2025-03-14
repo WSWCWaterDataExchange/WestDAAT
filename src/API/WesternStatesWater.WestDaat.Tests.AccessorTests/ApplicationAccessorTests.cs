@@ -29,7 +29,7 @@ public class ApplicationAccessorTests : AccessorTestBase
     }
 
     [TestMethod]
-    public async Task Load_CheckInProgressApplicationExists_ApplicationExistsWithNoSubmissions_ShouldReturnInProgressApplicationId()
+    public async Task Load_CheckApplicationExists_ApplicationExistsWithNoSubmissions_ShouldReturnInProgressApplicationId()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -39,23 +39,24 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.WaterConservationApplications.AddAsync(application);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new UnsubmittedApplicationExistsLoadRequest
+        var request = new ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = user.Id,
             WaterRightNativeId = application.WaterRightNativeId
         };
 
         // Act
-        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (ApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();
-        response.InProgressApplicationId.Should().Be(application.Id);
-        response.InProgressApplicationDisplayId.Should().Be(application.ApplicationDisplayId);
+        response.ApplicationId.Should().Be(application.Id);
+        response.ApplicationDisplayId.Should().Be(application.ApplicationDisplayId);
     }
 
     [TestMethod]
-    public async Task Load_CheckInProgressApplicationExists_ApplicationExistsWithSubmissions_ShouldReturnNullId()
+    public async Task Load_CheckApplicationExists_ApplicationExistsWithSubmissions_ShouldReturnNullId()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -66,23 +67,24 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new UnsubmittedApplicationExistsLoadRequest
+        var request = new ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = user.Id,
             WaterRightNativeId = application.WaterRightNativeId
         };
 
         // Act
-        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (ApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();
-        response.InProgressApplicationId.Should().BeNull();
-        response.InProgressApplicationDisplayId.Should().BeNull();
+        response.ApplicationId.Should().BeNull();
+        response.ApplicationDisplayId.Should().BeNull();
     }
 
     [TestMethod]
-    public async Task Load_CheckInProgressApplicationExists_ApplicationDoesNotExist_ShouldReturnNullId()
+    public async Task Load_CheckApplicationExists_ApplicationDoesNotExist_ShouldReturnNullId()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -90,26 +92,27 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.Users.AddAsync(user);
         await _westDaatDb.SaveChangesAsync();
 
-        var request = new UnsubmittedApplicationExistsLoadRequest
+        var request = new ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = user.Id,
             WaterRightNativeId = "1234",
         };
 
         // Act
-        var response = (UnsubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (ApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();
-        response.InProgressApplicationId.Should().BeNull();
-        response.InProgressApplicationDisplayId.Should().BeNull();
+        response.ApplicationId.Should().BeNull();
+        response.ApplicationDisplayId.Should().BeNull();
     }
 
     [DataTestMethod]
     [DataRow(false, false, false, DisplayName = "Application does not exist")]
     [DataRow(true, false, false, DisplayName = "Application exists but has no submission")]
     [DataRow(true, true, true, DisplayName = "Application exists and has submission")]
-    public async Task Load_CheckSubmittedApplicationExists_Success(
+    public async Task Load_CheckApplicationExists_Success(
         bool applicationExists,
         bool applicationHasSubmission,
         bool expectedExists)
@@ -136,11 +139,12 @@ public class ApplicationAccessorTests : AccessorTestBase
 
 
         // Act
-        var request = new SubmittedApplicationExistsLoadRequest
+        var request = new ApplicationExistsLoadRequest
         {
+            HasSubmission = true,
             ApplicationId = application?.Id ?? Guid.NewGuid()
         };
-        var response = (SubmittedApplicationExistsLoadResponse)await _accessor.Load(request);
+        var response = (ApplicationExistsLoadResponse)await _accessor.Load(request);
 
         // Assert
         response.Should().NotBeNull();

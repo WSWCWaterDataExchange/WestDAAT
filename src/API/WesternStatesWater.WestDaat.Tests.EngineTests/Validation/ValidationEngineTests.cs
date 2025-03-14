@@ -71,10 +71,11 @@ public class ValidationEngineTests : EngineTestBase
         Guid? organizationId = Guid.NewGuid();
 
         // Arrange
-        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<UnsubmittedApplicationExistsLoadRequest>()))
-            .ReturnsAsync(new UnsubmittedApplicationExistsLoadResponse
+        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<ApplicationExistsLoadRequest>()))
+            .ReturnsAsync(new ApplicationExistsLoadResponse
             {
-                InProgressApplicationId = applicationId,
+                ApplicationExists = applicationExists,
+                ApplicationId = applicationId,
                 FundingOrganizationId = organizationId,
             });
 
@@ -159,10 +160,10 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
-        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<SubmittedApplicationExistsLoadRequest>()));
+        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
         if (applicationExists)
         {
-            applicationAccessorMock.ReturnsAsync(new SubmittedApplicationExistsLoadResponse
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
             {
                 ApplicationExists = true,
                 ApplicantUserId = userIsApplicant ? userId : Guid.NewGuid(),
@@ -171,7 +172,7 @@ public class ValidationEngineTests : EngineTestBase
         }
         else
         {
-            applicationAccessorMock.ReturnsAsync(new SubmittedApplicationExistsLoadResponse
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
             {
                 ApplicationExists = false,
             });
@@ -258,10 +259,10 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
-        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<SubmittedApplicationExistsLoadRequest>()));
+        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
         if (applicationExists)
         {
-            applicationAccessorMock.ReturnsAsync(new SubmittedApplicationExistsLoadResponse
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
             {
                 ApplicationExists = true,
                 ApplicantUserId = Guid.NewGuid(),
@@ -270,7 +271,7 @@ public class ValidationEngineTests : EngineTestBase
         }
         else
         {
-            applicationAccessorMock.ReturnsAsync(new SubmittedApplicationExistsLoadResponse
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
             {
                 ApplicationExists = false,
             });

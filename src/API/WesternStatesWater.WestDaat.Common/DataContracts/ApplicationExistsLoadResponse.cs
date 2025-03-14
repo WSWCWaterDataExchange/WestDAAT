@@ -1,10 +1,13 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class SubmittedApplicationExistsLoadResponse : ApplicationLoadResponseBase
+public class ApplicationExistsLoadResponse : ApplicationLoadResponseBase
 {
     public bool ApplicationExists { get; set; }
 
-    // these will only be populated if the application exists
+    public Guid? ApplicationId { get; set; } = null!;
+
+    public string ApplicationDisplayId { get; set; } = null!;
+
     public Guid? ApplicantUserId { get; set; } = null!;
 
     public Guid? FundingOrganizationId { get; set; } = null!;

@@ -27,8 +27,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
             ApplicantConservationApplicationLoadRequest req => await GetApplicantConservationApplication(req),
             ReviewerConservationApplicationLoadRequest req => await GetReviewerConservationApplication(req),
-            UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
-            SubmittedApplicationExistsLoadRequest req => await CheckSubmittedApplicationExists(req),
+            ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
@@ -92,40 +91,50 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<UnsubmittedApplicationExistsLoadResponse> CheckInProgressApplicationExists(UnsubmittedApplicationExistsLoadRequest request)
+    private async Task<ApplicationExistsLoadResponse> CheckApplicationExists(ApplicationExistsLoadRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
-        var existingInProgressApplication = await db.WaterConservationApplications
-            .AsNoTracking()
-            .Include(wca => wca.Submission)
-            .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
-                                         wca.WaterRightNativeId == request.WaterRightNativeId &&
-                                         wca.Submission == null);
+        IQueryable<EFWD.WaterConservationApplication> applicationQuery = db.WaterConservationApplications
+            .Include(app => app.Submission)
+            .AsNoTracking();
 
-        return new UnsubmittedApplicationExistsLoadResponse
+        if (request.ApplicationId.HasValue)
         {
-            InProgressApplicationId = existingInProgressApplication?.Id,
-            InProgressApplicationDisplayId = existingInProgressApplication?.ApplicationDisplayId,
-            FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
-        };
-    }
+            applicationQuery = applicationQuery.Where(app => app.Id == request.ApplicationId.Value);
+        }
 
-    private async Task<SubmittedApplicationExistsLoadResponse> CheckSubmittedApplicationExists(SubmittedApplicationExistsLoadRequest request)
-    {
-        await using var db = _westDaatDatabaseContextFactory.Create();
-
-        var existingSubmittedApplication = await db.WaterConservationApplications
-            .Include(wca => wca.Submission)
-            .Where(wca => wca.Id == request.ApplicationId && wca.Submission != null)
-            .AsNoTracking()
-            .SingleOrDefaultAsync();
-
-        return new SubmittedApplicationExistsLoadResponse
+        if (!string.IsNullOrEmpty(request.WaterRightNativeId))
         {
-            ApplicationExists = existingSubmittedApplication != null,
-            ApplicantUserId = existingSubmittedApplication?.ApplicantUserId,
-            FundingOrganizationId = existingSubmittedApplication?.FundingOrganizationId,
+            applicationQuery = applicationQuery.Where(app => app.WaterRightNativeId == request.WaterRightNativeId);
+        }
+
+        if (request.ApplicantUserId.HasValue)
+        {
+            applicationQuery = applicationQuery.Where(app => app.ApplicantUserId == request.ApplicantUserId.Value);
+        }
+
+        if (request.HasSubmission.HasValue)
+        {
+            if (request.HasSubmission == true)
+            {
+                applicationQuery = applicationQuery.Where(app => app.Submission != null);
+            }
+            else
+            {
+                applicationQuery = applicationQuery.Where(app => app.Submission == null);
+            }
+        }
+
+        var application = await applicationQuery.SingleOrDefaultAsync();
+
+        return new ApplicationExistsLoadResponse
+        {
+            ApplicationExists = application != null,
+            ApplicationId = application?.Id,
+            ApplicationDisplayId = application?.ApplicationDisplayId,
+            ApplicantUserId = application?.ApplicantUserId,
+            FundingOrganizationId = application?.FundingOrganizationId,
         };
     }
 
