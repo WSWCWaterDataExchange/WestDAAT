@@ -58,7 +58,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<TDetails> GetFullApplicationDetails<TRequest, TDetails>(TRequest request)
+    private async Task<TDetails> GetApplicationDetails<TRequest, TDetails>(TRequest request)
         where TRequest : ApplicationLoadSingleRequestBase
         where TDetails : ApplicationDetailsBase
     {
@@ -74,7 +74,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicantConservationApplicationLoadResponse> GetApplicantConservationApplication(ApplicantConservationApplicationLoadRequest request)
     {
-        var application = await GetFullApplicationDetails<ApplicantConservationApplicationLoadRequest, ApplicationDetailsApplicantView>(request);
+        var application = await GetApplicationDetails<ApplicantConservationApplicationLoadRequest, ApplicationDetailsApplicantView>(request);
 
         return new ApplicantConservationApplicationLoadResponse
         {
@@ -84,7 +84,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ReviewerConservationApplicationLoadResponse> GetReviewerConservationApplication(ReviewerConservationApplicationLoadRequest request)
     {
-        var application = await GetFullApplicationDetails<ReviewerConservationApplicationLoadRequest, ApplicationDetailsReviewerView>(request);
+        var application = await GetApplicationDetails<ReviewerConservationApplicationLoadRequest, ApplicationDetailsReviewerView>(request);
 
         return new ReviewerConservationApplicationLoadResponse
         {
