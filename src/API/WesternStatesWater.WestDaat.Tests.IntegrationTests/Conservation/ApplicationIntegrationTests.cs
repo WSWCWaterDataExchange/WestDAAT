@@ -316,6 +316,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEmpty(); // not implemented yet
 
+        // verify notes are returned in order
+        var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
+        reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
+
         // verify that all possible request types are accounted for
         var requests = Assembly.GetAssembly(typeof(ApplicationLoadSingleRequestBase))?
             .GetTypes()
