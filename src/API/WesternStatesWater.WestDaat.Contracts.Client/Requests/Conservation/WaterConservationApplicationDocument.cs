@@ -1,4 +1,4 @@
-namespace WesternStatesWater.WestDaat.Database.EntityFramework;
+namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 public class WaterConservationApplicationDocument
 {
@@ -13,5 +13,5 @@ public class WaterConservationApplicationDocument
     /// </summary>
     public string FileName { get; set; } = null!;
     
-    public string? Description { get; set; }
+    public string Description { get; set; }
 }

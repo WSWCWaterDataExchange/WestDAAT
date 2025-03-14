@@ -106,6 +106,7 @@ export const submitApplication = async (
     waterConservationApplicationId: string;
     waterRightNativeId: string;
     form: ApplicationSubmissionForm;
+    supportingDocuments: ApplicationDocument[];
   },
 ): Promise<void> => {
   const api = await westDaatApi(context);
@@ -141,6 +142,7 @@ export const submitApplication = async (
     waterRightState: data.form.waterRightState!,
     waterUseDescription: data.form.waterUseDescription!,
     fieldDetails: data.form.fieldDetails,
+    supportingDocuments: data.supportingDocuments
   };
 
   await api.post<void>('Applications/Submit', request);

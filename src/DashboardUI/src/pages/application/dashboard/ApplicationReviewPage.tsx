@@ -38,19 +38,11 @@ export function ApplicationReviewPage() {
 
   const submitApplicationMutation = useMutation({
     mutationFn: async () => {
-      const waterConservationApplicationId = state.conservationApplication.waterConservationApplicationId!;
-
-      let alertString = `Submitting application documents - not yet implemented.\n\n
-        Files being submitted:\n\n`;
-      state.conservationApplication.supportingDocuments.forEach((file, index) => {
-        alertString += `File #${index + 1}: ${file.fileName}\n   (description: '${file.description ?? '(no text entered)'}')\n\n`;
-      });
-      alert(alertString);
-
       return await submitApplication(context, {
-        waterConservationApplicationId,
+        waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
         waterRightNativeId: state.conservationApplication.waterRightNativeId!,
         form: state.conservationApplication.applicationSubmissionForm,
+        supportingDocuments: state.conservationApplication.supportingDocuments,
       });
     },
     onSuccess: () => {
