@@ -221,12 +221,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
 
-            CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicantConservationApplicationLoadRequest>();
-            CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ReviewerConservationApplicationLoadRequest>();
+            CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
+            CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
 
-            CreateMap<CommonContracts.ApplicantConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
+            CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            CreateMap<CommonContracts.ReviewerConservationApplicationLoadResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
+            CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 

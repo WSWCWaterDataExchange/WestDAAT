@@ -25,8 +25,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
-            ApplicantConservationApplicationLoadRequest req => await GetApplicantConservationApplication(req),
-            ReviewerConservationApplicationLoadRequest req => await GetReviewerConservationApplication(req),
+            ApplicationLoadSingleRequest req => await GetApplication(req),
             ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
             _ => throw new NotImplementedException(
@@ -57,35 +56,16 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<TDetails> GetApplicationDetails<TRequest, TDetails>(TRequest request)
-        where TRequest : ApplicationLoadSingleRequestBase
-        where TDetails : ApplicationDetails
+    private async Task<ApplicationLoadSingleResponse> GetApplication(ApplicationLoadSingleRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var application = await db.WaterConservationApplications
             .Where(app => app.Id == request.ApplicationId)
-            .ProjectTo<TDetails>(DtoMapper.Configuration)
+            .ProjectTo<ApplicationDetails>(DtoMapper.Configuration)
             .SingleAsync();
 
-        return application;
-    }
-
-    private async Task<ApplicantConservationApplicationLoadResponse> GetApplicantConservationApplication(ApplicantConservationApplicationLoadRequest request)
-    {
-        var application = await GetApplicationDetails<ApplicantConservationApplicationLoadRequest, ApplicationDetails>(request);
-
-        return new ApplicantConservationApplicationLoadResponse
-        {
-            Application = application
-        };
-    }
-
-    private async Task<ReviewerConservationApplicationLoadResponse> GetReviewerConservationApplication(ReviewerConservationApplicationLoadRequest request)
-    {
-        var application = await GetApplicationDetails<ReviewerConservationApplicationLoadRequest, ApplicationDetails>(request);
-
-        return new ReviewerConservationApplicationLoadResponse
+        return new ApplicationLoadSingleResponse
         {
             Application = application
         };

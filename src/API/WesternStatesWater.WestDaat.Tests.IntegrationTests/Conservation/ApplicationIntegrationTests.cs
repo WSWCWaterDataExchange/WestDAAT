@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Transactions;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
@@ -281,17 +280,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         // Act
-        var applicantRequest = new CLI.Requests.Conservation.ApplicantConservationApplicationLoadRequest
+        var applicantRequest = new ApplicantConservationApplicationLoadRequest
         {
             ApplicationId = application.Id
         };
-        var reviewerRequest = new CLI.Requests.Conservation.ReviewerConservationApplicationLoadRequest
+        var reviewerRequest = new ReviewerConservationApplicationLoadRequest
         {
             ApplicationId = application.Id
         };
 
-        var applicantResponse = await _applicationManager.Load<CLI.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CLI.Responses.Conservation.ApplicantConservationApplicationLoadResponse>(applicantRequest);
-        var reviewerResponse = await _applicationManager.Load<CLI.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CLI.Responses.Conservation.ReviewerConservationApplicationLoadResponse>(reviewerRequest);
+        var applicantResponse = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(applicantRequest);
+        var reviewerResponse = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(reviewerRequest);
 
         // Assert
 
@@ -319,14 +318,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
-
-        // verify that all possible request types are accounted for
-        var requests = Assembly.GetAssembly(typeof(ApplicationLoadSingleRequestBase))?
-            .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(ApplicationLoadSingleRequestBase)))
-            .ToArray();
-
-        requests.Length.Should().Be(2, because: "this test currently only accounts for the specified number of request types. If more request types are added, this test should then be updated.");
     }
 
     [DataTestMethod]
