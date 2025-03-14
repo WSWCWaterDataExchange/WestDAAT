@@ -6,21 +6,28 @@ import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import ProgressBar from 'react-bootstrap/esm/ProgressBar';
+import Fade from 'react-bootstrap/Fade';
 import { useMutation } from 'react-query';
 import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
 
-export function ApplicationDocumentUpload() {
+export interface ApplicationDocumentUploadProps {
+  documentUploadingHandler: (isUploading: boolean) => void;
+}
+
+export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps) {
   const msalContext = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
   const uploadDocumentMutation = useMutation({
     mutationFn: async (params: { files: File[] }) => {
+      props.documentUploadingHandler(true);
       clearUploadDocumentError();
       return await uploadApplicationDocuments(msalContext, params.files);
     },
     onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
+      props.documentUploadingHandler(false);
       dispatch({
         type: 'APPLICATION_DOCUMENT_UPLOADED',
         payload: {
@@ -29,6 +36,7 @@ export function ApplicationDocumentUpload() {
       });
     },
     onError: () => {
+      props.documentUploadingHandler(false);
       setUploadDocumentError('An error occurred while uploading the document(s). Please try again.');
     },
   });
@@ -96,7 +104,6 @@ export function ApplicationDocumentUpload() {
     });
   };
 
-  uploadDocumentMutation.isLoading = true;
   // TODO: JN - in PR, add note about aria-label for progress bar and link to this: https://github.com/react-bootstrap/react-bootstrap/pull/6739
   return (
     <>
@@ -140,15 +147,20 @@ export function ApplicationDocumentUpload() {
             </tbody>
           </table>
         )}
-        <div className="container mb-4">
-          <ProgressBar
-            animated
-            now={100}
-            visuallyHidden
-            label="Document upload in progress, please wait..."
-            aria-label="Document upload in progress, please wait..."
-          />
-        </div>
+
+        <Fade in={uploadDocumentMutation.isLoading}>
+          <div className="container">
+            <ProgressBar
+              className="my-4"
+              animated
+              now={100}
+              visuallyHidden
+              label="Document upload in progress, please wait..."
+              aria-label="Document upload in progress, please wait..."
+            />
+          </div>
+        </Fade>
+
         <Button variant="outline-primary" onClick={handleUploadDocument} disabled={uploadDocumentMutation.isLoading}>
           Upload
         </Button>

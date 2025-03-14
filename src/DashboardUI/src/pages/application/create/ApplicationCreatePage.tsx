@@ -52,6 +52,7 @@ function ApplicationCreatePageForm() {
   const polygonData = state.conservationApplication.estimateLocations;
 
   const [formValidated, setFormValidated] = useState(false);
+  const [documentUploading, setDocumentUploading] = useState(false);
 
   const navigateToReviewApplicationPage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
@@ -561,7 +562,7 @@ function ApplicationCreatePageForm() {
       </Form>
 
       <ApplicationFormSection title="Supporting Documents (Optional)">
-        <ApplicationDocumentUpload></ApplicationDocumentUpload>
+        <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
       </ApplicationFormSection>
 
       <hr className="m-0" />
