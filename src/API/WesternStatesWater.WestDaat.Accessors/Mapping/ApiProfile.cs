@@ -355,11 +355,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             // using ProjectTo requires that we have maps to each contract that inherits from ApplicationDetailsBase,
             // not just one map from Application to ApplicationDetailsBase
-            CreateMap<EFWD.WaterConservationApplication, ApplicationDetailsApplicantView>()
-                .ForMember(dest => dest.StaticMapBlobUrl, opt => opt.Ignore());
+            CreateMap<EFWD.WaterConservationApplication, ApplicationDetailsApplicantView>();
 
             CreateMap<EFWD.WaterConservationApplication, ApplicationDetailsReviewerView>()
-                .ForMember(dest => dest.StaticMapBlobUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.Notes, opt => opt.Ignore());
 
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();

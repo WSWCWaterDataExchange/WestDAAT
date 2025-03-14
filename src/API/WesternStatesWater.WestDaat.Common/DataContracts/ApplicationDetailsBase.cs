@@ -12,9 +12,6 @@ public class ApplicationDetailsBase
 
     public string ApplicationDisplayId { get; set; } = null!;
 
-    // this will be retrieved later
-    public string StaticMapBlobUrl { get; set; } = null;
-
     public EstimateDetails Estimate { get; set; } = null!;
 
     public SubmissionDetails Submission { get; set; } = null!;
