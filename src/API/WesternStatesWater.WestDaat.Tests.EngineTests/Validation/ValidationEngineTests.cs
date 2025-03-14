@@ -160,6 +160,9 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequestBase>()))
+            .Returns([Permissions.ApplicationReview]);
+
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
         if (applicationExists)
         {
@@ -215,15 +218,14 @@ public class ValidationEngineTests : EngineTestBase
     [DataTestMethod]
     [DataRow(false, false, false, false, false, DisplayName = "User is not logged in")]
     [DataRow(true, false, false, false, false, DisplayName = "User is logged in but Application does not exist")]
-    [DataRow(true, true, false, false, false, DisplayName = "User is logged in and Application exists but they do not have access")]
-    [DataRow(true, true, true, false, true, DisplayName = "User is logged in, Application exists, and they have access because they are a global admin")]
-    [DataRow(true, true, false, true, true, DisplayName = "User is logged in, Application exists, and they have access because they are an organization member")]
-
+    [DataRow(true, true, false, false, false, DisplayName = "User is logged in and Application exists but they are not an org member")]
+    [DataRow(true, true, true, false, false, DisplayName = "User is logged in, Application exists, and they are an org member, but do not have permission")]
+    [DataRow(true, true, true, true, true, DisplayName = "User is logged in, Application exists, they are an org member, and they have permission")]
     public async Task Validate_ValidateReviewerConservationApplicationLoadRequest(
         bool isUserLoggedIn,
         bool applicationExists,
-        bool isUserGlobalAdmin,
-        bool isUserOrgMember,
+        bool isUserMemberOfOrg,
+        bool doesUserHaveCorrectPermission,
         bool shouldSucceed
         )
     {
@@ -239,13 +241,13 @@ public class ValidationEngineTests : EngineTestBase
             {
                 UserId = userId,
                 ExternalAuthId = "",
-                Roles = isUserGlobalAdmin ? [Roles.GlobalAdmin] : [],
-                OrganizationRoles = isUserOrgMember
+                Roles = [],
+                OrganizationRoles = isUserMemberOfOrg
                 ? [
                     new OrganizationRole
                     {
                         OrganizationId = organizationId,
-                        RoleNames = [Roles.TechnicalReviewer],
+                        RoleNames =  [Roles.TechnicalReviewer],
                     }
                 ]
                 : [],
@@ -258,6 +260,9 @@ public class ValidationEngineTests : EngineTestBase
             getContextMock.Returns<UserContext>(null);
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
+
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequestBase>()))
+            .Returns(doesUserHaveCorrectPermission ? [Permissions.ApplicationReview] : []);
 
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
         if (applicationExists)

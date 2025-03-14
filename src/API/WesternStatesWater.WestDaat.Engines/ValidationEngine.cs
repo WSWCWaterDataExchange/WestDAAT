@@ -143,14 +143,14 @@ internal class ValidationEngine : IValidationEngine
             return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
         }
 
-        // allow global admins
-        if (userContext.Roles.Contains(Roles.GlobalAdmin))
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
-            return null;
-        }
+            Context = context,
+            OrganizationId = submittedApplicationResponse.FundingOrganizationId
+        });
 
-        // deny if the user is not part of the linked Funding Organization
-        if (userContext.OrganizationRoles.All(orgRole => orgRole.OrganizationId != submittedApplicationResponse.FundingOrganizationId))
+        // deny if the user does not have permission to perform reviews in this organization
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
         {
             return CreateForbiddenError(request, context);
         }
