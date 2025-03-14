@@ -2,5 +2,7 @@
 
 public class ReviewerConservationApplicationLoadResponse : ApplicationLoadResponseBase
 {
-    public ApplicationDetailsReviewerView Application { get; set; } = null!;
+    public ApplicationDetails Application { get; set; } = null!;
+
+    public NoteDetails[] Notes { get; set; } = null!;
 }

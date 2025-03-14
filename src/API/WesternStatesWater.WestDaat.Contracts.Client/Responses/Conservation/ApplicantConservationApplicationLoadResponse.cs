@@ -2,5 +2,5 @@
 
 public class ApplicantConservationApplicationLoadResponse : ApplicationLoadResponseBase
 {
-    public Common.DataContracts.ApplicationDetailsApplicantView Application { get; set; } = null!;
+    public Common.DataContracts.ApplicationDetails Application { get; set; } = null!;
 }

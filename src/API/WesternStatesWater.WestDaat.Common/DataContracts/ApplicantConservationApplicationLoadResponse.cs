@@ -2,5 +2,5 @@
 
 public class ApplicantConservationApplicationLoadResponse : ApplicationLoadResponseBase
 {
-    public ApplicationDetailsApplicantView Application { get; set; } = null!;
+    public ApplicationDetails Application { get; set; } = null!;
 }

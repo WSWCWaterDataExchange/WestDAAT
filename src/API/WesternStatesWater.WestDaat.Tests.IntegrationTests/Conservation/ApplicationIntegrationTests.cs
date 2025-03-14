@@ -314,7 +314,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
-        reviewerResponse.Application.Notes.Should().BeNull(); // not implemented yet
+        reviewerResponse.Notes.Should().BeEmpty(); // not implemented yet
 
         // verify that all possible request types are accounted for
         var requests = Assembly.GetAssembly(typeof(ApplicationLoadSingleRequestBase))?
