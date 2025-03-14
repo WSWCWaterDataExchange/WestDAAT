@@ -46,6 +46,10 @@ on:
       react-app-auth-known-authority:
         required: true
         type: string
+      # REACT_APP_AUTH_AUTHORITY_FORGOT_PASSWORD
+      react-app-auth-authority-forgot-password:
+        required: true
+        type: string
       # REACT_APP_GA_ID
       react-app-ga-id:
         required: true
@@ -95,6 +99,7 @@ jobs:
           echo "REACT_APP_AUTH_CLIENT_ID=${{ inputs.react-app-auth-client-id }}" >> $GITHUB_ENV
           echo "REACT_APP_AUTH_AUTHORITY=${{ inputs.react-app-auth-authority }}" >> $GITHUB_ENV
           echo "REACT_APP_AUTH_KNOWN_AUTHORITY=${{ inputs.react-app-auth-known-authority }}" >> $GITHUB_ENV
+          echo "REACT_APP_AUTH_AUTHORITY_FORGOT_PASSWORD=${{ inputs.react-app-auth-authority-forgot-password }}" >> $GITHUB_ENV
           echo "REACT_APP_GA_ID=${{ inputs.react-app-ga-id }}" >> $GITHUB_ENV
           echo "REACT_APP_FEATURE_CONSERVATION_ESTIMATION_TOOL=${{ inputs.react-app-feature-conservation-estimation-tool }}" >> $GITHUB_ENV
           echo "REACT_APP_WATER_RIGHTS_VECTOR_TILE_URL=${{ inputs.react-app-water-rights-vector-tile-url }}" >> $GITHUB_ENV

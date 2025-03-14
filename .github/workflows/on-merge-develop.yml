@@ -42,7 +42,8 @@ jobs:
       react-app-auth-redirect-url: https://westdaatqa.westernstateswater.org
       react-app-webapi-url: https://westdaatqa.azure-api.net/api/
       react-app-auth-client-id: ab3cf308-8a7e-404e-977c-d0227f4a48c4
-      react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin
+      react-app-auth-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_signupsignin      
+      react-app-auth-authority-forgot-password: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com/b2c_1_passwordreset
       react-app-auth-known-authority: https://westdaatqa.b2clogin.com/westdaatqa.onmicrosoft.com
       react-app-ga-id: G-KFL0TGM4B8
       react-app-feature-conservation-estimation-tool: enabled
