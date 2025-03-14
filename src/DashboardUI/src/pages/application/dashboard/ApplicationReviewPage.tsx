@@ -329,6 +329,10 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         <ApplicationFormSection title="Supporting Documents">
           <div className="col mb-4">
+            {state.conservationApplication.supportingDocuments.length === 0 && (
+              <div className="text-muted">(No supporting documents have been provided)</div>
+            )}
+
             {state.conservationApplication.supportingDocuments.length > 0 && (
               <table className="table">
                 <tbody>
@@ -347,7 +351,8 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
           </div>
         </ApplicationFormSection>
 
-        <hr className="m-0" />
+        {state.conservationApplication.supportingDocuments.length === 0 && <hr className="m-0" />}
+
         <div className="d-flex justify-content-end p-3">
           <Button variant="success" type="button" onClick={props.submitApplication}>
             Submit
