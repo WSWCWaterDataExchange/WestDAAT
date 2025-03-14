@@ -24,7 +24,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
 
   return (
     <>
-      <div className="d-flex justify-content-around align-items-center mb-3">
+      <div className="d-flex justify-content-around gap-2 mb-3">
         {renderCard(props.fieldAcreage, 'Field Area', 'acres')}
         {renderCard(props.data?.averageYearlyEtInInches, 'Average Yearly ET', 'inches')}
         {renderCard(props.data?.averageYearlyEtInAcreFeet, 'Average Yearly ET', 'acre-feet')}
