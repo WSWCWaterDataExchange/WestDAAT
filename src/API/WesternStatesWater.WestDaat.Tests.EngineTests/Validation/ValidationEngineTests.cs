@@ -1,6 +1,7 @@
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
@@ -70,10 +71,11 @@ public class ValidationEngineTests : EngineTestBase
         Guid? organizationId = Guid.NewGuid();
 
         // Arrange
-        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<UnsubmittedApplicationExistsLoadRequest>()))
-            .ReturnsAsync(new UnsubmittedApplicationExistsLoadResponse
+        _applicationAccessorMock.Setup(x => x.Load(It.IsAny<ApplicationExistsLoadRequest>()))
+            .ReturnsAsync(new ApplicationExistsLoadResponse
             {
-                InProgressApplicationId = applicationId,
+                ApplicationExists = applicationExists,
+                ApplicationId = applicationId,
                 FundingOrganizationId = organizationId,
             });
 
@@ -119,6 +121,199 @@ public class ValidationEngineTests : EngineTestBase
             else if (polygonsIntersect)
             {
                 result.Should().BeOfType<ValidationError>();
+            }
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow(false, false, false, false, DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, false, DisplayName = "User is logged in but Application does not exist")]
+    [DataRow(true, true, false, false, DisplayName = "User is logged in and Application exists but they are not the Applicant")]
+    [DataRow(true, true, true, true, DisplayName = "User is logged in and Application exists and they are the Applicant")]
+    public async Task Validate_ValidateApplicantConservationApplicationLoadRequest_Success(
+        bool isUserLoggedIn,
+        bool applicationExists,
+        bool userIsApplicant,
+        bool shouldSucceed
+        )
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+
+        var getContextMock = _contextUtilityMock.Setup(mock => mock.GetContext());
+        var getRequiredContextMock = _contextUtilityMock.Setup(mock => mock.GetRequiredContext<UserContext>());
+        if (isUserLoggedIn)
+        {
+            var userContext = new UserContext
+            {
+                UserId = userId,
+                ExternalAuthId = "",
+                Roles = [],
+                OrganizationRoles = [],
+            };
+            getContextMock.Returns(userContext);
+            getRequiredContextMock.Returns(userContext);
+        }
+        else
+        {
+            getContextMock.Returns<UserContext>(null);
+            getRequiredContextMock.Throws<InvalidOperationException>();
+        }
+
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequestBase>()))
+            .Returns([Permissions.ApplicationReview]);
+
+        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
+        if (applicationExists)
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = true,
+                ApplicantUserId = userIsApplicant ? userId : Guid.NewGuid(),
+                FundingOrganizationId = Guid.NewGuid(),
+            });
+        }
+        else
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = false,
+            });
+        }
+
+        // Act
+        var request = new Contracts.Client.Requests.Conservation.ApplicantConservationApplicationLoadRequest
+        {
+            ApplicationId = Guid.NewGuid(),
+        };
+        var call = async () => await _validationEngine.Validate(request);
+
+        // Assert
+        if (shouldSucceed)
+        {
+            var response = await call();
+            response.Should().BeNull();
+        }
+        else
+        {
+            if (isUserLoggedIn)
+            {
+                var response = await call();
+                if (applicationExists)
+                {
+                    response.Should().BeOfType<ForbiddenError>();
+                }
+                else
+                {
+                    response.Should().BeOfType<NotFoundError>();
+                }
+            }
+            else
+            {
+                await call.Should().ThrowAsync<InvalidOperationException>();
+            }
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow(false, false, false, false, false, DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, false, false, DisplayName = "User is logged in but Application does not exist")]
+    [DataRow(true, true, false, false, false, DisplayName = "User is logged in and Application exists but they are not an org member")]
+    [DataRow(true, true, true, false, false, DisplayName = "User is logged in, Application exists, and they are an org member, but do not have permission")]
+    [DataRow(true, true, true, true, true, DisplayName = "User is logged in, Application exists, they are an org member, and they have permission")]
+    public async Task Validate_ValidateReviewerConservationApplicationLoadRequest(
+        bool isUserLoggedIn,
+        bool applicationExists,
+        bool isUserMemberOfOrg,
+        bool doesUserHaveCorrectPermission,
+        bool shouldSucceed
+        )
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
+
+        var getContextMock = _contextUtilityMock.Setup(mock => mock.GetContext());
+        var getRequiredContextMock = _contextUtilityMock.Setup(mock => mock.GetRequiredContext<UserContext>());
+        if (isUserLoggedIn)
+        {
+            var userContext = new UserContext
+            {
+                UserId = userId,
+                ExternalAuthId = "",
+                Roles = [],
+                OrganizationRoles = isUserMemberOfOrg
+                ? [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organizationId,
+                        RoleNames =  [Roles.TechnicalReviewer],
+                    }
+                ]
+                : [],
+            };
+            getContextMock.Returns(userContext);
+            getRequiredContextMock.Returns(userContext);
+        }
+        else
+        {
+            getContextMock.Returns<UserContext>(null);
+            getRequiredContextMock.Throws<InvalidOperationException>();
+        }
+
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequestBase>()))
+            .Returns(doesUserHaveCorrectPermission ? [Permissions.ApplicationReview] : []);
+
+        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
+        if (applicationExists)
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = true,
+                ApplicantUserId = Guid.NewGuid(),
+                FundingOrganizationId = organizationId,
+            });
+        }
+        else
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = false,
+            });
+        }
+
+        // Act
+        var request = new Contracts.Client.Requests.Conservation.ReviewerConservationApplicationLoadRequest
+        {
+            ApplicationId = Guid.NewGuid(),
+        };
+        var call = async () => await _validationEngine.Validate(request);
+
+        // Assert
+        if (shouldSucceed)
+        {
+            var response = await call();
+            response.Should().BeNull();
+        }
+        else
+        {
+            if (isUserLoggedIn)
+            {
+                var response = await call();
+
+                if (applicationExists)
+                {
+                    response.Should().BeOfType<ForbiddenError>();
+                }
+                else
+                {
+                    response.Should().BeOfType<NotFoundError>();
+                }
+
+            }
+            else
+            {
+                await call.Should().ThrowAsync<InvalidOperationException>();
             }
         }
     }
