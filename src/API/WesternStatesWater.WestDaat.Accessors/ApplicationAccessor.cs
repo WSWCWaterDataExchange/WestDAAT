@@ -65,7 +65,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var application = await db.WaterConservationApplications
-            .AsNoTracking()
             .Where(app => app.Id == request.ApplicationId)
             .ProjectTo<TDetails>(DtoMapper.Configuration)
             .SingleAsync();
