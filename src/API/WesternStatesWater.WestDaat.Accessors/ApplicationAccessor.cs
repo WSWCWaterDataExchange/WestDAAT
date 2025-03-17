@@ -217,7 +217,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         // save submission to db
         var entity = request.Map<EFWD.WaterConservationApplicationSubmission>();
         await db.WaterConservationApplicationSubmissions.AddAsync(entity);
-        
+
         // update related estimate locations' details
         var existingApplication = await db.WaterConservationApplications
             .Include(wca => wca.Estimate)
@@ -232,7 +232,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         {
             var existingEstimateLocation = existingApplication.Estimate.Locations
                 .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
-            
+
             if (existingEstimateLocation == null)
             {
                 throw new WestDaatException("Estimate location not found.");
