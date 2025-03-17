@@ -14,6 +14,10 @@ import { generateSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
 import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
+import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
+import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
+import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
+import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -144,4 +148,38 @@ export const submitApplication = async (
   };
 
   await api.post<void>('Applications/Submit', request);
+};
+
+export const getApplication = async (
+  context: IMsalContext,
+  data: {
+    applicationId: string;
+    perspective: 'applicant' | 'reviewer';
+  },
+): Promise<ApplicationLoadResponseBase> => {
+  const api = await westDaatApi(context);
+
+  let request: ApplicationLoadRequestBase;
+
+  switch (data.perspective) {
+    case 'applicant': {
+      const applicantRequest: ApplicantConservationApplicationLoadRequest = {
+        $type: 'ApplicantConservationApplicationLoadRequest',
+        applicationId: data.applicationId,
+      };
+      request = applicantRequest;
+      break;
+    }
+    case 'reviewer': {
+      const reviewerRequest: ReviewerConservationApplicationLoadRequest = {
+        $type: 'ReviewerConservationApplicationLoadRequest',
+        applicationId: data.applicationId,
+      };
+      request = reviewerRequest;
+      break;
+    }
+  }
+
+  const { data: response } = await api.post<ApplicationLoadResponseBase>('Applications/Load', request);
+  return response;
 };
