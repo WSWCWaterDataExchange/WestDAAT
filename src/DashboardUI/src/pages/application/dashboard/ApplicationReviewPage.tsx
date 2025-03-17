@@ -24,7 +24,8 @@ export function ApplicationReviewPage() {
   const context = useMsal();
   const { applicationId } = useParams();
 
-  useGetApplicationQuery(applicationId);
+  const { isLoading: isLoadingApplication } = useGetApplicationQuery(applicationId, 'applicant');
+  console.log('is loading application', isLoadingApplication);
 
   const navigateToApplicationCreatePage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
