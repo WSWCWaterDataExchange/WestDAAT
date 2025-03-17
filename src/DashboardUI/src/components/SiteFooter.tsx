@@ -16,7 +16,7 @@ function SiteFooter() {
 
   return (
     <>
-      <Navbar className="footer" variant="dark">
+      <Navbar className="footer d-print-none" variant="dark">
         <Container fluid className="ms-3 me-3">
           <div>
             <Nav>

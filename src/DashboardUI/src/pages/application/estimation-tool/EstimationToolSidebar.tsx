@@ -80,11 +80,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           <span>{state.conservationApplication.openEtModelName}</span>
         </SidebarElement>
 
-        <SidebarElement title="MAP LAYER">
-          <div className="mt-2">
-            <MapThemeSelector />
-          </div>
-        </SidebarElement>
+        <div className="d-print-none">
+          <SidebarElement title="MAP LAYER">
+            <div className="mt-2">
+              <MapThemeSelector />
+            </div>
+          </SidebarElement>
+        </div>
 
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"

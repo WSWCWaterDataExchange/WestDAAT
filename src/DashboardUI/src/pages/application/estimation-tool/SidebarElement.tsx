@@ -16,7 +16,7 @@ export function SidebarElement(props: SidebarElementProps) {
       <div className="position-relative mb-1">
         <span className="fs-5 fw-bold element-title">{props.title}</span>
 
-        <div className="d-inline position-absolute ms-2">
+        <div className="d-inline position-absolute ms-2 d-print-none">
           <span className="d-inline element-icon">
             {props.tooltip && <OverlayTooltip text={props.tooltip} placement="right" />}
           </span>
