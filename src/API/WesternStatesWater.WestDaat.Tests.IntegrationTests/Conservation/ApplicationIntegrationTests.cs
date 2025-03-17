@@ -667,6 +667,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         WaterConservationApplication application = null;
         WaterConservationApplicationEstimateLocation[] estimateLocations = null;
+        Database.EntityFramework.WaterConservationApplicationDocument[] documents = [];
         if (doesApplicationExist)
         {
             var applicationOwner = doesUserOwnApplication == true
@@ -676,8 +677,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             application = new WaterConservationApplicationFaker(applicationOwner, organization)
                 .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
                 .Generate();
+            documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
             await _dbContext.WaterConservationApplications.AddAsync(application);
-
+            
             var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
             await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
 
@@ -709,6 +711,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 WaterConservationApplicationEstimateLocationId = location.Id,
                 AdditionalDetails = "Some additional details"
             }).ToArray() ?? [])
+            .RuleFor(req => req.SupportingDocuments, () => documents.Select(document => new CLI.Requests.Conservation.WaterConservationApplicationDocument
+            {
+                BlobName = document.BlobName,
+                FileName = document.FileName,
+                Description = document.Description
+            }).ToArray())
             .Generate();
 
         // Act
@@ -727,6 +735,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .Include(application => application.Submission)
                 .Include(application => application.Estimate)
                 .ThenInclude(estimate => estimate.Locations)
+                .Include(application => application.SupportingDocuments)
                 .SingleOrDefaultAsync(application => application.Id == request.WaterConservationApplicationId);
 
             dbApplication.Should().NotBeNull();
@@ -736,7 +745,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbApplication.Submission.Should().BeEquivalentTo(request, options => options
                 .Excluding(submission => submission.WaterConservationApplicationId)
                 .Excluding(submission => submission.WaterRightNativeId)
-                .Excluding(submission => submission.FieldDetails));
+                .Excluding(submission => submission.FieldDetails)
+                .Excluding(submission => submission.SupportingDocuments));
 
             if (request.FieldDetails.Any())
             {
@@ -749,11 +759,22 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                         .Excluding(location => location.WaterConservationApplicationEstimateLocationId));
                 }
             }
+
+            dbApplication.SupportingDocuments.Count.Should().Be(3);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[0].BlobName);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[1].BlobName);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[2].BlobName);
+            dbApplication.SupportingDocuments.All((doc) => string.IsNullOrWhiteSpace(doc.BlobName) && string.IsNullOrWhiteSpace(doc.FileName) && string.IsNullOrWhiteSpace(doc.Description));
         }
         else
         {
             response.Error.Should().NotBeNull();
             response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
+            
+            var dbApplicationDocuments = _dbContext.WaterConservationApplicationDocuments
+                .Where(docs => docs.WaterConservationApplicationId == request.WaterConservationApplicationId).ToArray();
+
+            dbApplicationDocuments.Length.Should().Be(0);
         }
     }
 
