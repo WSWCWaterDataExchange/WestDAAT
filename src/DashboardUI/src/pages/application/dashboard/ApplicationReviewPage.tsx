@@ -25,7 +25,10 @@ export function ApplicationReviewPage() {
   const context = useMsal();
   const { applicationId } = useParams();
 
-  const isUserWorkingOnInProgressApplication = state.conservationApplication.estimateLocations.length > 0;
+  // using the presence of the application's id in state as a proxy to determine whether the user is working on an in-progress application,
+  // or whether they are viewing an application that has already been submitted for review
+  const isUserWorkingOnInProgressApplication = !!state.conservationApplication.waterConservationApplicationId;
+
   const isGetApplicationQueryEnabled = !isUserWorkingOnInProgressApplication;
   const isApplicationSubmitEnabled = !isUserWorkingOnInProgressApplication;
 
