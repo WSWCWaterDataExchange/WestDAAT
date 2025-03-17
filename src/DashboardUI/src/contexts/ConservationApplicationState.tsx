@@ -41,7 +41,6 @@ export interface ConservationApplicationState {
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
-    polygonEtAcreFeetSum: number;
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[]; // this is not used yet, but the get application call chain is set up to return this data once implemented.
   };
@@ -78,7 +77,6 @@ export const defaultState = (): ConservationApplicationState => ({
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
-    polygonEtAcreFeetSum: 0,
     supportingDocuments: [],
     reviewerNotes: [],
   },
@@ -474,7 +472,6 @@ const onApplicationLoaded = (
     (sum, location) => sum + location.polygonAreaInAcres,
     0,
   );
-  draftApplication.polygonEtAcreFeetSum = application.estimate.totalAverageYearlyConsumptionEtAcreFeet; // todo: is this correct?
   draftApplication.supportingDocuments = application.supportingDocuments.map(
     (doc): ApplicationDocument => ({
       blobName: doc.blobName,
@@ -554,7 +551,6 @@ const resetApplicationFormLocationDetails = (draftState: ConservationApplication
 
 const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
   let polygonAcreageSum = 0;
-  let polygonEtAcreFeetSum = 0;
   for (let i = 0; i < draftState.conservationApplication.estimateLocations.length; i++) {
     // compute data on the polygon object
     const polygon = draftState.conservationApplication.estimateLocations[i];
@@ -590,11 +586,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
     // compute data concerning all the polygons
     // these calculations assume that none of the polygons intersect with each other
     polygonAcreageSum += polygon.acreage!;
-    if (polygon.averageYearlyEtInAcreFeet) {
-      polygonEtAcreFeetSum += polygon.averageYearlyEtInAcreFeet;
-    }
   }
 
   draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
-  draftState.conservationApplication.polygonEtAcreFeetSum = polygonEtAcreFeetSum;
 };

@@ -304,7 +304,9 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement
                 label="Consumptive Use"
-                displayValue={formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2) + ' Acre-Feet'}
+                displayValue={
+                  formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2) + ' Acre-Feet'
+                }
               />
             </div>
 
