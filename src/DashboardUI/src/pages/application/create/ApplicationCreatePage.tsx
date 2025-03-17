@@ -561,7 +561,7 @@ function ApplicationCreatePageForm() {
         </ApplicationFormSection>
       </Form>
 
-      <ApplicationFormSection title="Supporting Documents (Optional)">
+      <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
         <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
       </ApplicationFormSection>
 

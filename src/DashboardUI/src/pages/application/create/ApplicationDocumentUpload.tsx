@@ -104,67 +104,60 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
     });
   };
 
-  // TODO: JN - in PR, add note about aria-label for progress bar and link to this: https://github.com/react-bootstrap/react-bootstrap/pull/6739
   return (
-    <>
+    <div className="col">
       {uploadDocumentErrorMessage !== null && (
         <Alert variant="danger" dismissible onClose={clearUploadDocumentError}>
           {uploadDocumentErrorMessage}
         </Alert>
       )}
-      <div className="col mb-4">
-        {state.conservationApplication.supportingDocuments.length > 0 && (
-          <table className="table">
-            <tbody>
-              {state.conservationApplication.supportingDocuments.map((file, index) => (
-                <tr key={`${file.fileName}-${index}`}>
-                  <td className="align-content-center">{file.fileName}</td>
-                  <td className="align-content-center flex-grow-1">
-                    <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
-                      <Form.Control
-                        as="textarea"
-                        maxLength={4000}
-                        value={file.description}
-                        onChange={(e) => handleDocumentDescriptionChanged(file.blobName, e.target.value)}
-                      ></Form.Control>
-                    </Form.Group>
-                  </td>
-                  <td className="align-content-center text-center">
-                    <Button
-                      variant="link"
-                      className="px-1 py-1 text-danger"
-                      onClick={() => handleRemoveDocument(file.blobName)}
-                    >
-                      <Icon
-                        path={mdiTrashCanOutline}
-                        size="1.5em"
-                        aria-label="Remove supporting document button"
-                      ></Icon>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      {state.conservationApplication.supportingDocuments.length > 0 && (
+        <table className="table">
+          <tbody>
+            {state.conservationApplication.supportingDocuments.map((file, index) => (
+              <tr key={`${file.fileName}-${index}`}>
+                <td className="align-content-center">{file.fileName}</td>
+                <td className="align-content-center flex-grow-1">
+                  <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
+                    <Form.Control
+                      as="textarea"
+                      maxLength={4000}
+                      value={file.description}
+                      onChange={(e) => handleDocumentDescriptionChanged(file.blobName, e.target.value)}
+                    ></Form.Control>
+                  </Form.Group>
+                </td>
+                <td className="align-content-center text-center">
+                  <Button
+                    variant="link"
+                    className="px-1 py-1 text-danger"
+                    onClick={() => handleRemoveDocument(file.blobName)}
+                  >
+                    <Icon path={mdiTrashCanOutline} size="1.5em" aria-label="Remove supporting document button"></Icon>
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
-        <Fade in={uploadDocumentMutation.isLoading}>
-          <div className="container">
-            <ProgressBar
-              className="my-4"
-              animated
-              now={100}
-              visuallyHidden
-              label="Document upload in progress, please wait..."
-              aria-label="Document upload in progress, please wait..."
-            />
-          </div>
-        </Fade>
+      <Fade in={uploadDocumentMutation.isLoading}>
+        <div className="container">
+          <ProgressBar animated now={100} aria-label="Document upload in progress, please wait..." />
+        </div>
+      </Fade>
 
-        <Button variant="outline-primary" onClick={handleUploadDocument} disabled={uploadDocumentMutation.isLoading}>
+      <div className="col-4">
+        <Button
+          variant="outline-primary"
+          className="mt-3"
+          onClick={handleUploadDocument}
+          disabled={uploadDocumentMutation.isLoading}
+        >
           Upload
         </Button>
       </div>
-    </>
+    </div>
   );
 }
