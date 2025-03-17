@@ -27,7 +27,7 @@ export function ApplicationReviewPage() {
   useGetApplicationQuery(applicationId);
 
   const navigateToApplicationCreatePage = () => {
-    navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
   };
 
   const navigateToWaterRightLandingPage = () => {
