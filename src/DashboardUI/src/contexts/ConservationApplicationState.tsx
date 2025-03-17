@@ -446,12 +446,10 @@ const onApplicationLoaded = (
     estimationSupplementaryDetails: application.submission.estimationSupplementaryDetails ?? '',
     conservationPlanAdditionalInfo: application.submission.conservationPlanAdditionalInfo ?? '',
 
-    fieldDetails: application.estimate.locations
-      .filter((location) => !!location.additionalDetails)
-      .map((location) => ({
-        waterConservationApplicationEstimateLocationId: location.id,
-        additionalDetails: location.additionalDetails!,
-      })),
+    fieldDetails: application.estimate.locations.map((location) => ({
+      waterConservationApplicationEstimateLocationId: location.id,
+      additionalDetails: location.additionalDetails ?? '',
+    })),
   };
   draftApplication.estimateLocations = application.estimate.locations.map(
     (location, index): PartialPolygonData => ({
