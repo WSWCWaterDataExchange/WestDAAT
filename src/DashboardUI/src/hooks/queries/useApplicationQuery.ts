@@ -1,7 +1,11 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
 import { useQuery } from 'react-query';
-import { applicationSearch, createWaterConservationApplication } from '../../accessors/applicationAccessor';
+import {
+  applicationSearch,
+  createWaterConservationApplication,
+  getApplication,
+} from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
@@ -80,6 +84,22 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
       onError: (error: Error) => {
         toast.error('Failed to load data. Please try again later.');
       },
+    },
+  );
+}
+
+export function useGetApplicationQuery(applicationId: string | undefined) {
+  const context = useMsal();
+
+  return useQuery(
+    ['getApplication', applicationId],
+    () =>
+      getApplication(context, {
+        applicationId: applicationId!,
+        perspective: 'applicant', // todo: how do you determine whether the user is a reviewer?
+      }),
+    {
+      enabled: !!applicationId,
     },
   );
 }
