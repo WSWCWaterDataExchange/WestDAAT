@@ -697,78 +697,78 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
     });
+  });
 
-    describe('Additional Use Cases', () => {
-      it("should reset the Application Submission form's polygons' AdditionalDetails fields if the user updates their polygon selections.", () => {
-        // user selects map polygons
-        const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
-        let newState = reducer(state, {
-          type: 'MAP_POLYGONS_UPDATED',
-          payload: {
-            polygons: [
-              {
-                polygonWkt,
-                acreage: 1,
-              },
-            ],
-            doPolygonsOverlap: true,
-          },
-        });
+  describe('Additional Use Cases', () => {
+    it("should reset the Application Submission form's polygons' AdditionalDetails fields if the user updates their polygon selections.", () => {
+      // user selects map polygons
+      const polygonWkt = 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))';
+      let newState = reducer(state, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [
+            {
+              polygonWkt,
+              acreage: 1,
+            },
+          ],
+          doPolygonsOverlap: true,
+        },
+      });
 
-        // user then requests an estimate for said polygons
-        newState = reducer(newState, {
-          type: 'CONSUMPTIVE_USE_ESTIMATED',
-          payload: {
-            totalAverageYearlyEtAcreFeet: 100,
-            conservationPayment: 200,
-            dataCollections: [
-              {
-                waterConservationApplicationEstimateLocationId: 'location-guid',
-                polygonWkt: polygonWkt,
-                averageYearlyEtInAcreFeet: 50,
-                averageYearlyEtInInches: 400,
-                datapoints: [
-                  {
-                    year: 2025,
-                    etInInches: 400,
-                  },
-                ],
-              },
-            ],
-          },
-        });
-
-        // user fills out part of the application submission form...
-        newState = reducer(newState, {
-          type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
-          payload: {
-            formValues: {
-              ...defaultApplicationSubmissionForm(),
-              fieldDetails: [
+      // user then requests an estimate for said polygons
+      newState = reducer(newState, {
+        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        payload: {
+          totalAverageYearlyEtAcreFeet: 100,
+          conservationPayment: 200,
+          dataCollections: [
+            {
+              waterConservationApplicationEstimateLocationId: 'location-guid',
+              polygonWkt: polygonWkt,
+              averageYearlyEtInAcreFeet: 50,
+              averageYearlyEtInInches: 400,
+              datapoints: [
                 {
-                  waterConservationApplicationEstimateLocationId: 'location-guid',
-                  additionalDetails: 'I, the user, have some things to say about this field.',
+                  year: 2025,
+                  etInInches: 400,
                 },
               ],
             },
-          },
-        });
-
-        expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toBeGreaterThan(0);
-
-        // user then goes back to change their polygon selections
-        newState = reducer(newState, {
-          type: 'MAP_POLYGONS_UPDATED',
-          payload: {
-            polygons: [],
-            doPolygonsOverlap: false,
-          },
-        });
-
-        // Assert
-        // their AdditionalDetails field should be reset
-        expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toEqual(0);
+          ],
+        },
       });
+
+      // user fills out part of the application submission form...
+      newState = reducer(newState, {
+        type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
+        payload: {
+          formValues: {
+            ...defaultApplicationSubmissionForm(),
+            fieldDetails: [
+              {
+                waterConservationApplicationEstimateLocationId: 'location-guid',
+                additionalDetails: 'I, the user, have some things to say about this field.',
+              },
+            ],
+          },
+        },
+      });
+
+      expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toBeGreaterThan(0);
+
+      // user then goes back to change their polygon selections
+      newState = reducer(newState, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [],
+          doPolygonsOverlap: false,
+        },
+      });
+
+      // Assert
+      // their AdditionalDetails field should be reset
+      expect(newState.conservationApplication.applicationSubmissionForm.fieldDetails.length).toEqual(0);
     });
   });
 });
