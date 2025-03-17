@@ -48,7 +48,7 @@ function SiteNavbar() {
   const showProfileEdit = isFeatureEnabled('conservationEstimationTool');
 
   return (
-    <div>
+    <div className="d-print-none">
       <Navbar variant="dark" expand={false}>
         <Container fluid>
           <div className="d-flex">
