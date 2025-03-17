@@ -464,9 +464,9 @@ const onApplicationLoaded = (
       fieldName: `Field ${index + 1}`,
       datapoints: location.consumptiveUses,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
-      // todo: I don't think we're storing this info in the db. do we need to?
-      averageYearlyEtInAcreFeet: 0,
-      averageYearlyEtInInches: 0,
+      // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
+      averageYearlyEtInAcreFeet: undefined,
+      averageYearlyEtInInches: undefined,
     }),
   );
   draftApplication.doPolygonsOverlap = false;
