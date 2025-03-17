@@ -567,7 +567,7 @@ function ApplicationCreatePageForm() {
 
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={handleSubmitClicked}>
+        <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
           Review & Submit
         </Button>
       </div>
