@@ -245,7 +245,7 @@ export function OrganizationDashboardPage() {
     }) ?? [];
 
   return (
-    <div className="overflow-y-auto h-100">
+    <main className="overflow-y-auto h-100">
       <div className="m-3">
         {dashboardTitle()}
         <div className="row my-4">
@@ -292,6 +292,6 @@ export function OrganizationDashboardPage() {
           ></DataGrid>
         </TableLoading>
       </div>
-    </div>
+    </main>
   );
 }

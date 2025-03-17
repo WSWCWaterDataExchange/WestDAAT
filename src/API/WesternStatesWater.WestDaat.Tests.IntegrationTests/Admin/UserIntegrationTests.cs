@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.Shared.Errors;
-using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common;
-using WesternStatesWater.WestDaat.Common.Exceptions;
+using WesternStatesWater.WestDaat.Common.Context;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Admin;
 
@@ -256,7 +255,7 @@ public class UserIntegrationTests : IntegrationTestBase
             .RuleFor(u => u.UserProfile, _ => new UserProfileFaker()
                 .RuleFor(up => up.FirstName, _ => "FirstName")
                 .RuleFor(up => up.LastName, _ => "LastName")
-                .RuleFor(up => up.UserName, f => "UserName" + f.Random.String(24))
+                .RuleFor(up => up.UserName, f => "UserName" + f.Internet.UserName())
                 .Generate())
             .Generate(3);
 

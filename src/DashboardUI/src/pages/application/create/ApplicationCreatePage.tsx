@@ -154,7 +154,7 @@ function ApplicationCreatePageForm() {
   };
 
   return (
-    <div className="container">
+    <main className="container">
       <div className="mb-3">
         <span className="fs-4 fw-bold">New Application</span>
       </div>
@@ -571,6 +571,6 @@ function ApplicationCreatePageForm() {
           Review & Submit
         </Button>
       </div>
-    </div>
+    </main>
   );
 }

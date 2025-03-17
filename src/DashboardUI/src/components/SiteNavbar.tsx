@@ -52,7 +52,7 @@ function SiteNavbar() {
       <Navbar variant="dark" expand={false}>
         <Container fluid>
           <div className="d-flex">
-            <Button variant="link" onClick={handleShow}>
+            <Button variant="link" onClick={handleShow} aria-label="Menu">
               <MenuIcon />
             </Button>
 

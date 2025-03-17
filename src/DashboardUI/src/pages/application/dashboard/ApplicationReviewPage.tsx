@@ -104,7 +104,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
   return (
-    <div className="container">
+    <main className="container">
       <div className="mb-3">
         <span className="fs-4 fw-bold">
           Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
@@ -359,7 +359,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

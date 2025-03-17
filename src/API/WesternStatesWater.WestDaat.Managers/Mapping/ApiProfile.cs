@@ -145,7 +145,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.ApplicantUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.ApplicationDisplayId, opt => opt.Ignore());
 
-            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.UnsubmittedApplicationExistsLoadRequest>();
+            CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.ApplicationExistsLoadRequest>()
+                .ForMember(dest => dest.HasSubmission, opt => opt.MapFrom(_ => false))
+                .ForMember(dest => dest.ApplicationId, opt => opt.Ignore());
 
             CreateMap<CommonContracts.WaterConservationApplicationCreateRequest, CommonContracts.ApplicationFormatDisplayIdRequest>();
 
@@ -222,6 +224,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationDocument, CommonContracts.WaterConservationApplicationDocument>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             
+            CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
+            CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
+
+            CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+            CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
