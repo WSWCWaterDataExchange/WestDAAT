@@ -1,12 +1,21 @@
+import { Placeholder } from 'react-bootstrap';
+
 interface ApplicationFormSectionProps {
   title: string;
   subtitle?: string;
   className?: string;
+  isLoading?: boolean;
   children: React.ReactNode | undefined;
 }
 
 function ApplicationFormSection(props: ApplicationFormSectionProps) {
-  return (
+  return props.isLoading ? (
+    <>
+      <Placeholder as="div" animation="glow">
+        <Placeholder xs={12} className="mb-4" />
+      </Placeholder>
+    </>
+  ) : (
     <div className={props.className}>
       <div className="mb-4">
         <div>

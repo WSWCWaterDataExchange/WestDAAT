@@ -92,6 +92,7 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 export function useGetApplicationQuery(
   applicationId: string | undefined,
   perspective: Parameters<typeof getApplication>[1]['perspective'],
+  isQueryEnabled: boolean,
 ) {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
@@ -104,7 +105,7 @@ export function useGetApplicationQuery(
         perspective,
       }),
     {
-      enabled: !!applicationId,
+      enabled: !!applicationId && isQueryEnabled,
       onSuccess: (result) => {
         dispatch({
           type: 'APPLICATION_LOADED',
