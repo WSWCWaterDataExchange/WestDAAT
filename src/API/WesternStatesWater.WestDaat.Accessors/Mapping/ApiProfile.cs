@@ -352,6 +352,19 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, ApplicationEstimateLocationDetails>()
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<EFWD.WaterConservationApplication, ApplicationDetails>()
+                .ForMember(dest => dest.Notes, opt => opt.Ignore());
+
+            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse, ConsumptiveUseDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationDocument, SupportingDocumentDetails>();
         }
     }
 }

@@ -161,6 +161,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   placeholder="100"
                   min={1}
                   aria-describedby="dollar-sign-addon"
+                  aria-label='Desired compensation in dollars'
                   value={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
                 ></Form.Control>

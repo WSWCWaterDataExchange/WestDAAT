@@ -241,6 +241,85 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
     }
 
+    [TestMethod]
+    public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var org = new OrganizationFaker().Generate();
+
+        var application = new WaterConservationApplicationFaker(user, org).Generate();
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(3);
+        await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(locations);
+
+        foreach (var location in locations)
+        {
+            var consumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(location).Generate(2);
+            await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
+        }
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id, // allows user to see Applicant view
+            Roles = [Roles.GlobalAdmin], // allows user to see Reviewer view
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var applicantRequest = new ApplicantConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+        var reviewerRequest = new ReviewerConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+
+        var applicantResponse = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(applicantRequest);
+        var reviewerResponse = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(reviewerRequest);
+
+        // Assert
+
+        // ExcludingMissingMembers is used to ignore properties that are intentionally not included in the response
+        // i.e. virtual navigation properties and parent id properties
+        applicantResponse.Should().NotBeNull();
+        applicantResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        // the following assertions are redundant given that `BeEquivalentTo` checks properties recursively,
+        // but are included for completeness just in case something changes in the future
+        applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+
+        reviewerResponse.Should().NotBeNull();
+        reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+        reviewerResponse.Notes.Should().BeEmpty(); // not implemented yet
+
+        // verify notes are returned in order
+        var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
+        reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
+    }
+
     [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
