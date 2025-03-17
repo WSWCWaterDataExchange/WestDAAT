@@ -34,8 +34,12 @@ export function ApplicationReviewPage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const navigateToApplicationCreatePage = () => {
-    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
+  const navigateBack = () => {
+    if (state.isCreatingApplication) {
+      navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
+    } else {
+      history.back();
+    }
   };
 
   const navigateToWaterRightLandingPage = () => {
@@ -78,8 +82,8 @@ export function ApplicationReviewPage() {
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
-        navigateBack={navigateToApplicationCreatePage}
-        backButtonText="Back to Application"
+        navigateBack={navigateBack}
+        backButtonText={state.isCreatingApplication ? 'Back to Application' : 'Back'}
         centerText="Water Conservation Estimation Tool"
       />
 
