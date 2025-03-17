@@ -4,7 +4,7 @@ import { LocationDetails } from './LocationDetails';
 export interface EstimateDetails {
   id: string;
   compensationRateDollars: number;
-  compensationRateUnits: CompensationRateUnits;
+  compensationRateUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   estimatedCompensationDollars: number;
   totalAverageYearlyConsumptionEtAcreFeet: number;
   locations: LocationDetails[];

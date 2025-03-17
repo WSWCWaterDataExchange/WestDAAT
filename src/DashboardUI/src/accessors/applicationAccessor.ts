@@ -18,6 +18,10 @@ import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadRe
 import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
 import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
 import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
+import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -156,7 +160,7 @@ export const getApplication = async (
     applicationId: string;
     perspective: 'applicant' | 'reviewer';
   },
-): Promise<ApplicationLoadResponseBase> => {
+): Promise<{ application: ApplicationDetails; notes: ApplicationReviewNote[] }> => {
   const api = await westDaatApi(context);
 
   let request: ApplicationLoadRequestBase;
@@ -181,5 +185,15 @@ export const getApplication = async (
   }
 
   const { data: response } = await api.post<ApplicationLoadResponseBase>('Applications/Load', request);
-  return response;
+
+  switch (data.perspective) {
+    case 'applicant': {
+      const applicantResponse = response as ApplicantConservationApplicationLoadResponse;
+      return { application: applicantResponse.application, notes: [] };
+    }
+    case 'reviewer': {
+      const reviewerResponse = response as ReviewerConservationApplicationLoadResponse;
+      return { application: reviewerResponse.application, notes: reviewerResponse.notes };
+    }
+  }
 };

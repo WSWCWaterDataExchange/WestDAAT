@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
+import { ApplicationLoadResponseBase } from '../../data-contracts/ApplicationLoadResponseBase';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -90,16 +91,29 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
 export function useGetApplicationQuery(applicationId: string | undefined) {
   const context = useMsal();
+  const { dispatch } = useConservationApplicationContext();
+
+  // todo: how do you determine whether the user is an applicant or a reviewer?
+  const perspective: Parameters<typeof getApplication>[1]['perspective'] = 'applicant';
 
   return useQuery(
-    ['getApplication', applicationId],
+    ['getApplication', applicationId, perspective],
     () =>
       getApplication(context, {
         applicationId: applicationId!,
-        perspective: 'applicant', // todo: how do you determine whether the user is a reviewer?
+        perspective,
       }),
     {
       enabled: !!applicationId,
+      onSuccess: (result) => {
+        dispatch({
+          type: 'APPLICATION_LOADED',
+          payload: {
+            application: result.application,
+            notes: result.notes,
+          },
+        });
+      },
     },
   );
 }

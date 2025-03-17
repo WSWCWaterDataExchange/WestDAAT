@@ -15,6 +15,8 @@ import center from '@turf/center';
 import { convertWktToGeometry } from '../utilities/geometryWktConverter';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -41,6 +43,7 @@ export interface ConservationApplicationState {
     polygonAcreageSum: number;
     polygonEtAcreFeetSum: number;
     supportingDocuments: ApplicationDocument[];
+    reviewerNotes: ApplicationReviewNote[]; // this is not used yet, but the get application call chain is set up to return this data once implemented.
   };
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
@@ -77,6 +80,7 @@ export const defaultState = (): ConservationApplicationState => ({
     polygonAcreageSum: 0,
     polygonEtAcreFeetSum: 0,
     supportingDocuments: [],
+    reviewerNotes: [],
   },
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
@@ -93,7 +97,8 @@ export type ApplicationAction =
   | ConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUploadedAction
-  | ApplicationDocumentRemovedAction;
+  | ApplicationDocumentRemovedAction
+  | ApplicationLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -182,6 +187,14 @@ export interface ApplicationDocumentRemovedAction {
   };
 }
 
+export interface ApplicationLoadedAction {
+  type: 'APPLICATION_LOADED';
+  payload: {
+    application: ApplicationDetails;
+    notes: ApplicationReviewNote[];
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -218,6 +231,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
       return onApplicationDocumentRemoved(draftState, action);
+    case 'APPLICATION_LOADED':
+      return onApplicationLoaded(draftState, action);
   }
 };
 
@@ -397,6 +412,77 @@ const onApplicationDocumentRemoved = (
     (doc) => doc.blobName !== payload.removedBlobName,
   );
   draftState.conservationApplication.supportingDocuments = filteredDocuments;
+  return draftState;
+};
+
+const onApplicationLoaded = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationLoadedAction,
+): ConservationApplicationState => {
+  const draftApplication = draftState.conservationApplication;
+  const application = payload.application;
+
+  draftApplication.waterConservationApplicationId = application.id;
+  draftApplication.waterRightNativeId = application.waterRightNativeId;
+  draftApplication.waterConservationApplicationDisplayId = application.applicationDisplayId;
+  draftApplication.fundingOrganizationId = application.fundingOrganizationId;
+  // funding org name, open et modal name, date range start / end, compensation rate model - all of these are funding org-related data points that are loaded based on the water right
+
+  draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
+  draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
+  draftApplication.totalAverageYearlyEtAcreFeet = application.estimate.totalAverageYearlyConsumptionEtAcreFeet;
+  draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
+  draftApplication.applicationSubmissionForm = {
+    ...application.submission,
+
+    agentName: application.submission.agentName ?? '',
+    agentEmail: application.submission.agentEmail ?? '',
+    agentPhoneNumber: application.submission.agentPhoneNumber ?? '',
+    agentAdditionalDetails: application.submission.agentAdditionalDetails ?? '',
+
+    canalOrIrrigationEntityName: application.submission.canalOrIrrigationEntityName ?? '',
+    canalOrIrrigationEntityEmail: application.submission.canalOrIrrigationEntityEmail ?? '',
+    canalOrIrrigationEntityPhoneNumber: application.submission.canalOrIrrigationEntityPhoneNumber ?? '',
+    canalOrIrrigationAdditionalDetails: application.submission.canalOrIrrigationAdditionalDetails ?? '',
+
+    estimationSupplementaryDetails: application.submission.estimationSupplementaryDetails ?? '',
+    conservationPlanAdditionalInfo: application.submission.conservationPlanAdditionalInfo ?? '',
+
+    fieldDetails: application.estimate.locations
+      .filter((location) => !!location.additionalDetails)
+      .map((location) => ({
+        waterConservationApplicationEstimateLocationId: location.id,
+        additionalDetails: location.additionalDetails!,
+      })),
+  };
+  draftApplication.estimateLocations = application.estimate.locations.map(
+    (location, index): PartialPolygonData => ({
+      waterConservationApplicationEstimateLocationId: location.id,
+      polygonWkt: location.polygonWkt,
+      acreage: location.polygonAreaInAcres,
+      additionalDetails: location.additionalDetails ?? '',
+      fieldName: `Field ${index + 1}`,
+      datapoints: location.consumptiveUses,
+      centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
+      // todo: I don't think we're storing this info in the db. do we need to?
+      averageYearlyEtInAcreFeet: 0,
+      averageYearlyEtInInches: 0,
+    }),
+  );
+  draftApplication.doPolygonsOverlap = false;
+  draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
+    (sum, location) => sum + location.polygonAreaInAcres,
+    0,
+  );
+  draftApplication.polygonEtAcreFeetSum = application.estimate.totalAverageYearlyConsumptionEtAcreFeet; // todo: is this correct?
+  draftApplication.supportingDocuments = application.supportingDocuments.map(
+    (doc): ApplicationDocument => ({
+      blobName: doc.blobName,
+      fileName: doc.fileName,
+      description: doc.description ?? '',
+    }),
+  );
+
   return draftState;
 };
 

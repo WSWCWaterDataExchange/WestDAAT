@@ -25,7 +25,7 @@ export interface SubmissionDetails {
   canalOrIrrigationAdditionalDetails: string | null;
 
   conservationPlanFundingRequestDollarAmount: number;
-  conservationPlanFundingRequestCompensationRateUnits: CompensationRateUnits;
+  conservationPlanFundingRequestCompensationRateUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None>;
   conservationPlanDescription: string;
   conservationPlanAdditionalInfo: string | null;
 
