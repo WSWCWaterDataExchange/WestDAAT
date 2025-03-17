@@ -9,13 +9,7 @@ interface ApplicationFormSectionProps {
 }
 
 function ApplicationFormSection(props: ApplicationFormSectionProps) {
-  return props.isLoading ? (
-    <>
-      <Placeholder as="div" animation="glow">
-        <Placeholder xs={12} className="mb-4" />
-      </Placeholder>
-    </>
-  ) : (
+  return (
     <div className={props.className}>
       <div className="mb-4">
         <div>
@@ -29,7 +23,15 @@ function ApplicationFormSection(props: ApplicationFormSectionProps) {
         )}
       </div>
 
-      <div className="row">{props.children}</div>
+      <div className="row">
+        {props.isLoading ? (
+          <Placeholder as="div" animation="glow">
+            <Placeholder xs={12} className="mb-4" />
+          </Placeholder>
+        ) : (
+          props.children
+        )}
+      </div>
     </div>
   );
 }

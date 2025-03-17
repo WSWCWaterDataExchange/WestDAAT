@@ -44,6 +44,7 @@ export interface ConservationApplicationState {
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[]; // this is not used yet, but the get application call chain is set up to return this data once implemented.
   };
+  isCreatingApplication: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -80,6 +81,7 @@ export const defaultState = (): ConservationApplicationState => ({
     supportingDocuments: [],
     reviewerNotes: [],
   },
+  isCreatingApplication: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -313,6 +315,8 @@ const onApplicationCreated = (
   draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
   draftState.conservationApplication.waterConservationApplicationDisplayId =
     payload.waterConservationApplicationDisplayId;
+
+  draftState.isCreatingApplication = true;
 
   checkCanEstimateConsumptiveUse(draftState);
 

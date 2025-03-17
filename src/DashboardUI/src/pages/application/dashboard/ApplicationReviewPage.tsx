@@ -25,17 +25,10 @@ export function ApplicationReviewPage() {
   const context = useMsal();
   const { applicationId } = useParams();
 
-  // using the presence of the application's id in state as a proxy to determine whether the user is working on an in-progress application,
-  // or whether they are viewing an application that has already been submitted for review
-  const isUserWorkingOnInProgressApplication = !!state.conservationApplication.waterConservationApplicationId;
-
-  const isGetApplicationQueryEnabled = !isUserWorkingOnInProgressApplication;
-  const isApplicationSubmitEnabled = !isUserWorkingOnInProgressApplication;
-
   const { isLoading: isApplicationLoading } = useGetApplicationQuery(
     applicationId,
     'applicant',
-    isGetApplicationQueryEnabled,
+    !state.isCreatingApplication,
   );
   const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
     state.conservationApplication.waterRightNativeId,
@@ -93,7 +86,6 @@ export function ApplicationReviewPage() {
       <div className="overflow-y-auto">
         <ApplicationReviewPageLayout
           submitApplication={presentConfirmationModal}
-          isApplicationSubmitEnabled={isApplicationSubmitEnabled}
           isLoading={isApplicationLoading || isFundingOrganizationLoading}
         />
       </div>
@@ -112,7 +104,6 @@ const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationReviewPageLayoutProps {
-  isApplicationSubmitEnabled: boolean;
   isLoading: boolean;
   submitApplication: () => void;
 }
@@ -122,26 +113,26 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
 
+  const isApplicationSubmitEnabled = state.isCreatingApplication;
+
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
   return (
     <main className="container">
-      {props.isLoading ? (
-        <>
-          <Placeholder as="div" animation="glow">
-            <Placeholder xs={12} className="mb-4" />
-          </Placeholder>
-        </>
-      ) : (
-        <>
-          <div className="mb-3">
-            <span className="fs-4 fw-bold">
-              Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
-            </span>
-          </div>
+      <div className="mb-3">
+        <span className="fs-4 fw-bold">
+          Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
+        </span>
+      </div>
 
-          <div className="d-flex gap-3 mb-4">
+      <div className="d-flex gap-3 mb-4">
+        {props.isLoading ? (
+          <Placeholder as="div" animation="glow" className="h-100 w-100">
+            <Placeholder xs={12} className="h-100 w-100" />
+          </Placeholder>
+        ) : (
+          <>
             <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
 
             <span className="fw-bold">
@@ -151,9 +142,9 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
             <span className="fw-bold">
               Funding Organization: {state.conservationApplication.fundingOrganizationName}
             </span>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
       <div>
         <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
@@ -372,7 +363,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         <hr className="m-0" />
 
-        {props.isApplicationSubmitEnabled && (
+        {isApplicationSubmitEnabled && (
           <div className="d-flex justify-content-end p-3">
             <Button variant="success" type="button" onClick={props.submitApplication}>
               Submit
