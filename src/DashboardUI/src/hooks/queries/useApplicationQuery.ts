@@ -111,7 +111,7 @@ export function useGetApplicationQuery(
           type: 'APPLICATION_LOADED',
           payload: {
             application: result.application,
-            notes: result.notes,
+            notes: result.notes ?? [],
           },
         });
       },

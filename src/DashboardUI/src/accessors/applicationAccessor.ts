@@ -160,7 +160,7 @@ export const getApplication = async (
     applicationId: string;
     perspective: 'applicant' | 'reviewer';
   },
-): Promise<{ application: ApplicationDetails; notes: ApplicationReviewNote[] }> => {
+): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
   const api = await westDaatApi(context);
 
   let request: ApplicationLoadRequestBase;
@@ -189,7 +189,7 @@ export const getApplication = async (
   switch (data.perspective) {
     case 'applicant': {
       const applicantResponse = response as ApplicantConservationApplicationLoadResponse;
-      return { application: applicantResponse.application, notes: [] };
+      return { application: applicantResponse.application };
     }
     case 'reviewer': {
       const reviewerResponse = response as ReviewerConservationApplicationLoadResponse;
