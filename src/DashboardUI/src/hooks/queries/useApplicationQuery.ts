@@ -91,10 +91,14 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
 export function useGetApplicationQuery(applicationId: string | undefined) {
   const context = useMsal();
-  const { dispatch } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
 
   // todo: how do you determine whether the user is an applicant or a reviewer?
   const perspective: Parameters<typeof getApplication>[1]['perspective'] = 'applicant';
+
+  const areParametersProvided = !!applicationId;
+  // determine whether the user is working on an in-progress application by checking if they have received a consumptive use estimation
+  const isUserWorkingOnInProgressApplication = state.conservationApplication.estimateLocations.length > 0;
 
   return useQuery(
     ['getApplication', applicationId, perspective],
@@ -104,7 +108,7 @@ export function useGetApplicationQuery(applicationId: string | undefined) {
         perspective,
       }),
     {
-      enabled: !!applicationId,
+      enabled: areParametersProvided && !isUserWorkingOnInProgressApplication,
       onSuccess: (result) => {
         dispatch({
           type: 'APPLICATION_LOADED',

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { formatNumber } from '../../../utilities/valueFormatters';
@@ -15,12 +15,16 @@ import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
+import { useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
   const [showSubmissionConfirmationModal, setShowSubmissionConfirmationModal] = useState(false);
   const navigate = useNavigate();
   const context = useMsal();
+  const { applicationId } = useParams();
+
+  useGetApplicationQuery(applicationId);
 
   const navigateToApplicationCreatePage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
