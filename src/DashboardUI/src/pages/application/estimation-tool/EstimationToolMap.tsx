@@ -141,7 +141,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
   return (
     <div className="flex-grow-1 position-relative">
-      <div className="w-100 position-absolute d-flex justify-content-center p-1">
+      <div className="w-100 position-absolute d-flex justify-content-center p-1 d-print-none">
         <div className="estimate-tool-map-dimmed-overlay"></div>
         <Button
           variant="success"

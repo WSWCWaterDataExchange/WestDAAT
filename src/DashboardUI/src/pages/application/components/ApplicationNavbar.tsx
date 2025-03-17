@@ -18,7 +18,7 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
         <Nav>
           <Nav.Item onClick={props.navigateBack}>
             {/* render as <button> instead of <a role="button"> */}
-            <Nav.Link as="button" className="text-dark">
+            <Nav.Link as="button" className="text-dark d-print-none">
               <div className="d-flex align-items-center gap-2">
                 <Icon path={mdiArrowLeft} size="1em" />
                 <span>{props.backButtonText}</span>
