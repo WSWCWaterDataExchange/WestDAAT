@@ -42,7 +42,7 @@ export interface ConservationApplicationState {
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
     supportingDocuments: ApplicationDocument[];
-    reviewerNotes: ApplicationReviewNote[]; // this is not used yet, but the get application call chain is set up to return this data once implemented.
+    reviewerNotes: ApplicationReviewNote[];
   };
   isCreatingApplication: boolean;
   canEstimateConsumptiveUse: boolean;
