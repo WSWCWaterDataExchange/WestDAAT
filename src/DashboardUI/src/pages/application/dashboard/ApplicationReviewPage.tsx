@@ -15,6 +15,8 @@ import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
+import { mdiFileDocument } from '@mdi/js';
+import Icon from '@mdi/react';
 
 export function ApplicationReviewPage() {
   const { state } = useConservationApplicationContext();
@@ -40,6 +42,7 @@ export function ApplicationReviewPage() {
         waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId!,
         waterRightNativeId: state.conservationApplication.waterRightNativeId!,
         form: state.conservationApplication.applicationSubmissionForm,
+        supportingDocuments: state.conservationApplication.supportingDocuments,
       });
     },
     onSuccess: () => {
@@ -325,10 +328,31 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         {sectionRule}
 
         <ApplicationFormSection title="Supporting Documents">
-          <NotImplementedPlaceholder />
+          <div className="col mb-4">
+            {state.conservationApplication.supportingDocuments.length === 0 && (
+              <div className="text-muted">(No supporting documents have been provided)</div>
+            )}
+
+            {state.conservationApplication.supportingDocuments.length > 0 && (
+              <table className="table">
+                <tbody>
+                  {state.conservationApplication.supportingDocuments.map((file, index) => (
+                    <tr key={`${file.fileName}-${index}`}>
+                      <td className="col-4 text-nowrap align-content-center px-2 py-3">
+                        <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3"/>
+                        {file.fileName}
+                      </td>
+                      <td className="align-content-center text-start">{file.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </ApplicationFormSection>
 
-        <hr className="m-0" />
+        {state.conservationApplication.supportingDocuments.length === 0 && <hr className="m-0" />}
+
         <div className="d-flex justify-content-end p-3">
           <Button variant="success" type="button" onClick={props.submitApplication}>
             Submit

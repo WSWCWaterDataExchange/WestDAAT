@@ -1,4 +1,4 @@
-namespace WesternStatesWater.WestDaat.Database.EntityFramework;
+namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 public class WaterConservationApplicationDocument
 {
@@ -6,12 +6,12 @@ public class WaterConservationApplicationDocument
 
     public Guid WaterConservationApplicationId { get; set; }
 
-    public string BlobName { get; set; } = null!;
+    public string BlobName { get; set; }
     
     /// <summary>
     /// The uploaded file name - used for displaying to the user.
     /// </summary>
-    public string FileName { get; set; } = null!;
+    public string FileName { get; set; }
     
-    public string? Description { get; set; }
+    public string Description { get; set; }
 }
