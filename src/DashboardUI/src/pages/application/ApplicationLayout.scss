@@ -1,0 +1,24 @@
+@media print {
+  .application-layout {
+    // Allow page to scroll so that it prints across multiple pages.
+    // Otherwise it will only print 1 page and contain a scrollbar.
+    &.overflow-hidden {
+      overflow: visible !important;
+    }
+
+    // Hide scrollbar while printing
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      max-width: 100%;
+    }
+
+    // Flex while printing causes the page to cut off.
+    // Override to block fixes this.
+    > .d-flex {
+      display: block !important;
+    }
+  }
+}

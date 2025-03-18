@@ -153,7 +153,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           </span>
 
           <Form onChange={onEstimationFormChanged} noValidate>
-            <div className="d-flex justify-content-between align-items-center gap-3">
+            <div className="d-flex d-print-block justify-content-between align-items-center gap-3">
               <InputGroup>
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
