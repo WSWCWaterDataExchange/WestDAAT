@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import ApplicationSubmissionFormLayout from '../components/ApplicationSubmissionFormLayout';
+import ApplicationSubmissionFormData from '../components/ApplicationSubmissionFormData';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
@@ -27,7 +27,7 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationSubmissionFormLayout perspective="reviewer" />
+        <ApplicationSubmissionFormData perspective="reviewer" />
       </div>
     </div>
   );
