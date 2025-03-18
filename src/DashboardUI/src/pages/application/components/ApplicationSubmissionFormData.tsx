@@ -38,8 +38,8 @@ function ApplicationSubmissionFormData(props: ApplicationSubmissionFormLayoutPro
   const [formValidated, setFormValidated] = useState(false);
   const [documentUploading, setDocumentUploading] = useState(false);
 
-  const navigateToReviewApplicationPage = () => {
-    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
+  const navigateToSubmitApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/submit`);
   };
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -133,7 +133,7 @@ function ApplicationSubmissionFormData(props: ApplicationSubmissionFormLayoutPro
     setFormValidated(true);
 
     if (isFormValid) {
-      navigateToReviewApplicationPage();
+      navigateToSubmitApplicationPage();
     }
   };
 
