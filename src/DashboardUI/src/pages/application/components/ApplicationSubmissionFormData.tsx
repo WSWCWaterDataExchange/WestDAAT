@@ -139,10 +139,15 @@ function ApplicationSubmissionFormData(props: ApplicationSubmissionFormLayoutPro
 
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
+  const pageTitleOptions: Record<Perspective, string> = {
+    applicant: 'New Application',
+    reviewer: 'Application',
+  };
+
   return (
     <main className="container">
       <div className="mb-3">
-        <span className="fs-4 fw-bold">New Application</span>
+        <span className="fs-4 fw-bold">{pageTitleOptions[perspective]}</span>
       </div>
 
       <div className="d-flex gap-3 mb-4">
