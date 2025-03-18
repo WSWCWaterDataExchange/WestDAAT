@@ -16,11 +16,20 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from '../components/ApplicationFormSection';
 import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
+
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-function ApplicationSubmissionFormLayout() {
+type Perspective = 'applicant' | 'reviewer';
+
+interface ApplicationSubmissionFormLayoutProps {
+  perspective: Perspective;
+}
+
+function ApplicationSubmissionFormLayout(props: ApplicationSubmissionFormLayoutProps) {
+  const { perspective } = props;
+
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
@@ -126,6 +135,11 @@ function ApplicationSubmissionFormLayout() {
     if (isFormValid) {
       navigateToReviewApplicationPage();
     }
+  };
+
+  const submitButtonTextOptions: Record<Perspective, string> = {
+    applicant: 'Review & Submit',
+    reviewer: 'Submit for Final Review',
   };
 
   return (
@@ -545,7 +559,7 @@ function ApplicationSubmissionFormLayout() {
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
         <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
-          Review & Submit
+          {submitButtonTextOptions[perspective]}
         </Button>
       </div>
     </main>

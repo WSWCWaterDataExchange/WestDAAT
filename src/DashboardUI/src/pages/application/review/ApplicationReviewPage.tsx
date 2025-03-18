@@ -27,7 +27,7 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationSubmissionFormLayout />
+        <ApplicationSubmissionFormLayout perspective="reviewer" />
       </div>
     </div>
   );
