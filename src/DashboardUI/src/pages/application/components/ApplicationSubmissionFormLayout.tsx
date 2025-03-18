@@ -137,10 +137,7 @@ function ApplicationSubmissionFormLayout(props: ApplicationSubmissionFormLayoutP
     }
   };
 
-  const submitButtonTextOptions: Record<Perspective, string> = {
-    applicant: 'Review & Submit',
-    reviewer: 'Submit for Final Review',
-  };
+  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
   return (
     <main className="container">
@@ -553,7 +550,17 @@ function ApplicationSubmissionFormLayout(props: ApplicationSubmissionFormLayoutP
       </Form>
 
       <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-        <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
+        {perspective === 'reviewer' ? (
+          <>
+            <NotImplementedPlaceholder />
+            <span className="fw-bold">
+              Document Upload is not implemented for Reviewers yet. This feature will be implemented in a future
+              release.
+            </span>
+          </>
+        ) : (
+          <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
+        )}
       </ApplicationFormSection>
 
       {perspective === 'reviewer' && (
@@ -566,11 +573,33 @@ function ApplicationSubmissionFormLayout(props: ApplicationSubmissionFormLayoutP
       )}
 
       <hr className="m-0" />
-      <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
-          {submitButtonTextOptions[perspective]}
-        </Button>
-      </div>
+      {perspective === 'applicant' ? (
+        <div className="d-flex justify-content-end p-3">
+          <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
+            Review & Submit
+          </Button>
+        </div>
+      ) : perspective === 'reviewer' ? (
+        <div className="d-flex justify-content-between p-3">
+          <div>
+            <Button variant="secondary" onClick={alertNotImplemented}>
+              Cancel
+            </Button>
+          </div>
+
+          <div className="d-flex gap-3">
+            <Button variant="outline-success" onClick={alertNotImplemented}>
+              Save Changes
+            </Button>
+
+            <Button variant="success" onClick={alertNotImplemented} disabled={documentUploading}>
+              Submit for Final Review
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <NotImplementedPlaceholder />
+      )}
     </main>
   );
 }
