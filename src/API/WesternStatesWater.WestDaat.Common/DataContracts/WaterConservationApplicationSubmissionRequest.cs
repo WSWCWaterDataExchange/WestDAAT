@@ -61,4 +61,6 @@ public class WaterConservationApplicationSubmissionRequest : ApplicationStoreReq
     public string WaterUseDescription { get; set; } = null!;
 
     public ApplicationSubmissionFieldDetail[] FieldDetails { get; set; } = null!;
+
+    public WaterConservationApplicationDocument[] SupportingDocuments { get; set; } = null!;
 }

@@ -1,3 +1,4 @@
+import { ApplicationDocument } from './ApplicationDocuments';
 import { ApplicationStoreRequestBase } from './ApplicationStoreRequestBase';
 import { CompensationRateUnits } from './CompensationRateUnits';
 
@@ -42,4 +43,6 @@ export interface WaterConservationApplicationSubmissionRequest extends Applicati
     waterConservationApplicationEstimateLocationId: string;
     additionalDetails: string;
   }[];
+
+  supportingDocuments: ApplicationDocument[]
 }

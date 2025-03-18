@@ -224,6 +224,9 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ThenInclude(estimate => estimate.Locations)
             .Where(wca => wca.Id == request.WaterConservationApplicationId)
             .SingleAsync();
+        
+        var documents = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
+        existingApplication.SupportingDocuments = documents;
 
         foreach (var details in request.FieldDetails)
         {
