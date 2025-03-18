@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class ApplicationDocumentDownloadRequest : ApplicationLoadRequestBase
+public class ApplicationSupportingDocumentExistsRequest : ApplicationLoadRequestBase
 {
     public Guid WaterConservationApplicationDocumentId { get; set; }
 }

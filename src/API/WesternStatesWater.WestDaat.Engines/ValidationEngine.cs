@@ -528,21 +528,24 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateApplicationDocumentDownloadSasTokenRequest(ApplicationDocumentDownloadSasTokenRequest request, ContextBase context)
     {
-        var documentInfo = (DTO.ApplicationDocumentDownloadResponse)await _applicationAccessor.Load(new DTO.ApplicationDocumentDownloadRequest
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var documentExistsRequest = new DTO.ApplicationSupportingDocumentExistsRequest
         {
             WaterConservationApplicationDocumentId = request.WaterConservationApplicationDocumentId
-        });
-        
-        var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var isUserTheApplicant = userContext.UserId == documentInfo.ApplicantId;
+        };
+
+        var documentExistsResponse = (DTO.ApplicationSupportingDocumentExistsResponse)await _applicationAccessor.Load(documentExistsRequest);
+
         var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
             Context = context,
-            OrganizationId = documentInfo.FundingOrganizationId
+            OrganizationId = documentExistsResponse.FundingOrganizationId
         });
 
-        if (!isUserTheApplicant && !permissions.Contains(Permissions.ApplicationReview) && !orgPermissions.Contains(Permissions.ApplicationReview))
+        if (userContext.UserId != documentExistsResponse.ApplicantId && !permissions.Contains(Permissions.ApplicationReview) &&
+            !orgPermissions.Contains(Permissions.ApplicationReview))
         {
             return CreateForbiddenError(new ApplicationDocumentDownloadSasTokenRequest(), context);
         }

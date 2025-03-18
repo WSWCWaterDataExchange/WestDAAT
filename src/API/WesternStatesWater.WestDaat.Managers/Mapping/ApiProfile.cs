@@ -233,7 +233,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
             
-            CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentDownloadRequest>();
+            CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationSupportingDocumentExistsRequest>();
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

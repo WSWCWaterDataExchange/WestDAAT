@@ -28,7 +28,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationLoadSingleRequest req => await GetApplication(req),
             ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
-            ApplicationDocumentDownloadRequest req => await GetApplicationDocumentInfo(req),
+            ApplicationSupportingDocumentExistsRequest req => await CheckApplicationDocumentExists(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -152,15 +152,20 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<ApplicationDocumentDownloadResponse> GetApplicationDocumentInfo(ApplicationDocumentDownloadRequest request)
+    private async Task<ApplicationSupportingDocumentExistsResponse> CheckApplicationDocumentExists(ApplicationSupportingDocumentExistsRequest request)
     {
-        await Task.CompletedTask;
-        return new ApplicationDocumentDownloadResponse
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var document = await db.WaterConservationApplicationDocuments
+            .AsNoTracking()
+            .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
+            .Include(doc => doc.WaterConservationApplication)
+            .FirstOrDefaultAsync();
+        
+        return new ApplicationSupportingDocumentExistsResponse
         {
-            WaterConservationApplicationDocumentId = request.WaterConservationApplicationDocumentId,
-            WaterConservationApplicationDocumentFileName = "test.pdf",
-            ApplicantId = Guid.NewGuid(),
-            FundingOrganizationId = Guid.NewGuid()
+            ApplicantId = document.WaterConservationApplication.ApplicantUserId,
+            FundingOrganizationId = document.WaterConservationApplication.FundingOrganizationId,
         };
     }
     
