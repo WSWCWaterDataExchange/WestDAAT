@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { formatNumber } from '../../../utilities/valueFormatters';
+import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
 import {
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
@@ -271,7 +271,10 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Priority Date" displayValue={stateForm.priorityDate} />
+            <FormElement
+              label="Priority Date"
+              displayValue={stateForm.priorityDate ? formatDateString(stateForm.priorityDate, 'MM/DD/YYYY') : undefined}
+            />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
