@@ -279,9 +279,11 @@ function ApplicationSubmissionFormLayout() {
                   <Form.Control
                     as="textarea"
                     maxLength={4000}
+                    required
                     ref={propertyAdditionalDetailsRef.current[index] as any}
                     value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
                   />
+                  <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
                 </Form.Group>
               </div>
             ))}
