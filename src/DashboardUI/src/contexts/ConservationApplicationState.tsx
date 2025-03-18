@@ -15,6 +15,8 @@ import center from '@turf/center';
 import { convertWktToGeometry } from '../utilities/geometryWktConverter';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -39,9 +41,10 @@ export interface ConservationApplicationState {
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
-    polygonEtAcreFeetSum: number;
     supportingDocuments: ApplicationDocument[];
+    reviewerNotes: ApplicationReviewNote[];
   };
+  isCreatingApplication: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -75,9 +78,10 @@ export const defaultState = (): ConservationApplicationState => ({
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
-    polygonEtAcreFeetSum: 0,
     supportingDocuments: [],
+    reviewerNotes: [],
   },
+  isCreatingApplication: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -94,7 +98,8 @@ export type ApplicationAction =
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadedAction
-  | ApplicationDocumentRemovedAction;
+  | ApplicationDocumentRemovedAction
+  | ApplicationLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -191,6 +196,14 @@ export interface ApplicationDocumentRemovedAction {
   };
 }
 
+export interface ApplicationLoadedAction {
+  type: 'APPLICATION_LOADED';
+  payload: {
+    application: ApplicationDetails;
+    notes: ApplicationReviewNote[];
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -229,6 +242,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
       return onApplicationDocumentRemoved(draftState, action);
+    case 'APPLICATION_LOADED':
+      return onApplicationLoaded(draftState, action);
   }
 };
 
@@ -311,6 +326,8 @@ const onApplicationCreated = (
   draftState.conservationApplication.waterConservationApplicationId = payload.waterConservationApplicationId;
   draftState.conservationApplication.waterConservationApplicationDisplayId =
     payload.waterConservationApplicationDisplayId;
+
+  draftState.isCreatingApplication = true;
 
   checkCanEstimateConsumptiveUse(draftState);
 
@@ -425,6 +442,74 @@ const onApplicationDocumentRemoved = (
   return draftState;
 };
 
+const onApplicationLoaded = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationLoadedAction,
+): ConservationApplicationState => {
+  const draftApplication = draftState.conservationApplication;
+  const application = payload.application;
+
+  draftApplication.waterConservationApplicationId = application.id;
+  draftApplication.waterRightNativeId = application.waterRightNativeId;
+  draftApplication.waterConservationApplicationDisplayId = application.applicationDisplayId;
+  draftApplication.fundingOrganizationId = application.fundingOrganizationId;
+  // funding org name, open et modal name, date range start / end, compensation rate model - all of these are funding org-related data points that are loaded based on the water right
+
+  draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
+  draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
+  draftApplication.totalAverageYearlyEtAcreFeet = application.estimate.totalAverageYearlyConsumptionEtAcreFeet;
+  draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
+  draftApplication.applicationSubmissionForm = {
+    ...application.submission,
+
+    agentName: application.submission.agentName ?? '',
+    agentEmail: application.submission.agentEmail ?? '',
+    agentPhoneNumber: application.submission.agentPhoneNumber ?? '',
+    agentAdditionalDetails: application.submission.agentAdditionalDetails ?? '',
+
+    canalOrIrrigationEntityName: application.submission.canalOrIrrigationEntityName ?? '',
+    canalOrIrrigationEntityEmail: application.submission.canalOrIrrigationEntityEmail ?? '',
+    canalOrIrrigationEntityPhoneNumber: application.submission.canalOrIrrigationEntityPhoneNumber ?? '',
+    canalOrIrrigationAdditionalDetails: application.submission.canalOrIrrigationAdditionalDetails ?? '',
+
+    estimationSupplementaryDetails: application.submission.estimationSupplementaryDetails ?? '',
+    conservationPlanAdditionalInfo: application.submission.conservationPlanAdditionalInfo ?? '',
+
+    fieldDetails: application.estimate.locations.map((location) => ({
+      waterConservationApplicationEstimateLocationId: location.id,
+      additionalDetails: location.additionalDetails ?? '',
+    })),
+  };
+  draftApplication.estimateLocations = application.estimate.locations.map(
+    (location, index): PartialPolygonData => ({
+      waterConservationApplicationEstimateLocationId: location.id,
+      polygonWkt: location.polygonWkt,
+      acreage: location.polygonAreaInAcres,
+      additionalDetails: location.additionalDetails ?? '',
+      fieldName: `Field ${index + 1}`,
+      datapoints: location.consumptiveUses,
+      centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
+      // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
+      averageYearlyEtInAcreFeet: undefined,
+      averageYearlyEtInInches: undefined,
+    }),
+  );
+  draftApplication.doPolygonsOverlap = false;
+  draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
+    (sum, location) => sum + location.polygonAreaInAcres,
+    0,
+  );
+  draftApplication.supportingDocuments = application.supportingDocuments.map(
+    (doc): ApplicationDocument => ({
+      blobName: doc.blobName,
+      fileName: doc.fileName,
+      description: doc.description ?? '',
+    }),
+  );
+
+  return draftState;
+};
+
 const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
@@ -493,7 +578,6 @@ const resetApplicationFormLocationDetails = (draftState: ConservationApplication
 
 const computeCombinedPolygonData = (draftState: ConservationApplicationState): void => {
   let polygonAcreageSum = 0;
-  let polygonEtAcreFeetSum = 0;
   for (let i = 0; i < draftState.conservationApplication.estimateLocations.length; i++) {
     // compute data on the polygon object
     const polygon = draftState.conservationApplication.estimateLocations[i];
@@ -529,11 +613,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
     // compute data concerning all the polygons
     // these calculations assume that none of the polygons intersect with each other
     polygonAcreageSum += polygon.acreage!;
-    if (polygon.averageYearlyEtInAcreFeet) {
-      polygonEtAcreFeetSum += polygon.averageYearlyEtInAcreFeet;
-    }
   }
 
   draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
-  draftState.conservationApplication.polygonEtAcreFeetSum = polygonEtAcreFeetSum;
 };

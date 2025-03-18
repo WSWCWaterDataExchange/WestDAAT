@@ -1,7 +1,11 @@
+import { Placeholder } from 'react-bootstrap';
+
 interface ApplicationFormSectionProps {
   title: string;
   subtitle?: string;
   className?: string;
+  isLoading?: boolean;
+  loadingFieldCount?: number;
   children: React.ReactNode | undefined;
 }
 
@@ -20,7 +24,15 @@ function ApplicationFormSection(props: ApplicationFormSectionProps) {
         )}
       </div>
 
-      <div className="row">{props.children}</div>
+      <div className="row">
+        {props.isLoading
+          ? new Array(props.loadingFieldCount ?? 4).fill(0).map((_, index) => (
+              <Placeholder animation="glow" className="col-3">
+                <Placeholder key={index} xs={12} className="rounded fs-3 mb-3" />
+              </Placeholder>
+            ))
+          : props.children}
+      </div>
     </div>
   );
 }

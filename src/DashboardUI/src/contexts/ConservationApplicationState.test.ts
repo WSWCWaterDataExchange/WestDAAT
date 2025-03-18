@@ -5,6 +5,8 @@ import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import { ConservationApplicationState, defaultState, reducer } from './ConservationApplicationState';
 import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
+import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -165,6 +167,8 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.conservationApplication.waterConservationApplicationId).toEqual('application-guid');
     expect(newState.conservationApplication.waterConservationApplicationDisplayId).toEqual('display-id');
+
+    expect(newState.isCreatingApplication).toBe(true);
 
     shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     shouldBeAbleToContinueToApplication(newState, false);
@@ -519,6 +523,106 @@ describe('ConservationApplicationState reducer', () => {
 
       // Assert
       shouldBeAbleToContinueToApplication(newState, true);
+    });
+  });
+
+  describe('Review Page Use Cases', () => {
+    it('loading application should hydrate state', () => {
+      // Arrange
+      const applicationDetails: ApplicationDetails = applicationDetailsMock();
+
+      // Act
+      const newState = reducer(state, {
+        type: 'APPLICATION_LOADED',
+        payload: {
+          application: applicationDetails,
+          notes: [],
+        },
+      });
+
+      // Assert
+      const application = newState.conservationApplication;
+
+      // application / application estimate
+      expect(application.waterConservationApplicationId).toEqual(applicationDetails.id);
+      expect(application.waterRightNativeId).toEqual(applicationDetails.waterRightNativeId);
+      expect(application.fundingOrganizationId).toEqual(applicationDetails.fundingOrganizationId);
+
+      expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
+      expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
+      expect(application.totalAverageYearlyEtAcreFeet).toEqual(
+        applicationDetails.estimate.totalAverageYearlyConsumptionEtAcreFeet,
+      );
+      expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
+
+      // application estimate locations
+      const location = application.estimateLocations[0];
+      const expectedLocation = applicationDetails.estimate.locations[0];
+      expect(application.estimateLocations.length).toEqual(applicationDetails.estimate.locations.length);
+      expect(location.waterConservationApplicationEstimateLocationId).toEqual(expectedLocation.id);
+      expect(location.polygonWkt).toEqual(expectedLocation.polygonWkt);
+      expect(location.acreage).toEqual(expectedLocation.polygonAreaInAcres);
+      expect(location.fieldName).toEqual('Field 1');
+      expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);
+
+      // application estimate location consumptive uses
+      const consumptiveUse = location.datapoints![0];
+      const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
+      expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
+      expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
+      expect(consumptiveUse.etInInches).toEqual(expectedConsumptiveUse.etInInches);
+
+      // application supporting documents
+      const document = application.supportingDocuments[0];
+      const expectedDocument = applicationDetails.supportingDocuments[0];
+      expect(application.supportingDocuments.length).toEqual(applicationDetails.supportingDocuments.length);
+      expect(document.fileName).toEqual(expectedDocument.fileName);
+      expect(document.blobName).toEqual(expectedDocument.blobName);
+      expect(document.description).toEqual(expectedDocument.description);
+
+      // application submission
+      const submission = application.applicationSubmissionForm;
+      const expectedSubmission = applicationDetails.submission;
+      expect(submission.agentName).toEqual(expectedSubmission.agentName);
+      expect(submission.agentEmail).toEqual(expectedSubmission.agentEmail);
+      expect(submission.agentPhoneNumber).toEqual(expectedSubmission.agentPhoneNumber);
+      expect(submission.agentAdditionalDetails).toEqual(expectedSubmission.agentAdditionalDetails);
+
+      expect(submission.landownerName).toEqual(expectedSubmission.landownerName);
+      expect(submission.landownerEmail).toEqual(expectedSubmission.landownerEmail);
+      expect(submission.landownerPhoneNumber).toEqual(expectedSubmission.landownerPhoneNumber);
+      expect(submission.landownerAddress).toEqual(expectedSubmission.landownerAddress);
+      expect(submission.landownerCity).toEqual(expectedSubmission.landownerCity);
+      expect(submission.landownerState).toEqual(expectedSubmission.landownerState);
+      expect(submission.landownerZipCode).toEqual(expectedSubmission.landownerZipCode);
+
+      expect(submission.canalOrIrrigationEntityName).toEqual(expectedSubmission.canalOrIrrigationEntityName);
+      expect(submission.canalOrIrrigationEntityEmail).toEqual(expectedSubmission.canalOrIrrigationEntityEmail);
+      expect(submission.canalOrIrrigationEntityPhoneNumber).toEqual(
+        expectedSubmission.canalOrIrrigationEntityPhoneNumber,
+      );
+      expect(submission.canalOrIrrigationAdditionalDetails).toEqual(
+        expectedSubmission.canalOrIrrigationAdditionalDetails,
+      );
+
+      expect(submission.conservationPlanFundingRequestDollarAmount).toEqual(
+        expectedSubmission.conservationPlanFundingRequestDollarAmount,
+      );
+      expect(submission.conservationPlanFundingRequestCompensationRateUnits).toEqual(
+        expectedSubmission.conservationPlanFundingRequestCompensationRateUnits,
+      );
+      expect(submission.conservationPlanDescription).toEqual(expectedSubmission.conservationPlanDescription);
+      expect(submission.conservationPlanAdditionalInfo).toEqual(expectedSubmission.conservationPlanAdditionalInfo);
+
+      expect(submission.estimationSupplementaryDetails).toEqual(expectedSubmission.estimationSupplementaryDetails);
+
+      expect(submission.permitNumber).toEqual(expectedSubmission.permitNumber);
+      expect(submission.facilityDitchName).toEqual(expectedSubmission.facilityDitchName);
+      expect(submission.priorityDate).toEqual(expectedSubmission.priorityDate);
+      expect(submission.certificateNumber).toEqual(expectedSubmission.certificateNumber);
+      expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
+      expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
+      expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
     });
   });
 

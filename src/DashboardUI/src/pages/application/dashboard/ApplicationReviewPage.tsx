@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { formatNumber } from '../../../utilities/valueFormatters';
+import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
 import {
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
@@ -15,6 +15,8 @@ import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import { Placeholder } from 'react-bootstrap';
 import { mdiFileDocument } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -23,9 +25,23 @@ export function ApplicationReviewPage() {
   const [showSubmissionConfirmationModal, setShowSubmissionConfirmationModal] = useState(false);
   const navigate = useNavigate();
   const context = useMsal();
+  const { applicationId } = useParams();
 
-  const navigateToApplicationCreatePage = () => {
-    navigate(`/application/${state.conservationApplication.waterRightNativeId}/create`);
+  const { isLoading: isApplicationLoading } = useGetApplicationQuery(
+    applicationId,
+    'applicant',
+    !state.isCreatingApplication,
+  );
+  const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
+    state.conservationApplication.waterRightNativeId,
+  );
+
+  const navigateBack = () => {
+    if (state.isCreatingApplication) {
+      navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
+    } else {
+      history.back();
+    }
   };
 
   const navigateToWaterRightLandingPage = () => {
@@ -69,13 +85,16 @@ export function ApplicationReviewPage() {
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
-        navigateBack={navigateToApplicationCreatePage}
-        backButtonText="Back to Application"
+        navigateBack={navigateBack}
+        backButtonText={state.isCreatingApplication ? 'Back to Application' : 'Back'}
         centerText="Water Conservation Estimation Tool"
       />
 
       <div className="overflow-y-auto">
-        <ApplicationReviewPageLayout submitApplication={presentConfirmationModal} />
+        <ApplicationReviewPageLayout
+          submitApplication={presentConfirmationModal}
+          isLoading={isApplicationLoading || isFundingOrganizationLoading}
+        />
       </div>
 
       <SubmitApplicationConfirmationModal
@@ -92,6 +111,7 @@ const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationReviewPageLayoutProps {
+  isLoading: boolean;
   submitApplication: () => void;
 }
 
@@ -99,6 +119,8 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
+
+  const isApplicationSubmitEnabled = state.isCreatingApplication;
 
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
@@ -112,17 +134,26 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
       </div>
 
       <div className="d-flex gap-3 mb-4">
-        <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
+        {props.isLoading ? (
+          <Placeholder as="div" animation="glow" className="h-100 w-100">
+            <Placeholder xs={12} className="h-100 w-25 rounded" />
+          </Placeholder>
+        ) : (
+          <>
+            <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
 
-        <span className="fw-bold">
-          Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
-        </span>
+            <span className="fw-bold">
+              Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
+            </span>
 
-        <span className="fw-bold">Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
+            <span className="fw-bold">
+              Funding Organization: {state.conservationApplication.fundingOrganizationName}
+            </span>
+          </>
+        )}
       </div>
-
       <div>
-        <ApplicationFormSection title="Applicant Information">
+        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
@@ -154,7 +185,11 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Representative / Agent Contact Information">
+        <ApplicationFormSection
+          title="Representative / Agent Contact Information"
+          isLoading={props.isLoading}
+          loadingFieldCount={3}
+        >
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
@@ -175,7 +210,11 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         {sectionRule}
 
         <div className="row">
-          <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
+          <ApplicationFormSection
+            title="Property & Land Area Information"
+            className="col-lg-6 col-12"
+            isLoading={props.isLoading}
+          >
             {polygonData.map((field) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
@@ -206,7 +245,11 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Canal Company / Irrigation District">
+        <ApplicationFormSection
+          title="Canal Company / Irrigation District"
+          isLoading={props.isLoading}
+          loadingFieldCount={3}
+        >
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
@@ -226,7 +269,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Water Right Information">
+        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
@@ -236,7 +279,10 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Priority Date" displayValue={stateForm.priorityDate} />
+            <FormElement
+              label="Priority Date"
+              displayValue={stateForm.priorityDate ? formatDateString(stateForm.priorityDate, 'MM/DD/YYYY') : undefined}
+            />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
@@ -258,7 +304,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Estimation Summary">
+        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement
@@ -270,7 +316,9 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement
                 label="Consumptive Use"
-                displayValue={formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2) + ' Acre-Feet'}
+                displayValue={
+                  formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2) + ' Acre-Feet'
+                }
               />
             </div>
 
@@ -299,7 +347,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Conservation Plan">
+        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement
               label="Funding Request $ Amount"
@@ -339,7 +387,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
                     <tr key={`${file.fileName}-${index}`}>
                       <td className="col-4 text-nowrap align-content-center px-2 py-3">
-                        <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3"/>
+                        <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3" />
                         {file.fileName}
                       </td>
                       <td className="align-content-center text-start">{file.description}</td>
@@ -353,11 +401,13 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {state.conservationApplication.supportingDocuments.length === 0 && <hr className="m-0" />}
 
-        <div className="d-flex justify-content-end p-3">
-          <Button variant="success" type="button" onClick={props.submitApplication}>
-            Submit
-          </Button>
-        </div>
+        {isApplicationSubmitEnabled && (
+          <div className="d-flex justify-content-end p-3">
+            <Button variant="success" type="button" onClick={props.submitApplication}>
+              Submit
+            </Button>
+          </div>
+        )}
       </div>
     </main>
   );

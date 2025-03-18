@@ -1,7 +1,11 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
 import { useQuery } from 'react-query';
-import { applicationSearch, createWaterConservationApplication } from '../../accessors/applicationAccessor';
+import {
+  applicationSearch,
+  createWaterConservationApplication,
+  getApplication,
+} from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
@@ -79,6 +83,36 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
       },
       onError: (error: Error) => {
         toast.error('Failed to load data. Please try again later.');
+      },
+    },
+  );
+}
+
+export function useGetApplicationQuery(
+  applicationId: string | undefined,
+  perspective: 'applicant' | 'reviewer',
+  isQueryEnabled: boolean,
+) {
+  const context = useMsal();
+  const { dispatch } = useConservationApplicationContext();
+
+  return useQuery(
+    ['getApplication', applicationId, perspective],
+    () =>
+      getApplication(context, {
+        applicationId: applicationId!,
+        perspective,
+      }),
+    {
+      enabled: !!applicationId && isQueryEnabled,
+      onSuccess: (result) => {
+        dispatch({
+          type: 'APPLICATION_LOADED',
+          payload: {
+            application: result.application,
+            notes: result.notes ?? [],
+          },
+        });
       },
     },
   );
