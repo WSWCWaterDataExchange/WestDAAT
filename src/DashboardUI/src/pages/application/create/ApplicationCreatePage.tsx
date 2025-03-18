@@ -306,7 +306,7 @@ function ApplicationCreatePageForm() {
                     as="textarea"
                     maxLength={4000}
                     ref={propertyAdditionalDetailsRef.current[index] as any}
-                    value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
+                    value={stateForm.fieldDetails[index].additionalDetails}
                   />
                 </Form.Group>
               </div>
