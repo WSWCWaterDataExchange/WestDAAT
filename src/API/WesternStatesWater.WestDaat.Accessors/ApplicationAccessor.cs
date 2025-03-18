@@ -28,6 +28,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationLoadSingleRequest req => await GetApplication(req),
             ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
+            ApplicationDocumentDownloadRequest req => await GetApplicationDocumentInfo(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -151,6 +152,18 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
+    private async Task<ApplicationDocumentDownloadResponse> GetApplicationDocumentInfo(ApplicationDocumentDownloadRequest request)
+    {
+        await Task.CompletedTask;
+        return new ApplicationDocumentDownloadResponse
+        {
+            WaterConservationApplicationDocumentId = request.WaterConservationApplicationDocumentId,
+            WaterConservationApplicationDocumentFileName = "test.pdf",
+            ApplicantId = Guid.NewGuid(),
+            FundingOrganizationId = Guid.NewGuid()
+        };
+    }
+    
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
