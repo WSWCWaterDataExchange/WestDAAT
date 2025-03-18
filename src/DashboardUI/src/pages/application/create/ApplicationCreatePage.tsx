@@ -41,7 +41,7 @@ export function ApplicationCreatePage() {
   );
 }
 
-const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-12';
+const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
