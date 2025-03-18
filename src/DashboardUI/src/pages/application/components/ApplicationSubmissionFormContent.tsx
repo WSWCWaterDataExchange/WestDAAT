@@ -14,14 +14,14 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import ApplicationFormSection from '../components/ApplicationFormSection';
+import ApplicationFormSection from './ApplicationFormSection';
 import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-function ApplicationSubmissionFormLayout() {
+function ApplicationSubmissionFormContent() {
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
@@ -553,4 +553,4 @@ function ApplicationSubmissionFormLayout() {
   );
 }
 
-export default ApplicationSubmissionFormLayout;
+export default ApplicationSubmissionFormContent;
