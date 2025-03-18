@@ -153,7 +153,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         )}
       </div>
       <div>
-        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingSections={7}>
+        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
@@ -188,7 +188,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         <ApplicationFormSection
           title="Representative / Agent Contact Information"
           isLoading={props.isLoading}
-          loadingSections={3}
+          loadingFieldCount={3}
         >
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
@@ -248,7 +248,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         <ApplicationFormSection
           title="Canal Company / Irrigation District"
           isLoading={props.isLoading}
-          loadingSections={3}
+          loadingFieldCount={3}
         >
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
@@ -269,7 +269,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingSections={7}>
+        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
@@ -304,7 +304,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingSections={5}>
+        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement
@@ -347,7 +347,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingSections={2}>
+        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement
               label="Funding Request $ Amount"

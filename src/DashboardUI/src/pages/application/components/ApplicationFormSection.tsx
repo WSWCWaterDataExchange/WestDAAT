@@ -5,7 +5,7 @@ interface ApplicationFormSectionProps {
   subtitle?: string;
   className?: string;
   isLoading?: boolean;
-  loadingSections?: number;
+  loadingFieldCount?: number;
   children: React.ReactNode | undefined;
 }
 
@@ -26,7 +26,7 @@ function ApplicationFormSection(props: ApplicationFormSectionProps) {
 
       <div className="row">
         {props.isLoading
-          ? new Array(props.loadingSections ?? 4).fill(0).map((_, index) => (
+          ? new Array(props.loadingFieldCount ?? 4).fill(0).map((_, index) => (
               <Placeholder animation="glow" className="col-3">
                 <Placeholder key={index} xs={12} className="rounded fs-3 mb-3" />
               </Placeholder>
