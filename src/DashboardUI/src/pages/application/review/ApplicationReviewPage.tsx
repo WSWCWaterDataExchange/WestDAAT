@@ -1,13 +1,22 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationSubmissionFormLayout from '../components/ApplicationSubmissionFormLayout';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
+  const { applicationId } = useParams();
+  const { state } = useConservationApplicationContext();
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
   };
+
+  const { isLoading: isApplicationLoading } = useGetApplicationQuery(applicationId, 'reviewer', true);
+  const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
+    state.conservationApplication.waterRightNativeId,
+  );
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
