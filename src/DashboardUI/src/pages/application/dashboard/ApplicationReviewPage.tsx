@@ -136,7 +136,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
       <div className="d-flex gap-3 mb-4">
         {props.isLoading ? (
           <Placeholder as="div" animation="glow" className="h-100 w-100">
-            <Placeholder xs={12} className="h-100 w-100" />
+            <Placeholder xs={12} className="h-100 w-25 rounded" />
           </Placeholder>
         ) : (
           <>
@@ -153,7 +153,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
         )}
       </div>
       <div>
-        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading}>
+        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingSections={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
@@ -185,7 +185,11 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Representative / Agent Contact Information" isLoading={props.isLoading}>
+        <ApplicationFormSection
+          title="Representative / Agent Contact Information"
+          isLoading={props.isLoading}
+          loadingSections={3}
+        >
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
@@ -241,7 +245,11 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Canal Company / Irrigation District" isLoading={props.isLoading}>
+        <ApplicationFormSection
+          title="Canal Company / Irrigation District"
+          isLoading={props.isLoading}
+          loadingSections={3}
+        >
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
@@ -261,7 +269,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading}>
+        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingSections={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
             <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
@@ -296,7 +304,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading}>
+        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingSections={5}>
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElement
@@ -339,7 +347,7 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading}>
+        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingSections={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
             <FormElement
               label="Funding Request $ Amount"
