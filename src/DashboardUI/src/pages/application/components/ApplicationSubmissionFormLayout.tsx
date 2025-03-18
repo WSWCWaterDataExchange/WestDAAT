@@ -556,6 +556,15 @@ function ApplicationSubmissionFormLayout(props: ApplicationSubmissionFormLayoutP
         <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
       </ApplicationFormSection>
 
+      {perspective === 'reviewer' && (
+        <>
+          <hr className="text-primary" />
+          <ApplicationFormSection title="Review Pipeline (Hidden from Applicant)" className="col mb-4">
+            <NotImplementedPlaceholder />
+          </ApplicationFormSection>
+        </>
+      )}
+
       <hr className="m-0" />
       <div className="d-flex justify-content-end p-3">
         <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
