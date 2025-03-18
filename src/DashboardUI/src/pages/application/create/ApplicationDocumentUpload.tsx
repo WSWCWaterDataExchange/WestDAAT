@@ -1,5 +1,5 @@
 import { useMsal } from '@azure/msal-react';
-import { mdiTrashCanOutline } from '@mdi/js';
+import { mdiFileDocument, mdiTrashCanOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
@@ -17,9 +17,13 @@ export interface ApplicationDocumentUploadProps {
 }
 
 export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps) {
+  const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
+  const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
+
   const msalContext = useMsal();
   const { state, dispatch } = useConservationApplicationContext();
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
+
   const uploadDocumentMutation = useMutation({
     mutationFn: async (params: { files: File[] }) => {
       props.documentUploadingHandler(true);
@@ -40,9 +44,6 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
       setUploadDocumentError('An error occurred while uploading the document(s). Please try again.');
     },
   });
-
-  const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
-  const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
 
   const isOverMaxDocumentLimit = (files: File[]): boolean => {
     return state.conservationApplication.supportingDocuments.length + files.length > MAX_NUMBER_UPLOADED_DOCUMENTS;
@@ -115,25 +116,29 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
         <table className="table">
           <tbody>
             {state.conservationApplication.supportingDocuments.map((file, index) => (
-              <tr key={`${file.fileName}-${index}`}>
-                <td className="align-content-center">{file.fileName}</td>
+              <tr key={file.blobName}>
+                <td className="col-3 text-nowrap align-content-center px-2">
+                  <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3" />
+                  {file.fileName}
+                </td>
                 <td className="align-content-center flex-grow-1">
                   <Form.Group controlId={`supportingDocumentsDescription-${index}`}>
                     <Form.Control
                       as="textarea"
                       maxLength={4000}
                       value={file.description}
+                      aria-label="Document description"
                       onChange={(e) => handleDocumentDescriptionChanged(file.blobName, e.target.value)}
-                    ></Form.Control>
+                    />
                   </Form.Group>
                 </td>
-                <td className="align-content-center text-center">
+                <td className="col-1 align-content-center text-center">
                   <Button
                     variant="link"
                     className="px-1 py-1 text-danger"
                     onClick={() => handleRemoveDocument(file.blobName)}
                   >
-                    <Icon path={mdiTrashCanOutline} size="1.5em" aria-label="Remove supporting document button"></Icon>
+                    <Icon path={mdiTrashCanOutline} size="1.5em" aria-label="Remove document" />
                   </Button>
                 </td>
               </tr>
@@ -143,9 +148,14 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
       )}
 
       <Fade in={uploadDocumentMutation.isLoading}>
-        <div className="container">
-          <ProgressBar animated now={100} aria-label="Document upload in progress, please wait..." />
-        </div>
+        {uploadDocumentMutation.isLoading ? (
+          <div className="container d-flex align-items-center mb-2">
+            <div className="text-nowrap fst-italic me-4">Document Uploading...</div>
+            <ProgressBar className="w-100" animated now={100} aria-label="Document upload in progress, please wait" />
+          </div>
+        ) : (
+          <div></div>
+        )}
       </Fade>
 
       <div className="col-4">

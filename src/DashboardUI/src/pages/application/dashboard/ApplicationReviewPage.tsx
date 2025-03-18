@@ -338,8 +338,8 @@ function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
                 <tbody>
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
                     <tr key={`${file.fileName}-${index}`}>
-                      <td colSpan={4} className="align-content-center px-2">
-                        <Icon path={mdiFileDocument} size="2em" className="primary p-1" color={'#007bff'}></Icon>
+                      <td className="col-4 text-nowrap align-content-center px-2 py-3">
+                        <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3"/>
                         {file.fileName}
                       </td>
                       <td className="align-content-center text-start">{file.description}</td>
