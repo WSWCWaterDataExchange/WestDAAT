@@ -48,7 +48,7 @@ public class FileIntegrationTests : IntegrationTestBase
         };
         
         // Act
-        var response = await _fileManager.GenerateFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request);
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request);
 
         // Assert
         response.Error.Should().NotBeNull();
@@ -74,7 +74,7 @@ public class FileIntegrationTests : IntegrationTestBase
         };
         
         // Act
-        var response = await _fileManager.GenerateFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request);
+        var response = await _fileManager.GenerateUploadFileSasToken<ApplicationDocumentUploadSasTokenRequest, ApplicationDocumentUploadSasTokenResponse>(request);
         
         // Assert
         response.Error.Should().BeNull();

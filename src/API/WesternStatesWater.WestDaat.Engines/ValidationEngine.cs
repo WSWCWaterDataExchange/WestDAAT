@@ -511,6 +511,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
+            ApplicationDocumentDownloadSasTokenRequest req => ValidateApplicationDocumentDownloadSasTokenRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -525,6 +526,11 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private ErrorBase ValidateApplicationDocumentDownloadSasTokenRequest(ApplicationDocumentDownloadSasTokenRequest request, ContextBase context)
+    {
+        throw new NotImplementedException("made it to validation engine");
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,
