@@ -96,42 +96,43 @@ function ApplicationCreatePageForm() {
     const cpfrcruValueAsEnum = Number(
       conservationPlanFundingRequestCompensationRateUnitsRef.current?.value,
     ) as CompensationRateUnits;
-    const conservationPlanFundingRequestCompensationUnits:
-      | Exclude<CompensationRateUnits, CompensationRateUnits.None>
-      | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
+    const conservationPlanFundingRequestCompensationUnits: Exclude<
+      CompensationRateUnits,
+      CompensationRateUnits.None
+    > | null = cpfrcruValueAsEnum === CompensationRateUnits.None ? null : cpfrcruValueAsEnum;
 
     const formValues: ApplicationSubmissionForm = {
-      landownerName: landownerNameRef.current?.value,
-      landownerEmail: landownerEmailRef.current?.value,
-      landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
-      landownerAddress: landownerAddressRef.current?.value,
-      landownerCity: landownerCityRef.current?.value,
-      landownerState: landownerStateRef.current?.value,
-      landownerZipCode: landownerZipCodeRef.current?.value,
-      agentName: agentNameRef.current?.value,
-      agentEmail: agentEmailRef.current?.value,
-      agentPhoneNumber: agentPhoneNumberRef.current?.value,
-      agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
+      landownerName: landownerNameRef.current!.value,
+      landownerEmail: landownerEmailRef.current!.value,
+      landownerPhoneNumber: landownerPhoneNumberRef.current!.value,
+      landownerAddress: landownerAddressRef.current!.value,
+      landownerCity: landownerCityRef.current!.value,
+      landownerState: landownerStateRef.current!.value,
+      landownerZipCode: landownerZipCodeRef.current!.value,
+      agentName: agentNameRef.current!.value,
+      agentEmail: agentEmailRef.current!.value,
+      agentPhoneNumber: agentPhoneNumberRef.current!.value,
+      agentAdditionalDetails: agentAdditionalDetailsRef.current!.value,
       fieldDetails: polygonData.map((field, index) => ({
         waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
-      canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
-      canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current?.value,
-      canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current?.value,
-      canalOrIrrigationAdditionalDetails: canalOrIrrigationAdditionalDetailsRef.current?.value,
-      permitNumber: permitNumberRef.current?.value,
-      facilityDitchName: facilityDitchNameRef.current?.value,
-      priorityDate: priorityDateRef.current?.value,
-      certificateNumber: certificateNumberRef.current?.value,
-      shareNumber: shareNumberRef.current?.value,
-      waterRightState: waterRightStateRef.current?.value,
-      waterUseDescription: waterUseDescriptionRef.current?.value,
-      estimationSupplementaryDetails: estimationSupplementaryDetailsRef.current?.value,
-      conservationPlanFundingRequestDollarAmount: conservationPlanFundingRequestDollarAmount,
+      canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current!.value,
+      canalOrIrrigationEntityEmail: canalOrIrrigationEntityEmailRef.current!.value,
+      canalOrIrrigationEntityPhoneNumber: canalOrIrrigationEntityPhoneNumberRef.current!.value,
+      canalOrIrrigationAdditionalDetails: canalOrIrrigationAdditionalDetailsRef.current!.value,
+      permitNumber: permitNumberRef.current!.value,
+      facilityDitchName: facilityDitchNameRef.current!.value,
+      priorityDate: priorityDateRef.current!.value,
+      certificateNumber: certificateNumberRef.current!.value,
+      shareNumber: shareNumberRef.current!.value,
+      waterRightState: waterRightStateRef.current!.value,
+      waterUseDescription: waterUseDescriptionRef.current!.value,
+      estimationSupplementaryDetails: estimationSupplementaryDetailsRef.current!.value,
+      conservationPlanFundingRequestDollarAmount: conservationPlanFundingRequestDollarAmount ?? 0,
       conservationPlanFundingRequestCompensationRateUnits: conservationPlanFundingRequestCompensationUnits,
-      conservationPlanDescription: conservationPlanDescriptionRef.current?.value,
-      conservationPlanAdditionalInfo: conservationPlanAdditionalInfoRef.current?.value,
+      conservationPlanDescription: conservationPlanDescriptionRef.current!.value,
+      conservationPlanAdditionalInfo: conservationPlanAdditionalInfoRef.current!.value,
     };
 
     dispatch({
@@ -527,7 +528,7 @@ function ApplicationCreatePageForm() {
             <Form.Select
               required
               ref={conservationPlanFundingRequestCompensationRateUnitsRef}
-              value={stateForm.conservationPlanFundingRequestCompensationRateUnits}
+              value={stateForm.conservationPlanFundingRequestCompensationRateUnits ?? undefined}
             >
               <option value={''}>Select an option</option>
               {CompensationRateUnitsOptions.map((value) => (
@@ -555,7 +556,7 @@ function ApplicationCreatePageForm() {
             <Form.Control
               as="textarea"
               ref={conservationPlanAdditionalInfoRef}
-              value={stateForm.conservationPlanAdditionalInfo}
+              value={stateForm.conservationPlanAdditionalInfo ?? undefined}
             />
           </Form.Group>
         </ApplicationFormSection>
