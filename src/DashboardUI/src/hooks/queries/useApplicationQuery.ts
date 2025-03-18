@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
-import { ApplicationLoadResponseBase } from '../../data-contracts/ApplicationLoadResponseBase';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -91,7 +90,7 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
 export function useGetApplicationQuery(
   applicationId: string | undefined,
-  perspective: Parameters<typeof getApplication>[1]['perspective'],
+  perspective: 'applicant' | 'reviewer',
   isQueryEnabled: boolean,
 ) {
   const context = useMsal();
