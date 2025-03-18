@@ -20,7 +20,7 @@ import { Placeholder } from 'react-bootstrap';
 import { mdiFileDocument } from '@mdi/js';
 import Icon from '@mdi/react';
 
-export function ApplicationReviewPage() {
+export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
   const [showSubmissionConfirmationModal, setShowSubmissionConfirmationModal] = useState(false);
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ export function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationReviewPageLayout
+        <ApplicationSubmitPageLayout
           submitApplication={presentConfirmationModal}
           isLoading={isApplicationLoading || isFundingOrganizationLoading}
         />
@@ -110,12 +110,12 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-interface ApplicationReviewPageLayoutProps {
+interface ApplicationSubmitPageLayoutProps {
   isLoading: boolean;
   submitApplication: () => void;
 }
 
-function ApplicationReviewPageLayout(props: ApplicationReviewPageLayoutProps) {
+function ApplicationSubmitPageLayout(props: ApplicationSubmitPageLayoutProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
