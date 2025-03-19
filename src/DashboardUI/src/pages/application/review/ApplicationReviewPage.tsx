@@ -21,24 +21,9 @@ function ApplicationReviewPage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const [initialFormValue, setInitialFormValue] = useState<ApplicationSubmissionForm | null>(null);
-
-  useEffect(() => {
-    if (isApplicationLoading || isFundingOrganizationLoading || initialFormValue) return;
-
-    const v = JSON.parse(JSON.stringify(state.conservationApplication.applicationSubmissionForm));
-    setInitialFormValue(v);
-    console.log('initialFormValue', v);
-  }, [isApplicationLoading, isFundingOrganizationLoading, state.conservationApplication.applicationSubmissionForm]);
-
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  useEffect(() => {
-    if (initialFormValue && state.conservationApplication.applicationSubmissionForm) {
-      const d = !deepEqual(initialFormValue, state.conservationApplication.applicationSubmissionForm);
-      setIsFormDirty(d);
-      console.log('isFormDirty', d);
-    }
-  }, [state.conservationApplication.applicationSubmissionForm, initialFormValue]);
+  const isFormDirty = useDirtyFormCheck(state.conservationApplication.applicationSubmissionForm, {
+    isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
+  });
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -49,7 +34,7 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        {!isApplicationLoading && !isFundingOrganizationLoading && !!initialFormValue && (
+        {!isApplicationLoading && !isFundingOrganizationLoading && (
           <ApplicationSubmissionFormData perspective="reviewer" isFormDirty={isFormDirty} />
         )}
       </div>
@@ -58,3 +43,31 @@ function ApplicationReviewPage() {
 }
 
 export default ApplicationReviewPage;
+
+function useDirtyFormCheck(
+  formValues: any,
+  options: {
+    isEnabled: boolean;
+  },
+): boolean {
+  const [initialFormValue, setInitialFormValue] = useState<any>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+
+  useEffect(() => {
+    const isInitialFormValueSet = initialFormValue !== null;
+    if (!options.isEnabled || isInitialFormValueSet) return;
+
+    setInitialFormValue(JSON.parse(JSON.stringify(formValues)));
+  }, [formValues, options.isEnabled, initialFormValue]);
+
+  useEffect(() => {
+    if (!options.isEnabled) return;
+
+    if (initialFormValue && formValues) {
+      const dirty = !deepEqual(initialFormValue, formValues);
+      setIsFormDirty(dirty);
+    }
+  }, [options.isEnabled, initialFormValue, formValues]);
+
+  return isFormDirty;
+}
