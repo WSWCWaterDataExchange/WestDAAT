@@ -32,6 +32,8 @@ import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
 import { ApplicationSubmitPage } from './pages/application/dashboard/ApplicationSubmitPage';
+import ApplicationReviewPage from './pages/application/review/ApplicationReviewPage';
+import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -108,6 +110,9 @@ function App({ msalInstance }: AppProps) {
                     <Route path=":applicationId">
                       <Route path="create" element={<ApplicationCreatePage />} />
                       <Route path="submit" element={<ApplicationSubmitPage />} />
+                      <Route path="review" element={<ApplicationReviewGuard />}>
+                        <Route index element={<ApplicationReviewPage />} />
+                      </Route>
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>

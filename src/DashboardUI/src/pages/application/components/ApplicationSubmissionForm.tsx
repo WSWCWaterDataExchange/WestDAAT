@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import { ApplicationSubmissionFormData } from '../../../data-contracts/ApplicationSubmissionFormData';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
@@ -21,7 +21,16 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-function ApplicationSubmissionFormData() {
+type Perspective = 'applicant' | 'reviewer';
+
+interface ApplicationSubmissionFormProps {
+  perspective: Perspective;
+  isFormDirty?: boolean;
+}
+
+function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
+  const { perspective, isFormDirty } = props;
+
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
@@ -30,8 +39,8 @@ function ApplicationSubmissionFormData() {
   const [formValidated, setFormValidated] = useState(false);
   const [documentUploading, setDocumentUploading] = useState(false);
 
-  const navigateToReviewApplicationPage = () => {
-    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
+  const navigateToSubmitApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/submit`);
   };
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -76,7 +85,7 @@ function ApplicationSubmissionFormData() {
       | Exclude<CompensationRateUnits, CompensationRateUnits.None>
       | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
 
-    const formValues: ApplicationSubmissionForm = {
+    const formValues: ApplicationSubmissionFormData = {
       landownerName: landownerNameRef.current?.value,
       landownerEmail: landownerEmailRef.current?.value,
       landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
@@ -125,14 +134,21 @@ function ApplicationSubmissionFormData() {
     setFormValidated(true);
 
     if (isFormValid) {
-      navigateToReviewApplicationPage();
+      navigateToSubmitApplicationPage();
     }
+  };
+
+  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
+
+  const pageTitleOptions: Record<Perspective, string> = {
+    applicant: 'New Application',
+    reviewer: 'Application',
   };
 
   return (
     <main className="container">
       <div className="mb-3">
-        <span className="fs-4 fw-bold">New Application</span>
+        <span className="fs-4 fw-bold">{pageTitleOptions[perspective]}</span>
       </div>
 
       <div className="d-flex gap-3 mb-4">
@@ -540,17 +556,62 @@ function ApplicationSubmissionFormData() {
       </Form>
 
       <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-        <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
+        {perspective === 'reviewer' ? (
+          <>
+            <NotImplementedPlaceholder />
+            <span className="fw-bold">
+              Document Upload is not implemented for Reviewers yet. This feature will be implemented in a future
+              release.
+            </span>
+          </>
+        ) : (
+          <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
+        )}
       </ApplicationFormSection>
 
+      {perspective === 'reviewer' && (
+        <>
+          <hr className="text-primary" />
+          <ApplicationFormSection title="Review Pipeline (Hidden from Applicant)" className="col mb-4">
+            <NotImplementedPlaceholder />
+          </ApplicationFormSection>
+        </>
+      )}
+
       <hr className="m-0" />
-      <div className="d-flex justify-content-end p-3">
-        <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
-          Review & Submit
-        </Button>
-      </div>
+      {perspective === 'applicant' ? (
+        <div className="d-flex justify-content-end p-3">
+          <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
+            Review & Submit
+          </Button>
+        </div>
+      ) : perspective === 'reviewer' ? (
+        <div className="d-flex justify-content-between p-3">
+          <div>
+            <Button variant="secondary" onClick={alertNotImplemented}>
+              Cancel
+            </Button>
+          </div>
+
+          <div className="d-flex gap-3">
+            <Button
+              variant="outline-success"
+              onClick={alertNotImplemented}
+              disabled={documentUploading || !isFormDirty}
+            >
+              Save Changes
+            </Button>
+
+            <Button variant="success" onClick={alertNotImplemented} disabled={documentUploading}>
+              Submit for Final Review
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <NotImplementedPlaceholder />
+      )}
     </main>
   );
 }
 
-export default ApplicationSubmissionFormData;
+export default ApplicationSubmissionForm;
