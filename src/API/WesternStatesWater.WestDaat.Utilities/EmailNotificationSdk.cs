@@ -43,7 +43,8 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new WestDaatException($"Something went wrong while sending email.\nStatusCode: {response.StatusCode}.\nSubject: {message.Subject}");
+                var responseBody = await response.Body.ReadAsStringAsync();
+                throw new WestDaatException($"Something went wrong while sending email.\n Response StatusCode: {response.StatusCode}. \n Response Body: {responseBody}. \nSubject: {message.Subject}");
             }
         }
     }
