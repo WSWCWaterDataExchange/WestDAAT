@@ -527,15 +527,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         </ApplicationFormSection>
       </Form>
 
-      {perspective === 'reviewer' && (
-        <>
-          <hr className="text-primary" />
-          <ApplicationFormSection title="Review Pipeline (Hidden from Applicant)" className="col mb-4">
-            <NotImplementedPlaceholder />
-          </ApplicationFormSection>
-        </>
-      )}
-
       <hr className="m-0" />
       {perspective === 'applicant' ? (
         <div className="d-flex justify-content-end p-3">

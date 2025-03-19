@@ -8,6 +8,7 @@ import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
 import { useState } from 'react';
+import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 
 const perspective: ApplicationReviewPerspective = 'reviewer'; // hard-coded for this page
 
@@ -52,6 +53,7 @@ function ApplicationReviewPage() {
               perspective={perspective}
               documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
             />
+            <ApplicationReviewPipelineSection />
           </main>
         )}
       </div>
