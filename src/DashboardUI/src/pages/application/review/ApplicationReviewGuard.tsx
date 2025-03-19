@@ -9,18 +9,14 @@ export const ApplicationReviewGuard = () => {
   } = useAppContext();
   const navigate = useNavigate();
 
-  if (!isAuthenticated) {
-    navigate('/');
-    return null;
-  }
-
   const authorizedRoles: Role[] = [Role.GlobalAdmin, Role.OrganizationAdmin, Role.TechnicalReviewer, Role.Member];
 
   const hasRequiredRole = authorizedRoles.some((role): boolean => {
     return hasUserRole(user, role) || hasOrganizationRole(user, role);
   });
 
-  if (!hasRequiredRole) {
+  // Must wait for the authContext to be set before checking if the user is allowed
+  if (isAuthenticated && !hasRequiredRole) {
     navigate('/');
     return null;
   }
