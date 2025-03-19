@@ -15,7 +15,7 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
-import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
+import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
