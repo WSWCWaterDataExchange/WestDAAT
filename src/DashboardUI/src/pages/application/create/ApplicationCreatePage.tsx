@@ -20,7 +20,9 @@ export function ApplicationCreatePage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationSubmissionForm perspective="applicant" />
+        <main className="container">
+          <ApplicationSubmissionForm perspective="applicant" />
+        </main>
       </div>
     </div>
   );

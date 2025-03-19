@@ -141,7 +141,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
   return (
-    <main className="container">
+    <>
       <ApplicationReviewHeader perspective={perspective} />
 
       <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
@@ -586,7 +586,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       ) : (
         <NotImplementedPlaceholder />
       )}
-    </main>
+    </>
   );
 }
 

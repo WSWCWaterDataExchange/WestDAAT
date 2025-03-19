@@ -33,7 +33,9 @@ function ApplicationReviewPage() {
 
       <div className="overflow-y-auto">
         {!isApplicationLoading && !isFundingOrganizationLoading && (
-          <ApplicationSubmissionForm perspective="reviewer" isFormDirty={isFormDirty} />
+          <main className="container">
+            <ApplicationSubmissionForm perspective="reviewer" isFormDirty={isFormDirty} />
+          </main>
         )}
       </div>
     </div>
