@@ -15,7 +15,6 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
-import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
@@ -24,11 +23,12 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormProps {
   perspective: ApplicationReviewPerspective;
+  documentUploading: boolean;
   isFormDirty?: boolean;
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const { perspective, isFormDirty } = props;
+  const { perspective, documentUploading, isFormDirty } = props;
 
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
@@ -36,7 +36,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const polygonData = state.conservationApplication.estimateLocations;
 
   const [formValidated, setFormValidated] = useState(false);
-  const [documentUploading, setDocumentUploading] = useState(false);
 
   const navigateToSubmitApplicationPage = () => {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/submit`);
@@ -527,20 +526,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
           </Form.Group>
         </ApplicationFormSection>
       </Form>
-
-      <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-        {perspective === 'reviewer' ? (
-          <>
-            <NotImplementedPlaceholder />
-            <span className="fw-bold">
-              Document Upload is not implemented for Reviewers yet. This feature will be implemented in a future
-              release.
-            </span>
-          </>
-        ) : (
-          <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
-        )}
-      </ApplicationFormSection>
 
       {perspective === 'reviewer' && (
         <>

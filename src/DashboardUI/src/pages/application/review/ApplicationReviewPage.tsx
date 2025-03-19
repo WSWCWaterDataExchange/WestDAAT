@@ -6,6 +6,8 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
+import { useState } from 'react';
 
 const perspective: ApplicationReviewPerspective = 'reviewer'; // hard-coded for this page
 
@@ -13,6 +15,8 @@ function ApplicationReviewPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+
+  const [documentUploading, setDocumentUploading] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -39,7 +43,15 @@ function ApplicationReviewPage() {
         {!isApplicationLoading && !isFundingOrganizationLoading && (
           <main className="container">
             <ApplicationReviewHeader perspective={perspective} />
-            <ApplicationSubmissionForm perspective={perspective} isFormDirty={isFormDirty} />
+            <ApplicationSubmissionForm
+              perspective={perspective}
+              documentUploading={documentUploading}
+              isFormDirty={isFormDirty}
+            />
+            <ApplicationDocumentUploadSection
+              perspective={perspective}
+              documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
+            />
           </main>
         )}
       </div>

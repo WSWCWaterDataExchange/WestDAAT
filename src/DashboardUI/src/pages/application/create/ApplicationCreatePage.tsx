@@ -4,12 +4,16 @@ import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationSubmissionForm from '../components/ApplicationSubmissionForm';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import { useState } from 'react';
+import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
 
 const perspective: ApplicationReviewPerspective = 'applicant'; // hard-coded for this page
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
   const navigate = useNavigate();
+
+  const [documentUploading, setDocumentUploading] = useState(false);
 
   const navigateToEstimationToolPage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/estimation`);
@@ -26,7 +30,11 @@ export function ApplicationCreatePage() {
       <div className="overflow-y-auto">
         <main className="container">
           <ApplicationReviewHeader perspective={perspective} />
-          <ApplicationSubmissionForm perspective={perspective} />
+          <ApplicationSubmissionForm perspective={perspective} documentUploading={documentUploading} />
+          <ApplicationDocumentUploadSection
+            perspective={perspective}
+            documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
+          />
         </main>
       </div>
     </div>
