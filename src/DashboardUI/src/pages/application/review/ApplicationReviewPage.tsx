@@ -3,9 +3,7 @@ import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationSubmissionFormData from '../components/ApplicationSubmissionFormData';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { useEffect, useState } from 'react';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
-import deepEqual from 'fast-deep-equal/es6';
+import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
@@ -43,31 +41,3 @@ function ApplicationReviewPage() {
 }
 
 export default ApplicationReviewPage;
-
-function useDirtyFormCheck(
-  formValues: any,
-  options: {
-    isEnabled: boolean;
-  },
-): boolean {
-  const [initialFormValue, setInitialFormValue] = useState<any>(null);
-  const [isFormDirty, setIsFormDirty] = useState(false);
-
-  useEffect(() => {
-    const isInitialFormValueSet = initialFormValue !== null;
-    if (!options.isEnabled || isInitialFormValueSet) return;
-
-    setInitialFormValue(JSON.parse(JSON.stringify(formValues)));
-  }, [formValues, options.isEnabled, initialFormValue]);
-
-  useEffect(() => {
-    if (!options.isEnabled) return;
-
-    if (initialFormValue && formValues) {
-      const dirty = !deepEqual(initialFormValue, formValues);
-      setIsFormDirty(dirty);
-    }
-  }, [options.isEnabled, initialFormValue, formValues]);
-
-  return isFormDirty;
-}
