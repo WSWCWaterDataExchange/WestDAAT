@@ -15,33 +15,23 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
-import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormProps {
-  perspective: ApplicationReviewPerspective;
-  documentUploading: boolean;
-  isFormDirty?: boolean;
+  ref: React.Ref<HTMLFormElement>;
+  formValidated: boolean;
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const { perspective, documentUploading, isFormDirty } = props;
+  const { ref, formValidated } = props;
 
-  const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
 
-  const [formValidated, setFormValidated] = useState(false);
-
-  const navigateToSubmitApplicationPage = () => {
-    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/submit`);
-  };
-
-  const formRef = useRef<HTMLFormElement>(null);
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
   const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -125,19 +115,8 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
     });
   };
 
-  const handleSubmitClicked = () => {
-    const form = formRef.current;
-    const isFormValid = form!.checkValidity();
-
-    setFormValidated(true);
-
-    if (isFormValid) {
-      navigateToSubmitApplicationPage();
-    }
-  };
-
   return (
-    <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
+    <Form ref={ref} onChange={onFormChanged} validated={formValidated} noValidate>
       <ApplicationFormSection title="Applicant Information">
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
           <Form.Label>Landowner Name</Form.Label>

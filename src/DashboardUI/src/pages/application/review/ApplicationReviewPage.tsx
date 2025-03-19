@@ -7,7 +7,7 @@ import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import Button from 'react-bootstrap/esm/Button';
 
@@ -33,7 +33,20 @@ function ApplicationReviewPage() {
     isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
   });
 
+  const formRef = useRef<HTMLFormElement>(null);
+  const [formValidated, setFormValidated] = useState(false);
+
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
+
+  const handleSaveClicked = () => {
+    const form = formRef.current;
+    const isFormValid = form!.checkValidity();
+    setFormValidated(true);
+
+    if (isFormValid) {
+      alertNotImplemented();
+    }
+  };
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -47,11 +60,7 @@ function ApplicationReviewPage() {
         {!isApplicationLoading && !isFundingOrganizationLoading && (
           <main className="container">
             <ApplicationReviewHeader perspective={perspective} />
-            <ApplicationSubmissionForm
-              perspective={perspective}
-              documentUploading={documentUploading}
-              isFormDirty={isFormDirty}
-            />
+            <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
             <ApplicationDocumentUploadSection
               perspective={perspective}
               documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
@@ -61,7 +70,7 @@ function ApplicationReviewPage() {
               documentUploading={documentUploading}
               isFormDirty={isFormDirty}
               handleCancelClicked={alertNotImplemented}
-              handleSaveClicked={alertNotImplemented}
+              handleSaveClicked={handleSaveClicked}
               handleSubmitForFinalReviewClicked={alertNotImplemented}
             />
           </main>
