@@ -7,9 +7,9 @@ import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollecti
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import {
-  ApplicationSubmissionForm,
-  defaultApplicationSubmissionForm,
-} from '../data-contracts/ApplicationSubmissionForm';
+  ApplicationSubmissionFormData,
+  defaultApplicationSubmissionFormData,
+} from '../data-contracts/ApplicationSubmissionFormData';
 import { truncate } from '@turf/truncate';
 import center from '@turf/center';
 import { convertWktToGeometry } from '../utilities/geometryWktConverter';
@@ -35,7 +35,7 @@ export interface ConservationApplicationState {
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
-    applicationSubmissionForm: ApplicationSubmissionForm;
+    applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
     doPolygonsOverlap: boolean;
     // derived/computed state
@@ -73,7 +73,7 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationUnits: undefined,
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
-    applicationSubmissionForm: defaultApplicationSubmissionForm(),
+    applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
@@ -170,7 +170,7 @@ export interface ConsumptiveUseEstimatedAction {
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
   payload: {
-    formValues: ApplicationSubmissionForm;
+    formValues: ApplicationSubmissionFormData;
   };
 }
 

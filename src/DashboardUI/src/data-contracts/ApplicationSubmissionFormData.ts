@@ -1,6 +1,6 @@
 import { CompensationRateUnits } from './CompensationRateUnits';
 
-export interface ApplicationSubmissionForm {
+export interface ApplicationSubmissionFormData {
   landownerName: string | undefined;
   landownerEmail: string | undefined;
   landownerPhoneNumber: string | undefined;
@@ -36,7 +36,7 @@ export interface ApplicationSubmissionForm {
   conservationPlanAdditionalInfo: string | undefined;
 }
 
-export const defaultApplicationSubmissionForm = (): ApplicationSubmissionForm => {
+export const defaultApplicationSubmissionFormData = (): ApplicationSubmissionFormData => {
   return {
     landownerName: undefined,
     landownerEmail: undefined,
