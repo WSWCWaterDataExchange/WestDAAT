@@ -28,7 +28,7 @@ interface ApplicationSubmissionFormDataProps {
   isFormDirty?: boolean;
 }
 
-function ApplicationSubmissionFormData(props: ApplicationSubmissionFormDataProps) {
+function ApplicationSubmissionFormTemp(props: ApplicationSubmissionFormDataProps) {
   const { perspective, isFormDirty } = props;
 
   const navigate = useNavigate();
@@ -614,4 +614,4 @@ function ApplicationSubmissionFormData(props: ApplicationSubmissionFormDataProps
   );
 }
 
-export default ApplicationSubmissionFormData;
+export default ApplicationSubmissionFormTemp;

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import ApplicationSubmissionFormData from '../components/ApplicationSubmissionFormData';
+import ApplicationSubmissionFormTemp from '../components/ApplicationSubmissionFormTemp';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
@@ -33,7 +33,7 @@ function ApplicationReviewPage() {
 
       <div className="overflow-y-auto">
         {!isApplicationLoading && !isFundingOrganizationLoading && (
-          <ApplicationSubmissionFormData perspective="reviewer" isFormDirty={isFormDirty} />
+          <ApplicationSubmissionFormTemp perspective="reviewer" isFormDirty={isFormDirty} />
         )}
       </div>
     </div>
