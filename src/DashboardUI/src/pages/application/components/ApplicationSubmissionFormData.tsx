@@ -25,10 +25,11 @@ type Perspective = 'applicant' | 'reviewer';
 
 interface ApplicationSubmissionFormLayoutProps {
   perspective: Perspective;
+  isFormDirty?: boolean;
 }
 
 function ApplicationSubmissionFormData(props: ApplicationSubmissionFormLayoutProps) {
-  const { perspective } = props;
+  const { perspective, isFormDirty } = props;
 
   const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
@@ -593,7 +594,11 @@ function ApplicationSubmissionFormData(props: ApplicationSubmissionFormLayoutPro
           </div>
 
           <div className="d-flex gap-3">
-            <Button variant="outline-success" onClick={alertNotImplemented}>
+            <Button
+              variant="outline-success"
+              onClick={alertNotImplemented}
+              disabled={documentUploading || !isFormDirty}
+            >
               Save Changes
             </Button>
 
