@@ -113,13 +113,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {state.conservationApplication.polygonEtAcreFeetSum > 0 ? (
+            {(state.conservationApplication.totalAverageYearlyEtAcreFeet ?? 0) > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
                 <span className="fs-5 fw-bold et-blue-text">
-                  {formatNumber(state.conservationApplication.polygonEtAcreFeetSum, 2)} Acre-Feet
+                  {formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet
                 </span>
               </>
             ) : (
@@ -153,7 +153,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           </span>
 
           <Form onChange={onEstimationFormChanged} noValidate>
-            <div className="d-flex justify-content-between align-items-center gap-3">
+            <div className="d-flex d-print-block justify-content-between align-items-center gap-3">
               <InputGroup>
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
@@ -161,7 +161,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   placeholder="100"
                   min={1}
                   aria-describedby="dollar-sign-addon"
-                  aria-label='Desired compensation in dollars'
+                  aria-label="Desired compensation in dollars"
                   value={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
                 ></Form.Control>

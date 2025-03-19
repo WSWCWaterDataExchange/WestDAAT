@@ -125,7 +125,8 @@ export function OrganizationDashboardPage() {
   };
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
-    return <NavLink to={`/application/${params.value}/review`}>{params.value}</NavLink>;
+    const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
+    return <NavLink to={`/application/${application.applicationId}/review`}>{params.value}</NavLink>;
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
