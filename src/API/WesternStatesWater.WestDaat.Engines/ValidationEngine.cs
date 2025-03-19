@@ -549,7 +549,7 @@ internal class ValidationEngine : IValidationEngine
             OrganizationId = documentExistsResponse.FundingOrganizationId
         });
 
-        if (userContext.UserId != documentExistsResponse.ApplicantId && !permissions.Contains(Permissions.ApplicationReview) &&
+        if (userContext.UserId != documentExistsResponse.ApplicantUserId && !permissions.Contains(Permissions.ApplicationReview) &&
             !orgPermissions.Contains(Permissions.ApplicationReview))
         {
             return CreateForbiddenError(new ApplicationDocumentDownloadSasTokenRequest(), context);

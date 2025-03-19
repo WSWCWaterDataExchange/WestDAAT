@@ -181,7 +181,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationSupportingDocumentExistsResponse
         {
             DocumentExists = document != null,
-            ApplicantId = document?.WaterConservationApplication.ApplicantUserId,
+            ApplicantUserId = document?.WaterConservationApplication.ApplicantUserId,
             FundingOrganizationId = document?.WaterConservationApplication.FundingOrganizationId,
         };
     }
