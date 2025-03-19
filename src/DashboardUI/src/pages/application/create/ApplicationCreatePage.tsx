@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import ApplicationSubmissionFormTemp from '../components/ApplicationSubmissionFormTemp';
+import ApplicationSubmissionForm from '../components/ApplicationSubmissionForm';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -20,7 +20,7 @@ export function ApplicationCreatePage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationSubmissionFormTemp perspective="applicant" />
+        <ApplicationSubmissionForm perspective="applicant" />
       </div>
     </div>
   );

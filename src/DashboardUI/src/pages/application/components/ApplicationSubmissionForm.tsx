@@ -23,12 +23,12 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 type Perspective = 'applicant' | 'reviewer';
 
-interface ApplicationSubmissionFormDataProps {
+interface ApplicationSubmissionFormProps {
   perspective: Perspective;
   isFormDirty?: boolean;
 }
 
-function ApplicationSubmissionFormTemp(props: ApplicationSubmissionFormDataProps) {
+function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const { perspective, isFormDirty } = props;
 
   const navigate = useNavigate();
@@ -614,4 +614,4 @@ function ApplicationSubmissionFormTemp(props: ApplicationSubmissionFormDataProps
   );
 }
 
-export default ApplicationSubmissionFormTemp;
+export default ApplicationSubmissionForm;
