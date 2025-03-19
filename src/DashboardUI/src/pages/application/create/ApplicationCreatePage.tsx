@@ -2,6 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationSubmissionForm from '../components/ApplicationSubmissionForm';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+
+const perspective: ApplicationReviewPerspective = 'applicant'; // hard-coded for this page
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -21,7 +25,8 @@ export function ApplicationCreatePage() {
 
       <div className="overflow-y-auto">
         <main className="container">
-          <ApplicationSubmissionForm perspective="applicant" />
+          <ApplicationReviewHeader perspective={perspective} />
+          <ApplicationSubmissionForm perspective={perspective} />
         </main>
       </div>
     </div>

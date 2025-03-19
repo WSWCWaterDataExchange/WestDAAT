@@ -4,6 +4,10 @@ import ApplicationSubmissionForm from '../components/ApplicationSubmissionForm';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+
+const perspective: ApplicationReviewPerspective = 'reviewer'; // hard-coded for this page
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
@@ -34,7 +38,8 @@ function ApplicationReviewPage() {
       <div className="overflow-y-auto">
         {!isApplicationLoading && !isFundingOrganizationLoading && (
           <main className="container">
-            <ApplicationSubmissionForm perspective="reviewer" isFormDirty={isFormDirty} />
+            <ApplicationReviewHeader perspective={perspective} />
+            <ApplicationSubmissionForm perspective={perspective} isFormDirty={isFormDirty} />
           </main>
         )}
       </div>

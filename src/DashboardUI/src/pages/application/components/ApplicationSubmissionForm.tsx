@@ -17,7 +17,6 @@ import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
-import ApplicationReviewHeader from './ApplicationReviewHeader';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
@@ -142,8 +141,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
   return (
     <>
-      <ApplicationReviewHeader perspective={perspective} />
-
       <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
         <ApplicationFormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
