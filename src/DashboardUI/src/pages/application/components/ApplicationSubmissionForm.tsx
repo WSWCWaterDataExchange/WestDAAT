@@ -136,8 +136,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
     }
   };
 
-  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
-
   return (
     <>
       <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
@@ -526,39 +524,6 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
           </Form.Group>
         </ApplicationFormSection>
       </Form>
-
-      <hr className="m-0" />
-      {perspective === 'applicant' ? (
-        <div className="d-flex justify-content-end p-3">
-          <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
-            Review & Submit
-          </Button>
-        </div>
-      ) : perspective === 'reviewer' ? (
-        <div className="d-flex justify-content-between p-3">
-          <div>
-            <Button variant="secondary" onClick={alertNotImplemented}>
-              Cancel
-            </Button>
-          </div>
-
-          <div className="d-flex gap-3">
-            <Button
-              variant="outline-success"
-              onClick={alertNotImplemented}
-              disabled={documentUploading || !isFormDirty}
-            >
-              Save Changes
-            </Button>
-
-            <Button variant="success" onClick={alertNotImplemented} disabled={documentUploading}>
-              Submit for Final Review
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <NotImplementedPlaceholder />
-      )}
     </>
   );
 }

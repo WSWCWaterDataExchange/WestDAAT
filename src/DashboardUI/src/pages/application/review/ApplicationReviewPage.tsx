@@ -9,6 +9,7 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
 import { useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
+import Button from 'react-bootstrap/esm/Button';
 
 const perspective: ApplicationReviewPerspective = 'reviewer'; // hard-coded for this page
 
@@ -32,6 +33,8 @@ function ApplicationReviewPage() {
     isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
   });
 
+  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -54,6 +57,13 @@ function ApplicationReviewPage() {
               documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
             />
             <ApplicationReviewPipelineSection />
+            <ReviewerButtonRow
+              documentUploading={documentUploading}
+              isFormDirty={isFormDirty}
+              handleCancelClicked={alertNotImplemented}
+              handleSaveClicked={alertNotImplemented}
+              handleSubmitForFinalReviewClicked={alertNotImplemented}
+            />
           </main>
         )}
       </div>
@@ -62,3 +72,36 @@ function ApplicationReviewPage() {
 }
 
 export default ApplicationReviewPage;
+
+interface ReviewerButtonRowProps {
+  documentUploading: boolean;
+  isFormDirty: boolean;
+  handleCancelClicked: () => void;
+  handleSaveClicked: () => void;
+  handleSubmitForFinalReviewClicked: () => void;
+}
+
+function ReviewerButtonRow(props: ReviewerButtonRowProps) {
+  const { documentUploading, isFormDirty, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } =
+    props;
+
+  return (
+    <div className="d-flex justify-content-between p-3">
+      <div>
+        <Button variant="secondary" onClick={handleCancelClicked}>
+          Cancel
+        </Button>
+      </div>
+
+      <div className="d-flex gap-3">
+        <Button variant="outline-success" onClick={handleSaveClicked} disabled={documentUploading || !isFormDirty}>
+          Save Changes
+        </Button>
+
+        <Button variant="success" onClick={handleSubmitForFinalReviewClicked} disabled={documentUploading}>
+          Submit for Final Review
+        </Button>
+      </div>
+    </div>
+  );
+}

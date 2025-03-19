@@ -6,6 +6,7 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { useState } from 'react';
 import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
+import Button from 'react-bootstrap/esm/Button';
 
 const perspective: ApplicationReviewPerspective = 'applicant'; // hard-coded for this page
 
@@ -18,6 +19,8 @@ export function ApplicationCreatePage() {
   const navigateToEstimationToolPage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/estimation`);
   };
+
+  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -35,8 +38,26 @@ export function ApplicationCreatePage() {
             perspective={perspective}
             documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
           />
+          <ApplicantButtonRow documentUploading={documentUploading} handleSubmitClicked={alertNotImplemented} />
         </main>
       </div>
+    </div>
+  );
+}
+
+interface ApplicantButtonRowProps {
+  documentUploading: boolean;
+  handleSubmitClicked: () => void;
+}
+
+function ApplicantButtonRow(props: ApplicantButtonRowProps) {
+  const { documentUploading, handleSubmitClicked } = props;
+
+  return (
+    <div className="d-flex justify-content-end p-3">
+      <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
+        Review & Submit
+      </Button>
     </div>
   );
 }
