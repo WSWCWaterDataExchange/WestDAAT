@@ -1,5 +1,5 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { defaultApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { defaultApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
@@ -280,7 +280,7 @@ describe('ConservationApplicationState reducer', () => {
       type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
       payload: {
         formValues: {
-          ...defaultApplicationSubmissionForm(),
+          ...defaultApplicationSubmissionFormData(),
           landownerName: 'Bobby Hill',
         },
       },
@@ -671,7 +671,7 @@ describe('ConservationApplicationState reducer', () => {
         type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
         payload: {
           formValues: {
-            ...defaultApplicationSubmissionForm(),
+            ...defaultApplicationSubmissionFormData(),
             fieldDetails: [
               {
                 waterConservationApplicationEstimateLocationId: 'location-guid',

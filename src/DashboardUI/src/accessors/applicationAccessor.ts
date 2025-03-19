@@ -12,7 +12,7 @@ import { WaterConservationApplicationCreateResponse } from '../data-contracts/Wa
 import { ContainerName, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
-import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
 import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
 import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
@@ -113,7 +113,7 @@ export const submitApplication = async (
   data: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    form: ApplicationSubmissionForm;
+    form: ApplicationSubmissionFormData;
     supportingDocuments: ApplicationDocument[];
   },
 ): Promise<void> => {
@@ -150,7 +150,7 @@ export const submitApplication = async (
     waterRightState: data.form.waterRightState!,
     waterUseDescription: data.form.waterUseDescription!,
     fieldDetails: data.form.fieldDetails,
-    supportingDocuments: data.supportingDocuments
+    supportingDocuments: data.supportingDocuments,
   };
 
   await api.post<void>('Applications/Submit', request);

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
+import { ApplicationSubmissionFormData } from '../../../data-contracts/ApplicationSubmissionFormData';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
@@ -85,7 +85,7 @@ function ApplicationSubmissionFormTemp(props: ApplicationSubmissionFormDataProps
       | Exclude<CompensationRateUnits, CompensationRateUnits.None>
       | undefined = cpfrcruValueAsEnum === CompensationRateUnits.None ? undefined : cpfrcruValueAsEnum;
 
-    const formValues: ApplicationSubmissionForm = {
+    const formValues: ApplicationSubmissionFormData = {
       landownerName: landownerNameRef.current?.value,
       landownerEmail: landownerEmailRef.current?.value,
       landownerPhoneNumber: landownerPhoneNumberRef.current?.value,
