@@ -81,7 +81,7 @@ export function EstimationToolPage() {
     await estimateConsumptiveUseMutation.mutateAsync({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      polygonWkts: state.conservationApplication.selectedMapPolygons.map((polygon) => polygon.polygonWkt),
+      polygonWkts: state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
       units: state.conservationApplication.desiredCompensationUnits,
     });
@@ -92,7 +92,7 @@ export function EstimationToolPage() {
   };
 
   return (
-    <div className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
+    <main className="estimation-tool-page d-flex flex-column flex-grow-1 overflow-hidden h-100">
       <ApplicationNavbar
         navigateBack={navigateToWaterRightLandingPage}
         backButtonText="Back to Water Right Landing Page"
@@ -118,7 +118,7 @@ export function EstimationToolPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

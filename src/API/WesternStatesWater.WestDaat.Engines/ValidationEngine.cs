@@ -40,8 +40,9 @@ internal class ValidationEngine : IValidationEngine
 
         return request switch
         {
-            ApplicationLoadRequestBase req => ValidateApplicationLoadRequest(req, context),
+            ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
+            FileSasTokenRequestBase req => ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -52,11 +53,13 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private ErrorBase ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
+    private async Task<ErrorBase> ValidateApplicationLoadRequest(ApplicationLoadRequestBase request, ContextBase context)
     {
         return request switch
         {
             OrganizationApplicationDashboardLoadRequest req => ValidateOrganizationApplicationDashboardLoadRequest(req, context),
+            ApplicantConservationApplicationLoadRequest req => await ValidateApplicantConservationApplicationLoadRequest(req, context),
+            ReviewerConservationApplicationLoadRequest req => await ValidateReviewerConservationApplicationLoadRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -96,6 +99,65 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicantConservationApplicationLoadRequest(ApplicantConservationApplicationLoadRequest request, ContextBase context)
+    {
+        // Must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var submittedApplicationRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.ApplicationId
+        };
+        var submittedApplicationResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+
+        if (!submittedApplicationResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
+        }
+
+        // deny if the user is not the applicant
+        if (userContext.UserId != submittedApplicationResponse.ApplicantUserId)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateReviewerConservationApplicationLoadRequest(ReviewerConservationApplicationLoadRequest request, ContextBase context)
+    {
+        // Must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var submittedApplicationRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.ApplicationId
+        };
+        var submittedApplicationResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationRequest);
+
+        // deny if the application does not exist
+        if (!submittedApplicationResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
+        }
+
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationResponse.FundingOrganizationId
+        });
+
+        // deny if the user does not have permission to perform reviews in this organization
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
     private async Task<ErrorBase> ValidateApplicationStoreRequest(ApplicationStoreRequestBase request,
         ContextBase context)
     {
@@ -115,21 +177,22 @@ internal class ValidationEngine : IValidationEngine
     {
         // verify user requesting an estimate is linking it to an application they own
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        var inProgressApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = userContext.UserId,
             WaterRightNativeId = request.WaterRightNativeId
-        });
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressApplicationExistsRequest);
 
-        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
-        if (applicationNotFound)
+        if (!applicationExistsResponse.ApplicationExists)
         {
             return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
         }
 
         // user has an in-progress application for the requested water right
         // BUT user is attempting to link the estimate to a different application
-        var estimateLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        var estimateLinkedToIncorrectApplication = applicationExistsResponse.ApplicationId.Value != request.WaterConservationApplicationId;
         if (estimateLinkedToIncorrectApplication)
         {
             return CreateForbiddenError(request, context);
@@ -161,19 +224,20 @@ internal class ValidationEngine : IValidationEngine
     {
         // verify user creating the submission is linking it to an application they own
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var inProgressApplicationExistsResponse = (DTO.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.UnsubmittedApplicationExistsLoadRequest
+        var inProgressApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
         {
+            HasSubmission = false,
             ApplicantUserId = userContext.UserId,
             WaterRightNativeId = request.WaterRightNativeId
-        });
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressApplicationExistsRequest);
 
-        var applicationNotFound = !inProgressApplicationExistsResponse.InProgressApplicationId.HasValue;
-        if (applicationNotFound)
+        if (!applicationExistsResponse.ApplicationExists)
         {
             return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
         }
 
-        var applicationLinkedToIncorrectApplication = inProgressApplicationExistsResponse.InProgressApplicationId.Value != request.WaterConservationApplicationId;
+        var applicationLinkedToIncorrectApplication = applicationExistsResponse.ApplicationId.Value != request.WaterConservationApplicationId;
         if (applicationLinkedToIncorrectApplication)
         {
             return CreateForbiddenError(request, context);
@@ -437,6 +501,25 @@ internal class ValidationEngine : IValidationEngine
     private ErrorBase ValidateUserProfileUpdateRequest()
     {
         // Must be logged in
+        _contextUtility.GetRequiredContext<UserContext>();
+
+        return null;
+    }
+
+    private ErrorBase ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
+    {
+        return request switch
+        {
+            ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateApplicationDocumentUploadSasTokenRequest(ApplicationDocumentUploadSasTokenRequest request, ContextBase context)
+    {
+        // User must be logged in
         _contextUtility.GetRequiredContext<UserContext>();
 
         return null;

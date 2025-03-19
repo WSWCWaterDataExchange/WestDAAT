@@ -90,6 +90,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
         {
             serviceCollection.AddTransient<CLI.IApplicationManager, ConservationManager>();
             serviceCollection.AddTransient<CLI.INotificationManager, NotificationManager>();
+            serviceCollection.AddTransient<CLI.IFileManager, AdminManager>();
             serviceCollection.AddTransient<CLI.IOrganizationManager, AdminManager>();
             serviceCollection.AddTransient<CLI.ITestManager, TestManager>();
             serviceCollection.AddTransient<CLI.IUserManager, AdminManager>();
@@ -110,6 +111,7 @@ namespace WesternStatesWater.WestDaat.Tests.IntegrationTests
             serviceCollection.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
             serviceCollection.AddTransient<ILocationEngine, LocationEngine>();
             serviceCollection.AddTransient<ITestEngine, TestEngine>();
+            serviceCollection.AddTransient<IUserNameFormattingEngine, FormattingEngine>();
             serviceCollection.AddTransient<IValidationEngine, ValidationEngine>();
         }
 

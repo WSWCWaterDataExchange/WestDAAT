@@ -2,6 +2,8 @@
 
 public class PolygonEtDataCollection
 {
+    public Guid WaterConservationApplicationEstimateLocationId { get; set; }
+
     public string PolygonWkt { get; set; }
 
     public double AverageYearlyEtInInches { get; set; }

@@ -24,7 +24,6 @@ import { ApplicationReviewPage } from './pages/application/dashboard/Application
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { SignupPage } from './pages/account/SignupPage';
-import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -103,7 +102,6 @@ function App({ msalInstance }: AppProps) {
                 </Route>
                 <Route path="application" element={<AuthGuard />}>
                   <Route element={<ApplicationLayout />}>
-                    <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>

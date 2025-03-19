@@ -4,15 +4,15 @@ import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCo
 import Card from 'react-bootstrap/esm/Card';
 
 interface EstimationToolFieldDataTableProps {
-  data: PolygonEtDataCollection;
+  data: Partial<PolygonEtDataCollection>;
   fieldAcreage: number;
 }
 
 function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) {
   const convertFieldEtInInchesToAcreFeet = (etInInches: number) => (etInInches / 12) * props.fieldAcreage;
 
-  const renderCard = (value: number, title: string, units: string) => (
-    <Card className="rounded-3 shadow-sm col-xxl-2 col-lg-3 col-4">
+  const renderCard = (value: number | undefined, title: string, units: string) => (
+    <Card className="flex-grow-1 rounded-3 shadow-sm col-xxl-2 col-lg-3 col-4">
       <Card.Body>
         <Card.Title className="mt-3 fs-3 text-center fw-bold">{formatNumber(value, 2)}</Card.Title>
         <Card.Text className="text-center fw-bold fs-6">
@@ -24,10 +24,10 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
 
   return (
     <>
-      <div className="d-flex justify-content-around align-items-center mb-3">
+      <div className="d-flex justify-content-around gap-3 mb-3">
         {renderCard(props.fieldAcreage, 'Field Area', 'acres')}
-        {renderCard(props.data.averageYearlyEtInInches, 'Average Yearly ET', 'inches')}
-        {renderCard(props.data.averageYearlyEtInAcreFeet, 'Average Yearly ET', 'acre-feet')}
+        {renderCard(props.data?.averageYearlyEtInInches, 'Average Yearly ET', 'inches')}
+        {renderCard(props.data?.averageYearlyEtInAcreFeet, 'Average Yearly ET', 'acre-feet')}
       </div>
 
       <Table>
@@ -39,7 +39,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
           </tr>
         </thead>
         <tbody>
-          {props.data.datapoints.map((item) => (
+          {(props.data.datapoints ?? []).map((item) => (
             <tr key={item.year}>
               <td>{item.year}</td>
               <td>{formatNumber(item.etInInches, 2)}</td>

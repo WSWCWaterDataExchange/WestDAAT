@@ -56,6 +56,7 @@ var host = new HostBuilder()
         // Managers
         services.AddTransient<IApplicationManager, ConservationManager>();
         services.AddTransient<INotificationManager, NotificationManager>();
+        services.AddTransient<IFileManager, AdminManager>();
         services.AddTransient<IOrganizationManager, AdminManager>();
         services.AddTransient<ITestManager, TestManager>();
         services.AddTransient<IUserManager, AdminManager>();
@@ -75,6 +76,7 @@ var host = new HostBuilder()
         services.AddTransient<IGeoConnexEngine, GeoConnexEngine>();
         services.AddTransient<ILocationEngine, LocationEngine>();
         services.AddTransient<ITestEngine, TestEngine>();
+        services.AddTransient<IUserNameFormattingEngine, FormattingEngine>();
         services.AddTransient<IValidationEngine, ValidationEngine>();
 
         // Accessors
@@ -115,7 +117,6 @@ var host = new HostBuilder()
         {
             logging.AddConsole();
         });
-
     })
     .Build();
 

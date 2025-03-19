@@ -73,4 +73,23 @@ public class ApplicationFunction : FunctionBase
         var results = await _applicationManager.Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(request);
         return await CreateResponse(req, results);
     }
+
+    [Function(nameof(GetApplication))]
+    [OpenApiOperation(nameof(GetApplication))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicationLoadResponseBase))]
+    public async Task<HttpResponseData> GetApplication(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Load")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<ApplicationLoadRequestBase>(req);
+        ApplicationLoadResponseBase result = request switch
+        {
+            ApplicantConservationApplicationLoadRequest applicantRequest => await _applicationManager
+                .Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(applicantRequest),
+            ReviewerConservationApplicationLoadRequest reviewerRequest => await _applicationManager
+                .Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(reviewerRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
+    }
 }

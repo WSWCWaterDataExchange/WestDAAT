@@ -13,16 +13,20 @@ public class ApplicationFormattingEngineTests : EngineTestBase
 
     private Mock<IOrganizationAccessor> _organizationAccessorMock;
 
+    private Mock<IUserAccessor> _userAccessorMock;
+
     [TestInitialize]
     public void TestInitialize()
     {
         _applicationAccessorMock = new Mock<IApplicationAccessor>();
         _organizationAccessorMock = new Mock<IOrganizationAccessor>();
+        _userAccessorMock = new Mock<IUserAccessor>();
 
         _applicationFormattingEngine = new FormattingEngine(
             CreateLogger<FormattingEngine>(),
             _applicationAccessorMock.Object,
-            _organizationAccessorMock.Object
+            _organizationAccessorMock.Object,
+            _userAccessorMock.Object
         );
     }
 

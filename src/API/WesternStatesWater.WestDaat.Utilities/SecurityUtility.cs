@@ -74,18 +74,21 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.Member,
             [
+                Permissions.ApplicationReview,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
         {
             Roles.TechnicalReviewer,
             [
+                Permissions.ApplicationReview,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
         {
             Roles.OrganizationAdmin,
             [
+                Permissions.ApplicationReview,
                 Permissions.OrganizationApplicationDashboardLoad,
                 Permissions.OrganizationMemberAdd,
                 Permissions.OrganizationMemberRemove,

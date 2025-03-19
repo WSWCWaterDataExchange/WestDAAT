@@ -330,6 +330,7 @@ var fnAppSettings = {
   AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
   FUNCTIONS_EXTENSION_VERSION: '~4'
   FUNCTIONS_WORKER_RUNTIME: 'dotnet-isolated'
+  ServiceBusConnection__fullyQualifiedNamespace: '${service_bus.name}.servicebus.windows.net'
   WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
   WEBSITE_CONTENTSHARE: 'westdaat-qa-1234'
 }

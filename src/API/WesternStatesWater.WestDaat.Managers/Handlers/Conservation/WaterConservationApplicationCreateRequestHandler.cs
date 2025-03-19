@@ -33,15 +33,15 @@ public class WaterConservationApplicationCreateRequestHandler :
         dtoRequest.ApplicantUserId = _contextUtility.GetRequiredContext<UserContext>().UserId;
 
         // if a WCA does already exists, return the id
-        var inProgressWcaRequest = dtoRequest.Map<Common.DataContracts.UnsubmittedApplicationExistsLoadRequest>();
-        var inProgressWcaResponse = (Common.DataContracts.UnsubmittedApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressWcaRequest);
+        var inProgressApplicationExistsRequest = dtoRequest.Map<Common.DataContracts.ApplicationExistsLoadRequest>();
+        var applicationExistsResponse = (Common.DataContracts.ApplicationExistsLoadResponse)await _applicationAccessor.Load(inProgressApplicationExistsRequest);
 
-        if (inProgressWcaResponse.InProgressApplicationId.HasValue)
+        if (applicationExistsResponse.ApplicationExists)
         {
             return new WaterConservationApplicationCreateResponse
             {
-                WaterConservationApplicationId = inProgressWcaResponse.InProgressApplicationId.Value,
-                WaterConservationApplicationDisplayId = inProgressWcaResponse.InProgressApplicationDisplayId
+                WaterConservationApplicationId = applicationExistsResponse.ApplicationId.Value,
+                WaterConservationApplicationDisplayId = applicationExistsResponse.ApplicationDisplayId
             };
         }
 

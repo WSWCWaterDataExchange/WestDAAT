@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import Form from 'react-bootstrap/esm/Form';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { createRef, useRef, useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
+import Form from 'react-bootstrap/esm/Form';
+import InputGroup from 'react-bootstrap/esm/InputGroup';
+import { useNavigate } from 'react-router-dom';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { states } from '../../../config/states';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
 import {
   CompensationRateUnits,
   CompensationRateUnitsLabelsPlural,
@@ -12,20 +14,9 @@ import {
   CompensationRateUnitsOptions,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
-import { createRef, useMemo, useRef, useState } from 'react';
-import { ApplicationSubmissionForm } from '../../../data-contracts/ApplicationSubmissionForm';
-import InputGroup from 'react-bootstrap/esm/InputGroup';
-import { Point } from 'geojson';
-import center from '@turf/center';
-import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import truncate from '@turf/truncate';
-
-interface FieldData {
-  fieldName: string;
-  acreage: number;
-  centerPoint: Point;
-  polygonWkt: string;
-}
+import ApplicationFormSection from '../components/ApplicationFormSection';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();
@@ -50,33 +41,24 @@ export function ApplicationCreatePage() {
   );
 }
 
-const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-12';
+const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 function ApplicationCreatePageForm() {
+  const navigate = useNavigate();
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
+  const polygonData = state.conservationApplication.estimateLocations;
 
   const [formValidated, setFormValidated] = useState(false);
+  const [documentUploading, setDocumentUploading] = useState(false);
 
-  const userDrawnFields: FieldData[] = useMemo(() => {
-    return state.conservationApplication.selectedMapPolygons.map((polygon): FieldData => {
-      const polygonEtData = state.conservationApplication.polygonEtData.find(
-        (etData) => etData.polygonWkt === polygon.polygonWkt,
-      )!;
+  const navigateToReviewApplicationPage = () => {
+    navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/review`);
+  };
 
-      const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt))).geometry;
-
-      return {
-        acreage: polygon.acreage,
-        fieldName: polygonEtData.fieldName,
-        polygonWkt: polygon.polygonWkt,
-        centerPoint,
-      };
-    });
-  }, [state.conservationApplication.selectedMapPolygons, state.conservationApplication.polygonEtData]);
-
+  const formRef = useRef<HTMLFormElement>(null);
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
   const landownerPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -88,7 +70,7 @@ function ApplicationCreatePageForm() {
   const agentEmailRef = useRef<HTMLInputElement>(null);
   const agentPhoneNumberRef = useRef<HTMLInputElement>(null);
   const agentAdditionalDetailsRef = useRef<HTMLTextAreaElement>(null);
-  const propertyAdditionalDetailsRef = useRef(userDrawnFields.map(() => createRef()));
+  const propertyAdditionalDetailsRef = useRef(polygonData.map(() => createRef()));
   const canalOrIrrigationEntityNameRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityEmailRef = useRef<HTMLInputElement>(null);
   const canalOrIrrigationEntityPhoneNumberRef = useRef<HTMLInputElement>(null);
@@ -130,8 +112,8 @@ function ApplicationCreatePageForm() {
       agentEmail: agentEmailRef.current?.value,
       agentPhoneNumber: agentPhoneNumberRef.current?.value,
       agentAdditionalDetails: agentAdditionalDetailsRef.current?.value,
-      fieldDetails: userDrawnFields.map((field, index) => ({
-        polygonWkt: field.polygonWkt,
+      fieldDetails: polygonData.map((field, index) => ({
+        waterConservationApplicationEstimateLocationId: field.waterConservationApplicationEstimateLocationId!,
         additionalDetails: (propertyAdditionalDetailsRef.current[index].current as any).value,
       })),
       canalOrIrrigationEntityName: canalOrIrrigationEntityNameRef.current?.value,
@@ -160,33 +142,19 @@ function ApplicationCreatePageForm() {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // event default causes page to refresh
-    event.preventDefault();
-    event.stopPropagation();
-
-    const form = event.currentTarget;
-    const isFormValid = form.checkValidity();
+  const handleSubmitClicked = () => {
+    const form = formRef.current;
+    const isFormValid = form!.checkValidity();
 
     setFormValidated(true);
 
     if (isFormValid) {
-      alert('This feature will be implemented in a future release.');
+      navigateToReviewApplicationPage();
     }
   };
 
-  // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
-
   return (
-    <div className="container">
+    <main className="container">
       <div className="mb-3">
         <span className="fs-4 fw-bold">New Application</span>
       </div>
@@ -208,8 +176,8 @@ function ApplicationCreatePageForm() {
         </span>
       </div>
 
-      <Form onChange={onFormChanged} onSubmit={handleSubmit} validated={formValidated} noValidate>
-        <FormSection title="Applicant Information">
+      <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
+        <ApplicationFormSection title="Applicant Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
             <Form.Label>Landowner Name</Form.Label>
             <Form.Control type="text" maxLength={100} required ref={landownerNameRef} value={stateForm.landownerName} />
@@ -282,9 +250,9 @@ function ApplicationCreatePageForm() {
             />
             <Form.Control.Feedback type="invalid">Zip Code is required.</Form.Control.Feedback>
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection
+        <ApplicationFormSection
           title="Representative / Agent Contact Information"
           subtitle="Is this application being submitted by a representative of the water right’s holder? If yes, please provide the representative’s contact information."
         >
@@ -312,11 +280,11 @@ function ApplicationCreatePageForm() {
               value={stateForm.agentAdditionalDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
         <div className="row">
-          <FormSection title="Property & Land Area Information" className="col-lg-6 col-12">
-            {userDrawnFields.map((field, index) => (
+          <ApplicationFormSection title="Property & Land Area Information" className="col-lg-6 col-12">
+            {polygonData.map((field, index) => (
               <div className="row mb-4" key={field.fieldName}>
                 <div className="col-3">
                   <span>{field.fieldName}</span>
@@ -328,7 +296,7 @@ function ApplicationCreatePageForm() {
                 <div className="col-6">
                   <span className="fw-bold">Location: </span>
                   <span>
-                    ({field.centerPoint.coordinates[1]}, {field.centerPoint.coordinates[0]})
+                    ({field.centerPoint!.coordinates[1]}, {field.centerPoint!.coordinates[0]})
                   </span>
                 </div>
                 <Form.Group className={`col-12 mb-4`} controlId={`propertyAdditionalDetails-${index}`}>
@@ -337,12 +305,12 @@ function ApplicationCreatePageForm() {
                     as="textarea"
                     maxLength={4000}
                     ref={propertyAdditionalDetailsRef.current[index] as any}
-                    value={stateForm.fieldDetails[index].additionalDetails}
+                    value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
                   />
                 </Form.Group>
               </div>
             ))}
-          </FormSection>
+          </ApplicationFormSection>
 
           <div className="col-lg-6 col-12">
             Static map here
@@ -350,7 +318,7 @@ function ApplicationCreatePageForm() {
           </div>
         </div>
 
-        <FormSection
+        <ApplicationFormSection
           title="Canal Company / Irrigation District"
           subtitle="Is your water right part of a canal company or irrigation district? If yes, please provide their contact
               information."
@@ -397,9 +365,9 @@ function ApplicationCreatePageForm() {
               value={stateForm.canalOrIrrigationAdditionalDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Water Right Information">
+        <ApplicationFormSection title="Water Right Information">
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="permitNumber">
             <Form.Label>Permit #</Form.Label>
             <Form.Control type="text" maxLength={255} required ref={permitNumberRef} value={stateForm.permitNumber} />
@@ -420,7 +388,14 @@ function ApplicationCreatePageForm() {
 
           <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="priorityDate">
             <Form.Label>Priority Date</Form.Label>
-            <Form.Control type="date" required ref={priorityDateRef} value={stateForm.priorityDate} />
+            <Form.Control
+              type="date"
+              required
+              ref={priorityDateRef}
+              value={stateForm.priorityDate}
+              // not sure on the actual min date, but this prevents users from entering the default value "0001-01-01"
+              min="1900-01-01"
+            />
             <Form.Control.Feedback type="invalid">Priority Date is required.</Form.Control.Feedback>
           </Form.Group>
 
@@ -466,16 +441,16 @@ function ApplicationCreatePageForm() {
             />
             <Form.Control.Feedback type="invalid">Description of Water Use is required.</Form.Control.Feedback>
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Estimation Summary">
+        <ApplicationFormSection title="Estimation Summary">
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
               <div>
                 <span className="fw-bold">Irrigated Field Area</span>
               </div>
               <div>
-                <span>{formatNumber(acreageSum, 2)} Acres</span>
+                <span>{formatNumber(state.conservationApplication.polygonAcreageSum, 2)} Acres</span>
               </div>
             </div>
 
@@ -484,7 +459,7 @@ function ApplicationCreatePageForm() {
                 <span className="fw-bold">Consumptive Use</span>
               </div>
               <div>
-                <span>{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+                <span>{formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet</span>
               </div>
             </div>
 
@@ -522,9 +497,9 @@ function ApplicationCreatePageForm() {
               value={stateForm.estimationSupplementaryDetails}
             />
           </Form.Group>
-        </FormSection>
+        </ApplicationFormSection>
 
-        <FormSection title="Conservation Plan">
+        <ApplicationFormSection title="Conservation Plan">
           <Form.Group
             className={`${responsiveOneThirdWidthDefault} mb-4`}
             controlId="conservationPlanFundingRequestDollarAmount"
@@ -535,6 +510,7 @@ function ApplicationCreatePageForm() {
               <Form.Control
                 type="number"
                 required
+                min={1}
                 ref={conservationPlanFundingRequestDollarAmountRef}
                 value={stateForm.conservationPlanFundingRequestDollarAmount}
               />
@@ -582,53 +558,19 @@ function ApplicationCreatePageForm() {
               value={stateForm.conservationPlanAdditionalInfo}
             />
           </Form.Group>
-        </FormSection>
-
-        <FormSection title="Supporting Documents (Optional)">
-          <div className="col mb-4">
-            <Button
-              variant="outline-primary"
-              onClick={() => alert('This feature will be implemented in a future release.')}
-            >
-              Upload
-            </Button>
-          </div>
-        </FormSection>
-
-        <hr className="m-0" />
-        <div className="d-flex justify-content-end p-3">
-          <Button variant="success" type="submit">
-            Review & Submit
-          </Button>
-        </div>
+        </ApplicationFormSection>
       </Form>
-    </div>
-  );
-}
 
-interface FormSectionProps {
-  title: string;
-  subtitle?: string;
-  className?: string;
-  children: React.ReactNode | undefined;
-}
+      <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
+        <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
+      </ApplicationFormSection>
 
-function FormSection(props: FormSectionProps) {
-  return (
-    <div className={props.className}>
-      <div className="mb-4">
-        <div>
-          <span className="fs-5">{props.title}</span>
-        </div>
-
-        {props.subtitle && (
-          <div>
-            <span className="text-muted">{props.subtitle}</span>
-          </div>
-        )}
+      <hr className="m-0" />
+      <div className="d-flex justify-content-end p-3">
+        <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
+          Review & Submit
+        </Button>
       </div>
-
-      <div className="row">{props.children}</div>
-    </div>
+    </main>
   );
 }

@@ -45,22 +45,14 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
     navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
   };
 
-  // assumes all polygons are not intersecting
-  const acreageSum = state.conservationApplication.selectedMapPolygons.reduce(
-    (sum, polygon) => sum + polygon.acreage,
-    0,
-  );
-  const etAcreFeet = state.conservationApplication.polygonEtData.reduce(
-    (sum, polygon) => sum + polygon.averageYearlyEtInAcreFeet,
-    0,
-  );
-
   return (
     <div className="flex-grow-1 panel-content">
       <div className="container-fluid pt-3 px-3">
         <SidebarElement title="CALCULATED SHAPE AREA FOR ALL IRRIGATED FIELDS">
           <div>
-            <span className="fs-5 fw-bold et-blue-text">{formatNumber(acreageSum, 2)} Acres</span>
+            <span className="fs-5 fw-bold et-blue-text">
+              {formatNumber(state.conservationApplication.polygonAcreageSum, 2)} Acres
+            </span>
           </div>
 
           <div>
@@ -88,11 +80,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           <span>{state.conservationApplication.openEtModelName}</span>
         </SidebarElement>
 
-        <SidebarElement title="MAP LAYER">
-          <div className="mt-2">
-            <MapThemeSelector />
-          </div>
-        </SidebarElement>
+        <div className="d-print-none">
+          <SidebarElement title="MAP LAYER">
+            <div className="mt-2">
+              <MapThemeSelector />
+            </div>
+          </SidebarElement>
+        </div>
 
         <SidebarElement
           title="ESTIMATED CONSUMPTIVE USE"
@@ -119,12 +113,14 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {etAcreFeet > 0 ? (
+            {(state.conservationApplication.totalAverageYearlyEtAcreFeet ?? 0) > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
-                <span className="fs-5 fw-bold et-blue-text">{formatNumber(etAcreFeet, 2)} Acre-Feet</span>
+                <span className="fs-5 fw-bold et-blue-text">
+                  {formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet
+                </span>
               </>
             ) : (
               <span className="text-muted">
@@ -157,7 +153,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
           </span>
 
           <Form onChange={onEstimationFormChanged} noValidate>
-            <div className="d-flex justify-content-between align-items-center gap-3">
+            <div className="d-flex d-print-block justify-content-between align-items-center gap-3">
               <InputGroup>
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
@@ -165,6 +161,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   placeholder="100"
                   min={1}
                   aria-describedby="dollar-sign-addon"
+                  aria-label="Desired compensation in dollars"
                   value={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
                 ></Form.Control>
