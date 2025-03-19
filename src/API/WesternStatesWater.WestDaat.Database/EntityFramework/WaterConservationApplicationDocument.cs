@@ -14,4 +14,6 @@ public class WaterConservationApplicationDocument
     public string FileName { get; set; } = null!;
     
     public string? Description { get; set; }
+
+    public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 }

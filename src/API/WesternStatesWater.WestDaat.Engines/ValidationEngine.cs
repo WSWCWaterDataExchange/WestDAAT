@@ -42,7 +42,7 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
-            FileSasTokenRequestBase req => ValidateFileSasTokenRequest(req, context),
+            FileSasTokenRequestBase req => await ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -506,11 +506,12 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private ErrorBase ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
+    private async Task<ErrorBase> ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
     {
         return request switch
         {
             ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
+            ApplicationDocumentDownloadSasTokenRequest req => await ValidateApplicationDocumentDownloadSasTokenRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -525,6 +526,43 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicationDocumentDownloadSasTokenRequest(ApplicationDocumentDownloadSasTokenRequest request, ContextBase context)
+    {
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var documentExistsRequest = new DTO.ApplicationSupportingDocumentExistsRequest
+        {
+            WaterConservationApplicationDocumentId = request.WaterConservationApplicationDocumentId
+        };
+
+        var documentExistsResponse = (DTO.ApplicationSupportingDocumentExistsResponse)await _applicationAccessor.Load(documentExistsRequest);
+
+        if (!documentExistsResponse.DocumentExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplicationDocument with Id ${request.WaterConservationApplicationDocumentId}");
+        }
+        
+        // Current user owns the application, so allow file download
+        if (userContext.UserId == documentExistsResponse.ApplicantUserId)
+        {
+            return null;
+        }
+
+        // Check if current user is a member of the application funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = documentExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
+        {
+            return CreateForbiddenError(new ApplicationDocumentDownloadSasTokenRequest(), context);
+        }
+
+        return null;
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,

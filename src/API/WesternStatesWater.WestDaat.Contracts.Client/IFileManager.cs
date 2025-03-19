@@ -7,7 +7,11 @@ namespace WesternStatesWater.WestDaat.Contracts.Client;
 
 public interface IFileManager : IServiceContractBase
 {
-    Task<TResponse> GenerateFileSasToken<TRequest, TResponse>(TRequest request)
+    Task<TResponse> GenerateUploadFileSasToken<TRequest, TResponse>(TRequest request)
+        where TRequest : FileSasTokenRequestBase
+        where TResponse : FileSasTokenResponseBase;
+    
+    Task<TResponse> GenerateDownloadFileSasToken<TRequest, TResponse>(TRequest request)
         where TRequest : FileSasTokenRequestBase
         where TResponse : FileSasTokenResponseBase;
 }
