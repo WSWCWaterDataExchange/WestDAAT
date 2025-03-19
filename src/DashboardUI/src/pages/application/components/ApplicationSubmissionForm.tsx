@@ -16,15 +16,15 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import ApplicationReviewHeader from './ApplicationReviewHeader';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-type Perspective = 'applicant' | 'reviewer';
-
 interface ApplicationSubmissionFormProps {
-  perspective: Perspective;
+  perspective: ApplicationReviewPerspective;
   isFormDirty?: boolean;
 }
 
@@ -140,33 +140,9 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
-  const pageTitleOptions: Record<Perspective, string> = {
-    applicant: 'New Application',
-    reviewer: 'Application',
-  };
-
   return (
     <main className="container">
-      <div className="mb-3">
-        <span className="fs-4 fw-bold">{pageTitleOptions[perspective]}</span>
-      </div>
-
-      <div className="d-flex gap-3 mb-4">
-        <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
-
-        <span className="fw-bold">
-          Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
-        </span>
-
-        <span className="fw-bold">Funding Organization: {state.conservationApplication.fundingOrganizationName}</span>
-      </div>
-
-      <div className="mb-4">
-        <span>
-          Complete the below fields in order to submit your application to your state agency for verification. Be sure
-          everything is filled out accurately and truthfully.
-        </span>
-      </div>
+      <ApplicationReviewHeader perspective={perspective} />
 
       <Form ref={formRef} onChange={onFormChanged} validated={formValidated} noValidate>
         <ApplicationFormSection title="Applicant Information">
