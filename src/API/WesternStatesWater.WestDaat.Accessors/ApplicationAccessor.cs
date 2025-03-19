@@ -158,10 +158,9 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var document = await db.WaterConservationApplicationDocuments
-            .AsNoTracking()
             .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
             .ProjectTo<SupportingDocumentDetails>(DtoMapper.Configuration)
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
 
         return new ApplicationDocumentLoadSingleResponse
         {
@@ -177,7 +176,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .AsNoTracking()
             .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
             .Include(doc => doc.WaterConservationApplication)
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
         
         return new ApplicationSupportingDocumentExistsResponse
         {
