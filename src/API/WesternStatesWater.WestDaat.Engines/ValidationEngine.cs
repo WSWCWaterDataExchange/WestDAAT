@@ -537,6 +537,11 @@ internal class ValidationEngine : IValidationEngine
 
         var documentExistsResponse = (DTO.ApplicationSupportingDocumentExistsResponse)await _applicationAccessor.Load(documentExistsRequest);
 
+        if (!documentExistsResponse.DocumentExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplicationDocument with Id ${request.WaterConservationApplicationDocumentId}");
+        }
+
         var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
