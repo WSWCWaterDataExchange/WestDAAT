@@ -541,16 +541,21 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateNotFoundError(context, $"WaterConservationApplicationDocument with Id ${request.WaterConservationApplicationDocumentId}");
         }
+        
+        // Current user owns the application, so allow file download
+        if (userContext.UserId == documentExistsResponse.ApplicantUserId)
+        {
+            return null;
+        }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        // Check if current user is a member of the application funding organization
         var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = documentExistsResponse.FundingOrganizationId
         });
 
-        if (userContext.UserId != documentExistsResponse.ApplicantUserId && !permissions.Contains(Permissions.ApplicationReview) &&
-            !orgPermissions.Contains(Permissions.ApplicationReview))
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
         {
             return CreateForbiddenError(new ApplicationDocumentDownloadSasTokenRequest(), context);
         }
