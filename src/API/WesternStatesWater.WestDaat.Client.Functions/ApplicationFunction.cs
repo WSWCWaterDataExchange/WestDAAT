@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
@@ -76,6 +77,7 @@ public class ApplicationFunction : FunctionBase
 
     [Function(nameof(UpdateApplication))]
     [OpenApiOperation(nameof(UpdateApplication))]
+    [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
     [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
     public async Task<HttpResponseData> UpdateApplication(
         [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/{{id}}")]
