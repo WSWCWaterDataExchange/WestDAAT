@@ -16,8 +16,7 @@ import {
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 import { ApplicationDocumentUpload } from '../create/ApplicationDocumentUpload';
-import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
-import { useMsal } from '@azure/msal-react';
+import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
@@ -31,7 +30,6 @@ interface ApplicationSubmissionFormProps {
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const msalContext = useMsal();
   const { perspective, isFormDirty } = props;
 
   const navigate = useNavigate();
@@ -560,9 +558,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
 
       <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
         {perspective === 'reviewer' ? (
-          <Button onClick={() => downloadApplicationDocuments(msalContext, '24432c08-6b5b-4240-1c07-08dd67ce93f8')}>
-            test download
-          </Button>
+          <ApplicationDocumentDownload />
         ) : (
           <ApplicationDocumentUpload documentUploadingHandler={setDocumentUploading}></ApplicationDocumentUpload>
         )}

@@ -385,7 +385,7 @@ function ApplicationSubmitPageLayout(props: ApplicationSubmitPageLayoutProps) {
               <table className="table">
                 <tbody>
                   {state.conservationApplication.supportingDocuments.map((file, index) => (
-                    <tr key={`${file.fileName}-${index}`}>
+                    <tr key={file.blobName}>
                       <td className="col-4 text-nowrap align-content-center px-2 py-3">
                         <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3" />
                         {file.fileName}
