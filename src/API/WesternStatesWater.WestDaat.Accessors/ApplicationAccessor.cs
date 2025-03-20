@@ -286,13 +286,15 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         var application = await db.WaterConservationApplications
             .Include(a => a.Submission)
-            .Include(a => a.Estimate)
-            .ThenInclude(estimate => estimate.Locations)
+            .Include(a => a.Estimate).ThenInclude(estimate => estimate.Locations)
+            .Include(a => a.SupportingDocuments)
             .Where(a => a.Id == request.WaterConservationApplicationId)
             .SingleAsync();
 
+        // update submission
         DtoMapper.Map(request, application.Submission);
 
+        // update estimate locations
         foreach (var details in request.FieldDetails)
         {
             var existingEstimateLocation = application.Estimate.Locations
@@ -306,10 +308,17 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             DtoMapper.Map(details, existingEstimateLocation);
         }
 
-        var note = new EFWD.WaterConservationApplicationSubmissionNote();
+        // overwrite supporting documents
+        foreach (var document in application.SupportingDocuments)
+        {
+            db.WaterConservationApplicationDocuments.Remove(document);
+        }
 
-        DtoMapper.Map(request, note);
+        var newDocuments = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
+        application.SupportingDocuments = newDocuments;
 
+        // add new note
+        var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
         await db.WaterConservationApplicationSubmissionNotes.AddAsync(note);
 
         await db.SaveChangesAsync();
