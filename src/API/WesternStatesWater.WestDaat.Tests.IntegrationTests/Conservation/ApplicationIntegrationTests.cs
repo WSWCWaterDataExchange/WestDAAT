@@ -850,8 +850,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseUserContext(new UserContext
         {
             UserId = user.Id,
-            Roles = [],
-            OrganizationRoles = [],
+            Roles = [Roles.TechnicalReviewer],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer]
+                }
+            ],
             ExternalAuthId = ""
         });
 
