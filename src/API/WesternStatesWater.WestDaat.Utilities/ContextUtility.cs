@@ -212,6 +212,12 @@ public class ContextUtility(
 
     private ContextBase Build()
     {
+        // Service bus triggers / etc will not have http context
+        if (httpContextAccessor?.HttpContext == null)
+        {
+            return new SystemContext();
+        }
+
         if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var authHeader))
         {
             string authHeaderString = authHeader;

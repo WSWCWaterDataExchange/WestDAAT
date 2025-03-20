@@ -2,6 +2,7 @@ using Azure.Messaging.ServiceBus;
 using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.UtilitiesTests;
@@ -15,11 +16,13 @@ public class MessageBusUtilityTests : UtilityTestBase
         // Arrange
         var messageBusUtility = new MessageBusUtility(Configuration.GetMessageBusConfiguration());
         var messageObject = new SmokeTestRequest { Message = "Look Ma! It's working!" };
+        var submitEvent = new WaterConservationApplicationSubmittedEvent { ApplicationId = Guid.NewGuid() };
 
         try
         {
             // Act
-            await messageBusUtility.SendMessageAsync(Queues.SmokeTest, messageObject);
+            // await messageBusUtility.SendMessageAsync(Queues.SmokeTest, messageObject);
+            await messageBusUtility.SendMessageAsync(Queues.ConservationApplicationSubmitted, submitEvent);
         }
         catch (ServiceBusException e)
         {
