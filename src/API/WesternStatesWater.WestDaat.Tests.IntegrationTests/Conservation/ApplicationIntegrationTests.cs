@@ -850,7 +850,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseUserContext(new UserContext
         {
             UserId = user.Id,
-            Roles = [Roles.TechnicalReviewer],
+            Roles = [],
             OrganizationRoles =
             [
                 new OrganizationRole
