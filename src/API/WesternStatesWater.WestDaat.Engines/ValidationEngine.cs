@@ -166,6 +166,7 @@ internal class ValidationEngine : IValidationEngine
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
+            WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -244,6 +245,50 @@ internal class ValidationEngine : IValidationEngine
         }
 
         return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationSubmissionUpdateRequest(WaterConservationApplicationSubmissionUpdateRequest request, ContextBase context)
+    {
+        // verify user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify user has permission to modify an application submission
+        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        if (!permissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // verify application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify application is in review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        // verify user belongs to the funding organization that is handling the application
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
+        {
+            return CreateForbiddenError(request, context);
+        }
     }
 
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
@@ -541,7 +586,7 @@ internal class ValidationEngine : IValidationEngine
         {
             return CreateNotFoundError(context, $"WaterConservationApplicationDocument with Id ${request.WaterConservationApplicationDocumentId}");
         }
-        
+
         // Current user owns the application, so allow file download
         if (userContext.UserId == documentExistsResponse.ApplicantUserId)
         {
@@ -562,7 +607,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,
