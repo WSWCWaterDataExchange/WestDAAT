@@ -321,6 +321,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
 
+        // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
         {
             note.SubmittedDate.Should().NotBe(default);

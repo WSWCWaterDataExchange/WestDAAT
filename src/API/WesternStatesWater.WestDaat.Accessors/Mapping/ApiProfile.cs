@@ -363,7 +363,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Notes, opt =>
                 {
                     opt.PreCondition(src => src.Submission != null);
-                    opt.MapFrom(src => src.Submission.SubmissionNotes);
+                    opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
                 });
 
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
