@@ -1,27 +1,27 @@
 import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
+import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
+import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
+import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
+import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
+import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
+import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
-import { ContainerName, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
-import { generateSasTokens } from './fileAccessor';
-import westDaatApi from './westDaatApi';
-import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
-import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
-import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
-import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
-import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
-import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
-import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
-import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
-import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
+import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
+import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
+import westDaatApi from './westDaatApi';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -88,7 +88,7 @@ export const uploadApplicationDocuments = async (
   context: IMsalContext,
   files: File[],
 ): Promise<ApplicationDocument[]> => {
-  const sasTokens = (await generateSasTokens(context, files.length)).sasTokens;
+  const sasTokens = (await generateUploadSasTokens(context, files.length)).sasTokens;
   const applicationDocuments: ApplicationDocument[] = [];
   const blobUploads: BlobUpload[] = [];
   files.forEach((file, index) => {
@@ -107,6 +107,15 @@ export const uploadApplicationDocuments = async (
   await uploadFilesToBlobStorage(ContainerName.ApplicationDocuments, blobUploads);
   return applicationDocuments;
 };
+
+export const downloadApplicationDocuments = async (
+  context: IMsalContext,
+  documentId: string
+): Promise<void> => {
+  const api = await westDaatApi(context);
+  const { sasToken, fileName } = (await generateDownloadSasToken(context, documentId));
+  await downloadFilesFromBlobStorage(sasToken, fileName);
+}
 
 export const submitApplication = async (
   context: IMsalContext,
