@@ -315,7 +315,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         }
 
         var newDocuments = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
-        application.SupportingDocuments = newDocuments;
+        foreach (var document in newDocuments)
+        {
+            application.SupportingDocuments.Add(document);
+        }
 
         // add new note
         var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();

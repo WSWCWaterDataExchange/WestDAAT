@@ -911,7 +911,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
 
         // verify the supporting document is correct
-        dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options.ExcludingMissingMembers());
+        dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options
+            // these fields are not defined on the request object
+            .Excluding(doc => doc.Id)
+            .Excluding(doc => doc.WaterConservationApplicationId)
+            .ExcludingMissingMembers());
 
         // verify the submission note is correct
         var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
