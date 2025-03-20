@@ -74,6 +74,19 @@ public class ApplicationFunction : FunctionBase
         return await CreateResponse(req, results);
     }
 
+    [Function(nameof(UpdateApplication))]
+    [OpenApiOperation(nameof(UpdateApplication))]
+    [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
+    public async Task<HttpResponseData> UpdateApplication(
+        [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/{{id}}")]
+        HttpRequestData req, Guid id)
+    {
+        var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
+            new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        return await CreateResponse(req, results);
+    }
+
     [Function(nameof(GetApplication))]
     [OpenApiOperation(nameof(GetApplication))]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicationLoadResponseBase))]
