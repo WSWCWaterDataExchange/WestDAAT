@@ -1,9 +1,9 @@
-interface FormElementProps {
+interface FormElementDisplay {
   label: string;
   displayValue: any;
 }
 
-function FormElement(props: FormElementProps) {
+function FormElementDisplay(props: FormElementDisplay) {
   const { label, displayValue } = props;
 
   return (
@@ -18,4 +18,4 @@ function FormElement(props: FormElementProps) {
   );
 }
 
-export default FormElement;
+export default FormElementDisplay;

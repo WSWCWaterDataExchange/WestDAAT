@@ -10,7 +10,7 @@ import {
   CompensationRateUnitsLabelsSingular,
 } from '../../../data-contracts/CompensationRateUnits';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import FormElement from './FormElement';
+import FormElementDisplay from './FormElementDisplay';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
@@ -61,31 +61,31 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
       <div>
         <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Landowner Name" displayValue={stateForm.landownerName} />
+            <FormElementDisplay label="Landowner Name" displayValue={stateForm.landownerName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Email Address" displayValue={stateForm.landownerEmail} />
+            <FormElementDisplay label="Email Address" displayValue={stateForm.landownerEmail} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Phone" displayValue={stateForm.landownerPhoneNumber} />
+            <FormElementDisplay label="Phone" displayValue={stateForm.landownerPhoneNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Address" displayValue={stateForm.landownerAddress} />
+            <FormElementDisplay label="Address" displayValue={stateForm.landownerAddress} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="City" displayValue={stateForm.landownerCity} />
+            <FormElementDisplay label="City" displayValue={stateForm.landownerCity} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="State" displayValue={stateForm.landownerState} />
+            <FormElementDisplay label="State" displayValue={stateForm.landownerState} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Zip Code" displayValue={stateForm.landownerZipCode} />
+            <FormElementDisplay label="Zip Code" displayValue={stateForm.landownerZipCode} />
           </div>
         </ApplicationFormSection>
 
@@ -97,19 +97,19 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
           loadingFieldCount={3}
         >
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Name / Organization" displayValue={stateForm.agentName} />
+            <FormElementDisplay label="Name / Organization" displayValue={stateForm.agentName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Email" displayValue={stateForm.agentEmail} />
+            <FormElementDisplay label="Email" displayValue={stateForm.agentEmail} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Phone" displayValue={stateForm.agentPhoneNumber} />
+            <FormElementDisplay label="Phone" displayValue={stateForm.agentPhoneNumber} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement label="Additional Details" displayValue={stateForm.agentAdditionalDetails} />
+            <FormElementDisplay label="Additional Details" displayValue={stateForm.agentAdditionalDetails} />
           </div>
         </ApplicationFormSection>
 
@@ -137,7 +137,7 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
                   </span>
                 </div>
                 <div className={`col-12 mb-4`}>
-                  <FormElement label="Additional Details" displayValue={field.additionalDetails} />
+                  <FormElementDisplay label="Additional Details" displayValue={field.additionalDetails} />
                 </div>
               </div>
             ))}
@@ -157,19 +157,22 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
           loadingFieldCount={3}
         >
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <FormElement label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
+            <FormElementDisplay label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <FormElement label="Email" displayValue={stateForm.canalOrIrrigationEntityEmail} />
+            <FormElementDisplay label="Email" displayValue={stateForm.canalOrIrrigationEntityEmail} />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <FormElement label="Phone" displayValue={stateForm.canalOrIrrigationEntityPhoneNumber} />
+            <FormElementDisplay label="Phone" displayValue={stateForm.canalOrIrrigationEntityPhoneNumber} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement label="Additional Details" displayValue={stateForm.canalOrIrrigationAdditionalDetails} />
+            <FormElementDisplay
+              label="Additional Details"
+              displayValue={stateForm.canalOrIrrigationAdditionalDetails}
+            />
           </div>
         </ApplicationFormSection>
 
@@ -177,34 +180,34 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
 
         <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Permit #" displayValue={stateForm.permitNumber} />
+            <FormElementDisplay label="Permit #" displayValue={stateForm.permitNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Facility (Ditch) Name" displayValue={stateForm.facilityDitchName} />
+            <FormElementDisplay label="Facility (Ditch) Name" displayValue={stateForm.facilityDitchName} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement
+            <FormElementDisplay
               label="Priority Date"
               displayValue={stateForm.priorityDate ? formatDateString(stateForm.priorityDate, 'MM/DD/YYYY') : undefined}
             />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Certificate #" displayValue={stateForm.certificateNumber} />
+            <FormElementDisplay label="Certificate #" displayValue={stateForm.certificateNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="Share #" displayValue={stateForm.shareNumber} />
+            <FormElementDisplay label="Share #" displayValue={stateForm.shareNumber} />
           </div>
 
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
-            <FormElement label="State" displayValue={stateForm.waterRightState} />
+            <FormElementDisplay label="State" displayValue={stateForm.waterRightState} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement label="Description of Water Use" displayValue={stateForm.waterUseDescription} />
+            <FormElementDisplay label="Description of Water Use" displayValue={stateForm.waterUseDescription} />
           </div>
         </ApplicationFormSection>
 
@@ -213,14 +216,14 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
         <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
           <div className="row">
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement
+              <FormElementDisplay
                 label="Irrigated Field Area"
                 displayValue={formatNumber(state.conservationApplication.polygonAcreageSum, 2) + ' Acres'}
               />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement
+              <FormElementDisplay
                 label="Consumptive Use"
                 displayValue={
                   formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2) + ' Acre-Feet'
@@ -229,14 +232,14 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement
+              <FormElementDisplay
                 label="Compensation Rate"
                 displayValue={`$${state.conservationApplication.desiredCompensationDollars}/${CompensationRateUnitsLabelsSingular[state.conservationApplication.desiredCompensationUnits!]}`}
               />
             </div>
 
             <div className="col-sm-6 col-md-3 mb-4">
-              <FormElement
+              <FormElementDisplay
                 label="Requested Total ($)"
                 displayValue={'$' + formatNumber(state.conservationApplication.conservationPayment, 0)}
               />
@@ -244,7 +247,7 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement
+            <FormElementDisplay
               label="Supplementary Review Information"
               displayValue={stateForm.estimationSupplementaryDetails}
             />
@@ -255,14 +258,14 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
 
         <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <FormElement
+            <FormElementDisplay
               label="Funding Request $ Amount"
               displayValue={'$' + stateForm.conservationPlanFundingRequestDollarAmount}
             />
           </div>
 
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
-            <FormElement
+            <FormElementDisplay
               label="Units"
               displayValue={
                 CompensationRateUnitsLabelsPlural[stateForm.conservationPlanFundingRequestCompensationRateUnits!]
@@ -271,11 +274,14 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement label="Conservation Description" displayValue={stateForm.conservationPlanDescription} />
+            <FormElementDisplay label="Conservation Description" displayValue={stateForm.conservationPlanDescription} />
           </div>
 
           <div className={`${responsiveHalfWidthDefault} mb-4`}>
-            <FormElement label="Additional Information" displayValue={stateForm.conservationPlanAdditionalInfo} />
+            <FormElementDisplay
+              label="Additional Information"
+              displayValue={stateForm.conservationPlanAdditionalInfo}
+            />
           </div>
         </ApplicationFormSection>
 
