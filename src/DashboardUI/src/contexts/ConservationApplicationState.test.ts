@@ -576,6 +576,7 @@ describe('ConservationApplicationState reducer', () => {
       const document = application.supportingDocuments[0];
       const expectedDocument = applicationDetails.supportingDocuments[0];
       expect(application.supportingDocuments.length).toEqual(applicationDetails.supportingDocuments.length);
+      expect(document.id).toEqual(expectedDocument.id);
       expect(document.fileName).toEqual(expectedDocument.fileName);
       expect(document.blobName).toEqual(expectedDocument.blobName);
       expect(document.description).toEqual(expectedDocument.description);
@@ -623,6 +624,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
+
     });
   });
 
