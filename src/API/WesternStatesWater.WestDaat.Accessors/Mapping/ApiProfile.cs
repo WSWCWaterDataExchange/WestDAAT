@@ -386,7 +386,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApplicationDisplayId, opt => opt.MapFrom(src => src.ApplicationDisplayId))
                 .ForMember(dest => dest.ApplicantUserId, opt => opt.MapFrom(src => src.ApplicantUserId))
                 .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)));
         }
 
         public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

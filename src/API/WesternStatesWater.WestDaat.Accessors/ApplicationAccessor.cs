@@ -113,16 +113,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .SingleOrDefaultAsync();
 
         return response;
-
-        return new ApplicationExistsLoadResponse
-        {
-            ApplicationExists = application != null,
-            ApplicationId = application?.Id,
-            ApplicationDisplayId = application?.ApplicationDisplayId,
-            ApplicantUserId = application?.ApplicantUserId,
-            FundingOrganizationId = application?.FundingOrganizationId,
-            Status
-        };
     }
 
     private async Task<ApplicationFindSequentialIdLoadResponse> FindSequentialDisplayId(ApplicationFindSequentialIdLoadRequest request)
