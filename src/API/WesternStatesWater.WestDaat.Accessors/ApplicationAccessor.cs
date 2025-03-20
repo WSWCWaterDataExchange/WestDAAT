@@ -108,7 +108,11 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             }
         }
 
-        var application = await applicationQuery.SingleOrDefaultAsync();
+        var response = await applicationQuery
+            .ProjectTo<ApplicationExistsLoadResponse>(DtoMapper.Configuration)
+            .SingleOrDefaultAsync();
+
+        return response;
 
         return new ApplicationExistsLoadResponse
         {
@@ -117,6 +121,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationDisplayId = application?.ApplicationDisplayId,
             ApplicantUserId = application?.ApplicantUserId,
             FundingOrganizationId = application?.FundingOrganizationId,
+            Status
         };
     }
 
@@ -167,7 +172,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             SupportingDocument = document
         };
     }
-    
+
     private async Task<ApplicationSupportingDocumentExistsResponse> CheckApplicationDocumentExists(ApplicationSupportingDocumentExistsRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
@@ -177,7 +182,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
             .Include(doc => doc.WaterConservationApplication)
             .SingleOrDefaultAsync();
-        
+
         return new ApplicationSupportingDocumentExistsResponse
         {
             DocumentExists = document != null,
@@ -185,7 +190,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             FundingOrganizationId = document?.WaterConservationApplication.FundingOrganizationId,
         };
     }
-    
+
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
@@ -259,7 +264,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ThenInclude(estimate => estimate.Locations)
             .Where(wca => wca.Id == request.WaterConservationApplicationId)
             .SingleAsync();
-        
+
         var documents = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
         existingApplication.SupportingDocuments = documents;
 

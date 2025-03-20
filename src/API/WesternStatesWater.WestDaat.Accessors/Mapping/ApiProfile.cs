@@ -379,6 +379,25 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Timestamp))
                 .ForMember(dest => dest.SubmittedByFullName, opt => opt.MapFrom(src => $"{src.User.UserProfile.FirstName} {src.User.UserProfile.LastName}"));
+
+            CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
+                .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(src => src != null))
+                .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ApplicationDisplayId, opt => opt.MapFrom(src => src.ApplicationDisplayId))
+                .ForMember(dest => dest.ApplicantUserId, opt => opt.MapFrom(src => src.ApplicantUserId))
+                .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate));
+        }
+
+        public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        {
+            return (acceptedDate, rejectedDate) switch
+            {
+                (null, null) => ConservationApplicationStatus.InReview,
+                (not null, null) => ConservationApplicationStatus.Approved,
+                (null, not null) => ConservationApplicationStatus.Rejected,
+                _ => ConservationApplicationStatus.Unknown
+            };
         }
     }
 }
