@@ -8,7 +8,7 @@ import { useRef, useState } from 'react';
 import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
 import Button from 'react-bootstrap/esm/Button';
 
-const perspective: ApplicationReviewPerspective = 'applicant'; // hard-coded for this page
+const perspective: ApplicationReviewPerspective = 'applicant';
 
 export function ApplicationCreatePage() {
   const { state } = useConservationApplicationContext();

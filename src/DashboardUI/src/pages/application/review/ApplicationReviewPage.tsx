@@ -11,7 +11,7 @@ import { useRef, useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import Button from 'react-bootstrap/esm/Button';
 
-const perspective: ApplicationReviewPerspective = 'reviewer'; // hard-coded for this page
+const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
