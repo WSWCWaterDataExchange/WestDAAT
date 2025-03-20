@@ -62,6 +62,8 @@ public class WaterConservationApplicationSubmissionUpdateRequest : ApplicationSt
 
     public string Note { get; set; } = null!;
 
+    public Guid UpdatedByUserId { get; set; }
+
     public ApplicationSubmissionFieldDetail[] FieldDetails { get; set; } = null!;
 
     public WaterConservationApplicationDocument[] SupportingDocuments { get; set; } = null!;

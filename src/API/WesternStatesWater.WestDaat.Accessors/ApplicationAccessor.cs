@@ -306,6 +306,12 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             DtoMapper.Map(details, existingEstimateLocation);
         }
 
+        var note = new EFWD.WaterConservationApplicationSubmissionNote();
+
+        DtoMapper.Map(request, note);
+
+        await db.WaterConservationApplicationSubmissionNotes.AddAsync(note);
+
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();
