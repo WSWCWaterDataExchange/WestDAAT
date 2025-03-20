@@ -403,6 +403,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)));
         }
 
+        // duplicated in other ApiProfile.cs
         public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
             return (acceptedDate, rejectedDate) switch
