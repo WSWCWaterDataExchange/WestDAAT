@@ -348,6 +348,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
 
+            CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmission>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmissionNotes, opt => opt.Ignore())
+                .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore());
+
             CreateMap<WaterConservationApplicationDocument, EFWD.WaterConservationApplicationDocument>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.Ignore())

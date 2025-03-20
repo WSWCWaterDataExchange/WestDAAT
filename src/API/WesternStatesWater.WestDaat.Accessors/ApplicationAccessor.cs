@@ -191,6 +191,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
+            WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -264,6 +265,37 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         foreach (var details in request.FieldDetails)
         {
             var existingEstimateLocation = existingApplication.Estimate.Locations
+                .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
+
+            if (existingEstimateLocation == null)
+            {
+                throw new WestDaatException("Estimate location not found.");
+            }
+
+            DtoMapper.Map(details, existingEstimateLocation);
+        }
+
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<ApplicationStoreResponseBase> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var application = await db.WaterConservationApplications
+            .Include(a => a.Submission)
+            .Include(a => a.Estimate)
+            .ThenInclude(estimate => estimate.Locations)
+            .Where(a => a.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+
+        DtoMapper.Map(request, application.Submission);
+
+        foreach (var details in request.FieldDetails)
+        {
+            var existingEstimateLocation = application.Estimate.Locations
                 .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
 
             if (existingEstimateLocation == null)
