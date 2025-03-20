@@ -322,9 +322,11 @@ var fnAppSettings = {
   'Nldi:MaxDownstreamMainDistance': '500'
   'Nldi:MaxUpstreamMainDistance': '500'
   'Nldi:MaxUpstreamTributaryDistance': '500'
-  'Smtp:FeedbackFrom': 'WaDE_WSWC@hotmail.com'
+  'Smtp:FeedbackFrom': 'no-reply@westernstateswater.org'
   'Smtp:FeedbackTo:0': 'WaDE_WSWC@hotmail.com'
   'Smtp:FeedbackTo:1': 'rjames@wswc.utah.gov'
+  'Smtp:NotificationFrom': 'no-reply@westernstateswater.org'
+  'Smtp:NotificationFromName': 'WestDAAT'
   APPLICATIONINSIGHTS_CONNECTION_STRING: reference(resource_name_dashes.id, '2020-02-02-preview').ConnectionString
   AzureWebJobsSecretStorageType: 'files'
   AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${resource_name_var};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(Microsoft_Storage_storageAccounts.id, '2019-06-01').keys[0].value}'
