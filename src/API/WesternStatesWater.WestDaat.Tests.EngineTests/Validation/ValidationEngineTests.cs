@@ -318,6 +318,100 @@ public class ValidationEngineTests : EngineTestBase
         }
     }
 
+    [DataTestMethod]
+    [DataRow(false, false, false, false, false, false, "", DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, false, false, false, nameof(ForbiddenError), DisplayName = "User does not have permission to edit an Application Submission")]
+    [DataRow(true, true, false, false, false, false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, true, false, false, false, nameof(ForbiddenError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, true, true, false, false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, true, true, true, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    public async Task Validate_ValidateWaterConservationApplicationSubmissionUpdateRequest_Success(
+        bool userIsLoggedIn,
+        bool userHasPermissionToModifyAnApplicationSubmission,
+        bool applicationExists,
+        bool applicationHasCorrectStatus,
+        bool userHasCorrectOrgPermission,
+        bool shouldSucceed,
+        string expectedErrorTypeName
+        )
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
+
+        var getContextMock = _contextUtilityMock.Setup(mock => mock.GetContext());
+        var getRequiredContextMock = _contextUtilityMock.Setup(mock => mock.GetRequiredContext<UserContext>());
+        if (userIsLoggedIn)
+        {
+            var userContext = new UserContext
+            {
+                UserId = userId,
+                ExternalAuthId = "",
+                Roles = [],
+                OrganizationRoles = [],
+            };
+            getContextMock.Returns(userContext);
+            getRequiredContextMock.Returns(userContext);
+        }
+        else
+        {
+            getContextMock.Returns<UserContext>(null);
+            getRequiredContextMock.Throws<InvalidOperationException>();
+        }
+
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequest>()))
+            .Returns(userHasPermissionToModifyAnApplicationSubmission ? [Permissions.ApplicationUpdate] : []);
+
+        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<OrganizationPermissionsGetRequest>()))
+            .Returns(userHasCorrectOrgPermission ? [Permissions.ApplicationReview] : []);
+
+
+        var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
+        if (applicationExists)
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = true,
+                FundingOrganizationId = organizationId,
+                Status = applicationHasCorrectStatus ? ConservationApplicationStatus.InReview : ConservationApplicationStatus.Approved,
+            });
+        }
+        else
+        {
+            applicationAccessorMock.ReturnsAsync(new ApplicationExistsLoadResponse
+            {
+                ApplicationExists = false,
+            });
+        }
+
+        // Act
+        var request = new Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest
+        {
+            WaterConservationApplicationId = Guid.NewGuid(),
+        };
+        var call = async () => await _validationEngine.Validate(request);
+
+        // Assert
+        if (shouldSucceed)
+        {
+            var response = await call();
+
+            response.Should().BeNull();
+        }
+        else
+        {
+            if (userIsLoggedIn)
+            {
+                var response = await call();
+                response.GetType().Name.Should().Be(expectedErrorTypeName);
+            }
+            else
+            {
+                await call.Should().ThrowAsync<InvalidOperationException>();
+            }
+        }
+    }
+
     private class TestType : RequestBase
     {
     }
