@@ -7,7 +7,12 @@ namespace WesternStatesWater.WestDaat.Managers;
 
 public sealed partial class AdminManager : IFileManager
 {
-    async Task<TResponse> IFileManager.GenerateFileSasToken<TRequest, TResponse>(TRequest request)
+    async Task<TResponse> IFileManager.GenerateUploadFileSasToken<TRequest, TResponse>(TRequest request)
+    {
+        return await ExecuteAsync<TRequest, TResponse>(request);
+    }
+    
+    async Task<TResponse> IFileManager.GenerateDownloadFileSasToken<TRequest, TResponse>(TRequest request)
     {
         return await ExecuteAsync<TRequest, TResponse>(request);
     }

@@ -28,6 +28,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationLoadSingleRequest req => await GetApplication(req),
             ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
+            ApplicationDocumentLoadSingleRequest req => await GetApplicationDocument(req),
+            ApplicationSupportingDocumentExistsRequest req => await CheckApplicationDocumentExists(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -151,6 +153,39 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
+    private async Task<ApplicationDocumentLoadSingleResponse> GetApplicationDocument(ApplicationDocumentLoadSingleRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var document = await db.WaterConservationApplicationDocuments
+            .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
+            .ProjectTo<SupportingDocumentDetails>(DtoMapper.Configuration)
+            .SingleOrDefaultAsync();
+
+        return new ApplicationDocumentLoadSingleResponse
+        {
+            SupportingDocument = document
+        };
+    }
+    
+    private async Task<ApplicationSupportingDocumentExistsResponse> CheckApplicationDocumentExists(ApplicationSupportingDocumentExistsRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var document = await db.WaterConservationApplicationDocuments
+            .AsNoTracking()
+            .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
+            .Include(doc => doc.WaterConservationApplication)
+            .SingleOrDefaultAsync();
+        
+        return new ApplicationSupportingDocumentExistsResponse
+        {
+            DocumentExists = document != null,
+            ApplicantUserId = document?.WaterConservationApplication.ApplicantUserId,
+            FundingOrganizationId = document?.WaterConservationApplication.FundingOrganizationId,
+        };
+    }
+    
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
