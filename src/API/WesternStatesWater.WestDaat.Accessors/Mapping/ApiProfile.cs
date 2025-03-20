@@ -400,9 +400,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
                 .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(_ => true))
                 .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.ApplicationDisplayId, opt => opt.MapFrom(src => src.ApplicationDisplayId))
-                .ForMember(dest => dest.ApplicantUserId, opt => opt.MapFrom(src => src.ApplicantUserId))
-                .ForMember(dest => dest.FundingOrganizationId, opt => opt.MapFrom(src => src.FundingOrganizationId))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)));
         }
 
