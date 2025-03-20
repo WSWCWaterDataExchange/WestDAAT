@@ -263,11 +263,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
         }
 
+        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
         var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
 
-        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
-        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+        var technicalReviewers = new UserFaker().Generate(2);
+        await _dbContext.Users.AddRangeAsync(technicalReviewers);
+
+        var notes = technicalReviewers.Select(user => new WaterConservationApplicationSubmissionNoteFaker(submission, user).Generate()).ToArray();
+        await _dbContext.WaterConservationApplicationSubmissionNotes.AddRangeAsync(notes);
 
         await _dbContext.SaveChangesAsync();
 
@@ -313,7 +319,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
-        reviewerResponse.Notes.Should().BeEmpty(); // not implemented yet
+        reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
+
+        // verify note fields with custom mappings are translated correctly
+        foreach (var note in reviewerResponse.Notes)
+        {
+            note.SubmittedDate.Should().NotBe(default);
+            note.SubmittedByFullName.Should().NotBeEmpty();
+        }
 
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
@@ -679,7 +692,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .Generate();
             documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
             await _dbContext.WaterConservationApplications.AddAsync(application);
-            
+
             var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
             await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
 
@@ -770,7 +783,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             response.Error.Should().NotBeNull();
             response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
-            
+
             var dbApplicationDocuments = _dbContext.WaterConservationApplicationDocuments
                 .Where(docs => docs.WaterConservationApplicationId == request.WaterConservationApplicationId).ToArray();
 
