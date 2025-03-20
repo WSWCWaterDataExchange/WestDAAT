@@ -4,6 +4,7 @@ import { Icon } from '@mdi/react';
 import Button from 'react-bootstrap/esm/Button';
 import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import './ApplicationDocumentDownload.scss';
 
 export function ApplicationDocumentDownload() {
   const msalContext = useMsal();
@@ -16,27 +17,23 @@ export function ApplicationDocumentDownload() {
     await downloadApplicationDocuments(msalContext, fileId);
   };
 
-  const getBottomBorderClass = (index: number) => {
-    return index === state.conservationApplication.supportingDocuments.length - 1 ? ' border-bottom-0' : '';
-  };
-
   return (
-    <div className="col mb-4">
+    <div className="col">
       {state.conservationApplication.supportingDocuments.length === 0 && (
         <div className="text-muted">(No supporting documents have been provided)</div>
       )}
 
       {state.conservationApplication.supportingDocuments.length > 0 && (
-        <table className="table">
+        <table className="table document-table">
           <tbody>
-            {state.conservationApplication.supportingDocuments.map((file, index) => (
+            {state.conservationApplication.supportingDocuments.map((file) => (
               <tr key={file.blobName}>
-                <td className={'col-4 text-nowrap align-content-center px-2 py-3' + getBottomBorderClass(index)}>
+                <td className="col-4 text-nowrap align-content-center px-2 py-3">
                   <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3" />
                   {file.fileName}
                 </td>
-                <td className={'align-content-center text-start' + getBottomBorderClass(index)}>{file.description}</td>
-                <td className={'col-1 align-content-center text-center' + getBottomBorderClass(index)}>
+                <td className="align-content-center text-start">{file.description}</td>
+                <td className="col-1 align-content-center text-center">
                   <Button
                     variant="link"
                     className="px-1 py-1 text-primary"

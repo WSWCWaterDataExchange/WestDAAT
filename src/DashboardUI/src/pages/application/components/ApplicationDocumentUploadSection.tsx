@@ -1,5 +1,6 @@
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
+import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
 
@@ -12,16 +13,7 @@ function ApplicationDocumentUploadSection(props: ApplicationDocumentUploadSectio
 
   return (
     <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-      {perspective === 'reviewer' ? (
-        <>
-          <NotImplementedPlaceholder />
-          <span className="fw-bold">
-            Document Upload is not implemented for Reviewers yet. This feature will be implemented in a future release.
-          </span>
-        </>
-      ) : (
-        <ApplicationDocumentUpload />
-      )}
+      {perspective === 'reviewer' ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
     </ApplicationFormSection>
   );
 }
