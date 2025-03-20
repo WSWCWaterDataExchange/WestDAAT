@@ -45,6 +45,7 @@ export interface ConservationApplicationState {
     reviewerNotes: ApplicationReviewNote[];
   };
   isCreatingApplication: boolean;
+  isUploadingDocument: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -82,6 +83,7 @@ export const defaultState = (): ConservationApplicationState => ({
     reviewerNotes: [],
   },
   isCreatingApplication: false,
+  isUploadingDocument: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -97,6 +99,7 @@ export type ApplicationAction =
   | ConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
+  | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction
   | ApplicationLoadedAction;
@@ -182,6 +185,13 @@ export interface ApplicationDocumentUpdatedAction {
   };
 }
 
+export interface ApplicationDocumentUploadingAction {
+  type: 'APPLICATION_DOCUMENT_UPLOADING';
+  payload: {
+    isUploadingDocument: boolean;
+  };
+}
+
 export interface ApplicationDocumentUploadedAction {
   type: 'APPLICATION_DOCUMENT_UPLOADED';
   payload: {
@@ -238,6 +248,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
       return onApplicationDocumentUpdated(draftState, action);
+    case 'APPLICATION_DOCUMENT_UPLOADING':
+      return onApplicationDocumentUploading(draftState, action);
     case 'APPLICATION_DOCUMENT_UPLOADED':
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
@@ -417,6 +429,14 @@ const onApplicationDocumentUpdated = (
     document.description = payload.description;
   }
 
+  return draftState;
+};
+
+const onApplicationDocumentUploading = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentUploadingAction,
+): ConservationApplicationState => {
+  draftState.isUploadingDocument = payload.isUploadingDocument;
   return draftState;
 };
 

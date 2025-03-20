@@ -7,6 +7,7 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
 import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { ApplicationReviewPerspective } from '../data-contracts/ApplicationReviewPerspective';
 import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
@@ -169,7 +170,7 @@ export const getApplication = async (
   context: IMsalContext,
   data: {
     applicationId: string;
-    perspective: 'applicant' | 'reviewer';
+    perspective: ApplicationReviewPerspective;
   },
 ): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
   const api = await westDaatApi(context);
