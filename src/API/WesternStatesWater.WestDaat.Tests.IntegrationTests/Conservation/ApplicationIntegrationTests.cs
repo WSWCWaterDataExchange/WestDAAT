@@ -321,6 +321,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
 
+        foreach (var note in reviewerResponse.Notes)
+        {
+            note.SubmittedDate.Should().NotBe(default);
+            note.SubmittedByFullName.Should().NotBeEmpty();
+        }
+
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
