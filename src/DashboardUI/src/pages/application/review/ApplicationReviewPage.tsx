@@ -58,7 +58,7 @@ function ApplicationReviewPage() {
 
       <div className="overflow-y-auto">
         {!isApplicationLoading && !isFundingOrganizationLoading && (
-          <main className="container">
+          <div className="container">
             <ApplicationReviewHeader perspective={perspective} />
             <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
             <ApplicationDocumentUploadSection
@@ -73,7 +73,7 @@ function ApplicationReviewPage() {
               handleSaveClicked={handleSaveClicked}
               handleSubmitForFinalReviewClicked={alertNotImplemented}
             />
-          </main>
+          </div>
         )}
       </div>
     </div>

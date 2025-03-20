@@ -46,7 +46,7 @@ export function ApplicationCreatePage() {
       />
 
       <div className="overflow-y-auto">
-        <main className="container">
+        <div className="container">
           <ApplicationReviewHeader perspective={perspective} />
           <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
           <ApplicationDocumentUploadSection
@@ -54,7 +54,7 @@ export function ApplicationCreatePage() {
             documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
           />
           <ApplicantButtonRow documentUploading={documentUploading} handleSubmitClicked={handleSubmitClicked} />
-        </main>
+        </div>
       </div>
     </div>
   );
