@@ -5,7 +5,6 @@ import ApplicationFormSection from './ApplicationFormSection';
 
 interface ApplicationDocumentUploadSectionProps {
   perspective: ApplicationReviewPerspective;
-  documentUploadProps: Parameters<typeof ApplicationDocumentUpload>[0];
 }
 
 function ApplicationDocumentUploadSection(props: ApplicationDocumentUploadSectionProps) {
@@ -21,9 +20,7 @@ function ApplicationDocumentUploadSection(props: ApplicationDocumentUploadSectio
           </span>
         </>
       ) : (
-        <ApplicationDocumentUpload
-          documentUploadingHandler={props.documentUploadProps.documentUploadingHandler}
-        ></ApplicationDocumentUpload>
+        <ApplicationDocumentUpload />
       )}
     </ApplicationFormSection>
   );

@@ -16,7 +16,6 @@ export function ApplicationCreatePage() {
 
   const formRef = useRef<HTMLFormElement>(null);
   const [formValidated, setFormValidated] = useState(false);
-  const [documentUploading, setDocumentUploading] = useState(false);
 
   const navigateToEstimationToolPage = () => {
     navigate(`/application/${state.conservationApplication.waterRightNativeId}/estimation`);
@@ -49,11 +48,8 @@ export function ApplicationCreatePage() {
         <div className="container">
           <ApplicationReviewHeader perspective={perspective} />
           <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
-          <ApplicationDocumentUploadSection
-            perspective={perspective}
-            documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
-          />
-          <ApplicantButtonRow documentUploading={documentUploading} handleSubmitClicked={handleSubmitClicked} />
+          <ApplicationDocumentUploadSection perspective={perspective} />
+          <ApplicantButtonRow handleSubmitClicked={handleSubmitClicked} />
         </div>
       </div>
     </div>
@@ -61,16 +57,16 @@ export function ApplicationCreatePage() {
 }
 
 interface ApplicantButtonRowProps {
-  documentUploading: boolean;
   handleSubmitClicked: () => void;
 }
 
 function ApplicantButtonRow(props: ApplicantButtonRowProps) {
-  const { documentUploading, handleSubmitClicked } = props;
+  const { state } = useConservationApplicationContext();
+  const { handleSubmitClicked } = props;
 
   return (
     <div className="d-flex justify-content-end p-3">
-      <Button variant="success" onClick={handleSubmitClicked} disabled={documentUploading}>
+      <Button variant="success" onClick={handleSubmitClicked} disabled={state.isUploadingDocument}>
         Review & Submit
       </Button>
     </div>

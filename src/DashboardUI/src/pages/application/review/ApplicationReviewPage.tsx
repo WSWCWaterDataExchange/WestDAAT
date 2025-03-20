@@ -18,8 +18,6 @@ function ApplicationReviewPage() {
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
 
-  const [documentUploading, setDocumentUploading] = useState(false);
-
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
   };
@@ -61,13 +59,9 @@ function ApplicationReviewPage() {
           <div className="container">
             <ApplicationReviewHeader perspective={perspective} />
             <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
-            <ApplicationDocumentUploadSection
-              perspective={perspective}
-              documentUploadProps={{ documentUploadingHandler: setDocumentUploading }}
-            />
+            <ApplicationDocumentUploadSection perspective={perspective} />
             <ApplicationReviewPipelineSection />
             <ReviewerButtonRow
-              documentUploading={documentUploading}
               isFormDirty={isFormDirty}
               handleCancelClicked={alertNotImplemented}
               handleSaveClicked={handleSaveClicked}
@@ -83,7 +77,6 @@ function ApplicationReviewPage() {
 export default ApplicationReviewPage;
 
 interface ReviewerButtonRowProps {
-  documentUploading: boolean;
   isFormDirty: boolean;
   handleCancelClicked: () => void;
   handleSaveClicked: () => void;
@@ -91,8 +84,8 @@ interface ReviewerButtonRowProps {
 }
 
 function ReviewerButtonRow(props: ReviewerButtonRowProps) {
-  const { documentUploading, isFormDirty, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } =
-    props;
+  const { isFormDirty, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } = props;
+  const { state } = useConservationApplicationContext();
 
   return (
     <div className="d-flex justify-content-between p-3">
@@ -103,11 +96,15 @@ function ReviewerButtonRow(props: ReviewerButtonRowProps) {
       </div>
 
       <div className="d-flex gap-3">
-        <Button variant="outline-success" onClick={handleSaveClicked} disabled={documentUploading || !isFormDirty}>
+        <Button
+          variant="outline-success"
+          onClick={handleSaveClicked}
+          disabled={state.isUploadingDocument || !isFormDirty}
+        >
           Save Changes
         </Button>
 
-        <Button variant="success" onClick={handleSubmitForFinalReviewClicked} disabled={documentUploading}>
+        <Button variant="success" onClick={handleSubmitForFinalReviewClicked} disabled={state.isUploadingDocument}>
           Submit for Final Review
         </Button>
       </div>

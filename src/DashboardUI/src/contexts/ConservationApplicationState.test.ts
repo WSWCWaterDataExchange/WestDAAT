@@ -339,6 +339,24 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
   });
 
+  it('setting document upload status should update state', () => {
+    let newState = reducer(state, {
+      type: 'APPLICATION_DOCUMENT_UPLOADING',
+      payload: {
+        isUploadingDocument: true,
+      },
+    });
+    expect(newState.isUploadingDocument).toBe(true);
+
+    newState = reducer(newState, {
+      type: 'APPLICATION_DOCUMENT_UPLOADING',
+      payload: {
+        isUploadingDocument: false,
+      },
+    });
+    expect(newState.isUploadingDocument).toBe(false);
+  });
+
   describe('Estimation Tool Page Use Cases', () => {
     it('estimate consumptive use should be disabled when no data is present', () => {
       // Arrange
