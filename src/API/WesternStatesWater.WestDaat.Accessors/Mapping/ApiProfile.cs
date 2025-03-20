@@ -360,7 +360,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
 
             CreateMap<EFWD.WaterConservationApplication, ApplicationDetails>()
-                .ForMember(dest => dest.Notes, opt => opt.Ignore());
+                .ForMember(dest => dest.Notes, opt =>
+                {
+                    opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => src.Submission.SubmissionNotes);
+                });
 
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
 
@@ -371,6 +375,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
 
             CreateMap<EFWD.WaterConservationApplicationDocument, SupportingDocumentDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()
+                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Timestamp))
+                .ForMember(dest => dest.SubmittedByFullName, opt => opt.MapFrom(src => $"{src.User.UserProfile.FirstName} {src.User.UserProfile.LastName}"));
         }
     }
 }
