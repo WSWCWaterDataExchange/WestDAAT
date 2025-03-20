@@ -319,15 +319,13 @@ public class ValidationEngineTests : EngineTestBase
     }
 
     [DataTestMethod]
-    [DataRow(false, false, false, false, false, false, "", DisplayName = "User is not logged in")]
-    [DataRow(true, false, false, false, false, false, nameof(ForbiddenError), DisplayName = "User does not have permission to edit an Application Submission")]
-    [DataRow(true, true, false, false, false, false, nameof(NotFoundError), DisplayName = "Application does not exist")]
-    [DataRow(true, true, true, false, false, false, nameof(ForbiddenError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
-    [DataRow(true, true, true, true, false, false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
-    [DataRow(true, true, true, true, true, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    [DataRow(false, false, false, false, false, "", DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, false, false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, false, false, false, nameof(ForbiddenError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, true, false, false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, true, true, true, "", DisplayName = "User has permission to edit an Application Submission")]
     public async Task Validate_ValidateWaterConservationApplicationSubmissionUpdateRequest_Success(
         bool userIsLoggedIn,
-        bool userHasPermissionToModifyAnApplicationSubmission,
         bool applicationExists,
         bool applicationHasCorrectStatus,
         bool userHasCorrectOrgPermission,
@@ -359,11 +357,8 @@ public class ValidationEngineTests : EngineTestBase
             getRequiredContextMock.Throws<InvalidOperationException>();
         }
 
-        _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<PermissionsGetRequest>()))
-            .Returns(userHasPermissionToModifyAnApplicationSubmission ? [Permissions.ApplicationUpdate] : []);
-
         _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<OrganizationPermissionsGetRequest>()))
-            .Returns(userHasCorrectOrgPermission ? [Permissions.ApplicationReview] : []);
+            .Returns(userHasCorrectOrgPermission ? [Permissions.ApplicationUpdate] : []);
 
 
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));

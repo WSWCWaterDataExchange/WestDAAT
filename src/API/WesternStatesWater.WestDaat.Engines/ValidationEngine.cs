@@ -252,13 +252,6 @@ internal class ValidationEngine : IValidationEngine
         // verify user is logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
 
-        // verify user has permission to modify an application submission
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        if (!permissions.Contains(Permissions.ApplicationUpdate))
-        {
-            return CreateForbiddenError(request, context);
-        }
-
         // verify application exists
         var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
         {
