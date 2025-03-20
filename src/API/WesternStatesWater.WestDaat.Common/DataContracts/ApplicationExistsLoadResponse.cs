@@ -11,4 +11,6 @@ public class ApplicationExistsLoadResponse : ApplicationLoadResponseBase
     public Guid? ApplicantUserId { get; set; } = null!;
 
     public Guid? FundingOrganizationId { get; set; } = null!;
+
+    public ConservationApplicationStatus? Status { get; set; } = null!;
 }

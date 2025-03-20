@@ -82,6 +82,7 @@ internal class SecurityUtility : ISecurityUtility
             Roles.TechnicalReviewer,
             [
                 Permissions.ApplicationReview,
+                Permissions.ApplicationUpdate,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
         },
@@ -89,6 +90,7 @@ internal class SecurityUtility : ISecurityUtility
             Roles.OrganizationAdmin,
             [
                 Permissions.ApplicationReview,
+                Permissions.ApplicationUpdate,
                 Permissions.OrganizationApplicationDashboardLoad,
                 Permissions.OrganizationMemberAdd,
                 Permissions.OrganizationMemberRemove,
