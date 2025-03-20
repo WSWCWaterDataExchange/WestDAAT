@@ -813,4 +813,103 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
     }
+
+    [TestMethod]
+    public async Task Store_UpdateApplicationSubmission_Success()
+    {
+        // Arrange
+        const string waterRightNativeId = "1234";
+
+        // setup application
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+
+        var applicationOwner = new UserFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicationOwner, organization)
+                .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
+                .Generate();
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        // setup application related details
+        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+        var estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+        await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
+
+        var documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var request = new WaterConservationApplicationSubmissionUpdateRequestFaker()
+            .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
+            .RuleFor(req => req.WaterConservationApplicationId, () => application.Id)
+            .RuleFor(req => req.FieldDetails, () => estimateLocations.Select(location => new CLI.ApplicationSubmissionFieldDetail
+            {
+                WaterConservationApplicationEstimateLocationId = location.Id,
+                AdditionalDetails = "Some additional details"
+            }).ToArray())
+            .RuleFor(req => req.SupportingDocuments, () =>
+            [
+                new CLI.Requests.Conservation.WaterConservationApplicationDocument
+                {
+                    BlobName = "blobname",
+                    FileName = "filename.pdf",
+                    Description = "description",
+                }
+            ])
+            .Generate();
+
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().BeNull();
+
+        // verify all db entries exist
+        var dbApplication = await _dbContext.WaterConservationApplications
+            .Include(a => a.Submission).ThenInclude(s => s.SubmissionNotes)
+            .Include(a => a.Estimate).ThenInclude(e => e.Locations)
+            .Include(a => a.SupportingDocuments)
+            .Where(a => a.Id == request.WaterConservationApplicationId)
+            .SingleOrDefaultAsync();
+
+        dbApplication.Should().NotBeNull();
+        dbApplication.Submission.Should().NotBeNull();
+        dbApplication.Submission.SubmissionNotes.Should().HaveCount(1); // was created in the update
+        dbApplication.Estimate.Should().NotBeNull();
+        dbApplication.Estimate.Locations.Should().HaveCount(1);
+        dbApplication.SupportingDocuments.Should().HaveCount(1); // other documents were removed in the update
+
+        // verify entries were updated correctly
+        dbApplication.Submission.Should().BeEquivalentTo(request, options => options.ExcludingMissingMembers());
+        dbApplication.Estimate.Locations.First().Should()
+            .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
+
+        // verify the supporting document is correct
+        dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options.ExcludingMissingMembers());
+
+        // verify the submission note is correct
+        var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
+        dbSubmissionNote.Text.Should().Be(request.Note);
+        dbSubmissionNote.UserId.Should().Be(user.Id);
+        dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+    }
 }
