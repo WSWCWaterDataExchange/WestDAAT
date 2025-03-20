@@ -10,6 +10,7 @@ import {
   CompensationRateUnitsLabelsSingular,
 } from '../../../data-contracts/CompensationRateUnits';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import FormElement from './FormElement';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
@@ -319,23 +320,3 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
 }
 
 export default ApplicationReviewForm;
-
-interface FormElementProps {
-  label: string;
-  displayValue: any;
-}
-
-function FormElement(props: FormElementProps) {
-  const { label, displayValue } = props;
-
-  return (
-    <>
-      <div>
-        <span className="text-muted">{label}</span>
-      </div>
-      <div>
-        <span>{displayValue || '-'}</span>
-      </div>
-    </>
-  );
-}
