@@ -112,7 +112,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ProjectTo<ApplicationExistsLoadResponse>(DtoMapper.Configuration)
             .SingleOrDefaultAsync();
 
-        return response;
+        return response ?? new ApplicationExistsLoadResponse
+        {
+            ApplicationExists = false
+        };
     }
 
     private async Task<ApplicationFindSequentialIdLoadResponse> FindSequentialDisplayId(ApplicationFindSequentialIdLoadRequest request)
