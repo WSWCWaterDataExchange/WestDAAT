@@ -4,7 +4,7 @@ public class WaterConservationApplicationSubmission
 {
     public WaterConservationApplicationSubmission()
     {
-
+        SubmissionNotes = new HashSet<WaterConservationApplicationSubmissionNote>();
     }
 
     public Guid Id { get; set; }
