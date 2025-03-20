@@ -22,6 +22,7 @@ import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
 import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
+import { ApplicationReviewPerspective } from '../data-contracts/ApplicationReviewPerspective';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -160,7 +161,7 @@ export const getApplication = async (
   context: IMsalContext,
   data: {
     applicationId: string;
-    perspective: 'applicant' | 'reviewer';
+    perspective: ApplicationReviewPerspective;
   },
 ): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
   const api = await westDaatApi(context);
