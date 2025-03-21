@@ -7,7 +7,7 @@ export enum ContainerName {
 
 export const uploadFilesToBlobStorage = async (
   containerName: ContainerName,
-  uploadDetails: BlobUpload[]
+  uploadDetails: BlobUpload[],
 ): Promise<BlockBlobUploadResponse[]> => {
   let uploadPromises: Promise<BlockBlobUploadResponse>[] = [];
 
@@ -20,4 +20,16 @@ export const uploadFilesToBlobStorage = async (
   });
 
   return await Promise.all(uploadPromises);
+};
+
+export const downloadFilesFromBlobStorage = async (sasToken: string, fileName: string): Promise<void> => {
+  const blobFile = await fetch(sasToken); // from azure directly
+  const blob = await blobFile.blob();
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([blob]));
+  if (fileName) {
+    link.setAttribute('download', fileName);
+  }
+  document.body.appendChild(link);
+  link.click();
 };

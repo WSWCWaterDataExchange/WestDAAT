@@ -1,15 +1,14 @@
-import Placeholder from 'react-bootstrap/esm/Placeholder';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import ApplicationFormSection from './ApplicationFormSection';
 import Button from 'react-bootstrap/esm/Button';
-import Icon from '@mdi/react';
-import { mdiFileDocument } from '@mdi/js';
-import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import {
   CompensationRateUnitsLabelsPlural,
   CompensationRateUnitsLabelsSingular,
 } from '../../../data-contracts/CompensationRateUnits';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
+import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
+import ApplicationFormSection from './ApplicationFormSection';
 import FormElementDisplay from './FormElementDisplay';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
@@ -288,27 +287,7 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
         {sectionRule}
 
         <ApplicationFormSection title="Supporting Documents">
-          <div className="col mb-4">
-            {state.conservationApplication.supportingDocuments.length === 0 && (
-              <div className="text-muted">(No supporting documents have been provided)</div>
-            )}
-
-            {state.conservationApplication.supportingDocuments.length > 0 && (
-              <table className="table">
-                <tbody>
-                  {state.conservationApplication.supportingDocuments.map((file, index) => (
-                    <tr key={`${file.fileName}-${index}`}>
-                      <td className="col-4 text-nowrap align-content-center px-2 py-3">
-                        <Icon path={mdiFileDocument} size="1.5em" className="text-primary me-3" />
-                        {file.fileName}
-                      </td>
-                      <td className="align-content-center text-start">{file.description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          <ApplicationDocumentDownload />
         </ApplicationFormSection>
 
         {state.conservationApplication.supportingDocuments.length === 0 && <hr className="m-0" />}
