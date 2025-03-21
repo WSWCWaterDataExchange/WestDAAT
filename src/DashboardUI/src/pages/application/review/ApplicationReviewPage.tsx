@@ -17,6 +17,7 @@ import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { toast, ToastContainer } from 'react-toastify';
+import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -93,6 +94,7 @@ function ApplicationReviewPage() {
             <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
             <ApplicationDocumentUploadSection perspective={perspective} />
             <ApplicationReviewPipelineSection />
+            <ApplicationReviewersNotesSection />
             <ReviewerButtonRow
               isFormDirty={isFormDirty}
               handleCancelClicked={() => setShowCancelConfirmationModal(true)}
