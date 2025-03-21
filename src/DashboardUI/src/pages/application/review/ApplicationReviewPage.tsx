@@ -10,6 +10,7 @@ import ApplicationDocumentUploadSection from '../components/ApplicationDocumentU
 import { useRef, useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import Button from 'react-bootstrap/esm/Button';
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -17,6 +18,7 @@ function ApplicationReviewPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+  const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -63,12 +65,23 @@ function ApplicationReviewPage() {
             <ApplicationReviewPipelineSection />
             <ReviewerButtonRow
               isFormDirty={isFormDirty}
-              handleCancelClicked={alertNotImplemented}
+              handleCancelClicked={() => setShowCancelConfirmationModal(true)}
               handleSaveClicked={handleSaveClicked}
               handleSubmitForFinalReviewClicked={alertNotImplemented}
             />
           </div>
         )}
+
+        <ConfirmationModal
+          show={showCancelConfirmationModal}
+          onCancel={() => setShowCancelConfirmationModal(false)}
+          onConfirm={navigateToApplicationOrganizationDashboard}
+          titleText="Are you sure you want to leave?"
+          cancelText="Cancel"
+          confirmText="Okay"
+        >
+          Any changes to this application will not be saved.
+        </ConfirmationModal>
       </div>
     </div>
   );
