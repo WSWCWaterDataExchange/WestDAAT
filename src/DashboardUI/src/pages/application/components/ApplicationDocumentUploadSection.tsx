@@ -3,11 +3,11 @@ import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
 
-interface ApplicationDocumentUploadSectionProps {
+interface ApplicationDocumentSectionProps {
   perspective: ApplicationReviewPerspective;
 }
 
-function ApplicationDocumentUploadSection(props: ApplicationDocumentUploadSectionProps) {
+function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
   const { perspective } = props;
 
   return (
@@ -17,4 +17,4 @@ function ApplicationDocumentUploadSection(props: ApplicationDocumentUploadSectio
   );
 }
 
-export default ApplicationDocumentUploadSection;
+export default ApplicationDocumentSection;

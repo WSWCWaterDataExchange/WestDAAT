@@ -6,7 +6,7 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import useDirtyFormCheck from '../../../hooks/useDirtyFormCheck';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
-import ApplicationDocumentUploadSection from '../components/ApplicationDocumentUploadSection';
+import ApplicationDocumentSection from '../components/ApplicationDocumentUploadSection';
 import { useRef, useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import Button from 'react-bootstrap/esm/Button';
@@ -59,7 +59,7 @@ function ApplicationReviewPage() {
           <div className="container">
             <ApplicationReviewHeader perspective={perspective} />
             <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
-            <ApplicationDocumentUploadSection perspective={perspective} />
+            <ApplicationDocumentSection perspective={perspective} />
             <ApplicationReviewPipelineSection />
             <ReviewerButtonRow
               isFormDirty={isFormDirty}
