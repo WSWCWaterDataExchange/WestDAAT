@@ -10,13 +10,24 @@ import ApplicationDocumentUploadSection from '../components/ApplicationDocumentU
 import { useRef, useState } from 'react';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import Button from 'react-bootstrap/esm/Button';
+import ConfirmationModal from '../../../components/ConfirmationModal';
+import Modal from 'react-bootstrap/esm/Modal';
+import Form from 'react-bootstrap/esm/Form';
+import { useMutation } from 'react-query';
+import { updateApplicationSubmission } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
+import { toast, ToastContainer } from 'react-toastify';
+import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+  const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
+  const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -42,9 +53,31 @@ function ApplicationReviewPage() {
     setFormValidated(true);
 
     if (isFormValid) {
-      alertNotImplemented();
+      setShowSaveChangesModal(true);
     }
   };
+
+  const updateApplicationSubmissionMutation = useMutation({
+    mutationFn: async (documentedChanges: string) => {
+      return await updateApplicationSubmission(context, {
+        waterConservationApplicationId: applicationId!,
+        waterRightNativeId: state.conservationApplication.waterRightNativeId!,
+        form: state.conservationApplication.applicationSubmissionForm,
+        supportingDocuments: state.conservationApplication.supportingDocuments,
+        note: documentedChanges,
+      });
+    },
+    onSuccess: () => {
+      navigateToApplicationOrganizationDashboard();
+
+      setTimeout(() => {
+        toast.success('Application changes saved successfully.');
+      }, 1);
+    },
+    onError: () => {
+      toast.error('Error saving application changes.');
+    },
+  });
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -61,14 +94,34 @@ function ApplicationReviewPage() {
             <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
             <ApplicationDocumentUploadSection perspective={perspective} />
             <ApplicationReviewPipelineSection />
+            <ApplicationReviewersNotesSection />
             <ReviewerButtonRow
               isFormDirty={isFormDirty}
-              handleCancelClicked={alertNotImplemented}
+              handleCancelClicked={() => setShowCancelConfirmationModal(true)}
               handleSaveClicked={handleSaveClicked}
               handleSubmitForFinalReviewClicked={alertNotImplemented}
             />
           </div>
         )}
+
+        <ConfirmationModal
+          show={showCancelConfirmationModal}
+          onCancel={() => setShowCancelConfirmationModal(false)}
+          onConfirm={navigateToApplicationOrganizationDashboard}
+          titleText="Are you sure you want to leave?"
+          cancelText="Cancel"
+          confirmText="Okay"
+        >
+          Any changes to this application will not be saved.
+        </ConfirmationModal>
+
+        <SaveChangesModal
+          show={showSaveChangesModal}
+          onCancel={() => setShowSaveChangesModal(false)}
+          onConfirm={async (documentedChanges: string) =>
+            await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
+          }
+        />
       </div>
     </div>
   );
@@ -109,5 +162,53 @@ function ReviewerButtonRow(props: ReviewerButtonRowProps) {
         </Button>
       </div>
     </div>
+  );
+}
+
+interface SaveChangesModalProps {
+  show: boolean;
+  onCancel: () => void;
+  onConfirm: (documentedChanges: string) => void;
+}
+
+function SaveChangesModal(props: SaveChangesModalProps) {
+  const [documentedChanges, setDocumentedChanges] = useState('');
+
+  return (
+    <Modal show={props.show} centered>
+      <Modal.Header closeButton onClick={props.onCancel}>
+        <Modal.Title>Document your Changes</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>
+          To save any modifications to this application, please{' '}
+          <strong>record what content you edited or added.</strong> Once submitted, your changes can be seen by you and
+          other reviewing users at the bottom of this application.
+        </p>
+
+        <Form>
+          <Form.Group controlId="documentedChanges">
+            <Form.Label>Changes</Form.Label>
+            <Form.Control
+              as="textarea"
+              type="text"
+              maxLength={4000}
+              required
+              placeholder="Describe any modifications to the document since last save. (Required)"
+              defaultValue={documentedChanges}
+              onChange={(e) => setDocumentedChanges(e.target.value)}
+            />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={props.onCancel}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={() => props.onConfirm(documentedChanges)} disabled={!documentedChanges}>
+          Submit
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }

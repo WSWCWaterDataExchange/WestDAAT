@@ -7,6 +7,7 @@ import { ConservationApplicationState, defaultState, reducer } from './Conservat
 import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -548,13 +549,19 @@ describe('ConservationApplicationState reducer', () => {
     it('loading application should hydrate state', () => {
       // Arrange
       const applicationDetails: ApplicationDetails = applicationDetailsMock();
+      const note: ApplicationReviewNote = {
+        id: 'note-guid',
+        submittedByFullName: 'first last',
+        submittedDate: '2025-01-01T00:00:00.0000000 +00:00',
+        text: 'This is a note from a reviewer.',
+      };
 
       // Act
       const newState = reducer(state, {
         type: 'APPLICATION_LOADED',
         payload: {
           application: applicationDetails,
-          notes: [],
+          notes: [note],
         },
       });
 
@@ -597,6 +604,13 @@ describe('ConservationApplicationState reducer', () => {
       expect(document.fileName).toEqual(expectedDocument.fileName);
       expect(document.blobName).toEqual(expectedDocument.blobName);
       expect(document.description).toEqual(expectedDocument.description);
+
+      // application notes
+      const applicationNote = application.reviewerNotes[0];
+      expect(applicationNote.id).toEqual(note.id);
+      expect(applicationNote.submittedByFullName).toEqual(note.submittedByFullName);
+      expect(applicationNote.submittedDate).toEqual(note.submittedDate);
+      expect(applicationNote.text).toEqual(note.text);
 
       // application submission
       const submission = application.applicationSubmissionForm;
