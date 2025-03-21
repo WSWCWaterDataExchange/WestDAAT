@@ -115,6 +115,9 @@ export function useGetApplicationQuery(
           },
         });
       },
+      onError: (error: Error) => {
+        toast.error('Failed to load Application data. Please try again later.');
+      },
     },
   );
 }
