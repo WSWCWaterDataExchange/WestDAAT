@@ -13,12 +13,13 @@ import { OrganizationFundingDetailsResponse } from '../../data-contracts/Organiz
 import { parseDateOnly } from '../../utilities/dateHelpers';
 import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
 
-export function useLoadDashboardApplications(organizationIdFilter: string | null) {
+export function useLoadDashboardApplications(organizationIdFilter: string | null, isEnabled: boolean) {
   const context = useMsal();
   const { dispatch } = useConservationApplicationContext();
 
   return useQuery(['organization-dashboard-load', organizationIdFilter], {
     queryFn: () => applicationSearch(context, organizationIdFilter),
+    enabled: isEnabled,
     onSuccess(data) {
       dispatch({ type: 'DASHBOARD_APPLICATIONS_LOADED', payload: { dashboardApplications: data.applications } });
     },

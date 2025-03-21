@@ -52,12 +52,14 @@ export function OrganizationDashboardPage() {
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
   const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
-  const organizationIdFilter = !isGlobalAdmin ? getUserOrganization(user) : null;
+  const organizationIdFilter = !isGlobalAdmin && !!user ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
-  const { isLoading: applicationListLoading, isError: applicationListErrored } =
-    useLoadDashboardApplications(organizationIdFilter);
+  const { isLoading: applicationListLoading, isError: applicationListErrored } = useLoadDashboardApplications(
+    organizationIdFilter,
+    !!user,
+  );
 
   const apiRef = useGridApiRef();
 
