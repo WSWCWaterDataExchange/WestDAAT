@@ -51,14 +51,15 @@ export function OrganizationDashboardPage() {
   const [dataGridFilters, setDataGridFilters] = useState<GridFilterItem[]>([]);
   const { user } = useAuthenticationContext();
   const { state, dispatch } = useConservationApplicationContext();
+  const isUserLoaded = !!user;
   const isGlobalAdmin = hasUserRole(user, Role.GlobalAdmin);
-  const organizationIdFilter = !isGlobalAdmin && !!user ? getUserOrganization(user) : null;
+  const organizationIdFilter = isUserLoaded && !isGlobalAdmin ? getUserOrganization(user) : null;
 
   const { data: organizationListResponse, isLoading: organizationListLoading } = useOrganizationQuery();
 
   const { isLoading: applicationListLoading, isError: applicationListErrored } = useLoadDashboardApplications(
     organizationIdFilter,
-    !!user,
+    isUserLoaded,
   );
 
   const apiRef = useGridApiRef();
