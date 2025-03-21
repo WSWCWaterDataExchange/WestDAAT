@@ -14,7 +14,7 @@ interface ConfirmationModalProps {
 function ConfirmationModal(props: ConfirmationModalProps) {
   return (
     <Modal show={props.show} centered>
-      <Modal.Header closeButton onClick={() => props.onCancel()}>
+      <Modal.Header closeButton onClick={props.onCancel}>
         <Modal.Title>{props.titleText}</Modal.Title>
       </Modal.Header>
       <Modal.Body>{props.children}</Modal.Body>
