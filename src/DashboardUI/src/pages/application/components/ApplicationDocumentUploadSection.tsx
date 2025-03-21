@@ -1,4 +1,3 @@
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
