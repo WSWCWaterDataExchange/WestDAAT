@@ -2,6 +2,8 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { formatDateString } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 
+import './ApplicationReviewersNotesSection.scss';
+
 function ApplicationReviewersNotesSection() {
   const { state } = useConservationApplicationContext();
 
@@ -15,7 +17,7 @@ function ApplicationReviewersNotesSection() {
       <ApplicationFormSection title="Notes from Reviewers (Hidden from Applicant)" className="col mb-4">
         {notes && notes.length > 0 ? (
           notes.map((note) => (
-            <div key={note.id} className="container mb-3">
+            <div key={note.id} className="container p-3 note-container">
               <div className="d-flex gap-3">
                 <div>
                   <span className="text-primary">{note.submittedByFullName}</span>
