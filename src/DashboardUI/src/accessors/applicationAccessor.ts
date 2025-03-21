@@ -113,7 +113,6 @@ export const downloadApplicationDocuments = async (
   context: IMsalContext,
   documentId: string
 ): Promise<void> => {
-  const api = await westDaatApi(context);
   const { sasToken, fileName } = (await generateDownloadSasToken(context, documentId));
   await downloadFilesFromBlobStorage(sasToken, fileName);
 }

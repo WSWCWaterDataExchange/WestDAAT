@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { mdiDownload, mdiFileDocument } from '@mdi/js';
 import { Icon } from '@mdi/react';
 import Button from 'react-bootstrap/esm/Button';
+import { toast, ToastContainer } from 'react-toastify';
 import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import './ApplicationDocumentDownload.scss';
@@ -10,15 +11,21 @@ export function ApplicationDocumentDownload() {
   const msalContext = useMsal();
   const { state } = useConservationApplicationContext();
 
-  const handleDownload = async (fileId?: string) => {
+  const handleDownload = async (fileName: string, fileId?: string) => {
     if (!fileId) {
       throw new Error('File ID is required to download the document');
     }
-    await downloadApplicationDocuments(msalContext, fileId);
+
+    toast.info(`Downloading ${fileName}`, { autoClose: 1000 });
+
+    await downloadApplicationDocuments(msalContext, fileId)
+      .then(() => toast.success(`${fileName} downloaded`, { autoClose: 1000 }))
+      .catch(() => toast.error(`An error occurred while downloading ${fileName}`, { autoClose: 3000 }));
   };
 
   return (
     <div className="col">
+      <ToastContainer></ToastContainer>
       {state.conservationApplication.supportingDocuments.length === 0 && (
         <div className="text-muted">(No supporting documents have been provided)</div>
       )}
@@ -38,7 +45,7 @@ export function ApplicationDocumentDownload() {
                     variant="link"
                     className="px-1 py-1 text-primary"
                     disabled={file.id === undefined}
-                    onClick={() => handleDownload(file.id)}
+                    onClick={() => handleDownload(file.fileName, file.id)}
                   >
                     <Icon path={mdiDownload} size="1.5em" aria-label="Remove document" />
                   </Button>
