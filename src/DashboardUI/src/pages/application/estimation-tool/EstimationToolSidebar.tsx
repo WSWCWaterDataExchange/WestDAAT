@@ -162,14 +162,14 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   min={1}
                   aria-describedby="dollar-sign-addon"
                   aria-label="Desired compensation in dollars"
-                  value={state.conservationApplication.desiredCompensationDollars}
+                  defaultValue={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
                 ></Form.Control>
               </InputGroup>
 
               <Form.Select
                 aria-label="Desired compensation units"
-                value={state.conservationApplication.desiredCompensationUnits}
+                defaultValue={state.conservationApplication.desiredCompensationUnits}
                 ref={desiredUnitsRef}
               >
                 <option value={0}>Select an option</option>
