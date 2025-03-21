@@ -13,10 +13,15 @@ import Button from 'react-bootstrap/esm/Button';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import Modal from 'react-bootstrap/esm/Modal';
 import Form from 'react-bootstrap/esm/Form';
+import { useMutation } from 'react-query';
+import { updateApplicationSubmission } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
+import { toast, ToastContainer } from 'react-toastify';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
@@ -50,6 +55,28 @@ function ApplicationReviewPage() {
       setShowSaveChangesModal(true);
     }
   };
+
+  const updateApplicationSubmissionMutation = useMutation({
+    mutationFn: async (documentedChanges: string) => {
+      return await updateApplicationSubmission(context, {
+        waterConservationApplicationId: applicationId!,
+        waterRightNativeId: state.conservationApplication.waterRightNativeId!,
+        form: state.conservationApplication.applicationSubmissionForm,
+        supportingDocuments: state.conservationApplication.supportingDocuments,
+        note: documentedChanges,
+      });
+    },
+    onSuccess: () => {
+      navigateToApplicationOrganizationDashboard();
+
+      setTimeout(() => {
+        toast.success('Application changes saved successfully.');
+      }, 1);
+    },
+    onError: () => {
+      toast.error('Error saving application changes.');
+    },
+  });
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -89,7 +116,9 @@ function ApplicationReviewPage() {
         <SaveChangesModal
           show={showSaveChangesModal}
           onCancel={() => setShowSaveChangesModal(false)}
-          onConfirm={alertNotImplemented}
+          onConfirm={async (documentedChanges: string) =>
+            await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
+          }
         />
       </div>
     </div>
