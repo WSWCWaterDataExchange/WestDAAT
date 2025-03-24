@@ -319,16 +319,16 @@ public class ValidationEngineTests : EngineTestBase
     }
 
     [DataTestMethod]
-    [DataRow(false, false, false, false, false, "", DisplayName = "User is not logged in")]
-    [DataRow(true, false, false, false, false, nameof(NotFoundError), DisplayName = "Application does not exist")]
-    [DataRow(true, true, false, false, false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
-    [DataRow(true, true, true, false, false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
-    [DataRow(true, true, true, true, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    [DataRow(false, false, ConservationApplicationStatus.Unknown, "", false, "", DisplayName = "User is not logged in")]
+    [DataRow(true, false, ConservationApplicationStatus.Unknown, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, ConservationApplicationStatus.Approved, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, ConservationApplicationStatus.InReview, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, ConservationApplicationStatus.InReview, Permissions.ApplicationUpdate, true, "", DisplayName = "User has permission to edit an Application Submission")]
     public async Task Validate_ValidateWaterConservationApplicationSubmissionUpdateRequest_Success(
         bool userIsLoggedIn,
         bool applicationExists,
-        bool applicationHasCorrectStatus,
-        bool userHasCorrectOrgPermission,
+        ConservationApplicationStatus applicationStatus,
+        string userOrgPermission,
         bool shouldSucceed,
         string expectedErrorTypeName
         )
@@ -358,7 +358,7 @@ public class ValidationEngineTests : EngineTestBase
         }
 
         _securityUtilityMock.Setup(mock => mock.Get(It.IsAny<OrganizationPermissionsGetRequest>()))
-            .Returns(userHasCorrectOrgPermission ? [Permissions.ApplicationUpdate] : []);
+            .Returns([userOrgPermission]);
 
 
         var applicationAccessorMock = _applicationAccessorMock.Setup(mock => mock.Load(It.IsAny<ApplicationExistsLoadRequest>()));
@@ -368,7 +368,7 @@ public class ValidationEngineTests : EngineTestBase
             {
                 ApplicationExists = true,
                 FundingOrganizationId = organizationId,
-                Status = applicationHasCorrectStatus ? ConservationApplicationStatus.InReview : ConservationApplicationStatus.Approved,
+                Status = applicationStatus,
             });
         }
         else
