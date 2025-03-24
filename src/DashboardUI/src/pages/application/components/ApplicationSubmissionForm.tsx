@@ -120,7 +120,13 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       <ApplicationFormSection title="Applicant Information">
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerName">
           <Form.Label>Landowner Name</Form.Label>
-          <Form.Control type="text" maxLength={100} required ref={landownerNameRef} value={stateForm.landownerName} />
+          <Form.Control
+            type="text"
+            maxLength={100}
+            required
+            ref={landownerNameRef}
+            defaultValue={stateForm.landownerName}
+          />
           <Form.Control.Feedback type="invalid">Landowner Name is required.</Form.Control.Feedback>
         </Form.Group>
 
@@ -131,7 +137,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={255}
             required
             ref={landownerEmailRef}
-            value={stateForm.landownerEmail}
+            defaultValue={stateForm.landownerEmail}
           />
           <Form.Control.Feedback type="invalid">Email Address is required.</Form.Control.Feedback>
         </Form.Group>
@@ -143,7 +149,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={50}
             required
             ref={landownerPhoneNumberRef}
-            value={stateForm.landownerPhoneNumber}
+            defaultValue={stateForm.landownerPhoneNumber}
           />
           <Form.Control.Feedback type="invalid">Phone is required.</Form.Control.Feedback>
         </Form.Group>
@@ -155,20 +161,26 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={255}
             required
             ref={landownerAddressRef}
-            value={stateForm.landownerAddress}
+            defaultValue={stateForm.landownerAddress}
           />
           <Form.Control.Feedback type="invalid">Address is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerCity">
           <Form.Label>City</Form.Label>
-          <Form.Control type="text" maxLength={100} required ref={landownerCityRef} value={stateForm.landownerCity} />
+          <Form.Control
+            type="text"
+            maxLength={100}
+            required
+            ref={landownerCityRef}
+            defaultValue={stateForm.landownerCity}
+          />
           <Form.Control.Feedback type="invalid">City is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="landownerState">
           <Form.Label>State</Form.Label>
-          <Form.Select required ref={landownerStateRef} value={stateForm.landownerState}>
+          <Form.Select required ref={landownerStateRef} defaultValue={stateForm.landownerState}>
             <option value={''}>Select a state</option>
             {states.map((state) => (
               <option key={state.value} value={state.value}>
@@ -186,7 +198,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={10}
             required
             ref={landownerZipCodeRef}
-            value={stateForm.landownerZipCode}
+            defaultValue={stateForm.landownerZipCode}
           />
           <Form.Control.Feedback type="invalid">Zip Code is required.</Form.Control.Feedback>
         </Form.Group>
@@ -198,17 +210,17 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       >
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentName">
           <Form.Label>Name / Organization</Form.Label>
-          <Form.Control type="text" maxLength={100} ref={agentNameRef} value={stateForm.agentName} />
+          <Form.Control type="text" maxLength={100} ref={agentNameRef} defaultValue={stateForm.agentName} />
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentEmail">
           <Form.Label>Email</Form.Label>
-          <Form.Control type="email" maxLength={255} ref={agentEmailRef} value={stateForm.agentEmail} />
+          <Form.Control type="email" maxLength={255} ref={agentEmailRef} defaultValue={stateForm.agentEmail} />
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="agentPhoneNumber">
           <Form.Label>Phone</Form.Label>
-          <Form.Control type="tel" maxLength={50} ref={agentPhoneNumberRef} value={stateForm.agentPhoneNumber} />
+          <Form.Control type="tel" maxLength={50} ref={agentPhoneNumberRef} defaultValue={stateForm.agentPhoneNumber} />
         </Form.Group>
 
         <Form.Group className={`${responsiveHalfWidthDefault} mb-4`} controlId="agentAdditionalDetails">
@@ -217,7 +229,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             as="textarea"
             maxLength={4000}
             ref={agentAdditionalDetailsRef}
-            value={stateForm.agentAdditionalDetails}
+            defaultValue={stateForm.agentAdditionalDetails}
           />
         </Form.Group>
       </ApplicationFormSection>
@@ -246,7 +258,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
                   maxLength={4000}
                   required
                   ref={propertyAdditionalDetailsRef.current[index] as any}
-                  value={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
+                  defaultValue={stateForm.fieldDetails[index]?.additionalDetails ?? ''}
                 />
                 <Form.Control.Feedback type="invalid">Additional Details is required.</Form.Control.Feedback>
               </Form.Group>
@@ -271,7 +283,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             type="text"
             maxLength={255}
             ref={canalOrIrrigationEntityNameRef}
-            value={stateForm.canalOrIrrigationEntityName}
+            defaultValue={stateForm.canalOrIrrigationEntityName}
           />
         </Form.Group>
 
@@ -281,7 +293,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             type="email"
             maxLength={255}
             ref={canalOrIrrigationEntityEmailRef}
-            value={stateForm.canalOrIrrigationEntityEmail}
+            defaultValue={stateForm.canalOrIrrigationEntityEmail}
           />
         </Form.Group>
 
@@ -291,7 +303,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             type="text"
             maxLength={50}
             ref={canalOrIrrigationEntityPhoneNumberRef}
-            value={stateForm.canalOrIrrigationEntityPhoneNumber}
+            defaultValue={stateForm.canalOrIrrigationEntityPhoneNumber}
           />
         </Form.Group>
 
@@ -301,7 +313,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             as="textarea"
             maxLength={4000}
             ref={canalOrIrrigationAdditionalDetailsRef}
-            value={stateForm.canalOrIrrigationAdditionalDetails}
+            defaultValue={stateForm.canalOrIrrigationAdditionalDetails}
           />
         </Form.Group>
       </ApplicationFormSection>
@@ -309,7 +321,13 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
       <ApplicationFormSection title="Water Right Information">
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="permitNumber">
           <Form.Label>Permit #</Form.Label>
-          <Form.Control type="text" maxLength={255} required ref={permitNumberRef} value={stateForm.permitNumber} />
+          <Form.Control
+            type="text"
+            maxLength={255}
+            required
+            ref={permitNumberRef}
+            defaultValue={stateForm.permitNumber}
+          />
           <Form.Control.Feedback type="invalid">Permit # is required.</Form.Control.Feedback>
         </Form.Group>
 
@@ -320,7 +338,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={255}
             required
             ref={facilityDitchNameRef}
-            value={stateForm.facilityDitchName}
+            defaultValue={stateForm.facilityDitchName}
           />
           <Form.Control.Feedback type="invalid">Facility (Ditch) Name is required.</Form.Control.Feedback>
         </Form.Group>
@@ -331,7 +349,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             type="date"
             required
             ref={priorityDateRef}
-            value={stateForm.priorityDate}
+            defaultValue={stateForm.priorityDate}
             // not sure on the actual min date, but this prevents users from entering the default value "0001-01-01"
             min="1900-01-01"
           />
@@ -345,20 +363,26 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={255}
             required
             ref={certificateNumberRef}
-            value={stateForm.certificateNumber}
+            defaultValue={stateForm.certificateNumber}
           />
           <Form.Control.Feedback type="invalid">Certificate # is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="shareNumber">
           <Form.Label>Share #</Form.Label>
-          <Form.Control type="text" maxLength={255} required ref={shareNumberRef} value={stateForm.shareNumber} />
+          <Form.Control
+            type="text"
+            maxLength={255}
+            required
+            ref={shareNumberRef}
+            defaultValue={stateForm.shareNumber}
+          />
           <Form.Control.Feedback type="invalid">Share # is required.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className={`${responsiveOneQuarterWidthDefault} mb-4`} controlId="waterRightState">
           <Form.Label>State</Form.Label>
-          <Form.Select required ref={waterRightStateRef} value={stateForm.waterRightState}>
+          <Form.Select required ref={waterRightStateRef} defaultValue={stateForm.waterRightState}>
             <option value={''}>Select a state</option>
             {states.map((state) => (
               <option key={state.value} value={state.value}>
@@ -376,7 +400,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={4000}
             required
             ref={waterUseDescriptionRef}
-            value={stateForm.waterUseDescription}
+            defaultValue={stateForm.waterUseDescription}
           />
           <Form.Control.Feedback type="invalid">Description of Water Use is required.</Form.Control.Feedback>
         </Form.Group>
@@ -433,7 +457,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             maxLength={4000}
             type="text"
             ref={estimationSupplementaryDetailsRef}
-            value={stateForm.estimationSupplementaryDetails}
+            defaultValue={stateForm.estimationSupplementaryDetails}
           />
         </Form.Group>
       </ApplicationFormSection>
@@ -451,7 +475,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
               required
               min={1}
               ref={conservationPlanFundingRequestDollarAmountRef}
-              value={stateForm.conservationPlanFundingRequestDollarAmount}
+              defaultValue={stateForm.conservationPlanFundingRequestDollarAmount}
             />
           </InputGroup>
 
@@ -466,7 +490,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
           <Form.Select
             required
             ref={conservationPlanFundingRequestCompensationRateUnitsRef}
-            value={stateForm.conservationPlanFundingRequestCompensationRateUnits}
+            defaultValue={stateForm.conservationPlanFundingRequestCompensationRateUnits}
           >
             <option value={''}>Select an option</option>
             {CompensationRateUnitsOptions.map((value) => (
@@ -484,7 +508,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
             as="textarea"
             required
             ref={conservationPlanDescriptionRef}
-            value={stateForm.conservationPlanDescription}
+            defaultValue={stateForm.conservationPlanDescription}
           />
           <Form.Control.Feedback type="invalid">Conservation Plan is required.</Form.Control.Feedback>
         </Form.Group>
@@ -494,7 +518,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
           <Form.Control
             as="textarea"
             ref={conservationPlanAdditionalInfoRef}
-            value={stateForm.conservationPlanAdditionalInfo}
+            defaultValue={stateForm.conservationPlanAdditionalInfo}
           />
         </Form.Group>
       </ApplicationFormSection>

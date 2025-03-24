@@ -521,11 +521,13 @@ const onApplicationLoaded = (
   );
   draftApplication.supportingDocuments = application.supportingDocuments.map(
     (doc): ApplicationDocument => ({
+      id: doc.id,
       blobName: doc.blobName,
       fileName: doc.fileName,
       description: doc.description ?? '',
     }),
   );
+  draftApplication.reviewerNotes = payload.notes;
 
   return draftState;
 };

@@ -394,6 +394,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Timestamp))
+                .ForMember(dest => dest.SubmittedByUserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.SubmittedByFullName, opt => opt.MapFrom(src => $"{src.User.UserProfile.FirstName} {src.User.UserProfile.LastName}"));
 
             CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
