@@ -118,9 +118,9 @@ function SiteNavbar() {
             <Nav.Link
               target="_blank"
               rel="noopener noreferrer"
-              href="https://westernstateswater.org/wade/water-rights-data"
+              href="https://westernstateswater.org/wade/wade-data-summary/"
             >
-              Water Rights Data
+              WaDE Water Data Summary
             </Nav.Link>
             <Nav.Link target="_blank" rel="noopener noreferrer" href="https://westernstateswater.org/wade/contact-us">
               Contact Us
