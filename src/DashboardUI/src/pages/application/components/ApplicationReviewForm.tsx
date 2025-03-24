@@ -10,6 +10,7 @@ import { formatDateString, formatNumber } from '../../../utilities/valueFormatte
 import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import ApplicationFormSection from './ApplicationFormSection';
 import FormElementDisplay from './FormElementDisplay';
+import ApplicationDocumentSection from './ApplicationDocumentSection';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
@@ -286,18 +287,18 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
 
         {sectionRule}
 
-        <ApplicationFormSection title="Supporting Documents">
-          <ApplicationDocumentDownload />
-        </ApplicationFormSection>
-
-        {state.conservationApplication.supportingDocuments.length === 0 && <hr className="m-0" />}
+        <ApplicationDocumentSection readOnly={true} />
 
         {isApplicationSubmitEnabled && (
-          <div className="d-flex justify-content-end p-3">
-            <Button variant="success" type="button" onClick={props.submitApplication}>
-              Submit
-            </Button>
-          </div>
+          <>
+            {sectionRule}
+
+            <div className="d-flex justify-content-end p-3">
+              <Button variant="success" type="button" onClick={props.submitApplication}>
+                Submit
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </main>

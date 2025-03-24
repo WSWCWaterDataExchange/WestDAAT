@@ -5,7 +5,7 @@ import ApplicationSubmissionForm from '../components/ApplicationSubmissionForm';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { useRef, useState } from 'react';
-import ApplicationDocumentSection from '../components/ApplicationDocumentUploadSection';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
 import Button from 'react-bootstrap/esm/Button';
 
 const perspective: ApplicationReviewPerspective = 'applicant';
@@ -48,7 +48,7 @@ export function ApplicationCreatePage() {
         <div className="container">
           <ApplicationReviewHeader perspective={perspective} />
           <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
-          <ApplicationDocumentSection perspective={perspective} />
+          <ApplicationDocumentSection readOnly={false} />
           <ApplicantButtonRow handleSubmitClicked={handleSubmitClicked} />
         </div>
       </div>

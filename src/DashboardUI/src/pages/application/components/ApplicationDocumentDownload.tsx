@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/esm/Button';
 import { toast, ToastContainer } from 'react-toastify';
 import { downloadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import './ApplicationDocumentDownload.scss';
+import './application-document.scss';
 
 export function ApplicationDocumentDownload() {
   const msalContext = useMsal();
@@ -40,17 +40,18 @@ export function ApplicationDocumentDownload() {
                   {file.fileName}
                 </td>
                 <td className="align-content-center text-start">{file.description}</td>
-                <td className="col-1 align-content-center text-center">
-                  <Button
-                    variant="link"
-                    className="px-1 py-1 text-primary"
-                    disabled={file.id === undefined}
-                    onClick={() => handleDownload(file.fileName, file.id)}
-                    aria-label="Download supporting document"
-                  >
-                    <Icon path={mdiDownload} size="1.5em" />
-                  </Button>
-                </td>
+                {file.id !== undefined && (
+                  <td className="col-1 align-content-center text-center">
+                    <Button
+                      variant="link"
+                      className="px-1 py-1 text-primary"
+                      onClick={() => handleDownload(file.fileName, file.id)}
+                      aria-label="Download supporting document"
+                    >
+                      <Icon path={mdiDownload} size="1.5em" />
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

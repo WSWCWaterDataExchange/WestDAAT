@@ -11,6 +11,7 @@ import { useMutation } from 'react-query';
 import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
+import './application-document.scss';
 
 export function ApplicationDocumentUpload() {
   const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
@@ -118,7 +119,7 @@ export function ApplicationDocumentUpload() {
         </Alert>
       )}
       {state.conservationApplication.supportingDocuments.length > 0 && (
-        <table className="table">
+        <table className="table document-table">
           <tbody>
             {state.conservationApplication.supportingDocuments.map((file, index) => (
               <tr key={file.blobName}>
