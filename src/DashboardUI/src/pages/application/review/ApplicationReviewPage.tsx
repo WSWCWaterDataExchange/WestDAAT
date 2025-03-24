@@ -213,7 +213,7 @@ function SaveChangesModal(props: SaveChangesModalProps) {
           Cancel
         </Button>
         <Button variant="primary" onClick={() => props.onConfirm(documentedChanges)} disabled={!documentedChanges}>
-          Submit
+          Save
         </Button>
       </Modal.Footer>
     </Modal>
