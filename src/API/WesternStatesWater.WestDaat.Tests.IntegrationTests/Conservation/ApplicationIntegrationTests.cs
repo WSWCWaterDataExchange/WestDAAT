@@ -919,7 +919,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // verify the submission note is correct
         var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
-        dbSubmissionNote.Text.Should().Be(request.Note);
+        dbSubmissionNote.Note.Should().Be(request.Note);
         dbSubmissionNote.UserId.Should().Be(user.Id);
         dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
     }
