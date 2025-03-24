@@ -551,8 +551,9 @@ describe('ConservationApplicationState reducer', () => {
       const applicationDetails: ApplicationDetails = applicationDetailsMock();
       const note: ApplicationReviewNote = {
         id: 'note-guid',
-        submittedByFullName: 'first last',
         submittedDate: '2025-01-01T00:00:00.0000000 +00:00',
+        submittedByUserId: 'user-guid',
+        submittedByFullName: 'first last',
         note: 'This is a note from a reviewer.',
       };
 
