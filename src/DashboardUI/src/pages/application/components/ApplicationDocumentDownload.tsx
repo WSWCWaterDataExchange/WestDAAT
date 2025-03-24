@@ -46,8 +46,9 @@ export function ApplicationDocumentDownload() {
                     className="px-1 py-1 text-primary"
                     disabled={file.id === undefined}
                     onClick={() => handleDownload(file.fileName, file.id)}
+                    aria-label="Download supporting document"
                   >
-                    <Icon path={mdiDownload} size="1.5em" aria-label="Remove document" />
+                    <Icon path={mdiDownload} size="1.5em" />
                   </Button>
                 </td>
               </tr>

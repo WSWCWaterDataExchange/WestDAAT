@@ -169,6 +169,7 @@ export function ApplicationDocumentUpload() {
           className="mt-3"
           onClick={handleUploadDocument}
           disabled={uploadDocumentMutation.isLoading}
+          aria-label="Upload supporting document"
         >
           Upload
         </Button>
