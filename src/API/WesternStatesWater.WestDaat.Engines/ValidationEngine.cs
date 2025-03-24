@@ -43,7 +43,7 @@ internal class ValidationEngine : IValidationEngine
             ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
             EventBase req => ValidateEvent(req, context),
-            FileSasTokenRequestBase req => ValidateFileSasTokenRequest(req, context),
+            FileSasTokenRequestBase req => await ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
             UserLoadRequestBase req => ValidateUserLoadRequest(req, context),
@@ -167,6 +167,7 @@ internal class ValidationEngine : IValidationEngine
             EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
+            WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -254,6 +255,45 @@ internal class ValidationEngine : IValidationEngine
 
         var applicationLinkedToIncorrectApplication = applicationExistsResponse.ApplicationId.Value != request.WaterConservationApplicationId;
         if (applicationLinkedToIncorrectApplication)
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateWaterConservationApplicationSubmissionUpdateRequest(WaterConservationApplicationSubmissionUpdateRequest request, ContextBase context)
+    {
+        // verify user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify application is in review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), "Application must be in review to be updated.");
+        }
+
+        // verify user belongs to the funding organization that is handling the application
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationUpdate))
         {
             return CreateForbiddenError(request, context);
         }
@@ -521,11 +561,12 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private ErrorBase ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
+    private async Task<ErrorBase> ValidateFileSasTokenRequest(FileSasTokenRequestBase request, ContextBase context)
     {
         return request switch
         {
             ApplicationDocumentUploadSasTokenRequest req => ValidateApplicationDocumentUploadSasTokenRequest(req, context),
+            ApplicationDocumentDownloadSasTokenRequest req => await ValidateApplicationDocumentDownloadSasTokenRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -536,6 +577,43 @@ internal class ValidationEngine : IValidationEngine
     {
         // User must be logged in
         _contextUtility.GetRequiredContext<UserContext>();
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateApplicationDocumentDownloadSasTokenRequest(ApplicationDocumentDownloadSasTokenRequest request, ContextBase context)
+    {
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        var documentExistsRequest = new DTO.ApplicationSupportingDocumentExistsRequest
+        {
+            WaterConservationApplicationDocumentId = request.WaterConservationApplicationDocumentId
+        };
+
+        var documentExistsResponse = (DTO.ApplicationSupportingDocumentExistsResponse)await _applicationAccessor.Load(documentExistsRequest);
+
+        if (!documentExistsResponse.DocumentExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplicationDocument with Id ${request.WaterConservationApplicationDocumentId}");
+        }
+
+        // Current user owns the application, so allow file download
+        if (userContext.UserId == documentExistsResponse.ApplicantUserId)
+        {
+            return null;
+        }
+
+        // Check if current user is a member of the application funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = documentExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationReview))
+        {
+            return CreateForbiddenError(new ApplicationDocumentDownloadSasTokenRequest(), context);
+        }
 
         return null;
     }

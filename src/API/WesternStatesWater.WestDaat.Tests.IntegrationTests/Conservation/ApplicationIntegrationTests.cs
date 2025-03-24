@@ -263,11 +263,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
         }
 
+        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
         var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
 
-        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
-        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+        var technicalReviewers = new UserFaker().Generate(2);
+        await _dbContext.Users.AddRangeAsync(technicalReviewers);
+
+        var notes = technicalReviewers.Select(user => new WaterConservationApplicationSubmissionNoteFaker(submission, user).Generate()).ToArray();
+        await _dbContext.WaterConservationApplicationSubmissionNotes.AddRangeAsync(notes);
 
         await _dbContext.SaveChangesAsync();
 
@@ -313,7 +319,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
-        reviewerResponse.Notes.Should().BeEmpty(); // not implemented yet
+        reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
+
+        // verify note fields with custom mappings are translated correctly
+        foreach (var note in reviewerResponse.Notes)
+        {
+            note.SubmittedDate.Should().NotBe(default);
+            note.SubmittedByFullName.Should().NotBeEmpty();
+        }
 
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
@@ -679,7 +692,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .Generate();
             documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
             await _dbContext.WaterConservationApplications.AddAsync(application);
-            
+
             var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
             await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
 
@@ -770,7 +783,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             response.Error.Should().NotBeNull();
             response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
-            
+
             var dbApplicationDocuments = _dbContext.WaterConservationApplicationDocuments
                 .Where(docs => docs.WaterConservationApplicationId == request.WaterConservationApplicationId).ToArray();
 
@@ -799,5 +812,147 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
 
         ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
+
+    [DataTestMethod]
+    [DataRow(false, false, false, "", false, nameof(InternalError), DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, false, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, true, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    public async Task Store_UpdateApplicationSubmission_Success(
+        bool userIsLoggedIn,
+        bool applicationExists,
+        bool applicationIsInReview,
+        string userOrgRole,
+        bool shouldSucceed,
+        string expectedErrorTypeName
+        )
+    {
+        // Arrange
+        // setup application
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+
+        WaterConservationApplication application = null;
+        WaterConservationApplicationEstimateLocation[] estimateLocations = [];
+
+        if (applicationExists)
+        {
+            var applicationOwner = new UserFaker().Generate();
+
+            application = new WaterConservationApplicationFaker(applicationOwner, organization).Generate();
+            await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            // setup application related details
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+            estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+            await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
+
+            var documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
+            await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+            var submission = new WaterConservationApplicationSubmissionFaker(application)
+                .RuleFor(sub => sub.AcceptedDate, () => applicationIsInReview ? null : DateTimeOffset.UtcNow)
+                .Generate();
+            await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        if (userIsLoggedIn)
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = user.Id,
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [userOrgRole]
+                    }
+                ],
+                ExternalAuthId = ""
+            });
+        }
+        else
+        {
+            UseAnonymousContext();
+        }
+
+
+        // Act
+        var request = new WaterConservationApplicationSubmissionUpdateRequestFaker()
+            .RuleFor(req => req.WaterConservationApplicationId, () => application?.Id ?? Guid.NewGuid())
+            .RuleFor(req => req.FieldDetails, () => estimateLocations.Select(location => new CLI.ApplicationSubmissionFieldDetail
+            {
+                WaterConservationApplicationEstimateLocationId = location.Id,
+                AdditionalDetails = "Some additional details"
+            }).ToArray())
+            .RuleFor(req => req.SupportingDocuments, () =>
+            [
+                new CLI.Requests.Conservation.WaterConservationApplicationDocument
+                {
+                    BlobName = "blobname",
+                    FileName = "filename.pdf",
+                    Description = "description",
+                }
+            ])
+            .Generate();
+
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        if (shouldSucceed)
+        {
+            response.Error.Should().BeNull();
+
+            // verify all db entries exist
+            var dbApplication = await _dbContext.WaterConservationApplications
+                .Include(a => a.Submission).ThenInclude(s => s.SubmissionNotes)
+                .Include(a => a.Estimate).ThenInclude(e => e.Locations)
+                .Include(a => a.SupportingDocuments)
+                .Where(a => a.Id == request.WaterConservationApplicationId)
+                .SingleOrDefaultAsync();
+
+            dbApplication.Should().NotBeNull();
+            dbApplication.Submission.Should().NotBeNull();
+            dbApplication.Submission.SubmissionNotes.Should().HaveCount(1); // was created in the update
+            dbApplication.Estimate.Should().NotBeNull();
+            dbApplication.Estimate.Locations.Should().HaveCount(1);
+            dbApplication.SupportingDocuments.Should().HaveCount(1); // other documents were removed in the update
+
+            // verify entries were updated correctly
+            dbApplication.Submission.Should().BeEquivalentTo(request, options => options.ExcludingMissingMembers());
+            dbApplication.Estimate.Locations.First().Should()
+                .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
+
+            // verify the supporting document is correct
+            dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options
+                // these fields are not defined on the request object
+                .Excluding(doc => doc.Id)
+                .Excluding(doc => doc.WaterConservationApplicationId)
+                .ExcludingMissingMembers());
+
+            // verify the submission note is correct
+            var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
+            dbSubmissionNote.Note.Should().Be(request.Note);
+            dbSubmissionNote.UserId.Should().Be(user.Id);
+            dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+        }
+        else
+        {
+            response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
+        }
     }
 }

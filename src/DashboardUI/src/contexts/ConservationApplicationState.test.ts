@@ -1,5 +1,5 @@
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
-import { defaultApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
+import { defaultApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
@@ -7,6 +7,7 @@ import { ConservationApplicationState, defaultState, reducer } from './Conservat
 import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -280,7 +281,7 @@ describe('ConservationApplicationState reducer', () => {
       type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
       payload: {
         formValues: {
-          ...defaultApplicationSubmissionForm(),
+          ...defaultApplicationSubmissionFormData(),
           landownerName: 'Bobby Hill',
         },
       },
@@ -337,6 +338,24 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.supportingDocuments[0].fileName).toEqual(anotherDocument.fileName);
     expect(newState.conservationApplication.supportingDocuments[0].blobName).toEqual(anotherDocument.blobName);
     expect(newState.conservationApplication.supportingDocuments[0].description).toEqual(anotherDocument.description);
+  });
+
+  it('setting document upload status should update state', () => {
+    let newState = reducer(state, {
+      type: 'APPLICATION_DOCUMENT_UPLOADING',
+      payload: {
+        isUploadingDocument: true,
+      },
+    });
+    expect(newState.isUploadingDocument).toBe(true);
+
+    newState = reducer(newState, {
+      type: 'APPLICATION_DOCUMENT_UPLOADING',
+      payload: {
+        isUploadingDocument: false,
+      },
+    });
+    expect(newState.isUploadingDocument).toBe(false);
   });
 
   describe('Estimation Tool Page Use Cases', () => {
@@ -530,13 +549,20 @@ describe('ConservationApplicationState reducer', () => {
     it('loading application should hydrate state', () => {
       // Arrange
       const applicationDetails: ApplicationDetails = applicationDetailsMock();
+      const note: ApplicationReviewNote = {
+        id: 'note-guid',
+        submittedDate: '2025-01-01T00:00:00.0000000 +00:00',
+        submittedByUserId: 'user-guid',
+        submittedByFullName: 'first last',
+        note: 'This is a note from a reviewer.',
+      };
 
       // Act
       const newState = reducer(state, {
         type: 'APPLICATION_LOADED',
         payload: {
           application: applicationDetails,
-          notes: [],
+          notes: [note],
         },
       });
 
@@ -576,9 +602,17 @@ describe('ConservationApplicationState reducer', () => {
       const document = application.supportingDocuments[0];
       const expectedDocument = applicationDetails.supportingDocuments[0];
       expect(application.supportingDocuments.length).toEqual(applicationDetails.supportingDocuments.length);
+      expect(document.id).toEqual(expectedDocument.id);
       expect(document.fileName).toEqual(expectedDocument.fileName);
       expect(document.blobName).toEqual(expectedDocument.blobName);
       expect(document.description).toEqual(expectedDocument.description);
+
+      // application notes
+      const applicationNote = application.reviewerNotes[0];
+      expect(applicationNote.id).toEqual(note.id);
+      expect(applicationNote.submittedByFullName).toEqual(note.submittedByFullName);
+      expect(applicationNote.submittedDate).toEqual(note.submittedDate);
+      expect(applicationNote.note).toEqual(note.note);
 
       // application submission
       const submission = application.applicationSubmissionForm;
@@ -623,6 +657,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
+
     });
   });
 
@@ -671,7 +706,7 @@ describe('ConservationApplicationState reducer', () => {
         type: 'APPLICATION_SUBMISSION_FORM_UPDATED',
         payload: {
           formValues: {
-            ...defaultApplicationSubmissionForm(),
+            ...defaultApplicationSubmissionFormData(),
             fieldDetails: [
               {
                 waterConservationApplicationEstimateLocationId: 'location-guid',

@@ -1,27 +1,29 @@
 import { IMsalContext } from '@azure/msal-react/dist/MsalContext';
+import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
+import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
 import { ApplicationDashboardListItem } from '../data-contracts/ApplicationDashboardListItem';
+import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
+import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
+import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
+import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { ApplicationReviewPerspective } from '../data-contracts/ApplicationReviewPerspective';
+import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
 import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
+import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
+import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
-import { ContainerName, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
-import { generateSasTokens } from './fileAccessor';
-import westDaatApi from './westDaatApi';
-import { ApplicationSubmissionForm } from '../data-contracts/ApplicationSubmissionForm';
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
-import { ApplicationLoadResponseBase } from '../data-contracts/ApplicationLoadResponseBase';
-import { ApplicationLoadRequestBase } from '../data-contracts/ApplicationLoadRequestBase';
-import { ApplicantConservationApplicationLoadRequest } from '../data-contracts/ApplicantConservationApplicationLoadRequest';
-import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
-import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
-import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
-import { ApplicantConservationApplicationLoadResponse } from '../data-contracts/ApplicantConservationApplicationLoadResponse';
-import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/ReviewerConservationApplicationLoadResponse';
+import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-contracts/WaterConservationApplicationSubmissionUpdateRequest';
+import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
+import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
+import westDaatApi from './westDaatApi';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -88,7 +90,7 @@ export const uploadApplicationDocuments = async (
   context: IMsalContext,
   files: File[],
 ): Promise<ApplicationDocument[]> => {
-  const sasTokens = (await generateSasTokens(context, files.length)).sasTokens;
+  const sasTokens = (await generateUploadSasTokens(context, files.length)).sasTokens;
   const applicationDocuments: ApplicationDocument[] = [];
   const blobUploads: BlobUpload[] = [];
   files.forEach((file, index) => {
@@ -108,12 +110,20 @@ export const uploadApplicationDocuments = async (
   return applicationDocuments;
 };
 
+export const downloadApplicationDocuments = async (
+  context: IMsalContext,
+  documentId: string
+): Promise<void> => {
+  const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
+  await downloadFilesFromBlobStorage(sasToken, fileName);
+}
+
 export const submitApplication = async (
   context: IMsalContext,
   data: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    form: ApplicationSubmissionForm;
+    form: ApplicationSubmissionFormData;
     supportingDocuments: ApplicationDocument[];
   },
 ): Promise<void> => {
@@ -150,17 +160,64 @@ export const submitApplication = async (
     waterRightState: data.form.waterRightState!,
     waterUseDescription: data.form.waterUseDescription!,
     fieldDetails: data.form.fieldDetails,
-    supportingDocuments: data.supportingDocuments
+    supportingDocuments: data.supportingDocuments,
   };
 
   await api.post<void>('Applications/Submit', request);
+};
+
+export const updateApplicationSubmission = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    form: ApplicationSubmissionFormData;
+    supportingDocuments: ApplicationDocument[];
+    note: string;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationSubmissionUpdateRequest = {
+    agentName: data.form.agentName,
+    agentEmail: data.form.agentEmail,
+    agentPhoneNumber: data.form.agentPhoneNumber,
+    agentAdditionalDetails: data.form.agentAdditionalDetails,
+    landownerName: data.form.landownerName!,
+    landownerEmail: data.form.landownerEmail!,
+    landownerPhoneNumber: data.form.landownerPhoneNumber!,
+    landownerAddress: data.form.landownerAddress!,
+    landownerCity: data.form.landownerCity!,
+    landownerState: data.form.landownerState!,
+    landownerZipCode: data.form.landownerZipCode!,
+    canalOrIrrigationEntityName: data.form.canalOrIrrigationEntityName,
+    canalOrIrrigationEntityEmail: data.form.canalOrIrrigationEntityEmail,
+    canalOrIrrigationEntityPhoneNumber: data.form.canalOrIrrigationEntityPhoneNumber,
+    canalOrIrrigationAdditionalDetails: data.form.canalOrIrrigationAdditionalDetails,
+    conservationPlanFundingRequestDollarAmount: data.form.conservationPlanFundingRequestDollarAmount!,
+    conservationPlanFundingRequestCompensationRateUnits: data.form.conservationPlanFundingRequestCompensationRateUnits!,
+    conservationPlanDescription: data.form.conservationPlanDescription!,
+    conservationPlanAdditionalInfo: data.form.conservationPlanAdditionalInfo,
+    estimationSupplementaryDetails: data.form.estimationSupplementaryDetails,
+    permitNumber: data.form.permitNumber!,
+    facilityDitchName: data.form.facilityDitchName!,
+    priorityDate: data.form.priorityDate!,
+    certificateNumber: data.form.certificateNumber!,
+    shareNumber: data.form.shareNumber!,
+    waterRightState: data.form.waterRightState!,
+    waterUseDescription: data.form.waterUseDescription!,
+    fieldDetails: data.form.fieldDetails,
+    supportingDocuments: data.supportingDocuments,
+    note: data.note,
+  };
+
+  await api.put<void>(`Applications/${data.waterConservationApplicationId}`, request);
 };
 
 export const getApplication = async (
   context: IMsalContext,
   data: {
     applicationId: string;
-    perspective: 'applicant' | 'reviewer';
+    perspective: ApplicationReviewPerspective;
   },
 ): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
   const api = await westDaatApi(context);

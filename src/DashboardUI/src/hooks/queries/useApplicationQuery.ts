@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
+import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -90,7 +91,7 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
 export function useGetApplicationQuery(
   applicationId: string | undefined,
-  perspective: 'applicant' | 'reviewer',
+  perspective: ApplicationReviewPerspective,
   isQueryEnabled: boolean,
 ) {
   const context = useMsal();
@@ -105,6 +106,8 @@ export function useGetApplicationQuery(
       }),
     {
       enabled: !!applicationId && isQueryEnabled,
+      // do not cache data. results should always be fresh in case another user updates the application
+      cacheTime: 0,
       onSuccess: (result) => {
         dispatch({
           type: 'APPLICATION_LOADED',

@@ -8,5 +8,6 @@ public class WaterConservationApplicationDocumentsFaker : Faker<EFWD.WaterConser
         RuleFor(ad => ad.BlobName, f => $"{user?.Id ?? f.Random.Guid()}/{f.Random.Guid()}");
         RuleFor(ad => ad.FileName, f => f.System.FileName(ext: "pdf"));
         RuleFor(ad => ad.Description, f => f.Lorem.Sentence());
+        RuleFor(ad => ad.WaterConservationApplication, _ => application);
     }
 }

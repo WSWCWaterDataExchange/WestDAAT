@@ -11,12 +11,9 @@ import { useMutation } from 'react-query';
 import { uploadApplicationDocuments } from '../../../accessors/applicationAccessor';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { ApplicationDocument } from '../../../data-contracts/ApplicationDocuments';
+import './application-document.scss';
 
-export interface ApplicationDocumentUploadProps {
-  documentUploadingHandler: (isUploading: boolean) => void;
-}
-
-export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps) {
+export function ApplicationDocumentUpload() {
   const MAX_NUMBER_UPLOADED_DOCUMENTS = 10;
   const UPLOADED_DOCUMENT_MAX_SIZE_MB = 25;
 
@@ -24,14 +21,23 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
   const { state, dispatch } = useConservationApplicationContext();
   const [uploadDocumentErrorMessage, setUploadDocumentErrorMessage] = useState<string | null>(null);
 
+  const setIsDocumentUploading = (isUploadingDocument: boolean) => {
+    dispatch({
+      type: 'APPLICATION_DOCUMENT_UPLOADING',
+      payload: {
+        isUploadingDocument,
+      },
+    });
+  };
+
   const uploadDocumentMutation = useMutation({
     mutationFn: async (params: { files: File[] }) => {
-      props.documentUploadingHandler(true);
+      setIsDocumentUploading(true);
       clearUploadDocumentError();
       return await uploadApplicationDocuments(msalContext, params.files);
     },
     onSuccess: (uploadedDocuments: ApplicationDocument[]) => {
-      props.documentUploadingHandler(false);
+      setIsDocumentUploading(false);
       dispatch({
         type: 'APPLICATION_DOCUMENT_UPLOADED',
         payload: {
@@ -40,7 +46,7 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
       });
     },
     onError: () => {
-      props.documentUploadingHandler(false);
+      setIsDocumentUploading(false);
       setUploadDocumentError('An error occurred while uploading the document(s). Please try again.');
     },
   });
@@ -113,7 +119,7 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
         </Alert>
       )}
       {state.conservationApplication.supportingDocuments.length > 0 && (
-        <table className="table">
+        <table className="table document-table">
           <tbody>
             {state.conservationApplication.supportingDocuments.map((file, index) => (
               <tr key={file.blobName}>
@@ -164,6 +170,7 @@ export function ApplicationDocumentUpload(props: ApplicationDocumentUploadProps)
           className="mt-3"
           onClick={handleUploadDocument}
           disabled={uploadDocumentMutation.isLoading}
+          aria-label="Upload supporting document"
         >
           Upload
         </Button>

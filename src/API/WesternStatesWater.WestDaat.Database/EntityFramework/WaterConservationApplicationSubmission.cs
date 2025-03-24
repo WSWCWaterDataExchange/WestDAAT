@@ -4,7 +4,7 @@ public class WaterConservationApplicationSubmission
 {
     public WaterConservationApplicationSubmission()
     {
-
+        SubmissionNotes = new HashSet<WaterConservationApplicationSubmissionNote>();
     }
 
     public Guid Id { get; set; }
@@ -72,4 +72,6 @@ public class WaterConservationApplicationSubmission
     public string WaterUseDescription { get; set; } = null!;
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
+
+    public virtual ICollection<WaterConservationApplicationSubmissionNote> SubmissionNotes { get; set; } = null!;
 }

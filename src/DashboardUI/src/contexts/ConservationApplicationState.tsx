@@ -7,9 +7,9 @@ import { PolygonEtDataCollection } from '../data-contracts/PolygonEtDataCollecti
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
 import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import {
-  ApplicationSubmissionForm,
-  defaultApplicationSubmissionForm,
-} from '../data-contracts/ApplicationSubmissionForm';
+  ApplicationSubmissionFormData,
+  defaultApplicationSubmissionFormData,
+} from '../data-contracts/ApplicationSubmissionFormData';
 import { truncate } from '@turf/truncate';
 import center from '@turf/center';
 import { convertWktToGeometry } from '../utilities/geometryWktConverter';
@@ -35,7 +35,7 @@ export interface ConservationApplicationState {
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     totalAverageYearlyEtAcreFeet: number | undefined;
     conservationPayment: number | undefined;
-    applicationSubmissionForm: ApplicationSubmissionForm;
+    applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
     doPolygonsOverlap: boolean;
     // derived/computed state
@@ -45,6 +45,7 @@ export interface ConservationApplicationState {
     reviewerNotes: ApplicationReviewNote[];
   };
   isCreatingApplication: boolean;
+  isUploadingDocument: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -73,7 +74,7 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationUnits: undefined,
     totalAverageYearlyEtAcreFeet: undefined,
     conservationPayment: undefined,
-    applicationSubmissionForm: defaultApplicationSubmissionForm(),
+    applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
@@ -82,6 +83,7 @@ export const defaultState = (): ConservationApplicationState => ({
     reviewerNotes: [],
   },
   isCreatingApplication: false,
+  isUploadingDocument: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -97,6 +99,7 @@ export type ApplicationAction =
   | ConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
+  | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction
   | ApplicationLoadedAction;
@@ -170,7 +173,7 @@ export interface ConsumptiveUseEstimatedAction {
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
   payload: {
-    formValues: ApplicationSubmissionForm;
+    formValues: ApplicationSubmissionFormData;
   };
 }
 
@@ -179,6 +182,13 @@ export interface ApplicationDocumentUpdatedAction {
   payload: {
     blobName: string;
     description: string;
+  };
+}
+
+export interface ApplicationDocumentUploadingAction {
+  type: 'APPLICATION_DOCUMENT_UPLOADING';
+  payload: {
+    isUploadingDocument: boolean;
   };
 }
 
@@ -238,6 +248,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
       return onApplicationDocumentUpdated(draftState, action);
+    case 'APPLICATION_DOCUMENT_UPLOADING':
+      return onApplicationDocumentUploading(draftState, action);
     case 'APPLICATION_DOCUMENT_UPLOADED':
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
@@ -420,6 +432,14 @@ const onApplicationDocumentUpdated = (
   return draftState;
 };
 
+const onApplicationDocumentUploading = (
+  draftState: ConservationApplicationState,
+  { payload }: ApplicationDocumentUploadingAction,
+): ConservationApplicationState => {
+  draftState.isUploadingDocument = payload.isUploadingDocument;
+  return draftState;
+};
+
 const onApplicationDocumentUploaded = (
   draftState: ConservationApplicationState,
   { payload }: ApplicationDocumentUploadedAction,
@@ -501,11 +521,13 @@ const onApplicationLoaded = (
   );
   draftApplication.supportingDocuments = application.supportingDocuments.map(
     (doc): ApplicationDocument => ({
+      id: doc.id,
       blobName: doc.blobName,
       fileName: doc.fileName,
       description: doc.description ?? '',
     }),
   );
+  draftApplication.reviewerNotes = payload.notes;
 
   return draftState;
 };

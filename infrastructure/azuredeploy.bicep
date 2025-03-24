@@ -35,6 +35,12 @@ var b2cOrigins = {
   prod: 'https://westdaat.b2clogin.com'
 }
 
+var siteOrigins = {
+  qa: 'https://westdaatqa.westernstateswater.org'
+  staging: 'https://westdaatstaging.westernstateswater.org'
+  prod: 'https://westdaat.westernstateswater.org'
+}
+
 // Role Definitions (Different per tenant). 
 // Can be found via IAM -> Role Assignment -> Search -> View Details -> JSON (guid is in id)
 var azureServiceBusDataSenderRoleDefinitionName = '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
@@ -143,6 +149,7 @@ resource storage_account_blob 'Microsoft.Storage/storageAccounts/blobServices@20
           ]
           allowedOrigins: [
             b2cOrigins[Environment]
+            siteOrigins[Environment]
           ]
           exposedHeaders: [
             '*'
