@@ -553,7 +553,7 @@ describe('ConservationApplicationState reducer', () => {
         id: 'note-guid',
         submittedByFullName: 'first last',
         submittedDate: '2025-01-01T00:00:00.0000000 +00:00',
-        text: 'This is a note from a reviewer.',
+        note: 'This is a note from a reviewer.',
       };
 
       // Act
@@ -610,7 +610,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(applicationNote.id).toEqual(note.id);
       expect(applicationNote.submittedByFullName).toEqual(note.submittedByFullName);
       expect(applicationNote.submittedDate).toEqual(note.submittedDate);
-      expect(applicationNote.text).toEqual(note.text);
+      expect(applicationNote.note).toEqual(note.note);
 
       // application submission
       const submission = application.applicationSubmissionForm;

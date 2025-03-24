@@ -30,7 +30,7 @@ function ApplicationReviewersNotesSection() {
               </div>
 
               <div>
-                <span>{note.text}</span>
+                <span>{note.note}</span>
               </div>
             </div>
           ))
