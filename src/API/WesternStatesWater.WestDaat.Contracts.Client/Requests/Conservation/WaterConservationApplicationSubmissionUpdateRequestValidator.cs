@@ -8,8 +8,6 @@ public class WaterConservationApplicationSubmissionUpdateRequestValidator : Abst
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
 
-        RuleFor(x => x.WaterRightNativeId).NotEmpty();
-
         RuleFor(x => x.AgentName).MaximumLength(255);
 
         RuleFor(x => x.AgentEmail).MaximumLength(255);

@@ -818,8 +818,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_UpdateApplicationSubmission_Success()
     {
         // Arrange
-        const string waterRightNativeId = "1234";
-
         // setup application
         var user = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
@@ -827,9 +825,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddAsync(organization);
 
         var applicationOwner = new UserFaker().Generate();
-        var application = new WaterConservationApplicationFaker(applicationOwner, organization)
-                .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
-                .Generate();
+        var application = new WaterConservationApplicationFaker(applicationOwner, organization).Generate();
         await _dbContext.WaterConservationApplications.AddAsync(application);
 
         // setup application related details
@@ -864,7 +860,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Act
         var request = new WaterConservationApplicationSubmissionUpdateRequestFaker()
-            .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
             .RuleFor(req => req.WaterConservationApplicationId, () => application.Id)
             .RuleFor(req => req.FieldDetails, () => estimateLocations.Select(location => new CLI.ApplicationSubmissionFieldDetail
             {

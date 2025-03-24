@@ -4,8 +4,6 @@ public class WaterConservationApplicationSubmissionUpdateRequest : ApplicationSt
 {
     public Guid WaterConservationApplicationId { get; set; }
 
-    public string WaterRightNativeId { get; set; } = null!;
-
     public string AgentName { get; set; } = null!;
 
     public string AgentEmail { get; set; } = null!;
