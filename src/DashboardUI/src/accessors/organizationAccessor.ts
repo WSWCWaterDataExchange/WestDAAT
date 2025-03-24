@@ -37,7 +37,6 @@ export const getOrganizationSummaryList = async (
   };
 
   const { data } = await api.post('Organizations/Search', request);
-  console.log(`getOrganizationSummaryList: ${JSON.stringify(data)}`);
   return data;
 };
 

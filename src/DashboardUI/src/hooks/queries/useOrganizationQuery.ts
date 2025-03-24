@@ -5,7 +5,6 @@ import { getOrganizationUsers, searchUsers } from '../../accessors/userAccessor'
 
 export function useOrganizationQuery() {
   const msalContext = useMsal();
-  console.log(`useOrganizationQuery: ${JSON.stringify(msalContext.accounts)}`);
   return useQuery('organizationSummaryList', async () => await getOrganizationSummaryList(msalContext));
 }
 

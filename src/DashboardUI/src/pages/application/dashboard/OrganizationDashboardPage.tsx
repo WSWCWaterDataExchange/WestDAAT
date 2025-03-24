@@ -151,7 +151,12 @@ export function OrganizationDashboardPage() {
             )}
           </Card.Title>
           <Card.Text className="mb-3 mx-3 fs-6">
-            {!applicationListLoading && subtitle && <p className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</p>}
+            {!applicationListLoading && subtitle && (
+              <>
+                <span className="mb-1 w-100 fs-6 fw-bolder">{subtitle}</span>
+                <br />
+              </>
+            )}
             {applicationListLoading ? (
               <Placeholder animation="glow">
                 <Placeholder xs={10} className="rounded" />
@@ -286,12 +291,8 @@ export function OrganizationDashboardPage() {
               },
             }}
             onStateChange={handleDataGridStateChange}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  fundingOrganization: isGlobalAdmin ? true : false,
-                },
-              },
+            columnVisibilityModel={{
+              fundingOrganization: isGlobalAdmin ? true : false,
             }}
           ></DataGrid>
         </TableLoading>
