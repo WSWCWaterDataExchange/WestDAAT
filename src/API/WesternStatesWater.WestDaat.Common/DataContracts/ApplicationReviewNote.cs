@@ -8,5 +8,5 @@ public class ApplicationReviewNote
 
     public string SubmittedByFullName { get; set; } = null!;
 
-    public string Text { get; set; } = null!;
+    public string Note { get; set; } = null!;
 }
