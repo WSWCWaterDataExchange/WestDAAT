@@ -195,10 +195,10 @@ function SaveChangesModal(props: SaveChangesModalProps) {
 
         <Form>
           <Form.Group controlId="documentedChanges">
-            <Form.Label>Changes</Form.Label>
             <Form.Control
               as="textarea"
               type="text"
+              aria-label="Changes"
               maxLength={4000}
               required
               placeholder="Describe any modifications to the document since last save. (Required)"
