@@ -1,18 +1,17 @@
-import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
 
 interface ApplicationDocumentSectionProps {
-  perspective: ApplicationReviewPerspective;
+  readOnly: boolean;
 }
 
 function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
-  const { perspective } = props;
+  const { readOnly } = props;
 
   return (
     <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-      {perspective === 'reviewer' ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
+      {readOnly ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
     </ApplicationFormSection>
   );
 }

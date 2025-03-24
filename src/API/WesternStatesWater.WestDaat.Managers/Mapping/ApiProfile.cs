@@ -219,11 +219,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest, CommonContracts.WaterConservationApplicationSubmissionUpdateRequest>()
+                .ForMember(dest => dest.UpdatedByUserId, opt => opt.Ignore());
+
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationDocument, CommonContracts.WaterConservationApplicationDocument>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            
+
             CreateMap<ClientContracts.Requests.Conservation.ApplicantConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
             CreateMap<ClientContracts.Requests.Conservation.ReviewerConservationApplicationLoadRequest, CommonContracts.ApplicationLoadSingleRequest>();
 
@@ -232,7 +235,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            
+
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
         }
 

@@ -15,7 +15,7 @@ public class WaterConservationApplicationSubmissionNote
 
     public DateTimeOffset Timestamp { get; set; }
 
-    public string Text { get; set; } = null!;
+    public string Note { get; set; } = null!;
 
     public virtual WaterConservationApplicationSubmission WaterConservationApplicationSubmission { get; set; } = null!;
 

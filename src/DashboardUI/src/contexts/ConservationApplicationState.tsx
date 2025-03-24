@@ -527,6 +527,7 @@ const onApplicationLoaded = (
       description: doc.description ?? '',
     }),
   );
+  draftApplication.reviewerNotes = payload.notes;
 
   return draftState;
 };

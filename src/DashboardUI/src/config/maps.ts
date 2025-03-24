@@ -300,7 +300,7 @@ const mapsJson: {
       type: 'symbol',
       filter: ['==', ['get', 'westdaat_pointdatasource'], 'Location'],
     },
-    /*    {
+      {
       id: mapLayerNames.timeSeriesPolygonsLayer,
       friendlyName: 'Time Series Polygons',
       'source-layer': 'polygons',
@@ -310,10 +310,10 @@ const mapsJson: {
       },
       type: 'fill',
       paint: {
-        'fill-color': '#008080',
+        'fill-color': '#FF7F50',
         'fill-opacity': 0.75,
       },
-    },*/
+    },
     {
       id: mapLayerNames.timeSeriesPointsLayer,
       friendlyName: 'Time Series Points',

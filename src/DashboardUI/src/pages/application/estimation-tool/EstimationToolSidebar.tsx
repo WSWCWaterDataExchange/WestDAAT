@@ -103,7 +103,7 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
 
         <SidebarElement
           title="AVERAGE HISTORICAL TOTAL CONSUMPTIVE USE (DEPLETION)"
-          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water nott returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
+          tooltip="Average Historical Total Consumptive Use (Depletion) refers to the average historical recorded amount of water use recorded by the state (if available). Consumed use is the portion of water not returned to the source over a defined historical period. This includes water lost through evapotranspiration, plant uptake, and other consumptive processes, helping to assess water rights, allocations, and conservation planning."
           isLoading={props.isLoading}
           isError={props.loadFailed}
           errorText="Failed to load details. Please try again later."
@@ -162,14 +162,14 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   min={1}
                   aria-describedby="dollar-sign-addon"
                   aria-label="Desired compensation in dollars"
-                  value={state.conservationApplication.desiredCompensationDollars}
+                  defaultValue={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
                 ></Form.Control>
               </InputGroup>
 
               <Form.Select
                 aria-label="Desired compensation units"
-                value={state.conservationApplication.desiredCompensationUnits}
+                defaultValue={state.conservationApplication.desiredCompensationUnits}
                 ref={desiredUnitsRef}
               >
                 <option value={0}>Select an option</option>

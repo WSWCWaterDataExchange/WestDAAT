@@ -20,6 +20,7 @@ import { ReviewerConservationApplicationLoadResponse } from '../data-contracts/R
 import { WaterConservationApplicationCreateRequest } from '../data-contracts/WaterConservationApplicationCreateRequest';
 import { WaterConservationApplicationCreateResponse } from '../data-contracts/WaterConservationApplicationCreateResponse';
 import { WaterConservationApplicationSubmissionRequest } from '../data-contracts/WaterConservationApplicationSubmissionRequest';
+import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-contracts/WaterConservationApplicationSubmissionUpdateRequest';
 import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
@@ -113,7 +114,7 @@ export const downloadApplicationDocuments = async (
   context: IMsalContext,
   documentId: string
 ): Promise<void> => {
-  const { sasToken, fileName } = (await generateDownloadSasToken(context, documentId));
+  const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
   await downloadFilesFromBlobStorage(sasToken, fileName);
 }
 
@@ -163,6 +164,53 @@ export const submitApplication = async (
   };
 
   await api.post<void>('Applications/Submit', request);
+};
+
+export const updateApplicationSubmission = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    form: ApplicationSubmissionFormData;
+    supportingDocuments: ApplicationDocument[];
+    note: string;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationSubmissionUpdateRequest = {
+    agentName: data.form.agentName,
+    agentEmail: data.form.agentEmail,
+    agentPhoneNumber: data.form.agentPhoneNumber,
+    agentAdditionalDetails: data.form.agentAdditionalDetails,
+    landownerName: data.form.landownerName!,
+    landownerEmail: data.form.landownerEmail!,
+    landownerPhoneNumber: data.form.landownerPhoneNumber!,
+    landownerAddress: data.form.landownerAddress!,
+    landownerCity: data.form.landownerCity!,
+    landownerState: data.form.landownerState!,
+    landownerZipCode: data.form.landownerZipCode!,
+    canalOrIrrigationEntityName: data.form.canalOrIrrigationEntityName,
+    canalOrIrrigationEntityEmail: data.form.canalOrIrrigationEntityEmail,
+    canalOrIrrigationEntityPhoneNumber: data.form.canalOrIrrigationEntityPhoneNumber,
+    canalOrIrrigationAdditionalDetails: data.form.canalOrIrrigationAdditionalDetails,
+    conservationPlanFundingRequestDollarAmount: data.form.conservationPlanFundingRequestDollarAmount!,
+    conservationPlanFundingRequestCompensationRateUnits: data.form.conservationPlanFundingRequestCompensationRateUnits!,
+    conservationPlanDescription: data.form.conservationPlanDescription!,
+    conservationPlanAdditionalInfo: data.form.conservationPlanAdditionalInfo,
+    estimationSupplementaryDetails: data.form.estimationSupplementaryDetails,
+    permitNumber: data.form.permitNumber!,
+    facilityDitchName: data.form.facilityDitchName!,
+    priorityDate: data.form.priorityDate!,
+    certificateNumber: data.form.certificateNumber!,
+    shareNumber: data.form.shareNumber!,
+    waterRightState: data.form.waterRightState!,
+    waterUseDescription: data.form.waterUseDescription!,
+    fieldDetails: data.form.fieldDetails,
+    supportingDocuments: data.supportingDocuments,
+    note: data.note,
+  };
+
+  await api.put<void>(`Applications/${data.waterConservationApplicationId}`, request);
 };
 
 export const getApplication = async (
