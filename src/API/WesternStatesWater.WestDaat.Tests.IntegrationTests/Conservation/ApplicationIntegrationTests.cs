@@ -814,8 +814,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
     }
 
-    [TestMethod]
-    public async Task Store_UpdateApplicationSubmission_Success()
+    [DataTestMethod]
+    [DataRow(false, false, false, "", false, nameof(InternalError), DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, false, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, true, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    public async Task Store_UpdateApplicationSubmission_Success(
+        bool userIsLoggedIn,
+        bool applicationExists,
+        bool applicationIsInReview,
+        string userOrgRole,
+        bool shouldSucceed,
+        string expectedErrorTypeName
+        )
     {
         // Arrange
         // setup application
@@ -824,43 +836,60 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Users.AddAsync(user);
         await _dbContext.Organizations.AddAsync(organization);
 
-        var applicationOwner = new UserFaker().Generate();
-        var application = new WaterConservationApplicationFaker(applicationOwner, organization).Generate();
-        await _dbContext.WaterConservationApplications.AddAsync(application);
+        WaterConservationApplication application = null;
+        WaterConservationApplicationEstimateLocation[] estimateLocations = [];
 
-        // setup application related details
-        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
-        await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+        if (applicationExists)
+        {
+            var applicationOwner = new UserFaker().Generate();
 
-        var estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
-        await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
+            application = new WaterConservationApplicationFaker(applicationOwner, organization).Generate();
+            await _dbContext.WaterConservationApplications.AddAsync(application);
 
-        var documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
-        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+            // setup application related details
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
 
-        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
-        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+            estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+            await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
+
+            var documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
+            await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+            var submission = new WaterConservationApplicationSubmissionFaker(application)
+                .RuleFor(sub => sub.AcceptedDate, () => applicationIsInReview ? null : DateTimeOffset.UtcNow)
+                .Generate();
+            await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        }
 
         await _dbContext.SaveChangesAsync();
 
-        UseUserContext(new UserContext
+        if (userIsLoggedIn)
         {
-            UserId = user.Id,
-            Roles = [],
-            OrganizationRoles =
-            [
-                new OrganizationRole
-                {
-                    OrganizationId = organization.Id,
-                    RoleNames = [Roles.TechnicalReviewer]
-                }
-            ],
-            ExternalAuthId = ""
-        });
+            UseUserContext(new UserContext
+            {
+                UserId = user.Id,
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [userOrgRole]
+                    }
+                ],
+                ExternalAuthId = ""
+            });
+        }
+        else
+        {
+            UseAnonymousContext();
+        }
+
 
         // Act
         var request = new WaterConservationApplicationSubmissionUpdateRequestFaker()
-            .RuleFor(req => req.WaterConservationApplicationId, () => application.Id)
+            .RuleFor(req => req.WaterConservationApplicationId, () => application?.Id ?? Guid.NewGuid())
             .RuleFor(req => req.FieldDetails, () => estimateLocations.Select(location => new CLI.ApplicationSubmissionFieldDetail
             {
                 WaterConservationApplicationEstimateLocationId = location.Id,
@@ -883,39 +912,47 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert
         response.Should().NotBeNull();
-        response.Error.Should().BeNull();
 
-        // verify all db entries exist
-        var dbApplication = await _dbContext.WaterConservationApplications
-            .Include(a => a.Submission).ThenInclude(s => s.SubmissionNotes)
-            .Include(a => a.Estimate).ThenInclude(e => e.Locations)
-            .Include(a => a.SupportingDocuments)
-            .Where(a => a.Id == request.WaterConservationApplicationId)
-            .SingleOrDefaultAsync();
+        if (shouldSucceed)
+        {
+            response.Error.Should().BeNull();
 
-        dbApplication.Should().NotBeNull();
-        dbApplication.Submission.Should().NotBeNull();
-        dbApplication.Submission.SubmissionNotes.Should().HaveCount(1); // was created in the update
-        dbApplication.Estimate.Should().NotBeNull();
-        dbApplication.Estimate.Locations.Should().HaveCount(1);
-        dbApplication.SupportingDocuments.Should().HaveCount(1); // other documents were removed in the update
+            // verify all db entries exist
+            var dbApplication = await _dbContext.WaterConservationApplications
+                .Include(a => a.Submission).ThenInclude(s => s.SubmissionNotes)
+                .Include(a => a.Estimate).ThenInclude(e => e.Locations)
+                .Include(a => a.SupportingDocuments)
+                .Where(a => a.Id == request.WaterConservationApplicationId)
+                .SingleOrDefaultAsync();
 
-        // verify entries were updated correctly
-        dbApplication.Submission.Should().BeEquivalentTo(request, options => options.ExcludingMissingMembers());
-        dbApplication.Estimate.Locations.First().Should()
-            .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
+            dbApplication.Should().NotBeNull();
+            dbApplication.Submission.Should().NotBeNull();
+            dbApplication.Submission.SubmissionNotes.Should().HaveCount(1); // was created in the update
+            dbApplication.Estimate.Should().NotBeNull();
+            dbApplication.Estimate.Locations.Should().HaveCount(1);
+            dbApplication.SupportingDocuments.Should().HaveCount(1); // other documents were removed in the update
 
-        // verify the supporting document is correct
-        dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options
-            // these fields are not defined on the request object
-            .Excluding(doc => doc.Id)
-            .Excluding(doc => doc.WaterConservationApplicationId)
-            .ExcludingMissingMembers());
+            // verify entries were updated correctly
+            dbApplication.Submission.Should().BeEquivalentTo(request, options => options.ExcludingMissingMembers());
+            dbApplication.Estimate.Locations.First().Should()
+                .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
 
-        // verify the submission note is correct
-        var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
-        dbSubmissionNote.Note.Should().Be(request.Note);
-        dbSubmissionNote.UserId.Should().Be(user.Id);
-        dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+            // verify the supporting document is correct
+            dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options
+                // these fields are not defined on the request object
+                .Excluding(doc => doc.Id)
+                .Excluding(doc => doc.WaterConservationApplicationId)
+                .ExcludingMissingMembers());
+
+            // verify the submission note is correct
+            var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
+            dbSubmissionNote.Note.Should().Be(request.Note);
+            dbSubmissionNote.UserId.Should().Be(user.Id);
+            dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+        }
+        else
+        {
+            response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
+        }
     }
 }
