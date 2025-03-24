@@ -4,6 +4,8 @@ namespace WesternStatesWater.WestDaat.Common;
 
 public static class Permissions
 {
+    public const string ApplicationReview = "Application_Review";
+    public const string ApplicationUpdate = "Application_Update";
     public const string OrganizationApplicationDashboardLoad = "Organization_Application_Dashboard_Load";
     public const string OrganizationDetailsList = "Organization_List_Details";
     public const string OrganizationMemberAdd = "Organization_Member_Add";

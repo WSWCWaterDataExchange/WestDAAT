@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
 using WesternStatesWater.WestDaat.Common.DataContracts;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -24,8 +25,11 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationDashboardLoadRequest req => await GetDashboardApplications(req),
-            UnsubmittedApplicationExistsLoadRequest req => await CheckInProgressApplicationExists(req),
+            ApplicationLoadSingleRequest req => await GetApplication(req),
+            ApplicationExistsLoadRequest req => await CheckApplicationExists(req),
             ApplicationFindSequentialIdLoadRequest req => await FindSequentialDisplayId(req),
+            ApplicationDocumentLoadSingleRequest req => await GetApplicationDocument(req),
+            ApplicationSupportingDocumentExistsRequest req => await CheckApplicationDocumentExists(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -54,22 +58,63 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
-    private async Task<UnsubmittedApplicationExistsLoadResponse> CheckInProgressApplicationExists(UnsubmittedApplicationExistsLoadRequest request)
+    private async Task<ApplicationLoadSingleResponse> GetApplication(ApplicationLoadSingleRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
-        var existingInProgressApplication = await db.WaterConservationApplications
-            .AsNoTracking()
-            .Include(wca => wca.Submission)
-            .SingleOrDefaultAsync(wca => wca.ApplicantUserId == request.ApplicantUserId &&
-                                         wca.WaterRightNativeId == request.WaterRightNativeId &&
-                                         wca.Submission == null);
+        var application = await db.WaterConservationApplications
+            .Where(app => app.Id == request.ApplicationId)
+            .ProjectTo<ApplicationDetails>(DtoMapper.Configuration)
+            .SingleAsync();
 
-        return new UnsubmittedApplicationExistsLoadResponse
+        return new ApplicationLoadSingleResponse
         {
-            InProgressApplicationId = existingInProgressApplication?.Id,
-            InProgressApplicationDisplayId = existingInProgressApplication?.ApplicationDisplayId,
-            FundingOrganizationId = existingInProgressApplication?.FundingOrganizationId,
+            Application = application
+        };
+    }
+
+    private async Task<ApplicationExistsLoadResponse> CheckApplicationExists(ApplicationExistsLoadRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        IQueryable<EFWD.WaterConservationApplication> applicationQuery = db.WaterConservationApplications
+            .Include(app => app.Submission)
+            .AsNoTracking();
+
+        if (request.ApplicationId.HasValue)
+        {
+            applicationQuery = applicationQuery.Where(app => app.Id == request.ApplicationId.Value);
+        }
+
+        if (!string.IsNullOrEmpty(request.WaterRightNativeId))
+        {
+            applicationQuery = applicationQuery.Where(app => app.WaterRightNativeId == request.WaterRightNativeId);
+        }
+
+        if (request.ApplicantUserId.HasValue)
+        {
+            applicationQuery = applicationQuery.Where(app => app.ApplicantUserId == request.ApplicantUserId.Value);
+        }
+
+        if (request.HasSubmission.HasValue)
+        {
+            if (request.HasSubmission == true)
+            {
+                applicationQuery = applicationQuery.Where(app => app.Submission != null);
+            }
+            else
+            {
+                applicationQuery = applicationQuery.Where(app => app.Submission == null);
+            }
+        }
+
+        var response = await applicationQuery
+            .ProjectTo<ApplicationExistsLoadResponse>(DtoMapper.Configuration)
+            .SingleOrDefaultAsync();
+
+        return response ?? new ApplicationExistsLoadResponse
+        {
+            ApplicationExists = false
         };
     }
 
@@ -106,6 +151,39 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         };
     }
 
+    private async Task<ApplicationDocumentLoadSingleResponse> GetApplicationDocument(ApplicationDocumentLoadSingleRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var document = await db.WaterConservationApplicationDocuments
+            .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
+            .ProjectTo<SupportingDocumentDetails>(DtoMapper.Configuration)
+            .SingleOrDefaultAsync();
+
+        return new ApplicationDocumentLoadSingleResponse
+        {
+            SupportingDocument = document
+        };
+    }
+
+    private async Task<ApplicationSupportingDocumentExistsResponse> CheckApplicationDocumentExists(ApplicationSupportingDocumentExistsRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var document = await db.WaterConservationApplicationDocuments
+            .AsNoTracking()
+            .Where(doc => doc.Id == request.WaterConservationApplicationDocumentId)
+            .Include(doc => doc.WaterConservationApplication)
+            .SingleOrDefaultAsync();
+
+        return new ApplicationSupportingDocumentExistsResponse
+        {
+            DocumentExists = document != null,
+            ApplicantUserId = document?.WaterConservationApplication.ApplicantUserId,
+            FundingOrganizationId = document?.WaterConservationApplication.FundingOrganizationId,
+        };
+    }
+
     public async Task<ApplicationStoreResponseBase> Store(ApplicationStoreRequestBase request)
     {
         return request switch
@@ -113,6 +191,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
+            WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -143,7 +222,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await db.WaterConservationApplicationEstimates.AddAsync(entity);
         await db.SaveChangesAsync();
 
-        return new ApplicationStoreResponseBase();
+        return new ApplicationEstimateStoreResponse
+        {
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations)
+        };
     }
 
     private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)
@@ -166,9 +248,82 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
+        // save submission to db
         var entity = request.Map<EFWD.WaterConservationApplicationSubmission>();
-
         await db.WaterConservationApplicationSubmissions.AddAsync(entity);
+
+        // update related estimate locations' details
+        var existingApplication = await db.WaterConservationApplications
+            .Include(wca => wca.Estimate)
+            .ThenInclude(estimate => estimate.Locations)
+            .Where(wca => wca.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+
+        var documents = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
+        existingApplication.SupportingDocuments = documents;
+
+        foreach (var details in request.FieldDetails)
+        {
+            var existingEstimateLocation = existingApplication.Estimate.Locations
+                .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
+
+            if (existingEstimateLocation == null)
+            {
+                throw new WestDaatException("Estimate location not found.");
+            }
+
+            DtoMapper.Map(details, existingEstimateLocation);
+        }
+
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<ApplicationStoreResponseBase> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var application = await db.WaterConservationApplications
+            .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes)
+            .Include(a => a.Estimate).ThenInclude(estimate => estimate.Locations)
+            .Include(a => a.SupportingDocuments)
+            .Where(a => a.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+
+        // update submission
+        DtoMapper.Map(request, application.Submission);
+
+        // update estimate locations
+        foreach (var details in request.FieldDetails)
+        {
+            var existingEstimateLocation = application.Estimate.Locations
+                .SingleOrDefault(location => location.Id == details.WaterConservationApplicationEstimateLocationId);
+
+            if (existingEstimateLocation == null)
+            {
+                throw new WestDaatException("Estimate location not found.");
+            }
+
+            DtoMapper.Map(details, existingEstimateLocation);
+        }
+
+        // overwrite supporting documents
+        foreach (var document in application.SupportingDocuments)
+        {
+            db.WaterConservationApplicationDocuments.Remove(document);
+        }
+
+        var newDocuments = request.SupportingDocuments.Map<EFWD.WaterConservationApplicationDocument[]>();
+        foreach (var document in newDocuments)
+        {
+            application.SupportingDocuments.Add(document);
+        }
+
+        // add new note
+        var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
+        application.Submission.SubmissionNotes.Add(note);
+
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();

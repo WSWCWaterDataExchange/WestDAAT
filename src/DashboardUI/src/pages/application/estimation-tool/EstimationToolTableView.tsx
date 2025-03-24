@@ -6,13 +6,12 @@ import Nav from 'react-bootstrap/esm/Nav';
 import Tab from 'react-bootstrap/esm/Tab';
 import EstimationToolFieldDataTable from './EstimationToolFieldDataTable';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { PolygonEtDataCollection } from '../../../data-contracts/PolygonEtDataCollection';
 
 import './estimation-tool-table-view.scss';
 
 function EstimationToolTableView() {
   const { state } = useConservationApplicationContext();
-  const fields = state.conservationApplication.polygonEtData;
+  const polygons = state.conservationApplication.estimateLocations;
 
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState<string | undefined>();
@@ -20,22 +19,17 @@ function EstimationToolTableView() {
   const toggleShow = () => setShow(!show);
 
   useEffect(() => {
-    const hasPerformedEstimation = fields.length > 0;
+    const hasPerformedEstimation = polygons.some((p) => !!p.waterConservationApplicationEstimateLocationId);
     if (!hasPerformedEstimation) {
       return;
     }
 
     setTimeout(() => {
       // wait a few seconds to allow the user to notice the map zooming in
-      setActiveTab(fields[0].fieldName);
+      setActiveTab(polygons[0].fieldName);
       setShow(true);
     }, 1000);
-  }, [fields]);
-
-  const getFieldAcres = (field: PolygonEtDataCollection & { fieldName: string }): number => {
-    return state.conservationApplication.selectedMapPolygons.find((polygon) => polygon.polygonWkt === field.polygonWkt)!
-      .acreage;
-  };
+  }, [polygons]);
 
   return (
     <div
@@ -45,10 +39,10 @@ function EstimationToolTableView() {
         <div className="d-flex flex-column flex-grow-1 h-100">
           <Tab.Container
             activeKey={activeTab}
-            onSelect={(tab) => setActiveTab(tab || (fields.length > 0 ? fields[0].fieldName : undefined))}
+            onSelect={(tab) => setActiveTab(tab || (polygons.length > 0 ? polygons[0].fieldName : undefined))}
           >
             <Nav variant="tabs" className="py-2 px-3">
-              {fields.map((field) => (
+              {polygons.map((field) => (
                 <Nav.Item key={field.fieldName}>
                   <Nav.Link eventKey={field.fieldName}>{field.fieldName}</Nav.Link>
                 </Nav.Item>
@@ -56,16 +50,26 @@ function EstimationToolTableView() {
             </Nav>
 
             <Tab.Content className="flex-grow-1 overflow-y-auto p-3">
-              {fields.length === 0 && (
+              {polygons.length === 0 && (
                 <div className="d-flex justify-content-center align-items-center">
                   <span className="text-muted">No data available. Please request an estimate.</span>
                 </div>
               )}
 
-              {fields.map((field) => (
+              {polygons.map((field) => (
                 <Tab.Pane eventKey={field.fieldName} key={field.fieldName} className="h-100">
                   {show && activeTab === field.fieldName && (
-                    <EstimationToolFieldDataTable data={field} fieldAcreage={getFieldAcres(field)} />
+                    <EstimationToolFieldDataTable
+                      data={{
+                        waterConservationApplicationEstimateLocationId:
+                          field.waterConservationApplicationEstimateLocationId!,
+                        polygonWkt: field.polygonWkt!,
+                        averageYearlyEtInInches: field.averageYearlyEtInInches,
+                        averageYearlyEtInAcreFeet: field.averageYearlyEtInAcreFeet,
+                        datapoints: field.datapoints,
+                      }}
+                      fieldAcreage={field.acreage!}
+                    />
                   )}
                 </Tab.Pane>
               ))}

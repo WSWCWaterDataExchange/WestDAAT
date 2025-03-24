@@ -66,7 +66,7 @@ public class SecurityUtilityTests : UtilityTestBase
     }
 
     [DataTestMethod]
-    [DataRow(true, DisplayName = "Should return permissions for a specific organiztion.")]
+    [DataRow(true, DisplayName = "Should return permissions for a specific organization.")]
     [DataRow(false, DisplayName = "Should return no permissions for an unrelated organization.")]
     public void Get_UserContext_ShouldReceiveOrganizationPermissions(bool forSpecificOrganization)
     {

@@ -322,6 +322,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.ConsumptiveUses, opt => opt.MapFrom(src => src.ConsumptiveUses));
 
             CreateMap<ApplicationEstimateStoreRequest, EFWD.WaterConservationApplicationEstimate>()
@@ -336,14 +337,82 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApplicantUser, opt => opt.Ignore())
                 .ForMember(dest => dest.FundingOrganization, opt => opt.Ignore())
                 .ForMember(dest => dest.Estimate, opt => opt.Ignore())
-                .ForMember(dest => dest.Submission, opt => opt.Ignore());
+                .ForMember(dest => dest.Submission, opt => opt.Ignore())
+                .ForMember(dest => dest.SupportingDocuments, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionRequest, EFWD.WaterConservationApplicationSubmission>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmissionNotes, opt => opt.Ignore())
                 .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
+
+            CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmission>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmissionNotes, opt => opt.Ignore())
+                .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore());
+
+            CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationSubmissionId, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
+                .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UpdatedByUserId));
+
+            CreateMap<WaterConservationApplicationDocument, EFWD.WaterConservationApplicationDocument>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore());
+
+            CreateMap<ApplicationSubmissionFieldDetail, EFWD.WaterConservationApplicationEstimateLocation>(MemberList.Source)
+                .ForSourceMember(src => src.WaterConservationApplicationEstimateLocationId, opt => opt.DoNotValidate());
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, ApplicationEstimateLocationDetails>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<EFWD.WaterConservationApplication, ApplicationDetails>()
+                .ForMember(dest => dest.Notes, opt =>
+                {
+                    opt.PreCondition(src => src.Submission != null);
+                    opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
+                });
+
+            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse, ConsumptiveUseDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationDocument, SupportingDocumentDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()
+                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Timestamp))
+                .ForMember(dest => dest.SubmittedByUserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.SubmittedByFullName, opt => opt.MapFrom(src => $"{src.User.UserProfile.FirstName} {src.User.UserProfile.LastName}"));
+
+            CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
+                .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(_ => true))
+                .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)));
+        }
+
+        // duplicated in other ApiProfile.cs
+        public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        {
+            return (acceptedDate, rejectedDate) switch
+            {
+                (null, null) => ConservationApplicationStatus.InReview,
+                (not null, null) => ConservationApplicationStatus.Approved,
+                (null, not null) => ConservationApplicationStatus.Rejected,
+                _ => ConservationApplicationStatus.Unknown
+            };
         }
     }
 }

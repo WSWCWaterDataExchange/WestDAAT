@@ -11,7 +11,9 @@ export function AccountLayout() {
 
       <div className="flex-grow-1">
         <AdminProvider>
-          <Outlet />
+          <main>
+            <Outlet />
+          </main>
         </AdminProvider>
       </div>
 

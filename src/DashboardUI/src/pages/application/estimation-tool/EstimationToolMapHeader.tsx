@@ -2,7 +2,7 @@ import Button from 'react-bootstrap/esm/Button';
 
 export function EstimationToolMapHeader() {
   return (
-    <div className="p-3 d-flex flex-column gap-2">
+    <div className="p-3 d-flex flex-column gap-2 d-print-none">
       <div>
         <span className="h5 fw-bold">Estimate consumptive use through OpenET for an irrigated field</span>
       </div>

@@ -1,12 +1,17 @@
 import { useMsal } from '@azure/msal-react';
 import { useConservationApplicationContext } from '../../contexts/ConservationApplicationProvider';
 import { useQuery } from 'react-query';
-import { applicationSearch, createWaterConservationApplication } from '../../accessors/applicationAccessor';
+import {
+  applicationSearch,
+  createWaterConservationApplication,
+  getApplication,
+} from '../../accessors/applicationAccessor';
 import { WaterConservationApplicationCreateResponse } from '../../data-contracts/WaterConservationApplicationCreateResponse';
 import { toast } from 'react-toastify';
 import { getOrganizationFundingDetails } from '../../accessors/organizationAccessor';
 import { OrganizationFundingDetailsResponse } from '../../data-contracts/OrganizationFundingDetailsResponse';
 import { parseDateOnly } from '../../utilities/dateHelpers';
+import { ApplicationReviewPerspective } from '../../data-contracts/ApplicationReviewPerspective';
 
 export function useLoadDashboardApplications(organizationIdFilter: string | null) {
   const context = useMsal();
@@ -79,6 +84,38 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
       },
       onError: (error: Error) => {
         toast.error('Failed to load data. Please try again later.');
+      },
+    },
+  );
+}
+
+export function useGetApplicationQuery(
+  applicationId: string | undefined,
+  perspective: ApplicationReviewPerspective,
+  isQueryEnabled: boolean,
+) {
+  const context = useMsal();
+  const { dispatch } = useConservationApplicationContext();
+
+  return useQuery(
+    ['getApplication', applicationId, perspective],
+    () =>
+      getApplication(context, {
+        applicationId: applicationId!,
+        perspective,
+      }),
+    {
+      enabled: !!applicationId && isQueryEnabled,
+      // do not cache data. results should always be fresh in case another user updates the application
+      cacheTime: 0,
+      onSuccess: (result) => {
+        dispatch({
+          type: 'APPLICATION_LOADED',
+          payload: {
+            application: result.application,
+            notes: result.notes ?? [],
+          },
+        });
       },
     },
   );

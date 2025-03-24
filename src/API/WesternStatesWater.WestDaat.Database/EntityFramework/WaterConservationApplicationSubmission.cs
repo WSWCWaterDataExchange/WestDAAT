@@ -4,7 +4,7 @@ public class WaterConservationApplicationSubmission
 {
     public WaterConservationApplicationSubmission()
     {
-
+        SubmissionNotes = new HashSet<WaterConservationApplicationSubmissionNote>();
     }
 
     public Guid Id { get; set; }
@@ -17,17 +17,15 @@ public class WaterConservationApplicationSubmission
 
     public DateTimeOffset? RejectedDate { get; set; }
 
-    public string AgentFirstName { get; set; } = null!;
-
-    public string AgentLastName { get; set; } = null!;
+    public string AgentName { get; set; } = null!;
 
     public string AgentEmail { get; set; } = null!;
 
     public string AgentPhoneNumber { get; set; } = null!;
 
-    public string LandownerFirstName { get; set; } = null!;
+    public string AgentAdditionalDetails { get; set; } = null!;
 
-    public string LandownerLastName { get; set; } = null!;
+    public string LandownerName { get; set; } = null!;
 
     public string LandownerEmail { get; set; } = null!;
 
@@ -47,6 +45,8 @@ public class WaterConservationApplicationSubmission
 
     public string CanalOrIrrigationEntityPhoneNumber { get; set; } = null!;
 
+    public string CanalOrIrrigationAdditionalDetails { get; set; } = null!;
+
     public int ConservationPlanFundingRequestDollarAmount { get; set; }
 
     public Common.DataContracts.CompensationRateUnits ConservationPlanFundingRequestCompensationRateUnits { get; set; }
@@ -56,14 +56,6 @@ public class WaterConservationApplicationSubmission
     public string ConservationPlanAdditionalInfo { get; set; } = null!;
 
     public string EstimationSupplementaryDetails { get; set; } = null!;
-
-    public string ProjectLocation { get; set; } = null!;
-
-    public string PropertyAdditionalDetails { get; set; } = null!;
-
-    public string DiversionPoint { get; set; } = null!;
-
-    public string DiversionPointDetails { get; set; } = null!;
 
     public string PermitNumber { get; set; } = null!;
 
@@ -80,4 +72,6 @@ public class WaterConservationApplicationSubmission
     public string WaterUseDescription { get; set; } = null!;
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
+
+    public virtual ICollection<WaterConservationApplicationSubmissionNote> SubmissionNotes { get; set; } = null!;
 }

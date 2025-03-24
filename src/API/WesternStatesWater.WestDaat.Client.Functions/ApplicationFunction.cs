@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System.Net;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
@@ -72,5 +73,38 @@ public class ApplicationFunction : FunctionBase
         var request = await ParseRequestBody<WaterConservationApplicationSubmissionRequest>(req);
         var results = await _applicationManager.Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(request);
         return await CreateResponse(req, results);
+    }
+
+    [Function(nameof(UpdateApplication))]
+    [OpenApiOperation(nameof(UpdateApplication))]
+    [OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Type = typeof(Guid))]
+    [OpenApiResponseWithoutBody(HttpStatusCode.OK)]
+    public async Task<HttpResponseData> UpdateApplication(
+        [HttpTrigger(AuthorizationLevel.Function, "put", Route = $"{RouteBase}/{{id}}")]
+        HttpRequestData req, Guid id)
+    {
+        var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
+            new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        return await CreateResponse(req, results);
+    }
+
+    [Function(nameof(GetApplication))]
+    [OpenApiOperation(nameof(GetApplication))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicationLoadResponseBase))]
+    public async Task<HttpResponseData> GetApplication(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Load")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<ApplicationLoadRequestBase>(req);
+        ApplicationLoadResponseBase result = request switch
+        {
+            ApplicantConservationApplicationLoadRequest applicantRequest => await _applicationManager
+                .Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(applicantRequest),
+            ReviewerConservationApplicationLoadRequest reviewerRequest => await _applicationManager
+                .Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(reviewerRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
+        return await CreateResponse(req, result);
     }
 }

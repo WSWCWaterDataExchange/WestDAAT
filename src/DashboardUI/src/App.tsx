@@ -20,11 +20,9 @@ import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUser
 import { ApplicationCreatePage } from './pages/application/create/ApplicationCreatePage';
 import { AuthGuard } from './pages/application/AuthGuard';
 import { ApplicationLayout } from './pages/application/ApplicationLayout';
-import { ApplicationReviewPage } from './pages/application/dashboard/ApplicationReviewPage';
 import { EstimationToolPage } from './pages/application/estimation-tool/EstimationToolPage';
 import { OrganizationDashboardPage } from './pages/application/dashboard/OrganizationDashboardPage';
 import { SignupPage } from './pages/account/SignupPage';
-import { WaterUserDashboardPage } from './pages/application/dashboard/WaterUserDashboardPage';
 import DetailLayout from './pages/DetailLayout';
 import HomePage from './pages/HomePage';
 import Layout from './pages/Layout';
@@ -33,6 +31,9 @@ import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 
 import './App.scss';
+import { ApplicationSubmitPage } from './pages/application/dashboard/ApplicationSubmitPage';
+import ApplicationReviewPage from './pages/application/review/ApplicationReviewPage';
+import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -103,13 +104,15 @@ function App({ msalInstance }: AppProps) {
                 </Route>
                 <Route path="application" element={<AuthGuard />}>
                   <Route element={<ApplicationLayout />}>
-                    <Route path="dashboard" element={<WaterUserDashboardPage />} />
                     <Route path="organization">
                       <Route path="dashboard" element={<OrganizationDashboardPage />} />
                     </Route>
                     <Route path=":applicationId">
                       <Route path="create" element={<ApplicationCreatePage />} />
-                      <Route path="review" element={<ApplicationReviewPage />} />
+                      <Route path="submit" element={<ApplicationSubmitPage />} />
+                      <Route path="review" element={<ApplicationReviewGuard />}>
+                        <Route index element={<ApplicationReviewPage />} />
+                      </Route>
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                   </Route>

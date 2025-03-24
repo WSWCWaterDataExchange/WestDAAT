@@ -4,17 +4,15 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 {
     public WaterConservationApplicationSubmissionRequestFaker()
     {
-        RuleFor(wcas => wcas.AgentFirstName, f => f.Person.FirstName);
-
-        RuleFor(wcas => wcas.AgentLastName, f => f.Person.LastName);
+        RuleFor(wcas => wcas.AgentName, f => f.Person.FullName);
 
         RuleFor(wcas => wcas.AgentEmail, f => f.Person.Email);
 
         RuleFor(wcas => wcas.AgentPhoneNumber, f => f.Phone.PhoneNumber());
 
-        RuleFor(wcas => wcas.LandownerFirstName, f => f.Person.FirstName);
+        RuleFor(wcas => wcas.AgentAdditionalDetails, f => f.Lorem.Sentence());
 
-        RuleFor(wcas => wcas.LandownerLastName, f => f.Person.LastName);
+        RuleFor(wcas => wcas.LandownerName, f => f.Person.FullName);
 
         RuleFor(wcas => wcas.LandownerEmail, f => f.Person.Email);
 
@@ -34,6 +32,8 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.CanalOrIrrigationEntityPhoneNumber, f => f.Phone.PhoneNumber());
 
+        RuleFor(wcas => wcas.CanalOrIrrigationAdditionalDetails, f => f.Lorem.Sentence());
+
         RuleFor(wcas => wcas.ConservationPlanFundingRequestDollarAmount, f => f.Random.Number(100, 1000));
 
         RuleFor(wcas => wcas.ConservationPlanFundingRequestCompensationRateUnits, f => f.PickRandomWithout(Common.DataContracts.CompensationRateUnits.None));
@@ -43,14 +43,6 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
         RuleFor(wcas => wcas.ConservationPlanAdditionalInfo, f => f.Lorem.Sentence());
 
         RuleFor(wcas => wcas.EstimationSupplementaryDetails, f => f.Lorem.Sentence());
-
-        RuleFor(wcas => wcas.ProjectLocation, f => f.Address.FullAddress());
-
-        RuleFor(wcas => wcas.PropertyAdditionalDetails, f => f.Lorem.Sentence());
-
-        RuleFor(wcas => wcas.DiversionPoint, f => f.Address.FullAddress());
-
-        RuleFor(wcas => wcas.DiversionPointDetails, f => f.Lorem.Sentence());
 
         RuleFor(wcas => wcas.PermitNumber, f => f.Random.Number(100000000, 1000000000).ToString());
 
@@ -66,5 +58,8 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
 
+        RuleFor(wcas => wcas.FieldDetails, f => []);
+
+        RuleFor(wcas => wcas.SupportingDocuments, f => []);
     }
 }

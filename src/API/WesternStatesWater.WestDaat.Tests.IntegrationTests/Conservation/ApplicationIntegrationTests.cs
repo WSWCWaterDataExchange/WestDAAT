@@ -241,6 +241,98 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
     }
 
+    [TestMethod]
+    public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var org = new OrganizationFaker().Generate();
+
+        var application = new WaterConservationApplicationFaker(user, org).Generate();
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(3);
+        await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(locations);
+
+        foreach (var location in locations)
+        {
+            var consumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(location).Generate(2);
+            await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
+        }
+
+        var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
+        await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        var technicalReviewers = new UserFaker().Generate(2);
+        await _dbContext.Users.AddRangeAsync(technicalReviewers);
+
+        var notes = technicalReviewers.Select(user => new WaterConservationApplicationSubmissionNoteFaker(submission, user).Generate()).ToArray();
+        await _dbContext.WaterConservationApplicationSubmissionNotes.AddRangeAsync(notes);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id, // allows user to see Applicant view
+            Roles = [Roles.GlobalAdmin], // allows user to see Reviewer view
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var applicantRequest = new ApplicantConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+        var reviewerRequest = new ReviewerConservationApplicationLoadRequest
+        {
+            ApplicationId = application.Id
+        };
+
+        var applicantResponse = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(applicantRequest);
+        var reviewerResponse = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(reviewerRequest);
+
+        // Assert
+
+        // ExcludingMissingMembers is used to ignore properties that are intentionally not included in the response
+        // i.e. virtual navigation properties and parent id properties
+        applicantResponse.Should().NotBeNull();
+        applicantResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        // the following assertions are redundant given that `BeEquivalentTo` checks properties recursively,
+        // but are included for completeness just in case something changes in the future
+        applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+
+        reviewerResponse.Should().NotBeNull();
+        reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
+        reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
+
+        // verify note fields with custom mappings are translated correctly
+        foreach (var note in reviewerResponse.Notes)
+        {
+            note.SubmittedDate.Should().NotBe(default);
+            note.SubmittedByFullName.Should().NotBeEmpty();
+        }
+
+        // verify notes are returned in order
+        var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
+        reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
+    }
+
     [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
@@ -417,6 +509,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
                 dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations
+                response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+
                 dbEstimateLocationConsumptiveUses.All(consumptiveUse =>
                 {
                     var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
@@ -562,9 +657,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(false, null, null, null, false, typeof(NotFoundError), DisplayName = "Application DNE -> should throw")]
-    [DataRow(true, false, null, null, false, typeof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
-    [DataRow(true, true, false, false, false, typeof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
+    [DataRow(false, null, null, null, false, nameof(NotFoundError), DisplayName = "Application DNE -> should throw")]
+    [DataRow(true, false, null, null, false, nameof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
+    [DataRow(true, true, false, false, false, nameof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
     [DataRow(true, true, false, true, true, null, DisplayName = "User has an in-progress Application for this water right, and they attempted to create a Submission for the correct Application -> should succeed")]
     public async Task Store_SubmitApplication_Success(
         bool doesApplicationExist,
@@ -572,7 +667,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         bool? doesApplicationAlreadyHaveASubmission,
         bool? doesProvidedApplicationIdMatch,
         bool shouldSucceed,
-        Type expectedErrorType
+        string expectedErrorTypeName
         )
     {
         // Arrange
@@ -584,6 +679,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Organizations.AddAsync(organization);
 
         WaterConservationApplication application = null;
+        WaterConservationApplicationEstimateLocation[] estimateLocations = null;
+        Database.EntityFramework.WaterConservationApplicationDocument[] documents = [];
         if (doesApplicationExist)
         {
             var applicationOwner = doesUserOwnApplication == true
@@ -593,7 +690,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             application = new WaterConservationApplicationFaker(applicationOwner, organization)
                 .RuleFor(app => app.WaterRightNativeId, () => waterRightNativeId)
                 .Generate();
+            documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
             await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+            estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+            await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
 
             if (doesApplicationAlreadyHaveASubmission == true)
             {
@@ -615,6 +719,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new WaterConservationApplicationSubmissionRequestFaker()
             .RuleFor(req => req.WaterRightNativeId, () => waterRightNativeId)
             .RuleFor(req => req.WaterConservationApplicationId, () => doesProvidedApplicationIdMatch == true ? application!.Id : Guid.NewGuid())
+            .RuleFor(req => req.FieldDetails, () => estimateLocations?.Select(location => new CLI.ApplicationSubmissionFieldDetail
+            {
+                WaterConservationApplicationEstimateLocationId = location.Id,
+                AdditionalDetails = "Some additional details"
+            }).ToArray() ?? [])
+            .RuleFor(req => req.SupportingDocuments, () => documents.Select(document => new CLI.Requests.Conservation.WaterConservationApplicationDocument
+            {
+                BlobName = document.BlobName,
+                FileName = document.FileName,
+                Description = document.Description
+            }).ToArray())
             .Generate();
 
         // Act
@@ -631,6 +746,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             var dbApplication = await _dbContext.WaterConservationApplications
                 .Include(application => application.Submission)
+                .Include(application => application.Estimate)
+                .ThenInclude(estimate => estimate.Locations)
+                .Include(application => application.SupportingDocuments)
                 .SingleOrDefaultAsync(application => application.Id == request.WaterConservationApplicationId);
 
             dbApplication.Should().NotBeNull();
@@ -639,12 +757,37 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // all properties on the request should be saved as a Submission record, excluding a couple which are found on the parent Application.
             dbApplication.Submission.Should().BeEquivalentTo(request, options => options
                 .Excluding(submission => submission.WaterConservationApplicationId)
-                .Excluding(submission => submission.WaterRightNativeId));
+                .Excluding(submission => submission.WaterRightNativeId)
+                .Excluding(submission => submission.FieldDetails)
+                .Excluding(submission => submission.SupportingDocuments));
+
+            if (request.FieldDetails.Any())
+            {
+                foreach (var detail in request.FieldDetails)
+                {
+                    var dbEstimateLocation = dbApplication.Estimate.Locations
+                        .SingleOrDefault(location => location.Id == detail.WaterConservationApplicationEstimateLocationId);
+                    dbEstimateLocation.Should().NotBeNull();
+                    dbEstimateLocation.Should().BeEquivalentTo(detail, options => options
+                        .Excluding(location => location.WaterConservationApplicationEstimateLocationId));
+                }
+            }
+
+            dbApplication.SupportingDocuments.Count.Should().Be(3);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[0].BlobName);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[1].BlobName);
+            dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[2].BlobName);
+            dbApplication.SupportingDocuments.All((doc) => string.IsNullOrWhiteSpace(doc.BlobName) && string.IsNullOrWhiteSpace(doc.FileName) && string.IsNullOrWhiteSpace(doc.Description));
         }
         else
         {
             response.Error.Should().NotBeNull();
-            response.Error.Should().BeOfType(expectedErrorType);
+            response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
+
+            var dbApplicationDocuments = _dbContext.WaterConservationApplicationDocuments
+                .Where(docs => docs.WaterConservationApplicationId == request.WaterConservationApplicationId).ToArray();
+
+            dbApplicationDocuments.Length.Should().Be(0);
         }
     }
 
@@ -669,5 +812,147 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
 
         ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
+
+    [DataTestMethod]
+    [DataRow(false, false, false, "", false, nameof(InternalError), DisplayName = "User is not logged in")]
+    [DataRow(true, false, false, "", false, nameof(NotFoundError), DisplayName = "Application does not exist")]
+    [DataRow(true, true, false, "", false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, true, "", false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
+    [DataRow(true, true, true, Roles.TechnicalReviewer, true, "", DisplayName = "User has permission to edit an Application Submission")]
+    public async Task Store_UpdateApplicationSubmission_Success(
+        bool userIsLoggedIn,
+        bool applicationExists,
+        bool applicationIsInReview,
+        string userOrgRole,
+        bool shouldSucceed,
+        string expectedErrorTypeName
+        )
+    {
+        // Arrange
+        // setup application
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+
+        WaterConservationApplication application = null;
+        WaterConservationApplicationEstimateLocation[] estimateLocations = [];
+
+        if (applicationExists)
+        {
+            var applicationOwner = new UserFaker().Generate();
+
+            application = new WaterConservationApplicationFaker(applicationOwner, organization).Generate();
+            await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            // setup application related details
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+            estimateLocations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(1).ToArray();
+            await _dbContext.WaterConservationApplicationEstimateLocations.AddRangeAsync(estimateLocations);
+
+            var documents = new WaterConservationApplicationDocumentsFaker(application, applicationOwner).Generate(3).ToArray();
+            await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
+
+            var submission = new WaterConservationApplicationSubmissionFaker(application)
+                .RuleFor(sub => sub.AcceptedDate, () => applicationIsInReview ? null : DateTimeOffset.UtcNow)
+                .Generate();
+            await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        if (userIsLoggedIn)
+        {
+            UseUserContext(new UserContext
+            {
+                UserId = user.Id,
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [userOrgRole]
+                    }
+                ],
+                ExternalAuthId = ""
+            });
+        }
+        else
+        {
+            UseAnonymousContext();
+        }
+
+
+        // Act
+        var request = new WaterConservationApplicationSubmissionUpdateRequestFaker()
+            .RuleFor(req => req.WaterConservationApplicationId, () => application?.Id ?? Guid.NewGuid())
+            .RuleFor(req => req.FieldDetails, () => estimateLocations.Select(location => new CLI.ApplicationSubmissionFieldDetail
+            {
+                WaterConservationApplicationEstimateLocationId = location.Id,
+                AdditionalDetails = "Some additional details"
+            }).ToArray())
+            .RuleFor(req => req.SupportingDocuments, () =>
+            [
+                new CLI.Requests.Conservation.WaterConservationApplicationDocument
+                {
+                    BlobName = "blobname",
+                    FileName = "filename.pdf",
+                    Description = "description",
+                }
+            ])
+            .Generate();
+
+        var response = await _applicationManager.Store<
+            CLI.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest,
+            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        if (shouldSucceed)
+        {
+            response.Error.Should().BeNull();
+
+            // verify all db entries exist
+            var dbApplication = await _dbContext.WaterConservationApplications
+                .Include(a => a.Submission).ThenInclude(s => s.SubmissionNotes)
+                .Include(a => a.Estimate).ThenInclude(e => e.Locations)
+                .Include(a => a.SupportingDocuments)
+                .Where(a => a.Id == request.WaterConservationApplicationId)
+                .SingleOrDefaultAsync();
+
+            dbApplication.Should().NotBeNull();
+            dbApplication.Submission.Should().NotBeNull();
+            dbApplication.Submission.SubmissionNotes.Should().HaveCount(1); // was created in the update
+            dbApplication.Estimate.Should().NotBeNull();
+            dbApplication.Estimate.Locations.Should().HaveCount(1);
+            dbApplication.SupportingDocuments.Should().HaveCount(1); // other documents were removed in the update
+
+            // verify entries were updated correctly
+            dbApplication.Submission.Should().BeEquivalentTo(request, options => options.ExcludingMissingMembers());
+            dbApplication.Estimate.Locations.First().Should()
+                .BeEquivalentTo(request.FieldDetails.First(), options => options.ExcludingMissingMembers());
+
+            // verify the supporting document is correct
+            dbApplication.SupportingDocuments.First().Should().BeEquivalentTo(request.SupportingDocuments.First(), options => options
+                // these fields are not defined on the request object
+                .Excluding(doc => doc.Id)
+                .Excluding(doc => doc.WaterConservationApplicationId)
+                .ExcludingMissingMembers());
+
+            // verify the submission note is correct
+            var dbSubmissionNote = dbApplication.Submission.SubmissionNotes.First();
+            dbSubmissionNote.Note.Should().Be(request.Note);
+            dbSubmissionNote.UserId.Should().Be(user.Id);
+            dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+        }
+        else
+        {
+            response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
+        }
     }
 }

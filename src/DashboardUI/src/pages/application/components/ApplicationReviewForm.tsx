@@ -1,0 +1,308 @@
+import Button from 'react-bootstrap/esm/Button';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
+import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import {
+  CompensationRateUnitsLabelsPlural,
+  CompensationRateUnitsLabelsSingular,
+} from '../../../data-contracts/CompensationRateUnits';
+import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
+import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
+import ApplicationFormSection from './ApplicationFormSection';
+import FormElementDisplay from './FormElementDisplay';
+import ApplicationDocumentSection from './ApplicationDocumentSection';
+
+const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
+const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
+const responsiveHalfWidthDefault = 'col-lg-6 col-12';
+
+interface ApplicationReviewFormProps {
+  isLoading: boolean;
+  submitApplication: () => void;
+}
+
+function ApplicationReviewForm(props: ApplicationReviewFormProps) {
+  const { state } = useConservationApplicationContext();
+  const stateForm = state.conservationApplication.applicationSubmissionForm;
+  const polygonData = state.conservationApplication.estimateLocations;
+
+  const isApplicationSubmitEnabled = state.isCreatingApplication;
+
+  // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
+  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
+
+  return (
+    <main className="container">
+      <div className="mb-3">
+        <span className="fs-4 fw-bold">
+          Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
+        </span>
+      </div>
+
+      <div className="d-flex gap-3 mb-4">
+        {props.isLoading ? (
+          <Placeholder as="div" animation="glow" className="h-100 w-100">
+            <Placeholder xs={12} className="h-100 w-25 rounded" />
+          </Placeholder>
+        ) : (
+          <>
+            <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
+
+            <span className="fw-bold">
+              Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
+            </span>
+
+            <span className="fw-bold">
+              Funding Organization: {state.conservationApplication.fundingOrganizationName}
+            </span>
+          </>
+        )}
+      </div>
+      <div>
+        <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Landowner Name" displayValue={stateForm.landownerName} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Email Address" displayValue={stateForm.landownerEmail} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Phone" displayValue={stateForm.landownerPhoneNumber} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Address" displayValue={stateForm.landownerAddress} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="City" displayValue={stateForm.landownerCity} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="State" displayValue={stateForm.landownerState} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Zip Code" displayValue={stateForm.landownerZipCode} />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <ApplicationFormSection
+          title="Representative / Agent Contact Information"
+          isLoading={props.isLoading}
+          loadingFieldCount={3}
+        >
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Name / Organization" displayValue={stateForm.agentName} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Email" displayValue={stateForm.agentEmail} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Phone" displayValue={stateForm.agentPhoneNumber} />
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay label="Additional Details" displayValue={stateForm.agentAdditionalDetails} />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <div className="row">
+          <ApplicationFormSection
+            title="Property & Land Area Information"
+            className="col-lg-6 col-12"
+            isLoading={props.isLoading}
+          >
+            {polygonData.map((field) => (
+              <div className="row mb-4" key={field.fieldName}>
+                <div className="col-3">
+                  <span className="text-muted">{field.fieldName}</span>
+                </div>
+                <div className="col-3">
+                  <span className="text-muted">Acres: </span>
+                  <span>{formatNumber(field.acreage, 2)}</span>
+                </div>
+                <div className="col-6">
+                  <span className="text-muted">Location: </span>
+                  <span>
+                    ({field.centerPoint!.coordinates[1]}, {field.centerPoint!.coordinates[0]})
+                  </span>
+                </div>
+                <div className={`col-12 mb-4`}>
+                  <FormElementDisplay label="Additional Details" displayValue={field.additionalDetails} />
+                </div>
+              </div>
+            ))}
+          </ApplicationFormSection>
+
+          <div className="col-lg-6 col-12">
+            Static map here
+            <NotImplementedPlaceholder />
+          </div>
+        </div>
+
+        {sectionRule}
+
+        <ApplicationFormSection
+          title="Canal Company / Irrigation District"
+          isLoading={props.isLoading}
+          loadingFieldCount={3}
+        >
+          <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
+            <FormElementDisplay label="Name / Organization" displayValue={stateForm.canalOrIrrigationEntityName} />
+          </div>
+
+          <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
+            <FormElementDisplay label="Email" displayValue={stateForm.canalOrIrrigationEntityEmail} />
+          </div>
+
+          <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
+            <FormElementDisplay label="Phone" displayValue={stateForm.canalOrIrrigationEntityPhoneNumber} />
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Additional Details"
+              displayValue={stateForm.canalOrIrrigationAdditionalDetails}
+            />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Permit #" displayValue={stateForm.permitNumber} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Facility (Ditch) Name" displayValue={stateForm.facilityDitchName} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Priority Date"
+              displayValue={stateForm.priorityDate ? formatDateString(stateForm.priorityDate, 'MM/DD/YYYY') : undefined}
+            />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Certificate #" displayValue={stateForm.certificateNumber} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="Share #" displayValue={stateForm.shareNumber} />
+          </div>
+
+          <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
+            <FormElementDisplay label="State" displayValue={stateForm.waterRightState} />
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay label="Description of Water Use" displayValue={stateForm.waterUseDescription} />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
+          <div className="row">
+            <div className="col-sm-6 col-md-3 mb-4">
+              <FormElementDisplay
+                label="Irrigated Field Area"
+                displayValue={formatNumber(state.conservationApplication.polygonAcreageSum, 2) + ' Acres'}
+              />
+            </div>
+
+            <div className="col-sm-6 col-md-3 mb-4">
+              <FormElementDisplay
+                label="Consumptive Use"
+                displayValue={
+                  formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2) + ' Acre-Feet'
+                }
+              />
+            </div>
+
+            <div className="col-sm-6 col-md-3 mb-4">
+              <FormElementDisplay
+                label="Compensation Rate"
+                displayValue={`$${state.conservationApplication.desiredCompensationDollars}/${CompensationRateUnitsLabelsSingular[state.conservationApplication.desiredCompensationUnits!]}`}
+              />
+            </div>
+
+            <div className="col-sm-6 col-md-3 mb-4">
+              <FormElementDisplay
+                label="Requested Total ($)"
+                displayValue={'$' + formatNumber(state.conservationApplication.conservationPayment, 0)}
+              />
+            </div>
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Supplementary Review Information"
+              displayValue={stateForm.estimationSupplementaryDetails}
+            />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
+          <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Funding Request $ Amount"
+              displayValue={'$' + stateForm.conservationPlanFundingRequestDollarAmount}
+            />
+          </div>
+
+          <div className={`${responsiveOneThirdWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Units"
+              displayValue={
+                CompensationRateUnitsLabelsPlural[stateForm.conservationPlanFundingRequestCompensationRateUnits!]
+              }
+            />
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay label="Conservation Description" displayValue={stateForm.conservationPlanDescription} />
+          </div>
+
+          <div className={`${responsiveHalfWidthDefault} mb-4`}>
+            <FormElementDisplay
+              label="Additional Information"
+              displayValue={stateForm.conservationPlanAdditionalInfo}
+            />
+          </div>
+        </ApplicationFormSection>
+
+        {sectionRule}
+
+        <ApplicationDocumentSection readOnly={true} />
+
+        {isApplicationSubmitEnabled && (
+          <>
+            {sectionRule}
+
+            <div className="d-flex justify-content-end p-3">
+              <Button variant="success" type="button" onClick={props.submitApplication}>
+                Submit
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default ApplicationReviewForm;
