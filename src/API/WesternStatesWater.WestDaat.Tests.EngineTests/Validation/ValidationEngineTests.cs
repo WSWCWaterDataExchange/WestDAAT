@@ -321,7 +321,7 @@ public class ValidationEngineTests : EngineTestBase
     [DataTestMethod]
     [DataRow(false, false, false, false, false, "", DisplayName = "User is not logged in")]
     [DataRow(true, false, false, false, false, nameof(NotFoundError), DisplayName = "Application does not exist")]
-    [DataRow(true, true, false, false, false, nameof(ForbiddenError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
+    [DataRow(true, true, false, false, false, nameof(ValidationError), DisplayName = "Users are not permitted to edit an Application that is not in review")]
     [DataRow(true, true, true, false, false, nameof(ForbiddenError), DisplayName = "User does not belong to the correct organization")]
     [DataRow(true, true, true, true, true, "", DisplayName = "User has permission to edit an Application Submission")]
     public async Task Validate_ValidateWaterConservationApplicationSubmissionUpdateRequest_Success(
