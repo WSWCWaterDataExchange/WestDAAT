@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Tests.Helpers;
 
-public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionRequest>
+public class WaterConservationApplicationSubmissionUpdateRequestFaker : Faker<Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest>
 {
-    public WaterConservationApplicationSubmissionRequestFaker()
+    public WaterConservationApplicationSubmissionUpdateRequestFaker()
     {
         RuleFor(wcas => wcas.AgentName, f => f.Person.FullName);
 
@@ -58,8 +58,8 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
 
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
 
-        RuleFor(wcas => wcas.FieldDetails, f => []);
+        RuleFor(wcas => wcas.Note, f => f.Lorem.Paragraph());
 
-        RuleFor(wcas => wcas.SupportingDocuments, f => []);
+        RuleFor(wcas => wcas.FieldDetails, f => []);
     }
 }

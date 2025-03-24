@@ -2,13 +2,11 @@
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-public class WaterConservationApplicationSubmissionRequestValidator : AbstractValidator<WaterConservationApplicationSubmissionRequest>
+public class WaterConservationApplicationSubmissionUpdateRequestValidator : AbstractValidator<WaterConservationApplicationSubmissionUpdateRequest>
 {
-    public WaterConservationApplicationSubmissionRequestValidator()
+    public WaterConservationApplicationSubmissionUpdateRequestValidator()
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
-
-        RuleFor(x => x.WaterRightNativeId).NotEmpty();
 
         RuleFor(x => x.AgentName).MaximumLength(255);
 
@@ -63,6 +61,8 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
         RuleFor(x => x.WaterRightState).NotEmpty().Length(2);
 
         RuleFor(x => x.WaterUseDescription).NotEmpty().MaximumLength(4000);
+
+        RuleFor(x => x.Note).NotEmpty().MaximumLength(4000);
 
         RuleFor(x => x.FieldDetails).NotNull().ForEach(item => item.ChildRules(detailValidator =>
         {

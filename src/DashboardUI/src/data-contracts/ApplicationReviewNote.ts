@@ -1,6 +1,7 @@
 export interface ApplicationReviewNote {
   id: string;
   submittedDate: string;
+  submittedByUserId: string;
   submittedByFullName: string;
-  text: string;
+  note: string;
 }
