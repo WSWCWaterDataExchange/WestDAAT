@@ -59,5 +59,7 @@ public class WaterConservationApplicationSubmissionRequestFaker : Faker<Contract
         RuleFor(wcas => wcas.WaterUseDescription, f => f.Lorem.Sentence());
 
         RuleFor(wcas => wcas.FieldDetails, f => []);
+
+        RuleFor(wcas => wcas.SupportingDocuments, f => []);
     }
 }
