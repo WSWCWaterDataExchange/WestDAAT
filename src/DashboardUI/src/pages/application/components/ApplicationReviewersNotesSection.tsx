@@ -9,6 +9,7 @@ function ApplicationReviewersNotesSection() {
 
   const notes = state.conservationApplication.reviewerNotes;
 
+  // docs: https://momentjs.com/docs/#/displaying/
   const momentJsLocalizedDateFormatString = 'llll';
 
   return (
