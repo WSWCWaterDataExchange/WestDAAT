@@ -16,7 +16,7 @@ import Form from 'react-bootstrap/esm/Form';
 import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
@@ -67,11 +67,7 @@ function ApplicationReviewPage() {
       });
     },
     onSuccess: () => {
-      navigateToApplicationOrganizationDashboard();
-
-      setTimeout(() => {
-        toast.success('Application changes saved successfully.');
-      }, 1);
+      toast.success('Application changes saved successfully.');
     },
     onError: () => {
       toast.error('Error saving application changes.');
