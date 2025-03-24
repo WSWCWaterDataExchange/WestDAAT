@@ -47,6 +47,18 @@ function ApplicationReviewPage() {
 
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
+  const handleCancelClicked = () => {
+    if (isFormDirty) {
+      setShowCancelConfirmationModal(true);
+    } else {
+      handleCancelConfirmed();
+    }
+  };
+
+  const handleCancelConfirmed = () => {
+    navigateToApplicationOrganizationDashboard();
+  };
+
   const handleSaveClicked = () => {
     const form = formRef.current;
     const isFormValid = form!.checkValidity();
@@ -92,7 +104,7 @@ function ApplicationReviewPage() {
             <ApplicationReviewersNotesSection />
             <ReviewerButtonRow
               isFormDirty={isFormDirty}
-              handleCancelClicked={() => setShowCancelConfirmationModal(true)}
+              handleCancelClicked={handleCancelClicked}
               handleSaveClicked={handleSaveClicked}
               handleSubmitForFinalReviewClicked={alertNotImplemented}
             />
@@ -102,7 +114,7 @@ function ApplicationReviewPage() {
         <ConfirmationModal
           show={showCancelConfirmationModal}
           onCancel={() => setShowCancelConfirmationModal(false)}
-          onConfirm={navigateToApplicationOrganizationDashboard}
+          onConfirm={handleCancelConfirmed}
           titleText="Are you sure you want to leave?"
           cancelText="Cancel"
           confirmText="Okay"
