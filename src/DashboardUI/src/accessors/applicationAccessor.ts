@@ -162,7 +162,6 @@ export const updateApplicationSubmission = async (
   context: IMsalContext,
   data: {
     waterConservationApplicationId: string;
-    waterRightNativeId: string;
     form: ApplicationSubmissionFormData;
     supportingDocuments: ApplicationDocument[];
     note: string;
@@ -171,7 +170,6 @@ export const updateApplicationSubmission = async (
   const api = await westDaatApi(context);
 
   const request: WaterConservationApplicationSubmissionUpdateRequest = {
-    waterRightNativeId: data.waterRightNativeId,
     agentName: data.form.agentName,
     agentEmail: data.form.agentEmail,
     agentPhoneNumber: data.form.agentPhoneNumber,

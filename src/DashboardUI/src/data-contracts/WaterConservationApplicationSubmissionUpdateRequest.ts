@@ -3,8 +3,6 @@ import { ApplicationStoreRequestBase } from './ApplicationStoreRequestBase';
 import { CompensationRateUnits } from './CompensationRateUnits';
 
 export interface WaterConservationApplicationSubmissionUpdateRequest extends ApplicationStoreRequestBase {
-  waterRightNativeId: string;
-
   agentName: string | undefined;
   agentEmail: string | undefined;
   agentPhoneNumber: string | undefined;

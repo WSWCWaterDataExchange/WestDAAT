@@ -61,7 +61,6 @@ function ApplicationReviewPage() {
     mutationFn: async (documentedChanges: string) => {
       return await updateApplicationSubmission(context, {
         waterConservationApplicationId: applicationId!,
-        waterRightNativeId: state.conservationApplication.waterRightNativeId!,
         form: state.conservationApplication.applicationSubmissionForm,
         supportingDocuments: state.conservationApplication.supportingDocuments,
         note: documentedChanges,
