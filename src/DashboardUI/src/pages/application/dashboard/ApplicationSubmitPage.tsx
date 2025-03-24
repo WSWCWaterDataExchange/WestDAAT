@@ -10,6 +10,7 @@ import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import ApplicationReviewForm from '../components/ApplicationReviewForm';
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
 export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
@@ -88,28 +89,14 @@ export function ApplicationSubmitPage() {
         />
       </div>
 
-      <SubmitApplicationConfirmationModal
+      <ConfirmationModal
         show={showSubmissionConfirmationModal}
-        cancelSubmission={handleModalCancel}
-        confirmSubmission={handleModalConfirm}
-      />
-    </div>
-  );
-}
-
-interface SubmitApplicationConfirmationModalProps {
-  show: boolean;
-  cancelSubmission: () => void;
-  confirmSubmission: () => void;
-}
-
-function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmationModalProps) {
-  return (
-    <Modal show={props.show} centered>
-      <Modal.Header closeButton onClick={() => props.cancelSubmission()}>
-        <Modal.Title>Submit for Review?</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+        onCancel={handleModalCancel}
+        onConfirm={handleModalConfirm}
+        titleText="Submit for Review?"
+        cancelText="Cancel"
+        confirmText="Submit"
+      >
         <div className="mb-2">
           Are you sure you want to submit this application? Once submitted, the application cannot be edited or resent.
         </div>
@@ -126,15 +113,7 @@ function SubmitApplicationConfirmationModal(props: SubmitApplicationConfirmation
         </div>
 
         <div>By submitting this application, I hereby declare that the information provided is true and correct</div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={() => props.cancelSubmission()}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={() => props.confirmSubmission()}>
-          Submit
-        </Button>
-      </Modal.Footer>
-    </Modal>
+      </ConfirmationModal>
+    </div>
   );
 }

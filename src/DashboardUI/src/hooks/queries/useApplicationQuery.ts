@@ -106,6 +106,8 @@ export function useGetApplicationQuery(
       }),
     {
       enabled: !!applicationId && isQueryEnabled,
+      // do not cache data. results should always be fresh in case another user updates the application
+      cacheTime: 0,
       onSuccess: (result) => {
         dispatch({
           type: 'APPLICATION_LOADED',
