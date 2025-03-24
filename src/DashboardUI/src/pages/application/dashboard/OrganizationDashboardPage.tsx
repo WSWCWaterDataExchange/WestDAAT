@@ -35,7 +35,6 @@ import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
-import { ToastContainer } from 'react-toastify';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -294,9 +293,6 @@ export function OrganizationDashboardPage() {
           ></DataGrid>
         </TableLoading>
       </div>
-
-      {/* other pages queue messages to be displayed after navigating here  */}
-      <ToastContainer />
     </main>
   );
 }
