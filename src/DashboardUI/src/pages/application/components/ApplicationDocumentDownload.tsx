@@ -18,9 +18,9 @@ export function ApplicationDocumentDownload() {
 
     toast.info(`Downloading ${fileName}`, { autoClose: 1000 });
 
-    await downloadApplicationDocuments(msalContext, fileId)
-      .then(() => toast.success(`${fileName} downloaded`, { autoClose: 1000 }))
-      .catch(() => toast.error(`An error occurred while downloading ${fileName}`, { autoClose: 3000 }));
+    await downloadApplicationDocuments(msalContext, fileId).catch(() =>
+      toast.error(`An error occurred while downloading ${fileName}`, { autoClose: 3000 }),
+    );
   };
 
   return (
