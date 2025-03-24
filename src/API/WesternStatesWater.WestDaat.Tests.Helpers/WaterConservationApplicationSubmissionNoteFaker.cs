@@ -6,7 +6,7 @@ public class WaterConservationApplicationSubmissionNoteFaker : Faker<EFWD.WaterC
     {
         RuleFor(note => note.Timestamp, f => f.Date.PastOffset(1, DateTimeOffset.UtcNow));
 
-        RuleFor(note => note.Text, f => f.Lorem.Paragraph());
+        RuleFor(note => note.Note, f => f.Lorem.Paragraph());
 
         if (submission != null)
         {

@@ -268,7 +268,7 @@ internal class ValidationEngine : IValidationEngine
         // verify application is in review
         if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
         {
-            return CreateForbiddenError(request, context);
+            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), "Application must be in review to be updated.");
         }
 
         // verify user belongs to the funding organization that is handling the application

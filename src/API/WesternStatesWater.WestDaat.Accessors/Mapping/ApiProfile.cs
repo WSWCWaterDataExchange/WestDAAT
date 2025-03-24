@@ -362,7 +362,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplicationSubmissionId, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
                 .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
-                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Note))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UpdatedByUserId));
 
             CreateMap<WaterConservationApplicationDocument, EFWD.WaterConservationApplicationDocument>()

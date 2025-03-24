@@ -69,5 +69,12 @@ public class WaterConservationApplicationSubmissionRequestValidator : AbstractVa
             detailValidator.RuleFor(detail => detail.WaterConservationApplicationEstimateLocationId).NotEmpty();
             detailValidator.RuleFor(detail => detail.AdditionalDetails).NotEmpty().MaximumLength(4000);
         }));
+
+        RuleFor(x => x.SupportingDocuments).NotNull().ForEach(item => item.ChildRules(documentValidator =>
+        {
+            documentValidator.RuleFor(document => document.BlobName).NotEmpty().MaximumLength(255);
+            documentValidator.RuleFor(document => document.FileName).NotEmpty().MaximumLength(255);
+            documentValidator.RuleFor(document => document.Description).MaximumLength(4000);
+        }));
     }
 }
