@@ -113,7 +113,7 @@ export const downloadApplicationDocuments = async (
   context: IMsalContext,
   documentId: string
 ): Promise<void> => {
-  const { sasToken, fileName } = (await generateDownloadSasToken(context, documentId));
+  const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
   await downloadFilesFromBlobStorage(sasToken, fileName);
 }
 
