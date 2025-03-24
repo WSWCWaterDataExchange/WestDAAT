@@ -23,7 +23,7 @@ const overlayLayers = [mapLayerNames.overlayTypesPolygonsLayer, mapLayerNames.ov
 
 const timeSeriesLayers = [
   mapLayerNames.timeSeriesPointsLayer,
-  // Add polygons if you have them: mapLayerNames.timeSeriesPolygonsLayer
+  mapLayerNames.timeSeriesPolygonsLayer
 ];
 
 export function useDisplayOptions() {
