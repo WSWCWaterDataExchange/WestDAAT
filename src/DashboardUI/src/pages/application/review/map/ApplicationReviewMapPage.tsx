@@ -1,8 +1,9 @@
 import { NotImplementedPlaceholder } from '../../../../components/NotImplementedAlert';
+import { useApplicationReviewPageContext } from '../Provider';
 
-export interface ApplicationReviewMapProps {}
+export function ApplicationReviewMapPage() {
+  const pageState = useApplicationReviewPageContext();
 
-export function ApplicationReviewMap(props: ApplicationReviewMapProps) {
   return (
     <div>
       <NotImplementedPlaceholder />

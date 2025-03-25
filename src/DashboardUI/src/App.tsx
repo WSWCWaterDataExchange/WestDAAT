@@ -32,8 +32,8 @@ import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
 import { ApplicationSubmitPage } from './pages/application/dashboard/ApplicationSubmitPage';
 import ApplicationReviewPage from './pages/application/review/ApplicationReviewPage';
 import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
-import ApplicationReviewFormLayout from './pages/application/review/form/ApplicationReviewFormLayout';
-import ApplicationReviewMapLayout from './pages/application/review/map/ApplicationReviewMapLayout';
+import { ApplicationReviewFormPage } from './pages/application/review/form/ApplicationReviewFormPage';
+import { ApplicationReviewMapPage } from './pages/application/review/map/ApplicationReviewMapPage';
 
 import './App.scss';
 
@@ -114,8 +114,8 @@ function App({ msalInstance }: AppProps) {
                       <Route path="submit" element={<ApplicationSubmitPage />} />
                       <Route path="review" element={<ApplicationReviewGuard />}>
                         <Route element={<ApplicationReviewPage />}>
-                          <Route index element={<ApplicationReviewFormLayout />} />
-                          <Route path="map" element={<ApplicationReviewMapLayout />} />
+                          <Route index element={<ApplicationReviewFormPage />} />
+                          <Route path="map" element={<ApplicationReviewMapPage />} />
                         </Route>
                       </Route>
                     </Route>

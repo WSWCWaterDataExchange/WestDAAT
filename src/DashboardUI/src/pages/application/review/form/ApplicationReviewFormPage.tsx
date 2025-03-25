@@ -14,14 +14,12 @@ import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
+import { useApplicationReviewPageContext } from '../Provider';
 
-export interface ApplicationReviewFormProps {
-  isApplicationLoading: boolean;
-  isFundingOrganizationLoading: boolean;
-}
-
-export function ApplicationReviewForm(props: ApplicationReviewFormProps) {
-  const { isApplicationLoading, isFundingOrganizationLoading } = props;
+export function ApplicationReviewFormPage() {
+  const pageState = useApplicationReviewPageContext();
+  const isApplicationLoading = pageState.getApplicationQuery.isLoading;
+  const isFundingOrganizationLoading = pageState.getFundingOrganizationQuery.isLoading;
 
   const context = useMsal();
   const navigate = useNavigate();
