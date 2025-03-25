@@ -7,7 +7,6 @@ import {
   CompensationRateUnitsLabelsSingular,
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
-import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import ApplicationFormSection from './ApplicationFormSection';
 import FormElementDisplay from './FormElementDisplay';
 import ApplicationDocumentSection from './ApplicationDocumentSection';
@@ -16,12 +15,12 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-interface ApplicationReviewFormProps {
+interface ApplicationReviewFormDisplayProps {
   isLoading: boolean;
   submitApplication: () => void;
 }
 
-function ApplicationReviewForm(props: ApplicationReviewFormProps) {
+function ApplicationReviewFormDisplay(props: ApplicationReviewFormDisplayProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
@@ -305,4 +304,4 @@ function ApplicationReviewForm(props: ApplicationReviewFormProps) {
   );
 }
 
-export default ApplicationReviewForm;
+export default ApplicationReviewFormDisplay;

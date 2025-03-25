@@ -3,7 +3,7 @@ import ApplicationDocumentSection from '../../components/ApplicationDocumentSect
 import ApplicationReviewersNotesSection from '../../components/ApplicationReviewersNotesSection';
 import ApplicationReviewPipelineSection from '../../components/ApplicationReviewPipelineSection';
 import ApplicationSubmissionForm from '../../components/ApplicationSubmissionForm';
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useDirtyFormCheck from '../../../../hooks/useDirtyFormCheck';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
@@ -15,25 +15,12 @@ import { updateApplicationSubmission } from '../../../../accessors/applicationAc
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
 
-function ApplicationReviewFormLayout() {
-  const { isApplicationLoading, isFundingOrganizationLoading } = useOutletContext<ApplicationReviewFormPageProps>();
-
-  return (
-    <ApplicationReviewFormPage
-      isApplicationLoading={isApplicationLoading}
-      isFundingOrganizationLoading={isFundingOrganizationLoading}
-    />
-  );
-}
-
-export default ApplicationReviewFormLayout;
-
-interface ApplicationReviewFormPageProps {
+export interface ApplicationReviewFormProps {
   isApplicationLoading: boolean;
   isFundingOrganizationLoading: boolean;
 }
 
-function ApplicationReviewFormPage(props: ApplicationReviewFormPageProps) {
+export function ApplicationReviewForm(props: ApplicationReviewFormProps) {
   const { isApplicationLoading, isFundingOrganizationLoading } = props;
 
   const context = useMsal();

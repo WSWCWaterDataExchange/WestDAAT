@@ -33,7 +33,7 @@ import { ApplicationSubmitPage } from './pages/application/dashboard/Application
 import ApplicationReviewPage from './pages/application/review/ApplicationReviewPage';
 import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
 import ApplicationReviewMap from './pages/application/review/map/ApplicationReviewMap';
-import ApplicationReviewFormLayout from './pages/application/review/form/ApplicationReviewFormPage';
+import ApplicationReviewFormLayout from './pages/application/review/form/ApplicationReviewFormLayout';
 
 import './App.scss';
 
