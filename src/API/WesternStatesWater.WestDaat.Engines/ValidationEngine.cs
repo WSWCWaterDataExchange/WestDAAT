@@ -20,18 +20,22 @@ internal class ValidationEngine : IValidationEngine
     private readonly IOrganizationAccessor _organizationAccessor;
 
     private readonly IApplicationAccessor _applicationAccessor;
+    
+    private readonly IUserAccessor _userAccessor;
 
     public ValidationEngine(
         IContextUtility contextUtility,
         ISecurityUtility securityUtility,
         IOrganizationAccessor organizationAccessor,
-        IApplicationAccessor applicationAccessor
+        IApplicationAccessor applicationAccessor,
+        IUserAccessor userAccessor
     )
     {
         _contextUtility = contextUtility;
         _securityUtility = securityUtility;
         _organizationAccessor = organizationAccessor;
         _applicationAccessor = applicationAccessor;
+        _userAccessor = userAccessor;
     }
 
     public async Task<ErrorBase> Validate(RequestBase request)
@@ -377,6 +381,18 @@ internal class ValidationEngine : IValidationEngine
         if (userOrganizationResponse.Organizations.Any())
         {
             return CreateConflictError(request, context, nameof(UserOrganization), request.UserId, request.OrganizationId);
+        }
+
+        // Verify the user's email domain matches the organization's
+        var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
+            { UserId = request.UserId });
+        var organizationEmailDomainResponse = (DTO.OrganizationEmailDomainResponse)await _organizationAccessor.Load(new DTO.OrganizationEmailDomainRequest
+            { OrganizationId = request.OrganizationId });
+        var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1].ToLower();
+        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Split("@")[1].ToLower();
+        if (userEmailDomain != organizationEmailDomain)
+        {
+            throw new NotImplementedException("User email domain does not match organization email domain");
         }
 
         return null;

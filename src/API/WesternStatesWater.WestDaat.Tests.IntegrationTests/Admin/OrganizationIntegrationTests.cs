@@ -437,6 +437,73 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task Store_OrganizationMemberAddRequest_AddingMemberWithDifferentEmailDomain_ShouldNotAllow()
+    {
+        // Arrange
+        var organization = new OrganizationFaker()
+            .RuleFor(x => x.EmailDomain, _ => "@fakeOrganization.com").Generate();
+        var user = new UserFaker()
+            .RuleFor(x => x.Email, _ => "fakeUser@differentFakeOrganization.com").Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organization.Id,
+            UserId = user.Id,
+            Role = Roles.Member
+        });
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+        response.Error.PublicMessage.Should().Be("this message is TBD");
+    }
+
+    [TestMethod]
+    public async Task Store_OrganizationMemberAddRequest_Success()
+    {
+        // Arrange
+        var organization = new OrganizationFaker()
+            .RuleFor(x => x.EmailDomain, _ => "@myOrganization.com").Generate();
+        var user = new UserFaker()
+            .RuleFor(x => x.Email, _ => "myUser@myOrganization.com").Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organization.Id,
+            UserId = user.Id,
+            Role = Roles.Member
+        });
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.Should().BeOfType<OrganizationMemberAddResponse>();
+    }
+    
+    [TestMethod]
     public async Task Store_OrganizationMemberRemoveRequest_ShouldNotAllowRemovingSelf()
     {
         // Arrange
