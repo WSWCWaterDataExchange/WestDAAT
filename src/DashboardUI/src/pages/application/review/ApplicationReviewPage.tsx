@@ -38,6 +38,7 @@ function ApplicationReviewPage() {
   const outletContext: ApplicationReviewFormProps & ApplicationReviewMapProps = {
     isApplicationLoading,
     isFundingOrganizationLoading,
+    waterRightNativeId: state.conservationApplication.waterRightNativeId,
   };
 
   return (
@@ -50,11 +51,13 @@ function ApplicationReviewPage() {
 
       <div className="overflow-y-auto">
         {!isApplicationLoading && !isFundingOrganizationLoading && (
-          <div className="container">
-            <ApplicationReviewHeader perspective={perspective} />
+          <>
+            <div className="container">
+              <ApplicationReviewHeader perspective={perspective} />
+            </div>
 
             <Outlet context={outletContext} />
-          </div>
+          </>
         )}
       </div>
     </div>
