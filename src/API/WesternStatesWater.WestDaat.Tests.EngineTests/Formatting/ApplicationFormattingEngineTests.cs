@@ -27,6 +27,7 @@ public class ApplicationFormattingEngineTests : EngineTestBase
         _applicationFormattingEngine = new FormattingEngine(
             CreateLogger<FormattingEngine>(),
             Services.GetRequiredService<EnvironmentConfiguration>(),
+            Services.GetRequiredService<EmailServiceConfiguration>(),
             _applicationAccessorMock.Object,
             _organizationAccessorMock.Object,
             _userAccessorMock.Object
