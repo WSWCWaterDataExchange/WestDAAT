@@ -11,7 +11,9 @@ public class NotificationFilteringEngineTests : EngineTestBase
     public void TestInitialize()
     {
         _notificationFilteringEngine = new FilteringEngine(
-            CreateLogger<FilteringEngine>()
+            CreateLogger<FilteringEngine>(),
+            ApplicationAccessorMock.Object,
+            UserAccessorMock.Object
         );
     }
 

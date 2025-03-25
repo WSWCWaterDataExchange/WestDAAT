@@ -219,7 +219,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 
-            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest, CommonContracts.WaterConservationApplicationSubmissionUpdateRequest>()
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest,
+                    CommonContracts.WaterConservationApplicationSubmissionUpdateRequest>()
                 .ForMember(dest => dest.UpdatedByUserId, opt => opt.Ignore());
 
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
@@ -237,6 +238,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
+
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
