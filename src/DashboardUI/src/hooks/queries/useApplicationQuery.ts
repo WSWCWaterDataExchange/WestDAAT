@@ -100,8 +100,8 @@ export function useGetApplicationQuery(
 
   return useQuery(
     ['getApplication', applicationId, perspective],
-    () =>
-      getApplication(context, {
+    async () =>
+      await getApplication(context, {
         applicationId: applicationId!,
         perspective,
       }),
