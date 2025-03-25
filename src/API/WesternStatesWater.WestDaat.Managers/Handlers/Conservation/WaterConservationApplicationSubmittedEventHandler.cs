@@ -4,25 +4,40 @@ using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
+using WesternStatesWater.WestDaat.Engines;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
 {
-    public IApplicationAccessor ApplicationAccessor { get; }
+    public INotificationFilteringEngine FilteringEngine { get; }
+
+    public INotificationFormattingEngine FormattingEngine { get; }
 
     public ILogger Logger { get; }
 
-    public WaterConservationApplicationSubmittedEventHandler(IApplicationAccessor applicationAccessor, ILogger<WaterConservationApplicationSubmittedEventHandler> logger)
+    public WaterConservationApplicationSubmittedEventHandler(
+        INotificationFilteringEngine filteringEngine,
+        INotificationFormattingEngine formattingEngine,
+        ILogger<WaterConservationApplicationSubmittedEventHandler> logger
+    )
     {
-        ApplicationAccessor = applicationAccessor;
+        FilteringEngine = filteringEngine;
+        FormattingEngine = formattingEngine;
         Logger = logger;
     }
 
-    public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent request)
+    public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent @event)
     {
-        await Task.CompletedTask;
-        Logger.LogInformation("WaterConservationApplicationSubmittedEvent handled. Id: {ApplicationId}", request.ApplicationId);
-        return new EventResponseBase();
+        await FilteringEngine.Filter(@event);
+        
+        
+        // var dto = DtoMapper.Map<DTO.FriendRequestSentEvent>(@event);
+        // var notificationMetas = await _notificationFilteringEngine.Filter(dto);
+        // var notifications = _notificationFormattingEngine.Format(notificationMetas);
+        //
+        // await Send(notifications);
+        //
+        // return new CLI.ResponseBase();
     }
 }
