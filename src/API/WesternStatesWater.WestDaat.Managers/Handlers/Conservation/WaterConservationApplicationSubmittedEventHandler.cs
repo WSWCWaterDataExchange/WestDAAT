@@ -5,39 +5,35 @@ using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
 {
-    public INotificationFilteringEngine FilteringEngine { get; }
+    public INotificationFilteringEngine NotificationFilteringEngine { get; }
 
-    public INotificationFormattingEngine FormattingEngine { get; }
+    public INotificationFormattingEngine NotificationFormattingEngine { get; }
 
     public ILogger Logger { get; }
 
     public WaterConservationApplicationSubmittedEventHandler(
-        INotificationFilteringEngine filteringEngine,
-        INotificationFormattingEngine formattingEngine,
+        INotificationFilteringEngine notificationFilteringEngine,
+        INotificationFormattingEngine notificationFormattingEngine,
         ILogger<WaterConservationApplicationSubmittedEventHandler> logger
     )
     {
-        FilteringEngine = filteringEngine;
-        FormattingEngine = formattingEngine;
+        NotificationFilteringEngine = notificationFilteringEngine;
+        NotificationFormattingEngine = notificationFormattingEngine;
         Logger = logger;
     }
 
     public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent @event)
     {
-        await FilteringEngine.Filter(@event);
+        var dto = DtoMapper.Map<DTO.WaterConservationApplicationSubmittedEvent>(@event);
+        var notificationMetas = await NotificationFilteringEngine.Filter(dto);
         
-        
-        // var dto = DtoMapper.Map<DTO.FriendRequestSentEvent>(@event);
-        // var notificationMetas = await _notificationFilteringEngine.Filter(dto);
-        // var notifications = _notificationFormattingEngine.Format(notificationMetas);
-        //
-        // await Send(notifications);
-        //
-        // return new CLI.ResponseBase();
+
+        return new EventResponseBase();
     }
 }
