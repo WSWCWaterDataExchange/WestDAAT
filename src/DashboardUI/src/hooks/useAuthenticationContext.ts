@@ -3,7 +3,6 @@ import { useAccount, useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect, useState } from 'react';
 import { loginRequest } from '../authConfig';
 import { Role } from '../config/role';
-import { error } from 'console';
 
 export interface User {
   userId?: string;
