@@ -20,14 +20,32 @@ internal class UserAccessor : AccessorBase, IUserAccessor
     {
         return request switch
         {
+            NotificationUserRequest req => await GetNotificationUser(req),
             UserExistsRequest req => await GetUserExists(req),
             UserListRequest req => await ListUsers(req),
             UserLoadRolesRequest req => await GetUserRoles(req),
+            UserNameExistsRequest req => await GetUserNameExists(req),
             UserProfileRequest req => await GetUserProfile(req),
             UserSearchRequest req => await SearchUsers(req),
-            UserNameExistsRequest req => await GetUserNameExists(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
+        };
+    }
+
+    private async Task<NotificationUserResponse> GetNotificationUser(NotificationUserRequest request)
+    {
+        await using var db = _westdaatDatabaseContextFactory.Create();
+
+        var user = await db.Users
+            .Where(u => u.Id == request.UserId)
+            .ProjectTo<NotificationUser>(DtoMapper.Configuration)
+            .SingleOrDefaultAsync();
+
+        NotFoundException.ThrowIfNull(user, $"User not found for id {request.UserId}");
+
+        return new NotificationUserResponse
+        {
+            User = user,
         };
     }
 
@@ -36,6 +54,7 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         await using var db = _westdaatDatabaseContextFactory.Create();
 
         var user = await db.Users
+            .AsNoTracking()
             .Include(u => u.UserRoles)
             .Include(u => u.UserOrganizations)
             .ThenInclude(uor => uor.UserOrganizationRoles)

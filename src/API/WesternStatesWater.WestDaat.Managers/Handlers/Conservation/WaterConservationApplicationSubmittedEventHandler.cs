@@ -4,25 +4,36 @@ using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
+using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
 {
-    public IApplicationAccessor ApplicationAccessor { get; }
+    public INotificationFilteringEngine NotificationFilteringEngine { get; }
+
+    public INotificationFormattingEngine NotificationFormattingEngine { get; }
 
     public ILogger Logger { get; }
 
-    public WaterConservationApplicationSubmittedEventHandler(IApplicationAccessor applicationAccessor, ILogger<WaterConservationApplicationSubmittedEventHandler> logger)
+    public WaterConservationApplicationSubmittedEventHandler(
+        INotificationFilteringEngine notificationFilteringEngine,
+        INotificationFormattingEngine notificationFormattingEngine,
+        ILogger<WaterConservationApplicationSubmittedEventHandler> logger
+    )
     {
-        ApplicationAccessor = applicationAccessor;
+        NotificationFilteringEngine = notificationFilteringEngine;
+        NotificationFormattingEngine = notificationFormattingEngine;
         Logger = logger;
     }
 
-    public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent request)
+    public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent @event)
     {
-        await Task.CompletedTask;
-        Logger.LogInformation("WaterConservationApplicationSubmittedEvent handled. Id: {ApplicationId}", request.ApplicationId);
+        var dto = DtoMapper.Map<DTO.WaterConservationApplicationSubmittedEvent>(@event);
+        var notificationMetas = await NotificationFilteringEngine.Filter(dto);
+        
+
         return new EventResponseBase();
     }
 }
