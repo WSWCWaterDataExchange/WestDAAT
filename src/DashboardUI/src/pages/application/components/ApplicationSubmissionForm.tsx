@@ -1,4 +1,4 @@
-import { createRef, useRef, useState } from 'react';
+import { createRef, useRef } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import InputGroup from 'react-bootstrap/esm/InputGroup';
@@ -31,6 +31,11 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
+
+  const navigate = useNavigate();
+  const navigateToReviewPageMap = () => {
+    navigate('map');
+  };
 
   const landownerNameRef = useRef<HTMLInputElement>(null);
   const landownerEmailRef = useRef<HTMLInputElement>(null);
@@ -269,6 +274,9 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         <div className="col-lg-6 col-12">
           Static map here
           <NotImplementedPlaceholder />
+          <Button variant="outline-primary" onClick={navigateToReviewPageMap}>
+            Edit in Estimator
+          </Button>
         </div>
       </div>
 
