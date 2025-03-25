@@ -14,17 +14,15 @@ import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
-import { useApplicationReviewPageContext } from '../Provider';
 
 export function ApplicationReviewFormPage() {
-  const pageState = useApplicationReviewPageContext();
-  const isApplicationLoading = pageState.getApplicationQuery.isLoading;
-  const isFundingOrganizationLoading = pageState.getFundingOrganizationQuery.isLoading;
-
   const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+
+  const isApplicationLoading = state.isLoadingApplication;
+  const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
 
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);

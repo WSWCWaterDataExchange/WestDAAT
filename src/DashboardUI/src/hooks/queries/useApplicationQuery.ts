@@ -65,7 +65,10 @@ export function useFundingOrganizationQuery(waterRightNativeId: string | undefin
 
   return useQuery(
     ['fundingOrganizationDetails', waterRightNativeId],
-    () => getOrganizationFundingDetails(context, waterRightNativeId!),
+    async () => {
+      dispatch({ type: 'FUNDING_ORGANIZATION_LOADING' });
+      return await getOrganizationFundingDetails(context, waterRightNativeId!);
+    },
     {
       enabled: !!waterRightNativeId,
       onSuccess: (result: OrganizationFundingDetailsResponse) => {
@@ -100,11 +103,14 @@ export function useGetApplicationQuery(
 
   return useQuery(
     ['getApplication', applicationId, perspective],
-    async () =>
-      await getApplication(context, {
+    async () => {
+      dispatch({ type: 'APPLICATION_LOADING' });
+
+      return await getApplication(context, {
         applicationId: applicationId!,
         perspective,
-      }),
+      });
+    },
     {
       enabled: !!applicationId && isQueryEnabled,
       // do not cache data. results should always be fresh in case another user updates the application

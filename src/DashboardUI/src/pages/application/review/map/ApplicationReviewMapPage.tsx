@@ -1,8 +1,8 @@
 import { NotImplementedPlaceholder } from '../../../../components/NotImplementedAlert';
-import { useApplicationReviewPageContext } from '../Provider';
+import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 
 export function ApplicationReviewMapPage() {
-  const pageState = useApplicationReviewPageContext();
+  const { state } = useConservationApplicationContext();
 
   return (
     <div>

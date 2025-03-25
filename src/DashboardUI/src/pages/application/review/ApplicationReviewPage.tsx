@@ -1,16 +1,18 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { useMemo } from 'react';
-import { ApplicationReviewPageProvider, useApplicationReviewPageContext } from './Provider';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
-  const pageState = useApplicationReviewPageContext();
+  const { applicationId } = useParams();
   const location = useLocation();
+  const { state } = useConservationApplicationContext();
 
   const isOnMapPage = location.pathname.includes('map');
 
@@ -26,29 +28,27 @@ function ApplicationReviewPage() {
     return isOnMapPage ? 'Back to Application' : 'Back to Dashboard';
   }, [isOnMapPage]);
 
-  const { isLoading: isApplicationLoading } = pageState.getApplicationQuery;
-  const { isLoading: isFundingOrganizationLoading } = pageState.getFundingOrganizationQuery;
+  useGetApplicationQuery(applicationId, 'reviewer', true);
+  useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
   return (
-    <ApplicationReviewPageProvider>
-      <div className="d-flex flex-column flex-grow-1 h-100">
-        <ApplicationNavbar
-          navigateBack={navigateBack}
-          backButtonText={backButtonText}
-          centerText="Water Conservation Estimation Tool"
-        />
+    <div className="d-flex flex-column flex-grow-1 h-100">
+      <ApplicationNavbar
+        navigateBack={navigateBack}
+        backButtonText={backButtonText}
+        centerText="Water Conservation Estimation Tool"
+      />
 
-        <div className="overflow-y-auto">
-          {!isApplicationLoading && !isFundingOrganizationLoading && (
-            <div className="container">
-              <ApplicationReviewHeader perspective={perspective} />
+      <div className="overflow-y-auto">
+        {!state.isLoadingApplication && !state.isLoadingFundingOrganization && (
+          <div className="container">
+            <ApplicationReviewHeader perspective={perspective} />
 
-              <Outlet />
-            </div>
-          )}
-        </div>
+            <Outlet />
+          </div>
+        )}
       </div>
-    </ApplicationReviewPageProvider>
+    </div>
   );
 }
 
