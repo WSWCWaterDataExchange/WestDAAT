@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
 
@@ -24,6 +26,7 @@ public class NotificationFormattingEngineTests : EngineTestBase
 
         _notificationFormattingEngine = new FormattingEngine(
             CreateLogger<FormattingEngine>(),
+            Services.GetRequiredService<EnvironmentConfiguration>(),
             _applicationAccessorMock.Object,
             _organizationAccessorMock.Object,
             _userAccessorMock.Object
