@@ -5,6 +5,8 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { useMemo } from 'react';
+import { ApplicationReviewFormProps } from './form/ApplicationReviewForm';
+import { ApplicationReviewMapProps } from './map/ApplicationReviewMap';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -33,6 +35,11 @@ function ApplicationReviewPage() {
     state.conservationApplication.waterRightNativeId,
   );
 
+  const outletContext: ApplicationReviewFormProps & ApplicationReviewMapProps = {
+    isApplicationLoading,
+    isFundingOrganizationLoading,
+  };
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -46,12 +53,7 @@ function ApplicationReviewPage() {
           <div className="container">
             <ApplicationReviewHeader perspective={perspective} />
 
-            <Outlet
-              context={{
-                isApplicationLoading,
-                isFundingOrganizationLoading,
-              }}
-            />
+            <Outlet context={outletContext} />
           </div>
         )}
       </div>
