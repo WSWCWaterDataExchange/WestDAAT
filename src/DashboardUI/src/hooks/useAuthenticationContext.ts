@@ -3,6 +3,7 @@ import { useAccount, useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect, useState } from 'react';
 import { loginRequest } from '../authConfig';
 import { Role } from '../config/role';
+import { error } from 'console';
 
 export interface User {
   userId?: string;
@@ -47,20 +48,32 @@ export function useAuthenticationContext(): IAuthenticationContext {
 
   useEffect(() => {
     if (isAuthenticated && inProgress !== InteractionStatus.Startup) {
-      msalContext.acquireTokenSilent(loginRequest).then((result) => {
-        const idTokenClaims = result?.account?.idTokenClaims;
-        setAuthContext({
-          isAuthenticated,
-          authenticationComplete,
-          user: {
-            emailAddress: result?.account?.username ?? null,
-            externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
-            userId: parseUserId(idTokenClaims),
-            roles: parseRoles(idTokenClaims),
-            organizationRoles: parseOrganizationRoles(idTokenClaims),
-          },
+      msalContext
+        .acquireTokenSilent(loginRequest)
+        .then((result) => {
+          const idTokenClaims = result?.account?.idTokenClaims;
+          setAuthContext({
+            isAuthenticated,
+            authenticationComplete,
+            user: {
+              emailAddress: result?.account?.username ?? null,
+              externalAuthId: idTokenClaims?.sub, // Subject is b2c user id (object id)
+              userId: parseUserId(idTokenClaims),
+              roles: parseRoles(idTokenClaims),
+              organizationRoles: parseOrganizationRoles(idTokenClaims),
+            },
+          });
+        })
+        .catch((error) => {
+          // If silent token acquisition fails, it's likely because the user needs to re-authenticate.
+          if (error && error.name === 'InteractionRequiredAuthError') {
+            msalContext.acquireTokenPopup({
+              scopes: loginRequest.scopes,
+            });
+          } else {
+            throw error;
+          }
         });
-      });
     } else {
       setAuthContext({
         isAuthenticated,
