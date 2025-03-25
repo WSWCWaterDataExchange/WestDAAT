@@ -1,4 +1,4 @@
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
+import { NotImplementedPlaceholder } from '../../../../components/NotImplementedAlert';
 
 function ApplicationReviewMap() {
   return (
