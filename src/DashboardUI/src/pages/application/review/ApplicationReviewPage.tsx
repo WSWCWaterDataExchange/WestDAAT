@@ -7,6 +7,7 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 import { useMemo } from 'react';
 import { ApplicationReviewFormProps } from './form/ApplicationReviewForm';
 import { ApplicationReviewMapProps } from './map/ApplicationReviewMap';
+import { ApplicationReviewPageProvider } from './Provider';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -41,23 +42,25 @@ function ApplicationReviewPage() {
   };
 
   return (
-    <div className="d-flex flex-column flex-grow-1 h-100">
-      <ApplicationNavbar
-        navigateBack={navigateBack}
-        backButtonText={backButtonText}
-        centerText="Water Conservation Estimation Tool"
-      />
+    <ApplicationReviewPageProvider>
+      <div className="d-flex flex-column flex-grow-1 h-100">
+        <ApplicationNavbar
+          navigateBack={navigateBack}
+          backButtonText={backButtonText}
+          centerText="Water Conservation Estimation Tool"
+        />
 
-      <div className="overflow-y-auto">
-        {!isApplicationLoading && !isFundingOrganizationLoading && (
-          <div className="container">
-            <ApplicationReviewHeader perspective={perspective} />
+        <div className="overflow-y-auto">
+          {!isApplicationLoading && !isFundingOrganizationLoading && (
+            <div className="container">
+              <ApplicationReviewHeader perspective={perspective} />
 
-            <Outlet context={outletContext} />
-          </div>
-        )}
+              <Outlet context={outletContext} />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ApplicationReviewPageProvider>
   );
 }
 
