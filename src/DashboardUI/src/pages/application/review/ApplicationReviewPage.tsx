@@ -1,20 +1,18 @@
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { useMemo } from 'react';
-import { ApplicationReviewFormProps } from './form/ApplicationReviewForm';
-import { ApplicationReviewMapProps } from './map/ApplicationReviewMap';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
-  const { state } = useConservationApplicationContext();
   const location = useLocation();
+  const { state } = useConservationApplicationContext();
 
   const isOnMapPage = location.pathname.includes('map');
 
@@ -30,15 +28,8 @@ function ApplicationReviewPage() {
     return isOnMapPage ? 'Back to Application' : 'Back to Dashboard';
   }, [isOnMapPage]);
 
-  const { isLoading: isApplicationLoading } = useGetApplicationQuery(applicationId, 'reviewer', true);
-  const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
-    state.conservationApplication.waterRightNativeId,
-  );
-
-  const outletContext: ApplicationReviewFormProps & ApplicationReviewMapProps = {
-    isApplicationLoading,
-    isFundingOrganizationLoading,
-  };
+  useGetApplicationQuery(applicationId, 'reviewer', true);
+  useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -49,11 +40,11 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        {!isApplicationLoading && !isFundingOrganizationLoading && (
+        {!state.isLoadingApplication && !state.isLoadingFundingOrganization && (
           <div className="container">
             <ApplicationReviewHeader perspective={perspective} />
 
-            <Outlet context={outletContext} />
+            <Outlet />
           </div>
         )}
       </div>
