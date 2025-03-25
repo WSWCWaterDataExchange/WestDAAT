@@ -20,6 +20,7 @@ interface ApplicationSubmissionFormDisplayProps {
   submitApplication: () => void;
 }
 
+// readonly / display-only version of the `ApplicationSubmissionForm` component
 function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDisplayProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
