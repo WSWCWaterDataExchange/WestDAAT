@@ -3,8 +3,12 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Net;
+using WesternStatesWater.Shared.DataContracts;
+using WesternStatesWater.WestDaat.Common.Constants;
+using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 namespace WesternStatesWater.WestDaat.Client.Functions;
@@ -106,5 +110,13 @@ public class ApplicationFunction : FunctionBase
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
         return await CreateResponse(req, result);
+    }
+
+    [Function(nameof(OnApplicationSubmitted))]
+    public async Task OnApplicationSubmitted(
+        [ServiceBusTrigger(queueName: Queues.ConservationApplicationSubmitted, Connection = "ServiceBusConnection")]
+        WaterConservationApplicationSubmittedEvent @event)
+    {
+        await _applicationManager.OnApplicationSubmitted<WaterConservationApplicationSubmittedEvent, EventResponseBase>(@event);
     }
 }

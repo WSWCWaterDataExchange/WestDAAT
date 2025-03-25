@@ -25,7 +25,7 @@ namespace WesternStatesWater.WestDaat.Utilities
                 Subject = message.Subject,
                 PlainTextContent = message.TextContent,
                 HtmlContent = message.Body,
-                From = new EmailAddress(message.From)
+                From = new EmailAddress(message.From, message.FromName ?? message.From),
             };
 
             if (!string.IsNullOrWhiteSpace(message.ReplyTo))
@@ -33,9 +33,9 @@ namespace WesternStatesWater.WestDaat.Utilities
                 msg.ReplyTo = new EmailAddress(message.ReplyTo);
             }
 
-            foreach (var address in message.To)
+            foreach (var toAddress in message.To)
             {
-                msg.AddTo(address);
+                msg.AddTo(toAddress);
             }
 
             var client = new SendGridClient(_emailConfiguration.APIKey);
@@ -43,8 +43,11 @@ namespace WesternStatesWater.WestDaat.Utilities
 
             if (!response.IsSuccessStatusCode)
             {
-                var responseBody = await response.Body.ReadAsStringAsync();
-                throw new WestDaatException($"Something went wrong while sending email.\n Response StatusCode: {response.StatusCode}. \n Response Body: {responseBody}. \nSubject: {message.Subject}");
+                throw new WestDaatException(
+                    $"Something went wrong while sending email.\n " +
+                    $"Response StatusCode: {response.StatusCode}.\n " +
+                    $"Response Body: {await response.Body.ReadAsStringAsync()}.\n " +
+                    $"Subject: {message.Subject}");
             }
         }
     }

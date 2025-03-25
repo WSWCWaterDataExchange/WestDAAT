@@ -260,6 +260,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.IsSignupComplete, opt => opt.MapFrom(_ => true));
 
             CreateMap<UserProfileUpdateRequest, EFWD.UserProfile>(MemberList.Source);
+
+            CreateMap<EFWD.User, NotificationUser>()
+                .ForMember(dest => dest.EmailAddress, opt => opt.MapFrom(src => src.Email));
         }
 
         private void AddOrganizationMappings()

@@ -1,5 +1,7 @@
-﻿using WesternStatesWater.WestDaat.Common;
+﻿using WesternStatesWater.Shared.DataContracts;
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 
 namespace WesternStatesWater.WestDaat.Contracts.Client;
@@ -17,4 +19,8 @@ public interface IApplicationManager : IServiceContractBase
     Task<TResponse> Store<TRequest, TResponse>(TRequest request)
         where TRequest : ApplicationStoreRequestBase
         where TResponse : ApplicationStoreResponseBase;
+
+    Task<TResponse> OnApplicationSubmitted<TRequest, TResponse>(TRequest request)
+        where TRequest : WaterConservationApplicationSubmittedEvent
+        where TResponse : EventResponseBase;
 }
