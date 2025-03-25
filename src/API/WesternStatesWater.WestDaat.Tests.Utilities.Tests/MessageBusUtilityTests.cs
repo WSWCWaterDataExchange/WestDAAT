@@ -16,13 +16,11 @@ public class MessageBusUtilityTests : UtilityTestBase
         // Arrange
         var messageBusUtility = new MessageBusUtility(Configuration.GetMessageBusConfiguration());
         var messageObject = new SmokeTestRequest { Message = "Look Ma! It's working!" };
-        var submitEvent = new WaterConservationApplicationSubmittedEvent { ApplicationId = Guid.NewGuid() };
 
         try
         {
             // Act
-            // await messageBusUtility.SendMessageAsync(Queues.SmokeTest, messageObject);
-            await messageBusUtility.SendMessageAsync(Queues.ConservationApplicationSubmitted, submitEvent);
+            await messageBusUtility.SendMessageAsync(Queues.SmokeTest, messageObject);
         }
         catch (ServiceBusException e)
         {
