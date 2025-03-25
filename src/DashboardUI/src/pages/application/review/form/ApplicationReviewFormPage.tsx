@@ -90,9 +90,11 @@ function ApplicationReviewFormPage(props: ApplicationReviewFormPageProps) {
     },
     onSuccess: () => {
       toast.success('Application changes saved successfully.');
+      setShowSaveChangesModal(false);
     },
     onError: () => {
       toast.error('Error saving application changes.');
+      setShowSaveChangesModal(false);
     },
   });
 
