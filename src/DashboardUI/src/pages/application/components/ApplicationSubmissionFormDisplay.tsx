@@ -15,12 +15,12 @@ const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
-interface ApplicationReviewFormDisplayProps {
+interface ApplicationSubmissionFormDisplayProps {
   isLoading: boolean;
   submitApplication: () => void;
 }
 
-function ApplicationReviewFormDisplay(props: ApplicationReviewFormDisplayProps) {
+function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDisplayProps) {
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
@@ -304,4 +304,4 @@ function ApplicationReviewFormDisplay(props: ApplicationReviewFormDisplayProps) 
   );
 }
 
-export default ApplicationReviewFormDisplay;
+export default ApplicationSubmissionFormDisplay;

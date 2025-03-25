@@ -9,7 +9,7 @@ import { useMsal } from '@azure/msal-react';
 import { submitApplication } from '../../../accessors/applicationAccessor';
 import { toast } from 'react-toastify';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
-import ApplicationReviewFormDisplay from '../components/ApplicationReviewFormDisplay';
+import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
 export function ApplicationSubmitPage() {
@@ -83,7 +83,7 @@ export function ApplicationSubmitPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationReviewFormDisplay
+        <ApplicationSubmissionFormDisplay
           submitApplication={presentConfirmationModal}
           isLoading={isApplicationLoading || isFundingOrganizationLoading}
         />
