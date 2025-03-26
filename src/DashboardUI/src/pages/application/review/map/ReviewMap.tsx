@@ -7,7 +7,7 @@ import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPoly
 import { convertGeometryToWkt, convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { convertSquareMetersToAcres } from '../../../../utilities/valueConverters';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
-import { useMapContext } from '../../../../contexts/MapProvider';
+import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
 import Button from 'react-bootstrap/esm/Button';
 import { useEffect, useMemo } from 'react';
 import centerOfMass from '@turf/center-of-mass';
@@ -23,8 +23,14 @@ interface ReviewMapProps {
 
 function ReviewMap(props: ReviewMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setVisibleLayers, setGeoJsonData, setUserDrawnPolygonData } =
-    useMapContext();
+  const { isMapLoaded, isMapRendering, setMapBoundSettings, setMapStyle, setUserDrawnPolygonData } = useMapContext();
+
+  useEffect(() => {
+    if (!isMapLoaded || isMapRendering) {
+      return;
+    }
+    setMapStyle(MapStyle.Satellite);
+  }, [isMapLoaded, isMapRendering, setMapStyle]);
 
   const isReadyToInitializeGeometries = useMemo(() => {
     const polygonData = state.conservationApplication.estimateLocations;
@@ -67,7 +73,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [state.conservationApplication.estimateLocations, convertWktToGeometry, centerOfMass]);
 
   useEffect(() => {
-    if (!userDrawnPolygonFeatures) {
+    if (!userDrawnPolygonFeatures || !isMapLoaded) {
       return;
     }
 
@@ -86,7 +92,8 @@ function ReviewMap(props: ReviewMapProps) {
       maxZoom: 16,
     });
   }, [
-    state.conservationApplication.estimateLocations,
+    userDrawnPolygonFeatures,
+    isMapLoaded,
     convertWktToGeometry,
     getLatsLongsFromFeatureCollection,
     setMapBoundSettings,
