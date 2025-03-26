@@ -15,18 +15,14 @@ import { updateApplicationSubmission } from '../../../../accessors/applicationAc
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
 
-export interface ApplicationReviewFormProps {
-  isApplicationLoading: boolean;
-  isFundingOrganizationLoading: boolean;
-}
-
-export function ApplicationReviewForm(props: ApplicationReviewFormProps) {
-  const { isApplicationLoading, isFundingOrganizationLoading } = props;
-
+export function ApplicationReviewFormPage() {
   const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+
+  const isApplicationLoading = state.isLoadingApplication;
+  const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
 
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
