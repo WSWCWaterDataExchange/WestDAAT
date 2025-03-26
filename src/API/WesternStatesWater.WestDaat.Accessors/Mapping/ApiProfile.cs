@@ -216,7 +216,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserProfile.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserProfile.LastName))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName));
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserProfile.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
             CreateProjection<EFWD.User, UserListResult>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
@@ -266,7 +267,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         {
             CreateMap<EFWD.Organization, OrganizationListItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count));
+                .ForMember(dest => dest.UserCount, opt => opt.MapFrom(src => src.UserOrganizations.Count))
+                .ForMember(dest => dest.EmailDomain, opt => opt.MapFrom(src => src.EmailDomain));
 
             CreateMap<EFWD.Organization, OrganizationSummaryItem>()
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Id));

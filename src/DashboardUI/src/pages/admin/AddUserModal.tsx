@@ -97,6 +97,9 @@ function AddUserModal(props: AddUserModalProps) {
       .then((searchResults) => {
         const options = searchResults?.searchResults
           ?.filter((result) => {
+            console.log(
+              `User's email: ${result.email} -- organization email domain: ${props.organization?.emailDomain}`,
+            );
             // Exclude current user from search results
             return result.userId !== user?.userId;
           })
