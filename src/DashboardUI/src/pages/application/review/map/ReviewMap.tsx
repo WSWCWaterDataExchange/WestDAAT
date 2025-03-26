@@ -116,8 +116,6 @@ function ReviewMap(props: ReviewMapProps) {
         doPolygonsOverlap,
       },
     });
-
-    // todo: add user drawn polygon
   };
 
   const estimateButtonEnabled = state.canEstimateConsumptiveUse && !props.isLoadingConsumptiveUseEstimate;
