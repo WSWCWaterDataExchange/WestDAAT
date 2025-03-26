@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal, { ModalProps } from 'react-bootstrap/Modal';
-import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
-import { Role, RoleDisplayNames } from '../../config/role';
-import { useMutation, useQueryClient } from 'react-query';
-import { searchUsers } from '../../accessors/userAccessor';
 import { useMsal } from '@azure/msal-react';
 import { useDebounceCallback } from '@react-hook/debounce';
+import { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/esm/Alert';
-import { addOrganizationMember } from '../../accessors/organizationAccessor';
+import Modal, { ModalProps } from 'react-bootstrap/Modal';
+import { useMutation, useQueryClient } from 'react-query';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import { toast } from 'react-toastify';
+import { addOrganizationMember } from '../../accessors/organizationAccessor';
+import { searchUsers } from '../../accessors/userAccessor';
+import { Role, RoleDisplayNames } from '../../config/role';
+import { ErrorBase } from '../../data-contracts/ErrorBase';
+import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
 interface AddUserModalProps extends ModalProps {
@@ -44,9 +45,15 @@ function AddUserModal(props: AddUserModalProps) {
         autoClose: 1000,
       });
     },
-    onError: (error: { status?: number }) => {
+    onError: (error: ErrorBase) => {
       if (error?.status === 409) {
         toast.error('User is already a member of an organization', {
+          position: 'top-center',
+          theme: 'colored',
+          autoClose: 3000,
+        });
+      } else if (error.errors['emailDomain']) {
+        toast.error("User's email domain does not match the organization's email domain.", {
           position: 'top-center',
           theme: 'colored',
           autoClose: 3000,

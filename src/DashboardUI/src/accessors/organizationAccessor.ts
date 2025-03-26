@@ -68,12 +68,15 @@ export const addOrganizationMember = async (
     role,
   };
 
-  const { data, status } = await api.post<OrganizationMemberAddResponse>(
-    `Organizations/${organizationId}/Members`,
-    request,
-  );
-
-  return { data, status };
+  try {
+    const { data, status } = await api.post<OrganizationMemberAddResponse>(
+      `Organizations/${organizationId}/Members`,
+      request,
+    );
+    return { data, status };
+  } catch (error: any) {
+    throw error.response.data;
+  }
 };
 
 export const removeOrganizationMember = async (
@@ -87,35 +90,35 @@ export const removeOrganizationMember = async (
     $type: 'OrganizationMemberRemoveRequest',
     organizationId,
     userId,
-  }
+  };
 
   const { data, status } = await api.delete<OrganizationMemberRemoveResponse>(
     `Organizations/${organizationId}/Members`,
-    { data: request }
+    { data: request },
   );
 
   return { data, status };
-}
+};
 
 export const editOrganizationMember = async (
   msalContext: IMsalContext,
   organizationId: string,
   userId: string,
-  role: Role
-): Promise<{ data: OrganizationMemberUpdateResponse, status: number }> => {
+  role: Role,
+): Promise<{ data: OrganizationMemberUpdateResponse; status: number }> => {
   const api = await westDaatApi(msalContext);
 
   const request: OrganizationMemberUpdateRequest = {
     $type: 'OrganizationMemberUpdateRequest',
     organizationId,
     userId,
-    role
-  }
+    role,
+  };
 
   const { data, status } = await api.put<OrganizationMemberUpdateResponse>(
     `Organizations/${organizationId}/Members`,
-    request
+    request,
   );
 
   return { data, status };
-}
+};
