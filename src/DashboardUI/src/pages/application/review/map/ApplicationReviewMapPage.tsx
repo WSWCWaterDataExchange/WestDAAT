@@ -2,7 +2,7 @@ import { useMutation } from 'react-query';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { EstimationToolSidebar } from '../../estimation-tool/EstimationToolSidebar';
 import { EstimationToolMapHeader } from '../../estimation-tool/EstimationToolMapHeader';
-import { EstimationToolMap } from '../../estimation-tool/EstimationToolMap';
+import ReviewMap from './ReviewMap';
 
 export function ApplicationReviewMapPage() {
   const { state } = useConservationApplicationContext();
@@ -31,7 +31,7 @@ export function ApplicationReviewMapPage() {
 
         <div className="flex-grow-1 d-flex flex-column overflow-y-hidden">
           <EstimationToolMapHeader />
-          <EstimationToolMap
+          <ReviewMap
             waterRightNativeId={state.conservationApplication.waterRightNativeId}
             handleEstimateConsumptiveUseClicked={handleEstimateConsumptiveUseClicked}
             isLoadingConsumptiveUseEstimate={estimateConsumptiveUseMutation.isLoading}
