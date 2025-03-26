@@ -260,7 +260,8 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Arrange
         var organization = new OrganizationFaker().Generate();
         var user = new UserFaker().Generate();
-        var userToBeAdded = new UserFaker().Generate();
+        var userToBeAdded = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
@@ -310,6 +311,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             response.Error.Should().NotBeNull();
             response.Error.Should().BeOfType<ForbiddenError>();
             response.Error!.LogMessage.Should().Contain("but did not have permission to do so.");
+            response.Error!.PublicMessage.Should().BeNull();
         }
     }
 
@@ -365,6 +367,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             response.Error.Should().NotBeNull();
             response.Error.Should().BeOfType<ValidationError>();
+            response.Error!.PublicMessage.Should().BeNull();
         }
     }
 
@@ -399,6 +402,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ValidationError>();
+        response.Error!.PublicMessage.Should().BeNull();
     }
 
     [TestMethod]
@@ -434,6 +438,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ConflictError>();
+        response.Error!.PublicMessage.Should().BeNull();
     }
 
     [TestMethod]
@@ -467,7 +472,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ValidationError>();
-        response.Error.PublicMessage.Should().Be("this message is TBD");
+        response.Error!.PublicMessage.Should().NotBeNullOrEmpty();
     }
 
     [TestMethod]

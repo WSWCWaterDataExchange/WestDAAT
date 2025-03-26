@@ -388,11 +388,14 @@ internal class ValidationEngine : IValidationEngine
             { UserId = request.UserId });
         var organizationEmailDomainResponse = (DTO.OrganizationEmailDomainResponse)await _organizationAccessor.Load(new DTO.OrganizationEmailDomainRequest
             { OrganizationId = request.OrganizationId });
+        
         var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1].ToLower();
-        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Split("@")[1].ToLower();
+        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.ToLower();
+        
         if (userEmailDomain != organizationEmailDomain)
         {
-            throw new NotImplementedException("User email domain does not match organization email domain");
+            var errorMessage = "User's email domain does not match the organization's email domain.";
+            return CreateValidationError(request, "emailDomain", errorMessage, errorMessage);
         }
 
         return null;
@@ -636,14 +639,15 @@ internal class ValidationEngine : IValidationEngine
     private ValidationError CreateValidationError(
         RequestBase request,
         string fieldName,
-        string errorMessage
+        string errorMessage,
+        string publicMessage = null
     )
     {
         var errors = new Dictionary<string, string[]> { { fieldName, new[] { errorMessage } } };
         var logMessage =
             $"'{request.GetType().Name}' failed validation on the fields {fieldName}";
 
-        return new ValidationError(errors) { LogMessage = logMessage };
+        return new ValidationError(errors) { LogMessage = logMessage, PublicMessage = publicMessage};
     }
 
     private ForbiddenError CreateForbiddenError(
