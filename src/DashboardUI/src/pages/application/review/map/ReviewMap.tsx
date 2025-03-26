@@ -13,6 +13,7 @@ import { useEffect, useMemo } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -46,7 +47,9 @@ function ReviewMap(props: ReviewMapProps) {
       (geometry): Feature<Polygon, GeoJsonProperties> => ({
         type: 'Feature',
         geometry,
-        properties: {},
+        properties: {
+          id: uuidv4(),
+        },
       }),
     );
   }, [userDrawnPolygonGeometries]);
