@@ -45,6 +45,7 @@ function ApplicationReviewPage() {
             <div className="container">
               <ApplicationReviewHeader perspective={perspective} />
             </div>
+
             <Outlet />
           </>
         )}
