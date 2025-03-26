@@ -58,6 +58,7 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
                 .Build();
 
             serviceCollection.AddScoped(_ => config.GetEnvironmentConfiguration());
+            serviceCollection.AddScoped(_ => config.GetSmtpConfiguration());
         }
 
         private void RegisterAccessorServices(IServiceCollection serviceCollection)
