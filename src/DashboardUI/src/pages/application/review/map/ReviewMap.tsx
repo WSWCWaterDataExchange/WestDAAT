@@ -13,7 +13,6 @@ import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -23,16 +22,16 @@ interface ReviewMapProps {
 
 function ReviewMap(props: ReviewMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, isMapRendering, setMapBoundSettings, setMapStyle, setUserDrawnPolygonData } = useMapContext();
+  const { isMapLoaded, setMapBoundSettings, setMapStyle, setUserDrawnPolygonData } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
 
   useEffect(() => {
-    if (!isMapLoaded || isMapRendering) {
+    if (!isMapLoaded) {
       return;
     }
     setMapStyle(MapStyle.Satellite);
-  }, [isMapLoaded, isMapRendering, setMapStyle]);
+  }, [isMapLoaded, setMapStyle]);
 
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
     return state.conservationApplication.estimateLocations.map(
