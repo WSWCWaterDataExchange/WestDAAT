@@ -9,7 +9,7 @@ import { convertSquareMetersToAcres } from '../../../../utilities/valueConverter
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
 import Button from 'react-bootstrap/esm/Button';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
@@ -25,6 +25,8 @@ function ReviewMap(props: ReviewMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
   const { isMapLoaded, isMapRendering, setMapBoundSettings, setMapStyle, setUserDrawnPolygonData } = useMapContext();
 
+  const [hasInitializedMap, setHasInitializedMap] = useState(false);
+
   useEffect(() => {
     if (!isMapLoaded || isMapRendering) {
       return;
@@ -32,48 +34,34 @@ function ReviewMap(props: ReviewMapProps) {
     setMapStyle(MapStyle.Satellite);
   }, [isMapLoaded, isMapRendering, setMapStyle]);
 
-  const isReadyToInitializeGeometries = useMemo(() => {
-    const polygonData = state.conservationApplication.estimateLocations;
-    const hasPerformedEstimation = polygonData.some((p) => !!p.waterConservationApplicationEstimateLocationId);
-    return hasPerformedEstimation;
-  }, [state.conservationApplication.estimateLocations]);
-
-  const userDrawnPolygonGeometries: Polygon[] = useMemo(() => {
-    if (!isReadyToInitializeGeometries) {
-      return [];
-    }
-
-    return state.conservationApplication.estimateLocations.map(
-      (polygon) => convertWktToGeometry(polygon.polygonWkt!) as Polygon,
-    );
-  }, [isReadyToInitializeGeometries, state.conservationApplication.estimateLocations]);
-
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
-    return userDrawnPolygonGeometries.map(
-      (geometry): Feature<Polygon, GeoJsonProperties> => ({
+    return state.conservationApplication.estimateLocations.map(
+      (estimateLocation): Feature<Polygon, GeoJsonProperties> => ({
         type: 'Feature',
-        geometry,
+        geometry: convertWktToGeometry(estimateLocation.polygonWkt!) as Polygon,
         properties: {
-          id: uuidv4(),
+          id: estimateLocation.waterConservationApplicationEstimateLocationId!,
+          labelTitle: estimateLocation.fieldName,
         },
       }),
     );
-  }, [userDrawnPolygonGeometries]);
+  }, [state.conservationApplication.estimateLocations]);
 
   const userDrawnPolygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
-    return state.conservationApplication.estimateLocations.map((polygon) => {
-      const polygonFeature = convertWktToGeometry(polygon.polygonWkt!) as Polygon;
-      const labelLocation = centerOfMass(polygonFeature);
-      labelLocation.properties = {
-        ...labelLocation.properties,
-        title: polygon.fieldName,
-      };
-      return labelLocation;
-    });
-  }, [state.conservationApplication.estimateLocations, convertWktToGeometry, centerOfMass]);
+    return userDrawnPolygonFeatures
+      .filter((polygonFeature) => !!polygonFeature.properties?.labelTitle)
+      .map((polygonFeature) => {
+        const labelLocation = centerOfMass(polygonFeature);
+        labelLocation.properties = {
+          ...labelLocation.properties,
+          title: polygonFeature.properties!.labelTitle,
+        };
+        return labelLocation;
+      });
+  }, [userDrawnPolygonFeatures]);
 
   useEffect(() => {
-    if (!userDrawnPolygonFeatures || !isMapLoaded) {
+    if (!userDrawnPolygonFeatures || !isMapLoaded || hasInitializedMap) {
       return;
     }
 
@@ -91,6 +79,8 @@ function ReviewMap(props: ReviewMapProps) {
       padding: 25,
       maxZoom: 16,
     });
+
+    setHasInitializedMap(true);
   }, [
     userDrawnPolygonFeatures,
     isMapLoaded,
