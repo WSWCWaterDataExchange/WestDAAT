@@ -329,7 +329,8 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         var organization = new OrganizationFaker().Generate();
         var user = new UserFaker()
             .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
-        var userToBeAdded = new UserFaker().Generate();
+        var userToBeAdded = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"anotherUser@{organization.EmailDomain}").Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
