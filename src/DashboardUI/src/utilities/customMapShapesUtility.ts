@@ -20,7 +20,7 @@ export const buildNewCircleFeature = (geometry: Polygon): Feature<Geometry, GeoJ
 };
 
 /**
- * Creates a new `Feature` object with the given geometry.
+ * Creates a new `Feature` object without a default geometry.
  * The feature is initialized with the correct properties to be recognized as a rectangle.
  */
 export const buildDefaultNewRectangleFeature = (): Feature<Geometry, GeoJsonProperties> => {
