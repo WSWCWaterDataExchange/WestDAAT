@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
+import { fromPartialPolygonDataToPolygonFeature } from '../../../../utilities/mapUtility';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -34,16 +35,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [isMapLoaded, setMapStyle]);
 
   const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = useMemo(() => {
-    return state.conservationApplication.estimateLocations.map(
-      (estimateLocation): Feature<Polygon, GeoJsonProperties> => ({
-        type: 'Feature',
-        geometry: convertWktToGeometry(estimateLocation.polygonWkt!) as Polygon,
-        properties: {
-          id: estimateLocation.waterConservationApplicationEstimateLocationId!,
-          labelTitle: estimateLocation.fieldName,
-        },
-      }),
-    );
+    return state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
   }, [state.conservationApplication.estimateLocations]);
 
   const userDrawnPolygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
@@ -53,7 +45,7 @@ function ReviewMap(props: ReviewMapProps) {
         const labelLocation = centerOfMass(polygonFeature);
         labelLocation.properties = {
           ...labelLocation.properties,
-          title: polygonFeature.properties!.labelTitle,
+          title: polygonFeature.properties!.title,
         };
         return labelLocation;
       });
