@@ -93,11 +93,17 @@ public class ValidationEngineTests : EngineTestBase
 
         // Act
         string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
+        var polygonDetails = new Contracts.Client.StorePolygonDetails
+        {
+            PolygonWkt = polygonWkt,
+            PolygonType = EstimateLocationPolygonType.Freeform,
+        };
+
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
         {
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
-            Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
+            Polygons = polygonsIntersect ? [polygonDetails, polygonDetails] : [polygonDetails],
         };
         var result = await _validationEngine.Validate(request);
 

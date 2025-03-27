@@ -165,6 +165,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
+            CreateMap<ClientContracts.StorePolygonDetails, CommonContracts.StorePolygonDetails>()
+                .ReverseMap();
+
             CreateMap<
                     (ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
                     CommonContracts.MultiPolygonYearlyEtRequest>()

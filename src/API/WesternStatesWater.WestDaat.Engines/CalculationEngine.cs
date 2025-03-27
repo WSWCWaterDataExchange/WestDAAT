@@ -66,9 +66,9 @@ internal class CalculationEngine : ICalculationEngine
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
     {
         var results = new List<PolygonEtDataCollection>();
-        foreach (var polygonWkt in request.Polygons)
+        foreach (var polygon in request.Polygons)
         {
-            var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygonWkt);
+            var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygon.PolygonWkt);
 
             var rasterRequest = new RasterTimeSeriesPolygonRequest
             {
@@ -97,7 +97,8 @@ internal class CalculationEngine : ICalculationEngine
 
             var result = new PolygonEtDataCollection
             {
-                PolygonWkt = polygonWkt,
+                PolygonWkt = polygon.PolygonWkt,
+                PolygonType = polygon.PolygonType,
                 AverageYearlyEtInInches = averageEtInInches,
                 AverageYearlyEtInAcreFeet = averageEtInAcreFeet,
                 Datapoints = yearlyDatapoints
