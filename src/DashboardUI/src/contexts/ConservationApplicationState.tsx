@@ -658,6 +658,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       // carry over existing data
       waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygon.polygonWkt,
+      polygonType: polygon.polygonType,
       acreage: polygon.acreage,
       averageYearlyEtInInches: polygon.averageYearlyEtInInches,
       averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,
