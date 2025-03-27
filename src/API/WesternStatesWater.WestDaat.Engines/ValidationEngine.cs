@@ -46,6 +46,7 @@ internal class ValidationEngine : IValidationEngine
         {
             ApplicationLoadRequestBase req => await ValidateApplicationLoadRequest(req, context),
             ApplicationStoreRequestBase req => await ValidateApplicationStoreRequest(req, context),
+            EventBase req => ValidateEvent(req, context),
             FileSasTokenRequestBase req => await ValidateFileSasTokenRequest(req, context),
             OrganizationLoadRequestBase req => ValidateOrganizationLoadRequest(req, context),
             OrganizationStoreRequestBase req => await ValidateOrganizationStoreRequest(req, context),
@@ -171,6 +172,20 @@ internal class ValidationEngine : IValidationEngine
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
+            _ => throw new NotImplementedException(
+                $"Validation for request type '{request.GetType().Name}' is not implemented."
+            )
+        };
+    }
+
+    private ErrorBase ValidateEvent(EventBase request, ContextBase context)
+    {
+        // Must be system context to process events
+        _contextUtility.GetRequiredContext<SystemContext>();
+
+        return request switch
+        {
+            WaterConservationApplicationSubmittedEvent => null,
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )

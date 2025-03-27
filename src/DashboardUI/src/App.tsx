@@ -29,11 +29,13 @@ import Layout from './pages/Layout';
 import OverlayDetailsPage from './pages/OverlayDetailsPage';
 import SiteDetailsPage from './pages/SiteDetailsPage';
 import WaterRightDetailsPage from './pages/WaterRightDetailsPage';
-
-import './App.scss';
 import { ApplicationSubmitPage } from './pages/application/dashboard/ApplicationSubmitPage';
 import ApplicationReviewPage from './pages/application/review/ApplicationReviewPage';
 import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
+import { ApplicationReviewFormPage } from './pages/application/review/form/ApplicationReviewFormPage';
+import { ApplicationReviewMapPage } from './pages/application/review/map/ApplicationReviewMapPage';
+
+import './App.scss';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -111,7 +113,10 @@ function App({ msalInstance }: AppProps) {
                       <Route path="create" element={<ApplicationCreatePage />} />
                       <Route path="submit" element={<ApplicationSubmitPage />} />
                       <Route path="review" element={<ApplicationReviewGuard />}>
-                        <Route index element={<ApplicationReviewPage />} />
+                        <Route element={<ApplicationReviewPage />}>
+                          <Route index element={<ApplicationReviewFormPage />} />
+                          <Route path="map" element={<ApplicationReviewMapPage />} />
+                        </Route>
                       </Route>
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
