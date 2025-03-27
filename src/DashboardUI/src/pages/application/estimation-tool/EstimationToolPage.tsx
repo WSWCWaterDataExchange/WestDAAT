@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 import './estimation-tool-page.scss';
+import { StorePolygonDetails } from '../../../data-contracts/StorePolygonDetails';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -53,7 +54,7 @@ export function EstimationToolPage() {
       const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
-        polygons: fields.polygonWkts!,
+        polygons: fields.polygons!,
         compensationRateDollars: fields.compensationRateDollars,
         units: fields.units,
       };
@@ -81,7 +82,12 @@ export function EstimationToolPage() {
     await estimateConsumptiveUseMutation.mutateAsync({
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
-      polygonWkts: state.conservationApplication.estimateLocations.map((polygon) => polygon.polygonWkt!),
+      polygons: state.conservationApplication.estimateLocations.map(
+        (polygon): StorePolygonDetails => ({
+          polygonWkt: polygon.polygonWkt!,
+          polygonType: polygon.polygonType!,
+        }),
+      ),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,
       units: state.conservationApplication.desiredCompensationUnits,
     });
@@ -125,7 +131,7 @@ export function EstimationToolPage() {
 interface EstimateConsumptiveUseApiCallFields {
   waterConservationApplicationId: string | undefined;
   waterRightNativeId: string | undefined;
-  polygonWkts: string[] | undefined;
+  polygons: StorePolygonDetails[] | undefined;
   compensationRateDollars: number | undefined;
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }
@@ -134,8 +140,8 @@ const validateFields = (fields: EstimateConsumptiveUseApiCallFields) => {
   const isValid: boolean =
     !!fields.waterConservationApplicationId &&
     !!fields.waterRightNativeId &&
-    !!fields.polygonWkts &&
-    fields.polygonWkts.length > 0; // compensation rate is optional
+    !!fields.polygons &&
+    fields.polygons.length > 0; // compensation rate is optional
   if (!isValid) {
     throw new Error('Invalid fields');
   }

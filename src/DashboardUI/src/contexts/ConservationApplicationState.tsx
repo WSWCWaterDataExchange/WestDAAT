@@ -616,6 +616,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
     const polygonPostMapSelection: MapSelectionPolygonData = {
       polygonWkt: polygon.polygonWkt!,
+      polygonType: polygon.polygonType!,
       acreage: polygon.acreage!,
     };
 
