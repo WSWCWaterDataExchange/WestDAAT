@@ -46,7 +46,7 @@ public class CalculationEngineTests : EngineTestBase
             Model = RasterTimeSeriesModel.SSEBop,
             Polygons =
             [
-                new StorePolygonDetails
+                new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
                     PolygonType = PolygonType.Freeform,
@@ -138,12 +138,12 @@ public class CalculationEngineTests : EngineTestBase
             Model = RasterTimeSeriesModel.SSEBop,
             Polygons =
             [
-                new StorePolygonDetails
+                new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
                     PolygonType = PolygonType.Freeform,
                 },
-                new StorePolygonDetails
+                new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt2,
                     PolygonType = PolygonType.Freeform,

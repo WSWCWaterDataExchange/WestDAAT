@@ -463,7 +463,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 WaterRightNativeId = application.WaterRightNativeId,
                 Polygons =
                 [
-                    new CLI.StorePolygonDetails
+                    new CLI.MapPolygon
                     {
                         PolygonWkt = memorialStadiumFootballField,
                         PolygonType = PolygonType.Freeform,
@@ -618,7 +618,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = application.WaterRightNativeId,
             Polygons =
             [
-                new CLI.StorePolygonDetails
+                new CLI.MapPolygon
                 {
                     PolygonWkt = memorialStadiumFootballField,
                     PolygonType = PolygonType.Freeform,

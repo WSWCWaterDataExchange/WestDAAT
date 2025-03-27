@@ -1,6 +1,6 @@
-﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
+﻿namespace WesternStatesWater.WestDaat.Contracts.Client;
 
-public class StorePolygonDetails
+public class MapPolygon
 {
     /// <summary>
     /// Polygon(s) in "Well-known text" (WKT) format.
@@ -9,6 +9,5 @@ public class StorePolygonDetails
     /// </summary>
     public string PolygonWkt { get; set; } = null!;
 
-    public PolygonType PolygonType { get; set; }
+    public Common.DataContracts.PolygonType PolygonType { get; set; }
 }
-

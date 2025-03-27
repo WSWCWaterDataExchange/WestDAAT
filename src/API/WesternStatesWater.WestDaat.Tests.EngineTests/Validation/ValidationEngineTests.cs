@@ -93,7 +93,7 @@ public class ValidationEngineTests : EngineTestBase
 
         // Act
         string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
-        var polygonDetails = new Contracts.Client.StorePolygonDetails
+        var polygonDetails = new Contracts.Client.MapPolygon
         {
             PolygonWkt = polygonWkt,
             PolygonType = PolygonType.Freeform,

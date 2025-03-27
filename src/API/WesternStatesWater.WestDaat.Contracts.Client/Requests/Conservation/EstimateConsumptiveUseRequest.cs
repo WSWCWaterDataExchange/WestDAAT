@@ -8,7 +8,7 @@ public class EstimateConsumptiveUseRequest : ApplicationStoreRequestBase
 
     public string WaterRightNativeId { get; set; } = null!;
 
-    public StorePolygonDetails[] Polygons { get; set; }
+    public MapPolygon[] Polygons { get; set; }
 
     public int? CompensationRateDollars { get; set; }
 

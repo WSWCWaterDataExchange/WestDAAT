@@ -2,7 +2,7 @@
 
 public class MultiPolygonYearlyEtRequest : CalculateRequestBase
 {
-    public StorePolygonDetails[] Polygons { get; set; }
+    public MapPolygon[] Polygons { get; set; }
 
     public RasterTimeSeriesModel Model { get; set; }
 
