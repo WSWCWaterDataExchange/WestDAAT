@@ -13,7 +13,10 @@ import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
-import { fromPartialPolygonDataToPolygonFeature } from '../../../../utilities/mapUtility';
+import {
+  fromGeometryFeatureToMapSelectionPolygonData,
+  fromPartialPolygonDataToPolygonFeature,
+} from '../../../../utilities/mapUtility';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -92,10 +95,7 @@ function ReviewMap(props: ReviewMapProps) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = polygons.map((polygonFeature) => ({
-      polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
-      acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
-    }));
+    const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
 
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
