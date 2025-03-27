@@ -91,7 +91,9 @@ function AddUserModal(props: AddUserModalProps) {
       return false;
     }
 
-    const userEmailDomain = userEmail.includes('@') ? userEmail.split('@')[1] : userEmail;
+    // There is validation to ensure the user email includes an '@'.
+    // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
+    const userEmailDomain = userEmail.split('@')[1];
     const orgEmailDomain = organizationDomain.includes('@') ? organizationDomain.split('@')[1] : organizationDomain;
 
     return userEmailDomain.toLowerCase() === orgEmailDomain.toLowerCase();

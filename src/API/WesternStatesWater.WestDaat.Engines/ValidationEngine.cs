@@ -404,9 +404,9 @@ internal class ValidationEngine : IValidationEngine
         var organizationEmailDomainResponse = (DTO.OrganizationEmailDomainResponse)await _organizationAccessor.Load(new DTO.OrganizationEmailDomainRequest
             { OrganizationId = request.OrganizationId });
 
-        var userEmailDomain = userProfileResponse.UserProfile.Email.Contains('@') 
-            ? userProfileResponse.UserProfile.Email.Split("@")[1] 
-            : userProfileResponse.UserProfile.Email;
+        // There is validation to ensure the user email includes an '@'.
+        // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
+        var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1];
         var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Contains('@')
             ? organizationEmailDomainResponse.EmailDomain.Split("@")[1]
             : organizationEmailDomainResponse.EmailDomain;
