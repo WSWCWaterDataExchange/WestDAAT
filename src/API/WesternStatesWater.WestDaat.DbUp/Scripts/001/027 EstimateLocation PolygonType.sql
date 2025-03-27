@@ -1,6 +1,6 @@
 ALTER TABLE dbo.WaterConservationApplicationEstimateLocations ADD
 	DrawToolType INT NOT NULL 
-		CONSTRAINT DF_DrawToolType_Temp DEFAULT 0;
+		CONSTRAINT DF_DrawToolType_Temp DEFAULT 1;
 
 GO;
 
