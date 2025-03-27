@@ -1,6 +1,10 @@
 import { Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
 import { PolygonType } from '../data-contracts/PolygonType';
 
+/**
+ * Creates a new `Feature` object with the given geometry.
+ * The feature is initialized with the correct properties to be recognized as a circle.
+ */
 export const buildNewCircleFeature = (geometry: Polygon): Feature<Geometry, GeoJsonProperties> => {
   return {
     type: 'Feature',
@@ -15,6 +19,10 @@ export const buildNewCircleFeature = (geometry: Polygon): Feature<Geometry, GeoJ
   };
 };
 
+/**
+ * Creates a new `Feature` object with the given geometry.
+ * The feature is initialized with the correct properties to be recognized as a rectangle.
+ */
 export const buildDefaultNewRectangleFeature = (): Feature<Geometry, GeoJsonProperties> => {
   return {
     type: 'Feature',
