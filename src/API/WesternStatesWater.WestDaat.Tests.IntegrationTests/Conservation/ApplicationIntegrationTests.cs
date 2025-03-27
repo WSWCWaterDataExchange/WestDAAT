@@ -544,7 +544,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-                dbEstimateLocation.PolygonType.Should().Be(request.Polygons[0].DrawToolType);
+                dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
                 dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
                 // double-check that the response data was cross-referenced successfully with the db EstimateLocations

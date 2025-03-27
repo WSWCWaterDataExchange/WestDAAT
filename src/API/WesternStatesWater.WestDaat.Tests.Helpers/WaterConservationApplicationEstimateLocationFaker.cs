@@ -17,7 +17,7 @@ public class WaterConservationApplicationEstimateLocationFaker : Faker<EFWD.Wate
 
         RuleFor(wcael => wcael.AdditionalDetails, f => f.Lorem.Sentence());
 
-        RuleFor(wcael => wcael.PolygonType, f => f.PickRandomWithout(Common.DataContracts.DrawToolType.Unknown));
+        RuleFor(wcael => wcael.DrawToolType, f => f.PickRandomWithout(Common.DataContracts.DrawToolType.Unknown));
 
         if (estimate != null)
         {
