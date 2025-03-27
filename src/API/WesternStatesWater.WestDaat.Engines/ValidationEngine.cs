@@ -414,7 +414,7 @@ internal class ValidationEngine : IValidationEngine
         if (!string.Equals(userEmailDomain.ToLower(), organizationEmailDomain.ToLower()))
         {
             var errorMessage = "User's email domain does not match the organization's email domain.";
-            return CreateValidationError(request, "emailDomain", errorMessage, errorMessage);
+            return CreateValidationError(request, "emailDomain", errorMessage);
         }
 
         return null;
@@ -658,15 +658,14 @@ internal class ValidationEngine : IValidationEngine
     private ValidationError CreateValidationError(
         RequestBase request,
         string fieldName,
-        string errorMessage,
-        string publicMessage = null
+        string errorMessage
     )
     {
         var errors = new Dictionary<string, string[]> { { fieldName, new[] { errorMessage } } };
         var logMessage =
             $"'{request.GetType().Name}' failed validation on the fields {fieldName}";
 
-        return new ValidationError(errors) { LogMessage = logMessage, PublicMessage = publicMessage};
+        return new ValidationError(errors) { LogMessage = logMessage };
     }
 
     private ForbiddenError CreateForbiddenError(

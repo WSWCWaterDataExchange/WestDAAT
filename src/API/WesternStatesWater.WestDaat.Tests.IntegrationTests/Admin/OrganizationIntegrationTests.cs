@@ -372,7 +372,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         {
             response.Error.Should().NotBeNull();
             response.Error.Should().BeOfType<ValidationError>();
-            response.Error!.PublicMessage.Should().BeNull();
         }
     }
 
@@ -407,7 +406,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ValidationError>();
-        response.Error!.PublicMessage.Should().BeNull();
     }
 
     [TestMethod]
@@ -443,7 +441,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ConflictError>();
-        response.Error!.PublicMessage.Should().BeNull();
     }
 
     [TestMethod]
@@ -477,7 +474,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ValidationError>();
-        response.Error!.PublicMessage.Should().NotBeNullOrEmpty();
     }
 
     [TestMethod]
