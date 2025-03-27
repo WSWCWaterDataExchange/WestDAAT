@@ -24,7 +24,7 @@ import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-con
 import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
-import { StorePolygonDetails } from '../data-contracts/StorePolygonDetails';
+import { MapPolygon } from '../data-contracts/MapPolygon';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -68,7 +68,7 @@ export const estimateConsumptiveUse = async (
   fields: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    polygons: StorePolygonDetails[];
+    polygons: MapPolygon[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },

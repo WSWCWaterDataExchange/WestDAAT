@@ -1,6 +1,6 @@
 import { PolygonType } from './PolygonType';
 
-export interface StorePolygonDetails {
+export interface MapPolygon {
   polygonWkt: string;
   polygonType: PolygonType;
 }

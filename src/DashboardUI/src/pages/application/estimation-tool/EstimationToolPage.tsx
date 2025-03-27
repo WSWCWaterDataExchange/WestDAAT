@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
 import './estimation-tool-page.scss';
-import { StorePolygonDetails } from '../../../data-contracts/StorePolygonDetails';
+import { MapPolygon } from '../../../data-contracts/MapPolygon';
 
 export function EstimationToolPage() {
   const context = useMsal();
@@ -83,7 +83,7 @@ export function EstimationToolPage() {
       waterRightNativeId: state.conservationApplication.waterRightNativeId,
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
       polygons: state.conservationApplication.estimateLocations.map(
-        (polygon): StorePolygonDetails => ({
+        (polygon): MapPolygon => ({
           polygonWkt: polygon.polygonWkt!,
           polygonType: polygon.polygonType!,
         }),
@@ -131,7 +131,7 @@ export function EstimationToolPage() {
 interface EstimateConsumptiveUseApiCallFields {
   waterConservationApplicationId: string | undefined;
   waterRightNativeId: string | undefined;
-  polygons: StorePolygonDetails[] | undefined;
+  polygons: MapPolygon[] | undefined;
   compensationRateDollars: number | undefined;
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }

@@ -1,11 +1,11 @@
 import { ApplicationStoreRequestBase } from './ApplicationStoreRequestBase';
 import { CompensationRateUnits } from './CompensationRateUnits';
-import { StorePolygonDetails } from './StorePolygonDetails';
+import { MapPolygon } from './MapPolygon';
 
 export interface EstimateConsumptiveUseRequest extends ApplicationStoreRequestBase {
   waterConservationApplicationId: string;
   waterRightNativeId: string;
-  polygons: StorePolygonDetails[];
+  polygons: MapPolygon[];
   compensationRateDollars: number | undefined;
   units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
 }
