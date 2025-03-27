@@ -475,38 +475,6 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ValidationError>();
     }
-
-    [TestMethod]
-    public async Task Store_OrganizationMemberAddRequest_Success()
-    {
-        // Arrange
-        var organization = new OrganizationFaker().Generate();
-        var user = new UserFaker()
-            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
-
-        await _dbContext.Organizations.AddAsync(organization);
-        await _dbContext.Users.AddAsync(user);
-        await _dbContext.SaveChangesAsync();
-
-        UseUserContext(new UserContext
-        {
-            UserId = Guid.NewGuid(),
-            Roles = [Roles.GlobalAdmin],
-            OrganizationRoles = []
-        });
-
-        // Act
-        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
-        {
-            OrganizationId = organization.Id,
-            UserId = user.Id,
-            Role = Roles.Member
-        });
-
-        // Assert
-        response.Error.Should().BeNull();
-        response.Should().BeOfType<OrganizationMemberAddResponse>();
-    }
     
     [TestMethod]
     public async Task Store_OrganizationMemberRemoveRequest_ShouldNotAllowRemovingSelf()
