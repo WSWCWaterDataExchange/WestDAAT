@@ -25,7 +25,7 @@ export function ApplicationReviewMapPage() {
         <div className="estimation-tool-side-panel d-flex flex-column overflow-y-auto">
           <EstimationToolSidebar
             isLoading={state.isLoadingApplication || state.isLoadingFundingOrganization}
-            loadFailed={false}
+            loadFailed={state.loadApplicationErrored || state.loadFundingOrganizationErrored}
           />
         </div>
 
