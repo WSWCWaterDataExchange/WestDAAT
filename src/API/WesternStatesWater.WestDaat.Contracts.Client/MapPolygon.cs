@@ -9,5 +9,5 @@ public class MapPolygon
     /// </summary>
     public string PolygonWkt { get; set; } = null!;
 
-    public Common.DataContracts.PolygonType DrawToolType { get; set; }
+    public Common.DataContracts.DrawToolType DrawToolType { get; set; }
 }

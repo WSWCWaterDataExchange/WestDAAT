@@ -9,6 +9,6 @@ public class MapPolygon
     /// </summary>
     public string PolygonWkt { get; set; } = null!;
 
-    public PolygonType DrawToolType { get; set; }
+    public DrawToolType DrawToolType { get; set; }
 }
 

@@ -6,7 +6,7 @@ public class PolygonEtDataCollection
 
     public string PolygonWkt { get; set; }
 
-    public PolygonType PolygonType { get; set; }
+    public DrawToolType PolygonType { get; set; }
 
     public double AverageYearlyEtInInches { get; set; }
 

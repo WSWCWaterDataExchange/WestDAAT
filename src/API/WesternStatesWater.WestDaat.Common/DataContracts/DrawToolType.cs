@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum PolygonType
+public enum DrawToolType
 {
     Unknown = 0,
     Freeform = 1,

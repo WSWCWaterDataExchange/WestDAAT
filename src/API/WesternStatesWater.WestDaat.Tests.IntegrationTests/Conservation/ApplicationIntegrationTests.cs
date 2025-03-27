@@ -466,7 +466,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     new CLI.MapPolygon
                     {
                         PolygonWkt = memorialStadiumFootballField,
-                        DrawToolType = PolygonType.Freeform,
+                        DrawToolType = DrawToolType.Freeform,
                     }
                 ],
             };
@@ -621,7 +621,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new CLI.MapPolygon
                 {
                     PolygonWkt = memorialStadiumFootballField,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 }
             ],
         };

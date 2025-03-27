@@ -49,7 +49,7 @@ public class CalculationEngineTests : EngineTestBase
                 new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 }
             ]
         };
@@ -141,12 +141,12 @@ public class CalculationEngineTests : EngineTestBase
                 new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 },
                 new MapPolygon
                 {
                     PolygonWkt = arbitraryValidPolygonWkt2,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 }
             ]
         };
@@ -244,12 +244,12 @@ public class CalculationEngineTests : EngineTestBase
                 new()
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 },
                 new()
                 {
                     PolygonWkt = arbitraryValidPolygonWkt2,
-                    DrawToolType = PolygonType.Freeform,
+                    DrawToolType = DrawToolType.Freeform,
                 }
             ]
         };

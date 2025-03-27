@@ -13,7 +13,7 @@ public class WaterConservationApplicationEstimateLocation
 
     public string PolygonWkt { get; set; } = null!;
 
-    public Common.DataContracts.PolygonType PolygonType { get; set; }
+    public Common.DataContracts.DrawToolType PolygonType { get; set; }
 
     public double PolygonAreaInAcres { get; set; }
 
