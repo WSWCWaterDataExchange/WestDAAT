@@ -15,7 +15,7 @@ public class EstimateConsumptiveUseRequestValidator : AbstractValidator<Estimate
         {
             polygonEntryValidator.RuleFor(polygon => polygon).NotNull();
             polygonEntryValidator.RuleFor(polygon => polygon.PolygonWkt).NotEmpty();
-            polygonEntryValidator.RuleFor(polygon => polygon.PolygonType).NotEmpty();
+            polygonEntryValidator.RuleFor(polygon => polygon.DrawToolType).NotEmpty();
         });
 
         // if one property is non-null, then they both must be non-null
