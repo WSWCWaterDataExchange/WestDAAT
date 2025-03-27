@@ -15,6 +15,10 @@ import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 import { useWaterRightSiteLocations } from '../../../hooks/queries';
 import { mapLayerNames, mapSourceNames } from '../../../config/maps';
 import { MapSelectionPolygonData } from '../../../data-contracts/CombinedPolygonData';
+import {
+  fromPartialPolygonDataToPolygonFeature,
+  fromGeometryFeatureToMapSelectionPolygonData,
+} from '../../../utilities/mapUtility';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
@@ -60,18 +64,12 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       return;
     }
 
-    const userDrawnPolygonGeometries = polygonData.map(
-      (polygon) => convertWktToGeometry(polygon.polygonWkt!) as Polygon,
+    const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = polygonData.map(
+      fromPartialPolygonDataToPolygonFeature,
     );
     const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonGeometries.map(
-        (geometry): Feature<Polygon, GeoJsonProperties> => ({
-          type: 'Feature',
-          geometry,
-          properties: {},
-        }),
-      ),
+      features: userDrawnPolygonFeatures,
     };
 
     setMapBoundSettings({
@@ -117,10 +115,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = polygons.map((polygonFeature) => ({
-      polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
-      acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
-    }));
+    const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
 
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
