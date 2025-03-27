@@ -218,7 +218,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt)).ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
         {

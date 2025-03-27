@@ -650,6 +650,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
     const polygonPostMapSelection: MapSelectionPolygonData = {
       polygonWkt: polygon.polygonWkt!,
+      drawToolType: polygon.drawToolType!,
       acreage: polygon.acreage!,
     };
 
@@ -691,6 +692,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       // carry over existing data
       waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygon.polygonWkt,
+      drawToolType: polygon.drawToolType,
       acreage: polygon.acreage,
       averageYearlyEtInInches: polygon.averageYearlyEtInInches,
       averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,

@@ -13,7 +13,9 @@ public class EstimateConsumptiveUseRequestValidator : AbstractValidator<Estimate
         RuleFor(x => x.Polygons).NotEmpty().Must(polygons => polygons.Length <= 20);
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
         {
-            polygonEntryValidator.RuleFor(polygon => polygon).NotEmpty();
+            polygonEntryValidator.RuleFor(polygon => polygon).NotNull();
+            polygonEntryValidator.RuleFor(polygon => polygon.PolygonWkt).NotEmpty();
+            polygonEntryValidator.RuleFor(polygon => polygon.DrawToolType).NotEmpty();
         });
 
         // if one property is non-null, then they both must be non-null

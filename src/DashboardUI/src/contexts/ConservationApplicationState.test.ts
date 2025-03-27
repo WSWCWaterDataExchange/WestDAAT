@@ -8,6 +8,7 @@ import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -184,6 +185,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -233,6 +235,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt,
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -398,6 +401,7 @@ describe('ConservationApplicationState reducer', () => {
 
       const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        drawToolType: DrawToolType.Freeform,
         acreage: 1,
       };
 
@@ -449,6 +453,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -503,6 +508,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -657,7 +663,6 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
-
     });
   });
 
@@ -671,6 +676,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],

@@ -1,11 +1,9 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import Map from '../../../components/map/Map';
-import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import { area as areaInSquareMeters } from '@turf/area';
+import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
-import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';

@@ -1,6 +1,7 @@
 import MapboxDraw, { DrawCustomMode, MapMouseEvent } from '@mapbox/mapbox-gl-draw';
 import { GeoJSON } from 'geojson';
 import { generateCircleWithRadiusFromCenterPointToEdgePoint } from '../../utilities/geometryHelpers';
+import { buildNewCircleFeature } from '../../utilities/customMapShapesUtility';
 
 interface CircleDrawModeState {
   inProgressCircleCenterPoint: [number, number] | undefined;
@@ -69,17 +70,7 @@ export const CustomCircleDrawMode: DrawCustomMode = {
 
     if (!circleFeature) {
       // create new circle feature if it doesn't exist
-      circleFeature = this.newFeature({
-        type: 'Feature',
-        properties: {
-          isCircle: true,
-          isInProgress: true,
-        },
-        geometry: {
-          type: 'Polygon',
-          coordinates: circle.geometry.coordinates,
-        },
-      }) as MapboxDraw.DrawPolygon;
+      circleFeature = this.newFeature(buildNewCircleFeature(circle.geometry)) as MapboxDraw.DrawPolygon;
 
       // newFeature generates an id for the feature automatically; track it:
       state.inProgressCircleId = String(circleFeature.id);

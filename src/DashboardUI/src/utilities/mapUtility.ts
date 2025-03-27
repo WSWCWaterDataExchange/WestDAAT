@@ -3,6 +3,7 @@ import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/C
 import { convertGeometryToWkt, convertWktToGeometry } from './geometryWktConverter';
 import { convertSquareMetersToAcres } from './valueConverters';
 import areaInSquareMeters from '@turf/area';
+import { parseDrawToolTypeFromFeature } from './customMapShapesUtility';
 
 export const fromPartialPolygonDataToPolygonFeature = (
   item: PartialPolygonData,
@@ -19,5 +20,6 @@ export const fromGeometryFeatureToMapSelectionPolygonData = (
   polygonFeature: Feature<Geometry, GeoJsonProperties>,
 ): MapSelectionPolygonData => ({
   polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
+  drawToolType: parseDrawToolTypeFromFeature(polygonFeature),
   acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
 });
