@@ -140,17 +140,20 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             new()
             {
                 OrganizationId = organizations[0].Id,
-                Name = organizations[0].Name
+                Name = organizations[0].Name,
+                EmailDomain = organizations[0].EmailDomain
             },
             new()
             {
                 OrganizationId = organizations[1].Id,
-                Name = organizations[1].Name
+                Name = organizations[1].Name,
+                EmailDomain = organizations[1].EmailDomain
             },
             new()
             {
                 OrganizationId = organizations[2].Id,
-                Name = organizations[2].Name
+                Name = organizations[2].Name,
+                EmailDomain = organizations[2].EmailDomain
             }
         }.OrderBy(org => org.Name);
 
@@ -260,7 +263,8 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         // Arrange
         var organization = new OrganizationFaker().Generate();
         var user = new UserFaker().Generate();
-        var userToBeAdded = new UserFaker().Generate();
+        var userToBeAdded = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
@@ -310,11 +314,12 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             response.Error.Should().NotBeNull();
             response.Error.Should().BeOfType<ForbiddenError>();
             response.Error!.LogMessage.Should().Contain("but did not have permission to do so.");
+            response.Error!.PublicMessage.Should().BeNull();
         }
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user memeber role")]
+    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user member role")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Should be able to assign a user technical reviewer role")]
     [DataRow(Roles.OrganizationAdmin, true, DisplayName = "Should be able to assign a user organization admin role")]
     [DataRow(Roles.GlobalAdmin, false, DisplayName = "Should not be able to assign a user global admin role")]
@@ -322,8 +327,10 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var organization = new OrganizationFaker().Generate();
-        var user = new UserFaker().Generate();
-        var userToBeAdded = new UserFaker().Generate();
+        var user = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
+        var userToBeAdded = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"anotherUser@{organization.EmailDomain}").Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
@@ -436,6 +443,39 @@ public class OrganizationIntegrationTests : IntegrationTestBase
         response.Error.Should().BeOfType<ConflictError>();
     }
 
+    [TestMethod]
+    public async Task Store_OrganizationMemberAddRequest_AddingMemberWithDifferentEmailDomain_ShouldNotAllow()
+    {
+        // Arrange
+        var organization = new OrganizationFaker()
+            .RuleFor(x => x.EmailDomain, _ => "@fakeOrganization.com").Generate();
+        var user = new UserFaker()
+            .RuleFor(x => x.Email, _ => "fakeUser@differentFakeOrganization.com").Generate();
+
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = []
+        });
+
+        // Act
+        var response = await _organizationManager.Store<OrganizationMemberAddRequest, OrganizationMemberAddResponse>(new OrganizationMemberAddRequest()
+        {
+            OrganizationId = organization.Id,
+            UserId = user.Id,
+            Role = Roles.Member
+        });
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+    }
+    
     [TestMethod]
     public async Task Store_OrganizationMemberRemoveRequest_ShouldNotAllowRemovingSelf()
     {
