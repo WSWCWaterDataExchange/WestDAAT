@@ -382,198 +382,198 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         try
         {
-            //// Arrange
-            //const int monthsInYear = 12;
-            //const int startYear = 2024;
-            //const int yearRange = 1;
+            // Arrange
+            const int monthsInYear = 12;
+            const int startYear = 2024;
+            const int yearRange = 1;
 
-            //var user = new UserFaker().Generate();
-            //var organization = new OrganizationFaker()
-            //    .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
-            //    .Generate();
-            //await _dbContext.Users.AddAsync(user);
-            //await _dbContext.Organizations.AddAsync(organization);
-            //await _dbContext.SaveChangesAsync();
+            var user = new UserFaker().Generate();
+            var organization = new OrganizationFaker()
+                .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
+                .Generate();
+            await _dbContext.Users.AddAsync(user);
+            await _dbContext.Organizations.AddAsync(organization);
+            await _dbContext.SaveChangesAsync();
 
-            //var waterRight = new AllocationAmountFactFaker()
-            //    .RuleFor(aaf => aaf.ConservationApplicationFundingOrganizationId, () => organization.Id)
-            //    .Generate();
-            //await wadeDb.AllocationAmountsFact.AddAsync(waterRight);
-            //await wadeDb.SaveChangesAsync();
-
-
-            //var application = new WaterConservationApplicationFaker()
-            //    .RuleFor(a => a.ApplicantUserId, () => user.Id)
-            //    .RuleFor(a => a.FundingOrganizationId, () => organization.Id)
-            //    .RuleFor(a => a.WaterRightNativeId, () => waterRight.AllocationUuid)
-            //    .Generate();
-
-            //await _dbContext.WaterConservationApplications.AddAsync(application);
-
-            //WaterConservationApplicationEstimate estimate = null;
-            //if (shouldInitializePreviousEstimate)
-            //{
-            //    estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
-            //    var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
-            //    var estimateLocationConsumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(estimateLocation).Generate(12);
-
-            //    await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(estimateLocationConsumptiveUses);
-            //}
-
-            //await _dbContext.SaveChangesAsync();
-
-            //if (shouldInitializePreviousEstimate)
-            //{
-            //    estimate.Id.Should().NotBe(Guid.Empty);
-            //    var estimateCreated = await _dbContext.WaterConservationApplicationEstimates
-            //        .AnyAsync(e => e.Id == estimate.Id);
-            //    estimateCreated.Should().BeTrue();
-            //}
+            var waterRight = new AllocationAmountFactFaker()
+                .RuleFor(aaf => aaf.ConservationApplicationFundingOrganizationId, () => organization.Id)
+                .Generate();
+            await wadeDb.AllocationAmountsFact.AddAsync(waterRight);
+            await wadeDb.SaveChangesAsync();
 
 
-            //OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
-            //    .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
-            //    {
-            //        Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
-            //        {
-            //            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
-            //            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
-            //            {
-            //                Time = time,
-            //                Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
-            //            });
-            //        })
-            //        .SelectMany(monthlyData => monthlyData)
-            //        .ToArray()
-            //    });
+            var application = new WaterConservationApplicationFaker()
+                .RuleFor(a => a.ApplicantUserId, () => user.Id)
+                .RuleFor(a => a.FundingOrganizationId, () => organization.Id)
+                .RuleFor(a => a.WaterRightNativeId, () => waterRight.AllocationUuid)
+                .Generate();
+
+            await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            WaterConservationApplicationEstimate estimate = null;
+            if (shouldInitializePreviousEstimate)
+            {
+                estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+                var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
+                var estimateLocationConsumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(estimateLocation).Generate(12);
+
+                await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(estimateLocationConsumptiveUses);
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            if (shouldInitializePreviousEstimate)
+            {
+                estimate.Id.Should().NotBe(Guid.Empty);
+                var estimateCreated = await _dbContext.WaterConservationApplicationEstimates
+                    .AnyAsync(e => e.Id == estimate.Id);
+                estimateCreated.Should().BeTrue();
+            }
 
 
-            //UseUserContext(new UserContext
-            //{
-            //    UserId = user.Id,
-            //    Roles = [Roles.GlobalAdmin],
-            //    OrganizationRoles = [],
-            //    ExternalAuthId = ""
-            //});
-
-            //var requestedCompensationPerAcreFoot = 1000;
-            //var request = new EstimateConsumptiveUseRequest
-            //{
-            //    WaterConservationApplicationId = application.Id,
-            //    WaterRightNativeId = application.WaterRightNativeId,
-            //    Polygons =
-            //    [
-            //        new CLI.StorePolygonDetails
-            //        {
-            //            PolygonWkt = memorialStadiumFootballField,
-            //            PolygonType = EstimateLocationPolygonType.Freeform,
-            //        }
-            //    ],
-            //};
-
-            //if (requestShouldIncludeCompensationInfo)
-            //{
-            //    request.CompensationRateDollars = requestedCompensationPerAcreFoot;
-            //    request.Units = Common.DataContracts.CompensationRateUnits.AcreFeet;
-            //}
+            OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
+                .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
+                {
+                    Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
+                    {
+                        var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                        return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                        {
+                            Time = time,
+                            Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                        });
+                    })
+                    .SelectMany(monthlyData => monthlyData)
+                    .ToArray()
+                });
 
 
-            //// Act
-            //var response = await _applicationManager.Store<
-            //    EstimateConsumptiveUseRequest,
-            //    EstimateConsumptiveUseResponse>(
-            //    request);
+            UseUserContext(new UserContext
+            {
+                UserId = user.Id,
+                Roles = [Roles.GlobalAdmin],
+                OrganizationRoles = [],
+                ExternalAuthId = ""
+            });
+
+            var requestedCompensationPerAcreFoot = 1000;
+            var request = new EstimateConsumptiveUseRequest
+            {
+                WaterConservationApplicationId = application.Id,
+                WaterRightNativeId = application.WaterRightNativeId,
+                Polygons =
+                [
+                    new CLI.StorePolygonDetails
+                    {
+                        PolygonWkt = memorialStadiumFootballField,
+                        PolygonType = PolygonType.Freeform,
+                    }
+                ],
+            };
+
+            if (requestShouldIncludeCompensationInfo)
+            {
+                request.CompensationRateDollars = requestedCompensationPerAcreFoot;
+                request.Units = Common.DataContracts.CompensationRateUnits.AcreFeet;
+            }
 
 
-            //// Assert
-            //response.Should().NotBeNull();
-            //response.Error.Should().BeNull();
+            // Act
+            var response = await _applicationManager.Store<
+                EstimateConsumptiveUseRequest,
+                EstimateConsumptiveUseResponse>(
+                request);
 
 
-            //// verify response calculations are correct
-            //const int knownAvgYearlyEtInches = 60;
-            //var knownAvgYearlyEtFeet = knownAvgYearlyEtInches / 12;
-            //var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
-            //response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            // Assert
+            response.Should().NotBeNull();
+            response.Error.Should().BeNull();
 
-            //if (requestShouldIncludeCompensationInfo)
-            //{
-            //    var expectedConservationPayment = requestedCompensationPerAcreFoot * response.TotalAverageYearlyEtAcreFeet;
-            //    response.ConservationPayment.Should().NotBeNull();
-            //    response.ConservationPayment.Should().Be((int)expectedConservationPayment);
-            //}
-            //else
-            //{
-            //    response.ConservationPayment.Should().BeNull();
-            //}
 
-            //// verify db entries were either created, created and overwritten, or not created at all
-            //var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
-            //    .Include(estimate => estimate.Locations)
-            //    .ThenInclude(location => location.ConsumptiveUses)
-            //    .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
-            //var dbEstimateLocation = dbEstimate?.Locations.First();
-            //var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.ConsumptiveUses;
+            // verify response calculations are correct
+            const int knownAvgYearlyEtInches = 60;
+            var knownAvgYearlyEtFeet = knownAvgYearlyEtInches / 12;
+            var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
+            response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
-            //if (requestShouldIncludeCompensationInfo)
-            //{
-            //    // verify db entries were created successfully
-            //    dbEstimate.Should().NotBeNull();
-            //    dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
-            //    dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
+            if (requestShouldIncludeCompensationInfo)
+            {
+                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.TotalAverageYearlyEtAcreFeet;
+                response.ConservationPayment.Should().NotBeNull();
+                response.ConservationPayment.Should().Be((int)expectedConservationPayment);
+            }
+            else
+            {
+                response.ConservationPayment.Should().BeNull();
+            }
 
-            //    // verify db fields all match expectations
-            //    dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
-            //    dbEstimate.Model.Should().Be(organization.OpenEtModel);
-            //    dbEstimate.DateRangeStart.Should().Be(
-            //        DateOnly.FromDateTime(
-            //            new DateTimeOffset(DateTimeOffset.UtcNow.Year - yearRange, 1, 1, 0, 0, 0, TimeSpan.Zero)
-            //            .UtcDateTime
-            //        )
-            //    );
-            //    dbEstimate.DateRangeEnd.Should().Be(
-            //        DateOnly.FromDateTime(
-            //            new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
-            //            .AddMinutes(-1)
-            //            .UtcDateTime
-            //        )
-            //    );
-            //    dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
-            //    dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
-            //    dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-            //    dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            // verify db entries were either created, created and overwritten, or not created at all
+            var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
+                .Include(estimate => estimate.Locations)
+                .ThenInclude(location => location.ConsumptiveUses)
+                .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
+            var dbEstimateLocation = dbEstimate?.Locations.First();
+            var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.ConsumptiveUses;
 
-            //    dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-            //    dbEstimateLocation.PolygonType.Should().Be(request.Polygons[0].PolygonType);
-            //    dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
+            if (requestShouldIncludeCompensationInfo)
+            {
+                // verify db entries were created successfully
+                dbEstimate.Should().NotBeNull();
+                dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
+                dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
 
-            //    // double-check that the response data was cross-referenced successfully with the db EstimateLocations
-            //    response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+                // verify db fields all match expectations
+                dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
+                dbEstimate.Model.Should().Be(organization.OpenEtModel);
+                dbEstimate.DateRangeStart.Should().Be(
+                    DateOnly.FromDateTime(
+                        new DateTimeOffset(DateTimeOffset.UtcNow.Year - yearRange, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                        .UtcDateTime
+                    )
+                );
+                dbEstimate.DateRangeEnd.Should().Be(
+                    DateOnly.FromDateTime(
+                        new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                        .AddMinutes(-1)
+                        .UtcDateTime
+                    )
+                );
+                dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
+                dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
+                dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
+                dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
-            //    dbEstimateLocationConsumptiveUses.All(consumptiveUse =>
-            //    {
-            //        var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
-            //        return yearMatches;
-            //    }).Should().BeTrue();
-            //    dbEstimateLocationConsumptiveUses.Select(cu => cu.EtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
+                dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
+                dbEstimateLocation.PolygonType.Should().Be(request.Polygons[0].PolygonType);
+                dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
-            //    if (shouldInitializePreviousEstimate)
-            //    {
-            //        // verify db entries were overwritten successfully
-            //        dbEstimate.Id.Should().NotBe(estimate.Id);
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations
+                response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
 
-            //        dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
+                dbEstimateLocationConsumptiveUses.All(consumptiveUse =>
+                {
+                    var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
+                    return yearMatches;
+                }).Should().BeTrue();
+                dbEstimateLocationConsumptiveUses.Select(cu => cu.EtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
 
-            //        var previousConsumptiveUsesIds = estimate.Locations.First().ConsumptiveUses.Select(cu => cu.Id).ToHashSet();
-            //        dbEstimateLocationConsumptiveUses.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
-            //            .Should().BeFalse();
-            //    }
-            //}
-            //else
-            //{
-            //    // verify db entries were not created
-            //    dbEstimate.Should().BeNull();
-            //}
+                if (shouldInitializePreviousEstimate)
+                {
+                    // verify db entries were overwritten successfully
+                    dbEstimate.Id.Should().NotBe(estimate.Id);
+
+                    dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
+
+                    var previousConsumptiveUsesIds = estimate.Locations.First().ConsumptiveUses.Select(cu => cu.Id).ToHashSet();
+                    dbEstimateLocationConsumptiveUses.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
+                        .Should().BeFalse();
+                }
+            }
+            else
+            {
+                // verify db entries were not created
+                dbEstimate.Should().BeNull();
+            }
         }
         finally
         {
