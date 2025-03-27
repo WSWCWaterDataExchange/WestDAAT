@@ -198,6 +198,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
+    expect(newState.conservationApplication.estimateLocations[0].drawToolType).toEqual(DrawToolType.Freeform);
     expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
@@ -593,6 +594,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(application.estimateLocations.length).toEqual(applicationDetails.estimate.locations.length);
       expect(location.waterConservationApplicationEstimateLocationId).toEqual(expectedLocation.id);
       expect(location.polygonWkt).toEqual(expectedLocation.polygonWkt);
+      expect(location.drawToolType).toEqual(expectedLocation.drawToolType);
       expect(location.acreage).toEqual(expectedLocation.polygonAreaInAcres);
       expect(location.fieldName).toEqual('Field 1');
       expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);
