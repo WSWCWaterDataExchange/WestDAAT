@@ -2,7 +2,7 @@ import { Feature, GeoJsonProperties, Polygon } from 'geojson';
 import {
   buildDefaultNewRectangleFeature,
   buildNewCircleFeature,
-  parsePolygonTypeFromFeature,
+  parseDrawToolTypeFromFeature,
 } from './customMapShapesUtility';
 import { DrawToolType } from '../data-contracts/DrawToolType';
 
@@ -45,14 +45,14 @@ describe('customMapShapesUtility', () => {
     });
   });
 
-  describe('parsePolygonTypeFromFeature', () => {
+  describe('parseDrawToolTypeFromFeature', () => {
     it('should recognize a circle', () => {
       const circleFeature = buildNewCircleFeature({
         type: 'Polygon',
         coordinates: [[]],
       });
 
-      const result = parsePolygonTypeFromFeature(circleFeature);
+      const result = parseDrawToolTypeFromFeature(circleFeature);
 
       expect(result).toBe(DrawToolType.Circle);
     });
@@ -60,7 +60,7 @@ describe('customMapShapesUtility', () => {
     it('should recognize a rectangle', () => {
       const rectangleFeature = buildDefaultNewRectangleFeature();
 
-      const result = parsePolygonTypeFromFeature(rectangleFeature);
+      const result = parseDrawToolTypeFromFeature(rectangleFeature);
 
       expect(result).toBe(DrawToolType.Rectangle);
     });
@@ -75,7 +75,7 @@ describe('customMapShapesUtility', () => {
         properties: {},
       };
 
-      const result = parsePolygonTypeFromFeature(feature);
+      const result = parseDrawToolTypeFromFeature(feature);
 
       expect(result).toBe(DrawToolType.Freeform);
     });

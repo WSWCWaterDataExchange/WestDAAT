@@ -36,7 +36,7 @@ export const buildDefaultNewRectangleFeature = (): Feature<Geometry, GeoJsonProp
   };
 };
 
-export const parsePolygonTypeFromFeature = (feature: Feature<Geometry, GeoJsonProperties>): DrawToolType => {
+export const parseDrawToolTypeFromFeature = (feature: Feature<Geometry, GeoJsonProperties>): DrawToolType => {
   if (feature.properties?.isCircle) {
     return DrawToolType.Circle;
   }
