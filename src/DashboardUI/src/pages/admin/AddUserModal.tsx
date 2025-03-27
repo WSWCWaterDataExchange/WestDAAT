@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import { addOrganizationMember } from '../../accessors/organizationAccessor';
 import { searchUsers } from '../../accessors/userAccessor';
 import { Role, RoleDisplayNames } from '../../config/role';
-import { ErrorBase } from '../../data-contracts/ErrorBase';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
@@ -45,7 +44,7 @@ function AddUserModal(props: AddUserModalProps) {
         autoClose: 1000,
       });
     },
-    onError: (error: ErrorBase) => {
+    onError: (error: { status?: number; errors?: any }) => {
       if (error?.status === 409) {
         toast.error('User is already a member of an organization', {
           position: 'top-center',
