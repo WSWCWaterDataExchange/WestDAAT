@@ -4,7 +4,7 @@ import {
   buildNewCircleFeature,
   parsePolygonTypeFromFeature,
 } from './customMapShapesUtility';
-import { PolygonType } from '../data-contracts/PolygonType';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 describe('customMapShapesUtility', () => {
   describe('buildNewCircleFeature', () => {
@@ -54,7 +54,7 @@ describe('customMapShapesUtility', () => {
 
       const result = parsePolygonTypeFromFeature(circleFeature);
 
-      expect(result).toBe(PolygonType.Circle);
+      expect(result).toBe(DrawToolType.Circle);
     });
 
     it('should recognize a rectangle', () => {
@@ -62,7 +62,7 @@ describe('customMapShapesUtility', () => {
 
       const result = parsePolygonTypeFromFeature(rectangleFeature);
 
-      expect(result).toBe(PolygonType.Rectangle);
+      expect(result).toBe(DrawToolType.Rectangle);
     });
 
     it('should default to freeform', () => {
@@ -77,7 +77,7 @@ describe('customMapShapesUtility', () => {
 
       const result = parsePolygonTypeFromFeature(feature);
 
-      expect(result).toBe(PolygonType.Freeform);
+      expect(result).toBe(DrawToolType.Freeform);
     });
   });
 });

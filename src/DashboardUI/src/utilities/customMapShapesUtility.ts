@@ -1,5 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
-import { PolygonType } from '../data-contracts/PolygonType';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 /**
  * Creates a new `Feature` object with the given geometry.
@@ -36,14 +36,14 @@ export const buildDefaultNewRectangleFeature = (): Feature<Geometry, GeoJsonProp
   };
 };
 
-export const parsePolygonTypeFromFeature = (feature: Feature<Geometry, GeoJsonProperties>): PolygonType => {
+export const parsePolygonTypeFromFeature = (feature: Feature<Geometry, GeoJsonProperties>): DrawToolType => {
   if (feature.properties?.isCircle) {
-    return PolygonType.Circle;
+    return DrawToolType.Circle;
   }
 
   if (feature.properties?.isRectangle) {
-    return PolygonType.Rectangle;
+    return DrawToolType.Rectangle;
   }
 
-  return PolygonType.Freeform;
+  return DrawToolType.Freeform;
 };

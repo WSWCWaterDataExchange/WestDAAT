@@ -1,11 +1,11 @@
 import { Point } from 'geojson';
 import { PolygonEtDatapoint } from './PolygonEtDatapoint';
-import { PolygonType } from './PolygonType';
+import { DrawToolType } from './DrawToolType';
 
 type FullPolygonData = {
   waterConservationApplicationEstimateLocationId: string;
   polygonWkt: string;
-  polygonType: PolygonType;
+  polygonType: DrawToolType;
   centerPoint: Point;
   fieldName: string;
   acreage: number;

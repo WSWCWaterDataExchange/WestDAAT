@@ -8,7 +8,7 @@ import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
-import { PolygonType } from '../data-contracts/PolygonType';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -185,7 +185,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-            polygonType: PolygonType.Freeform,
+            polygonType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -235,7 +235,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt,
-            polygonType: PolygonType.Freeform,
+            polygonType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -401,7 +401,7 @@ describe('ConservationApplicationState reducer', () => {
 
       const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-        polygonType: PolygonType.Freeform,
+        polygonType: DrawToolType.Freeform,
         acreage: 1,
       };
 
@@ -453,7 +453,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              polygonType: PolygonType.Freeform,
+              polygonType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -508,7 +508,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              polygonType: PolygonType.Freeform,
+              polygonType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -676,7 +676,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt,
-              polygonType: PolygonType.Freeform,
+              polygonType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],

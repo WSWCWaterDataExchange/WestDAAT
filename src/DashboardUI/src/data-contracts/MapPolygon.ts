@@ -1,6 +1,6 @@
-import { PolygonType } from './PolygonType';
+import { DrawToolType } from './DrawToolType';
 
 export interface MapPolygon {
   polygonWkt: string;
-  polygonType: PolygonType;
+  polygonType: DrawToolType;
 }
