@@ -85,7 +85,7 @@ export function EstimationToolPage() {
       polygons: state.conservationApplication.estimateLocations.map(
         (polygon): MapPolygon => ({
           polygonWkt: polygon.polygonWkt!,
-          polygonType: polygon.polygonType!,
+          drawToolType: polygon.drawToolType!,
         }),
       ),
       compensationRateDollars: state.conservationApplication.desiredCompensationDollars,

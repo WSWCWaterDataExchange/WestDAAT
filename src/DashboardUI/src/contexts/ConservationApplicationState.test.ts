@@ -185,7 +185,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-            polygonType: DrawToolType.Freeform,
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -235,7 +235,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt,
-            polygonType: DrawToolType.Freeform,
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -401,7 +401,7 @@ describe('ConservationApplicationState reducer', () => {
 
       const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-        polygonType: DrawToolType.Freeform,
+        drawToolType: DrawToolType.Freeform,
         acreage: 1,
       };
 
@@ -453,7 +453,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              polygonType: DrawToolType.Freeform,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -508,7 +508,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              polygonType: DrawToolType.Freeform,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -676,7 +676,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt,
-              polygonType: DrawToolType.Freeform,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],

@@ -5,7 +5,7 @@ import { DrawToolType } from './DrawToolType';
 type FullPolygonData = {
   waterConservationApplicationEstimateLocationId: string;
   polygonWkt: string;
-  polygonType: DrawToolType;
+  drawToolType: DrawToolType;
   centerPoint: Point;
   fieldName: string;
   acreage: number;
@@ -17,4 +17,4 @@ type FullPolygonData = {
 
 export type PartialPolygonData = Partial<FullPolygonData>;
 
-export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'polygonType' | 'acreage'>;
+export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'drawToolType' | 'acreage'>;

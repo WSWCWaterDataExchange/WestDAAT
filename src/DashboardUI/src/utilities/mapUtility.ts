@@ -20,6 +20,6 @@ export const fromGeometryFeatureToMapSelectionPolygonData = (
   polygonFeature: Feature<Geometry, GeoJsonProperties>,
 ): MapSelectionPolygonData => ({
   polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
-  polygonType: parsePolygonTypeFromFeature(polygonFeature),
+  drawToolType: parsePolygonTypeFromFeature(polygonFeature),
   acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
 });
