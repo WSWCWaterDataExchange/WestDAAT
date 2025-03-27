@@ -410,8 +410,8 @@ internal class ValidationEngine : IValidationEngine
         var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Contains('@')
             ? organizationEmailDomainResponse.EmailDomain.Split("@")[1]
             : organizationEmailDomainResponse.EmailDomain;
-        
-        if (!string.Equals(userEmailDomain.ToLower(), organizationEmailDomain.ToLower()))
+
+        if (userEmailDomain.ToLower() != organizationEmailDomain.ToLower())
         {
             var errorMessage = "User's email domain does not match the organization's email domain.";
             return CreateValidationError(request, "emailDomain", errorMessage);
