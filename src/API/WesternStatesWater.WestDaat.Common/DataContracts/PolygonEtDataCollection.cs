@@ -6,6 +6,8 @@ public class PolygonEtDataCollection
 
     public string PolygonWkt { get; set; }
 
+    public EstimateLocationPolygonType PolygonType { get; set; }
+
     public double AverageYearlyEtInInches { get; set; }
 
     public double AverageYearlyEtInAcreFeet { get; set; }

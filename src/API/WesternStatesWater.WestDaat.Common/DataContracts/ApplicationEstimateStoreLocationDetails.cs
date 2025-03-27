@@ -4,6 +4,8 @@ public class ApplicationEstimateStoreLocationDetails
 {
     required public string PolygonWkt { get; set; }
 
+    required public EstimateLocationPolygonType PolygonType { get; set; }
+
     required public double PolygonAreaInAcres { get; set; }
 
     required public ApplicationEstimateStoreLocationConsumptiveUseDetails[] ConsumptiveUses { get; set; }

@@ -190,6 +190,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     return new CommonContracts.ApplicationEstimateStoreLocationDetails
                     {
                         PolygonWkt = src.PolygonWkt,
+                        PolygonType = src.PolygonType,
                         PolygonAreaInAcres = polygonAreaInAcres,
                         ConsumptiveUses = src.Datapoints.Select(y => new CommonContracts.ApplicationEstimateStoreLocationConsumptiveUseDetails
                         {
