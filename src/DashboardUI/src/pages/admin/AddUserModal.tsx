@@ -53,11 +53,14 @@ function AddUserModal(props: AddUserModalProps) {
           autoClose: 3000,
         });
       } else if (error.errors['emailDomain']) {
-        toast.error("User's email domain does not match the organization's email domain.", {
-          position: 'top-center',
-          theme: 'colored',
-          autoClose: 3000,
-        });
+        toast.error(
+          `User must have an ${props.organization!.emailDomain} email address to be added to this organization.`,
+          {
+            position: 'top-center',
+            theme: 'colored',
+            autoClose: 3000,
+          },
+        );
       } else {
         toast.error('Error adding user to organization', {
           position: 'top-center',
