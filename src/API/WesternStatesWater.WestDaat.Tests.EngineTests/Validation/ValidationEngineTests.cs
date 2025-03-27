@@ -96,7 +96,7 @@ public class ValidationEngineTests : EngineTestBase
         var polygonDetails = new Contracts.Client.StorePolygonDetails
         {
             PolygonWkt = polygonWkt,
-            PolygonType = EstimateLocationPolygonType.Freeform,
+            PolygonType = PolygonType.Freeform,
         };
 
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest

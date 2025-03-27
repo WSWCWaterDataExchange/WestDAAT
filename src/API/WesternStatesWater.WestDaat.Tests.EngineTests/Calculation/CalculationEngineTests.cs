@@ -49,7 +49,7 @@ public class CalculationEngineTests : EngineTestBase
                 new StorePolygonDetails
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 }
             ]
         };
@@ -141,12 +141,12 @@ public class CalculationEngineTests : EngineTestBase
                 new StorePolygonDetails
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 },
                 new StorePolygonDetails
                 {
                     PolygonWkt = arbitraryValidPolygonWkt2,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 }
             ]
         };
@@ -244,12 +244,12 @@ public class CalculationEngineTests : EngineTestBase
                 new()
                 {
                     PolygonWkt = arbitraryValidPolygonWkt1,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 },
                 new()
                 {
                     PolygonWkt = arbitraryValidPolygonWkt2,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 }
             ]
         };

@@ -9,6 +9,6 @@ public class StorePolygonDetails
     /// </summary>
     public string PolygonWkt { get; set; } = null!;
 
-    public EstimateLocationPolygonType PolygonType { get; set; }
+    public PolygonType PolygonType { get; set; }
 }
 

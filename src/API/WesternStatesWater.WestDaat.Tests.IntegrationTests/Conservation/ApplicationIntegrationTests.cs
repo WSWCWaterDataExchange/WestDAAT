@@ -621,7 +621,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 new CLI.StorePolygonDetails
                 {
                     PolygonWkt = memorialStadiumFootballField,
-                    PolygonType = EstimateLocationPolygonType.Freeform,
+                    PolygonType = PolygonType.Freeform,
                 }
             ],
         };

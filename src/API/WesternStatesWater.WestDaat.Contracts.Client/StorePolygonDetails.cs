@@ -9,5 +9,5 @@ public class StorePolygonDetails
     /// </summary>
     public string PolygonWkt { get; set; } = null!;
 
-    public Common.DataContracts.EstimateLocationPolygonType PolygonType { get; set; }
+    public Common.DataContracts.PolygonType PolygonType { get; set; }
 }

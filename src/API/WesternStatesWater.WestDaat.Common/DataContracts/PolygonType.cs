@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum EstimateLocationPolygonType
+public enum PolygonType
 {
     Unknown = 0,
     Freeform = 1,
