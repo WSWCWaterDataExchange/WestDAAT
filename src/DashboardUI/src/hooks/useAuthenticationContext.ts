@@ -66,7 +66,7 @@ export function useAuthenticationContext(): IAuthenticationContext {
         .catch((error) => {
           // If silent token acquisition fails, it's likely because the user needs to re-authenticate.
           if (error && error.name === 'InteractionRequiredAuthError') {
-            msalContext.acquireTokenPopup({
+            msalContext.loginRedirect({
               scopes: loginRequest.scopes,
             });
           } else {

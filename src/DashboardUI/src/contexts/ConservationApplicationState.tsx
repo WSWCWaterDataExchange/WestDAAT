@@ -46,6 +46,8 @@ export interface ConservationApplicationState {
   };
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
+  isLoadingApplication: boolean;
+  isLoadingFundingOrganization: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -84,6 +86,8 @@ export const defaultState = (): ConservationApplicationState => ({
   },
   isCreatingApplication: false,
   isUploadingDocument: false,
+  isLoadingApplication: false,
+  isLoadingFundingOrganization: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -92,6 +96,7 @@ export type ApplicationAction =
   | DashboardApplicationsLoadedAction
   | DashboardApplicationsFilteredAction
   | EstimationToolPageLoadedAction
+  | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
@@ -102,6 +107,7 @@ export type ApplicationAction =
   | ApplicationDocumentUploadingAction
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction
+  | ApplicationLoadingAction
   | ApplicationLoadedAction;
 
 export interface DashboardApplicationsLoadedAction {
@@ -123,6 +129,10 @@ export interface EstimationToolPageLoadedAction {
   payload: {
     waterRightNativeId: string;
   };
+}
+
+export interface FundingOrganizationLoadingAction {
+  type: 'FUNDING_ORGANIZATION_LOADING';
 }
 
 export interface FundingOrganizationLoadedAction {
@@ -206,6 +216,10 @@ export interface ApplicationDocumentRemovedAction {
   };
 }
 
+export interface ApplicationLoadingAction {
+  type: 'APPLICATION_LOADING';
+}
+
 export interface ApplicationLoadedAction {
   type: 'APPLICATION_LOADED';
   payload: {
@@ -234,6 +248,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onDashboardApplicationsFiltered(draftState, action);
     case 'ESTIMATION_TOOL_PAGE_LOADED':
       return onEstimationToolPageLoaded(draftState, action);
+    case 'FUNDING_ORGANIZATION_LOADING':
+      return onFundingOrganizationLoading(draftState);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
     case 'APPLICATION_CREATED':
@@ -254,6 +270,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationDocumentUploaded(draftState, action);
     case 'APPLICATION_DOCUMENT_REMOVED':
       return onApplicationDocumentRemoved(draftState, action);
+    case 'APPLICATION_LOADING':
+      return onApplicationLoading(draftState);
     case 'APPLICATION_LOADED':
       return onApplicationLoaded(draftState, action);
   }
@@ -313,6 +331,11 @@ const onEstimationToolPageLoaded = (
   return draftState;
 };
 
+const onFundingOrganizationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.isLoadingFundingOrganization = true;
+  return draftState;
+};
+
 const onFundingOrganizationLoaded = (
   draftState: ConservationApplicationState,
   { payload }: FundingOrganizationLoadedAction,
@@ -325,6 +348,8 @@ const onFundingOrganizationLoaded = (
   application.dateRangeStart = payload.dateRangeStart;
   application.dateRangeEnd = payload.dateRangeEnd;
   application.compensationRateModel = payload.compensationRateModel;
+
+  draftState.isLoadingFundingOrganization = false;
 
   checkCanEstimateConsumptiveUse(draftState);
 
@@ -462,6 +487,11 @@ const onApplicationDocumentRemoved = (
   return draftState;
 };
 
+const onApplicationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.isLoadingApplication = true;
+  return draftState;
+};
+
 const onApplicationLoaded = (
   draftState: ConservationApplicationState,
   { payload }: ApplicationLoadedAction,
@@ -528,6 +558,8 @@ const onApplicationLoaded = (
     }),
   );
   draftApplication.reviewerNotes = payload.notes;
+
+  draftState.isLoadingApplication = false;
 
   return draftState;
 };
