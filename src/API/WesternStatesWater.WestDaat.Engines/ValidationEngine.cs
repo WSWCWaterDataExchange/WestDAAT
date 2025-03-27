@@ -388,11 +388,15 @@ internal class ValidationEngine : IValidationEngine
             { UserId = request.UserId });
         var organizationEmailDomainResponse = (DTO.OrganizationEmailDomainResponse)await _organizationAccessor.Load(new DTO.OrganizationEmailDomainRequest
             { OrganizationId = request.OrganizationId });
+
+        var userEmailDomain = userProfileResponse.UserProfile.Email.Contains('@') 
+            ? userProfileResponse.UserProfile.Email.Split("@")[1] 
+            : userProfileResponse.UserProfile.Email;
+        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Contains('@')
+            ? organizationEmailDomainResponse.EmailDomain.Split("@")[1]
+            : organizationEmailDomainResponse.EmailDomain;
         
-        var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1].ToLower();
-        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.ToLower();
-        
-        if (userEmailDomain != organizationEmailDomain)
+        if (!string.Equals(userEmailDomain.ToLower(), organizationEmailDomain.ToLower()))
         {
             var errorMessage = "User's email domain does not match the organization's email domain.";
             return CreateValidationError(request, "emailDomain", errorMessage, errorMessage);

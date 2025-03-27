@@ -86,6 +86,17 @@ function AddUserModal(props: AddUserModalProps) {
     }
   }, [props.show]);
 
+  const areEmailDomainsSame = (userEmail: string, organizationDomain?: string): boolean => {
+    if (!organizationDomain) {
+      return false;
+    }
+
+    const userEmailDomain = userEmail.includes('@') ? userEmail.split('@')[1] : userEmail;
+    const orgEmailDomain = organizationDomain.includes('@') ? organizationDomain.split('@')[1] : organizationDomain;
+
+    return userEmailDomain.toLowerCase() === orgEmailDomain.toLowerCase();
+  };
+
   const loadUserOptions = useDebounceCallback((inputValue: string, callback: (options: UserSelectOption[]) => void) => {
     if (inputValue.trim().length < 3) {
       callback([]);
@@ -97,10 +108,15 @@ function AddUserModal(props: AddUserModalProps) {
       .then((searchResults) => {
         const options = searchResults?.searchResults
           ?.filter((result) => {
-            console.log(
-              `User's email: ${result.email} -- organization email domain: ${props.organization?.emailDomain}`,
-            );
             // Exclude current user from search results
+            const userEmail = result.email;
+            const orgDomain = props.organization?.emailDomain;
+            const areSameDomain = areEmailDomainsSame(userEmail, orgDomain);
+
+            if (!areSameDomain) {
+              return false;
+            }
+
             return result.userId !== user?.userId;
           })
           ?.map(
