@@ -43,7 +43,7 @@ function ReviewMap(props: ReviewMapProps) {
 
   const userDrawnPolygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     return userDrawnPolygonFeatures
-      .filter((polygonFeature) => !!polygonFeature.properties?.labelTitle)
+      .filter((polygonFeature) => !!polygonFeature.properties?.title)
       .map((polygonFeature) => {
         const labelLocation = centerOfMass(polygonFeature);
         labelLocation.properties = {
