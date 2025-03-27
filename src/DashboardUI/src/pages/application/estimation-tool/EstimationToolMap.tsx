@@ -15,6 +15,7 @@ import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 import { useWaterRightSiteLocations } from '../../../hooks/queries';
 import { mapLayerNames, mapSourceNames } from '../../../config/maps';
 import { MapSelectionPolygonData } from '../../../data-contracts/CombinedPolygonData';
+import { PolygonType } from '../../../data-contracts/PolygonType';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
@@ -106,6 +107,16 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
   }, [state.conservationApplication.estimateLocations]);
 
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
+    const parsePolygonTypeFromFeature = (feature: Feature<Geometry, GeoJsonProperties>): PolygonType => {
+      if (feature.properties?.isCircle) {
+        return PolygonType.Circle;
+      }
+
+      if (feature.properties?.isRectangle) {
+        return PolygonType.Rectangle;
+      }
+    }
+
     if (polygons.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
@@ -119,6 +130,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
 
     const polygonData: MapSelectionPolygonData[] = polygons.map((polygonFeature) => ({
       polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
+      polygonType:
       acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
     }));
 

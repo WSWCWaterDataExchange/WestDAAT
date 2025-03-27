@@ -53,7 +53,7 @@ export function EstimationToolPage() {
       const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
-        polygonWkts: fields.polygonWkts!,
+        polygons: fields.polygonWkts!,
         compensationRateDollars: fields.compensationRateDollars,
         units: fields.units,
       };

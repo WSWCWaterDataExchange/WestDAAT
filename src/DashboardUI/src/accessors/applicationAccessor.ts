@@ -24,6 +24,7 @@ import { WaterConservationApplicationSubmissionUpdateRequest } from '../data-con
 import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage } from '../utilities/fileUploadHelpers';
 import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
+import { StorePolygonDetails } from '../data-contracts/StorePolygonDetails';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -67,7 +68,7 @@ export const estimateConsumptiveUse = async (
   fields: {
     waterConservationApplicationId: string;
     waterRightNativeId: string;
-    polygonWkts: string[];
+    polygons: StorePolygonDetails[];
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },
@@ -75,7 +76,7 @@ export const estimateConsumptiveUse = async (
   const request: EstimateConsumptiveUseRequest = {
     waterConservationApplicationId: fields.waterConservationApplicationId,
     waterRightNativeId: fields.waterRightNativeId,
-    polygons: fields.polygonWkts,
+    polygons: fields.polygons,
     compensationRateDollars: fields.compensationRateDollars,
     units: fields.units,
   };
@@ -110,13 +111,10 @@ export const uploadApplicationDocuments = async (
   return applicationDocuments;
 };
 
-export const downloadApplicationDocuments = async (
-  context: IMsalContext,
-  documentId: string
-): Promise<void> => {
+export const downloadApplicationDocuments = async (context: IMsalContext, documentId: string): Promise<void> => {
   const { sasToken, fileName } = await generateDownloadSasToken(context, documentId);
   await downloadFilesFromBlobStorage(sasToken, fileName);
-}
+};
 
 export const submitApplication = async (
   context: IMsalContext,
