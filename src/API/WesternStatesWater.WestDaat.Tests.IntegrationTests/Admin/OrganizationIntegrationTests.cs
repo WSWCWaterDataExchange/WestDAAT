@@ -140,17 +140,20 @@ public class OrganizationIntegrationTests : IntegrationTestBase
             new()
             {
                 OrganizationId = organizations[0].Id,
-                Name = organizations[0].Name
+                Name = organizations[0].Name,
+                EmailDomain = organizations[0].EmailDomain
             },
             new()
             {
                 OrganizationId = organizations[1].Id,
-                Name = organizations[1].Name
+                Name = organizations[1].Name,
+                EmailDomain = organizations[1].EmailDomain
             },
             new()
             {
                 OrganizationId = organizations[2].Id,
-                Name = organizations[2].Name
+                Name = organizations[2].Name,
+                EmailDomain = organizations[2].EmailDomain
             }
         }.OrderBy(org => org.Name);
 
@@ -316,7 +319,7 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user memeber role")]
+    [DataRow(Roles.Member, true, DisplayName = "Should be able to assign a user member role")]
     [DataRow(Roles.TechnicalReviewer, true, DisplayName = "Should be able to assign a user technical reviewer role")]
     [DataRow(Roles.OrganizationAdmin, true, DisplayName = "Should be able to assign a user organization admin role")]
     [DataRow(Roles.GlobalAdmin, false, DisplayName = "Should not be able to assign a user global admin role")]
@@ -324,7 +327,8 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var organization = new OrganizationFaker().Generate();
-        var user = new UserFaker().Generate();
+        var user = new UserFaker()
+            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
         var userToBeAdded = new UserFaker().Generate();
         var userOrg = new UserOrganizationFaker(user, organization).Generate();
 
@@ -479,10 +483,9 @@ public class OrganizationIntegrationTests : IntegrationTestBase
     public async Task Store_OrganizationMemberAddRequest_Success()
     {
         // Arrange
-        var organization = new OrganizationFaker()
-            .RuleFor(x => x.EmailDomain, _ => "@myOrganization.com").Generate();
+        var organization = new OrganizationFaker().Generate();
         var user = new UserFaker()
-            .RuleFor(x => x.Email, _ => "myUser@myOrganization.com").Generate();
+            .RuleFor(x => x.Email, _ => $"myUser@{organization.EmailDomain}").Generate();
 
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.Users.AddAsync(user);
