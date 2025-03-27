@@ -64,7 +64,9 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       return;
     }
 
-    const userDrawnPolygonFeatures = polygonData.map(fromPartialPolygonDataToPolygonFeature);
+    const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = polygonData.map(
+      fromPartialPolygonDataToPolygonFeature,
+    );
     const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
       type: 'FeatureCollection',
       features: userDrawnPolygonFeatures,
