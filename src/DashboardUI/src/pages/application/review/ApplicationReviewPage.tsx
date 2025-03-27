@@ -5,6 +5,8 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 import { useMemo } from 'react';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
+import Alert from 'react-bootstrap/esm/Alert';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -40,14 +42,25 @@ function ApplicationReviewPage() {
       />
 
       <div className="overflow-y-auto">
-        {!state.isLoadingApplication && !state.isLoadingFundingOrganization && (
-          <>
-            <div className="container">
-              <ApplicationReviewHeader perspective={perspective} />
-            </div>
+        {!state.isLoadingApplication &&
+          !state.isLoadingFundingOrganization &&
+          !state.loadApplicationErrored &&
+          !state.loadFundingOrganizationErrored && (
+            <>
+              <div className="container">
+                <ApplicationReviewHeader perspective={perspective} />
+              </div>
 
-            <Outlet />
-          </>
+              <Outlet />
+            </>
+          )}
+
+        {(state.loadApplicationErrored || state.loadFundingOrganizationErrored) && (
+          <div className="container mt-3">
+            <Alert variant="danger" className="text-center">
+              Failed to load Application data. Please try again later.
+            </Alert>
+          </div>
         )}
       </div>
     </div>
