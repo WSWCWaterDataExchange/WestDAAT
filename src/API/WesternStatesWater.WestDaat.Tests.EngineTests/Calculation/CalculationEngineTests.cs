@@ -62,7 +62,7 @@ public class CalculationEngineTests : EngineTestBase
 
         response.DataCollections.Length.Should().Be(1);
         response.DataCollections[0].PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-        response.DataCollections[0].PolygonType.Should().Be(request.Polygons[0].DrawToolType);
+        response.DataCollections[0].DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
         // 2025: 1 inch
         // avg: 1 inch / 1 year = 1 inch
         response.DataCollections[0].AverageYearlyEtInInches.Should().Be(1.0);
@@ -160,14 +160,14 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections.Length.Should().Be(2);
 
         response.DataCollections[0].PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-        response.DataCollections[0].PolygonType.Should().Be(request.Polygons[0].DrawToolType);
+        response.DataCollections[0].DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
         // 2025: 1 inch + 2 inches + 3 inches = 6 inches
         // avg: 6 inches / 1 year = 6 inches
         response.DataCollections[0].AverageYearlyEtInInches.Should().Be(6);
         response.DataCollections[0].Datapoints.Length.Should().Be(1); // only one year of data
 
         response.DataCollections[1].PolygonWkt.Should().Be(request.Polygons[1].PolygonWkt);
-        response.DataCollections[1].PolygonType.Should().Be(request.Polygons[1].DrawToolType);
+        response.DataCollections[1].DrawToolType.Should().Be(request.Polygons[1].DrawToolType);
         // 2025: 0.33 + 1.65 + 12.73 + 0 + 30.5 = 45.21 inches
         // avg: 45.21 inches / 1 year = 45.21 inches
         response.DataCollections[1].AverageYearlyEtInInches.Should().Be(45.21);
@@ -263,7 +263,7 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections.Length.Should().Be(2);
 
         response.DataCollections[0].PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-        response.DataCollections[0].PolygonType.Should().Be(request.Polygons[0].DrawToolType);
+        response.DataCollections[0].DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
         // 2023: 1 inch
         // 2024: 2 inches
         // 2025: 3 inches
@@ -272,7 +272,7 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections[0].Datapoints.Length.Should().Be(3); // three years of data
 
         response.DataCollections[1].PolygonWkt.Should().Be(request.Polygons[1].PolygonWkt);
-        response.DataCollections[1].PolygonType.Should().Be(request.Polygons[1].DrawToolType);
+        response.DataCollections[1].DrawToolType.Should().Be(request.Polygons[1].DrawToolType);
         // 2023: 0.33 + 1.65 = 1.98 inches
         // 2024: 12.73 + 0 = 12.73 inches
         // 2025: 30.5 inches

@@ -98,7 +98,7 @@ internal class CalculationEngine : ICalculationEngine
             var result = new PolygonEtDataCollection
             {
                 PolygonWkt = polygon.PolygonWkt,
-                PolygonType = polygon.DrawToolType,
+                DrawToolType = polygon.DrawToolType,
                 AverageYearlyEtInInches = averageEtInInches,
                 AverageYearlyEtInAcreFeet = averageEtInAcreFeet,
                 Datapoints = yearlyDatapoints
