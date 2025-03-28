@@ -47,7 +47,7 @@ export function ApplicationCreatePage() {
       <div className="overflow-y-auto">
         <div className="container">
           <ApplicationReviewHeader perspective={perspective} />
-          <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
+          <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
           <ApplicationDocumentSection readOnly={false} />
           <ApplicantButtonRow handleSubmitClicked={handleSubmitClicked} />
         </div>
