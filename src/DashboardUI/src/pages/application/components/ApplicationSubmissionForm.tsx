@@ -15,18 +15,20 @@ import {
 } from '../../../data-contracts/CompensationRateUnits';
 import { formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-12';
 const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormProps {
+  perspective: ApplicationReviewPerspective;
   ref: React.Ref<HTMLFormElement>;
   formValidated: boolean;
 }
 
 function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
-  const { ref, formValidated } = props;
+  const { perspective, ref, formValidated } = props;
 
   const { state, dispatch } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
@@ -274,9 +276,11 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
         <div className="col-lg-6 col-12">
           Static map here
           <NotImplementedPlaceholder />
-          <Button variant="outline-primary" onClick={navigateToReviewPageMap}>
-            Edit in Estimator
-          </Button>
+          {perspective === 'reviewer' && (
+            <Button variant="outline-primary" onClick={navigateToReviewPageMap}>
+              Edit in Estimator
+            </Button>
+          )}
         </div>
       </div>
 

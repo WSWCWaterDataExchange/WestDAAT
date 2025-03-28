@@ -52,6 +52,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       LngLatBounds: getLatsLongsFromFeatureCollection(siteLocationsQuery.data!),
       padding: 25,
       maxZoom: 16,
+      duration: 2000,
     });
   }, [isMapLoaded, siteLocationsQuery.data, siteLocationsQuery.isLoading]);
 

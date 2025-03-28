@@ -5,7 +5,6 @@ import { ApplicationReviewPerspective } from '../../../data-contracts/Applicatio
 import { useMemo } from 'react';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 import Alert from 'react-bootstrap/esm/Alert';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
