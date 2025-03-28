@@ -49,6 +49,8 @@ namespace WesternStatesWater.WestDaat.Utilities
                     $"Response Body: {await response.Body.ReadAsStringAsync()}.\n " +
                     $"Subject: {message.Subject}");
             }
+
+            _logger.LogInformation("Email sent successfully. To: {To}, Subject: {Subject}", message.To, message.Subject);
         }
     }
 }

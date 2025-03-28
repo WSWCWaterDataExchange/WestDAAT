@@ -324,6 +324,7 @@ var fnAppSettings = {
   'Database:WadeConnectionString': 'Server=tcp:${wadeDatabaseServer[Environment]},1433;Initial Catalog=${wadeDatabaseName[Environment]};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   'Database:WestDaatConnectionString': 'Server=tcp:${sql_server.name}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sql_server_database.name};Application Name=${sites_fn_resource.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;Column Encryption Setting=enabled;TrustServerCertificate=False;Connection Timeout=30;'
   'Environment:IsDevelopment': false
+  'Environment:SiteUrl': siteOrigins[Environment]
   'MessageBus:ServiceBusUrl': '${service_bus.name}.servicebus.windows.net'
   'Nldi:MaxDownstreamDiversionDistance': '500'
   'Nldi:MaxDownstreamMainDistance': '500'
