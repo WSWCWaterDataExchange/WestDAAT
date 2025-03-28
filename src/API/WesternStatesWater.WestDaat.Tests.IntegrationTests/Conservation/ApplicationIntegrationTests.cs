@@ -4,13 +4,16 @@ using System.Transactions;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
+using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
+using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
+using WaterConservationApplicationSubmittedEvent = WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmittedEvent;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 
@@ -21,12 +24,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     private WestDaatDatabaseContext _dbContext;
 
     private const string memorialStadiumFootballField = "POLYGON ((" +
-            "-96.70537000 40.82014318, " +
-            "-96.70537429129318 40.82112749428667, " +
-            "-96.70595069212823 40.82113037830751, " +
-            "-96.70595263797125 40.82014685607426, " +
-            "-96.70537000 40.82014318" +
-            "))";
+                                                        "-96.70537000 40.82014318, " +
+                                                        "-96.70537429129318 40.82112749428667, " +
+                                                        "-96.70595069212823 40.82113037830751, " +
+                                                        "-96.70595263797125 40.82014685607426, " +
+                                                        "-96.70537000 40.82014318" +
+                                                        "))";
+
     private const double memorialStadiumApproximateAreaInAcres = 1.32;
 
     [TestInitialize]
@@ -308,7 +312,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // but are included for completeness just in case something changes in the future
         applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
+            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
         applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
 
@@ -316,7 +321,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should().BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
+            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
@@ -435,16 +441,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
                 {
                     Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
-                    {
-                        var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
-                        return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
                         {
-                            Time = time,
-                            Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
-                        });
-                    })
-                    .SelectMany(monthlyData => monthlyData)
-                    .ToArray()
+                            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                            {
+                                Time = time,
+                                Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                            });
+                        })
+                        .SelectMany(monthlyData => monthlyData)
+                        .ToArray()
                 });
 
 
@@ -528,14 +534,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.DateRangeStart.Should().Be(
                     DateOnly.FromDateTime(
                         new DateTimeOffset(DateTimeOffset.UtcNow.Year - yearRange, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                        .UtcDateTime
+                            .UtcDateTime
                     )
                 );
                 dbEstimate.DateRangeEnd.Should().Be(
                     DateOnly.FromDateTime(
                         new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
-                        .AddMinutes(-1)
-                        .UtcDateTime
+                            .AddMinutes(-1)
+                            .UtcDateTime
                     )
                 );
                 dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
@@ -598,7 +604,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
             .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
             {
-                Data = [
+                Data =
+                [
                     new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
                     {
                         Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
@@ -682,8 +689,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(false, null, null, null, false, nameof(NotFoundError), DisplayName = "Application DNE -> should throw")]
     [DataRow(true, false, null, null, false, nameof(NotFoundError), DisplayName = "User does not have an in-progress Application for this water right -> should throw")]
-    [DataRow(true, true, false, false, false, nameof(ForbiddenError), DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
-    [DataRow(true, true, false, true, true, null, DisplayName = "User has an in-progress Application for this water right, and they attempted to create a Submission for the correct Application -> should succeed")]
+    [DataRow(true, true, false, false, false, nameof(ForbiddenError),
+        DisplayName = "User has an in-progress Application for this water right, but they attempted to create a Submission for a different Application -> should throw")]
+    [DataRow(true, true, false, true, true, null,
+        DisplayName = "User has an in-progress Application for this water right, and they attempted to create a Submission for the correct Application -> should succeed")]
     public async Task Store_SubmitApplication_Success(
         bool doesApplicationExist,
         bool? doesUserOwnApplication,
@@ -691,7 +700,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         bool? doesProvidedApplicationIdMatch,
         bool shouldSucceed,
         string expectedErrorTypeName
-        )
+    )
     {
         // Arrange
         const string waterRightNativeId = "1234";
@@ -800,7 +809,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[0].BlobName);
             dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[1].BlobName);
             dbApplication.SupportingDocuments.Any((doc) => doc.BlobName == documents[2].BlobName);
-            dbApplication.SupportingDocuments.All((doc) => string.IsNullOrWhiteSpace(doc.BlobName) && string.IsNullOrWhiteSpace(doc.FileName) && string.IsNullOrWhiteSpace(doc.Description));
+            dbApplication.SupportingDocuments.All((doc) =>
+                string.IsNullOrWhiteSpace(doc.BlobName) && string.IsNullOrWhiteSpace(doc.FileName) && string.IsNullOrWhiteSpace(doc.Description));
+
+            // Should queue event message
+            MessageBusUtilityMock.Verify(
+                mock => mock.SendMessageAsync(
+                    Queues.ConservationApplicationSubmitted,
+                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationSubmittedEvent>()),
+                Times.Once);
         }
         else
         {
@@ -850,7 +867,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         string userOrgRole,
         bool shouldSucceed,
         string expectedErrorTypeName
-        )
+    )
     {
         // Arrange
         // setup application
@@ -977,5 +994,41 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             response.Error.GetType().Name.Should().Be(expectedErrorTypeName);
         }
+    }
+
+    [TestMethod]
+    public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmail()
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var fundingOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, fundingOrganization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        UseSystemContext();
+
+        // Act
+        var result = await _applicationManager.OnApplicationSubmitted<WaterConservationApplicationSubmittedEvent, EventResponseBase>(new WaterConservationApplicationSubmittedEvent
+        {
+            ApplicationId = application.Id,
+        });
+
+        // Assert
+        result.Error.Should().BeNull();
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == waterUser.Email &&
+                    req.Subject == "Water Conservation Application Submitted" &&
+                    req.Body.Contains(application.Id.ToString())
+                )
+            ),
+            Times.Once
+        );
     }
 }

@@ -6,10 +6,11 @@ using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Engines;
 using WesternStatesWater.WestDaat.Managers.Mapping;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
+public class WaterConservationApplicationSubmittedEventHandler : NotificationEventHandlerBase, IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
 {
     public INotificationFilteringEngine NotificationFilteringEngine { get; }
 
@@ -20,8 +21,9 @@ public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler
     public WaterConservationApplicationSubmittedEventHandler(
         INotificationFilteringEngine notificationFilteringEngine,
         INotificationFormattingEngine notificationFormattingEngine,
-        ILogger<WaterConservationApplicationSubmittedEventHandler> logger
-    )
+        ILogger<WaterConservationApplicationSubmittedEventHandler> logger,
+        IEmailNotificationSdk emailSdk
+    ): base(logger, emailSdk)
     {
         NotificationFilteringEngine = notificationFilteringEngine;
         NotificationFormattingEngine = notificationFormattingEngine;
@@ -32,7 +34,10 @@ public class WaterConservationApplicationSubmittedEventHandler : IRequestHandler
     {
         var dto = DtoMapper.Map<DTO.WaterConservationApplicationSubmittedEvent>(@event);
         var notificationMetas = await NotificationFilteringEngine.Filter(dto);
-        
+
+        var notifications = NotificationFormattingEngine.Format(notificationMetas);
+
+        await Send(notifications);
 
         return new EventResponseBase();
     }
