@@ -1,5 +1,6 @@
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export const applicationDetailsMock = (): ApplicationDetails => ({
   id: 'application-guid',
@@ -17,6 +18,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
       {
         id: 'location-guid',
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        drawToolType: DrawToolType.Rectangle,
         polygonAreaInAcres: 1,
         additionalDetails: 'I, the user, have some things to say about this field.',
         consumptiveUses: [
