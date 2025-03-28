@@ -22,6 +22,8 @@ public class ValidationEngineTests : EngineTestBase
 
     private Mock<IApplicationAccessor> _applicationAccessorMock = null!;
 
+    private Mock<IUserAccessor> _userAccessorMock = null!;
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -30,8 +32,10 @@ public class ValidationEngineTests : EngineTestBase
 
         _organizationAccessorMock = new Mock<IOrganizationAccessor>(MockBehavior.Strict);
         _applicationAccessorMock = new Mock<IApplicationAccessor>(MockBehavior.Strict);
+        _userAccessorMock = new Mock<IUserAccessor>(MockBehavior.Strict);
 
-        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object, _organizationAccessorMock.Object, _applicationAccessorMock.Object);
+        _validationEngine = new ValidationEngine(_contextUtilityMock.Object, _securityUtilityMock.Object, _organizationAccessorMock.Object, _applicationAccessorMock.Object,
+            _userAccessorMock.Object);
     }
 
     [TestMethod]
@@ -93,11 +97,17 @@ public class ValidationEngineTests : EngineTestBase
 
         // Act
         string polygonWkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
+        var polygonDetails = new Contracts.Client.MapPolygon
+        {
+            PolygonWkt = polygonWkt,
+            DrawToolType = DrawToolType.Freeform,
+        };
+
         var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
         {
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),
-            Polygons = polygonsIntersect ? [polygonWkt, polygonWkt] : [polygonWkt],
+            Polygons = polygonsIntersect ? [polygonDetails, polygonDetails] : [polygonDetails],
         };
         var result = await _validationEngine.Validate(request);
 
@@ -135,7 +145,7 @@ public class ValidationEngineTests : EngineTestBase
         bool applicationExists,
         bool userIsApplicant,
         bool shouldSucceed
-        )
+    )
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -227,7 +237,7 @@ public class ValidationEngineTests : EngineTestBase
         bool isUserMemberOfOrg,
         bool doesUserHaveCorrectPermission,
         bool shouldSucceed
-        )
+    )
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -243,14 +253,15 @@ public class ValidationEngineTests : EngineTestBase
                 ExternalAuthId = "",
                 Roles = [],
                 OrganizationRoles = isUserMemberOfOrg
-                ? [
-                    new OrganizationRole
-                    {
-                        OrganizationId = organizationId,
-                        RoleNames =  [Roles.TechnicalReviewer],
-                    }
-                ]
-                : [],
+                    ?
+                    [
+                        new OrganizationRole
+                        {
+                            OrganizationId = organizationId,
+                            RoleNames = [Roles.TechnicalReviewer],
+                        }
+                    ]
+                    : [],
             };
             getContextMock.Returns(userContext);
             getRequiredContextMock.Returns(userContext);
@@ -309,7 +320,6 @@ public class ValidationEngineTests : EngineTestBase
                 {
                     response.Should().BeOfType<NotFoundError>();
                 }
-
             }
             else
             {

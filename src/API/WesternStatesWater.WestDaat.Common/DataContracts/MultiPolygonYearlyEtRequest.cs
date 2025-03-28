@@ -2,10 +2,7 @@
 
 public class MultiPolygonYearlyEtRequest : CalculateRequestBase
 {
-    /// <summary>
-    /// Array of polygons in WKT format.
-    /// </summary>
-    public string[] Polygons { get; set; }
+    public MapPolygon[] Polygons { get; set; }
 
     public RasterTimeSeriesModel Model { get; set; }
 

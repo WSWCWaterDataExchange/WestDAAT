@@ -1,9 +1,11 @@
 import { Point } from 'geojson';
 import { PolygonEtDatapoint } from './PolygonEtDatapoint';
+import { DrawToolType } from './DrawToolType';
 
 type FullPolygonData = {
   waterConservationApplicationEstimateLocationId: string;
   polygonWkt: string;
+  drawToolType: DrawToolType;
   centerPoint: Point;
   fieldName: string;
   acreage: number;
@@ -15,4 +17,4 @@ type FullPolygonData = {
 
 export type PartialPolygonData = Partial<FullPolygonData>;
 
-export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'acreage'>;
+export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'drawToolType' | 'acreage'>;

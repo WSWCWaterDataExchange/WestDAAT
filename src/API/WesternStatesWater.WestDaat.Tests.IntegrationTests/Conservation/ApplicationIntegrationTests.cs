@@ -356,6 +356,36 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         var wadeDb = Services.GetRequiredService<IDatabaseContextFactory>().Create();
 
+        // necessary since we're using a custom transaction scope
+        var cleanupDatabase = async () =>
+        {
+            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
+            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
+            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
+            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
+            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
+            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
+            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
+            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
+            wadeDb.Variable.RemoveRange(wadeDb.Variable);
+            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
+            wadeDb.Units.RemoveRange(wadeDb.Units);
+            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
+            await wadeDb.SaveChangesAsync();
+
+            _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses);
+            _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
+            _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
+            _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
+            _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
+            _dbContext.Users.RemoveRange(_dbContext.Users);
+            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
+            await _dbContext.SaveChangesAsync();
+        };
+
+        // run prior to test initialization in case previous run failed
+        await cleanupDatabase();
+
         try
         {
             // Arrange
@@ -437,7 +467,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             {
                 WaterConservationApplicationId = application.Id,
                 WaterRightNativeId = application.WaterRightNativeId,
-                Polygons = [memorialStadiumFootballField],
+                Polygons =
+                [
+                    new CLI.MapPolygon
+                    {
+                        PolygonWkt = memorialStadiumFootballField,
+                        DrawToolType = DrawToolType.Freeform,
+                    }
+                ],
             };
 
             if (requestShouldIncludeCompensationInfo)
@@ -512,7 +549,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
                 dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
-                dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0]);
+                dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
+                dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
                 dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
                 // double-check that the response data was cross-referenced successfully with the db EstimateLocations
@@ -545,30 +583,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
         finally
         {
-            // cleanup
-            // necessary since we're using a custom transaction scope
-            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
-            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
-            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
-            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
-            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
-            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
-            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
-            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
-            wadeDb.Variable.RemoveRange(wadeDb.Variable);
-            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
-            wadeDb.Units.RemoveRange(wadeDb.Units);
-            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
-            await wadeDb.SaveChangesAsync();
-
-            _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses);
-            _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
-            _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
-            _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
-            _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
-            _dbContext.Users.RemoveRange(_dbContext.Users);
-            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
-            await _dbContext.SaveChangesAsync();
+            // cleanup after test finishes to prevent issues with other tests
+            await cleanupDatabase();
         }
     }
 
@@ -607,7 +623,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             WaterConservationApplicationId = application.Id,
             WaterRightNativeId = application.WaterRightNativeId,
-            Polygons = [memorialStadiumFootballField],
+            Polygons =
+            [
+                new CLI.MapPolygon
+                {
+                    PolygonWkt = memorialStadiumFootballField,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
         };
 
         // Act

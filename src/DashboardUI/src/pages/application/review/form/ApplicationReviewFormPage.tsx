@@ -82,7 +82,7 @@ export function ApplicationReviewFormPage() {
   });
 
   return (
-    <>
+    <div className="container">
       <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
       <ApplicationDocumentSection readOnly={false} />
       <ApplicationReviewPipelineSection />
@@ -112,7 +112,7 @@ export function ApplicationReviewFormPage() {
           await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
         }
       />
-    </>
+    </div>
   );
 }
 
