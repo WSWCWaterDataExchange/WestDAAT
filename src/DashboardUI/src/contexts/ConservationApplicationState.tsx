@@ -561,6 +561,7 @@ const onApplicationLoaded = (
     (location, index): PartialPolygonData => ({
       waterConservationApplicationEstimateLocationId: location.id,
       polygonWkt: location.polygonWkt,
+      drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
       fieldName: `Field ${index + 1}`,

@@ -47,3 +47,18 @@ export const parseDrawToolTypeFromFeature = (feature: Feature<Geometry, GeoJsonP
 
   return DrawToolType.Freeform;
 };
+
+export const initializeFeaturePropertyFromDrawToolType = (drawToolType: DrawToolType): GeoJsonProperties => {
+  switch (drawToolType) {
+    case DrawToolType.Circle:
+      return {
+        isCircle: true,
+      };
+    case DrawToolType.Rectangle:
+      return {
+        isRectangle: true,
+      };
+    default:
+      return {};
+  }
+};
