@@ -1003,16 +1003,40 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_SubmitApplicationRecommendation_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
     {
         // Arrange
-        // create an organization
-        // create an application & submission in review status
-        // create the request object
-        // use a usercontext (use params)
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+        
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = isPartOfOrg ? organization.Id : Guid.NewGuid(),
+                RoleNames = [role]
+            }],
+            ExternalAuthId = ""
+        });
+
+        var request = new WaterConservationApplicationRecommendationRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            IsRecommended = true,
+        };
 
         // Act
-        
+        var response = await _applicationManager.Store<WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
         // Assert
-        // error should exist
-        // error should be type ForbiddenError
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
     }
     
     [DataTestMethod]
@@ -1021,15 +1045,43 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_SubmitApplicationRecommendation_Success(bool isRecommended, string role)
     {
         // Arrange
-        // create an organization
-        // create an application & submission in review status
-        // create the request object
-        // use a usercontext (role from params, same organization)
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId =  organization.Id ,
+                RoleNames = [role]
+            }],
+            ExternalAuthId = ""
+        });
         
+        var request = new WaterConservationApplicationRecommendationRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            IsRecommended = isRecommended,
+        };
+
         // Act
-        
+        var response = await _applicationManager.Store<WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
         // Assert
-        // no errors
+        response.Error.Should().BeNull();
+        
+        var applicationInDb = await _dbContext.WaterConservationApplications
+            .Include(app => app.Submission)
+            .SingleOrDefaultAsync(app => app.Id == application.Id);
         // application has the right date (recommendedfor date, recommendedagainst date)
         // application's other date is null
         // application has the reviewer's userid
