@@ -14,6 +14,9 @@ import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
+import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
+
+const perspective: ApplicationReviewPerspective = 'reviewer';
 
 export function ApplicationReviewFormPage() {
   const context = useMsal();
@@ -82,8 +85,8 @@ export function ApplicationReviewFormPage() {
   });
 
   return (
-    <>
-      <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
+    <div className="container">
+      <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
       <ApplicationDocumentSection readOnly={false} />
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
@@ -112,7 +115,7 @@ export function ApplicationReviewFormPage() {
           await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
         }
       />
-    </>
+    </div>
   );
 }
 

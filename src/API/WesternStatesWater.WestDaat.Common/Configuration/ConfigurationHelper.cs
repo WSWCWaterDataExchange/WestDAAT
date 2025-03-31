@@ -17,7 +17,9 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
                 $"{ConfigurationRootNames.Database}:{nameof(DatabaseConfiguration.WestDaatConnectionString)}",
                 "Server=localhost;Initial Catalog=WestDAAT;TrustServerCertificate=True;User=sa;Password=DevP@ssw0rd!;Encrypt=False;"
             },
-            { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://api.water.usgs.gov/nldi/" },            { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.BaseAddress)}", "https://openet-api.org/" },
+            { $"{ConfigurationRootNames.Environment}:{nameof(EnvironmentConfiguration.SiteUrl)}", "http://localhost:3000" },
+            { $"{ConfigurationRootNames.UsgsNldiService}:{nameof(UsgsNldiServiceConfiguration.BaseAddress)}", "https://api.water.usgs.gov/nldi/" },
+            { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.BaseAddress)}", "https://openet-api.org/" },
             { $"{ConfigurationRootNames.OpenEt}:{nameof(OpenEtConfiguration.ApiKey)}", "API_KEY" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamMainDistance)}", "50" },
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxUpstreamTributaryDistance)}", "50" },
@@ -25,7 +27,9 @@ namespace WesternStatesWater.WestDaat.Common.Configuration
             { $"{ConfigurationRootNames.Nldi}:{nameof(NldiConfiguration.MaxDownstreamDiversionDistance)}", "50" },
             { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.WaterRightsSearchPageSize)}", "100" },
             { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.MaxRecordsDownload)}", "100000" },
-            { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.DownloadCommandTimeout)}", "120" }
+            { $"{ConfigurationRootNames.Performance}:{nameof(PerformanceConfiguration.DownloadCommandTimeout)}", "120" },
+            { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.NotificationFrom)}", "no-reply@westernstateswater.org" },
+            { $"{ConfigurationRootNames.Smtp}:{nameof(EmailServiceConfiguration.NotificationFromName)}", "WestDAAT" },
         };
 
         public static DatabaseConfiguration GetDatabaseConfiguration(this IConfiguration config)

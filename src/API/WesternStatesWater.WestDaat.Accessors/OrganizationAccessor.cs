@@ -24,7 +24,6 @@ namespace WesternStatesWater.WestDaat.Accessors
                 OrganizationLoadDetailsRequest req => await GetOrganizationDetails(req),
                 OrganizationFundingDetailsRequest req => await GetOrganizationFundingDetails(req),
                 UserOrganizationLoadRequest req => await GetUserOrganizations(req),
-                OrganizationEmailDomainRequest req => await GetOrganizationEmailDomain(req),
                 _ => throw new NotImplementedException(
                     $"Handling of request type '{request.GetType().Name}' is not implemented.")
             };
@@ -94,19 +93,6 @@ namespace WesternStatesWater.WestDaat.Accessors
             };
         }
 
-        private async Task<OrganizationEmailDomainResponse> GetOrganizationEmailDomain(OrganizationEmailDomainRequest request)
-        {
-            await using var db = _westDaatDatabaseContextFactory.Create();
-            var organization = await db.Organizations
-                .Where(org => org.Id == request.OrganizationId)
-                .SingleAsync();
-
-            return new OrganizationEmailDomainResponse
-            {
-                EmailDomain = organization.EmailDomain
-            };
-        }
-        
         public async Task<OrganizationStoreResponseBase> Store(OrganizationStoreRequestBase request)
         {
             return request switch

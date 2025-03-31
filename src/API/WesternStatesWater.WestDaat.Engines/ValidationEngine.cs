@@ -218,7 +218,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        var polygonGeometries = request.Polygons.Select(GeometryHelpers.GetGeometryByWkt).ToArray();
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt)).ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
         {
@@ -401,17 +401,17 @@ internal class ValidationEngine : IValidationEngine
         // Verify the user's email domain matches the organization's
         var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
             { UserId = request.UserId });
-        var organizationEmailDomainResponse = (DTO.OrganizationEmailDomainResponse)await _organizationAccessor.Load(new DTO.OrganizationEmailDomainRequest
+        var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
             { OrganizationId = request.OrganizationId });
 
         // There is validation to ensure the user email includes an '@'.
         // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
         var userEmailDomain = userProfileResponse.UserProfile.Email.Split("@")[1];
-        var organizationEmailDomain = organizationEmailDomainResponse.EmailDomain.Contains('@')
-            ? organizationEmailDomainResponse.EmailDomain.Split("@")[1]
-            : organizationEmailDomainResponse.EmailDomain;
-        
-        if (!string.Equals(userEmailDomain.ToLower(), organizationEmailDomain.ToLower()))
+        var organizationEmailDomain = organizationEmailDomainResponse.Organization.EmailDomain.Contains('@')
+            ? organizationEmailDomainResponse.Organization.EmailDomain.Split("@")[1]
+            : organizationEmailDomainResponse.Organization.EmailDomain;
+
+        if (userEmailDomain.ToLower() != organizationEmailDomain.ToLower())
         {
             var errorMessage = "User's email domain does not match the organization's email domain.";
             return CreateValidationError(request, "emailDomain", errorMessage);

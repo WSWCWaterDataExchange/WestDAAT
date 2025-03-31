@@ -549,6 +549,7 @@ function Map({
     map.fitBounds(bounds, {
       padding: mapBoundSettings.padding,
       maxZoom: mapBoundSettings.maxZoom,
+      duration: mapBoundSettings.duration ?? 5000,
     });
   }, [map, mapBoundSettings]);
 

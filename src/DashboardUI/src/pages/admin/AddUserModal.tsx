@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import { addOrganizationMember } from '../../accessors/organizationAccessor';
 import { searchUsers } from '../../accessors/userAccessor';
 import { Role, RoleDisplayNames } from '../../config/role';
-import { ErrorBase } from '../../data-contracts/ErrorBase';
 import { OrganizationSummaryItem } from '../../data-contracts/OrganizationSummaryItem';
 import { useAuthenticationContext } from '../../hooks/useAuthenticationContext';
 
@@ -45,7 +44,7 @@ function AddUserModal(props: AddUserModalProps) {
         autoClose: 1000,
       });
     },
-    onError: (error: ErrorBase) => {
+    onError: (error: { status?: number; errors?: any }) => {
       if (error?.status === 409) {
         toast.error('User is already a member of an organization', {
           position: 'top-center',
@@ -53,11 +52,14 @@ function AddUserModal(props: AddUserModalProps) {
           autoClose: 3000,
         });
       } else if (error.errors['emailDomain']) {
-        toast.error("User's email domain does not match the organization's email domain.", {
-          position: 'top-center',
-          theme: 'colored',
-          autoClose: 3000,
-        });
+        toast.error(
+          `User must have an ${props.organization!.emailDomain} email address to be added to this organization.`,
+          {
+            position: 'top-center',
+            theme: 'colored',
+            autoClose: 3000,
+          },
+        );
       } else {
         toast.error('Error adding user to organization', {
           position: 'top-center',
@@ -86,19 +88,6 @@ function AddUserModal(props: AddUserModalProps) {
     }
   }, [props.show]);
 
-  const areEmailDomainsSame = (userEmail: string, organizationDomain?: string): boolean => {
-    if (!organizationDomain) {
-      return false;
-    }
-
-    // There is validation to ensure the user email includes an '@'.
-    // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.
-    const userEmailDomain = userEmail.split('@')[1];
-    const orgEmailDomain = organizationDomain.includes('@') ? organizationDomain.split('@')[1] : organizationDomain;
-
-    return userEmailDomain.toLowerCase() === orgEmailDomain.toLowerCase();
-  };
-
   const loadUserOptions = useDebounceCallback((inputValue: string, callback: (options: UserSelectOption[]) => void) => {
     if (inputValue.trim().length < 3) {
       callback([]);
@@ -111,14 +100,6 @@ function AddUserModal(props: AddUserModalProps) {
         const options = searchResults?.searchResults
           ?.filter((result) => {
             // Exclude current user from search results
-            const userEmail = result.email;
-            const orgDomain = props.organization?.emailDomain;
-            const areSameDomain = areEmailDomainsSame(userEmail, orgDomain);
-
-            if (!areSameDomain) {
-              return false;
-            }
-
             return result.userId !== user?.userId;
           })
           ?.map(

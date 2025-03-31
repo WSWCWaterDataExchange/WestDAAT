@@ -47,7 +47,9 @@ export interface ConservationApplicationState {
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
   isLoadingApplication: boolean;
+  loadApplicationErrored: boolean;
   isLoadingFundingOrganization: boolean;
+  loadFundingOrganizationErrored: boolean;
   canEstimateConsumptiveUse: boolean;
   canContinueToApplication: boolean;
 }
@@ -87,7 +89,9 @@ export const defaultState = (): ConservationApplicationState => ({
   isCreatingApplication: false,
   isUploadingDocument: false,
   isLoadingApplication: false,
+  loadApplicationErrored: false,
   isLoadingFundingOrganization: false,
+  loadFundingOrganizationErrored: false,
   canEstimateConsumptiveUse: false,
   canContinueToApplication: false,
 });
@@ -98,6 +102,7 @@ export type ApplicationAction =
   | EstimationToolPageLoadedAction
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
+  | FundingOrganizationLoadErrored
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
@@ -108,7 +113,8 @@ export type ApplicationAction =
   | ApplicationDocumentUploadedAction
   | ApplicationDocumentRemovedAction
   | ApplicationLoadingAction
-  | ApplicationLoadedAction;
+  | ApplicationLoadedAction
+  | ApplicationLoadErroredAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -145,6 +151,10 @@ export interface FundingOrganizationLoadedAction {
     dateRangeEnd: Date;
     compensationRateModel: string;
   };
+}
+
+export interface FundingOrganizationLoadErrored {
+  type: 'FUNDING_ORGANIZATION_LOAD_ERRORED';
 }
 
 export interface MapPolygonsUpdatedAction {
@@ -228,6 +238,10 @@ export interface ApplicationLoadedAction {
   };
 }
 
+export interface ApplicationLoadErroredAction {
+  type: 'APPLICATION_LOAD_ERRORED';
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -252,6 +266,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onFundingOrganizationLoading(draftState);
     case 'FUNDING_ORGANIZATION_LOADED':
       return onFundingOrganizationLoaded(draftState, action);
+    case 'FUNDING_ORGANIZATION_LOAD_ERRORED':
+      return onFundingOrganizationLoadErrored(draftState);
     case 'APPLICATION_CREATED':
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
@@ -274,6 +290,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationLoading(draftState);
     case 'APPLICATION_LOADED':
       return onApplicationLoaded(draftState, action);
+    case 'APPLICATION_LOAD_ERRORED':
+      return onApplicationLoadErrored(draftState);
   }
 };
 
@@ -333,6 +351,7 @@ const onEstimationToolPageLoaded = (
 
 const onFundingOrganizationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.isLoadingFundingOrganization = true;
+  draftState.loadFundingOrganizationErrored = false;
   return draftState;
 };
 
@@ -350,9 +369,16 @@ const onFundingOrganizationLoaded = (
   application.compensationRateModel = payload.compensationRateModel;
 
   draftState.isLoadingFundingOrganization = false;
+  draftState.loadFundingOrganizationErrored = false;
 
   checkCanEstimateConsumptiveUse(draftState);
 
+  return draftState;
+};
+
+const onFundingOrganizationLoadErrored = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.loadFundingOrganizationErrored = true;
+  draftState.isLoadingFundingOrganization = false;
   return draftState;
 };
 
@@ -489,6 +515,7 @@ const onApplicationDocumentRemoved = (
 
 const onApplicationLoading = (draftState: ConservationApplicationState): ConservationApplicationState => {
   draftState.isLoadingApplication = true;
+  draftState.loadApplicationErrored = false;
   return draftState;
 };
 
@@ -534,6 +561,7 @@ const onApplicationLoaded = (
     (location, index): PartialPolygonData => ({
       waterConservationApplicationEstimateLocationId: location.id,
       polygonWkt: location.polygonWkt,
+      drawToolType: location.drawToolType,
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
       fieldName: `Field ${index + 1}`,
@@ -560,7 +588,14 @@ const onApplicationLoaded = (
   draftApplication.reviewerNotes = payload.notes;
 
   draftState.isLoadingApplication = false;
+  draftState.loadApplicationErrored = false;
 
+  return draftState;
+};
+
+const onApplicationLoadErrored = (draftState: ConservationApplicationState): ConservationApplicationState => {
+  draftState.loadApplicationErrored = true;
+  draftState.isLoadingApplication = false;
   return draftState;
 };
 
@@ -616,6 +651,7 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
 
     const polygonPostMapSelection: MapSelectionPolygonData = {
       polygonWkt: polygon.polygonWkt!,
+      drawToolType: polygon.drawToolType!,
       acreage: polygon.acreage!,
     };
 
@@ -657,6 +693,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       // carry over existing data
       waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygon.polygonWkt,
+      drawToolType: polygon.drawToolType,
       acreage: polygon.acreage,
       averageYearlyEtInInches: polygon.averageYearlyEtInInches,
       averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,

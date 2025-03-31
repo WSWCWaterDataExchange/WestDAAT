@@ -1,11 +1,9 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import Map from '../../../components/map/Map';
-import { convertGeometryToWkt, convertWktToGeometry } from '../../../utilities/geometryWktConverter';
-import { area as areaInSquareMeters } from '@turf/area';
+import { convertWktToGeometry } from '../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Button from 'react-bootstrap/esm/Button';
 import Spinner from 'react-bootstrap/esm/Spinner';
-import { convertSquareMetersToAcres } from '../../../utilities/valueConverters';
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../utilities/geometryHelpers';
 import EstimationToolTableView from './EstimationToolTableView';
@@ -15,6 +13,10 @@ import { MapStyle, useMapContext } from '../../../contexts/MapProvider';
 import { useWaterRightSiteLocations } from '../../../hooks/queries';
 import { mapLayerNames, mapSourceNames } from '../../../config/maps';
 import { MapSelectionPolygonData } from '../../../data-contracts/CombinedPolygonData';
+import {
+  fromPartialPolygonDataToPolygonFeature,
+  fromGeometryFeatureToMapSelectionPolygonData,
+} from '../../../utilities/mapUtility';
 
 interface EstimationToolMapProps {
   waterRightNativeId: string | undefined;
@@ -50,6 +52,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       LngLatBounds: getLatsLongsFromFeatureCollection(siteLocationsQuery.data!),
       padding: 25,
       maxZoom: 16,
+      duration: 2000,
     });
   }, [isMapLoaded, siteLocationsQuery.data, siteLocationsQuery.isLoading]);
 
@@ -60,18 +63,12 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       return;
     }
 
-    const userDrawnPolygonGeometries = polygonData.map(
-      (polygon) => convertWktToGeometry(polygon.polygonWkt!) as Polygon,
+    const userDrawnPolygonFeatures: Feature<Polygon, GeoJsonProperties>[] = polygonData.map(
+      fromPartialPolygonDataToPolygonFeature,
     );
     const userDrawnPolygonFeatureCollection: FeatureCollection<Polygon, GeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: userDrawnPolygonGeometries.map(
-        (geometry): Feature<Polygon, GeoJsonProperties> => ({
-          type: 'Feature',
-          geometry,
-          properties: {},
-        }),
-      ),
+      features: userDrawnPolygonFeatures,
     };
 
     setMapBoundSettings({
@@ -117,10 +114,7 @@ export function EstimationToolMap(props: EstimationToolMapProps) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = polygons.map((polygonFeature) => ({
-      polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
-      acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
-    }));
+    const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
 
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');

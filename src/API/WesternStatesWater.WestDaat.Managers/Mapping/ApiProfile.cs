@@ -165,6 +165,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
 
+            CreateMap<ClientContracts.MapPolygon, CommonContracts.MapPolygon>()
+                .ReverseMap();
+
             CreateMap<
                     (ClientContracts.Requests.Conservation.EstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
                     CommonContracts.MultiPolygonYearlyEtRequest>()
@@ -190,6 +193,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     return new CommonContracts.ApplicationEstimateStoreLocationDetails
                     {
                         PolygonWkt = src.PolygonWkt,
+                        DrawToolType = src.DrawToolType,
                         PolygonAreaInAcres = polygonAreaInAcres,
                         ConsumptiveUses = src.Datapoints.Select(y => new CommonContracts.ApplicationEstimateStoreLocationConsumptiveUseDetails
                         {

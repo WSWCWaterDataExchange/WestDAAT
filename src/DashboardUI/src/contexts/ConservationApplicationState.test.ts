@@ -8,6 +8,7 @@ import { MapSelectionPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -184,6 +185,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -196,6 +198,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
+    expect(newState.conservationApplication.estimateLocations[0].drawToolType).toEqual(DrawToolType.Freeform);
     expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
@@ -233,6 +236,7 @@ describe('ConservationApplicationState reducer', () => {
         polygons: [
           {
             polygonWkt,
+            drawToolType: DrawToolType.Freeform,
             acreage: 1,
           },
         ],
@@ -398,6 +402,7 @@ describe('ConservationApplicationState reducer', () => {
 
       const polygon: MapSelectionPolygonData = {
         polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+        drawToolType: DrawToolType.Freeform,
         acreage: 1,
       };
 
@@ -449,6 +454,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -503,6 +509,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
@@ -587,6 +594,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(application.estimateLocations.length).toEqual(applicationDetails.estimate.locations.length);
       expect(location.waterConservationApplicationEstimateLocationId).toEqual(expectedLocation.id);
       expect(location.polygonWkt).toEqual(expectedLocation.polygonWkt);
+      expect(location.drawToolType).toEqual(expectedLocation.drawToolType);
       expect(location.acreage).toEqual(expectedLocation.polygonAreaInAcres);
       expect(location.fieldName).toEqual('Field 1');
       expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);
@@ -657,7 +665,6 @@ describe('ConservationApplicationState reducer', () => {
       expect(submission.shareNumber).toEqual(expectedSubmission.shareNumber);
       expect(submission.waterRightState).toEqual(expectedSubmission.waterRightState);
       expect(submission.waterUseDescription).toEqual(expectedSubmission.waterUseDescription);
-
     });
   });
 
@@ -671,6 +678,7 @@ describe('ConservationApplicationState reducer', () => {
           polygons: [
             {
               polygonWkt,
+              drawToolType: DrawToolType.Freeform,
               acreage: 1,
             },
           ],
