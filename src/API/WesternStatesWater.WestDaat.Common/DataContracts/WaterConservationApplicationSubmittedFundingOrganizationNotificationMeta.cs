@@ -5,4 +5,6 @@ public class WaterConservationApplicationSubmittedFundingOrganizationNotificatio
     public Guid ApplicationId { get; init; }
 
     public NotificationUser ToUser { get; init; } = null!;
+
+    public string[] ToUserPermissions { get; set; }
 }

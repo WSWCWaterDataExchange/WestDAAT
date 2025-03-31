@@ -65,15 +65,20 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             OrganizationId = application.FundingOrganizationId.Value,
         });
 
+
         var fundingOrganizationNotifications = fundingOrganizationUsers.Users
-            .Select(user => new DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta
+            .Select(orgUser => new DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta
             {
                 ApplicationId = @event.ApplicationId,
                 ToUser = new DTO.NotificationUser
                 {
-                    EmailAddress = user.Email
+                    EmailAddress = orgUser.Email
                 },
-                Type = DTO.NotificationType.Email
+                Type = DTO.NotificationType.Email,
+                ToUserPermissions = _securityUtility.Get(new DTO.RolePermissionsGetRequest
+                {
+                    Role = orgUser.Role
+                })
             })
             .ToArray();
 
