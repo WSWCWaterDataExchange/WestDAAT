@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTimeSeriesContext } from '../../TimeSeriesProvider';
 import { useNldiFilter } from '../../nldi/hooks/useNldiFilter';
+import {usePolylinesFilter } from "../../../map-options/hooks/usePolylinesFilter";
 
 export function useTimeSeriesFilter() {
   const {
@@ -18,6 +19,7 @@ export function useTimeSeriesFilter() {
   } = useTimeSeriesContext();
 
   const { mapFilters: nldiMapFilters, isNldiFilterActive } = useNldiFilter();
+  const { mapFilters: polylinesMapFilters } = usePolylinesFilter();
 
   const siteTypeFilters = useMemo(() => {
     if (!selectedSiteTypes || selectedSiteTypes.length === 0) return null;
@@ -86,6 +88,7 @@ export function useTimeSeriesFilter() {
     if (waterSourceTypeFilters) filters.push(waterSourceTypeFilters);
     if (stateFilters) filters.push(stateFilters);
     if (dateFilters) filters.push(dateFilters);
+    if (polylinesMapFilters) filters.push(polylinesMapFilters);
 
     if (isTimeSeriesFilterActive && isNldiFilterActive && nldiMapFilters) {
       filters.push(nldiMapFilters);
@@ -103,6 +106,7 @@ export function useTimeSeriesFilter() {
     dateFilters,
     isNldiFilterActive,
     nldiMapFilters,
+    polylinesMapFilters
   ]);
 
   return {
