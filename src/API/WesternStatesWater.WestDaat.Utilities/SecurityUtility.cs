@@ -90,6 +90,7 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.Member,
             [
+                Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
@@ -97,7 +98,6 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.TechnicalReviewer,
             [
-                Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
                 Permissions.OrganizationApplicationDashboardLoad,
