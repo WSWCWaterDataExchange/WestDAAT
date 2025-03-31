@@ -37,9 +37,12 @@ export function ApplicationReviewFormPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [formValidated, setFormValidated] = useState(false);
 
-  const isFormDirty = useDirtyFormCheck(state.conservationApplication.applicationSubmissionForm, {
-    isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
-  });
+  const [isFormDirty, reinitializeDirtyFormCheck] = useDirtyFormCheck(
+    state.conservationApplication.applicationSubmissionForm,
+    {
+      isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
+    },
+  );
 
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
@@ -77,6 +80,7 @@ export function ApplicationReviewFormPage() {
     onSuccess: () => {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
+      reinitializeDirtyFormCheck(state.conservationApplication.applicationSubmissionForm);
     },
     onError: () => {
       toast.error('Error saving application changes.');
