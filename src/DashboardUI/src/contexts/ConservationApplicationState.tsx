@@ -602,6 +602,9 @@ const onApplicationLoadErrored = (draftState: ConservationApplicationState): Con
 const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
+  const dollarsHasValue = !!app.desiredCompensationDollars;
+  const unitsHasValue = !!app.desiredCompensationUnits;
+
   draftState.canEstimateConsumptiveUse =
     !!app.waterConservationApplicationId &&
     !!app.waterRightNativeId &&
@@ -609,6 +612,8 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     !!app.dateRangeStart &&
     !!app.dateRangeEnd &&
     !!app.estimateLocations &&
+    // cannot estimate consumptive use if the user has provided *only one* of dollars or units
+    ((dollarsHasValue && unitsHasValue) || (!dollarsHasValue && !unitsHasValue)) &&
     app.estimateLocations.length > 0 &&
     app.estimateLocations.length <= 20 &&
     app.estimateLocations.every((p) => p.acreage! <= 50000) &&
