@@ -83,7 +83,7 @@ internal class SecurityUtility : ISecurityUtility
             [
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
-                Permissions.OrganizationApplicationDashboardLoad
+                Permissions.OrganizationApplicationDashboardLoad,
             ]
         },
         {

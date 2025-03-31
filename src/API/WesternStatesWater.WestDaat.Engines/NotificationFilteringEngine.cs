@@ -13,7 +13,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         };
     }
 
-    private async Task<DTO.WaterConservationApplicationSubmittedNotificationMeta[]> FilterWaterConservationApplicationSubmittedEvent(
+    private async Task<DTO.NotificationMetaBase[]> FilterWaterConservationApplicationSubmittedEvent(
         DTO.WaterConservationApplicationSubmittedEvent @event)
     {
         var application = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.ApplicationExistsLoadRequest
@@ -27,19 +27,56 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             throw new WestDaatException("Application not found, or it does contain an applicant user.");
         }
 
+        var applicantNotification = await BuildApplicantNotification(@event, application);
+        var fundingOrganizationNotifications = await BuildFundingOrganizationNotification(@event, application);
+
+        return
+        [
+            applicantNotification,
+            .. fundingOrganizationNotifications
+        ];
+    }
+
+    private async Task<DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta> BuildApplicantNotification(
+        DTO.WaterConservationApplicationSubmittedEvent @event,
+        DTO.ApplicationExistsLoadResponse application
+    )
+    {
         var notificationUserResponse = (DTO.NotificationUserResponse)await _userAccessor.Load(new DTO.NotificationUserRequest
         {
             UserId = application.ApplicantUserId.Value,
         });
+        var applicantNotification = new DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta
+        {
+            ApplicationId = @event.ApplicationId,
+            ToUser = notificationUserResponse.User,
+            Type = DTO.NotificationType.Email
+        };
+        return applicantNotification;
+    }
 
-        return
-        [
-            new DTO.WaterConservationApplicationSubmittedNotificationMeta
+    private async Task<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta[]> BuildFundingOrganizationNotification(
+        DTO.WaterConservationApplicationSubmittedEvent @event,
+        DTO.ApplicationExistsLoadResponse application
+    )
+    {
+        var fundingOrganizationUsers = (DTO.UserListResponse)await _userAccessor.Load(new DTO.UserListRequest
+        {
+            OrganizationId = application.FundingOrganizationId.Value,
+        });
+
+        var fundingOrganizationNotifications = fundingOrganizationUsers.Users
+            .Select(user => new DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta
             {
                 ApplicationId = @event.ApplicationId,
-                ToUser = notificationUserResponse.User,
+                ToUser = new DTO.NotificationUser
+                {
+                    EmailAddress = user.Email
+                },
                 Type = DTO.NotificationType.Email
-            }
-        ];
+            })
+            .ToArray();
+
+        return fundingOrganizationNotifications;
     }
 }

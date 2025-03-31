@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class WaterConservationApplicationSubmittedNotificationMeta : NotificationMetaBase
+public class WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta : NotificationMetaBase
 {
     public Guid ApplicationId { get; init; }
 
