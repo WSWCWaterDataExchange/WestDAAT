@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTimeSeriesContext } from '../../TimeSeriesProvider';
 import { useNldiFilter } from '../../nldi/hooks/useNldiFilter';
-import {usePolylinesFilter } from "../../../map-options/hooks/usePolylinesFilter";
+import { usePolylinesFilter } from "../../../map-options/hooks/usePolylinesFilter";
 
 export function useTimeSeriesFilter() {
   const {
