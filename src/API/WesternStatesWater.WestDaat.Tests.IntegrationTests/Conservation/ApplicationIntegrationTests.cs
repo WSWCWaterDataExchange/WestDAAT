@@ -996,6 +996,46 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
     }
 
+    [DataTestMethod]
+    [DataRow(Roles.Member, true, DisplayName = "A Member of the same Funding Organization should not be able to submit a recommendation")]
+    [DataRow(Roles.TechnicalReviewer, false, DisplayName = "A Technical Reviewer of a different Funding Organization should not be able to submit a recommendation")]
+    [DataRow(Roles.OrganizationAdmin, false, DisplayName = "An Organization Admin of a different Funding Organization should not be able to submit a recommendation")]
+    public async Task Store_SubmitApplicationRecommendation_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
+    {
+        // Arrange
+        // create an organization
+        // create an application & submission in review status
+        // create the request object
+        // use a usercontext (use params)
+
+        // Act
+        
+        // Assert
+        // error should exist
+        // error should be type ForbiddenError
+    }
+    
+    [DataTestMethod]
+    [DataRow(true, Roles.TechnicalReviewer, DisplayName = "Application is successfully Recommended for approval by a Technical Reviewer")]
+    [DataRow(false, Roles.OrganizationAdmin, DisplayName = "Application is successfully Not Recommended for approval by an Organization Admin")]
+    public async Task Store_SubmitApplicationRecommendation_Success(bool isRecommended, string role)
+    {
+        // Arrange
+        // create an organization
+        // create an application & submission in review status
+        // create the request object
+        // use a usercontext (role from params, same organization)
+        
+        // Act
+        
+        // Assert
+        // no errors
+        // application has the right date (recommendedfor date, recommendedagainst date)
+        // application's other date is null
+        // application has the reviewer's userid
+        // application notes have been saved off
+    }
+    
     [TestMethod]
     public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmail()
     {

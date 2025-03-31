@@ -308,8 +308,43 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateWaterConservationApplicationRecommendationRequest(WaterConservationApplicationRecommendationRequest request, ContextBase context)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("made it to validation engine");
+        // verify the user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify the application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify the application is in review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
+                "Application must be in review status to receive a recommendation for final review.");
+        }
+
+        // verify the user has permissions to submit a recommendation
+        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationRecommendation))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
     }
 
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
