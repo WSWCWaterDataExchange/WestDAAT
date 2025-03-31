@@ -36,6 +36,7 @@ import { ApplicationReviewFormPage } from './pages/application/review/form/Appli
 import { ApplicationReviewMapPage } from './pages/application/review/map/ApplicationReviewMapPage';
 
 import './App.scss';
+import { ApplicationApprovePage } from './pages/application/create/ApplicationApprovePage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -117,6 +118,9 @@ function App({ msalInstance }: AppProps) {
                           <Route index element={<ApplicationReviewFormPage />} />
                           <Route path="map" element={<ApplicationReviewMapPage />} />
                         </Route>
+                      </Route>
+                      <Route path="approve" element={<ApplicationReviewGuard />}>
+                        <Route index element={<ApplicationApprovePage />} />
                       </Route>
                     </Route>
                     <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />

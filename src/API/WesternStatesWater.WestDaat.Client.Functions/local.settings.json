@@ -28,5 +28,9 @@
   "Environment": {
     "IsDevelopment": true,
     "SiteUrl": "http://localhost:3000"
+  },
+  "MessageBus": {
+    "ServiceBusUrl": "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;",
+    "UseDevelopmentEmulator": true
   }
 }
