@@ -163,7 +163,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardListItem>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)))
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
-                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyConsumptionEtAcreFeet));
+                .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.SumAverageYearlyTotalEtInAcreFeet));
 
             CreateMap<ClientContracts.MapPolygon, CommonContracts.MapPolygon>()
                 .ReverseMap();
