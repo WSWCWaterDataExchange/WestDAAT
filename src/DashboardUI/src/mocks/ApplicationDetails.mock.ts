@@ -13,7 +13,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateDollars: 100,
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
-    totalAverageYearlyConsumptionEtAcreFeet: 300,
+    averageYearlyTotalEtInAcreFeet: 300,
     locations: [
       {
         id: 'location-guid',

@@ -665,7 +665,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
       expect(application.totalAverageYearlyEtAcreFeet).toEqual(
-        applicationDetails.estimate.totalAverageYearlyConsumptionEtAcreFeet,
+        applicationDetails.estimate.averageYearlyTotalEtInAcreFeet,
       );
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 

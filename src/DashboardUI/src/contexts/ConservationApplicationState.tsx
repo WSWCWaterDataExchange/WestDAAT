@@ -534,7 +534,7 @@ const onApplicationLoaded = (
 
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
-  draftApplication.totalAverageYearlyEtAcreFeet = application.estimate.totalAverageYearlyConsumptionEtAcreFeet;
+  draftApplication.totalAverageYearlyEtAcreFeet = application.estimate.averageYearlyTotalEtInAcreFeet;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,

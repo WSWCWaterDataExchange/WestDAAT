@@ -6,6 +6,6 @@ export interface EstimateDetails {
   compensationRateDollars: number;
   compensationRateUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   estimatedCompensationDollars: number;
-  totalAverageYearlyConsumptionEtAcreFeet: number;
+  averageYearlyTotalEtInAcreFeet: number;
   locations: LocationDetails[];
 }
