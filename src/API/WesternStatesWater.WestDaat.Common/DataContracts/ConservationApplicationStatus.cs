@@ -1,8 +1,9 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public enum RecommendationDecision
+public enum ConservationApplicationStatus
 {
     Unknown = 0,
-    For = 1,
-    Against = 2,
+    InReview = 1,
+    Approved = 2,
+    Rejected = 3
 }
