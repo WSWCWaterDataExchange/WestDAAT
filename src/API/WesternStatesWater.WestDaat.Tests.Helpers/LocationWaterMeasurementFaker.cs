@@ -14,7 +14,7 @@ public class LocationWaterMeasurementFaker : Faker<EFWD.LocationWaterMeasurement
 
         if (location != null)
         {
-            RuleFor(wcaelcu => wcaelcu.Location, () => location);
+            RuleFor(x => x.Location, () => location);
         }
     }
 }
