@@ -25,7 +25,11 @@ public class WaterConservationApplicationEstimate
 
     public int EstimatedCompensationDollars { get; set; }
 
-    public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
+    public double AverageYearlyTotalEtInAcreFeet { get; set; }
+
+    public double? AverageYearlyEffectivePrecipitationInAcreFeet { get; set; } = null;
+
+    public double? AverageYearlyNetEtInAcreFeet { get; set; } = null;
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 

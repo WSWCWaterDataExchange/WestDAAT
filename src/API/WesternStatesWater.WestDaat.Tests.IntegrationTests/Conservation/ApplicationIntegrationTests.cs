@@ -169,7 +169,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.AverageYearlyTotalEtInAcreFeet
         };
 
         var rejectedAppResponse = new ApplicationDashboardListItem
@@ -185,7 +185,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
             WaterRightState = rejectedApp.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.AverageYearlyTotalEtInAcreFeet
         };
 
         var inReviewAppResponse = new ApplicationDashboardListItem
@@ -201,7 +201,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
             TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.AverageYearlyTotalEtInAcreFeet
         };
 
         var orgUserOrganizationRoles = new[]
@@ -263,7 +263,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         foreach (var location in locations)
         {
-            var consumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(location).Generate(2);
+            var consumptiveUses = new LocationWaterMeasurementFaker(location).Generate(2);
             await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
         }
 
@@ -421,7 +421,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             {
                 estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
                 var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
-                var estimateLocationConsumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(estimateLocation).Generate(12);
+                var estimateLocationConsumptiveUses = new LocationWaterMeasurementFaker(estimateLocation).Generate(12);
 
                 await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(estimateLocationConsumptiveUses);
             }
@@ -547,7 +547,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
                 dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
                 dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-                dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+                dbEstimate.AverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
                 dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
@@ -561,7 +561,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
                     return yearMatches;
                 }).Should().BeTrue();
-                dbEstimateLocationConsumptiveUses.Select(cu => cu.EtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
+                dbEstimateLocationConsumptiveUses.Select(cu => cu.TotalEtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
 
                 if (shouldInitializePreviousEstimate)
                 {
