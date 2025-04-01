@@ -339,10 +339,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .Where(a => a.Id == request.WaterConservationApplicationId)
             .SingleAsync();
         
-        // update submission
         DtoMapper.Map(request, application.Submission);
         
-        // add new note if provided
         if (!string.IsNullOrEmpty(request.RecommendationNotes))
         {
             var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
