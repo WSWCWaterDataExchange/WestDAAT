@@ -66,7 +66,7 @@ export function EstimationToolPage() {
         dispatch({
           type: 'CONSUMPTIVE_USE_ESTIMATED',
           payload: {
-            totalAverageYearlyEtAcreFeet: result.sumAverageYearlyTotalEtInAcreFeet,
+            sumAverageYearlyTotalEtInAcreFeet: result.sumAverageYearlyTotalEtInAcreFeet,
             conservationPayment: result.conservationPayment,
             dataCollections: result.dataCollections,
           },

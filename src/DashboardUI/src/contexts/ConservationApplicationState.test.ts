@@ -248,7 +248,7 @@ describe('ConservationApplicationState reducer', () => {
     newState = reducer(newState, {
       type: 'CONSUMPTIVE_USE_ESTIMATED',
       payload: {
-        totalAverageYearlyEtAcreFeet: 100,
+        sumAverageYearlyTotalEtInAcreFeet: 100,
         conservationPayment: 200,
         dataCollections: [
           {
@@ -607,7 +607,7 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          sumAverageYearlyTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
@@ -771,7 +771,7 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          sumAverageYearlyTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {

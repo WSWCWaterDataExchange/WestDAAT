@@ -184,7 +184,7 @@ export interface ApplicationCreatedAction {
 export interface ConsumptiveUseEstimatedAction {
   type: 'CONSUMPTIVE_USE_ESTIMATED';
   payload: {
-    totalAverageYearlyEtAcreFeet: number;
+    sumAverageYearlyTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
     dataCollections: PolygonEtDataCollection[];
   };
@@ -433,7 +433,7 @@ const onConsumptiveUseEstimated = (
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 
-  application.totalAverageYearlyEtAcreFeet = payload.totalAverageYearlyEtAcreFeet;
+  application.totalAverageYearlyEtAcreFeet = payload.sumAverageYearlyTotalEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
   // combine polygon data
