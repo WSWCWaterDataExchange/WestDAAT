@@ -192,6 +192,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
+            WaterConservationApplicationRecommendationRequest req => await SubmitApplicationRecommendation(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -327,5 +328,11 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await db.SaveChangesAsync();
 
         return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
+    {
+        await Task.CompletedTask;
+        throw new NotImplementedException("made it to accessor");
     }
 }
