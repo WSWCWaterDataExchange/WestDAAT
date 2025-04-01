@@ -1032,10 +1032,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 }).Generate()
         ];
 
+        var globalAdmins = new UserFaker()
+            .RuleFor(u => u.UserRoles, _ => new List<UserRole> { new() { Role = Roles.GlobalAdmin } })
+            .Generate(2);
+
 
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _dbContext.Users.AddRangeAsync(techReviewer, orgMember);
+        await _dbContext.Users.AddRangeAsync(globalAdmins);
         await _dbContext.SaveChangesAsync();
 
         UseSystemContext();
@@ -1048,6 +1053,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Error.Should().BeNull();
+
+
+        // Emails include:
+        //      1 x Applicant
+        //      1 x Tech Reviewer
+        //      1 x Org Member
+        //      2 x Global Admins
+        EmailNotificationSdkMock
+            .Verify(mock => mock.SendEmail(It.IsAny<EmailRequest>()), Times.Exactly(5));
 
         EmailNotificationSdkMock.Verify(
             mock => mock.SendEmail(
@@ -1083,5 +1097,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+
+        globalAdmins.Count.Should().Be(2);
+        foreach (var globalAdmin in globalAdmins)
+        {
+            EmailNotificationSdkMock.Verify(
+                mock => mock.SendEmail(
+                    It.Is<EmailRequest>(req =>
+                        req.To.Single() == globalAdmin.Email &&
+                        req.Subject == "New Water Conservation Application Submitted" &&
+                        req.Body.Contains($"A {fundingOrganization.Name} water conservation application has been submitted.") &&
+                        req.Body.Contains($"{application.Id}/approve")
+                    )
+                ), Times.Once
+            );
+        }
     }
 }

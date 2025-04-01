@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Accessors.Mapping;
+using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Accessors;
 
@@ -116,6 +117,11 @@ internal class UserAccessor : AccessorBase, IUserAccessor
         if (request.OrganizationId != null)
         {
             query = query.Where(u => u.UserOrganizations.Any(uo => uo.OrganizationId == request.OrganizationId));
+        }
+
+        if (request.IncludeGlobalAdministrators)
+        {
+            query = query.Where(u => u.UserRoles.Any(ur => ur.Role == Roles.GlobalAdmin));
         }
 
         var users = await query
