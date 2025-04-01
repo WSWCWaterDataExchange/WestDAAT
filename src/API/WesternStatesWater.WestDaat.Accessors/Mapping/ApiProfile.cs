@@ -335,7 +335,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
-                .ForMember(dest => dest.SumAverageYearlyTotalEtInAcreFeet, opt => opt.MapFrom(src => src.AverageYearlyTotalEtInAcreFeet))
+                .ForMember(dest => dest.SumAverageYearlyTotalEtInAcreFeet, opt => opt.MapFrom(src => src.SumAverageYearlyTotalEtInAcreFeet))
                 .ForMember(dest => dest.SumAverageYearlyEffectivePrecipitationInAcreFeet, opt => opt.Ignore())
                 .ForMember(dest => dest.SumAverageYearlyNetEtInAcreFeet, opt => opt.Ignore());
 
