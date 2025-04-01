@@ -259,7 +259,9 @@ describe('ConservationApplicationState reducer', () => {
             datapoints: [
               {
                 year: 2025,
-                etInInches: 400,
+                totalEtInInches: 400,
+                effectivePrecipitationInInches: null,
+                netEtInInches: null,
               },
             ],
           },
@@ -616,7 +618,9 @@ describe('ConservationApplicationState reducer', () => {
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },
@@ -681,7 +685,7 @@ describe('ConservationApplicationState reducer', () => {
       const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
       expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
       expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
-      expect(consumptiveUse.etInInches).toEqual(expectedConsumptiveUse.etInInches);
+      expect(consumptiveUse.totalEtInInches).toEqual(expectedConsumptiveUse.totalEtInInches);
 
       // application supporting documents
       const document = application.supportingDocuments[0];
@@ -778,7 +782,9 @@ describe('ConservationApplicationState reducer', () => {
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },

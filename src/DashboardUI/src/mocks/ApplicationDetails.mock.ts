@@ -25,7 +25,9 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
           {
             id: 'consumptive-use-guid',
             year: 2025,
-            etInInches: 400,
+            totalEtInInches: 400,
+            effectivePrecipitationInInches: null,
+            netEtInInches: null,
           },
         ],
       },

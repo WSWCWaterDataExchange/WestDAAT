@@ -42,8 +42,8 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
           {(props.data.datapoints ?? []).map((item) => (
             <tr key={item.year}>
               <td>{item.year}</td>
-              <td>{formatNumber(item.etInInches, 2)}</td>
-              <td>{formatNumber(convertFieldEtInInchesToAcreFeet(item.etInInches), 2)}</td>
+              <td>{formatNumber(item.totalEtInInches, 2)}</td>
+              <td>{formatNumber(convertFieldEtInInchesToAcreFeet(item.totalEtInInches), 2)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,4 +1,6 @@
 export interface PolygonEtDatapoint {
   year: number;
-  etInInches: number;
+  totalEtInInches: number;
+  effectivePrecipitationInInches: number | null;
+  netEtInInches: number | null;
 }
