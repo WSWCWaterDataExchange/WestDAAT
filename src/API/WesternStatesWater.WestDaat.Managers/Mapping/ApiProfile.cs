@@ -198,7 +198,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                         ConsumptiveUses = src.Datapoints.Select(y => new CommonContracts.ApplicationEstimateStoreLocationConsumptiveUseDetails
                         {
                             Year = y.Year,
-                            TotalEtInInches = y.EtInInches,
+                            TotalEtInInches = y.TotalEtInInches,
                         }).ToArray()
                     };
                 });

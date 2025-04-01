@@ -86,10 +86,10 @@ internal class CalculationEngine : ICalculationEngine
             var rasterResponse = await _openEtSdk.RasterTimeseriesPolygon(rasterRequest);
 
             var yearlyDatapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
-                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, EtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
+                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
-            var averageEtInInches = yearlyDatapoints.Average(d => d.EtInInches);
+            var averageEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
             var averageEtInFeet = averageEtInInches / 12;
 
             var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(polygonGeo);

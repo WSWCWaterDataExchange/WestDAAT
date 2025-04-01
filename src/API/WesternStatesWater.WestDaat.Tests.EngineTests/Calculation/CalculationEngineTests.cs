@@ -69,7 +69,7 @@ public class CalculationEngineTests : EngineTestBase
 
         response.DataCollections[0].Datapoints.Length.Should().Be(1);
         response.DataCollections[0].Datapoints[0].Year.Should().Be(twentyTwentyFive.Year);
-        response.DataCollections[0].Datapoints[0].EtInInches.Should().Be(1.0);
+        response.DataCollections[0].Datapoints[0].TotalEtInInches.Should().Be(1.0);
     }
 
     [TestMethod]
