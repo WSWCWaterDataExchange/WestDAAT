@@ -169,7 +169,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.AverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.SumAverageYearlyTotalEtInAcreFeet
         };
 
         var rejectedAppResponse = new ApplicationDashboardListItem
@@ -185,7 +185,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
             WaterRightState = rejectedApp.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.AverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.SumAverageYearlyTotalEtInAcreFeet
         };
 
         var inReviewAppResponse = new ApplicationDashboardListItem
@@ -201,7 +201,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
             TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.AverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.SumAverageYearlyTotalEtInAcreFeet
         };
 
         var orgUserOrganizationRoles = new[]
@@ -554,7 +554,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
                 dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
                 dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-                dbEstimate.AverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+                dbEstimate.SumAverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
                 dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
