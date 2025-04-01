@@ -21,8 +21,8 @@ public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
     required public CompensationRateUnits CompensationRateUnits { get; set; }
 
     required public int EstimatedCompensationDollars { get; set; }
-    
-    required public double TotalAverageYearlyEtAcreFeet { get; set; }
+
+    required public double AverageYearlyTotalEtInAcreFeet { get; set; }
 
     required public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
 }
