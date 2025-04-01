@@ -263,8 +263,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         foreach (var location in locations)
         {
-            var consumptiveUses = new LocationWaterMeasurementFaker(location).Generate(2);
-            await _dbContext.LocationWaterMeasurements.AddRangeAsync(consumptiveUses);
+            var locationWaterMeasurements = new LocationWaterMeasurementFaker(location).Generate(2);
+            await _dbContext.LocationWaterMeasurements.AddRangeAsync(locationWaterMeasurements);
         }
 
         var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
@@ -326,6 +326,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
+
+        // sanity checks: these should all be covered by the `BeEquivalentTo` comparisons, but we're performing them just in case
+
+        // verify that new fields are included in response
+        reviewerResponse.Application.Estimate.Locations.All(loc =>
+            loc.ConsumptiveUses.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
+        ).Should().BeTrue();
 
         // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
