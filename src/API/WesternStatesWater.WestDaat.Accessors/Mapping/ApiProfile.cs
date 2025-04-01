@@ -377,17 +377,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForSourceMember(src => src.WaterConservationApplicationId, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.RecommendationNotes, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.IsRecommended, opt => opt.DoNotValidate())
-                .ForMember(dest => dest.RecommendedForDate, opt =>
-                {
-                    opt.PreCondition(src => src.IsRecommended);
-                    opt.MapFrom(_ => DateTimeOffset.UtcNow);
-                })
-                .ForMember(dest => dest.RecommendedAgainstDate, opt =>
-                {
-                    opt.PreCondition(src => !src.IsRecommended);
-                    opt.MapFrom(_ => DateTimeOffset.UtcNow);
-                });
-
+                .ForMember(dest => dest.RecommendedForDate, opt => opt.MapFrom(src => src.IsRecommended ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.MapFrom(src => src.IsRecommended ? (DateTimeOffset?)null : DateTimeOffset.UtcNow));
+                
             CreateMap<WaterConservationApplicationRecommendationRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())

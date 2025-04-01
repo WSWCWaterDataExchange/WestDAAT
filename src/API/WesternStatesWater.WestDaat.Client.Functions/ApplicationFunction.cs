@@ -75,7 +75,7 @@ public class ApplicationFunction : FunctionBase
         HttpRequestData req)
     {
         var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
-        ApplicationStoreResponseBase results = request switch
+        var results = request switch
         {
             WaterConservationApplicationSubmissionRequest submissionRequest => await _applicationManager
                 .Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(submissionRequest),

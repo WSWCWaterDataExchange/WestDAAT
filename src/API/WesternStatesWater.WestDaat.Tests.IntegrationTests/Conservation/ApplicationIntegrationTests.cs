@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
+using Azure.Core;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
@@ -1039,76 +1040,100 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Error.Should().BeOfType<ForbiddenError>();
     }
     
-    [DataTestMethod]
-    [DataRow(true, Roles.TechnicalReviewer, true, DisplayName = "Application is successfully Recommended for approval by a Technical Reviewer")]
-    [DataRow(false, Roles.OrganizationAdmin, false, DisplayName = "Application is successfully Not Recommended for approval by an Organization Admin")]
-    public async Task Store_SubmitApplicationRecommendation_Success(bool isRecommended, string role, bool hasNotes)
+    [TestMethod]
+    public async Task Store_SubmitApplicationRecommendation_MultipleTimes_Success()
     {
         // Arrange
-        var user = new UserFaker().Generate();
+        var organizationAdmin = new UserFaker().Generate();
+        var technicalReviewer = new UserFaker().Generate();
+        var waterUser = new UserFaker().Generate();
         var organization = new OrganizationFaker().Generate();
-        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
         var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
-        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Users.AddRangeAsync(waterUser, technicalReviewer, organizationAdmin);
         await _dbContext.Organizations.AddAsync(organization);
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _dbContext.SaveChangesAsync();
 
+        // Arrange 1 (Technical Reviewer - recommends for with no notes)
         UseUserContext(new UserContext
         {
-            UserId = user.Id,
+            UserId = technicalReviewer.Id,
             Roles = [],
-            OrganizationRoles = [new OrganizationRole
-            {
-                OrganizationId =  organization.Id ,
-                RoleNames = [role]
-            }],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer]
+                }
+            ],
             ExternalAuthId = ""
         });
-        
-        var request = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
+
+        var recommendForRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
-            IsRecommended = isRecommended,
+            IsRecommended = true,
         };
 
-        if (hasNotes)
-        {
-            request.RecommendationNotes = "Optional recommendation notes";
-        }
+        // Act 1
+        var recommendForResponse =
+            await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(
+                recommendForRequest);
 
-        // Act
-        var response = await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
-
-        // Assert
-        response.Error.Should().BeNull();
+        // Assert 1
+        recommendForResponse.Error.Should().BeNull();
         
-        var applicationInDb = await _dbContext.WaterConservationApplications
-            .Include(app => app.Submission)
-            .ThenInclude(app => app.SubmissionNotes)
-            .SingleOrDefaultAsync(app => app.Id == application.Id);
+        var applicationSubmission = await _dbContext.WaterConservationApplicationSubmissions
+            .AsNoTracking()
+            .Include(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync(sub => sub.WaterConservationApplicationId == recommendForRequest.WaterConservationApplicationId);
+        applicationSubmission.RecommendedByUserId.Should().Be(technicalReviewer.Id);
+        applicationSubmission.RecommendedForDate.Should().NotBeNull();
+        applicationSubmission.RecommendedAgainstDate.Should().BeNull();
+        applicationSubmission.SubmissionNotes.Should().HaveCount(0);
 
-        applicationInDb.Submission.RecommendedByUserId.Should().Be(user.Id);
-        if (isRecommended)
+        // Arrange 2 (Organization Admin - recommends against with a note)
+        UseUserContext(new UserContext
         {
-            applicationInDb.Submission.RecommendedForDate.Should().NotBeNull();
-            applicationInDb.Submission.RecommendedAgainstDate.Should().BeNull();
-        }
-        else
-        {
-            applicationInDb.Submission.RecommendedForDate.Should().BeNull();
-            applicationInDb.Submission.RecommendedAgainstDate.Should().NotBeNull();
-        }
+            UserId = organizationAdmin.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.OrganizationAdmin]
+                }
+            ],
+            ExternalAuthId = ""
+        });
 
-        if (hasNotes)
+        var recommendAgainstRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
-            applicationInDb.Submission.SubmissionNotes.Should().HaveCount(1);
-        }
-        else
-        {
-            applicationInDb.Submission.SubmissionNotes.Should().HaveCount(0);
-        }
+            WaterConservationApplicationId = application.Id,
+            IsRecommended = false,
+            RecommendationNotes = "Recommending against approving this application"
+        };
+
+        // Act 2
+        var recommendAgainstResponse =
+            await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(
+                recommendAgainstRequest);
+
+        // Assert 2
+        recommendAgainstResponse.Error.Should().BeNull();
+        
+        var applicationSubmission2 = await _dbContext.WaterConservationApplicationSubmissions
+            .AsNoTracking()
+            .Include(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync(sub => sub.WaterConservationApplicationId == recommendForRequest.WaterConservationApplicationId);
+        applicationSubmission2.RecommendedByUserId.Should().Be(organizationAdmin.Id);
+        applicationSubmission2.RecommendedForDate.Should().BeNull();
+        applicationSubmission2.RecommendedAgainstDate.Should().NotBeNull();
+        applicationSubmission2.SubmissionNotes.Should().HaveCount(1);
     }
     
     [TestMethod]
