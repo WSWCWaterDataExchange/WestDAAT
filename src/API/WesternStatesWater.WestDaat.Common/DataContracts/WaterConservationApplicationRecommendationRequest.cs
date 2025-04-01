@@ -6,7 +6,7 @@ public class WaterConservationApplicationRecommendationRequest : ApplicationStor
     
     public Guid RecommendedByUserId { get; set; }
     
-    public bool IsRecommended { get; set; }
+    public RecommendationDecision RecommendationDecision { get; set; }
     
     public string RecommendationNotes { get; set; }
 }

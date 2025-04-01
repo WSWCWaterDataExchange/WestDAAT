@@ -7,8 +7,8 @@ public class WaterConservationApplicationRecommendationRequestValidator : Abstra
     public WaterConservationApplicationRecommendationRequestValidator()
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
-        
-        RuleFor(x => x.IsRecommended).NotNull();
+
+        RuleFor(x => x.RecommendationDecision).NotEmpty();
         
         RuleFor(x => x.RecommendationNotes).MaximumLength(4000);
     }

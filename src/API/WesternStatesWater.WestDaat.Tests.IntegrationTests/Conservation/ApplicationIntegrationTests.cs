@@ -1029,7 +1029,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
-            IsRecommended = true,
+            RecommendationDecision = RecommendationDecision.For,
         };
 
         // Act
@@ -1075,7 +1075,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var recommendForRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
-            IsRecommended = true,
+            RecommendationDecision = RecommendationDecision.For
         };
 
         // Act 1
@@ -1114,7 +1114,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var recommendAgainstRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
-            IsRecommended = false,
+            RecommendationDecision = RecommendationDecision.Against,
             RecommendationNotes = "Recommending against approving this application"
         };
 
