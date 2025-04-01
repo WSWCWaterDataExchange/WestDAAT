@@ -333,7 +333,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify the user has permissions to submit a recommendation
-        var permissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
