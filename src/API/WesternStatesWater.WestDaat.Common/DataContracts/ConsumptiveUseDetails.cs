@@ -6,5 +6,5 @@ public class ConsumptiveUseDetails
 
     public int Year { get; set; }
 
-    public double EtInInches { get; set; }
+    public double TotalEtInInches { get; set; }
 }
