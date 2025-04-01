@@ -8,6 +8,22 @@ internal class SecurityUtility : ISecurityUtility
 {
     public string[] Get(PermissionsGetRequestBase request)
     {
+        return request switch
+        {
+            RolePermissionsGetRequest req => GetRolePermission(req),
+            UserPermissionsGetRequestBase req => GetUserPermission(req),
+            _ => throw new InvalidOperationException($"Request type '{request.GetType().Name}' is not supported.")
+        };
+    }
+
+    private static string[] GetRolePermission(RolePermissionsGetRequest request)
+    {
+        RolePermissions.TryGetValue(request.Role, out var permissions);
+        return permissions ?? throw new InvalidOperationException($"Role '{request.Role}' is not supported.");
+    }
+
+    private static string[] GetUserPermission(UserPermissionsGetRequestBase request)
+    {
         return request.Context switch
         {
             AnonymousContext => [],
@@ -16,7 +32,7 @@ internal class SecurityUtility : ISecurityUtility
         };
     }
 
-    private static string[] GetUserContextPermissions(PermissionsGetRequestBase request)
+    private static string[] GetUserContextPermissions(UserPermissionsGetRequestBase request)
     {
         // If global admin return all permissions.
         if (((UserContext)request.Context).Roles.Contains(Roles.GlobalAdmin))
@@ -26,13 +42,13 @@ internal class SecurityUtility : ISecurityUtility
 
         return request switch
         {
-            PermissionsGetRequest req => GetPermissions(req),
-            OrganizationPermissionsGetRequest req => GetOrganizationPermissions(req),
+            UserPermissionsGetRequest req => GetPermissions(req),
+            UserOrganizationPermissionsGetRequest req => GetOrganizationPermissions(req),
             _ => throw new InvalidOperationException($"Request type '{request.GetType().Name}' is not supported.")
         };
     }
 
-    private static string[] GetPermissions(PermissionsGetRequest request)
+    private static string[] GetPermissions(UserPermissionsGetRequest request)
     {
         var userContext = (UserContext)request.Context;
         var uniquePermissions = new HashSet<string>();
@@ -47,7 +63,7 @@ internal class SecurityUtility : ISecurityUtility
         return uniquePermissions.ToArray();
     }
 
-    private static string[] GetOrganizationPermissions(OrganizationPermissionsGetRequest request)
+    private static string[] GetOrganizationPermissions(UserOrganizationPermissionsGetRequest request)
     {
         var userContext = (UserContext)request.Context;
         var organizationRoles = userContext.OrganizationRoles.FirstOrDefault(or =>
@@ -74,6 +90,7 @@ internal class SecurityUtility : ISecurityUtility
         {
             Roles.Member,
             [
+                Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,
                 Permissions.OrganizationApplicationDashboardLoad
             ]
@@ -83,12 +100,13 @@ internal class SecurityUtility : ISecurityUtility
             [
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
-                Permissions.OrganizationApplicationDashboardLoad
+                Permissions.OrganizationApplicationDashboardLoad,
             ]
         },
         {
             Roles.OrganizationAdmin,
             [
+                Permissions.ApplicationApprove,
                 Permissions.ApplicationReview,
                 Permissions.ApplicationUpdate,
                 Permissions.OrganizationApplicationDashboardLoad,

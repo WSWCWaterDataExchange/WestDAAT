@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Configuration;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.EngineTests
 {
@@ -17,6 +18,8 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
         protected Mock<IUserAccessor> UserAccessorMock { get; set; }
 
         protected Mock<IOrganizationAccessor> OrganizationAccessorMock { get; set; }
+
+        protected Mock<ISecurityUtility> SecurityUtilityMock { get; set; }
 
         protected IServiceProvider Services { get; private set; }
 
@@ -66,10 +69,7 @@ namespace WesternStatesWater.WestDaat.Tests.EngineTests
             ApplicationAccessorMock = new Mock<IApplicationAccessor>(MockBehavior.Strict);
             UserAccessorMock = new Mock<IUserAccessor>(MockBehavior.Strict);
             OrganizationAccessorMock = new Mock<IOrganizationAccessor>(MockBehavior.Strict);
-
-            serviceCollection.AddTransient<IApplicationAccessor, ApplicationAccessor>();
-            serviceCollection.AddTransient<IOrganizationAccessor, OrganizationAccessor>();
-            serviceCollection.AddTransient<IUserAccessor, UserAccessor>();
+            SecurityUtilityMock = new Mock<ISecurityUtility>(MockBehavior.Strict);
         }
     }
 }
