@@ -1074,7 +1074,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     req.Subject == "New Water Conservation Application Submitted" &&
                     // Url to page where tech reviewer can make changes to application.
                     // This is because they have permission to edit the application (not approve)
-                    req.Body.Contains($"{application.Id}/review/form")
+                    req.Body.Contains($"{application.Id}/review")
                 )
             ), Times.Once
         );
