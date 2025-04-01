@@ -124,7 +124,7 @@ export function OrganizationDashboardPage() {
   };
 
   const renderWaterRightCell = (params: GridRenderCellParams<any, string>) => {
-    return <NavLink to={`/details/right/${params.row.waterRightState}wr_WR${params.value}`}>{params.value}</NavLink>;
+    return <NavLink to={`/details/right/${params.value}`}>{params.value}</NavLink>;
   };
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
