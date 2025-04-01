@@ -81,7 +81,7 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
 
         var applicationUrl = (canReview, canApprove) switch
         {
-            (true, _) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/review/form",
+            (true, _) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/review",
             (_, true) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/approve",
             _ => $"{_environmentConfiguration.SiteUrl}" // Homepage as backup url
         };
