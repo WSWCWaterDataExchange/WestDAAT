@@ -113,13 +113,13 @@ export function EstimationToolSidebar(props: EstimationToolSidebarProps) {
           </div>
 
           <div className="d-flex align-items-center my-2">
-            {(state.conservationApplication.totalAverageYearlyEtAcreFeet ?? 0) > 0 ? (
+            {(state.conservationApplication.sumAverageYearlyTotalEtInAcreFeet ?? 0) > 0 ? (
               <>
                 <span className="me-1">
                   <Icon path={mdiWater} size="1.5em" className="estimate-tool-water-icon" />
                 </span>
                 <span className="fs-5 fw-bold et-blue-text">
-                  {formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet
+                  {formatNumber(state.conservationApplication.sumAverageYearlyTotalEtInAcreFeet, 2)} Acre-Feet
                 </span>
               </>
             ) : (

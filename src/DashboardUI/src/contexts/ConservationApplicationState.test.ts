@@ -270,7 +270,7 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
+    expect(newState.conservationApplication.sumAverageYearlyTotalEtInAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
     expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
     expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
@@ -664,7 +664,7 @@ describe('ConservationApplicationState reducer', () => {
 
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.totalAverageYearlyEtAcreFeet).toEqual(
+      expect(application.sumAverageYearlyTotalEtInAcreFeet).toEqual(
         applicationDetails.estimate.sumAverageYearlyTotalEtInAcreFeet,
       );
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);

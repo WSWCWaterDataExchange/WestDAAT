@@ -434,7 +434,7 @@ function ApplicationSubmissionForm(props: ApplicationSubmissionFormProps) {
               <span className="fw-bold">Consumptive Use</span>
             </div>
             <div>
-              <span>{formatNumber(state.conservationApplication.totalAverageYearlyEtAcreFeet, 2)} Acre-Feet</span>
+              <span>{formatNumber(state.conservationApplication.sumAverageYearlyTotalEtInAcreFeet, 2)} Acre-Feet</span>
             </div>
           </div>
 
