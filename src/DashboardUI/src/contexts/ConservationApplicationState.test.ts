@@ -254,8 +254,8 @@ describe('ConservationApplicationState reducer', () => {
           {
             waterConservationApplicationEstimateLocationId: 'location-guid',
             polygonWkt: polygonWkt,
-            averageYearlyEtInAcreFeet: 50,
-            averageYearlyEtInInches: 400,
+            averageYearlyTotalEtInAcreFeet: 50,
+            averageYearlyTotalEtInInches: 400,
             datapoints: [
               {
                 year: 2025,
@@ -613,8 +613,8 @@ describe('ConservationApplicationState reducer', () => {
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
               datapoints: [
                 {
                   year: 2025,
@@ -777,8 +777,8 @@ describe('ConservationApplicationState reducer', () => {
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: polygonWkt,
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
               datapoints: [
                 {
                   year: 2025,
