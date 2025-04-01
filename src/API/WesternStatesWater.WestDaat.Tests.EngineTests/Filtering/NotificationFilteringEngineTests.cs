@@ -13,7 +13,8 @@ public class NotificationFilteringEngineTests : EngineTestBase
         _notificationFilteringEngine = new FilteringEngine(
             CreateLogger<FilteringEngine>(),
             ApplicationAccessorMock.Object,
-            UserAccessorMock.Object
+            UserAccessorMock.Object,
+            SecurityUtilityMock.Object
         );
     }
 

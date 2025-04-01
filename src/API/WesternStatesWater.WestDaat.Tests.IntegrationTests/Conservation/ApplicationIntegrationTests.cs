@@ -1137,7 +1137,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
     
     [TestMethod]
-    public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmail()
+    public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmails()
     {
         // Arrange
         var waterUser = new UserFaker().Generate();
@@ -1145,8 +1145,37 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var application = new WaterConservationApplicationFaker(waterUser, fundingOrganization).Generate();
         var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
 
+        var techReviewer = new UserFaker().Generate();
+        var orgMember = new UserFaker().Generate();
+
+        techReviewer.UserOrganizations =
+        [
+            new UserOrganizationFaker(techReviewer, fundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.TechnicalReviewer,
+                    }
+                }).Generate()
+        ];
+
+        orgMember.UserOrganizations =
+        [
+            new UserOrganizationFaker(orgMember, fundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.Member,
+                    }
+                }).Generate()
+        ];
+
+
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.Users.AddRangeAsync(techReviewer, orgMember);
         await _dbContext.SaveChangesAsync();
 
         UseSystemContext();
@@ -1165,10 +1194,34 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 It.Is<EmailRequest>(req =>
                     req.To.Single() == waterUser.Email &&
                     req.Subject == "Water Conservation Application Submitted" &&
-                    req.Body.Contains(application.Id.ToString())
+                    req.Body.Contains($"{application.Id.ToString()}/submit")
                 )
             ),
             Times.Once
+        );
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == techReviewer.Email &&
+                    req.Subject == "New Water Conservation Application Submitted" &&
+                    // Url to page where tech reviewer can make changes to application.
+                    // This is because they have permission to edit the application (not approve)
+                    req.Body.Contains($"{application.Id}/review")
+                )
+            ), Times.Once
+        );
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == orgMember.Email &&
+                    req.Subject == "New Water Conservation Application Submitted" &&
+                    // Url to page where organization member can approve/deny application.
+                    // This is because they have permission to approve the application (not edit)
+                    req.Body.Contains($"{application.Id}/approve")
+                )
+            ), Times.Once
         );
     }
 }

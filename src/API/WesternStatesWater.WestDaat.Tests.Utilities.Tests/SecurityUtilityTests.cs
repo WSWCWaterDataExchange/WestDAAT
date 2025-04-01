@@ -16,7 +16,7 @@ public class SecurityUtilityTests : UtilityTestBase
         var securityUtility = new SecurityUtility();
 
         // Act
-        var permissions = securityUtility.Get(new PermissionsGetRequest
+        var permissions = securityUtility.Get(new UserPermissionsGetRequest
         {
             Context = new AnonymousContext()
         });
@@ -36,7 +36,7 @@ public class SecurityUtilityTests : UtilityTestBase
         };
 
         // Act
-        var permissions = securityUtility.Get(new PermissionsGetRequest
+        var permissions = securityUtility.Get(new UserPermissionsGetRequest
         {
             Context = userContext
         });
@@ -56,7 +56,7 @@ public class SecurityUtilityTests : UtilityTestBase
         };
 
         // Act
-        var permissions = securityUtility.Get(new PermissionsGetRequest
+        var permissions = securityUtility.Get(new UserPermissionsGetRequest
         {
             Context = userContext
         });
@@ -86,7 +86,7 @@ public class SecurityUtilityTests : UtilityTestBase
         };
 
         // Act
-        var permissions = securityUtility.Get(new OrganizationPermissionsGetRequest
+        var permissions = securityUtility.Get(new UserOrganizationPermissionsGetRequest
         {
             Context = userContext,
             OrganizationId = forSpecificOrganization ? organizationId : null
@@ -116,7 +116,7 @@ public class SecurityUtilityTests : UtilityTestBase
         };
 
         // Act
-        var permissions = securityUtility.Get(new OrganizationPermissionsGetRequest
+        var permissions = securityUtility.Get(new UserOrganizationPermissionsGetRequest
         {
             Context = userContext,
             OrganizationId = unrelatedOrganization

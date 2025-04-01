@@ -74,7 +74,7 @@ internal class ValidationEngine : IValidationEngine
     private ErrorBase ValidateOrganizationApplicationDashboardLoadRequest(OrganizationApplicationDashboardLoadRequest request, ContextBase context)
     {
         // check if user is a global admin first
-        var rolePermissions = _securityUtility.Get(new DTO.PermissionsGetRequest
+        var rolePermissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest
         {
             Context = context
         });
@@ -90,7 +90,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationIdFilter.Value,
@@ -148,7 +148,7 @@ internal class ValidationEngine : IValidationEngine
             return CreateNotFoundError(context, $"WaterConservationApplication with Id ${request.ApplicationId}");
         }
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = submittedApplicationResponse.FundingOrganizationId
@@ -292,7 +292,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify user belongs to the funding organization that is handling the application
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
@@ -361,7 +361,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationDetailsListRequest(OrganizationDetailsListRequest request, ContextBase context)
     {
-        var permissionsRequest = new DTO.PermissionsGetRequest()
+        var permissionsRequest = new DTO.UserPermissionsGetRequest()
         {
             Context = context
         };
@@ -415,8 +415,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to add themselves to an organization since a user can only be in a single organization.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -471,8 +471,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to remove themselves from an organization.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -497,8 +497,8 @@ internal class ValidationEngine : IValidationEngine
             return CreateValidationError(request, "UserId", "User is not allowed to modify their own organization role.");
         }
 
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -540,7 +540,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateOrganizationUserListRequest(OrganizationUserListRequest request, ContextBase context)
     {
-        var organizationPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var organizationPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = request.OrganizationId
@@ -556,7 +556,7 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateUserListRequest(ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
 
         // Must have permission at the non-organization level (Global Admin, etc)
         if (!permissions.Contains(Permissions.UserList))
@@ -581,9 +581,9 @@ internal class ValidationEngine : IValidationEngine
 
     private ErrorBase ValidateUserSearchRequest(ContextBase context)
     {
-        var permissions = _securityUtility.Get(new DTO.PermissionsGetRequest { Context = context });
+        var permissions = _securityUtility.Get(new DTO.UserPermissionsGetRequest { Context = context });
 
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = null // Any organization
@@ -669,7 +669,7 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // Check if current user is a member of the application funding organization
-        var orgPermissions = _securityUtility.Get(new DTO.OrganizationPermissionsGetRequest
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
         {
             Context = context,
             OrganizationId = documentExistsResponse.FundingOrganizationId

@@ -3,7 +3,8 @@ import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/C
 import { convertGeometryToWkt, convertWktToGeometry } from './geometryWktConverter';
 import { convertSquareMetersToAcres } from './valueConverters';
 import areaInSquareMeters from '@turf/area';
-import { parseDrawToolTypeFromFeature } from './customMapShapesUtility';
+import { initializeFeaturePropertyFromDrawToolType, parseDrawToolTypeFromFeature } from './customMapShapesUtility';
+import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export const fromPartialPolygonDataToPolygonFeature = (
   item: PartialPolygonData,
@@ -11,6 +12,7 @@ export const fromPartialPolygonDataToPolygonFeature = (
   type: 'Feature',
   geometry: convertWktToGeometry(item.polygonWkt!) as Polygon,
   properties: {
+    ...initializeFeaturePropertyFromDrawToolType(item.drawToolType ?? DrawToolType.Freeform),
     id: item.waterConservationApplicationEstimateLocationId,
     title: item.fieldName,
   },

@@ -14,6 +14,9 @@ import { useMutation } from 'react-query';
 import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { toast } from 'react-toastify';
+import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
+
+const perspective: ApplicationReviewPerspective = 'reviewer';
 
 export function ApplicationReviewFormPage() {
   const context = useMsal();
@@ -34,9 +37,12 @@ export function ApplicationReviewFormPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [formValidated, setFormValidated] = useState(false);
 
-  const isFormDirty = useDirtyFormCheck(state.conservationApplication.applicationSubmissionForm, {
-    isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
-  });
+  const [isFormDirty, reinitializeDirtyFormCheck] = useDirtyFormCheck(
+    state.conservationApplication.applicationSubmissionForm,
+    {
+      isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
+    },
+  );
 
   const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
@@ -74,6 +80,7 @@ export function ApplicationReviewFormPage() {
     onSuccess: () => {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
+      reinitializeDirtyFormCheck(state.conservationApplication.applicationSubmissionForm);
     },
     onError: () => {
       toast.error('Error saving application changes.');
@@ -83,7 +90,7 @@ export function ApplicationReviewFormPage() {
 
   return (
     <div className="container">
-      <ApplicationSubmissionForm ref={formRef} formValidated={formValidated} />
+      <ApplicationSubmissionForm perspective={perspective} ref={formRef} formValidated={formValidated} />
       <ApplicationDocumentSection readOnly={false} />
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />

@@ -198,6 +198,7 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.conservationApplication.estimateLocations[0].polygonWkt).toEqual(
       'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
     );
+    expect(newState.conservationApplication.estimateLocations[0].drawToolType).toEqual(DrawToolType.Freeform);
     expect(newState.conservationApplication.estimateLocations[0].acreage).toEqual(1);
     expect(newState.conservationApplication.doPolygonsOverlap).toEqual(true);
 
@@ -417,7 +418,7 @@ describe('ConservationApplicationState reducer', () => {
       shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
     });
 
-    it('estimate consumptive use should be enabled when all required data is present', () => {
+    it('estimate consumptive use should be enabled when at least one map polygon is present', () => {
       // Arrange
       // Act
       let newState = reducer(state, {
@@ -462,6 +463,83 @@ describe('ConservationApplicationState reducer', () => {
       });
 
       // Assert
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
+    });
+
+    it('estimate consumptive use should be enabled or disabled depending on the sidebar inputs', () => {
+      // Arrange - initialize page, setup map
+      let newState = reducer(state, {
+        type: 'ESTIMATION_TOOL_PAGE_LOADED',
+        payload: {
+          waterRightNativeId: 'mock-water-right-native-id',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'FUNDING_ORGANIZATION_LOADED',
+        payload: {
+          fundingOrganizationId: 'funding-organization-guid',
+          fundingOrganizationName: 'Mock Funding Organization',
+          openEtModelName: 'Mock Open ET Model',
+          dateRangeStart: new Date(2025, 0, 1),
+          dateRangeEnd: new Date(2025, 11, 31),
+          compensationRateModel: 'Mock Compensation Rate Model',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'APPLICATION_CREATED',
+        payload: {
+          waterConservationApplicationId: 'application-guid',
+          waterConservationApplicationDisplayId: 'display-id',
+        },
+      });
+
+      newState = reducer(newState, {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: [
+            {
+              polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
+              drawToolType: DrawToolType.Freeform,
+              acreage: 1,
+            },
+          ],
+          doPolygonsOverlap: false,
+        },
+      });
+
+      // Act / Assert
+      // estimation form has no data
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
+
+      // estimation form has partial data
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: 100,
+          desiredCompensationUnits: undefined,
+        },
+      });
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
+
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: undefined,
+          desiredCompensationUnits: CompensationRateUnits.AcreFeet,
+        },
+      });
+      shouldBeAbleToPerformConsumptiveUseEstimate(newState, false);
+
+      // estimation form has all data
+      newState = reducer(newState, {
+        type: 'ESTIMATION_FORM_UPDATED',
+        payload: {
+          desiredCompensationDollars: 100,
+          desiredCompensationUnits: CompensationRateUnits.AcreFeet,
+        },
+      });
       shouldBeAbleToPerformConsumptiveUseEstimate(newState, true);
     });
 
@@ -593,6 +671,7 @@ describe('ConservationApplicationState reducer', () => {
       expect(application.estimateLocations.length).toEqual(applicationDetails.estimate.locations.length);
       expect(location.waterConservationApplicationEstimateLocationId).toEqual(expectedLocation.id);
       expect(location.polygonWkt).toEqual(expectedLocation.polygonWkt);
+      expect(location.drawToolType).toEqual(expectedLocation.drawToolType);
       expect(location.acreage).toEqual(expectedLocation.polygonAreaInAcres);
       expect(location.fieldName).toEqual('Field 1');
       expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);

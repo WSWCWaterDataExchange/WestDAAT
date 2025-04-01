@@ -6,7 +6,7 @@ function useDirtyFormCheck(
   options: {
     isEnabled: boolean;
   },
-): boolean {
+): [boolean, (formValues: any) => void] {
   const [initialFormValue, setInitialFormValue] = useState<any>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
 
@@ -26,7 +26,12 @@ function useDirtyFormCheck(
     }
   }, [options.isEnabled, initialFormValue, formValues]);
 
-  return isFormDirty;
+  function reinitializeDirtyFormCheck(formValues: any) {
+    setInitialFormValue(JSON.parse(JSON.stringify(formValues)));
+    setIsFormDirty(false);
+  }
+
+  return [isFormDirty, reinitializeDirtyFormCheck];
 }
 
 export default useDirtyFormCheck;
