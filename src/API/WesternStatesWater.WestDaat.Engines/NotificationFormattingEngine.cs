@@ -76,10 +76,10 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
     private DTO.NotificationBase FormatApplicationSubmittedFundingOrganizationEmailNotification(
         DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta meta)
     {
-        var canReview = meta.ToUserPermissions.Contains(Permissions.ApplicationUpdate);
+        var canUpdate = meta.ToUserPermissions.Contains(Permissions.ApplicationUpdate);
         var canApprove = meta.ToUserPermissions.Contains(Permissions.ApplicationApprove);
 
-        var applicationUrl = (canReview, canApprove) switch
+        var applicationUrl = (canUpdate, canApprove) switch
         {
             (true, _) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/review",
             (_, true) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/approve",
