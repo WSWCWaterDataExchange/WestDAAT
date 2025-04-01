@@ -264,7 +264,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         foreach (var location in locations)
         {
             var consumptiveUses = new LocationWaterMeasurementFaker(location).Generate(2);
-            await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
+            await _dbContext.LocationWaterMeasurements.AddRangeAsync(consumptiveUses);
         }
 
         var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
@@ -373,7 +373,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
             await wadeDb.SaveChangesAsync();
 
-            _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses);
+            _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
             _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
             _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
             _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
@@ -423,7 +423,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
                 var estimateLocationConsumptiveUses = new LocationWaterMeasurementFaker(estimateLocation).Generate(12);
 
-                await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(estimateLocationConsumptiveUses);
+                await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
             }
 
             await _dbContext.SaveChangesAsync();

@@ -209,7 +209,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         if (existingEntity != null)
         {
-            db.WaterConservationApplicationEstimateLocationConsumptiveUses
+            db.LocationWaterMeasurements
                 .RemoveRange(existingEntity.Locations.SelectMany(location => location.ConsumptiveUses));
 
             db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
