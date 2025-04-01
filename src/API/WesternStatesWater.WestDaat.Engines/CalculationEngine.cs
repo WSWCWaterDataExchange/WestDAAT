@@ -52,7 +52,7 @@ internal class CalculationEngine : ICalculationEngine
         foreach (var collection in request.DataCollections)
         {
             var acreage = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(collection.PolygonWkt));
-            var averageEtInFeet = collection.AverageYearlyEtInInches / 12;
+            var averageEtInFeet = collection.AverageYearlyTotalEtInInches / 12;
             var averageEtInAcreFeet = averageEtInFeet * acreage;
             estimatedCompensation += averageEtInAcreFeet * request.CompensationRateDollars;
         }
@@ -99,8 +99,8 @@ internal class CalculationEngine : ICalculationEngine
             {
                 PolygonWkt = polygon.PolygonWkt,
                 DrawToolType = polygon.DrawToolType,
-                AverageYearlyEtInInches = averageEtInInches,
-                AverageYearlyEtInAcreFeet = averageEtInAcreFeet,
+                AverageYearlyTotalEtInInches = averageEtInInches,
+                AverageYearlyTotalEtInAcreFeet = averageEtInAcreFeet,
                 Datapoints = yearlyDatapoints
             };
             results.Add(result);
