@@ -504,8 +504,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
 
             // verify response calculations are correct
-            const int knownAvgYearlyEtInches = 60;
-            var knownAvgYearlyEtFeet = knownAvgYearlyEtInches / 12;
+            const int knownAvgYearlyTotalEtInInches = 60;
+            var knownAvgYearlyEtFeet = knownAvgYearlyTotalEtInInches / 12;
             var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
             response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
@@ -568,7 +568,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
                     return yearMatches;
                 }).Should().BeTrue();
-                dbEstimateLocationConsumptiveUses.Select(cu => cu.TotalEtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
+                dbEstimateLocationConsumptiveUses.Select(cu => cu.TotalEtInInches).Sum().Should().Be(knownAvgYearlyTotalEtInInches);
 
                 if (shouldInitializePreviousEstimate)
                 {
