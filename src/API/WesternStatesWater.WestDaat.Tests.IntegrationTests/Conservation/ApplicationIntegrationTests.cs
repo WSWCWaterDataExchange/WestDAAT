@@ -1025,14 +1025,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
 
-        var request = new WaterConservationApplicationRecommendationRequest
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
             IsRecommended = true,
         };
 
         // Act
-        var response = await _applicationManager.Store<WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        var response = await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().NotBeNull();
@@ -1040,9 +1040,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
     
     [DataTestMethod]
-    [DataRow(true, Roles.TechnicalReviewer, DisplayName = "Application is successfully Recommended for approval by a Technical Reviewer")]
-    [DataRow(false, Roles.OrganizationAdmin, DisplayName = "Application is successfully Not Recommended for approval by an Organization Admin")]
-    public async Task Store_SubmitApplicationRecommendation_Success(bool isRecommended, string role)
+    [DataRow(true, Roles.TechnicalReviewer, true, DisplayName = "Application is successfully Recommended for approval by a Technical Reviewer")]
+    [DataRow(false, Roles.OrganizationAdmin, false, DisplayName = "Application is successfully Not Recommended for approval by an Organization Admin")]
+    public async Task Store_SubmitApplicationRecommendation_Success(bool isRecommended, string role, bool hasNotes)
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -1067,25 +1067,48 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ExternalAuthId = ""
         });
         
-        var request = new WaterConservationApplicationRecommendationRequest
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
         {
             WaterConservationApplicationId = application.Id,
             IsRecommended = isRecommended,
         };
 
+        if (hasNotes)
+        {
+            request.RecommendationNotes = "Optional recommendation notes";
+        }
+
         // Act
-        var response = await _applicationManager.Store<WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        var response = await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().BeNull();
         
         var applicationInDb = await _dbContext.WaterConservationApplications
             .Include(app => app.Submission)
+            .ThenInclude(app => app.SubmissionNotes)
             .SingleOrDefaultAsync(app => app.Id == application.Id);
-        // application has the right date (recommendedfor date, recommendedagainst date)
-        // application's other date is null
-        // application has the reviewer's userid
-        // application notes have been saved off
+
+        applicationInDb.Submission.RecommendedByUserId.Should().Be(user.Id);
+        if (isRecommended)
+        {
+            applicationInDb.Submission.RecommendedForDate.Should().NotBeNull();
+            applicationInDb.Submission.RecommendedAgainstDate.Should().BeNull();
+        }
+        else
+        {
+            applicationInDb.Submission.RecommendedForDate.Should().BeNull();
+            applicationInDb.Submission.RecommendedAgainstDate.Should().NotBeNull();
+        }
+
+        if (hasNotes)
+        {
+            applicationInDb.Submission.SubmissionNotes.Should().HaveCount(1);
+        }
+        else
+        {
+            applicationInDb.Submission.SubmissionNotes.Should().HaveCount(0);
+        }
     }
     
     [TestMethod]

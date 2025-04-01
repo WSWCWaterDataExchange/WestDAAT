@@ -387,7 +387,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt.PreCondition(src => !src.IsRecommended);
                     opt.MapFrom(_ => DateTimeOffset.UtcNow);
                 });
-                
+
+            CreateMap<WaterConservationApplicationRecommendationRequest, EFWD.WaterConservationApplicationSubmissionNote>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationSubmissionId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.RecommendedByUserId))
+                .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.RecommendationNotes));
+
             CreateMap<WaterConservationApplicationDocument, EFWD.WaterConservationApplicationDocument>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.Ignore())

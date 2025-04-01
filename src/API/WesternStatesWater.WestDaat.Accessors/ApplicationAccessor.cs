@@ -332,7 +332,26 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
     private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("made it to accessor");
+        await using var db = _westDaatDatabaseContextFactory.Create();
+        var application = await db.WaterConservationApplications
+            .Include(a => a.Submission)
+            .ThenInclude(sub => sub.SubmissionNotes)
+            .Where(a => a.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+        
+        // update submission
+        DtoMapper.Map(request, application.Submission);
+        
+        // add new note if provided
+        if (!string.IsNullOrEmpty(request.RecommendationNotes))
+        {
+            var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
+            note.WaterConservationApplicationSubmissionId = application.Submission.Id;
+            application.Submission.SubmissionNotes.Add(note);
+        }
+
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
     }
 }
