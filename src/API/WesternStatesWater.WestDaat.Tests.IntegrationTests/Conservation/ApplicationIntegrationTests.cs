@@ -507,11 +507,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             const int knownAvgYearlyTotalEtInInches = 60;
             var knownAvgYearlyEtFeet = knownAvgYearlyTotalEtInInches / 12;
             var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
-            response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            response.SumAverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
             if (requestShouldIncludeCompensationInfo)
             {
-                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.TotalAverageYearlyEtAcreFeet;
+                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.SumAverageYearlyTotalEtInAcreFeet;
                 response.ConservationPayment.Should().NotBeNull();
                 response.ConservationPayment.Should().Be((int)expectedConservationPayment);
             }
