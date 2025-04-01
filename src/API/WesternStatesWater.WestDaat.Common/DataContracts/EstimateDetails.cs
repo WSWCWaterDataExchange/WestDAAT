@@ -10,7 +10,7 @@ public class EstimateDetails
 
     public int EstimatedCompensationDollars { get; set; }
 
-    public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
+    public double AverageYearlyTotalEtInAcreFeet { get; set; }
 
     public LocationDetails[] Locations { get; set; } = null!;
 }
