@@ -15,5 +15,5 @@ public class WaterConservationApplicationEstimateControlLocation
 
     public virtual WaterConservationApplicationEstimate Estimate { get; set; } = null!;
 
-    public virtual ICollection<ControlLocationWaterMeasurement> ConsumptiveUses { get; set; } = null!;
+    public virtual ICollection<ControlLocationWaterMeasurement> WaterMeasurements { get; set; } = null!;
 }
