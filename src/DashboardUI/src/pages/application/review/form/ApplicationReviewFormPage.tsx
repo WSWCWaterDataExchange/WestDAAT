@@ -15,6 +15,8 @@ import ApplicationSubmissionForm from '../../components/ApplicationSubmissionFor
 import { ReviewerButtonRow } from './ReviewerButtonRow';
 import { SaveChangesModal } from './SaveChangesModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
+import { RecommendationDecision } from '../../../../data-contracts/RecommendationDecision';
+import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -30,6 +32,7 @@ export function ApplicationReviewFormPage() {
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+  const [showSubmitRecommendationModal, setShowSubmitRecommendationModal] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -71,8 +74,14 @@ export function ApplicationReviewFormPage() {
     if (isFormDirty) {
       setShowUnsavedChangesModal(true);
     } else {
-      alert('Submit for final review - navigate implement here');
+      setShowSubmitRecommendationModal(true);
     }
+  };
+
+  const handleSubmitConfirmed = (decision: RecommendationDecision, notes?: string) => {
+    alert(`'Recommendation decision submitted': ${decision}, 'Notes: ', ${notes}`);
+    setShowSubmitRecommendationModal(false);
+    // TODO: JN - make a mutation that calls the accessor that calls the API
   };
 
   const updateApplicationSubmissionMutation = useMutation({
@@ -127,6 +136,11 @@ export function ApplicationReviewFormPage() {
         }
       />
       <UnsavedChangesModal show={showUnsavedChangesModal} onClose={() => setShowUnsavedChangesModal(false)} />
+      <SubmitApplicationRecommendationModal
+        show={showSubmitRecommendationModal}
+        onClose={() => setShowSubmitRecommendationModal(false)}
+        onSubmit={handleSubmitConfirmed}
+      ></SubmitApplicationRecommendationModal>
     </div>
   );
 }
