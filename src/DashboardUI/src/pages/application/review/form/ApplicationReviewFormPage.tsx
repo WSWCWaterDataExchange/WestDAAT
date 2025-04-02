@@ -1,20 +1,20 @@
+import { useMsal } from '@azure/msal-react';
 import { useRef, useState } from 'react';
+import { useMutation } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
+import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
+import useDirtyFormCheck from '../../../../hooks/useDirtyFormCheck';
 import ApplicationDocumentSection from '../../components/ApplicationDocumentSection';
 import ApplicationReviewersNotesSection from '../../components/ApplicationReviewersNotesSection';
 import ApplicationReviewPipelineSection from '../../components/ApplicationReviewPipelineSection';
 import ApplicationSubmissionForm from '../../components/ApplicationSubmissionForm';
-import { useNavigate, useParams } from 'react-router-dom';
-import useDirtyFormCheck from '../../../../hooks/useDirtyFormCheck';
-import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import Button from 'react-bootstrap/esm/Button';
-import Modal from 'react-bootstrap/esm/Modal';
-import Form from 'react-bootstrap/esm/Form';
-import { useMutation } from 'react-query';
-import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
-import { useMsal } from '@azure/msal-react';
-import { toast } from 'react-toastify';
-import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
+import { ReviewerButtonRow } from './ReviewerButtonRow';
+import { SaveChangesModal } from './SaveChangesModal';
+import { UnsavedChangesModal } from './UnsavedChangesModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -29,6 +29,7 @@ export function ApplicationReviewFormPage() {
 
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
+  const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
 
   const navigateToApplicationOrganizationDashboard = () => {
     navigate(`/application/organization/dashboard`);
@@ -43,8 +44,6 @@ export function ApplicationReviewFormPage() {
       isEnabled: !isApplicationLoading && !isFundingOrganizationLoading,
     },
   );
-
-  const alertNotImplemented = () => alert('Not implemented. This feature will be implemented in a future release.');
 
   const handleCancelClicked = () => {
     if (isFormDirty) {
@@ -65,6 +64,14 @@ export function ApplicationReviewFormPage() {
 
     if (isFormValid) {
       setShowSaveChangesModal(true);
+    }
+  };
+
+  const handleSubmitClicked = () => {
+    if (isFormDirty) {
+      setShowUnsavedChangesModal(true);
+    } else {
+      alert('Submit for final review - navigate implement here');
     }
   };
 
@@ -98,7 +105,7 @@ export function ApplicationReviewFormPage() {
         isFormDirty={isFormDirty}
         handleCancelClicked={handleCancelClicked}
         handleSaveClicked={handleSaveClicked}
-        handleSubmitForFinalReviewClicked={alertNotImplemented}
+        handleSubmitForFinalReviewClicked={handleSubmitClicked}
       />
 
       <ConfirmationModal
@@ -119,90 +126,7 @@ export function ApplicationReviewFormPage() {
           await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
         }
       />
+      <UnsavedChangesModal show={showUnsavedChangesModal} onClose={() => setShowUnsavedChangesModal(false)} />
     </div>
-  );
-}
-
-interface ReviewerButtonRowProps {
-  isFormDirty: boolean;
-  handleCancelClicked: () => void;
-  handleSaveClicked: () => void;
-  handleSubmitForFinalReviewClicked: () => void;
-}
-
-function ReviewerButtonRow(props: ReviewerButtonRowProps) {
-  const { isFormDirty, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } = props;
-  const { state } = useConservationApplicationContext();
-
-  return (
-    <div className="d-flex justify-content-between p-3">
-      <div>
-        <Button variant="secondary" onClick={handleCancelClicked}>
-          Cancel
-        </Button>
-      </div>
-
-      <div className="d-flex gap-3">
-        <Button
-          variant="outline-success"
-          onClick={handleSaveClicked}
-          disabled={state.isUploadingDocument || !isFormDirty}
-        >
-          Save Changes
-        </Button>
-
-        <Button variant="success" onClick={handleSubmitForFinalReviewClicked} disabled={state.isUploadingDocument}>
-          Submit for Final Review
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-interface SaveChangesModalProps {
-  show: boolean;
-  onCancel: () => void;
-  onConfirm: (documentedChanges: string) => void;
-}
-
-function SaveChangesModal(props: SaveChangesModalProps) {
-  const [documentedChanges, setDocumentedChanges] = useState('');
-
-  return (
-    <Modal show={props.show} centered>
-      <Modal.Header closeButton onClick={props.onCancel}>
-        <Modal.Title>Document your Changes</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          To save any modifications to this application, please{' '}
-          <strong>record what content you edited or added.</strong> Once submitted, your changes can be seen by you and
-          other reviewing users at the bottom of this application.
-        </p>
-
-        <Form>
-          <Form.Group controlId="documentedChanges">
-            <Form.Control
-              as="textarea"
-              type="text"
-              aria-label="Changes"
-              maxLength={4000}
-              required
-              placeholder="Describe any modifications to the document since last save. (Required)"
-              defaultValue={documentedChanges}
-              onChange={(e) => setDocumentedChanges(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={props.onCancel}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={() => props.onConfirm(documentedChanges)} disabled={!documentedChanges}>
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
   );
 }
