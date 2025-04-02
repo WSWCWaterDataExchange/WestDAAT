@@ -22,7 +22,7 @@ public class ApplicationListItemDetails
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
-    required public double SumAverageYearlyTotalEtInAcreFeet { get; set; }
+    required public double CumulativeTotalEtInAcreFeet { get; set; }
 
     required public string WaterRightNativeId { get; set; }
 

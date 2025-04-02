@@ -3,9 +3,9 @@
     public class EstimateConsumptiveUseResponse : ApplicationStoreResponseBase
     {
         /// <summary>
-        /// The average yearly estimated consumptive use in acre-feet for all polygons.
+        /// The average yearly estimated total et in acre-feet for all polygons.
         /// </summary>
-        public double SumAverageYearlyTotalEtInAcreFeet { get; set; }
+        public double CumulativeTotalEtInAcreFeet { get; set; }
 
         /// <summary>
         /// The total estimated conservation payment in dollars.

@@ -169,7 +169,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.SumAverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var rejectedAppResponse = new ApplicationDashboardListItem
@@ -185,7 +185,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
             WaterRightState = rejectedApp.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.SumAverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var inReviewAppResponse = new ApplicationDashboardListItem
@@ -201,7 +201,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
             TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.SumAverageYearlyTotalEtInAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var orgUserOrganizationRoles = new[]
@@ -507,11 +507,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             const int knownAvgYearlyTotalEtInInches = 60;
             var knownAvgYearlyEtFeet = knownAvgYearlyTotalEtInInches / 12;
             var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
-            response.SumAverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            response.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
             if (requestShouldIncludeCompensationInfo)
             {
-                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.SumAverageYearlyTotalEtInAcreFeet;
+                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.CumulativeTotalEtInAcreFeet;
                 response.ConservationPayment.Should().NotBeNull();
                 response.ConservationPayment.Should().Be((int)expectedConservationPayment);
             }
@@ -554,7 +554,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
                 dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
                 dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-                dbEstimate.SumAverageYearlyTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+                dbEstimate.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
                 dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);

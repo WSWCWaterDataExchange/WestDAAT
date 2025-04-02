@@ -22,7 +22,7 @@ public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
 
     required public int EstimatedCompensationDollars { get; set; }
 
-    required public double SumAverageYearlyTotalEtInAcreFeet { get; set; }
+    required public double CumulativeTotalEtInAcreFeet { get; set; }
 
     required public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
 }

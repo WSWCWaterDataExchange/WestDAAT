@@ -1,10 +1,9 @@
 -- update Estimates table
 ALTER TABLE dbo.WaterConservationApplicationEstimates ADD
-	SumAverageYearlyEffectivePrecipitationInAcreFeet FLOAT NULL,
-	SumAverageYearlyNetEtInAcreFeet FLOAT NULL;
+    CumulativeNetEtInAcreFeet FLOAT NULL;
 
 -- sp_rename handles renaming the column in the History table automatically
-exec sp_rename 'dbo.WaterConservationApplicationEstimates.TotalAverageYearlyConsumptionEtAcreFeet', 'SumAverageYearlyTotalEtInAcreFeet', 'COLUMN';
+exec sp_rename 'dbo.WaterConservationApplicationEstimates.TotalAverageYearlyConsumptionEtAcreFeet', 'CumulativeTotalEtInAcreFeet', 'COLUMN';
 
 
 -- update EstimateLocationConsumptiveUses table

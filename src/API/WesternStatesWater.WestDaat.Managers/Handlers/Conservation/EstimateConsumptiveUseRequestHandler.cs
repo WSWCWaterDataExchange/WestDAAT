@@ -69,7 +69,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         return new EstimateConsumptiveUseResponse
         {
             ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
-            SumAverageYearlyTotalEtInAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),
+            CumulativeTotalEtInAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),
             DataCollections = dataCollections,
         };
     }
