@@ -323,4 +323,127 @@ public class OpenEtSdkTests : UtilityTestBase
         serializedRequest.Should().Be(expectedJson);
     }
 
+    [DataTestMethod]
+    [DataRow(RasterTimeSeriesOutputUnits.Millimeters)]
+    [DataRow(RasterTimeSeriesOutputUnits.Inches)]
+    public async Task RasterTimeseriesPoint_MockedApi_Success(RasterTimeSeriesOutputUnits outputUnits)
+    {
+        // Arrange
+        var responseContentString = """
+        [
+            {
+                "time":"2024-01-01",
+                "et":16.184
+            },
+            {
+                "time":"2024-02-01",
+                "et":27.359
+            },
+            {
+                "time":"2024-03-01",
+                "et":46.508
+            },
+            {
+                "time":"2024-04-01",
+                "et":54.863
+            },
+            {
+                "time":"2024-05-01",
+                "et":93.419
+            },
+            {
+                "time":"2024-06-01",
+                "et":118.884
+            },
+            {
+                "time":"2024-07-01",
+                "et":136.422
+            },
+            {
+                "time":"2024-08-01",
+                "et":117.174
+            },
+            {
+                "time":"2024-09-01",
+                "et":93.941
+            },
+            {
+                "time":"2024-10-01",
+                "et":70.393
+            },
+            {
+                "time":"2024-11-01",
+                "et":26.606
+            },
+            {
+                "time":"2024-12-01",
+                "et":17.882
+            }
+        ]
+        """;
+        _mockHttp.When(HttpMethod.Post, baseAddress + "raster/timeseries/point")
+            .Respond("application/json", responseContentString);
+
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var pointCoordinate = new Coordinate(-119.7937, 35.58995);
+
+        var request = new RasterTimeSeriesPointRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePoint(pointCoordinate),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = outputUnits,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var sdk = CreateOpenEtSdk(_mockHttp.ToHttpClient());
+        var response = await sdk.RasterTimeseriesPoint(request);
+
+        // Assert
+        response.Should().NotBeNull();
+
+        const int monthsInYear = 12;
+        response.Data.Should().HaveCount(monthsInYear);
+        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
+        response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task RasterTimeSeriesPoint_MockedApi_ApiError_ShouldThrow()
+    {
+        // Arrange
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var pointCoordinate = new Coordinate(-119.7937, 35.58995);
+
+        _mockHttp.When(HttpMethod.Post, baseAddress + "raster/timeseries/point")
+            .Respond(System.Net.HttpStatusCode.InternalServerError);
+
+        var request = new RasterTimeSeriesPointRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePoint(pointCoordinate),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var sdk = CreateOpenEtSdk(_mockHttp.ToHttpClient());
+        var call = async () => await sdk.RasterTimeseriesPoint(request);
+
+        // Assert
+        await call.Should().ThrowAsync<ServiceUnavailableException>();
+    }
+
 }
