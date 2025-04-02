@@ -3,7 +3,10 @@ import { useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
+import {
+  submitApplicationRecommendation,
+  updateApplicationSubmission,
+} from '../../../../accessors/applicationAccessor';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
@@ -78,10 +81,9 @@ export function ApplicationReviewFormPage() {
     }
   };
 
-  const handleSubmitConfirmed = (decision: RecommendationDecision, notes?: string) => {
-    alert(`'Recommendation decision submitted': ${decision}, 'Notes: ', ${notes}`);
+  const handleSubmitConfirmed = async (decision: RecommendationDecision, notes?: string) => {
     setShowSubmitRecommendationModal(false);
-    // TODO: JN - make a mutation that calls the accessor that calls the API
+    await submitApplicationRecommendationMutation.mutateAsync({ decision, notes });
   };
 
   const updateApplicationSubmissionMutation = useMutation({
@@ -101,6 +103,29 @@ export function ApplicationReviewFormPage() {
     onError: () => {
       toast.error('Error saving application changes.');
       setShowSaveChangesModal(false);
+    },
+  });
+
+  const submitApplicationRecommendationMutation = useMutation({
+    mutationFn: async (recommendation: { decision: RecommendationDecision; notes: string | undefined }) => {
+      return await submitApplicationRecommendation(context, {
+        waterConservationApplicationId: applicationId!,
+        recommendationDecision: recommendation.decision,
+        recommendationNotes: recommendation.notes,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Application recommendation submitted successfully.', {
+        autoClose: 1000,
+      });
+      navigateToApplicationOrganizationDashboard();
+    },
+    onError: () => {
+      toast.error('Error submitting application recommendation.', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
     },
   });
 

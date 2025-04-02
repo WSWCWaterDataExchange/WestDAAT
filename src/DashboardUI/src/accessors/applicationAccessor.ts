@@ -25,6 +25,8 @@ import { ContainerName, downloadFilesFromBlobStorage, uploadFilesToBlobStorage }
 import { generateDownloadSasToken, generateUploadSasTokens } from './fileAccessor';
 import westDaatApi from './westDaatApi';
 import { MapPolygon } from '../data-contracts/MapPolygon';
+import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
+import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -211,6 +213,26 @@ export const updateApplicationSubmission = async (
 
   await api.put<void>(`Applications/${data.waterConservationApplicationId}`, request);
 };
+
+export const submitApplicationRecommendation = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    recommendationDecision: RecommendationDecision;
+    recommendationNotes?: string;
+  },
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationRecommendationRequest = {
+    $type: 'WaterConservationApplicationRecommendationRequest',
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    recommendationDecision: data.recommendationDecision,
+    recommendationNotes: data.recommendationNotes
+  };
+
+  await api.post<void>('Applications/Submit', request);
+}
 
 export const getApplication = async (
   context: IMsalContext,
