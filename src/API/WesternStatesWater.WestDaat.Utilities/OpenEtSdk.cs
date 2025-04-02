@@ -39,7 +39,7 @@ internal class OpenEtSdk : IOpenEtSdk
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseData = JsonSerializer.Deserialize<RasterTimeSeriesPolygonResponseDatapoint[]>(responseContent);
+            var responseData = JsonSerializer.Deserialize<RasterTimeSeriesDatapoint[]>(responseContent);
 
             return new RasterTimeSeriesPolygonResponse
             {

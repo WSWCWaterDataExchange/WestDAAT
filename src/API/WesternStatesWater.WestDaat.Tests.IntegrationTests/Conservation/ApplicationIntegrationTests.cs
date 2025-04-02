@@ -451,7 +451,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
                         {
                             var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
-                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
                             {
                                 Time = time,
                                 Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
@@ -614,7 +614,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             {
                 Data =
                 [
-                    new Common.DataContracts.RasterTimeSeriesPolygonResponseDatapoint
+                    new Common.DataContracts.RasterTimeSeriesDatapoint
                     {
                         Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
                         Evapotranspiration = 5,
