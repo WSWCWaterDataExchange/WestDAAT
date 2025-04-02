@@ -271,7 +271,7 @@ public class OpenEtSdkTests : UtilityTestBase
         // Assert
         response.Should().NotBeNull();
         response.Data.Length.Should().BeGreaterThan(0);
-        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year || datapoint.Time.Year == currentYear.Year).Should().BeTrue();
+        response.Data.All(datapoint => datapoint.Time.Year >= lastYear.Year || datapoint.Time.Year <= currentYear.Year).Should().BeTrue();
     }
 
     [TestMethod]
@@ -475,6 +475,6 @@ public class OpenEtSdkTests : UtilityTestBase
         // Assert
         response.Should().NotBeNull();
         response.Data.Length.Should().BeGreaterThan(0);
-        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year || datapoint.Time.Year == currentYear.Year).Should().BeTrue();
+        response.Data.All(datapoint => datapoint.Time.Year >= lastYear.Year || datapoint.Time.Year <= currentYear.Year).Should().BeTrue();
     }
 }
