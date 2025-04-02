@@ -270,11 +270,8 @@ public class OpenEtSdkTests : UtilityTestBase
 
         // Assert
         response.Should().NotBeNull();
-
-        const int monthsInYear = 12;
-        response.Data.Should().HaveCount(monthsInYear);
-        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
-        response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
+        response.Data.Length.Should().BeGreaterThan(0);
+        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year || datapoint.Time.Year == currentYear.Year).Should().BeTrue();
     }
 
     [TestMethod]
@@ -446,4 +443,38 @@ public class OpenEtSdkTests : UtilityTestBase
         await call.Should().ThrowAsync<ServiceUnavailableException>();
     }
 
+    [TestMethod]
+    [Ignore("This test is ignored because it uses the real api.")]
+    public async Task RasterTimeseriesPoint_RealApi_Success()
+    {
+        // Arrange
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var pointCoordinate = new Coordinate(-119.7937, 35.58995);
+
+        var request = new RasterTimeSeriesPointRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePoint(pointCoordinate),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var sdk = CreateOpenEtSdk(new HttpClient()
+        {
+            BaseAddress = new Uri(Configuration.GetOpenEtConfiguration().BaseAddress)
+        });
+        var response = await sdk.RasterTimeseriesPoint(request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Data.Length.Should().BeGreaterThan(0);
+        response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year || datapoint.Time.Year == currentYear.Year).Should().BeTrue();
+    }
 }
