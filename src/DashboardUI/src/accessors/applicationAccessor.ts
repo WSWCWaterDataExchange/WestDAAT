@@ -128,6 +128,7 @@ export const submitApplication = async (
   const api = await westDaatApi(context);
 
   const request: WaterConservationApplicationSubmissionRequest = {
+    $type: 'WaterConservationApplicationSubmissionRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     waterRightNativeId: data.waterRightNativeId,
     agentName: data.form.agentName,

@@ -352,7 +352,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmissionNotes, opt => opt.Ignore())
                 .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
-                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
+                .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmission>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -360,7 +363,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmissionNotes, opt => opt.Ignore())
                 .ForMember(dest => dest.AcceptedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RejectedDate, opt => opt.Ignore())
-                .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore());
+                .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -369,6 +375,24 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
                 .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UpdatedByUserId));
+
+            CreateMap<WaterConservationApplicationRecommendationRequest, EFWD.WaterConservationApplicationSubmission>(MemberList.Source)
+                .ForSourceMember(src => src.WaterConservationApplicationId, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.RecommendationNotes, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.RecommendationDecision, opt => opt.DoNotValidate())
+                .ForMember(dest => dest.RecommendedForDate,
+                    opt => opt.MapFrom(src => src.RecommendationDecision == RecommendationDecision.For ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
+                .ForMember(dest => dest.RecommendedAgainstDate,
+                    opt => opt.MapFrom(src => src.RecommendationDecision == RecommendationDecision.Against ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
+                
+            CreateMap<WaterConservationApplicationRecommendationRequest, EFWD.WaterConservationApplicationSubmissionNote>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
+                .ForMember(dest => dest.WaterConservationApplicationSubmissionId, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.RecommendedByUserId))
+                .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.RecommendationNotes));
 
             CreateMap<WaterConservationApplicationDocument, EFWD.WaterConservationApplicationDocument>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

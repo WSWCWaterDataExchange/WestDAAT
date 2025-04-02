@@ -16,6 +16,8 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                     group.Cast<DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta>().ToArray()),
                 DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta => ApplicationSubmittedFundingOrganizationNotifications(
                     group.Cast<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta>().ToArray()),
+                DTO.WaterConservationApplicationSubmittedAdminNotificationMeta => ApplicationSubmittedAdminNotifications(
+                    group.Cast<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta>().ToArray()),
                 _ => throw new NotImplementedException(
                     $"Formatting notifications for type {group.Key.Name} has not been implemented."
                 )
@@ -38,7 +40,7 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
         return notifications;
     }
 
-    private DTO.NotificationBase FormatApplicationSubmittedApplicantEmailNotification(
+    private DTO.EmailNotification FormatApplicationSubmittedApplicantEmailNotification(
         DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta meta)
     {
         var applicationUrl = $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/submit";
@@ -73,13 +75,13 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
         return notifications;
     }
 
-    private DTO.NotificationBase FormatApplicationSubmittedFundingOrganizationEmailNotification(
+    private DTO.EmailNotification FormatApplicationSubmittedFundingOrganizationEmailNotification(
         DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta meta)
     {
-        var canReview = meta.ToUserPermissions.Contains(Permissions.ApplicationUpdate);
+        var canUpdate = meta.ToUserPermissions.Contains(Permissions.ApplicationUpdate);
         var canApprove = meta.ToUserPermissions.Contains(Permissions.ApplicationApprove);
 
-        var applicationUrl = (canReview, canApprove) switch
+        var applicationUrl = (canUpdate, canApprove) switch
         {
             (true, _) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/review",
             (_, true) => $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/approve",
@@ -96,6 +98,40 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                 Subject = "New Water Conservation Application Submitted",
                 TextContent = "A water conservation application has been submitted.",
                 Body = "A water conservation application has been submitted. "
+                       + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
+            }
+        };
+    }
+
+    private DTO.NotificationBase[] ApplicationSubmittedAdminNotifications(
+        DTO.WaterConservationApplicationSubmittedAdminNotificationMeta[] metas)
+    {
+        var notifications = metas.Select(
+            meta => meta.Type switch
+            {
+                DTO.NotificationType.Email => FormatApplicationSubmittedAdminEmailNotification(meta),
+                _ => throw new NotImplementedException("Formatting notifications of type " +
+                                                       $"'{meta.Type}' has not been implemented.")
+            }).ToArray();
+
+        return notifications;
+    }
+
+    private DTO.EmailNotification FormatApplicationSubmittedAdminEmailNotification(
+        DTO.WaterConservationApplicationSubmittedAdminNotificationMeta meta)
+    {
+        var applicationUrl = $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/approve";
+
+        return new DTO.EmailNotification
+        {
+            EmailRequest = new DTO.EmailRequest
+            {
+                To = [meta.ToUser.EmailAddress],
+                From = _emailServiceConfiguration.NotificationFrom,
+                FromName = _emailServiceConfiguration.NotificationFromName,
+                Subject = "New Water Conservation Application Submitted",
+                TextContent = $"A {meta.FundingOrganizationName} water conservation application has been submitted.",
+                Body = $"A {meta.FundingOrganizationName} water conservation application has been submitted. "
                        + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
             }
         };

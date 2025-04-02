@@ -120,9 +120,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.OrganizationMemberUpdateResponse, ClientContracts.Responses.Admin.OrganizationMemberUpdateResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
-            CreateMap<ClientContracts.Requests.Admin.OrganizationUserListRequest, CommonContracts.UserListRequest>();
+            CreateMap<ClientContracts.Requests.Admin.OrganizationUserListRequest, CommonContracts.UserListRequest>()
+                .ForMember(dest => dest.IncludeGlobalAdministrators, opt => opt.MapFrom(_ => false));
 
             CreateMap<ClientContracts.Requests.Admin.UserListRequest, CommonContracts.UserListRequest>()
+                .ForMember(dest => dest.IncludeGlobalAdministrators, opt => opt.MapFrom(_ => false))
                 .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(_ => (Guid?)null));
 
             CreateMap<CommonContracts.UserListResponse, ClientContracts.Responses.Admin.UserListResponse>()
@@ -244,6 +246,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
+            
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
+using Azure.Core;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
@@ -1003,6 +1004,145 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
     }
 
+    [DataTestMethod]
+    [DataRow(Roles.Member, true, DisplayName = "A Member of the same Funding Organization should not be able to submit a recommendation")]
+    [DataRow(Roles.TechnicalReviewer, false, DisplayName = "A Technical Reviewer of a different Funding Organization should not be able to submit a recommendation")]
+    [DataRow(Roles.OrganizationAdmin, false, DisplayName = "An Organization Admin of a different Funding Organization should not be able to submit a recommendation")]
+    public async Task Store_SubmitApplicationRecommendation_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+        
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = isPartOfOrg ? organization.Id : Guid.NewGuid(),
+                RoleNames = [role]
+            }],
+            ExternalAuthId = ""
+        });
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            RecommendationDecision = RecommendationDecision.For,
+        };
+
+        // Act
+        var response = await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+    }
+    
+    [TestMethod]
+    public async Task Store_SubmitApplicationRecommendation_MultipleTimes_Success()
+    {
+        // Arrange
+        var organizationAdmin = new UserFaker().Generate();
+        var technicalReviewer = new UserFaker().Generate();
+        var waterUser = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.Users.AddRangeAsync(waterUser, technicalReviewer, organizationAdmin);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        // Arrange 1 (Technical Reviewer - recommends for with no notes)
+        UseUserContext(new UserContext
+        {
+            UserId = technicalReviewer.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer]
+                }
+            ],
+            ExternalAuthId = ""
+        });
+
+        var recommendForRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            RecommendationDecision = RecommendationDecision.For
+        };
+
+        // Act 1
+        var recommendForResponse =
+            await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(
+                recommendForRequest);
+
+        // Assert 1
+        recommendForResponse.Error.Should().BeNull();
+        
+        var applicationSubmission = await _dbContext.WaterConservationApplicationSubmissions
+            .AsNoTracking()
+            .Include(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync(sub => sub.WaterConservationApplicationId == recommendForRequest.WaterConservationApplicationId);
+        applicationSubmission.RecommendedByUserId.Should().Be(technicalReviewer.Id);
+        applicationSubmission.RecommendedForDate.Should().NotBeNull();
+        applicationSubmission.RecommendedAgainstDate.Should().BeNull();
+        applicationSubmission.SubmissionNotes.Should().HaveCount(0);
+
+        // Arrange 2 (Organization Admin - recommends against with a note)
+        UseUserContext(new UserContext
+        {
+            UserId = organizationAdmin.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.OrganizationAdmin]
+                }
+            ],
+            ExternalAuthId = ""
+        });
+
+        var recommendAgainstRequest = new CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            RecommendationDecision = RecommendationDecision.Against,
+            RecommendationNotes = "Recommending against approving this application"
+        };
+
+        // Act 2
+        var recommendAgainstResponse =
+            await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(
+                recommendAgainstRequest);
+
+        // Assert 2
+        recommendAgainstResponse.Error.Should().BeNull();
+        
+        var applicationSubmission2 = await _dbContext.WaterConservationApplicationSubmissions
+            .AsNoTracking()
+            .Include(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync(sub => sub.WaterConservationApplicationId == recommendForRequest.WaterConservationApplicationId);
+        applicationSubmission2.RecommendedByUserId.Should().Be(organizationAdmin.Id);
+        applicationSubmission2.RecommendedForDate.Should().BeNull();
+        applicationSubmission2.RecommendedAgainstDate.Should().NotBeNull();
+        applicationSubmission2.SubmissionNotes.Should().HaveCount(1);
+    }
+    
     [TestMethod]
     public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmails()
     {
@@ -1039,10 +1179,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 }).Generate()
         ];
 
+        var globalAdmins = new UserFaker()
+            .RuleFor(u => u.UserRoles, _ => new List<UserRole> { new() { Role = Roles.GlobalAdmin } })
+            .Generate(2);
+
 
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _dbContext.Users.AddRangeAsync(techReviewer, orgMember);
+        await _dbContext.Users.AddRangeAsync(globalAdmins);
         await _dbContext.SaveChangesAsync();
 
         UseSystemContext();
@@ -1055,6 +1200,15 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert
         result.Error.Should().BeNull();
+
+
+        // Emails include:
+        //      1 x Applicant
+        //      1 x Tech Reviewer
+        //      1 x Org Member
+        //      2 x Global Admins
+        EmailNotificationSdkMock
+            .Verify(mock => mock.SendEmail(It.IsAny<EmailRequest>()), Times.Exactly(5));
 
         EmailNotificationSdkMock.Verify(
             mock => mock.SendEmail(
@@ -1090,5 +1244,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+
+        globalAdmins.Count.Should().Be(2);
+        foreach (var globalAdmin in globalAdmins)
+        {
+            EmailNotificationSdkMock.Verify(
+                mock => mock.SendEmail(
+                    It.Is<EmailRequest>(req =>
+                        req.To.Single() == globalAdmin.Email &&
+                        req.Subject == "New Water Conservation Application Submitted" &&
+                        req.Body.Contains($"A {fundingOrganization.Name} water conservation application has been submitted.") &&
+                        req.Body.Contains($"{application.Id}/approve")
+                    )
+                ), Times.Once
+            );
+        }
     }
 }

@@ -192,6 +192,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
+            WaterConservationApplicationRecommendationRequest req => await SubmitApplicationRecommendation(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -323,6 +324,29 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         // add new note
         var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
         application.Submission.SubmissionNotes.Add(note);
+
+        await db.SaveChangesAsync();
+
+        return new ApplicationStoreResponseBase();
+    }
+
+    private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+        var application = await db.WaterConservationApplications
+            .Include(a => a.Submission)
+            .ThenInclude(sub => sub.SubmissionNotes)
+            .Where(a => a.Id == request.WaterConservationApplicationId)
+            .SingleAsync();
+        
+        DtoMapper.Map(request, application.Submission);
+        
+        if (!string.IsNullOrEmpty(request.RecommendationNotes))
+        {
+            var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
+            note.WaterConservationApplicationSubmissionId = application.Submission.Id;
+            application.Submission.SubmissionNotes.Add(note);
+        }
 
         await db.SaveChangesAsync();
 

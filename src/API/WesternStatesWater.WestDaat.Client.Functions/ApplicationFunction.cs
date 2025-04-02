@@ -74,8 +74,15 @@ public class ApplicationFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Submit")]
         HttpRequestData req)
     {
-        var request = await ParseRequestBody<WaterConservationApplicationSubmissionRequest>(req);
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(request);
+        var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
+        var results = request switch
+        {
+            WaterConservationApplicationSubmissionRequest submissionRequest => await _applicationManager
+                .Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(submissionRequest),
+            WaterConservationApplicationRecommendationRequest recommendationRequest => await _applicationManager
+                .Store<WaterConservationApplicationRecommendationRequest, ApplicationStoreResponseBase>(recommendationRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
         return await CreateResponse(req, results);
     }
 
