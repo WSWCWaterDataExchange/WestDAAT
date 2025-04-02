@@ -33,7 +33,7 @@ export interface ConservationApplicationState {
     compensationRateModel: string | undefined;
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
-    sumAverageYearlyTotalEtInAcreFeet: number | undefined;
+    cumulativeTotalEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
@@ -76,7 +76,7 @@ export const defaultState = (): ConservationApplicationState => ({
     compensationRateModel: undefined,
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
-    sumAverageYearlyTotalEtInAcreFeet: undefined,
+    cumulativeTotalEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
@@ -184,7 +184,7 @@ export interface ApplicationCreatedAction {
 export interface ConsumptiveUseEstimatedAction {
   type: 'CONSUMPTIVE_USE_ESTIMATED';
   payload: {
-    sumAverageYearlyTotalEtInAcreFeet: number;
+    cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
     dataCollections: PolygonEtDataCollection[];
   };
@@ -433,7 +433,7 @@ const onConsumptiveUseEstimated = (
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 
-  application.sumAverageYearlyTotalEtInAcreFeet = payload.sumAverageYearlyTotalEtInAcreFeet;
+  application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
   application.conservationPayment = payload.conservationPayment;
 
   // combine polygon data
@@ -534,7 +534,7 @@ const onApplicationLoaded = (
 
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
-  draftApplication.sumAverageYearlyTotalEtInAcreFeet = application.estimate.sumAverageYearlyTotalEtInAcreFeet;
+  draftApplication.cumulativeTotalEtInAcreFeet = application.estimate.cumulativeTotalEtInAcreFeet;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,
@@ -632,7 +632,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
     !!app.dateRangeEnd &&
     !!app.desiredCompensationDollars &&
     !!app.desiredCompensationUnits &&
-    !!app.sumAverageYearlyTotalEtInAcreFeet &&
+    !!app.cumulativeTotalEtInAcreFeet &&
     !!app.conservationPayment &&
     !!app.estimateLocations &&
     app.estimateLocations.length > 0 &&
@@ -641,7 +641,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 };
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
-  draftState.conservationApplication.sumAverageYearlyTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
   // this `reset` method is activated when the user:

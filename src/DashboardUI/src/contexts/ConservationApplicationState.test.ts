@@ -248,7 +248,7 @@ describe('ConservationApplicationState reducer', () => {
     newState = reducer(newState, {
       type: 'CONSUMPTIVE_USE_ESTIMATED',
       payload: {
-        sumAverageYearlyTotalEtInAcreFeet: 100,
+        cumulativeTotalEtInAcreFeet: 100,
         conservationPayment: 200,
         dataCollections: [
           {
@@ -270,7 +270,7 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.sumAverageYearlyTotalEtInAcreFeet).toEqual(100);
+    expect(newState.conservationApplication.cumulativeTotalEtInAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
     expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
     expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
@@ -607,7 +607,7 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          sumAverageYearlyTotalEtInAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
@@ -664,8 +664,8 @@ describe('ConservationApplicationState reducer', () => {
 
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.sumAverageYearlyTotalEtInAcreFeet).toEqual(
-        applicationDetails.estimate.sumAverageYearlyTotalEtInAcreFeet,
+      expect(application.cumulativeTotalEtInAcreFeet).toEqual(
+        applicationDetails.estimate.cumulativeTotalEtInAcreFeet,
       );
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 
@@ -771,7 +771,7 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          sumAverageYearlyTotalEtInAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {

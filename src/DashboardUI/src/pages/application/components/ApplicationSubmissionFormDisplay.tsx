@@ -226,7 +226,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
               <FormElementDisplay
                 label="Consumptive Use"
                 displayValue={
-                  formatNumber(state.conservationApplication.sumAverageYearlyTotalEtInAcreFeet, 2) + ' Acre-Feet'
+                  formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2) + ' Acre-Feet'
                 }
               />
             </div>
