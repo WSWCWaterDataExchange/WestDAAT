@@ -276,4 +276,51 @@ public class OpenEtSdkTests : UtilityTestBase
         response.Data.All(datapoint => datapoint.Time.Year == lastYear.Year).Should().BeTrue();
         response.Data.All(datapoint => datapoint.Evapotranspiration > 0).Should().BeTrue();
     }
+
+    [TestMethod]
+    public void RasterTimeSeriesPoint_RequestSerializesSuccessfully()
+    {
+        // Arrange
+        // remove whitespace from expected json
+        var expectedJson = Regex.Replace("""
+            {   
+                "date_range":["2024-01-01","2025-01-01"],
+                "geometry":[
+                    -119.7937,35.53326
+                ],
+                "file_format":"JSON",
+                "interval":"Monthly",
+                "model":"SSEBop",
+                "reference_et":"GridMET",
+                "units":"mm",
+                "variable":"ET"
+            }
+            """,
+            @"\s",
+            string.Empty);
+
+        var lastYear = new DateTime(DateTime.Now.Year - 1, 1, 1);
+        var currentYear = new DateTime(DateTime.Now.Year, 1, 1);
+        var pointCoordinate = new Coordinate(-119.7937, 35.53326);
+
+        var request = new RasterTimeSeriesPointRequest
+        {
+            DateRangeStart = DateOnly.FromDateTime(lastYear),
+            DateRangeEnd = DateOnly.FromDateTime(currentYear),
+            Geometry = new GeometryFactory().CreatePoint(pointCoordinate),
+            Interval = RasterTimeSeriesInterval.Monthly,
+            Model = RasterTimeSeriesModel.SSEBop,
+            ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+            OutputExtension = RasterTimeSeriesFileFormat.JSON,
+            OutputUnits = RasterTimeSeriesOutputUnits.Millimeters,
+            Variable = RasterTimeSeriesCollectionVariable.ET,
+        };
+
+        // Act
+        var serializedRequest = JsonSerializer.Serialize(request);
+
+        // Assert
+        serializedRequest.Should().Be(expectedJson);
+    }
+
 }
