@@ -50,9 +50,10 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
 
-        var results = request switch
+        ApplicationStoreResponseBase results = request switch
         {
             EstimateConsumptiveUseApplicantRequest applicantRequest => await _applicationManager.Store<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseApplicantResponse>(applicantRequest),
+            EstimateConsumptiveUseReviewerRequest reviewerRequest => await _applicationManager.Store<EstimateConsumptiveUseReviewerRequest, EstimateConsumptiveUseReviewerResponse>(reviewerRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 
