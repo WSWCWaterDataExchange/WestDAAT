@@ -69,12 +69,12 @@ export function SubmitApplicationRecommendationModal(props: SubmitApplicationRec
     setRecommendationNotes(undefined);
   };
 
-  const handleSubmitClicked = async () => {
+  const handleSubmitClicked = () => {
     if (!recommendationDecision) {
       throw new Error('Recommendation decision is required.');
     }
 
-    await submitApplicationRecommendationMutation.mutateAsync({
+    submitApplicationRecommendationMutation.mutate({
       decision: recommendationDecision,
       notes: recommendationNotes,
     });
