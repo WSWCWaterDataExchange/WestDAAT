@@ -1,7 +1,7 @@
 import { PolygonEtDataCollection } from './PolygonEtDataCollection';
 
 export interface EstimateConsumptiveUseResponse {
-  totalAverageYearlyEtAcreFeet: number;
+  cumulativeTotalEtInAcreFeet: number;
   conservationPayment: number | undefined;
   dataCollections: PolygonEtDataCollection[];
 }

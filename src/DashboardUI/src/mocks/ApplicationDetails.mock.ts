@@ -13,7 +13,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateDollars: 100,
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
-    totalAverageYearlyConsumptionEtAcreFeet: 300,
+    cumulativeTotalEtInAcreFeet: 300,
     locations: [
       {
         id: 'location-guid',
@@ -25,7 +25,9 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
           {
             id: 'consumptive-use-guid',
             year: 2025,
-            etInInches: 400,
+            totalEtInInches: 400,
+            effectivePrecipitationInInches: null,
+            netEtInInches: null,
           },
         ],
       },

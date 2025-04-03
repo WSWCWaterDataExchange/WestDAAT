@@ -8,9 +8,9 @@ public class PolygonEtDataCollection
 
     public DrawToolType DrawToolType { get; set; }
 
-    public double AverageYearlyEtInInches { get; set; }
+    public double AverageYearlyTotalEtInInches { get; set; }
 
-    public double AverageYearlyEtInAcreFeet { get; set; }
+    public double AverageYearlyTotalEtInAcreFeet { get; set; }
 
     public PolygonEtDatapoint[] Datapoints { get; set; }
 }
