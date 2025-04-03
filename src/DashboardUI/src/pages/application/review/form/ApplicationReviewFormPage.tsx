@@ -3,10 +3,7 @@ import { useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-  submitApplicationRecommendation,
-  updateApplicationSubmission,
-} from '../../../../accessors/applicationAccessor';
+import { updateApplicationSubmission } from '../../../../accessors/applicationAccessor';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { ApplicationReviewPerspective } from '../../../../data-contracts/ApplicationReviewPerspective';
@@ -17,9 +14,8 @@ import ApplicationReviewPipelineSection from '../../components/ApplicationReview
 import ApplicationSubmissionForm from '../../components/ApplicationSubmissionForm';
 import { ReviewerButtonRow } from './ReviewerButtonRow';
 import { SaveChangesModal } from './SaveChangesModal';
-import { UnsavedChangesModal } from './UnsavedChangesModal';
-import { RecommendationDecision } from '../../../../data-contracts/RecommendationDecision';
 import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
+import { UnsavedChangesModal } from './UnsavedChangesModal';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -81,9 +77,9 @@ export function ApplicationReviewFormPage() {
     }
   };
 
-  const handleSubmitConfirmed = async (decision: RecommendationDecision, notes?: string) => {
+  const handleSubmitConfirmed = () => {
     setShowSubmitRecommendationModal(false);
-    await submitApplicationRecommendationMutation.mutateAsync({ decision, notes });
+    navigateToApplicationOrganizationDashboard();
   };
 
   const updateApplicationSubmissionMutation = useMutation({
@@ -103,29 +99,6 @@ export function ApplicationReviewFormPage() {
     onError: () => {
       toast.error('Error saving application changes.');
       setShowSaveChangesModal(false);
-    },
-  });
-
-  const submitApplicationRecommendationMutation = useMutation({
-    mutationFn: async (recommendation: { decision: RecommendationDecision; notes: string | undefined }) => {
-      return await submitApplicationRecommendation(context, {
-        waterConservationApplicationId: applicationId!,
-        recommendationDecision: recommendation.decision,
-        recommendationNotes: recommendation.notes,
-      });
-    },
-    onSuccess: () => {
-      toast.success('Application recommendation submitted successfully.', {
-        autoClose: 1000,
-      });
-      navigateToApplicationOrganizationDashboard();
-    },
-    onError: () => {
-      toast.error('Error submitting application recommendation.', {
-        position: 'top-center',
-        theme: 'colored',
-        autoClose: 3000,
-      });
     },
   });
 
@@ -163,8 +136,9 @@ export function ApplicationReviewFormPage() {
       <UnsavedChangesModal show={showUnsavedChangesModal} onClose={() => setShowUnsavedChangesModal(false)} />
       <SubmitApplicationRecommendationModal
         show={showSubmitRecommendationModal}
+        applicationId={applicationId!}
         onClose={() => setShowSubmitRecommendationModal(false)}
-        onSubmit={handleSubmitConfirmed}
+        onSuccess={handleSubmitConfirmed}
       ></SubmitApplicationRecommendationModal>
     </div>
   );

@@ -1,8 +1,12 @@
+import { useMsal } from '@azure/msal-react';
 import { useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
 import Modal from 'react-bootstrap/esm/Modal';
+import { useMutation } from 'react-query';
 import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { submitApplicationRecommendation } from '../../../../accessors/applicationAccessor';
 import {
   RecommendationDecision,
   RecommendationDecisionDisplayNames,
@@ -10,11 +14,13 @@ import {
 
 export interface SubmitApplicationRecommendationModalProps {
   show: boolean;
+  applicationId: string;
   onClose: () => void;
-  onSubmit: (decision: RecommendationDecision, notes?: string) => void;
+  onSuccess: () => void;
 }
 
 export function SubmitApplicationRecommendationModal(props: SubmitApplicationRecommendationModalProps) {
+  const context = useMsal();
   const [recommendationDecision, setRecommendationDecision] = useState<RecommendationDecision | undefined>(undefined);
   const [recommendationNotes, setRecommendationNotes] = useState<string | undefined>(undefined);
 
@@ -29,6 +35,31 @@ export function SubmitApplicationRecommendationModal(props: SubmitApplicationRec
     },
   ];
 
+  const submitApplicationRecommendationMutation = useMutation({
+    mutationFn: async (recommendation: { decision: RecommendationDecision; notes: string | undefined }) => {
+      return await submitApplicationRecommendation(context, {
+        waterConservationApplicationId: props.applicationId,
+        recommendationDecision: recommendation.decision,
+        recommendationNotes: recommendation.notes,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Application recommendation submitted successfully.', {
+        autoClose: 1000,
+      });
+      setRecommendationDecision(undefined);
+      setRecommendationNotes(undefined);
+      props.onSuccess();
+    },
+    onError: () => {
+      toast.error('Error submitting application recommendation.', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
+    },
+  });
+
   const handleDecisionChange = (option: { value: RecommendationDecision } | null) =>
     setRecommendationDecision(option?.value);
 
@@ -38,10 +69,15 @@ export function SubmitApplicationRecommendationModal(props: SubmitApplicationRec
     setRecommendationNotes(undefined);
   };
 
-  const handleSubmitClicked = () => {
-    props.onSubmit(recommendationDecision!, recommendationNotes);
-    setRecommendationDecision(undefined);
-    setRecommendationNotes(undefined);
+  const handleSubmitClicked = async () => {
+    if (!recommendationDecision) {
+      throw new Error('Recommendation decision is required.');
+    }
+
+    await submitApplicationRecommendationMutation.mutateAsync({
+      decision: recommendationDecision,
+      notes: recommendationNotes,
+    });
   };
 
   return (
