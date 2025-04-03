@@ -20,7 +20,7 @@ internal class ValidationEngine : IValidationEngine
     private readonly IOrganizationAccessor _organizationAccessor;
 
     private readonly IApplicationAccessor _applicationAccessor;
-    
+
     private readonly IUserAccessor _userAccessor;
 
     public ValidationEngine(
@@ -168,7 +168,7 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            EstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseRequest(req, context),
+            ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -193,7 +193,7 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseRequest(EstimateConsumptiveUseRequest request,
+    private async Task<ErrorBase> ValidateApplicantEstimateConsumptiveUseRequest(ApplicantEstimateConsumptiveUseRequest request,
         ContextBase context)
     {
         // verify user requesting an estimate is linking it to an application they own
@@ -227,7 +227,7 @@ internal class ValidationEngine : IValidationEngine
             {
                 if (polygonGeometries[i].Intersects(polygonGeometries[j]))
                 {
-                    return CreateValidationError(request, nameof(EstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
+                    return CreateValidationError(request, nameof(ApplicantEstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
                 }
             }
         }
@@ -442,9 +442,9 @@ internal class ValidationEngine : IValidationEngine
 
         // Verify the user's email domain matches the organization's
         var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
-            { UserId = request.UserId });
+        { UserId = request.UserId });
         var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
-            { OrganizationId = request.OrganizationId });
+        { OrganizationId = request.OrganizationId });
 
         // There is validation to ensure the user email includes an '@'.
         // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.

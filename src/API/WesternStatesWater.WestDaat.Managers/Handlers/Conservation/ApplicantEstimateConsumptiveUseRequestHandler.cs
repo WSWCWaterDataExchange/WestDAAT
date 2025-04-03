@@ -9,7 +9,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>
+public class ApplicantEstimateConsumptiveUseRequestHandler : IRequestHandler<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
@@ -17,7 +17,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
     public IOrganizationAccessor OrganizationAccessor { get; }
     public IWaterAllocationAccessor WaterAllocationAccessor { get; }
 
-    public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
+    public ApplicantEstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk,
         IApplicationAccessor applicationAccessor,
         IOrganizationAccessor organizationAccessor,
@@ -30,7 +30,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
         WaterAllocationAccessor = waterAllocationAccessor;
     }
 
-    public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseRequest request)
+    public async Task<ApplicantEstimateConsumptiveUseResponse> Handle(ApplicantEstimateConsumptiveUseRequest request)
     {
         var waterRightFundingOrgDetails = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByUuid(request.WaterRightNativeId);
 
@@ -66,7 +66,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
             }
         }
 
-        return new EstimateConsumptiveUseResponse
+        return new ApplicantEstimateConsumptiveUseResponse
         {
             ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
             CumulativeTotalEtInAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),

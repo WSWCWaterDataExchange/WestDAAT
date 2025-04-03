@@ -3,9 +3,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Net;
-using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.WestDaat.Common.Constants;
-using WesternStatesWater.WestDaat.Common.Exceptions;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
@@ -45,13 +43,19 @@ public class ApplicationFunction : FunctionBase
 
     [Function(nameof(EstimateConsumptiveUse))]
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(ApplicantEstimateConsumptiveUseResponse))]
     public async Task<HttpResponseData> EstimateConsumptiveUse(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
     {
-        var request = await ParseRequestBody<EstimateConsumptiveUseRequest>(req);
-        var results = await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(request);
+        var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
+
+        var results = request switch
+        {
+            ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager.Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
+            _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
+        };
+
         return await CreateResponse(req, results);
     }
 

@@ -11,8 +11,8 @@ import { ApplicationReviewPerspective } from '../data-contracts/ApplicationRevie
 import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
-import { EstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseRequest';
-import { EstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseResponse';
+import { ApplicantEstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseApplicantRequest';
+import { ApplicantEstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
@@ -74,8 +74,9 @@ export const estimateConsumptiveUse = async (
     compensationRateDollars: number | undefined;
     units: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   },
-): Promise<EstimateConsumptiveUseResponse> => {
-  const request: EstimateConsumptiveUseRequest = {
+): Promise<ApplicantEstimateConsumptiveUseResponse> => {
+  const request: ApplicantEstimateConsumptiveUseRequest = {
+    $type: 'ApplicantEstimateConsumptiveUseRequest',
     waterConservationApplicationId: fields.waterConservationApplicationId,
     waterRightNativeId: fields.waterRightNativeId,
     polygons: fields.polygons,
@@ -84,7 +85,10 @@ export const estimateConsumptiveUse = async (
   };
 
   const api = await westDaatApi(context);
-  const { data } = await api.post<EstimateConsumptiveUseResponse>('Applications/EstimateConsumptiveUse', request);
+  const { data } = await api.post<ApplicantEstimateConsumptiveUseResponse>(
+    'Applications/EstimateConsumptiveUse',
+    request,
+  );
 
   return data;
 };
