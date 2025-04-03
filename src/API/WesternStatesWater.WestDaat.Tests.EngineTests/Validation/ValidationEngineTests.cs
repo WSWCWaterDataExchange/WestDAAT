@@ -63,7 +63,7 @@ public class ValidationEngineTests : EngineTestBase
     [DataRow(false, false, false, false, false, DisplayName = "User requests estimate for Application that does not exist")]
     [DataRow(true, false, true, false, false, DisplayName = "User requests estimate for a different Application that they own")]
     [DataRow(true, true, true, true, false, DisplayName = "User requests estimate for their own Application with intersecting polygons")]
-    public async Task Validate_ValidateEstimateConsumptiveUseRequest_Success(
+    public async Task Validate_ValidateEstimateConsumptiveUseApplicantRequest_Success(
         bool applicationExists,
         bool applicationIdMatches,
         bool organizationIdMatches,
