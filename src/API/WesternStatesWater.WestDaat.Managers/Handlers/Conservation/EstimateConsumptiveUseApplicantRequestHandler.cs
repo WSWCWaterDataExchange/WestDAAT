@@ -9,7 +9,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseResponse>
+public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
@@ -17,7 +17,7 @@ public class EstimateConsumptiveUseRequestHandler : IRequestHandler<EstimateCons
     public IOrganizationAccessor OrganizationAccessor { get; }
     public IWaterAllocationAccessor WaterAllocationAccessor { get; }
 
-    public EstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
+    public EstimateConsumptiveUseApplicantRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk,
         IApplicationAccessor applicationAccessor,
         IOrganizationAccessor organizationAccessor,
