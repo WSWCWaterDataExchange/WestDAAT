@@ -28,12 +28,14 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         }
 
         var applicantNotification = await BuildApplicantNotification(@event, application);
-        var fundingOrganizationNotifications = await BuildFundingOrganizationNotification(@event, application);
+        var fundingOrganizationNotifications = await BuildFundingOrganizationNotifications(@event, application);
+        var adminNotifications = await BuildAdministratorNotifications(@event, application);
 
         return
         [
             applicantNotification,
-            .. fundingOrganizationNotifications
+            .. fundingOrganizationNotifications,
+            .. adminNotifications
         ];
     }
 
@@ -55,7 +57,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         return applicantNotification;
     }
 
-    private async Task<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta[]> BuildFundingOrganizationNotification(
+    private async Task<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta[]> BuildFundingOrganizationNotifications(
         DTO.WaterConservationApplicationSubmittedEvent @event,
         DTO.ApplicationExistsLoadResponse application
     )
@@ -83,5 +85,31 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             .ToArray();
 
         return fundingOrganizationNotifications;
+    }
+
+    private async Task<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta[]> BuildAdministratorNotifications(
+        DTO.WaterConservationApplicationSubmittedEvent @event,
+        DTO.ApplicationExistsLoadResponse application
+    )
+    {
+        var adminUsers = (DTO.UserListResponse)await _userAccessor.Load(new DTO.UserListRequest
+        {
+            IncludeGlobalAdministrators = true
+        });
+
+        var adminNotifications = adminUsers.Users
+            .Select(adminUser => new DTO.WaterConservationApplicationSubmittedAdminNotificationMeta
+            {
+                ApplicationId = @event.ApplicationId,
+                ToUser = new DTO.NotificationUser
+                {
+                    EmailAddress = adminUser.Email
+                },
+                Type = DTO.NotificationType.Email,
+                FundingOrganizationName = application.FundingOrganizationName,
+            })
+            .ToArray();
+
+        return adminNotifications;
     }
 }
