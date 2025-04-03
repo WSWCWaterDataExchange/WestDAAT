@@ -9,7 +9,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseResponse>
+public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseApplicantResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
@@ -30,7 +30,7 @@ public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<Est
         WaterAllocationAccessor = waterAllocationAccessor;
     }
 
-    public async Task<EstimateConsumptiveUseResponse> Handle(EstimateConsumptiveUseApplicantRequest request)
+    public async Task<EstimateConsumptiveUseApplicantResponse> Handle(EstimateConsumptiveUseApplicantRequest request)
     {
         var waterRightFundingOrgDetails = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByUuid(request.WaterRightNativeId);
 
@@ -66,7 +66,7 @@ public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<Est
             }
         }
 
-        return new EstimateConsumptiveUseResponse
+        return new EstimateConsumptiveUseApplicantResponse
         {
             ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
             CumulativeTotalEtInAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),

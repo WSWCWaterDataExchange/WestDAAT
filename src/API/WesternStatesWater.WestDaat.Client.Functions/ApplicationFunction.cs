@@ -43,7 +43,7 @@ public class ApplicationFunction : FunctionBase
 
     [Function(nameof(EstimateConsumptiveUse))]
     [OpenApiOperation(nameof(EstimateConsumptiveUse))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseResponse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(EstimateConsumptiveUseApplicantResponse))]
     public async Task<HttpResponseData> EstimateConsumptiveUse(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/EstimateConsumptiveUse")]
         HttpRequestData req)
@@ -52,7 +52,7 @@ public class ApplicationFunction : FunctionBase
 
         var results = request switch
         {
-            EstimateConsumptiveUseApplicantRequest applicantRequest => await _applicationManager.Store<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseResponse>(applicantRequest),
+            EstimateConsumptiveUseApplicantRequest applicantRequest => await _applicationManager.Store<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseApplicantResponse>(applicantRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 

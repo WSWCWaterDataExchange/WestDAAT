@@ -495,7 +495,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // Act
             var response = await _applicationManager.Store<
                 EstimateConsumptiveUseApplicantRequest,
-                EstimateConsumptiveUseResponse>(
+                EstimateConsumptiveUseApplicantResponse>(
                 request);
 
 
@@ -644,7 +644,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Act
         var response = await _applicationManager.Store<
             EstimateConsumptiveUseApplicantRequest,
-            EstimateConsumptiveUseResponse>(
+            EstimateConsumptiveUseApplicantResponse>(
             request);
 
         // Assert
