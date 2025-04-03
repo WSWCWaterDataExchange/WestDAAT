@@ -3,8 +3,8 @@ using WesternStatesWater.WestDaat.Common.DataContracts.Converters;
 
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-[JsonConverter(typeof(RasterTimeSeriesPolygonRequestConverter))]
-public class RasterTimeSeriesPolygonRequest
+[JsonConverter(typeof(RasterTimeSeriesPointRequestConverter))]
+public class RasterTimeSeriesPointRequest
 {
     /// <summary>
     /// Inclusive start date.
@@ -16,13 +16,11 @@ public class RasterTimeSeriesPolygonRequest
     /// </summary>
     public DateOnly DateRangeEnd { get; set; }
 
-    public NetTopologySuite.Geometries.Polygon Geometry { get; set; }
+    public NetTopologySuite.Geometries.Point Geometry { get; set; }
 
     public RasterTimeSeriesInterval Interval { get; set; }
 
     public RasterTimeSeriesModel Model { get; set; }
-
-    public RasterTimeSeriesPixelReducer PixelReducer { get; set; }
 
     public RasterTimeSeriesReferenceEt ReferenceEt { get; set; }
 
