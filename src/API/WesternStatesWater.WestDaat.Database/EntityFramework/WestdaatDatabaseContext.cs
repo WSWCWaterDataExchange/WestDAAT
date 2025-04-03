@@ -89,6 +89,8 @@ namespace WesternStatesWater.WestDaat.Database.EntityFramework
         public virtual DbSet<WaterConservationApplicationEstimate> WaterConservationApplicationEstimates { get; set; }
         public virtual DbSet<WaterConservationApplicationEstimateLocation> WaterConservationApplicationEstimateLocations { get; set; }
         public virtual DbSet<LocationWaterMeasurement> LocationWaterMeasurements { get; set; }
+        public virtual DbSet<WaterConservationApplicationEstimateControlLocation> WaterConservationApplicationEstimateControlLocations { get; set; }
+        public virtual DbSet<ControlLocationWaterMeasurement> ControlLocationWaterMeasurements { get; set; }
         public virtual DbSet<WaterConservationApplicationSubmission> WaterConservationApplicationSubmissions { get; set; }
         public virtual DbSet<WaterConservationApplicationSubmissionNote> WaterConservationApplicationSubmissionNotes { get; set; }
         public virtual DbSet<WaterConservationApplicationDocument> WaterConservationApplicationDocuments { get; set; }
