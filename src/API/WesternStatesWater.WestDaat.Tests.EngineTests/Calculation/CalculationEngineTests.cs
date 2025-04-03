@@ -13,6 +13,7 @@ public class CalculationEngineTests : EngineTestBase
 
     private const string arbitraryValidPolygonWkt1 = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
     private const string arbitraryValidPolygonWkt2 = "POLYGON ((0 0, 5 0, 5 5, 0 5, 0 0))";
+    private const string arbitraryValidPointWKt = "POINT (0 0)";
 
     [TestInitialize]
     public void TestInitialize()
@@ -22,8 +23,10 @@ public class CalculationEngineTests : EngineTestBase
         _calculationEngine = new CalculationEngine(_openEtSdkMock.Object);
     }
 
-    [TestMethod]
-    public async Task Calculate_MultiPolygonYearlyEt_OnePolygon_OneDatapoint_OneYear_ShouldComputeCorrectly()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Calculate_MultiPolygonYearlyEt_OnePolygon_OneDatapoint_OneYear_ShouldComputeCorrectly(bool shouldIncludeControl)
     {
         // Arrange
         var twentyTwentyFive = DateOnly.FromDateTime(new DateTime(2025, 1, 1));
@@ -39,6 +42,21 @@ public class CalculationEngineTests : EngineTestBase
                 ]
             });
 
+        if (shouldIncludeControl)
+        {
+            _openEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<RasterTimeSeriesPointRequest>()))
+                .ReturnsAsync(new RasterTimeSeriesPointResponse
+                {
+                    Data = [
+                        new()
+                        {
+                            Evapotranspiration = 1.0,
+                            Time = twentyTwentyFive
+                        }
+                    ]
+                });
+        }
+
         var request = new MultiPolygonYearlyEtRequest
         {
             DateRangeStart = DateOnly.MinValue,
@@ -51,7 +69,13 @@ public class CalculationEngineTests : EngineTestBase
                     PolygonWkt = arbitraryValidPolygonWkt1,
                     DrawToolType = DrawToolType.Freeform,
                 }
-            ]
+            ],
+            ControlLocation = shouldIncludeControl
+                ? new MapPoint
+                {
+                    PointWkt = arbitraryValidPointWKt
+                }
+                : null
         };
 
         // Act
@@ -70,6 +94,16 @@ public class CalculationEngineTests : EngineTestBase
         response.DataCollections[0].Datapoints.Length.Should().Be(1);
         response.DataCollections[0].Datapoints[0].Year.Should().Be(twentyTwentyFive.Year);
         response.DataCollections[0].Datapoints[0].TotalEtInInches.Should().Be(1.0);
+
+        if (shouldIncludeControl)
+        {
+            // collection should have net et
+            response.DataCollections[0].AverageYearlyNetEtInInches.Should().Be(0.0);
+
+            // each datapoint should have precipitation, net et
+            response.DataCollections[0].Datapoints[0].EffectivePrecipitationInInches.Should().Be(1.0);
+            response.DataCollections[0].Datapoints[0].NetEtInInches.Should().Be(0.0);
+        }
     }
 
     [TestMethod]
