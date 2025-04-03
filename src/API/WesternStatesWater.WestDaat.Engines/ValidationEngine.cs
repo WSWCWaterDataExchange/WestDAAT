@@ -169,6 +169,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             EstimateConsumptiveUseApplicantRequest req => await ValidateEstimateConsumptiveUseApplicantRequest(req, context),
+            EstimateConsumptiveUseReviewerRequest req => await ValidateEstimateConsumptiveUseReviewerRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -228,6 +229,55 @@ internal class ValidationEngine : IValidationEngine
                 if (polygonGeometries[i].Intersects(polygonGeometries[j]))
                 {
                     return CreateValidationError(request, nameof(EstimateConsumptiveUseApplicantRequest.Polygons), "Polygons must not intersect.");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<ErrorBase> ValidateEstimateConsumptiveUseReviewerRequest(EstimateConsumptiveUseReviewerRequest request, ContextBase context)
+    {
+        // user must be logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // application must exist and must have been submitted
+        var applicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            ApplicationId = request.WaterConservationApplicationId,
+            HasSubmission = true,
+        };
+        var applicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(applicationExistsRequest);
+
+        if (!applicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // user must have permission to update applications in the application's linked funding organization
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = applicationExistsResponse.FundingOrganizationId
+        });
+
+        // control location must not intersect with any polygons
+        // polygons must not intersect with each other
+        var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon).ToArray();
+
+        for (int i = 0; i < polygonGeometries.Length; i++)
+        {
+            if (controlLocationGeometry.Within(polygonGeometries[i]))
+            {
+                return CreateValidationError(request, nameof(EstimateConsumptiveUseReviewerRequest.ControlLocation), "Control Location must not intersect with any polygons.");
+            }
+
+            for (int j = i + 1; j < polygonGeometries.Length; j++)
+            {
+                if (polygonGeometries[i].Intersects(polygonGeometries[j]))
+                {
+                    return CreateValidationError(request, nameof(EstimateConsumptiveUseReviewerRequest.Polygons), "Polygons must not intersect.");
                 }
             }
         }
