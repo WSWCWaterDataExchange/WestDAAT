@@ -249,8 +249,10 @@ public class CalculationEngineTests : EngineTestBase
         }
     }
 
-    [TestMethod]
-    public async Task Calculate_MultiPolygonYearlyEt_MultiplePolygons_MultipleDatapoints_MultipleYears_ShouldComputeCorrectly()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Calculate_MultiPolygonYearlyEt_MultiplePolygons_MultipleDatapoints_MultipleYears_ShouldComputeCorrectly(bool shouldIncludeControl)
     {
         // Arrange
         var twentyTwentyThree = DateOnly.FromDateTime(new DateTime(2023, 1, 1));
@@ -310,6 +312,33 @@ public class CalculationEngineTests : EngineTestBase
                 ]
             });
 
+        RasterTimeSeriesDatapoint[] controlEtData =
+        [
+            new()
+            {
+                Evapotranspiration = 1,
+                Time = twentyTwentyThree,
+            },
+            new()
+            {
+                Evapotranspiration = 2,
+                Time = twentyTwentyFour,
+            },
+            new()
+            {
+                Evapotranspiration = 3,
+                Time = twentyTwentyFive
+            }
+        ];
+        if (shouldIncludeControl)
+        {
+            _openEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<RasterTimeSeriesPointRequest>()))
+                .ReturnsAsync(new RasterTimeSeriesPointResponse
+                {
+                    Data = controlEtData
+                });
+        }
+
         var request = new MultiPolygonYearlyEtRequest
         {
             DateRangeStart = DateOnly.MinValue,
@@ -326,7 +355,13 @@ public class CalculationEngineTests : EngineTestBase
                     PolygonWkt = arbitraryValidPolygonWkt2,
                     DrawToolType = DrawToolType.Freeform,
                 }
-            ]
+            ],
+            ControlLocation = shouldIncludeControl
+                ? new MapPoint
+                {
+                    PointWkt = arbitraryValidPointWKt,
+                }
+                : null
         };
 
         // Act
@@ -354,6 +389,29 @@ public class CalculationEngineTests : EngineTestBase
         // avg: (1.98 + 12.73 + 30.5) / 3 years = 15.07 inches
         response.DataCollections[1].AverageYearlyTotalEtInInches.Should().Be(15.07);
         response.DataCollections[1].Datapoints.Length.Should().Be(3); // three years of data
+
+        if (shouldIncludeControl)
+        {
+            double controlAverageTotalEt = controlEtData.Select(datum => datum.Evapotranspiration).Average();
+
+            foreach (var collection in response.DataCollections)
+            {
+                // collection Net ET = collection Total ET - control avg Total ET
+                collection.AverageYearlyNetEtInInches.Should().Be(
+                    collection.AverageYearlyTotalEtInInches - controlAverageTotalEt
+                );
+
+                foreach (var datapoint in collection.Datapoints)
+                {
+                    // datapoint Net ET = datapoint Total ET - control Total ET for the same year
+                    var matchingControlDatapoint = controlEtData.Single(datum => datum.Time.Year == datapoint.Year);
+
+                    datapoint.NetEtInInches.Should().Be(
+                        datapoint.TotalEtInInches - matchingControlDatapoint.Evapotranspiration
+                    );
+                }
+            }
+        }
     }
 
     [DataTestMethod]
