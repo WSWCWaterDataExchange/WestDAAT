@@ -71,6 +71,7 @@ internal class CalculationEngine : ICalculationEngine
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
     {
         double? controlLocationAverageTotalEtInInches = null;
+        Dictionary<int, double> controlLocationTotalEtByYear = null;
 
         // The Control Location is the location of an unirrigated field near the polygons.
         // This allows us to estimate the "Net ET" via this formula:
@@ -100,6 +101,8 @@ internal class CalculationEngine : ICalculationEngine
                 .ToArray();
 
             controlLocationAverageTotalEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
+
+            controlLocationTotalEtByYear = yearlyDatapoints.ToDictionary(datapoint => datapoint.Year, datapoint => datapoint.TotalEtInInches);
         }
 
         var results = new List<PolygonEtDataCollection>();
@@ -152,8 +155,9 @@ internal class CalculationEngine : ICalculationEngine
                 // update each datapoint
                 foreach (var datapoint in result.Datapoints)
                 {
-                    datapoint.EffectivePrecipitationInInches = controlLocationAverageTotalEtInInches;
-                    datapoint.NetEtInInches = datapoint.TotalEtInInches - controlLocationAverageTotalEtInInches;
+                    var controlLocationTotalEt = controlLocationTotalEtByYear[datapoint.Year];
+                    datapoint.EffectivePrecipitationInInches = controlLocationTotalEt;
+                    datapoint.NetEtInInches = datapoint.TotalEtInInches - controlLocationTotalEt;
                 }
             }
 
