@@ -110,6 +110,7 @@ export function ApplicationReviewFormPage() {
       <ApplicationReviewersNotesSection />
       <ReviewerButtonRow
         isFormDirty={isFormDirty}
+        isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
         handleSaveClicked={handleSaveClicked}
         handleSubmitForFinalReviewClicked={handleSubmitClicked}

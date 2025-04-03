@@ -120,10 +120,18 @@ export function SubmitApplicationRecommendationModal(props: SubmitApplicationRec
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleCancelClicked}>
+        <Button
+          variant="secondary"
+          onClick={handleCancelClicked}
+          disabled={submitApplicationRecommendationMutation.isLoading}
+        >
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSubmitClicked} disabled={!recommendationDecision}>
+        <Button
+          variant="primary"
+          onClick={handleSubmitClicked}
+          disabled={!recommendationDecision || submitApplicationRecommendationMutation.isLoading}
+        >
           Submit
         </Button>
       </Modal.Footer>
