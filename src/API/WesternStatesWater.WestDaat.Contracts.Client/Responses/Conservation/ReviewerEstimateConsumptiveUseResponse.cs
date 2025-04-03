@@ -8,6 +8,11 @@
         public double CumulativeTotalEtInAcreFeet { get; set; }
 
         /// <summary>
+        /// The average yearly estimated net et in acre-feet for all polygons.
+        /// </summary>
+        public double CumulativeNetEtInAcreFeet { get; set; }
+
+        /// <summary>
         /// The total estimated conservation payment in dollars.
         /// </summary>
         public int? ConservationPayment { get; set; }
