@@ -64,8 +64,44 @@ internal class CalculationEngine : ICalculationEngine
         };
     }
 
+    /// <summary>
+    /// Given a list of polygons, computes the Total ET for each polygon.
+    /// If also provided with a Control Location, then computes the Net ET for each polygon.
+    /// </summary>
     private async Task<MultiPolygonYearlyEtResponse> CalculatePolygonsEt(MultiPolygonYearlyEtRequest request)
     {
+        double? controlLocationAverageTotalEtInInches = null;
+
+        // The Control Location is the location of an unirrigated field near the polygons.
+        // This allows us to estimate the "Net ET" via this formula:
+        //     irrigated field Net ET = irrigated field Total ET - Effective Precipitation
+        //     Effective Precipitation ~= nearby unirrigated field Total ET
+        // ->  irrigated field Net ET ~= irrigated field Total ET - nearby unirrigated field Total ET
+        if (request.ControlLocation != null)
+        {
+            var controlLocationGeo = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as Point;
+
+            var rasterRequest = new RasterTimeSeriesPointRequest
+            {
+                Geometry = controlLocationGeo,
+                DateRangeStart = request.DateRangeStart,
+                DateRangeEnd = request.DateRangeEnd,
+                Model = request.Model,
+                Interval = RasterTimeSeriesInterval.Monthly,
+                OutputExtension = RasterTimeSeriesFileFormat.JSON,
+                OutputUnits = RasterTimeSeriesOutputUnits.Inches,
+                ReferenceEt = RasterTimeSeriesReferenceEt.GridMET,
+                Variable = RasterTimeSeriesCollectionVariable.ET,
+            };
+            var rasterResponse = await _openEtSdk.RasterTimeseriesPoint(rasterRequest);
+
+            var yearlyDatapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
+                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
+                .ToArray();
+
+            controlLocationAverageTotalEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
+        }
+
         var results = new List<PolygonEtDataCollection>();
         foreach (var polygon in request.Polygons)
         {
@@ -90,20 +126,37 @@ internal class CalculationEngine : ICalculationEngine
                 .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
-            var averageEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
-            var averageEtInFeet = averageEtInInches / 12;
+            var averageTotalEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
+            var averageTotalEtInFeet = averageTotalEtInInches / 12;
 
             var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(polygonGeo);
-            var averageEtInAcreFeet = averageEtInFeet * polygonAreaInAcres;
+            var averageTotalEtInAcreFeet = averageTotalEtInFeet * polygonAreaInAcres;
 
             var result = new PolygonEtDataCollection
             {
                 PolygonWkt = polygon.PolygonWkt,
                 DrawToolType = polygon.DrawToolType,
-                AverageYearlyTotalEtInInches = averageEtInInches,
-                AverageYearlyTotalEtInAcreFeet = averageEtInAcreFeet,
+                AverageYearlyTotalEtInInches = averageTotalEtInInches,
+                AverageYearlyTotalEtInAcreFeet = averageTotalEtInAcreFeet,
                 Datapoints = yearlyDatapoints
             };
+
+            if (controlLocationAverageTotalEtInInches.HasValue)
+            {
+                // update collection
+                result.AverageYearlyNetEtInInches = result.AverageYearlyTotalEtInInches - controlLocationAverageTotalEtInInches.Value;
+
+                var averageNetEtInFeet = result.AverageYearlyNetEtInInches / 12;
+                result.AverageYearlyNetEtInAcreFeet = averageNetEtInFeet * polygonAreaInAcres;
+
+                // update each datapoint
+                foreach (var datapoint in result.Datapoints)
+                {
+                    datapoint.EffectivePrecipitationInInches = controlLocationAverageTotalEtInInches;
+                    datapoint.NetEtInInches = datapoint.TotalEtInInches - controlLocationAverageTotalEtInInches;
+                }
+            }
+
             results.Add(result);
         }
 
