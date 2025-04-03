@@ -8,8 +8,6 @@ public class ReviewerEstimateConsumptiveUseRequestValidator : AbstractValidator<
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
 
-        RuleFor(x => x.WaterRightNativeId).NotEmpty();
-
         RuleFor(x => x.Polygons).NotEmpty().Must(polygons => polygons.Length <= 20);
         RuleForEach(x => x.Polygons).ChildRules(polygonEntryValidator =>
         {
