@@ -53,7 +53,7 @@ export function SubmitApplicationRecommendationModal(props: SubmitApplicationRec
         <Form>
           <Form.Group>
             <div>Are you sure you want to submit your decision as it relates to this application?</div>
-            <div>Select Status:</div>
+            <div className="mt-3">Select Status:</div>
             <div>
               <Select
                 required
