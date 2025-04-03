@@ -103,7 +103,7 @@ public class ValidationEngineTests : EngineTestBase
             DrawToolType = DrawToolType.Freeform,
         };
 
-        var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseRequest
+        var request = new Contracts.Client.Requests.Conservation.EstimateConsumptiveUseApplicantRequest
         {
             WaterRightNativeId = "xyz",
             WaterConservationApplicationId = applicationIdMatches ? applicationId.Value : Guid.NewGuid(),

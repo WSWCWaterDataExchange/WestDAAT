@@ -52,7 +52,7 @@ public class ApplicationFunction : FunctionBase
 
         var results = request switch
         {
-            EstimateConsumptiveUseRequest applicantRequest => await _applicationManager.Store<EstimateConsumptiveUseRequest, EstimateConsumptiveUseResponse>(applicantRequest),
+            EstimateConsumptiveUseApplicantRequest applicantRequest => await _applicationManager.Store<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseResponse>(applicantRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 

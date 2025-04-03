@@ -2,7 +2,7 @@
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-public class EstimateConsumptiveUseRequest : ApplicationStoreRequestBase
+public class EstimateConsumptiveUseApplicantRequest : ApplicationStoreRequestBase
 {
     public Guid WaterConservationApplicationId { get; set; }
 
