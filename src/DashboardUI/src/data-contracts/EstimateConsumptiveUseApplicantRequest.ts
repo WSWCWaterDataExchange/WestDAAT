@@ -3,6 +3,7 @@ import { CompensationRateUnits } from './CompensationRateUnits';
 import { MapPolygon } from './MapPolygon';
 
 export interface EstimateConsumptiveUseApplicantRequest extends ApplicationStoreRequestBase {
+  $type: 'EstimateConsumptiveUseApplicantRequest';
   waterConservationApplicationId: string;
   waterRightNativeId: string;
   polygons: MapPolygon[];

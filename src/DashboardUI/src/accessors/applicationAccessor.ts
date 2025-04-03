@@ -74,6 +74,7 @@ export const estimateConsumptiveUse = async (
   },
 ): Promise<EstimateConsumptiveUseApplicantResponse> => {
   const request: EstimateConsumptiveUseApplicantRequest = {
+    $type: 'EstimateConsumptiveUseApplicantRequest',
     waterConservationApplicationId: fields.waterConservationApplicationId,
     waterRightNativeId: fields.waterRightNativeId,
     polygons: fields.polygons,
