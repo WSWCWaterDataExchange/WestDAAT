@@ -248,18 +248,20 @@ describe('ConservationApplicationState reducer', () => {
     newState = reducer(newState, {
       type: 'CONSUMPTIVE_USE_ESTIMATED',
       payload: {
-        totalAverageYearlyEtAcreFeet: 100,
+        cumulativeTotalEtInAcreFeet: 100,
         conservationPayment: 200,
         dataCollections: [
           {
             waterConservationApplicationEstimateLocationId: 'location-guid',
             polygonWkt: polygonWkt,
-            averageYearlyEtInAcreFeet: 50,
-            averageYearlyEtInInches: 400,
+            averageYearlyTotalEtInAcreFeet: 50,
+            averageYearlyTotalEtInInches: 400,
             datapoints: [
               {
                 year: 2025,
-                etInInches: 400,
+                totalEtInInches: 400,
+                effectivePrecipitationInInches: null,
+                netEtInInches: null,
               },
             ],
           },
@@ -268,7 +270,7 @@ describe('ConservationApplicationState reducer', () => {
     });
 
     // Assert
-    expect(newState.conservationApplication.totalAverageYearlyEtAcreFeet).toEqual(100);
+    expect(newState.conservationApplication.cumulativeTotalEtInAcreFeet).toEqual(100);
     expect(newState.conservationApplication.conservationPayment).toEqual(200);
     expect(newState.conservationApplication.estimateLocations.length).toEqual(1);
     expect(newState.conservationApplication.estimateLocations[0].datapoints!.length).toEqual(1);
@@ -605,18 +607,20 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },
@@ -660,8 +664,8 @@ describe('ConservationApplicationState reducer', () => {
 
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.totalAverageYearlyEtAcreFeet).toEqual(
-        applicationDetails.estimate.totalAverageYearlyConsumptionEtAcreFeet,
+      expect(application.cumulativeTotalEtInAcreFeet).toEqual(
+        applicationDetails.estimate.cumulativeTotalEtInAcreFeet,
       );
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 
@@ -681,7 +685,7 @@ describe('ConservationApplicationState reducer', () => {
       const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
       expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
       expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
-      expect(consumptiveUse.etInInches).toEqual(expectedConsumptiveUse.etInInches);
+      expect(consumptiveUse.totalEtInInches).toEqual(expectedConsumptiveUse.totalEtInInches);
 
       // application supporting documents
       const document = application.supportingDocuments[0];
@@ -767,18 +771,20 @@ describe('ConservationApplicationState reducer', () => {
       newState = reducer(newState, {
         type: 'CONSUMPTIVE_USE_ESTIMATED',
         payload: {
-          totalAverageYearlyEtAcreFeet: 100,
+          cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
           dataCollections: [
             {
               waterConservationApplicationEstimateLocationId: 'location-guid',
               polygonWkt: polygonWkt,
-              averageYearlyEtInAcreFeet: 50,
-              averageYearlyEtInInches: 400,
+              averageYearlyTotalEtInAcreFeet: 50,
+              averageYearlyTotalEtInInches: 400,
               datapoints: [
                 {
                   year: 2025,
-                  etInInches: 400,
+                  totalEtInInches: 400,
+                  effectivePrecipitationInInches: null,
+                  netEtInInches: null,
                 },
               ],
             },

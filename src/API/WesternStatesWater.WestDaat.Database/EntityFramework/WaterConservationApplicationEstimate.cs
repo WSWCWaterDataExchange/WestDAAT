@@ -6,7 +6,6 @@ public class WaterConservationApplicationEstimate
 {
     public WaterConservationApplicationEstimate()
     {
-
     }
 
     public Guid Id { get; set; }
@@ -25,7 +24,9 @@ public class WaterConservationApplicationEstimate
 
     public int EstimatedCompensationDollars { get; set; }
 
-    public double TotalAverageYearlyConsumptionEtAcreFeet { get; set; }
+    public double CumulativeTotalEtInAcreFeet { get; set; }
+
+    public double? CumulativeNetEtInAcreFeet { get; set; }
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
 

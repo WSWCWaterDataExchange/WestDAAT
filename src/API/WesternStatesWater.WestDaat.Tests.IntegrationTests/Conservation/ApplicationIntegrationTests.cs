@@ -170,7 +170,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var rejectedAppResponse = new ApplicationDashboardListItem
@@ -186,7 +186,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appTwo.WaterRightNativeId,
             WaterRightState = rejectedApp.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var inReviewAppResponse = new ApplicationDashboardListItem
@@ -202,7 +202,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
             TotalObligationDollars = inReviewEstimate.EstimatedCompensationDollars,
-            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.TotalAverageYearlyConsumptionEtAcreFeet
+            TotalWaterVolumeSavingsAcreFeet = inReviewEstimate.CumulativeTotalEtInAcreFeet
         };
 
         var orgUserOrganizationRoles = new[]
@@ -264,8 +264,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         foreach (var location in locations)
         {
-            var consumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(location).Generate(2);
-            await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(consumptiveUses);
+            var locationWaterMeasurements = new LocationWaterMeasurementFaker(location).Generate(2);
+            await _dbContext.LocationWaterMeasurements.AddRangeAsync(locationWaterMeasurements);
         }
 
         var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
@@ -328,6 +328,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
 
+        // sanity checks: these should all be covered by the `BeEquivalentTo` comparisons, but we're performing them just in case
+
+        // verify that new fields are included in response
+        reviewerResponse.Application.Estimate.Locations.All(loc =>
+            loc.ConsumptiveUses.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
+        ).Should().BeTrue();
+
         // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
         {
@@ -374,7 +381,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
             await wadeDb.SaveChangesAsync();
 
-            _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses);
+            _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
             _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
             _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
             _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
@@ -422,9 +429,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             {
                 estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
                 var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
-                var estimateLocationConsumptiveUses = new WaterConservationApplicationEstimateLocationConsumptiveUseFaker(estimateLocation).Generate(12);
+                var estimateLocationConsumptiveUses = new LocationWaterMeasurementFaker(estimateLocation).Generate(12);
 
-                await _dbContext.WaterConservationApplicationEstimateLocationConsumptiveUses.AddRangeAsync(estimateLocationConsumptiveUses);
+                await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -498,14 +505,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
 
             // verify response calculations are correct
-            const int knownAvgYearlyEtInches = 60;
-            var knownAvgYearlyEtFeet = knownAvgYearlyEtInches / 12;
+            const int knownAvgYearlyTotalEtInInches = 60;
+            var knownAvgYearlyEtFeet = knownAvgYearlyTotalEtInInches / 12;
             var expectedAvgYearlyEtAcreFeet = knownAvgYearlyEtFeet * memorialStadiumApproximateAreaInAcres;
-            response.TotalAverageYearlyEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+            response.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
             if (requestShouldIncludeCompensationInfo)
             {
-                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.TotalAverageYearlyEtAcreFeet;
+                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.CumulativeTotalEtInAcreFeet;
                 response.ConservationPayment.Should().NotBeNull();
                 response.ConservationPayment.Should().Be((int)expectedConservationPayment);
             }
@@ -548,7 +555,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.CompensationRateDollars.Should().Be(request.CompensationRateDollars);
                 dbEstimate.CompensationRateUnits.Should().Be(request.Units.Value);
                 dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
-                dbEstimate.TotalAverageYearlyConsumptionEtAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
+                dbEstimate.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedAvgYearlyEtAcreFeet, 0.01);
 
                 dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
                 dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
@@ -562,7 +569,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     var yearMatches = consumptiveUse.Year >= startYear && consumptiveUse.Year < startYear + yearRange;
                     return yearMatches;
                 }).Should().BeTrue();
-                dbEstimateLocationConsumptiveUses.Select(cu => cu.EtInInches).Sum().Should().Be(knownAvgYearlyEtInches);
+                dbEstimateLocationConsumptiveUses.Select(cu => cu.TotalEtInInches).Sum().Should().Be(knownAvgYearlyTotalEtInInches);
 
                 if (shouldInitializePreviousEstimate)
                 {

@@ -1,8 +1,8 @@
 ﻿namespace WesternStatesWater.WestDaat.Database.EntityFramework;
 
-public class WaterConservationApplicationEstimateLocationConsumptiveUse
+public class LocationWaterMeasurement
 {
-    public WaterConservationApplicationEstimateLocationConsumptiveUse()
+    public LocationWaterMeasurement()
     {
 
     }
@@ -13,7 +13,11 @@ public class WaterConservationApplicationEstimateLocationConsumptiveUse
 
     public int Year { get; set; }
 
-    public double EtInInches { get; set; }
+    public double TotalEtInInches { get; set; }
+
+    public double? EffectivePrecipitationInInches { get; set; } = null!;
+
+    public double? NetEtInInches { get; set; } = null!;
 
     public virtual WaterConservationApplicationEstimateLocation Location { get; set; } = null!;
 }

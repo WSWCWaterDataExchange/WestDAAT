@@ -314,12 +314,14 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate))
                 .ForMember(dest => dest.WaterRightState, opt => opt.MapFrom(src => src.Submission.WaterRightState))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.Estimate.EstimatedCompensationDollars))
-                .ForMember(dest => dest.TotalAverageYearlyConsumptionEtAcreFeet, opt => opt.MapFrom(src => src.Estimate.TotalAverageYearlyConsumptionEtAcreFeet));
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.Estimate.CumulativeTotalEtInAcreFeet));
 
-            CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse>()
+            CreateMap<ApplicationEstimateStoreLocationConsumptiveUseDetails, EFWD.LocationWaterMeasurement>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.Ignore())
-                .ForMember(dest => dest.Location, opt => opt.Ignore());
+                .ForMember(dest => dest.Location, opt => opt.Ignore())
+                .ForMember(dest => dest.EffectivePrecipitationInInches, opt => opt.Ignore())
+                .ForMember(dest => dest.NetEtInInches, opt => opt.Ignore());
 
             CreateMap<ApplicationEstimateStoreLocationDetails, EFWD.WaterConservationApplicationEstimateLocation>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -333,7 +335,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.WaterConservationApplication, opt => opt.Ignore())
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.DesiredCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
-                .ForMember(dest => dest.TotalAverageYearlyConsumptionEtAcreFeet, opt => opt.MapFrom(src => src.TotalAverageYearlyEtAcreFeet));
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.CumulativeTotalEtInAcreFeet))
+                .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationCreateRequest, EFWD.WaterConservationApplication>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -413,7 +416,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
 
-            CreateMap<EFWD.WaterConservationApplicationEstimateLocationConsumptiveUse, ConsumptiveUseDetails>();
+            CreateMap<EFWD.LocationWaterMeasurement, ConsumptiveUseDetails>();
 
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
 
