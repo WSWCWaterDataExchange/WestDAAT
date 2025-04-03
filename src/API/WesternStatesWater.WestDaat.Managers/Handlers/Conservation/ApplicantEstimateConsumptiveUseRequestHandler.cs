@@ -9,7 +9,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<EstimateConsumptiveUseApplicantRequest, EstimateConsumptiveUseApplicantResponse>
+public class ApplicantEstimateConsumptiveUseRequestHandler : IRequestHandler<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>
 {
     public ICalculationEngine CalculationEngine { get; }
     public IOpenEtSdk OpenEtSdk { get; }
@@ -17,7 +17,7 @@ public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<Est
     public IOrganizationAccessor OrganizationAccessor { get; }
     public IWaterAllocationAccessor WaterAllocationAccessor { get; }
 
-    public EstimateConsumptiveUseApplicantRequestHandler(ICalculationEngine calculationEngine,
+    public ApplicantEstimateConsumptiveUseRequestHandler(ICalculationEngine calculationEngine,
         IOpenEtSdk openEtSdk,
         IApplicationAccessor applicationAccessor,
         IOrganizationAccessor organizationAccessor,
@@ -30,7 +30,7 @@ public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<Est
         WaterAllocationAccessor = waterAllocationAccessor;
     }
 
-    public async Task<EstimateConsumptiveUseApplicantResponse> Handle(EstimateConsumptiveUseApplicantRequest request)
+    public async Task<ApplicantEstimateConsumptiveUseResponse> Handle(ApplicantEstimateConsumptiveUseRequest request)
     {
         var waterRightFundingOrgDetails = await WaterAllocationAccessor.GetWaterRightFundingOrgDetailsByUuid(request.WaterRightNativeId);
 
@@ -66,7 +66,7 @@ public class EstimateConsumptiveUseApplicantRequestHandler : IRequestHandler<Est
             }
         }
 
-        return new EstimateConsumptiveUseApplicantResponse
+        return new ApplicantEstimateConsumptiveUseResponse
         {
             ConservationPayment = estimateConservationPaymentResponse?.EstimatedCompensationDollars,
             CumulativeTotalEtInAcreFeet = multiPolygonYearlyEtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),

@@ -5,7 +5,7 @@ namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
 [JsonDerivedType(typeof(WaterConservationApplicationSubmissionRequest), typeDiscriminator: nameof(WaterConservationApplicationSubmissionRequest))]
 [JsonDerivedType(typeof(WaterConservationApplicationRecommendationRequest), typeDiscriminator: nameof(WaterConservationApplicationRecommendationRequest))]
-[JsonDerivedType(typeof(EstimateConsumptiveUseApplicantRequest), typeDiscriminator: nameof(EstimateConsumptiveUseApplicantRequest))]
+[JsonDerivedType(typeof(ApplicantEstimateConsumptiveUseRequest), typeDiscriminator: nameof(ApplicantEstimateConsumptiveUseRequest))]
 public class ApplicationStoreRequestBase : RequestBase
 {
 }

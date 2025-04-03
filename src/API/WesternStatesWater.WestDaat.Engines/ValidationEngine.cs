@@ -168,7 +168,7 @@ internal class ValidationEngine : IValidationEngine
     {
         return request switch
         {
-            EstimateConsumptiveUseApplicantRequest req => await ValidateEstimateConsumptiveUseApplicantRequest(req, context),
+            ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -193,7 +193,7 @@ internal class ValidationEngine : IValidationEngine
         };
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseApplicantRequest(EstimateConsumptiveUseApplicantRequest request,
+    private async Task<ErrorBase> ValidateApplicantEstimateConsumptiveUseRequest(ApplicantEstimateConsumptiveUseRequest request,
         ContextBase context)
     {
         // verify user requesting an estimate is linking it to an application they own
@@ -227,7 +227,7 @@ internal class ValidationEngine : IValidationEngine
             {
                 if (polygonGeometries[i].Intersects(polygonGeometries[j]))
                 {
-                    return CreateValidationError(request, nameof(EstimateConsumptiveUseApplicantRequest.Polygons), "Polygons must not intersect.");
+                    return CreateValidationError(request, nameof(ApplicantEstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
                 }
             }
         }

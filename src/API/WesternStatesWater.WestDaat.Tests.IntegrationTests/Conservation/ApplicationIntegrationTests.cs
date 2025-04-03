@@ -471,7 +471,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             });
 
             var requestedCompensationPerAcreFoot = 1000;
-            var request = new EstimateConsumptiveUseApplicantRequest
+            var request = new ApplicantEstimateConsumptiveUseRequest
             {
                 WaterConservationApplicationId = application.Id,
                 WaterRightNativeId = application.WaterRightNativeId,
@@ -494,8 +494,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             // Act
             var response = await _applicationManager.Store<
-                EstimateConsumptiveUseApplicantRequest,
-                EstimateConsumptiveUseApplicantResponse>(
+                ApplicantEstimateConsumptiveUseRequest,
+                ApplicantEstimateConsumptiveUseResponse>(
                 request);
 
 
@@ -627,7 +627,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         UseAnonymousContext();
 
-        var request = new EstimateConsumptiveUseApplicantRequest
+        var request = new ApplicantEstimateConsumptiveUseRequest
         {
             WaterConservationApplicationId = application.Id,
             WaterRightNativeId = application.WaterRightNativeId,
@@ -643,8 +643,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Act
         var response = await _applicationManager.Store<
-            EstimateConsumptiveUseApplicantRequest,
-            EstimateConsumptiveUseApplicantResponse>(
+            ApplicantEstimateConsumptiveUseRequest,
+            ApplicantEstimateConsumptiveUseResponse>(
             request);
 
         // Assert
