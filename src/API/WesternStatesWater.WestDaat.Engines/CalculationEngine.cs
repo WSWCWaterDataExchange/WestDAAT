@@ -1,4 +1,5 @@
-﻿using WesternStatesWater.WestDaat.Common.DataContracts;
+﻿using NetTopologySuite.Geometries;
+using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Engines;
@@ -68,7 +69,7 @@ internal class CalculationEngine : ICalculationEngine
         var results = new List<PolygonEtDataCollection>();
         foreach (var polygon in request.Polygons)
         {
-            var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygon.PolygonWkt);
+            var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygon.PolygonWkt) as Polygon;
 
             var rasterRequest = new RasterTimeSeriesPolygonRequest
             {
