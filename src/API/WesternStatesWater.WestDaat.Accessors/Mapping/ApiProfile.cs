@@ -384,7 +384,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt => opt.MapFrom(src => src.RecommendationDecision == RecommendationDecision.For ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
                 .ForMember(dest => dest.RecommendedAgainstDate,
                     opt => opt.MapFrom(src => src.RecommendationDecision == RecommendationDecision.Against ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
-                
+
             CreateMap<WaterConservationApplicationRecommendationRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
@@ -404,6 +404,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, ApplicationEstimateLocationDetails>()
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
+
+            // todo: is this mapping needed?
+            CreateMap<EFWD.WaterConservationApplicationEstimateControlLocation, ApplicationEstimateControlLocationDetails>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateControlLocationId, opt => opt.MapFrom(src => src.Id));
 
             CreateMap<EFWD.WaterConservationApplication, ApplicationDetails>()
                 .ForMember(dest => dest.Notes, opt =>
