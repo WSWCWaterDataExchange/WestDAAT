@@ -2,7 +2,7 @@ import { ApplicationStoreRequestBase } from './ApplicationStoreRequestBase';
 import { CompensationRateUnits } from './CompensationRateUnits';
 import { MapPolygon } from './MapPolygon';
 
-export interface EstimateConsumptiveUseRequest extends ApplicationStoreRequestBase {
+export interface EstimateConsumptiveUseApplicantRequest extends ApplicationStoreRequestBase {
   waterConservationApplicationId: string;
   waterRightNativeId: string;
   polygons: MapPolygon[];
