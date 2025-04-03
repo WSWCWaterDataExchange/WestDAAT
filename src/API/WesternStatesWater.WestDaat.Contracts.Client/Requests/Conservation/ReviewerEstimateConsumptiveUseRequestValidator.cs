@@ -2,9 +2,9 @@
 
 namespace WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 
-public class EstimateConsumptiveUseReviewerRequestValidator : AbstractValidator<EstimateConsumptiveUseReviewerRequest>
+public class ReviewerEstimateConsumptiveUseRequestValidator : AbstractValidator<ReviewerEstimateConsumptiveUseRequest>
 {
-    public EstimateConsumptiveUseReviewerRequestValidator()
+    public ReviewerEstimateConsumptiveUseRequestValidator()
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
 

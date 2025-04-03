@@ -53,7 +53,7 @@ public class ApplicationFunction : FunctionBase
         ApplicationStoreResponseBase results = request switch
         {
             ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager.Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
-            EstimateConsumptiveUseReviewerRequest reviewerRequest => await _applicationManager.Store<EstimateConsumptiveUseReviewerRequest, EstimateConsumptiveUseReviewerResponse>(reviewerRequest),
+            ReviewerEstimateConsumptiveUseRequest reviewerRequest => await _applicationManager.Store<ReviewerEstimateConsumptiveUseRequest, ReviewerEstimateConsumptiveUseResponse>(reviewerRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 

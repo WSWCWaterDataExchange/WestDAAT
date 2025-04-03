@@ -169,7 +169,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
-            EstimateConsumptiveUseReviewerRequest req => await ValidateEstimateConsumptiveUseReviewerRequest(req, context),
+            ReviewerEstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseReviewerRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -236,7 +236,7 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseReviewerRequest(EstimateConsumptiveUseReviewerRequest request, ContextBase context)
+    private async Task<ErrorBase> ValidateEstimateConsumptiveUseReviewerRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
     {
         // user must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
@@ -270,14 +270,14 @@ internal class ValidationEngine : IValidationEngine
         {
             if (controlLocationGeometry.Within(polygonGeometries[i]))
             {
-                return CreateValidationError(request, nameof(EstimateConsumptiveUseReviewerRequest.ControlLocation), "Control Location must not intersect with any polygons.");
+                return CreateValidationError(request, nameof(ReviewerEstimateConsumptiveUseRequest.ControlLocation), "Control Location must not intersect with any polygons.");
             }
 
             for (int j = i + 1; j < polygonGeometries.Length; j++)
             {
                 if (polygonGeometries[i].Intersects(polygonGeometries[j]))
                 {
-                    return CreateValidationError(request, nameof(EstimateConsumptiveUseReviewerRequest.Polygons), "Polygons must not intersect.");
+                    return CreateValidationError(request, nameof(ReviewerEstimateConsumptiveUseRequest.Polygons), "Polygons must not intersect.");
                 }
             }
         }
