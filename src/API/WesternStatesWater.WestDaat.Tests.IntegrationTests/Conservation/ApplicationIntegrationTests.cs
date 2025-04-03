@@ -314,7 +314,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
         applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
-            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+            .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
 
@@ -323,7 +323,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
-            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+            .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
@@ -524,17 +524,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // verify db entries were either created, created and overwritten, or not created at all
             var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
                 .Include(estimate => estimate.Locations)
-                .ThenInclude(location => location.ConsumptiveUses)
+                .ThenInclude(location => location.WaterMeasurements)
                 .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
             var dbEstimateLocation = dbEstimate?.Locations.First();
-            var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.ConsumptiveUses;
+            var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.WaterMeasurements;
 
             if (requestShouldIncludeCompensationInfo)
             {
                 // verify db entries were created successfully
                 dbEstimate.Should().NotBeNull();
                 dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
-                dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
+                dbEstimate.Locations.First().WaterMeasurements.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
 
                 // verify db fields all match expectations
                 dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
@@ -578,7 +578,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
                     dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
 
-                    var previousConsumptiveUsesIds = estimate.Locations.First().ConsumptiveUses.Select(cu => cu.Id).ToHashSet();
+                    var previousConsumptiveUsesIds = estimate.Locations.First().WaterMeasurements.Select(cu => cu.Id).ToHashSet();
                     dbEstimateLocationConsumptiveUses.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
                         .Should().BeFalse();
                 }

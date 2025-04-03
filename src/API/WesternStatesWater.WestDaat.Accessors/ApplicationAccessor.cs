@@ -205,13 +205,13 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         var existingEntity = await db.WaterConservationApplicationEstimates
             .AsNoTracking()
             .Include(estimate => estimate.Locations)
-            .ThenInclude(location => location.ConsumptiveUses)
+            .ThenInclude(location => location.WaterMeasurements)
             .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
 
         if (existingEntity != null)
         {
             db.LocationWaterMeasurements
-                .RemoveRange(existingEntity.Locations.SelectMany(location => location.ConsumptiveUses));
+                .RemoveRange(existingEntity.Locations.SelectMany(location => location.WaterMeasurements));
 
             db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
 
@@ -338,9 +338,9 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ThenInclude(sub => sub.SubmissionNotes)
             .Where(a => a.Id == request.WaterConservationApplicationId)
             .SingleAsync();
-        
+
         DtoMapper.Map(request, application.Submission);
-        
+
         if (!string.IsNullOrEmpty(request.RecommendationNotes))
         {
             var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
