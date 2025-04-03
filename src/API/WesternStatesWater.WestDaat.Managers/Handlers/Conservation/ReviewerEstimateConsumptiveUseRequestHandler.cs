@@ -50,13 +50,14 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
         if (request.OverwriteEstimate)
         {
             var originalEstimate = applicationDetailsResponse.Application.Estimate;
-            var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((request, evapotranspirationResponse, originalEstimate));
+            var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((originalEstimate, evapotranspirationResponse));
             estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
 
             // store estimate
             var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
                 request,
                 fundingOrgDetailsResponse.Organization,
+                originalEstimate,
                 evapotranspirationResponse,
                 estimateConservationPaymentResponse
             ));
