@@ -204,16 +204,19 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         var existingEntity = await db.WaterConservationApplicationEstimates
             .AsNoTracking()
-            .Include(estimate => estimate.Locations)
-            .ThenInclude(location => location.WaterMeasurements)
+            .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
+            .Include(estimate => estimate.ControlLocations).ThenInclude(controlLocation => controlLocation.WaterMeasurements)
             .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
 
         if (existingEntity != null)
         {
             db.LocationWaterMeasurements
                 .RemoveRange(existingEntity.Locations.SelectMany(location => location.WaterMeasurements));
+            db.ControlLocationWaterMeasurements
+                .RemoveRange(existingEntity.ControlLocations.SelectMany(controlLocation => controlLocation.WaterMeasurements));
 
             db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
+            db.WaterConservationApplicationEstimateControlLocations.RemoveRange(existingEntity.ControlLocations);
 
             db.WaterConservationApplicationEstimates.Remove(existingEntity);
         }
@@ -225,7 +228,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         return new ApplicationEstimateStoreResponse
         {
-            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations)
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations),
+            ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails>(entity.ControlLocations.Single())
         };
     }
 
