@@ -24,5 +24,9 @@ public class ApplicationEstimateStoreRequest : ApplicationStoreRequestBase
 
     required public double CumulativeTotalEtInAcreFeet { get; set; }
 
+    required public double? CumulativeNetEtInAcreFeet { get; set; } = null!;
+
     required public ApplicationEstimateStoreLocationDetails[] Locations { get; set; }
+
+    required public ApplicationEstimateStoreControlLocationDetails ControlLocation { get; set; } = null;
 }
