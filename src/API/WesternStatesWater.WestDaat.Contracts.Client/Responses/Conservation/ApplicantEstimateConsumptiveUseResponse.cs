@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation
 {
-    public class EstimateConsumptiveUseApplicantResponse : ApplicationStoreResponseBase
+    public class ApplicantEstimateConsumptiveUseResponse : ApplicationStoreResponseBase
     {
         /// <summary>
         /// The average yearly estimated total et in acre-feet for all polygons.

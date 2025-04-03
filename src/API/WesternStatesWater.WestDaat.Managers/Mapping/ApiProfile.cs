@@ -171,14 +171,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ReverseMap();
 
             CreateMap<
-                    (ClientContracts.Requests.Conservation.EstimateConsumptiveUseApplicantRequest Request, CommonContracts.OrganizationFundingDetails Organization),
+                    (ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
                     CommonContracts.MultiPolygonYearlyEtRequest>()
                 .ForMember(dest => dest.Polygons, opt => opt.MapFrom(src => src.Request.Polygons))
                 .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
                 .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
                 .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd));
 
-            CreateMap<(ClientContracts.Requests.Conservation.EstimateConsumptiveUseApplicantRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
+            CreateMap<(ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
                     CommonContracts.EstimateConservationPaymentRequest>()
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
@@ -206,7 +206,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 });
 
             CreateMap<(
-                    ClientContracts.Requests.Conservation.EstimateConsumptiveUseApplicantRequest Request,
+                    ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request,
                     CommonContracts.OrganizationFundingDetails Organization,
                     CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
                     CommonContracts.EstimateConservationPaymentResponse PaymentResponse
