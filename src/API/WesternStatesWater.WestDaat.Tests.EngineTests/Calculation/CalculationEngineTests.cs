@@ -106,8 +106,10 @@ public class CalculationEngineTests : EngineTestBase
         }
     }
 
-    [TestMethod]
-    public async Task Calculate_MultiPolygonYearlyEt_MultiplePolygons_MultipleDatapoints_OneYear_ShouldComputeCorrectly()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Calculate_MultiPolygonYearlyEt_MultiplePolygons_MultipleDatapoints_OneYear_ShouldComputeCorrectly(bool shouldIncludeControl)
     {
         // Arrange
         var twentyTwentyFive = DateOnly.FromDateTime(new DateTime(2025, 1, 1));
@@ -165,6 +167,21 @@ public class CalculationEngineTests : EngineTestBase
                 ]
             });
 
+        if (shouldIncludeControl)
+        {
+            _openEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<RasterTimeSeriesPointRequest>()))
+                .ReturnsAsync(new RasterTimeSeriesPointResponse
+                {
+                    Data = [
+                        new()
+                        {
+                            Evapotranspiration = 1.0,
+                            Time = twentyTwentyFive
+                        }
+                    ]
+                });
+        }
+
         var request = new MultiPolygonYearlyEtRequest
         {
             DateRangeStart = DateOnly.MinValue,
@@ -182,7 +199,13 @@ public class CalculationEngineTests : EngineTestBase
                     PolygonWkt = arbitraryValidPolygonWkt2,
                     DrawToolType = DrawToolType.Freeform,
                 }
-            ]
+            ],
+            ControlLocation = shouldIncludeControl
+                ? new MapPoint
+                {
+                    PointWkt = arbitraryValidPointWKt
+                }
+                : null
         };
 
         // Act
@@ -206,6 +229,24 @@ public class CalculationEngineTests : EngineTestBase
         // avg: 45.21 inches / 1 year = 45.21 inches
         response.DataCollections[1].AverageYearlyTotalEtInInches.Should().Be(45.21);
         response.DataCollections[1].Datapoints.Length.Should().Be(1); // only one year of data
+
+        if (shouldIncludeControl)
+        {
+            foreach (var collection in response.DataCollections)
+            {
+                // collections should have net et
+                collection.AverageYearlyNetEtInInches.Should().Be(
+                    collection.AverageYearlyTotalEtInInches - 1.0
+                );
+
+                // data points should have precipitation, net et
+                foreach (var datapoint in collection.Datapoints)
+                {
+                    datapoint.EffectivePrecipitationInInches.Should().Be(1);
+                    datapoint.NetEtInInches.Should().Be(datapoint.TotalEtInInches - datapoint.EffectivePrecipitationInInches);
+                }
+            }
+        }
     }
 
     [TestMethod]
