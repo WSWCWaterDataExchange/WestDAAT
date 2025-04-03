@@ -3,7 +3,7 @@
 public class MapPolygon
 {
     /// <summary>
-    /// Polygon(s) in "Well-known text" (WKT) format.
+    /// Polygon in "Well-known text" (WKT) format.
     /// <br />
     /// <see href="https://libgeos.org/specifications/wkt/">WKT Format Specification</see>.
     /// </summary>
