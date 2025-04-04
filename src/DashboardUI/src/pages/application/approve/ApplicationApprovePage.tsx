@@ -12,6 +12,8 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
+import ApplicationFormSection from '../components/ApplicationFormSection';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -57,6 +59,7 @@ export function ApplicationApprovePage() {
               <ApplicationDocumentSection readOnly={true} />
               <ApplicationReviewPipelineSection />
               <ApplicationReviewersNotesSection />
+              <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
                 isFormSubmitting={submittingAppDecision}
                 handleAcceptClicked={handleAcceptClicked}
