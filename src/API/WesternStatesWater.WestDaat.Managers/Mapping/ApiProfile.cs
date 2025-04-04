@@ -214,6 +214,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<CommonContracts.GeometryEtDatapoint, ClientContracts.GeometryEtDatapoint>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
+            CreateMap<CommonContracts.PointEtDataCollection, ClientContracts.PointEtDataCollection>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, CommonContracts.ApplicationEstimateStoreLocationDetails>()
                 .ConvertUsing((src, dest) =>
