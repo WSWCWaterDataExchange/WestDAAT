@@ -9,10 +9,14 @@ interface ApplicationDocumentSectionProps {
 function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
   const { readOnly } = props;
 
+  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
   return (
-    <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
-      {readOnly ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
-    </ApplicationFormSection>
+    <>
+      {readOnly && sectionRule}
+      <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
+        {readOnly ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
+      </ApplicationFormSection>
+    </>
   );
 }
 

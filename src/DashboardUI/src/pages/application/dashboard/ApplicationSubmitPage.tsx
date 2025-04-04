@@ -77,6 +77,8 @@ export function ApplicationSubmitPage() {
     await submitApplicationMutation.mutateAsync();
   };
 
+  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -88,36 +90,23 @@ export function ApplicationSubmitPage() {
       />
 
       <div className="overflow-y-auto">
-        <div className="d-flex gap-3 mb-4">
-          {isApplicationLoading || isFundingOrganizationLoading ? (
-            <Placeholder as="div" animation="glow" className="h-100 w-100">
-              <Placeholder xs={12} className="h-100 w-25 rounded" />
-            </Placeholder>
-          ) : (
-            <ApplicationReviewHeader />
+        <div className="container">
+          <ApplicationReviewHeader />
+          <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
+          <ApplicationDocumentSection readOnly={true} />
+
+          {state.isCreatingApplication && (
+            <>
+              {sectionRule}
+
+              <div className="d-flex justify-content-end p-3">
+                <Button variant="success" type="button" onClick={presentConfirmationModal}>
+                  Submit
+                </Button>
+              </div>
+            </>
           )}
         </div>
-
-        <ApplicationSubmissionFormDisplay
-          submitApplication={presentConfirmationModal}
-          isLoading={isApplicationLoading || isFundingOrganizationLoading}
-        />
-
-        <hr className="text-primary" style={{ borderWidth: 2 }} />
-
-        <ApplicationDocumentSection readOnly={true} />
-
-        {state.isCreatingApplication && (
-          <>
-            <hr className="text-primary" style={{ borderWidth: 2 }} />
-
-            <div className="d-flex justify-content-end p-3">
-              <Button variant="success" type="button" onClick={presentConfirmationModal}>
-                Submit
-              </Button>
-            </div>
-          </>
-        )}
       </div>
 
       <ConfirmationModal

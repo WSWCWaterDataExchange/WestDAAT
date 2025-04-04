@@ -38,12 +38,8 @@ export function ApplicationApprovePage() {
           <>
             <div className="container">
               <ApplicationReviewHeader />
-              <ApplicationSubmissionFormDisplay
-                isLoading={isApplicationLoading || isFundingOrganizationLoading}
-                submitApplication={() => {}}
-              />
+              <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
               <ApplicationDocumentSection readOnly={true} />
-
               <ApplicationReviewPipelineSection />
               <ApplicationReviewersNotesSection />
             </div>

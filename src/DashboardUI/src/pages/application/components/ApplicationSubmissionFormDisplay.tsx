@@ -18,7 +18,6 @@ const responsiveHalfWidthDefault = 'col-lg-6 col-12';
 
 interface ApplicationSubmissionFormDisplayProps {
   isLoading: boolean;
-  submitApplication: () => void;
 }
 
 // readonly / display-only version of the `ApplicationSubmissionForm` component
@@ -28,10 +27,11 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
   const polygonData = state.conservationApplication.estimateLocations;
 
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
+  // TODO: JN - extract this into a separate component
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
   return (
-    <main className="">
+    <main>
       <div>
         <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
