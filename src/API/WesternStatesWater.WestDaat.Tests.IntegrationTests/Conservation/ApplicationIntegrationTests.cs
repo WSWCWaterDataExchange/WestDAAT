@@ -380,7 +380,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
             await wadeDb.SaveChangesAsync();
 
+            _dbContext.ControlLocationWaterMeasurements.RemoveRange(_dbContext.ControlLocationWaterMeasurements);
             _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
+            _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
             _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
             _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
             _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
