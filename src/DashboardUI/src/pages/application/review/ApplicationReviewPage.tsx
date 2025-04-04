@@ -1,13 +1,10 @@
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
-import { ApplicationReviewPerspective } from '../../../data-contracts/ApplicationReviewPerspective';
 import { useMemo } from 'react';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import Alert from 'react-bootstrap/esm/Alert';
-
-const perspective: ApplicationReviewPerspective = 'reviewer';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
@@ -37,7 +34,9 @@ function ApplicationReviewPage() {
       <ApplicationNavbar
         navigateBack={navigateBack}
         backButtonText={backButtonText}
-        centerText="Water Conservation Estimation Tool"
+        centerText="Application Review"
+        centerTextIsLoading={false}
+        displayWaterIcon={false}
       />
 
       <div className="overflow-y-auto">
@@ -47,7 +46,7 @@ function ApplicationReviewPage() {
           !state.loadFundingOrganizationErrored && (
             <>
               <div className="container">
-                <ApplicationReviewHeader perspective={perspective} />
+                <ApplicationReviewHeader />
               </div>
 
               <Outlet />
