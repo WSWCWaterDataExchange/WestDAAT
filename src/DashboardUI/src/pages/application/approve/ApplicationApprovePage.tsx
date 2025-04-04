@@ -1,13 +1,12 @@
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import Alert from 'react-bootstrap/esm/Alert';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
-import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 
 export function ApplicationApprovePage() {

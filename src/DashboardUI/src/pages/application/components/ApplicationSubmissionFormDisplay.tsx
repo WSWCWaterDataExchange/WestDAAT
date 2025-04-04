@@ -1,5 +1,4 @@
-import Button from 'react-bootstrap/esm/Button';
-import Placeholder from 'react-bootstrap/esm/Placeholder';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import {
@@ -9,8 +8,6 @@ import {
 import { formatDateString, formatNumber } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 import FormElementDisplay from './FormElementDisplay';
-import ApplicationDocumentSection from './ApplicationDocumentSection';
-import ApplicationReviewHeader from './ApplicationReviewHeader';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
@@ -25,10 +22,6 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
   const { state } = useConservationApplicationContext();
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
-
-  // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
-  // TODO: JN - extract this into a separate component
-  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
   return (
     <main>
@@ -63,7 +56,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </ApplicationFormSection>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <ApplicationFormSection
           title="Representative / Agent Contact Information"
@@ -87,7 +80,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </ApplicationFormSection>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <div className="row">
           <ApplicationFormSection
@@ -123,7 +116,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </div>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <ApplicationFormSection
           title="Canal Company / Irrigation District"
@@ -150,7 +143,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </ApplicationFormSection>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <ApplicationFormSection title="Water Right Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
@@ -185,7 +178,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </ApplicationFormSection>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <ApplicationFormSection title="Estimation Summary" isLoading={props.isLoading} loadingFieldCount={5}>
           <div className="row">
@@ -226,7 +219,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
           </div>
         </ApplicationFormSection>
 
-        {sectionRule}
+        <ApplicationFormSectionRule width={2} />
 
         <ApplicationFormSection title="Conservation Plan" isLoading={props.isLoading} loadingFieldCount={2}>
           <div className={`${responsiveOneThirdWidthDefault} mb-4`}>

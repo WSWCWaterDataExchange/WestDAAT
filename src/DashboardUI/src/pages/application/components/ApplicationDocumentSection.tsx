@@ -1,3 +1,4 @@
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { ApplicationDocumentDownload } from './ApplicationDocumentDownload';
 import { ApplicationDocumentUpload } from './ApplicationDocumentUpload';
 import ApplicationFormSection from './ApplicationFormSection';
@@ -9,10 +10,9 @@ interface ApplicationDocumentSectionProps {
 function ApplicationDocumentSection(props: ApplicationDocumentSectionProps) {
   const { readOnly } = props;
 
-  const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
   return (
     <>
-      {readOnly && sectionRule}
+      {readOnly && <ApplicationFormSectionRule width={2} />}
       <ApplicationFormSection title="Supporting Documents (Optional)" className={`col mb-4`}>
         {readOnly ? <ApplicationDocumentDownload /> : <ApplicationDocumentUpload />}
       </ApplicationFormSection>
