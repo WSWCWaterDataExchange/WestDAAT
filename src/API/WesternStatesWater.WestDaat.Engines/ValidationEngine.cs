@@ -261,6 +261,11 @@ internal class ValidationEngine : IValidationEngine
             OrganizationId = applicationExistsResponse.FundingOrganizationId
         });
 
+        if (!permissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
         // control location must not intersect with any polygons
         // polygons must not intersect with each other
         var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
