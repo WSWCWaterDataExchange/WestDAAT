@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
@@ -12,8 +13,6 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
-import ApplicationFormSection from '../components/ApplicationFormSection';
-import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -29,7 +28,6 @@ export function ApplicationApprovePage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const [submittingAppDecision, setSubmittingAppDecision] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
 
@@ -61,7 +59,7 @@ export function ApplicationApprovePage() {
               <ApplicationReviewersNotesSection />
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
-                isFormSubmitting={submittingAppDecision}
+                isFormSubmitting={showAcceptModal || showDenyModal}
                 handleAcceptClicked={handleAcceptClicked}
                 handleDenyClicked={handleDenyClicked}
               />
