@@ -706,8 +706,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             // Arrange
             const int monthsInYear = 12;
-            const int startYear = 2024;
-            const int yearRange = 1;
+            const int startYear = 2015;
+            const int yearRange = 10;
 
             var user = new UserFaker().Generate();
             var organization = new OrganizationFaker()
@@ -732,9 +732,19 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             await _dbContext.WaterConservationApplications.AddAsync(application);
 
-            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            var estimate = new WaterConservationApplicationEstimateFaker(application)
+                .RuleFor(est => est.CompensationRateUnits, () => CompensationRateUnits.AcreFeet)
+                .GenerateMetadataFromOrganization(organization)
+                .Generate();
             var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
-            var estimateLocationConsumptiveUses = new LocationWaterMeasurementFaker(estimateLocation).Generate(12);
+
+            var estimateLocationConsumptiveUses = Enumerable.Range(0, yearRange)
+                .Select(yearOffset =>
+                    new LocationWaterMeasurementFaker(estimateLocation)
+                    .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2014 - 2023
+                    .Generate()
+                )
+                .ToArray();
             await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
 
             var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
@@ -821,30 +831,23 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.Error.Should().BeNull();
 
 
-            // verify response calculations are correct
+            // verify response calculations are correct:
+            // - verify Total ET
             const int locationsCumulativeTotalEtInInches = 60;
             var locationsCumulativeTotalEtInFeet = locationsCumulativeTotalEtInInches / 12;
             var expectedLocationsCumulativeTotalEtInAcreFeet = locationsCumulativeTotalEtInFeet * memorialStadiumApproximateAreaInAcres;
             response.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeTotalEtInAcreFeet, 0.01);
 
+            // - verify Net ET
             const int controlCumulativeTotalEtInInches = 12;
             var locationsCumulativeNetEtInInches = locationsCumulativeTotalEtInInches - controlCumulativeTotalEtInInches;
             var locationsCumulativeNetEtInFeet = locationsCumulativeNetEtInInches / 12;
             var expectedLocationsCumulativeNetEtInAcreFeet = locationsCumulativeNetEtInFeet * memorialStadiumApproximateAreaInAcres;
             response.CumulativeNetEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeNetEtInAcreFeet, 0.01);
 
-            if (shouldOverwriteApplicantsEstimate)
-            {
-                var expectedConservationPayment = requestedCompensationPerAcreFoot * response.CumulativeTotalEtInAcreFeet;
-                response.ConservationPayment.Should().NotBeNull();
-                response.ConservationPayment.Should().Be((int)expectedConservationPayment);
-            }
-            else
-            {
-                // should remain the same as it was before
-                // todo: verify; is this correct, or should it just be null since it wasn't overwritten?
-                response.ConservationPayment.Should().Be(estimate.EstimatedCompensationDollars);
-            }
+            // - verify payment reuses original estimate's desired compensation dollars
+            var expectedConservationPayment = estimate.CompensationRateDollars * response.CumulativeTotalEtInAcreFeet;
+            response.ConservationPayment.Should().Be((int)expectedConservationPayment);
 
             var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
                 .Include(estimate => estimate.Locations)
@@ -860,10 +863,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // * overwritten by the technical reviewer
             dbEstimate.Should().NotBeNull();
             dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
-            dbEstimate.Locations.First().WaterMeasurements.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
+            dbEstimate.Locations.First().WaterMeasurements.Should().HaveCount(yearRange);
 
             // verify db fields all match expectations
             dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
+
+
+            // Model, DateRangeStart, and DateRangeEnd are all populated based on the Organization.
+            // In a real world use case, they should always match regardless of the `OverwriteEstimate` parameter.
+            // For this test, they only match regardless of the `OverwriteEstimate` parameter because we're generating the Estimate
+            // - with the correct data in the first place.
             dbEstimate.Model.Should().Be(organization.OpenEtModel);
             dbEstimate.DateRangeStart.Should().Be(
                 DateOnly.FromDateTime(
@@ -883,21 +892,31 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbEstimate.CompensationRateDollars.Should().Be(estimate.CompensationRateDollars);
             dbEstimate.CompensationRateUnits.Should().Be(estimate.CompensationRateUnits);
 
-            dbEstimate.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeTotalEtInAcreFeet, 0.01);
-
-            dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
-            dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
-            dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
-
-            // double-check that the response data was cross-referenced successfully with the db EstimateLocations
-            response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
-
-            dbEstimateLocationWaterMeasurements.All(waterMeasurement =>
+            if (shouldOverwriteApplicantsEstimate)
             {
-                var yearMatches = waterMeasurement.Year >= startYear && waterMeasurement.Year < startYear + yearRange;
-                return yearMatches;
-            }).Should().BeTrue();
-            dbEstimateLocationWaterMeasurements.Select(cu => cu.TotalEtInInches).Sum().Should().Be(locationsCumulativeTotalEtInInches);
+                // these values are not generated by the faker, so they are only populated on the Estimate
+                // if the Estimate is overwritten.
+                dbEstimate.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeTotalEtInAcreFeet, 0.01);
+                // todo: failing HERE
+                dbEstimate.CumulativeNetEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeNetEtInAcreFeet, 0.01);
+
+
+                // these remaining values are randomly generated, so the Estimate only matches
+                // if the Estimate is overwritten.
+                dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
+                dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
+                dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
+
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations
+                response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+
+                dbEstimateLocationWaterMeasurements.All(waterMeasurement =>
+                {
+                    var yearMatches = waterMeasurement.Year >= startYear && waterMeasurement.Year < startYear + yearRange;
+                    return yearMatches;
+                }).Should().BeTrue();
+                dbEstimateLocationWaterMeasurements.Select(cu => cu.TotalEtInInches).Sum().Should().Be(locationsCumulativeTotalEtInInches);
+            }
 
 
             var previousConsumptiveUsesIds = estimate.Locations.First().WaterMeasurements.Select(cu => cu.Id).ToHashSet();
@@ -907,7 +926,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimate.Id.Should().NotBe(estimate.Id);
 
                 // conservation payment was updated to reflect changed polygons
-                dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment.Value);
+                dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment);
 
                 // location was overwritten
                 dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
