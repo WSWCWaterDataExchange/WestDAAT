@@ -1,5 +1,6 @@
 using WesternStatesWater.WestDaat.Common.DataContracts;
 using WesternStatesWater.WestDaat.Engines;
+using WesternStatesWater.WestDaat.Tests.Helpers;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Tests.EngineTests.Calculation;
@@ -464,7 +465,6 @@ public class CalculationEngineTests : EngineTestBase
         response.Should().NotBeNull();
 
         double expectedCompensation;
-        double onePercentMarginOfError;
         switch (units)
         {
             case CompensationRateUnits.AcreFeet:
@@ -477,19 +477,19 @@ public class CalculationEngineTests : EngineTestBase
                     expectedCompensation = totalEtVolumeInAcreFeet * compensationRateDollars;
                 }
 
-                onePercentMarginOfError = expectedCompensation * 0.01;
-                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
+                ((double)response.EstimatedCompensationDollars).Should().BeWithinPercentOf(expectedCompensation, 1);
                 break;
             case CompensationRateUnits.Acres:
                 expectedCompensation = areaOfAFootballFieldInAcres * compensationRateDollars;
-                onePercentMarginOfError = expectedCompensation * 0.01;
-                ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
+                ((double)response.EstimatedCompensationDollars).Should().BeWithinPercentOf(expectedCompensation, 1);
                 break;
         }
     }
 
-    [TestMethod]
-    public async Task Calculate_EstimateConservationPayment_MultiplePolygons_MultipleETs_Success()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Calculate_EstimateConservationPayment_MultiplePolygons_MultipleETs_Success(bool useNetEt)
     {
         var firstCorner = "-96.70537000 40.82014318";
         var memorialStadium = "POLYGON ((" +
@@ -513,24 +513,28 @@ public class CalculationEngineTests : EngineTestBase
                 {
                     PolygonWkt = memorialStadium,
                     AverageYearlyTotalEtInInches = 12,
+                    AverageYearlyNetEtInInches = useNetEt ? 6 : null,
                     Datapoints = []
                 },
                 new()
                 {
                     PolygonWkt = zeroToOneSquare,
                     AverageYearlyTotalEtInInches = 12,
+                    AverageYearlyNetEtInInches = useNetEt ? 6 : null,
                     Datapoints = []
                 },
                 new()
                 {
                     PolygonWkt = memorialStadium,
                     AverageYearlyTotalEtInInches = 120,
+                    AverageYearlyNetEtInInches = useNetEt ? 60 : null,
                     Datapoints = []
                 },
                 new()
                 {
                     PolygonWkt = zeroToOneSquare,
                     AverageYearlyTotalEtInInches = 120,
+                    AverageYearlyNetEtInInches = useNetEt ? 60 : null,
                     Datapoints = []
                 },
             ]
@@ -542,14 +546,19 @@ public class CalculationEngineTests : EngineTestBase
         // Assert
         response.Should().NotBeNull();
 
+        // Total ET:
         // collection 1: 1ft ET * 1.32 acres * $350 = $462
         // collection 2: 1ft ET * 30621.33 acres * $350 = $10717465.5
         // collection 3: 10ft ET * 1.32 acres * $350 = $4620
         // collection 4: 10ft ET * 30621.33 acres * $350 = $107174655
         // sum: 462 + 10717465.5 + 4620 + 107174655 = 117897202.5
+        const double totalEtExpectedCompensation = 117897202.5;
 
-        var expectedCompensation = 117897202.5;
-        var onePercentMarginOfError = expectedCompensation * 0.01;
-        ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
+        // Net ET - using half of Total ET to make the math easy
+
+        var expectedCompensation = useNetEt
+            ? totalEtExpectedCompensation / 2
+            : totalEtExpectedCompensation;
+        ((double)response.EstimatedCompensationDollars).Should().BeWithinPercentOf(expectedCompensation, 1);
     }
 }
