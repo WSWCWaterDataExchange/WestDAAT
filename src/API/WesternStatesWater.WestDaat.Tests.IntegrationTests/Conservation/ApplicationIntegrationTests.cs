@@ -971,63 +971,67 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         }
     }
 
-    //[TestMethod]
-    //public async Task Store_ReviewerEstimateConsumptiveUse_AsAnonymous_Failure()
-    //{
-    //    // Arrange
-    //    var user = new UserFaker().Generate();
-    //    var organization = new OrganizationFaker().Generate();
-    //    var application = new WaterConservationApplicationFaker(user, organization).Generate();
+    [TestMethod]
+    public async Task Store_ReviewerEstimateConsumptiveUse_AsAnonymous_Failure()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
 
-    //    await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
 
-    //    await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 
-    //    const int startYear = 2024;
-    //    OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
-    //        .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
-    //        {
-    //            Data =
-    //            [
-    //                new Common.DataContracts.RasterTimeSeriesDatapoint
-    //                {
-    //                    Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
-    //                    Evapotranspiration = 5,
-    //                }
-    //            ]
-    //        });
+        const int startYear = 2024;
+        OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<RasterTimeSeriesPolygonRequest>()))
+            .ReturnsAsync(new RasterTimeSeriesPolygonResponse
+            {
+                Data =
+                [
+                    new RasterTimeSeriesDatapoint
+                    {
+                        Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+                        Evapotranspiration = 5,
+                    }
+                ]
+            });
 
-    //    ContextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>())
-    //        .Throws(new InvalidOperationException("User context is required for this operation"));
+        ContextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>())
+            .Throws(new InvalidOperationException("User context is required for this operation"));
 
-    //    UseAnonymousContext();
+        UseAnonymousContext();
 
-    //    var request = new ApplicantEstimateConsumptiveUseRequest
-    //    {
-    //        WaterConservationApplicationId = application.Id,
-    //        WaterRightNativeId = application.WaterRightNativeId,
-    //        Polygons =
-    //        [
-    //            new CLI.MapPolygon
-    //            {
-    //                PolygonWkt = memorialStadiumFootballField,
-    //                DrawToolType = DrawToolType.Freeform,
-    //            }
-    //        ],
-    //    };
+        var request = new ReviewerEstimateConsumptiveUseRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            OverwriteEstimate = false,
+            Polygons =
+            [
+                new CLI.MapPolygon
+                {
+                    PolygonWkt = memorialStadiumFootballField,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
+            ControlLocation = new CLI.MapPoint
+            {
+                PointWkt = "POINT (0 0)",
+            }
+        };
 
-    //    // Act
-    //    var response = await _applicationManager.Store<
-    //        ApplicantEstimateConsumptiveUseRequest,
-    //        ApplicantEstimateConsumptiveUseResponse>(
-    //        request);
+        // Act
+        var response = await _applicationManager.Store<
+            ReviewerEstimateConsumptiveUseRequest,
+            ReviewerEstimateConsumptiveUseResponse>(
+            request);
 
-    //    // Assert
-    //    response.Should().NotBeNull();
-    //    response.Error.Should().NotBeNull();
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
 
-    //    ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
-    //}
+        ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
 
     [TestMethod]
     public async Task Store_CreateWaterConservationApplication_Success()
