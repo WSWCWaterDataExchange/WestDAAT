@@ -53,7 +53,11 @@ internal class CalculationEngine : ICalculationEngine
         foreach (var collection in request.DataCollections)
         {
             var acreage = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(collection.PolygonWkt));
-            var averageEtInFeet = collection.AverageYearlyTotalEtInInches / 12;
+
+            // prefer Net ET if it's been computed, otherwise use Total ET
+            var etMetricToUse = collection.AverageYearlyNetEtInInches ?? collection.AverageYearlyTotalEtInInches;
+
+            var averageEtInFeet = etMetricToUse / 12;
             var averageEtInAcreFeet = averageEtInFeet * acreage;
             estimatedCompensation += averageEtInAcreFeet * request.CompensationRateDollars;
         }
