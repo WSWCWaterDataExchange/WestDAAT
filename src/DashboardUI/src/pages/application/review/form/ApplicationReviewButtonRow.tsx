@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/esm/Button';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 
-export interface ReviewerButtonRowProps {
+export interface ApplicationReviewButtonRowProps {
   isFormDirty: boolean;
   isFormSubmitting: boolean;
   handleCancelClicked: () => void;
@@ -9,7 +9,7 @@ export interface ReviewerButtonRowProps {
   handleSubmitForFinalReviewClicked: () => void;
 }
 
-export function ReviewerButtonRow(props: ReviewerButtonRowProps) {
+export function ApplicationReviewButtonRow(props: ApplicationReviewButtonRowProps) {
   const { isFormDirty, isFormSubmitting, handleCancelClicked, handleSaveClicked, handleSubmitForFinalReviewClicked } =
     props;
   const { state } = useConservationApplicationContext();

@@ -12,7 +12,7 @@ import ApplicationDocumentSection from '../../components/ApplicationDocumentSect
 import ApplicationReviewersNotesSection from '../../components/ApplicationReviewersNotesSection';
 import ApplicationReviewPipelineSection from '../../components/ApplicationReviewPipelineSection';
 import ApplicationSubmissionForm from '../../components/ApplicationSubmissionForm';
-import { ReviewerButtonRow } from './ReviewerButtonRow';
+import { ApplicationReviewButtonRow } from './ApplicationReviewButtonRow';
 import { SaveChangesModal } from './SaveChangesModal';
 import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
@@ -108,7 +108,7 @@ export function ApplicationReviewFormPage() {
       <ApplicationDocumentSection readOnly={false} />
       <ApplicationReviewPipelineSection />
       <ApplicationReviewersNotesSection />
-      <ReviewerButtonRow
+      <ApplicationReviewButtonRow
         isFormDirty={isFormDirty}
         isFormSubmitting={showSubmitRecommendationModal}
         handleCancelClicked={handleCancelClicked}
