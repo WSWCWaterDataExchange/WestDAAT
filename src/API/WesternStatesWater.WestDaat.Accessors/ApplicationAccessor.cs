@@ -229,7 +229,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationEstimateStoreResponse
         {
             Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations),
-            ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails>(entity.ControlLocations.Single())
+            ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails[]>(entity.ControlLocations).SingleOrDefault()
         };
     }
 
