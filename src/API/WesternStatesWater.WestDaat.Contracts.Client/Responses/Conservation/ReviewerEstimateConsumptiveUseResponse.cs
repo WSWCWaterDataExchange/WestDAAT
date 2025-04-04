@@ -15,11 +15,16 @@
         /// <summary>
         /// The total estimated conservation payment in dollars.
         /// </summary>
-        public int? ConservationPayment { get; set; }
+        public int ConservationPayment { get; set; }
 
         /// <summary>
-        /// The average yearly estimated consumptive use in acre-feet per polygon, as well as the yearly data points.
+        /// A summary of estimated consumptive use data per location, along with each location's yearly data points.
         /// </summary>
         public PolygonEtDataCollection[] DataCollections { get; set; }
+
+        /// <summary>
+        /// A summary of estimated consumptive use data for the control location, along with its yearly data points.
+        /// </summary>
+        public PointEtDataCollection ControlDataCollection { get; set; }
     }
 }
