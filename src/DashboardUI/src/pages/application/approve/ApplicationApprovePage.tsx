@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
@@ -8,6 +9,9 @@ import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
+import { ApplicationAcceptModal } from './ApplicationAcceptModal';
+import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
+import { ApplicationDenyModal } from './ApplicationDenyModal';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -22,6 +26,18 @@ export function ApplicationApprovePage() {
   const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
     state.conservationApplication.waterRightNativeId,
   );
+
+  const [submittingAppDecision, setSubmittingAppDecision] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showDenyModal, setShowDenyModal] = useState(false);
+
+  const handleAcceptClicked = () => {
+    setShowAcceptModal(true);
+  };
+
+  const handleDenyClicked = () => {
+    setShowDenyModal(true);
+  };
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -41,6 +57,11 @@ export function ApplicationApprovePage() {
               <ApplicationDocumentSection readOnly={true} />
               <ApplicationReviewPipelineSection />
               <ApplicationReviewersNotesSection />
+              <ApplicationApproveButtonRow
+                isFormSubmitting={submittingAppDecision}
+                handleAcceptClicked={handleAcceptClicked}
+                handleDenyClicked={handleDenyClicked}
+              />
             </div>
           </>
         )}
@@ -52,6 +73,9 @@ export function ApplicationApprovePage() {
             </Alert>
           </div>
         )}
+
+        <ApplicationAcceptModal show={showAcceptModal} onCancel={() => setShowAcceptModal(false)} />
+        <ApplicationDenyModal show={showDenyModal} onCancel={() => setShowDenyModal(false)} />
       </div>
     </div>
   );
