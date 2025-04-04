@@ -9,3 +9,11 @@ public class WaterConservationApplicationSubmittedEventValidator : AbstractValid
         RuleFor(x => x.ApplicationId).NotEmpty();
     }
 }
+
+public class WaterConservationApplicationRecommendedEventValidator : AbstractValidator<WaterConservationApplicationRecommendedEvent>
+{
+    public WaterConservationApplicationRecommendedEventValidator()
+    {
+        RuleFor(x => x.ApplicationId).NotEmpty();
+    }
+}
