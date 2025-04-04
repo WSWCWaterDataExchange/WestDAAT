@@ -822,7 +822,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // Should queue event message
             MessageBusUtilityMock.Verify(
                 mock => mock.SendMessageAsync(
-                    Queues.ConservationApplicationSubmitted,
+                    Queues.ConservationApplicationStatusChanged,
                     It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationSubmittedEvent>()),
                 Times.Once);
         }
@@ -1192,7 +1192,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseSystemContext();
 
         // Act
-        var result = await _applicationManager.OnApplicationSubmitted<WaterConservationApplicationSubmittedEvent, EventResponseBase>(new WaterConservationApplicationSubmittedEvent
+        var result = await _applicationManager.OnApplicationStatusChanged<WaterConservationApplicationSubmittedEvent, EventResponseBase>(new WaterConservationApplicationSubmittedEvent
         {
             ApplicationId = application.Id,
         });
