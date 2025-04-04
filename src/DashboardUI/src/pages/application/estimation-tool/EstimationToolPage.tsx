@@ -12,7 +12,7 @@ import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
-import { EstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseResponse';
+import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 
@@ -61,7 +61,7 @@ export function EstimationToolPage() {
 
       return await estimateConsumptiveUse(context, apiCallFields);
     },
-    onSuccess: (result: EstimateConsumptiveUseResponse) => {
+    onSuccess: (result: ApplicantEstimateConsumptiveUseResponse) => {
       if (result) {
         dispatch({
           type: 'CONSUMPTIVE_USE_ESTIMATED',
