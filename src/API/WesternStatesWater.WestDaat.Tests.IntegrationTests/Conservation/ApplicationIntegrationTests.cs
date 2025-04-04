@@ -350,7 +350,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
     [DataRow(false, false, DisplayName = "Request without compensation should not save estimate")]
-    public async Task Store_EstimateConsumptiveUse_AsUser_Success(
+    public async Task Store_ApplicantEstimateConsumptiveUse_AsUser_Success(
         bool shouldInitializePreviousEstimate,
         bool requestShouldIncludeCompensationInfo
     )
@@ -598,7 +598,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task Store_EstimateConsumptiveUse_AsAnonymous_Failure()
+    public async Task Store_ApplicantEstimateConsumptiveUse_AsAnonymous_Failure()
     {
         // Arrange
         var user = new UserFaker().Generate();
