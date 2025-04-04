@@ -211,7 +211,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateUnits))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
 
-            CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
+            CreateMap<CommonContracts.GeometryEtDatapoint, ClientContracts.GeometryEtDatapoint>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
 
@@ -228,6 +228,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                         {
                             Year = y.Year,
                             TotalEtInInches = y.TotalEtInInches,
+                            EffectivePrecipitationInInches = y.EffectivePrecipitationInInches,
+                            NetEtInInches = y.NetEtInInches
                         }).ToArray()
                     };
                 });
@@ -248,7 +250,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
-                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)));
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
+                // applicant does not provide a control location, thus no Net ET estimate is calculated
+                .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.Ignore())
+                .ForMember(dest => dest.ControlLocation, opt => opt.Ignore());
 
             CreateMap<(
                 ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest Request,
@@ -265,7 +270,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateUnits))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
-                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)));
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
+                .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyNetEtInAcreFeet)))
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.EtResponse.contro));
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 

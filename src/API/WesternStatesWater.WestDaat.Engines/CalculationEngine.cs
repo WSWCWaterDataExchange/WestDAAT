@@ -72,6 +72,7 @@ internal class CalculationEngine : ICalculationEngine
     {
         double? controlLocationAverageTotalEtInInches = null;
         Dictionary<int, double> controlLocationTotalEtByYear = null;
+        PointEtDataCollection controlLocationResult = null;
 
         // The Control Location is the location of an unirrigated field near the polygons.
         // This allows us to estimate the "Net ET" via this formula:
@@ -97,15 +98,22 @@ internal class CalculationEngine : ICalculationEngine
             var rasterResponse = await _openEtSdk.RasterTimeseriesPoint(rasterRequest);
 
             var yearlyDatapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
-                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
+                .Select(grouping => new GeometryEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
             controlLocationAverageTotalEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
 
             controlLocationTotalEtByYear = yearlyDatapoints.ToDictionary(datapoint => datapoint.Year, datapoint => datapoint.TotalEtInInches);
+
+            controlLocationResult = new PointEtDataCollection
+            {
+                PointWkt = request.ControlLocation.PointWkt,
+                AverageYearlyTotalEtInInches = controlLocationAverageTotalEtInInches.Value,
+                Datapoints = yearlyDatapoints,
+            };
         }
 
-        var results = new List<PolygonEtDataCollection>();
+        var polygonResults = new List<PolygonEtDataCollection>();
         foreach (var polygon in request.Polygons)
         {
             var polygonGeo = GeometryHelpers.GetGeometryByWkt(polygon.PolygonWkt) as Polygon;
@@ -126,7 +134,7 @@ internal class CalculationEngine : ICalculationEngine
             var rasterResponse = await _openEtSdk.RasterTimeseriesPolygon(rasterRequest);
 
             var yearlyDatapoints = rasterResponse.Data.GroupBy(datum => datum.Time.Year)
-                .Select(grouping => new PolygonEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
+                .Select(grouping => new GeometryEtDatapoint { Year = grouping.Key, TotalEtInInches = grouping.Sum(datum => datum.Evapotranspiration) })
                 .ToArray();
 
             var averageTotalEtInInches = yearlyDatapoints.Average(d => d.TotalEtInInches);
@@ -161,12 +169,13 @@ internal class CalculationEngine : ICalculationEngine
                 }
             }
 
-            results.Add(result);
+            polygonResults.Add(result);
         }
 
         return new MultiPolygonYearlyEtResponse
         {
-            DataCollections = results.ToArray()
+            DataCollections = polygonResults.ToArray(),
+            ControlLocationDataCollection = controlLocationResult
         };
     }
 

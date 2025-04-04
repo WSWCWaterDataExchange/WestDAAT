@@ -16,5 +16,5 @@ public class PolygonEtDataCollection
 
     public double? AverageYearlyNetEtInAcreFeet { get; set; }
 
-    public PolygonEtDatapoint[] Datapoints { get; set; }
+    public GeometryEtDatapoint[] Datapoints { get; set; }
 }
