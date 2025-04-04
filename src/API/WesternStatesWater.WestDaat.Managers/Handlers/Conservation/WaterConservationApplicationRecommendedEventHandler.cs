@@ -1,7 +1,5 @@
 using Microsoft.Extensions.Logging;
-using WesternStatesWater.Shared.DataContracts;
 using WesternStatesWater.Shared.Resolver;
-using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Engines;
@@ -10,7 +8,7 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class WaterConservationApplicationSubmittedEventHandler : NotificationEventHandlerBase, IRequestHandler<WaterConservationApplicationSubmittedEvent, EventResponseBase>
+public class WaterConservationApplicationRecommendedEventHandler : NotificationEventHandlerBase, IRequestHandler<WaterConservationApplicationRecommendedEvent, EventResponseBase>
 {
     public INotificationFilteringEngine NotificationFilteringEngine { get; }
 
@@ -18,10 +16,10 @@ public class WaterConservationApplicationSubmittedEventHandler : NotificationEve
 
     public ILogger Logger { get; }
 
-    public WaterConservationApplicationSubmittedEventHandler(
+    public WaterConservationApplicationRecommendedEventHandler(
         INotificationFilteringEngine notificationFilteringEngine,
         INotificationFormattingEngine notificationFormattingEngine,
-        ILogger<WaterConservationApplicationSubmittedEventHandler> logger,
+        ILogger<WaterConservationApplicationRecommendedEventHandler> logger,
         IEmailNotificationSdk emailSdk
     ) : base(logger, emailSdk)
     {
@@ -30,9 +28,9 @@ public class WaterConservationApplicationSubmittedEventHandler : NotificationEve
         Logger = logger;
     }
 
-    public async Task<EventResponseBase> Handle(WaterConservationApplicationSubmittedEvent @event)
+    public async Task<EventResponseBase> Handle(WaterConservationApplicationRecommendedEvent @event)
     {
-        var dto = @event.Map<DTO.WaterConservationApplicationSubmittedEvent>();
+        var dto = @event.Map<DTO.WaterConservationApplicationRecommendedEvent>();
         var notificationMetas = await NotificationFilteringEngine.Filter(dto);
 
         var notifications = NotificationFormattingEngine.Format(notificationMetas);

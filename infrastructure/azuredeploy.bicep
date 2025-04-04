@@ -539,10 +539,11 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
 }
 
 // Will need to match the following locations:
-//   AzureNames.Queues list
+//   AzureNames.cs Queues list
 //   sb-emulator.config.json
 var queueNames = [
   'conservation-application-submitted'
+  'conservation-application-recommended'
 ]
 
 resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = [

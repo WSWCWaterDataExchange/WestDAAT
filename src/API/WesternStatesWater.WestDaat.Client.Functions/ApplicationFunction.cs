@@ -130,4 +130,12 @@ public class ApplicationFunction : FunctionBase
     {
         await _applicationManager.OnApplicationSubmitted<WaterConservationApplicationSubmittedEvent, EventResponseBase>(@event);
     }
+
+    [Function(nameof(OnApplicationRecommended))]
+    public async Task OnApplicationRecommended(
+        [ServiceBusTrigger(queueName: Queues.ConservationApplicationRecommended, Connection = "ServiceBusConnection")]
+        WaterConservationApplicationRecommendedEvent @event)
+    {
+        await _applicationManager.OnApplicationRecommended<WaterConservationApplicationRecommendedEvent, EventResponseBase>(@event);
+    }
 }

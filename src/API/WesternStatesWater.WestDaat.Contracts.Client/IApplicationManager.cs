@@ -23,4 +23,8 @@ public interface IApplicationManager : IServiceContractBase
     Task<TResponse> OnApplicationSubmitted<TRequest, TResponse>(TRequest request)
         where TRequest : WaterConservationApplicationSubmittedEvent
         where TResponse : EventResponseBase;
+    
+    Task<TResponse> OnApplicationRecommended<TRequest, TResponse>(TRequest request)
+        where TRequest : WaterConservationApplicationRecommendedEvent
+        where TResponse : EventResponseBase;
 }
