@@ -40,19 +40,19 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
         var fundingOrgDetailsRequest = applicationDetailsResponse.Map<OrganizationFundingDetailsRequest>();
         var fundingOrgDetailsResponse = (OrganizationFundingDetailsResponse)await OrganizationAccessor.Load(fundingOrgDetailsRequest);
 
-        // compute ET
         var evapotranspirationRequest = DtoMapper.Map<MultiPolygonYearlyEtRequest>((request, fundingOrgDetailsResponse.Organization));
         var evapotranspirationResponse = (MultiPolygonYearlyEtResponse)await CalculationEngine.Calculate(evapotranspirationRequest);
 
-        var dataCollections = evapotranspirationResponse.Map<Contracts.Client.PolygonEtDataCollection[]>();
+        // initialize client contracts - they may need to be hydrated
+        var responseLocationsEtData = evapotranspirationResponse.DataCollections.Map<Contracts.Client.PolygonEtDataCollection[]>();
+        var responseControlLocationEtData = evapotranspirationResponse.ControlLocationDataCollection.Map<Contracts.Client.PointEtDataCollection>();
 
-        EstimateConservationPaymentResponse estimateConservationPaymentResponse = null;
+        var originalEstimate = applicationDetailsResponse.Application.Estimate;
+        var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((originalEstimate, evapotranspirationResponse));
+        var estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
+
         if (request.OverwriteEstimate)
         {
-            var originalEstimate = applicationDetailsResponse.Application.Estimate;
-            var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((originalEstimate, evapotranspirationResponse));
-            estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
-
             // store estimate
             var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
                 request,
@@ -65,19 +65,24 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
             var storeEstimateResponse = (ApplicationEstimateStoreResponse)await ApplicationAccessor.Store(storeEstimateRequest);
 
             // connect the EstimateLocation Ids to the ET data
-            foreach (var collection in dataCollections)
+            foreach (var collection in responseLocationsEtData)
             {
                 var matchingEstimateLocation = storeEstimateResponse.Details.Single(detail => detail.PolygonWkt == collection.PolygonWkt);
                 collection.WaterConservationApplicationEstimateLocationId = matchingEstimateLocation.WaterConservationApplicationEstimateLocationId;
             }
+
+            // connect the EstimateControlLocation Ids to the ET data
+            var matchingEstimateControlLocationId = storeEstimateResponse.ControlLocationDetails.WaterConservationApplicationEstimateControlLocationId;
+            responseControlLocationEtData.WaterConservationApplicationEstimateControlLocationId = matchingEstimateControlLocationId;
         }
 
         return new ReviewerEstimateConsumptiveUseResponse
         {
-            ConservationPayment = null,
+            ConservationPayment = estimateConservationPaymentResponse.EstimatedCompensationDollars,
             CumulativeTotalEtInAcreFeet = evapotranspirationResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),
             CumulativeNetEtInAcreFeet = evapotranspirationResponse.DataCollections.Sum(dc => dc.AverageYearlyNetEtInAcreFeet.Value),
-            DataCollections = dataCollections,
+            DataCollections = responseLocationsEtData,
+            ControlDataCollection = responseControlLocationEtData,
         };
     }
 }
