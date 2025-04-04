@@ -103,6 +103,8 @@ export function EstimationToolPage() {
         navigateBack={navigateToWaterRightLandingPage}
         backButtonText="Back to Water Right Landing Page"
         centerText="Water Conservation Estimation Tool"
+        centerTextIsLoading={false}
+        displayWaterIcon={true}
       />
 
       <div className="flex-grow-1 overflow-y-auto">

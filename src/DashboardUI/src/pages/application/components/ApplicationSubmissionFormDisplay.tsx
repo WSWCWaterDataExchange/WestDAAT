@@ -10,6 +10,7 @@ import { formatDateString, formatNumber } from '../../../utilities/valueFormatte
 import ApplicationFormSection from './ApplicationFormSection';
 import FormElementDisplay from './FormElementDisplay';
 import ApplicationDocumentSection from './ApplicationDocumentSection';
+import ApplicationReviewHeader from './ApplicationReviewHeader';
 
 const responsiveOneQuarterWidthDefault = 'col-lg-3 col-md-4 col-sm-6 col-12';
 const responsiveOneThirdWidthDefault = 'col-lg-4 col-md-6 col-sm-6 col-12';
@@ -33,29 +34,13 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
 
   return (
     <main className="container">
-      <div className="mb-3">
-        <span className="fs-4 fw-bold">
-          Application for Water Right Native ID: {state.conservationApplication.waterRightNativeId}
-        </span>
-      </div>
-
       <div className="d-flex gap-3 mb-4">
         {props.isLoading ? (
           <Placeholder as="div" animation="glow" className="h-100 w-100">
             <Placeholder xs={12} className="h-100 w-25 rounded" />
           </Placeholder>
         ) : (
-          <>
-            <span className="fw-bold">Water Right Native ID: {state.conservationApplication.waterRightNativeId}</span>
-
-            <span className="fw-bold">
-              Application ID: {state.conservationApplication.waterConservationApplicationDisplayId}
-            </span>
-
-            <span className="fw-bold">
-              Funding Organization: {state.conservationApplication.fundingOrganizationName}
-            </span>
-          </>
+          <ApplicationReviewHeader />
         )}
       </div>
       <div>

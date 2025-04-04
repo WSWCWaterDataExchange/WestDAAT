@@ -79,7 +79,9 @@ export function ApplicationSubmitPage() {
       <ApplicationNavbar
         navigateBack={navigateBack}
         backButtonText={state.isCreatingApplication ? 'Back to Application' : 'Back'}
-        centerText="Water Conservation Estimation Tool"
+        centerText={`Application for Water Right Native ID: ${state.conservationApplication.waterRightNativeId}`}
+        centerTextIsLoading={isApplicationLoading || isFundingOrganizationLoading}
+        displayWaterIcon={false}
       />
 
       <div className="overflow-y-auto">
