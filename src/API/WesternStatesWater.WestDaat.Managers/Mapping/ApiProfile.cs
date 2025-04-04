@@ -234,6 +234,20 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     };
                 });
 
+            CreateMap<CommonContracts.PointEtDataCollection, CommonContracts.ApplicationEstimateStoreControlLocationDetails>()
+                .ConvertUsing((src, dest) =>
+                {
+                    return new CommonContracts.ApplicationEstimateStoreControlLocationDetails
+                    {
+                        PointWkt = src.PointWkt,
+                        WaterMeasurements = src.Datapoints.Select(datapoint => new CommonContracts.ApplicationEstimateStoreControlLocationWaterMeasurementsDetails
+                        {
+                            Year = datapoint.Year,
+                            TotalEtInInches = datapoint.TotalEtInInches,
+                        }).ToArray()
+                    };
+                });
+
             CreateMap<(
                     ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request,
                     CommonContracts.OrganizationFundingDetails Organization,
@@ -272,7 +286,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
                 .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
                 .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyNetEtInAcreFeet)))
-                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.EtResponse.contro));
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.EtResponse.ControlLocationDataCollection));
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 
