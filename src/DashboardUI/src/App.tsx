@@ -34,9 +34,9 @@ import ApplicationReviewPage from './pages/application/review/ApplicationReviewP
 import { ApplicationReviewGuard } from './pages/application/review/ApplicationReviewGuard';
 import { ApplicationReviewFormPage } from './pages/application/review/form/ApplicationReviewFormPage';
 import { ApplicationReviewMapPage } from './pages/application/review/map/ApplicationReviewMapPage';
+import { ApplicationApprovePage } from './pages/application/approve/ApplicationApprovePage';
 
 import './App.scss';
-import { ApplicationApprovePage } from './pages/application/create/ApplicationApprovePage';
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;

@@ -2,6 +2,7 @@ import { mdiArrowLeft, mdiWater } from '@mdi/js';
 import Icon from '@mdi/react';
 import Nav from 'react-bootstrap/esm/Nav';
 import Navbar from 'react-bootstrap/esm/Navbar';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 import './application-navbar.scss';
 
@@ -9,6 +10,8 @@ interface ApplicationNavbarProps {
   navigateBack: () => void;
   backButtonText: string;
   centerText: string;
+  centerTextIsLoading: boolean;
+  displayWaterIcon: boolean;
 }
 
 export function ApplicationNavbar(props: ApplicationNavbarProps) {
@@ -29,8 +32,18 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
 
         <Navbar.Brand>
           <div className="d-flex align-items-center gap-2">
-            <Icon path={mdiWater} size="1.25em" className="application-water-icon" />
-            <span className="fw-bold">{props.centerText}</span>
+            {props.centerTextIsLoading ? (
+              <>
+                <Placeholder animation="glow">
+                  <Placeholder xs={12} className="rounded" style={{ width: '200px' }} />
+                </Placeholder>
+              </>
+            ) : (
+              <>
+                {props.displayWaterIcon && <Icon path={mdiWater} size="1.25em" className="application-water-icon" />}
+                <span className="fw-bold">{props.centerText}</span>
+              </>
+            )}
           </div>
         </Navbar.Brand>
 
