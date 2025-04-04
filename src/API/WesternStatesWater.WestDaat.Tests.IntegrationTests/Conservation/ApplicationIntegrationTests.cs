@@ -690,6 +690,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
             _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
             _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
+            _dbContext.WaterConservationApplicationSubmissionNotes.RemoveRange(_dbContext.WaterConservationApplicationSubmissionNotes);
+            _dbContext.WaterConservationApplicationSubmissions.RemoveRange(_dbContext.WaterConservationApplicationSubmissions);
             _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
             _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
             _dbContext.Users.RemoveRange(_dbContext.Users);
@@ -730,11 +732,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
             await _dbContext.WaterConservationApplications.AddAsync(application);
 
-            // estimate was created by applicant
             var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
             var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
             var estimateLocationConsumptiveUses = new LocationWaterMeasurementFaker(estimateLocation).Generate(12);
             await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
+
+            var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
 
             await _dbContext.SaveChangesAsync();
 
