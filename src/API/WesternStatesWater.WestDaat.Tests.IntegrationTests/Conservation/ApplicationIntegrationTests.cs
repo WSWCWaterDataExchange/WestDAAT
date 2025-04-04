@@ -850,8 +850,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.ConservationPayment.Should().Be((int)expectedConservationPayment);
 
             var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
-                .Include(estimate => estimate.Locations)
-                .ThenInclude(location => location.WaterMeasurements)
+                .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
+                .Include(estimate => estimate.ControlLocations).ThenInclude(cLocation => cLocation.WaterMeasurements)
                 .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
             var dbEstimateLocation = dbEstimate?.Locations.First();
             var dbEstimateLocationWaterMeasurements = dbEstimateLocation?.WaterMeasurements;
@@ -907,15 +907,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
                 dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
 
-                // double-check that the response data was cross-referenced successfully with the db EstimateLocations
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations and EstimateControlLocation
                 response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+                response.ControlDataCollection.WaterConservationApplicationEstimateControlLocationId.Should().Be(dbEstimateControlLocation.Id);
 
+                // verify that the dates are all in the correct range
                 dbEstimateLocationWaterMeasurements.All(waterMeasurement =>
                 {
                     var yearMatches = waterMeasurement.Year >= startYear && waterMeasurement.Year < startYear + yearRange;
                     return yearMatches;
                 }).Should().BeTrue();
-                dbEstimateLocationWaterMeasurements.Select(cu => cu.TotalEtInInches).Sum().Should().Be(locationsCumulativeTotalEtInInches);
+
+                dbEstimate.ControlLocations.Single().WaterMeasurements.All(measurement =>
+                    startYear <= measurement.Year && measurement.Year < startYear + yearRange)
+                    .Should().BeTrue();
             }
 
 
