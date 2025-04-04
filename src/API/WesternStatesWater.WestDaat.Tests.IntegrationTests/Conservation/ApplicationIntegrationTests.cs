@@ -846,7 +846,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             response.CumulativeNetEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeNetEtInAcreFeet, 0.01);
 
             // - verify payment reuses original estimate's desired compensation dollars
-            var expectedConservationPayment = estimate.CompensationRateDollars * response.CumulativeTotalEtInAcreFeet;
+            // - verify payment calculates using Net ET instead of Total ET
+            var expectedConservationPayment = estimate.CompensationRateDollars * response.CumulativeNetEtInAcreFeet;
             response.ConservationPayment.Should().Be((int)expectedConservationPayment);
 
             var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
