@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
-using Azure.Core;
 using WesternStatesWater.Shared.Errors;
 using WesternStatesWater.WaDE.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Common;
@@ -313,7 +312,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // but are included for completeness just in case something changes in the future
         applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.WaterMeasurements).Should()
             .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
@@ -322,7 +321,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.WaterMeasurements).Should()
             .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
@@ -332,7 +331,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // verify that new fields are included in response
         reviewerResponse.Application.Estimate.Locations.All(loc =>
-            loc.ConsumptiveUses.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
+            loc.WaterMeasurements.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
         ).Should().BeTrue();
 
         // verify note fields with custom mappings are translated correctly
@@ -1020,7 +1019,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _dbContext.SaveChangesAsync();
-        
+
         UseUserContext(new UserContext
         {
             UserId = user.Id,
@@ -1046,7 +1045,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ForbiddenError>();
     }
-    
+
     [TestMethod]
     public async Task Store_SubmitApplicationRecommendation_MultipleTimes_Success()
     {
@@ -1092,7 +1091,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert 1
         recommendForResponse.Error.Should().BeNull();
-        
+
         var applicationSubmission = await _dbContext.WaterConservationApplicationSubmissions
             .AsNoTracking()
             .Include(sub => sub.SubmissionNotes)
@@ -1132,7 +1131,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert 2
         recommendAgainstResponse.Error.Should().BeNull();
-        
+
         var applicationSubmission2 = await _dbContext.WaterConservationApplicationSubmissions
             .AsNoTracking()
             .Include(sub => sub.SubmissionNotes)
@@ -1142,7 +1141,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicationSubmission2.RecommendedAgainstDate.Should().NotBeNull();
         applicationSubmission2.SubmissionNotes.Should().HaveCount(1);
     }
-    
+
     [TestMethod]
     public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmails()
     {
