@@ -27,22 +27,11 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
   const stateForm = state.conservationApplication.applicationSubmissionForm;
   const polygonData = state.conservationApplication.estimateLocations;
 
-  const isApplicationSubmitEnabled = state.isCreatingApplication;
-
   // not combined with the section component because of the one-off case of the "Property & Land Area Information" section
   const sectionRule = <hr className="text-primary" style={{ borderWidth: 2 }} />;
 
   return (
-    <main className="container">
-      <div className="d-flex gap-3 mb-4">
-        {props.isLoading ? (
-          <Placeholder as="div" animation="glow" className="h-100 w-100">
-            <Placeholder xs={12} className="h-100 w-25 rounded" />
-          </Placeholder>
-        ) : (
-          <ApplicationReviewHeader />
-        )}
-      </div>
+    <main className="">
       <div>
         <ApplicationFormSection title="Applicant Information" isLoading={props.isLoading} loadingFieldCount={7}>
           <div className={`${responsiveOneQuarterWidthDefault} mb-4`}>
@@ -210,9 +199,7 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
             <div className="col-sm-6 col-md-3 mb-4">
               <FormElementDisplay
                 label="Consumptive Use"
-                displayValue={
-                  formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2) + ' Acre-Feet'
-                }
+                displayValue={formatNumber(state.conservationApplication.cumulativeTotalEtInAcreFeet, 2) + ' Acre-Feet'}
               />
             </div>
 
@@ -269,22 +256,6 @@ function ApplicationSubmissionFormDisplay(props: ApplicationSubmissionFormDispla
             />
           </div>
         </ApplicationFormSection>
-
-        {sectionRule}
-
-        <ApplicationDocumentSection readOnly={true} />
-
-        {isApplicationSubmitEnabled && (
-          <>
-            {sectionRule}
-
-            <div className="d-flex justify-content-end p-3">
-              <Button variant="success" type="button" onClick={props.submitApplication}>
-                Submit
-              </Button>
-            </div>
-          </>
-        )}
       </div>
     </main>
   );

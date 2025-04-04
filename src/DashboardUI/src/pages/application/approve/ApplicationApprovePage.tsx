@@ -1,10 +1,14 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { NotImplementedPlaceholder } from '../../../components/NotImplementedAlert';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import Alert from 'react-bootstrap/esm/Alert';
+import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
+import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
+import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -15,8 +19,10 @@ export function ApplicationApprovePage() {
     navigate(`/application/organization/dashboard`);
   };
 
-  useGetApplicationQuery(applicationId, 'reviewer', true);
-  useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
+  const { isLoading: isApplicationLoading } = useGetApplicationQuery(applicationId, 'reviewer', true);
+  const { isLoading: isFundingOrganizationLoading } = useFundingOrganizationQuery(
+    state.conservationApplication.waterRightNativeId,
+  );
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -32,8 +38,14 @@ export function ApplicationApprovePage() {
           <>
             <div className="container">
               <ApplicationReviewHeader />
+              <ApplicationSubmissionFormDisplay
+                isLoading={isApplicationLoading || isFundingOrganizationLoading}
+                submitApplication={() => {}}
+              />
+              <ApplicationDocumentSection readOnly={true} />
 
-              <NotImplementedPlaceholder />
+              <ApplicationReviewPipelineSection />
+              <ApplicationReviewersNotesSection />
             </div>
           </>
         )}

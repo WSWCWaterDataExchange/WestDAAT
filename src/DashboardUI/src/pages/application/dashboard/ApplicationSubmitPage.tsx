@@ -11,6 +11,9 @@ import { toast } from 'react-toastify';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import Placeholder from 'react-bootstrap/esm/Placeholder';
 
 export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
@@ -85,10 +88,36 @@ export function ApplicationSubmitPage() {
       />
 
       <div className="overflow-y-auto">
+        <div className="d-flex gap-3 mb-4">
+          {isApplicationLoading || isFundingOrganizationLoading ? (
+            <Placeholder as="div" animation="glow" className="h-100 w-100">
+              <Placeholder xs={12} className="h-100 w-25 rounded" />
+            </Placeholder>
+          ) : (
+            <ApplicationReviewHeader />
+          )}
+        </div>
+
         <ApplicationSubmissionFormDisplay
           submitApplication={presentConfirmationModal}
           isLoading={isApplicationLoading || isFundingOrganizationLoading}
         />
+
+        <hr className="text-primary" style={{ borderWidth: 2 }} />
+
+        <ApplicationDocumentSection readOnly={true} />
+
+        {state.isCreatingApplication && (
+          <>
+            <hr className="text-primary" style={{ borderWidth: 2 }} />
+
+            <div className="d-flex justify-content-end p-3">
+              <Button variant="success" type="button" onClick={presentConfirmationModal}>
+                Submit
+              </Button>
+            </div>
+          </>
+        )}
       </div>
 
       <ConfirmationModal
