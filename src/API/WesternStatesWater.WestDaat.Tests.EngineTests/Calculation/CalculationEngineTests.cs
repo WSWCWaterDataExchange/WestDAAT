@@ -415,9 +415,10 @@ public class CalculationEngineTests : EngineTestBase
     }
 
     [DataTestMethod]
-    [DataRow(CompensationRateUnits.AcreFeet)]
-    [DataRow(CompensationRateUnits.Acres)]
-    public async Task Calculate_EstimateConservationPayment_Success(CompensationRateUnits units)
+    [DataRow(CompensationRateUnits.AcreFeet, false)]
+    [DataRow(CompensationRateUnits.AcreFeet, true)]
+    [DataRow(CompensationRateUnits.Acres, false)]
+    public async Task Calculate_EstimateConservationPayment_Success(CompensationRateUnits units, bool useNetEt)
     {
         // Arrange
         var firstCorner = "-96.70537000 40.82014318";
@@ -431,10 +432,13 @@ public class CalculationEngineTests : EngineTestBase
 
         var areaOfAFootballFieldInAcres = 1.32;
 
-        var etInInches = 60;
-        var etInFeet = etInInches / 12; // 5 feet
+        var totalEtInInches = 60;
+        var totalEtInFeet = totalEtInInches / 12; // 5 feet
+        var totalEtVolumeInAcreFeet = areaOfAFootballFieldInAcres * totalEtInFeet;
 
-        var etVolumeInAcreFeet = areaOfAFootballFieldInAcres * etInFeet;
+        var netEtInInches = 48; // 80% of total ET is a reasonable example
+        var netEtInFeet = netEtInInches / 12; // 4 feet
+        var netEtVolumeInAcreFeet = areaOfAFootballFieldInAcres * netEtInFeet;
 
         var compensationRateDollars = 1000;
 
@@ -446,7 +450,8 @@ public class CalculationEngineTests : EngineTestBase
                 new()
                 {
                     PolygonWkt = memorialStadium,
-                    AverageYearlyTotalEtInInches = etInInches,
+                    AverageYearlyTotalEtInInches = totalEtInInches,
+                    AverageYearlyNetEtInInches = useNetEt ? netEtInInches : null,
                     Datapoints = []
                 },
             ]
@@ -463,7 +468,15 @@ public class CalculationEngineTests : EngineTestBase
         switch (units)
         {
             case CompensationRateUnits.AcreFeet:
-                expectedCompensation = etVolumeInAcreFeet * compensationRateDollars;
+                if (useNetEt)
+                {
+                    expectedCompensation = netEtVolumeInAcreFeet * compensationRateDollars;
+                }
+                else
+                {
+                    expectedCompensation = totalEtVolumeInAcreFeet * compensationRateDollars;
+                }
+
                 onePercentMarginOfError = expectedCompensation * 0.01;
                 ((double)response.EstimatedCompensationDollars).Should().BeApproximately(expectedCompensation, onePercentMarginOfError);
                 break;
