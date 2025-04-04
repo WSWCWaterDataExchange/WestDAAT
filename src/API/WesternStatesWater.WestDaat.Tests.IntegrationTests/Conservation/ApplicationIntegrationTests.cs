@@ -855,7 +855,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
             var dbEstimateLocation = dbEstimate?.Locations.First();
             var dbEstimateLocationWaterMeasurements = dbEstimateLocation?.WaterMeasurements;
-            var dbEstimateControlLocation = dbEstimate?.ControlLocations?.First();
+            var dbEstimateControlLocation = dbEstimate?.ControlLocations?.FirstOrDefault();
             var dbEstimateControlLocationWaterMeasurements = dbEstimateControlLocation?.WaterMeasurements;
 
             // estimate should always exist; it was either:
