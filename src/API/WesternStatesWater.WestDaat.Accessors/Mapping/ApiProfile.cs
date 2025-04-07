@@ -415,7 +415,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, ApplicationEstimateLocationDetails>()
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
 
-            // todo: is this mapping needed?
             CreateMap<EFWD.WaterConservationApplicationEstimateControlLocation, ApplicationEstimateControlLocationDetails>()
                 .ForMember(dest => dest.WaterConservationApplicationEstimateControlLocationId, opt => opt.MapFrom(src => src.Id));
 
