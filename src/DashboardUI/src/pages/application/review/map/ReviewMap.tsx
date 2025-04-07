@@ -4,15 +4,13 @@ import EstimationToolTableView from '../../estimation-tool/EstimationToolTableVi
 import { toast } from 'react-toastify';
 import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../../utilities/geometryHelpers';
 import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPolygonData';
-import { convertGeometryToWkt, convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
-import { convertSquareMetersToAcres } from '../../../../utilities/valueConverters';
+import { convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
 import Button from 'react-bootstrap/esm/Button';
 import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
-import { area as areaInSquareMeters } from '@turf/area';
 import {
   fromGeometryFeatureToMapSelectionPolygonData,
   fromPartialPolygonDataToPolygonFeature,
