@@ -1,9 +1,9 @@
-import { PolygonEtDatapoint } from './PolygonEtDatapoint';
+import { GeometryEtDatapoint } from './GeometryEtDatapoint';
 
 export interface PolygonEtDataCollection {
   waterConservationApplicationEstimateLocationId: string;
   polygonWkt: string;
   averageYearlyTotalEtInInches: number;
   averageYearlyTotalEtInAcreFeet: number;
-  datapoints: PolygonEtDatapoint[];
+  datapoints: GeometryEtDatapoint[];
 }
