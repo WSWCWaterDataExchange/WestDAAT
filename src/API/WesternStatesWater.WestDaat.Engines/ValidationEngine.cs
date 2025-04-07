@@ -187,8 +187,9 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             WaterConservationApplicationSubmittedEvent => null,
+            WaterConservationApplicationRecommendedEvent => null,
             _ => throw new NotImplementedException(
-                $"Validation for request type '{request.GetType().Name}' is not implemented."
+                $"Validation for event type '{request.GetType().Name}' is not implemented."
             )
         };
     }

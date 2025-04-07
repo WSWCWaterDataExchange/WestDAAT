@@ -34,7 +34,7 @@ export function ApplicationSubmitPage() {
     if (state.isCreatingApplication) {
       navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
     } else {
-      history.back();
+      navigateToWaterRightLandingPage();
     }
   };
 
