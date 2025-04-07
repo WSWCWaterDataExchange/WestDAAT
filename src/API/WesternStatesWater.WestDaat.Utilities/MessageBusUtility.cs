@@ -20,7 +20,7 @@ public class MessageBusUtility : IMessageBusUtility, IAsyncDisposable
         _messageBusSenderCache = new ConcurrentDictionary<string, ServiceBusSender>();
     }
 
-    public async Task SendMessageAsync<T>(string queueOrTopicName, T messageObject) where T : RequestBase
+    public async Task SendMessageAsync<T>(string queueOrTopicName, T messageObject) where T : EventBase
     {
         var message = JsonSerializer.Serialize(messageObject, new JsonSerializerOptions
         {

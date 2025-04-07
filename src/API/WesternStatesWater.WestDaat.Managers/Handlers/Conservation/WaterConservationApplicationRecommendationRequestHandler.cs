@@ -42,10 +42,11 @@ public class WaterConservationApplicationRecommendationRequestHandler
         try
         {
             // Try/catch so recommendation call succeeds even if queuing the event message fails
-            await _messageBusUtility.SendMessageAsync(Queues.ConservationApplicationStatusChanged, new WaterConservationApplicationRecommendedEvent
-            {
-                ApplicationId = request.WaterConservationApplicationId,
-            });
+            await _messageBusUtility.SendMessageAsync<WaterConservationApplicationStatusChangedEventBase>(Queues.ConservationApplicationStatusChanged,
+                new WaterConservationApplicationRecommendedEvent
+                {
+                    ApplicationId = request.WaterConservationApplicationId,
+                });
         }
         catch (Exception ex)
         {
