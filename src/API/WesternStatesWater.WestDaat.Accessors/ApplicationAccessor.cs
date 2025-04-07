@@ -328,9 +328,14 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         await db.SaveChangesAsync();
 
+        var savedNote = await db.WaterConservationApplicationSubmissionNotes
+            .Include(n => n.User).ThenInclude(user => user.UserProfile)
+            .Where(n => n.Id == note.Id)
+            .SingleAsync();
+
         return new WaterConservationApplicationSubmissionUpdateResponse
         {
-            Note = note.Map<ApplicationReviewNote>()
+            Note = savedNote.Map<ApplicationReviewNote>()
         };
     }
 

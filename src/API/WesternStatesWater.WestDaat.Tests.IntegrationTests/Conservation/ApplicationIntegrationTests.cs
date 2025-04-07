@@ -955,7 +955,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         var response = await _applicationManager.Store<
             CLI.Requests.Conservation.WaterConservationApplicationSubmissionUpdateRequest,
-            CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+            CLI.Responses.Conservation.WaterConservationApplicationSubmissionUpdateResponse>(request);
 
         // Assert
         response.Should().NotBeNull();
@@ -996,6 +996,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbSubmissionNote.Note.Should().Be(request.Note);
             dbSubmissionNote.UserId.Should().Be(user.Id);
             dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
+            
+            // verify the returned note has all the required information
+            response.Note.Note.Should().BeEquivalentTo(request.Note);
+            response.Note.SubmittedDate.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
+            response.Note.SubmittedByUserId.Should().Be(user.Id);
+            response.Note.SubmittedByFullName.Should().Be($"{user.UserProfile.FirstName} {user.UserProfile.LastName}");
         }
         else
         {
