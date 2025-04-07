@@ -34,11 +34,21 @@ export function ApplicationReviewMapPage() {
       return await reviewerEstimateConsumptiveUse(context, fields);
     },
     onSuccess: (result: ReviewerEstimateConsumptiveUseResponse) => {
-      toast.success('Consumptive use estimate successfully calculated.');
-      console.log(result);
+      if (result) {
+        dispatch({
+          type: 'CONSUMPTIVE_USE_ADJUSTED',
+          payload: {
+            cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
+            cumulativeNetEtInAcreFeet: result.cumulativeNetEtInAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+            controlDataCollection: result.controlDataCollection,
+          },
+        });
+      }
     },
     onError: (error: Error) => {
-      toast.error('Failed to calculate consumptive use estimate.');
+      toast.error('Failed to estimate consumptive use. Please try again later');
     },
   });
 
