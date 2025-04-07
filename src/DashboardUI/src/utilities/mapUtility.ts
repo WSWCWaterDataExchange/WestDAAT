@@ -5,6 +5,7 @@ import { convertSquareMetersToAcres } from './valueConverters';
 import areaInSquareMeters from '@turf/area';
 import { initializeFeaturePropertyFromDrawToolType, parseDrawToolTypeFromFeature } from './customMapShapesUtility';
 import { DrawToolType } from '../data-contracts/DrawToolType';
+import { MapSelectionPointData } from '../data-contracts/CombinedPointData';
 
 export const fromPartialPolygonDataToPolygonFeature = (
   item: PartialPolygonData,
@@ -24,4 +25,10 @@ export const fromGeometryFeatureToMapSelectionPolygonData = (
   polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
   drawToolType: parseDrawToolTypeFromFeature(polygonFeature),
   acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
+});
+
+export const fromGeometryFeatureToMapSelectionPointData = (
+  pointFeature: Feature<Geometry, GeoJsonProperties>,
+): MapSelectionPointData => ({
+  pointWkt: convertGeometryToWkt(pointFeature.geometry),
 });

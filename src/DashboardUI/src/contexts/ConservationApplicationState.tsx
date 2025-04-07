@@ -18,6 +18,7 @@ import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/C
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
+import { MapSelectionPointData, PartialPointData } from '../data-contracts/CombinedPointData';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -39,8 +40,9 @@ export interface ConservationApplicationState {
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
-    controlLocation: PointEtDataCollection | undefined;
+    controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
+    doesControlLocationOverlapWithPolygons: boolean;
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
@@ -86,6 +88,7 @@ export const defaultState = (): ConservationApplicationState => ({
     estimateLocations: [],
     controlLocation: undefined,
     doPolygonsOverlap: false,
+    doesControlLocationOverlapWithPolygons: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
     supportingDocuments: [],
@@ -168,6 +171,8 @@ export interface MapPolygonsUpdatedAction {
   payload: {
     polygons: MapSelectionPolygonData[];
     doPolygonsOverlap: boolean;
+    controlLocation?: MapSelectionPointData;
+    doesControlLocationOverlapWithPolygons?: boolean;
   };
 }
 
@@ -423,6 +428,12 @@ const onMapPolygonsUpdated = (
   draftState.conservationApplication.estimateLocations = payload.polygons;
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
+  if (payload.controlLocation) {
+    draftState.conservationApplication.controlLocation = payload.controlLocation;
+    draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
+      payload.doesControlLocationOverlapWithPolygons!;
+  }
+
   resetConsumptiveUseEstimation(draftState);
   checkCanEstimateConsumptiveUse(draftState);
   computeCombinedPolygonData(draftState);
@@ -668,7 +679,10 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     app.estimateLocations.length > 0 &&
     app.estimateLocations.length <= 20 &&
     app.estimateLocations.every((p) => p.acreage! <= 50000) &&
-    !app.doPolygonsOverlap;
+    !app.doPolygonsOverlap &&
+    // applicant does not have a control location
+    // technical reviewer must have a control location, which cannot be contained in any of the polygons
+    (app.controlLocation === undefined || (!!app.controlLocation && !app.doesControlLocationOverlapWithPolygons));
 };
 
 const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
@@ -693,14 +707,16 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
   draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
-  // this `reset` method is activated when the user:
-  // * updates polygons on the map
-  // * modifies a form value in the Estimation Tool sidebar
+  // this `reset` method is activated when:
+  // * the applicant updates polygons on the map
+  // * a technical reviewer updates polygons on the map or adds a control location
+  // * the applicant modifies a form value in the Estimation Tool sidebar
 
-  // for the first case, all polygon data will be overwritten. nothing needs to happen here.
-  // for the second case, any data on the map will remain the same, but the consumptive use data needs to be reset
+  // for the first case and the second case, all polygon data will be overwritten. nothing needs to happen here.
+  // for the third case, any data on the map will remain the same, but the consumptive use data needs to be reset
   const combinedPolygonDataCopy = [...draftState.conservationApplication.estimateLocations];
   for (let i = 0; i < combinedPolygonDataCopy.length; i++) {
     const polygon = combinedPolygonDataCopy[i];
@@ -714,6 +730,8 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
     combinedPolygonDataCopy[i] = polygonPostMapSelection;
   }
   draftState.conservationApplication.estimateLocations = combinedPolygonDataCopy;
+
+  // regarding the third case, the applicant will not have any control locations in state, and so nothing should need to be reset here.
 
   draftState.canContinueToApplication = false;
 };

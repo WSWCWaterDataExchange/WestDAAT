@@ -1,9 +1,10 @@
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { circle } from '@turf/circle';
 import { distance } from '@turf/distance';
 import { featureCollection } from '@turf/helpers';
 import intersect from '@turf/intersect';
 import truncate from '@turf/truncate';
-import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Polygon, Position } from 'geojson';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon, Position } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 
 export function getLatsLongsFromFeatureCollection(featureCollection: FeatureCollection<Geometry, GeoJsonProperties>) {
@@ -58,4 +59,11 @@ export const doPolygonsIntersect = (polygons: Feature<Geometry, GeoJsonPropertie
   }
 
   return false;
+};
+
+export const doesPointIntersectWithPolygon = (
+  point: Feature<Point, GeoJsonProperties>,
+  polygon: Feature<Polygon, GeoJsonProperties>,
+): boolean => {
+  return booleanPointInPolygon(point, polygon);
 };

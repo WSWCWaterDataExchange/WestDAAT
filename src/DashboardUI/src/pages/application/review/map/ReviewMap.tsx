@@ -2,7 +2,11 @@ import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon
 import Map from '../../../../components/map/Map';
 import EstimationToolTableView from '../../estimation-tool/EstimationToolTableView';
 import { toast } from 'react-toastify';
-import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../../utilities/geometryHelpers';
+import {
+  doesPointIntersectWithPolygon,
+  doPolygonsIntersect,
+  getLatsLongsFromFeatureCollection,
+} from '../../../../utilities/geometryHelpers';
 import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPolygonData';
 import { convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
@@ -12,9 +16,11 @@ import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import {
+  fromGeometryFeatureToMapSelectionPointData,
   fromGeometryFeatureToMapSelectionPolygonData,
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
+import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -81,19 +87,47 @@ function ReviewMap(props: ReviewMapProps) {
     setMapBoundSettings,
   ]);
 
-  const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
-    if (polygons.length > 20) {
+  const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
+    // irrigated field locations
+    const polygonFeatures: Feature<Polygon, GeoJsonProperties>[] = mapGeometries
+      .filter((feature) => feature.geometry.type === 'Polygon')
+      .map((feature) => feature as Feature<Polygon, GeoJsonProperties>);
+
+    if (polygonFeatures.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
       );
     }
 
-    const doPolygonsOverlap = doPolygonsIntersect(polygons);
+    // control location
+    const pointFeatures: Feature<Point, GeoJsonProperties>[] = mapGeometries
+      .filter((feature) => feature.geometry.type === 'Point')
+      .map((feature) => feature as Feature<Point, GeoJsonProperties>);
+
+    if (pointFeatures.length > 1) {
+      toast.error('You may only select one control location.');
+    }
+    const controlLocationFeature = pointFeatures[0];
+
+    // check if polygons intersect with each other
+    const doPolygonsOverlap = doPolygonsIntersect(polygonFeatures);
     if (doPolygonsOverlap) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
+    // check if control location is contained within any polygon
+
+    const doesControlLocationOverlapWithPolygons = polygonFeatures.some((polygonFeature) =>
+      doesPointIntersectWithPolygon(controlLocationFeature, polygonFeature),
+    );
+
+    if (doesControlLocationOverlapWithPolygons) {
+      toast.error('Control location must not be contained within any polygon. Please move the control location.');
+    }
+
+    const polygonData: MapSelectionPolygonData[] = polygonFeatures.map(fromGeometryFeatureToMapSelectionPolygonData);
+    const controlLocationData: MapSelectionPointData =
+      fromGeometryFeatureToMapSelectionPointData(controlLocationFeature);
 
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
@@ -104,6 +138,8 @@ function ReviewMap(props: ReviewMapProps) {
       payload: {
         polygons: polygonData,
         doPolygonsOverlap,
+        controlLocation: controlLocationData,
+        doesControlLocationOverlapWithPolygons,
       },
     });
   };

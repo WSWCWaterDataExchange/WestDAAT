@@ -24,7 +24,7 @@ export function ApplicationReviewMapPage() {
           }),
         ),
         controlLocation: {
-          pointWkt: 'POINT (-106.1264 34.9799)',
+          pointWkt: state.conservationApplication.controlLocation!.pointWkt!,
         },
         overwriteEstimate: overwriteEstimate,
       };
