@@ -7,6 +7,7 @@ export interface SaveChangesModalProps {
   show: boolean;
   onCancel: () => void;
   onConfirm: (documentedChanges: string) => void;
+  disableActionButtons?: boolean;
 }
 
 export function SaveChangesModal(props: SaveChangesModalProps) {
@@ -40,10 +41,14 @@ export function SaveChangesModal(props: SaveChangesModalProps) {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onCancel}>
+        <Button variant="secondary" onClick={props.onCancel} disabled={props.disableActionButtons}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={() => props.onConfirm(documentedChanges)} disabled={!documentedChanges}>
+        <Button
+          variant="primary"
+          onClick={() => props.onConfirm(documentedChanges)}
+          disabled={!documentedChanges || props.disableActionButtons}
+        >
           Save
         </Button>
       </Modal.Footer>
