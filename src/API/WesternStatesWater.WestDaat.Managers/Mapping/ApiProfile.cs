@@ -250,6 +250,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .IncludeAllDerived();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendedEvent, CommonContracts.WaterConservationApplicationRecommendedEvent>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());

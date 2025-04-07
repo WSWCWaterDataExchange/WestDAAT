@@ -13,7 +13,6 @@ using WesternStatesWater.WestDaat.Contracts.Client.Responses;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
 using WesternStatesWater.WestDaat.Database.EntityFramework;
 using WesternStatesWater.WestDaat.Tests.Helpers;
-using WaterConservationApplicationSubmittedEvent = WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation.WaterConservationApplicationSubmittedEvent;
 
 namespace WesternStatesWater.WestDaat.Tests.IntegrationTests.Conservation;
 
@@ -1019,16 +1018,19 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.WaterConservationApplications.AddAsync(application);
         await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         await _dbContext.SaveChangesAsync();
-        
+
         UseUserContext(new UserContext
         {
             UserId = user.Id,
             Roles = [],
-            OrganizationRoles = [new OrganizationRole
-            {
-                OrganizationId = isPartOfOrg ? organization.Id : Guid.NewGuid(),
-                RoleNames = [role]
-            }],
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = isPartOfOrg ? organization.Id : Guid.NewGuid(),
+                    RoleNames = [role]
+                }
+            ],
             ExternalAuthId = ""
         });
 
@@ -1039,13 +1041,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         };
 
         // Act
-        var response = await _applicationManager.Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ForbiddenError>();
     }
-    
+
     [TestMethod]
     public async Task Store_SubmitApplicationRecommendation_MultipleTimes_Success()
     {
@@ -1091,7 +1094,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert 1
         recommendForResponse.Error.Should().BeNull();
-        
+
         var applicationSubmission = await _dbContext.WaterConservationApplicationSubmissions
             .AsNoTracking()
             .Include(sub => sub.SubmissionNotes)
@@ -1131,7 +1134,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Assert 2
         recommendAgainstResponse.Error.Should().BeNull();
-        
+
         var applicationSubmission2 = await _dbContext.WaterConservationApplicationSubmissions
             .AsNoTracking()
             .Include(sub => sub.SubmissionNotes)
@@ -1140,10 +1143,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicationSubmission2.RecommendedForDate.Should().BeNull();
         applicationSubmission2.RecommendedAgainstDate.Should().NotBeNull();
         applicationSubmission2.SubmissionNotes.Should().HaveCount(1);
+
+        MessageBusUtilityMock.Verify(mock =>
+                mock.SendMessageAsync(
+                    Queues.ConservationApplicationStatusChanged,
+                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationRecommendedEvent>()),
+            Times.Exactly(2));
     }
-    
+
     [TestMethod]
-    public async Task OnApplicationSubmitted_WaterConservationApplication_ShouldSendEmails()
+    public async Task OnApplicationStatusChanged_ApplicationSubmitted_ShouldSendEmails()
     {
         // Arrange
         var waterUser = new UserFaker().Generate();
@@ -1192,10 +1201,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseSystemContext();
 
         // Act
-        var result = await _applicationManager.OnApplicationStatusChanged<WaterConservationApplicationSubmittedEvent, EventResponseBase>(new WaterConservationApplicationSubmittedEvent
-        {
-            ApplicationId = application.Id,
-        });
+        var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
+            new CLI.Requests.Conservation.WaterConservationApplicationSubmittedEvent
+            {
+                ApplicationId = application.Id,
+            });
 
         // Assert
         result.Error.Should().BeNull();
@@ -1258,5 +1268,106 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 ), Times.Once
             );
         }
+    }
+
+    [TestMethod]
+    public async Task OnApplicationStatusChanged_ApplicationRecommended_ShouldSendEmails()
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var fundingOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, fundingOrganization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        var techReviewer = new UserFaker().Generate();
+        var orgMember = new UserFaker().Generate();
+        var orgAdmin = new UserFaker().Generate();
+
+        techReviewer.UserOrganizations =
+        [
+            new UserOrganizationFaker(techReviewer, fundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.TechnicalReviewer,
+                    }
+                }).Generate()
+        ];
+
+        orgMember.UserOrganizations =
+        [
+            new UserOrganizationFaker(orgMember, fundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.Member,
+                    }
+                }).Generate()
+        ];
+
+        orgAdmin.UserOrganizations =
+        [
+            new UserOrganizationFaker(orgAdmin, fundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.OrganizationAdmin,
+                    }
+                }).Generate()
+        ];
+
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.Users.AddRangeAsync(techReviewer, orgMember, orgAdmin);
+        await _dbContext.SaveChangesAsync();
+
+        UseSystemContext();
+        
+        
+        // Act
+        var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
+            new CLI.Requests.Conservation.WaterConservationApplicationRecommendedEvent
+            {
+                ApplicationId = application.Id,
+            });
+
+        // Assert
+        result.Error.Should().BeNull();
+
+        // Emails include:
+        //      1 x Member
+        //      1 x Org Admin
+        //      0 x Tech Reviewer
+
+        EmailNotificationSdkMock
+            .Verify(mock => mock.SendEmail(It.IsAny<EmailRequest>()), Times.Exactly(2));
+
+        var expectedSubject = "Water Conservation Application Recommendation";
+        var expectedUrlSlug = $"{application.Id}/approve"; // Link to final approval page
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == orgMember.Email &&
+                    req.Subject == expectedSubject &&
+                    req.Body.Contains(expectedUrlSlug)
+                )
+            ),
+            Times.Once
+        );
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == orgAdmin.Email &&
+                    req.Subject == expectedSubject &&
+                    req.Body.Contains(expectedUrlSlug)
+                )
+            ), Times.Once
+        );
     }
 }
