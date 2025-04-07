@@ -32,7 +32,6 @@ public class WaterConservationApplicationSubmissionUpdateRequestHandler
 
         var dtoResponse = await _applicationAccessor.Store(dtoRequest);
 
-        var managerResponse = dtoResponse.Map<WaterConservationApplicationSubmissionUpdateResponse>();
-        return managerResponse;
+        return dtoResponse.Map<WaterConservationApplicationSubmissionUpdateResponse>();
     }
 }

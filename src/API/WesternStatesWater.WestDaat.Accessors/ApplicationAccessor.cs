@@ -286,7 +286,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var application = await db.WaterConservationApplications
-            .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes)
+            .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes).ThenInclude(note => note.User).ThenInclude(user => user.UserProfile)
             .Include(a => a.Estimate).ThenInclude(estimate => estimate.Locations)
             .Include(a => a.SupportingDocuments)
             .Where(a => a.Id == request.WaterConservationApplicationId)
@@ -327,13 +327,10 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         await db.SaveChangesAsync();
 
-        var returnNote = note.Map<ApplicationReviewNote>();
-        var response = new WaterConservationApplicationSubmissionUpdateResponse
+        return new WaterConservationApplicationSubmissionUpdateResponse
         {
-            Note = returnNote
+            Note = note.Map<ApplicationReviewNote>()
         };
-
-        return response;
     }
 
     private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
