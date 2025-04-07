@@ -17,6 +17,7 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -34,6 +35,7 @@ export interface ConservationApplicationState {
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     cumulativeTotalEtInAcreFeet: number | undefined;
+    cumulativeNetEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
@@ -77,6 +79,7 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
     cumulativeTotalEtInAcreFeet: undefined,
+    cumulativeNetEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
@@ -107,6 +110,7 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
+  | ReviewerConsumptiveUseEstimateAdjustedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -187,6 +191,17 @@ export interface ApplicantConsumptiveUseEstimatedAction {
     cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
     dataCollections: PolygonEtDataCollection[];
+  };
+}
+
+export interface ReviewerConsumptiveUseEstimateAdjustedAction {
+  type: 'CONSUMPTIVE_USE_ADJUSTED';
+  payload: {
+    cumulativeTotalEtInAcreFeet: number;
+    cumulativeNetEtInAcreFeet: number;
+    conservationPayment: number | undefined;
+    dataCollections: PolygonEtDataCollection[];
+    controlDataCollection: PointEtDataCollection;
   };
 }
 
@@ -276,6 +291,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
       return onConsumptiveUseEstimated(draftState, action);
+    case 'CONSUMPTIVE_USE_ADJUSTED':
+      return onConsumptiveUseAdjusted(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -450,6 +467,34 @@ const onConsumptiveUseEstimated = (
   }
 
   checkCanContinueToApplication(draftState);
+  computeCombinedPolygonData(draftState);
+
+  return draftState;
+};
+
+const onConsumptiveUseAdjusted = (
+  draftState: ConservationApplicationState,
+  { payload }: ReviewerConsumptiveUseEstimateAdjustedAction,
+): ConservationApplicationState => {
+  const application = draftState.conservationApplication;
+
+  application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
+  application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
+  application.conservationPayment = payload.conservationPayment;
+
+  // combine polygon data
+  for (let i = 0; i < application.estimateLocations.length; i++) {
+    const polygon = application.estimateLocations[i];
+    const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
+
+    polygon.fieldName = `Field ${i + 1}`;
+    polygon.waterConservationApplicationEstimateLocationId =
+      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
+    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.datapoints = matchingConsumptiveUseData.datapoints;
+  }
+
   computeCombinedPolygonData(draftState);
 
   return draftState;
