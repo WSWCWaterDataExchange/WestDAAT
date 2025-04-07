@@ -913,7 +913,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 // verify that the dates are all in the correct range
                 dbEstimateLocationWaterMeasurements.All(waterMeasurement =>
                 {
-                    var yearMatches = waterMeasurement.Year >= startYear && waterMeasurement.Year < startYear + yearRange;
+                    var yearMatches = startYear <= waterMeasurement.Year && waterMeasurement.Year < startYear + yearRange;
                     return yearMatches;
                 }).Should().BeTrue();
 
