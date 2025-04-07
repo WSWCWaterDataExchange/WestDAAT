@@ -286,7 +286,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         var application = await db.WaterConservationApplications
-            .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes).ThenInclude(note => note.User)
+            .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes)
             .Include(a => a.Estimate).ThenInclude(estimate => estimate.Locations)
             .Include(a => a.SupportingDocuments)
             .Where(a => a.Id == request.WaterConservationApplicationId)
