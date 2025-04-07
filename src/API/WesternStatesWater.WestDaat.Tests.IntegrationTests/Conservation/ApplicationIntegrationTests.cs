@@ -741,7 +741,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             var estimateLocationConsumptiveUses = Enumerable.Range(0, yearRange)
                 .Select(yearOffset =>
                     new LocationWaterMeasurementFaker(estimateLocation)
-                    .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2014 - 2023
+                    .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2015 - 2024
                     .Generate()
                 )
                 .ToArray();
