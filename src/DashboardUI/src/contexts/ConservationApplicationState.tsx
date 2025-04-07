@@ -115,7 +115,7 @@ export type ApplicationAction =
   | ApplicationLoadingAction
   | ApplicationLoadedAction
   | ApplicationLoadErroredAction
-  | ApplicationReviewerNoteAdded;
+  | ApplicationReviewerNoteAddedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -243,7 +243,7 @@ export interface ApplicationLoadErroredAction {
   type: 'APPLICATION_LOAD_ERRORED';
 }
 
-export interface ApplicationReviewerNoteAdded {
+export interface ApplicationReviewerNoteAddedAction {
   type: 'APPLICATION_NOTE_ADDED';
   payload: {
     note: ApplicationReviewNote;
@@ -726,7 +726,7 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
 
 const onApplicationReviewerNoteAdded = (
   draftState: ConservationApplicationState,
-  action: ApplicationReviewerNoteAdded,
+  action: ApplicationReviewerNoteAddedAction,
 ): ConservationApplicationState => {
   draftState.conservationApplication.reviewerNotes.push(action.payload.note);
   return draftState;
