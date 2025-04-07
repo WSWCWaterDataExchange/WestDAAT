@@ -113,6 +113,7 @@ export function ApplicationSubmitPage() {
         titleText="Submit for Review?"
         cancelText="Cancel"
         confirmText="Submit"
+        disableActionButtons={submitApplicationMutation.isLoading}
       >
         <div className="mb-2">
           Are you sure you want to submit this application? Once submitted, the application cannot be edited or resent.

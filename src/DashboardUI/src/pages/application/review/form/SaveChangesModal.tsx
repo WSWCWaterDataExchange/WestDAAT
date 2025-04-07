@@ -7,6 +7,7 @@ export interface SaveChangesModalProps {
   show: boolean;
   onCancel: () => void;
   onConfirm: (documentedChanges: string) => void;
+  disableActionButtons?: boolean;
 }
 
 export function SaveChangesModal(props: SaveChangesModalProps) {
