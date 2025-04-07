@@ -11,8 +11,8 @@ type FullPolygonData = {
   acreage: number;
   averageYearlyTotalEtInInches: number;
   averageYearlyTotalEtInAcreFeet: number;
-  averageYearlyNetEtInInches: number | undefined;
-  averageYearlyNetEtInAcreFeet: number | undefined;
+  averageYearlyNetEtInInches: number | null;
+  averageYearlyNetEtInAcreFeet: number | null;
   datapoints: GeometryEtDatapoint[];
   additionalDetails: string;
 };

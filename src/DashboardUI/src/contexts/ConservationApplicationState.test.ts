@@ -256,6 +256,8 @@ describe('ConservationApplicationState reducer', () => {
             polygonWkt: polygonWkt,
             averageYearlyTotalEtInAcreFeet: 50,
             averageYearlyTotalEtInInches: 400,
+            averageYearlyNetEtInInches: null,
+            averageYearlyNetEtInAcreFeet: null,
             datapoints: [
               {
                 year: 2025,
@@ -615,6 +617,8 @@ describe('ConservationApplicationState reducer', () => {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
               averageYearlyTotalEtInAcreFeet: 50,
               averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,
@@ -664,9 +668,7 @@ describe('ConservationApplicationState reducer', () => {
 
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.cumulativeTotalEtInAcreFeet).toEqual(
-        applicationDetails.estimate.cumulativeTotalEtInAcreFeet,
-      );
+      expect(application.cumulativeTotalEtInAcreFeet).toEqual(applicationDetails.estimate.cumulativeTotalEtInAcreFeet);
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 
       // application estimate locations
@@ -779,6 +781,8 @@ describe('ConservationApplicationState reducer', () => {
               polygonWkt: polygonWkt,
               averageYearlyTotalEtInAcreFeet: 50,
               averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,
