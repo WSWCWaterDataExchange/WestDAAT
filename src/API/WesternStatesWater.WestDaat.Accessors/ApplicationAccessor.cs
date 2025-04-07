@@ -330,11 +330,12 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         var savedNote = await db.WaterConservationApplicationSubmissionNotes
             .Include(n => n.User).ThenInclude(user => user.UserProfile)
             .Where(n => n.Id == note.Id)
+            .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
             .SingleAsync();
 
         return new WaterConservationApplicationSubmissionUpdateResponse
         {
-            Note = savedNote.Map<ApplicationReviewNote>()
+            Note = savedNote
         };
     }
 
