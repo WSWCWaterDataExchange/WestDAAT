@@ -822,7 +822,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             MessageBusUtilityMock.Verify(
                 mock => mock.SendMessageAsync(
                     Queues.ConservationApplicationStatusChanged,
-                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationSubmittedEvent>()),
+                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>()),
                 Times.Once);
         }
         else
@@ -1147,7 +1147,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         MessageBusUtilityMock.Verify(mock =>
                 mock.SendMessageAsync(
                     Queues.ConservationApplicationStatusChanged,
-                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationRecommendedEvent>()),
+                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>()),
             Times.Exactly(2));
     }
 
