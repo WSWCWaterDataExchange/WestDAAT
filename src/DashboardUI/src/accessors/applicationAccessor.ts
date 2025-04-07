@@ -27,6 +27,9 @@ import westDaatApi from './westDaatApi';
 import { MapPolygon } from '../data-contracts/MapPolygon';
 import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
 import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
+import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
+import { MapPoint } from '../data-contracts/MapPoint';
+import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -86,6 +89,32 @@ export const applicantEstimateConsumptiveUse = async (
 
   const api = await westDaatApi(context);
   const { data } = await api.post<ApplicantEstimateConsumptiveUseResponse>(
+    'Applications/EstimateConsumptiveUse',
+    request,
+  );
+
+  return data;
+};
+
+export const reviewerEstimateConsumptiveUse = async (
+  context: IMsalContext,
+  fields: {
+    waterConservationApplicationId: string;
+    polygons: MapPolygon[];
+    controlLocation: MapPoint;
+    overwriteEstimate: boolean;
+  },
+): Promise<ReviewerEstimateConsumptiveUseResponse> => {
+  const request: ReviewerEstimateConsumptiveUseRequest = {
+    $type: 'ReviewerEstimateConsumptiveUseRequest',
+    waterConservationApplicationId: fields.waterConservationApplicationId,
+    polygons: fields.polygons,
+    controlLocation: fields.controlLocation,
+    overwriteEstimate: fields.overwriteEstimate,
+  };
+
+  const api = await westDaatApi(context);
+  const { data } = await api.post<ReviewerEstimateConsumptiveUseResponse>(
     'Applications/EstimateConsumptiveUse',
     request,
   );
