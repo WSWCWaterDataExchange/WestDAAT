@@ -289,7 +289,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .Include(a => a.Submission).ThenInclude(sub => sub.SubmissionNotes)
             .Include(a => a.Estimate).ThenInclude(estimate => estimate.Locations)
             .Include(a => a.SupportingDocuments)
-            .Include(a => a.ApplicantUser).ThenInclude(user => user.UserProfile)
             .Where(a => a.Id == request.WaterConservationApplicationId)
             .SingleAsync();
 
