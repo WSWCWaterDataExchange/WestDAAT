@@ -16,6 +16,7 @@ import { ApplicationReviewButtonRow } from './ApplicationReviewButtonRow';
 import { SaveChangesModal } from './SaveChangesModal';
 import { SubmitApplicationRecommendationModal } from './SubmitApplicationRecommendationModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
+import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationReviewNote';
 
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
@@ -23,7 +24,7 @@ export function ApplicationReviewFormPage() {
   const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
 
   const isApplicationLoading = state.isLoadingApplication;
   const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
@@ -84,17 +85,19 @@ export function ApplicationReviewFormPage() {
 
   const updateApplicationSubmissionMutation = useMutation({
     mutationFn: async (documentedChanges: string) => {
-      return await updateApplicationSubmission(context, {
+      const response = await updateApplicationSubmission(context, {
         waterConservationApplicationId: applicationId!,
         form: state.conservationApplication.applicationSubmissionForm,
         supportingDocuments: state.conservationApplication.supportingDocuments,
         note: documentedChanges,
       });
+      return response.note;
     },
-    onSuccess: () => {
+    onSuccess: (note: ApplicationReviewNote) => {
       toast.success('Application changes saved successfully.');
       setShowSaveChangesModal(false);
       reinitializeDirtyFormCheck(state.conservationApplication.applicationSubmissionForm);
+      dispatch({ type: 'APPLICATION_NOTE_ADDED', payload: { note } });
     },
     onError: () => {
       toast.error('Error saving application changes.');

@@ -9,7 +9,7 @@ using WesternStatesWater.WestDaat.Utilities;
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
 public class WaterConservationApplicationSubmissionUpdateRequestHandler
-    : IRequestHandler<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>
+    : IRequestHandler<WaterConservationApplicationSubmissionUpdateRequest, WaterConservationApplicationSubmissionUpdateResponse>
 {
     private readonly IContextUtility _contextUtility;
 
@@ -23,15 +23,16 @@ public class WaterConservationApplicationSubmissionUpdateRequestHandler
         _applicationAccessor = applicationAccessor;
     }
 
-    public async Task<ApplicationStoreResponseBase> Handle(WaterConservationApplicationSubmissionUpdateRequest request)
+    public async Task<WaterConservationApplicationSubmissionUpdateResponse> Handle(WaterConservationApplicationSubmissionUpdateRequest request)
     {
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
 
         var dtoRequest = request.Map<Common.DataContracts.WaterConservationApplicationSubmissionUpdateRequest>();
         dtoRequest.UpdatedByUserId = userContext.UserId;
 
-        await _applicationAccessor.Store(dtoRequest);
+        var dtoResponse = await _applicationAccessor.Store(dtoRequest);
 
-        return new ApplicationStoreResponseBase();
+        var managerResponse = dtoResponse.Map<WaterConservationApplicationSubmissionUpdateResponse>();
+        return managerResponse;
     }
 }
