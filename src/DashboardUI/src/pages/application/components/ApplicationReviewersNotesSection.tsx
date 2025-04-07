@@ -1,3 +1,4 @@
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { formatDateString } from '../../../utilities/valueFormatters';
@@ -16,7 +17,7 @@ function ApplicationReviewersNotesSection() {
 
   return (
     <>
-      <hr className="text-primary" />
+      <ApplicationFormSectionRule width={1} />
       <ApplicationFormSection title="Notes from Reviewers (Hidden from Applicant)" className="col mb-4">
         {notes && notes.length > 0 ? (
           notes.map((note) => (
