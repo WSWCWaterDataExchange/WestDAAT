@@ -158,6 +158,14 @@ function Map({
       buttons: [
         {
           on: 'click',
+          title: 'Point tool',
+          buttonIconPath: mdiMapMarker,
+          action: () => {
+            drawControlStateRef.current?.changeMode('draw_point');
+          },
+        },
+        {
+          on: 'click',
           title: 'Rectangle tool',
           buttonIconPath: mdiVectorRectangle,
           action: () => {
