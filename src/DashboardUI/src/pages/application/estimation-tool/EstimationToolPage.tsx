@@ -12,7 +12,7 @@ import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
 import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
-import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
+import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/ApplicantEstimateConsumptiveUseResponse';
 import { toast } from 'react-toastify';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 

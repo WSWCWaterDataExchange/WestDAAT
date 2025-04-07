@@ -11,8 +11,8 @@ import { ApplicationReviewPerspective } from '../data-contracts/ApplicationRevie
 import { ApplicationSubmissionFormData } from '../data-contracts/ApplicationSubmissionFormData';
 import { BlobUpload } from '../data-contracts/BlobUpload';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
-import { ApplicantEstimateConsumptiveUseRequest } from '../data-contracts/EstimateConsumptiveUseApplicantRequest';
-import { ApplicantEstimateConsumptiveUseResponse } from '../data-contracts/EstimateConsumptiveUseApplicantResponse';
+import { ApplicantEstimateConsumptiveUseRequest } from '../data-contracts/ApplicantEstimateConsumptiveUseRequest';
+import { ApplicantEstimateConsumptiveUseResponse } from '../data-contracts/ApplicantEstimateConsumptiveUseResponse';
 import { OrganizationApplicationDashboardLoadRequest } from '../data-contracts/OrganizationApplicationDashboardLoadRequest';
 import { OrganizationApplicationDashboardLoadResponse } from '../data-contracts/OrganizationApplicationDashboardLoadResponse';
 import { ReviewerConservationApplicationLoadRequest } from '../data-contracts/ReviewerConservationApplicationLoadRequest';
@@ -232,11 +232,11 @@ export const submitApplicationRecommendation = async (
     $type: 'WaterConservationApplicationRecommendationRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     recommendationDecision: data.recommendationDecision,
-    recommendationNotes: data.recommendationNotes
+    recommendationNotes: data.recommendationNotes,
   };
 
   await api.post<void>('Applications/Submit', request);
-}
+};
 
 export const getApplication = async (
   context: IMsalContext,
