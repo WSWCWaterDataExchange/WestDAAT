@@ -749,6 +749,8 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       acreage: polygon.acreage,
       averageYearlyTotalEtInInches: polygon.averageYearlyTotalEtInInches,
       averageYearlyTotalEtInAcreFeet: polygon.averageYearlyTotalEtInAcreFeet,
+      averageYearlyNetEtInInches: polygon.averageYearlyNetEtInInches,
+      averageYearlyNetEtInAcreFeet: polygon.averageYearlyNetEtInAcreFeet,
       fieldName: polygon.fieldName,
       datapoints: polygon.datapoints,
     };
