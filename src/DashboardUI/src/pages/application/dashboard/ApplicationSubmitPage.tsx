@@ -1,14 +1,18 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
-import { ApplicationNavbar } from '../components/ApplicationNavbar';
-import { useState } from 'react';
-import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
-import { submitApplication } from '../../../accessors/applicationAccessor';
+import { useState } from 'react';
+import Button from 'react-bootstrap/esm/Button';
+import { useMutation } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
-import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
+import { submitApplication } from '../../../accessors/applicationAccessor';
+import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
+import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
+import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
 
 export function ApplicationSubmitPage() {
   const { state } = useConservationApplicationContext();
@@ -83,10 +87,23 @@ export function ApplicationSubmitPage() {
       />
 
       <div className="overflow-y-auto">
-        <ApplicationSubmissionFormDisplay
-          submitApplication={presentConfirmationModal}
-          isLoading={isApplicationLoading || isFundingOrganizationLoading}
-        />
+        <div className="container">
+          <ApplicationReviewHeader />
+          <ApplicationSubmissionFormDisplay isLoading={isApplicationLoading || isFundingOrganizationLoading} />
+          <ApplicationDocumentSection readOnly={true} />
+
+          {state.isCreatingApplication && (
+            <>
+              <ApplicationFormSectionRule width={2} />
+
+              <div className="d-flex justify-content-end p-3">
+                <Button variant="success" type="button" onClick={presentConfirmationModal}>
+                  Submit
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <ConfirmationModal
