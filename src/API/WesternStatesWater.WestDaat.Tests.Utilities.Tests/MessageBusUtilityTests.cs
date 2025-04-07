@@ -30,7 +30,7 @@ public class MessageBusUtilityTests : UtilityTestBase
         }
     }
 
-    class SmokeTestRequest : RequestBase
+    class SmokeTestRequest : EventBase
     {
         public string Message { get; set; } = null!;
     }

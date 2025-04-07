@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
 using WesternStatesWater.WestDaat.Common.Constants;
@@ -34,10 +33,11 @@ public class WaterConservationApplicationSubmissionRequestHandler : IRequestHand
         try
         {
             // User should see success message even if the message bus fails. Catch and log the exception.
-            await _messageBusUtility.SendMessageAsync(Queues.ConservationApplicationSubmitted, new WaterConservationApplicationSubmittedEvent
-            {
-                ApplicationId = request.WaterConservationApplicationId,
-            });
+            await _messageBusUtility.SendMessageAsync<WaterConservationApplicationStatusChangedEventBase>(Queues.ConservationApplicationStatusChanged,
+                new WaterConservationApplicationSubmittedEvent
+                {
+                    ApplicationId = request.WaterConservationApplicationId,
+                });
         }
         catch (Exception ex)
         {
