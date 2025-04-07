@@ -822,7 +822,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             MessageBusUtilityMock.Verify(
                 mock => mock.SendMessageAsync(
                     Queues.ConservationApplicationStatusChanged,
-                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>()),
+                    It.Is<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>(
+                        // Check for derived event type
+                        x => x is CLI.Requests.Conservation.WaterConservationApplicationSubmittedEvent
+                    )),
                 Times.Once);
         }
         else
@@ -1147,7 +1150,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         MessageBusUtilityMock.Verify(mock =>
                 mock.SendMessageAsync(
                     Queues.ConservationApplicationStatusChanged,
-                    It.IsAny<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>()),
+                    It.Is<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase>(
+                        // Check for derived event type
+                        x => x is CLI.Requests.Conservation.WaterConservationApplicationRecommendedEvent
+                    )),
             Times.Exactly(2));
     }
 
@@ -1326,8 +1332,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.SaveChangesAsync();
 
         UseSystemContext();
-        
-        
+
+
         // Act
         var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
             new CLI.Requests.Conservation.WaterConservationApplicationRecommendedEvent
