@@ -9,8 +9,8 @@ type FullPolygonData = {
   centerPoint: Point;
   fieldName: string;
   acreage: number;
-  averageYearlyEtInInches: number;
-  averageYearlyEtInAcreFeet: number;
+  averageYearlyTotalEtInInches: number;
+  averageYearlyTotalEtInAcreFeet: number;
   datapoints: GeometryEtDatapoint[];
   additionalDetails: string;
 };

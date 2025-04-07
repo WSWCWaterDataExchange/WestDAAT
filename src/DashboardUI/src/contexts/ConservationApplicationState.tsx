@@ -461,8 +461,8 @@ const onConsumptiveUseEstimated = (
     polygon.fieldName = `Field ${i + 1}`;
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
-    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
-    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
@@ -490,8 +490,8 @@ const onConsumptiveUseAdjusted = (
     polygon.fieldName = `Field ${i + 1}`;
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
-    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
-    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
@@ -613,8 +613,8 @@ const onApplicationLoaded = (
       datapoints: location.consumptiveUses,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
-      averageYearlyEtInAcreFeet: undefined,
-      averageYearlyEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyTotalEtInInches: undefined,
     }),
   );
   draftApplication.doPolygonsOverlap = false;
@@ -745,8 +745,8 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       polygonWkt: polygon.polygonWkt,
       drawToolType: polygon.drawToolType,
       acreage: polygon.acreage,
-      averageYearlyEtInInches: polygon.averageYearlyEtInInches,
-      averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,
+      averageYearlyTotalEtInInches: polygon.averageYearlyTotalEtInInches,
+      averageYearlyTotalEtInAcreFeet: polygon.averageYearlyTotalEtInAcreFeet,
       fieldName: polygon.fieldName,
       datapoints: polygon.datapoints,
     };
