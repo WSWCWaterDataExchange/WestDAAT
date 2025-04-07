@@ -12,6 +12,16 @@ export interface SaveChangesModalProps {
 export function SaveChangesModal(props: SaveChangesModalProps) {
   const [documentedChanges, setDocumentedChanges] = useState('');
 
+  const handleConfirmClicked = () => {
+    props.onConfirm(documentedChanges);
+    setDocumentedChanges('');
+  };
+
+  const handleCancelClicked = () => {
+    setDocumentedChanges('');
+    props.onCancel();
+  };
+
   return (
     <Modal show={props.show} centered>
       <Modal.Header closeButton onClick={props.onCancel}>
@@ -40,10 +50,10 @@ export function SaveChangesModal(props: SaveChangesModalProps) {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onCancel}>
+        <Button variant="secondary" onClick={handleCancelClicked}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={() => props.onConfirm(documentedChanges)} disabled={!documentedChanges}>
+        <Button variant="primary" onClick={handleConfirmClicked} disabled={!documentedChanges}>
           Save
         </Button>
       </Modal.Footer>
