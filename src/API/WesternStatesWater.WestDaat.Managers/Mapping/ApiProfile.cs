@@ -245,8 +245,13 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
 
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase,
+                    CommonContracts.WaterConservationApplicationStatusChangedEventBase>()
+                .IncludeAllDerived();
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
-            
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendedEvent, CommonContracts.WaterConservationApplicationRecommendedEvent>();
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
         }

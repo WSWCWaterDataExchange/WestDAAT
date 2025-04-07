@@ -1,4 +1,6 @@
 import { useMsal } from '@azure/msal-react';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import { useState } from 'react';
 import Button from 'react-bootstrap/esm/Button';
 import { useMutation } from 'react-query';
@@ -34,7 +36,7 @@ export function ApplicationSubmitPage() {
     if (state.isCreatingApplication) {
       navigate(`/application/${state.conservationApplication.waterConservationApplicationId}/create`);
     } else {
-      history.back();
+      navigateToWaterRightLandingPage();
     }
   };
 

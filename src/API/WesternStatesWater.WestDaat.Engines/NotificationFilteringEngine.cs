@@ -1,3 +1,4 @@
+using WesternStatesWater.WestDaat.Common;
 using WesternStatesWater.WestDaat.Common.Exceptions;
 
 namespace WesternStatesWater.WestDaat.Engines;
@@ -9,6 +10,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         return filterEvent switch
         {
             DTO.WaterConservationApplicationSubmittedEvent e => await FilterWaterConservationApplicationSubmittedEvent(e),
+            DTO.WaterConservationApplicationRecommendedEvent e => await FilterWaterConservationApplicationRecommendedEvent(e),
             _ => throw new NotImplementedException($"Filtering for type {typeof(T).Name} has not been implemented.")
         };
     }
@@ -27,9 +29,9 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             throw new WestDaatException("Application not found, or it does contain an applicant user.");
         }
 
-        var applicantNotification = await BuildApplicantNotification(@event, application);
-        var fundingOrganizationNotifications = await BuildFundingOrganizationNotifications(@event, application);
-        var adminNotifications = await BuildAdministratorNotifications(@event, application);
+        var applicantNotification = await BuildApplicationSubmittedApplicantNotification(@event, application);
+        var fundingOrganizationNotifications = await BuildApplicationSubmittedFundingOrganizationNotifications(@event, application);
+        var adminNotifications = await BuildApplicationSubmittedAdministratorNotifications(@event, application);
 
         return
         [
@@ -39,7 +41,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         ];
     }
 
-    private async Task<DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta> BuildApplicantNotification(
+    private async Task<DTO.WaterConservationApplicationSubmittedApplicantNotificationMeta> BuildApplicationSubmittedApplicantNotification(
         DTO.WaterConservationApplicationSubmittedEvent @event,
         DTO.ApplicationExistsLoadResponse application
     )
@@ -57,7 +59,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         return applicantNotification;
     }
 
-    private async Task<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta[]> BuildFundingOrganizationNotifications(
+    private async Task<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta[]> BuildApplicationSubmittedFundingOrganizationNotifications(
         DTO.WaterConservationApplicationSubmittedEvent @event,
         DTO.ApplicationExistsLoadResponse application
     )
@@ -87,7 +89,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         return fundingOrganizationNotifications;
     }
 
-    private async Task<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta[]> BuildAdministratorNotifications(
+    private async Task<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta[]> BuildApplicationSubmittedAdministratorNotifications(
         DTO.WaterConservationApplicationSubmittedEvent @event,
         DTO.ApplicationExistsLoadResponse application
     )
@@ -111,5 +113,61 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             .ToArray();
 
         return adminNotifications;
+    }
+
+    private async Task<DTO.NotificationMetaBase[]> FilterWaterConservationApplicationRecommendedEvent(
+        DTO.WaterConservationApplicationRecommendedEvent @event)
+    {
+        var application = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.ApplicationExistsLoadRequest
+        {
+            ApplicationId = @event.ApplicationId,
+            HasSubmission = true
+        });
+
+        if (application?.ApplicantUserId == null)
+        {
+            throw new WestDaatException("Application not found, or it does contain an applicant user.");
+        }
+
+        DTO.NotificationMetaBase[] fundingOrganizationNotifications = await BuildApplicationRecommendedFundingOrganizationNotifications(@event, application);
+
+        return fundingOrganizationNotifications;
+    }
+
+    private async Task<DTO.WaterConservationApplicationRecommendedNotificationMeta[]> BuildApplicationRecommendedFundingOrganizationNotifications(
+        DTO.WaterConservationApplicationRecommendedEvent @event,
+        DTO.ApplicationExistsLoadResponse application
+    )
+    {
+        var fundingOrganizationUsers = (DTO.UserListResponse)await _userAccessor.Load(new DTO.UserListRequest
+        {
+            OrganizationId = application.FundingOrganizationId.Value,
+        });
+
+        // Only send to users that are next up in the review pipeline
+        var finalApprovalUsers = fundingOrganizationUsers.Users.Where(u =>
+        {
+            var permissions = _securityUtility.Get(new DTO.RolePermissionsGetRequest
+            {
+                Role = u.Role
+            });
+
+            var hasFinalApprovalPermission = permissions.Any(p => p == Permissions.ApplicationApprove);
+            return hasFinalApprovalPermission;
+        });
+
+        var fundingOrganizationNotifications = finalApprovalUsers
+            .Select(approver => new DTO.WaterConservationApplicationRecommendedNotificationMeta
+            {
+                ApplicationId = @event.ApplicationId,
+                ToUser = new DTO.NotificationUser
+                {
+                    EmailAddress = approver.Email
+                },
+                Type = DTO.NotificationType.Email,
+            })
+            .ToArray();
+
+        return fundingOrganizationNotifications;
     }
 }

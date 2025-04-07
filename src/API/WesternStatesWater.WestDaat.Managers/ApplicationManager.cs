@@ -14,7 +14,7 @@ public sealed partial class ConservationManager : IApplicationManager
         return await ExecuteAsync<TRequest, TResponse>(request);
     }
 
-    async Task<TResponse> IApplicationManager.OnApplicationSubmitted<TRequest, TResponse>(TRequest request)
+    async Task<TResponse> IApplicationManager.OnApplicationStatusChanged<TRequest, TResponse>(TRequest request)
     {
         return await ExecuteAsync<TRequest, TResponse>(request);
     }
