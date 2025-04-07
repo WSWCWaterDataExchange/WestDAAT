@@ -9,7 +9,7 @@ export const AuthGuard = () => {
     authenticationContext: { authenticationComplete, isAuthenticated },
   } = useAppContext();
   const navigate = useNavigate();
-  const { instance } = useMsal();
+  const { instance, accounts } = useMsal();
 
   useEffect(() => {
     if (authenticationComplete) {
@@ -23,8 +23,8 @@ export const AuthGuard = () => {
     }
   }, [authenticationComplete, isAuthenticated, instance, navigate]);
 
-  // Don't render anything during the authentication check
-  if (authenticationComplete && !isAuthenticated) {
+  // Don't render anything until the authentication check is finished above
+  if (!authenticationComplete || !isAuthenticated || accounts.length === 0) {
     return null;
   }
 
