@@ -492,6 +492,8 @@ const onConsumptiveUseAdjusted = (
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
     polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
     polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.averageYearlyNetEtInInches = matchingConsumptiveUseData.averageYearlyNetEtInInches;
+    polygon.averageYearlyNetEtInAcreFeet = matchingConsumptiveUseData.averageYearlyNetEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
