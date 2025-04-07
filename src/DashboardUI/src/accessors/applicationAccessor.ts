@@ -65,7 +65,7 @@ export const createWaterConservationApplication = async (
   return data;
 };
 
-export const estimateConsumptiveUse = async (
+export const applicantEstimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
