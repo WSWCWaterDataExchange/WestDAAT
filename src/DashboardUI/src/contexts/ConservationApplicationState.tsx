@@ -39,6 +39,7 @@ export interface ConservationApplicationState {
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
+    controlLocation: PointEtDataCollection | undefined;
     doPolygonsOverlap: boolean;
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
@@ -83,6 +84,7 @@ export const defaultState = (): ConservationApplicationState => ({
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
+    controlLocation: undefined,
     doPolygonsOverlap: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
@@ -496,6 +498,8 @@ const onConsumptiveUseAdjusted = (
     polygon.averageYearlyNetEtInAcreFeet = matchingConsumptiveUseData.averageYearlyNetEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
+
+  application.controlLocation = payload.controlDataCollection;
 
   computeCombinedPolygonData(draftState);
 
