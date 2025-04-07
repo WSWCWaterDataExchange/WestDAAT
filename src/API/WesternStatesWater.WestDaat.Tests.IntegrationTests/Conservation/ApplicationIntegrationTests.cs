@@ -800,7 +800,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 ExternalAuthId = ""
             });
 
-            var requestedCompensationPerAcreFoot = 1000;
             var request = new ReviewerEstimateConsumptiveUseRequest
             {
                 WaterConservationApplicationId = application.Id,
