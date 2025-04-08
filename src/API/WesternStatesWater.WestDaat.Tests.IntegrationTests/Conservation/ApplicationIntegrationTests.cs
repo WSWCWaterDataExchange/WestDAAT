@@ -163,7 +163,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = acceptedEstimate.CompensationRateDollars,
             CompensationRateUnits = acceptedEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.Approved,
+            Status = ConservationApplicationStatus.Accepted,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
@@ -195,7 +195,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = inReviewEstimate.CompensationRateDollars,
             CompensationRateUnits = inReviewEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.InReview,
+            Status = ConservationApplicationStatus.InTechnicalReview,
             SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
@@ -242,6 +242,72 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
         });
+    }
+
+    [TestMethod]
+    public async Task Load_OrganizationApplicationDashboardRequest_ShouldHaveEachStatus()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var admin = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        var submittedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var recommendedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var approvedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var rejectedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+
+        var submittedSubmission = new WaterConservationApplicationSubmissionFaker(submittedApplication).Generate();
+
+        var recommendedSubmission = new WaterConservationApplicationSubmissionFaker(recommendedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var approvedSubmission = new WaterConservationApplicationSubmissionFaker(approvedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.AcceptedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var rejectedSubmission = new WaterConservationApplicationSubmissionFaker(rejectedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.RejectedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        _dbContext.Organizations.Add(organization);
+        _dbContext.Users.AddRange(applicant, admin);
+        _dbContext.WaterConservationApplications.AddRange(submittedApplication, recommendedApplication, approvedApplication, rejectedApplication);
+        _dbContext.WaterConservationApplicationSubmissions.AddRange(submittedSubmission, recommendedSubmission, approvedSubmission, rejectedSubmission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(
+            new OrganizationApplicationDashboardLoadRequest());
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        response.Applications.Should().HaveCount(4);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InTechnicalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InFinalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Accepted);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Rejected);
     }
 
     [TestMethod]
@@ -343,6 +409,92 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
+    }
+
+    [DataTestMethod]
+    [DataRow(ReviewStepType.ApplicantSubmitted, DisplayName = "Recently submitted application")]
+    [DataRow(ReviewStepType.Recommendation, DisplayName = "Recently recommended application")]
+    [DataRow(ReviewStepType.Approval, DisplayName = "Recently approved application")]
+    public async Task Load_ConservationApplicationLoadRequest_ShouldHaveReviewPipeline(ReviewStepType latestStep)
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var recommender = new UserFaker().Generate();
+        var approver = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        if (latestStep is ReviewStepType.Recommendation)
+        {
+            submission.RecommendedByUser = recommender;
+            submission.RecommendedForDate = DateTimeOffset.UtcNow;
+        }
+
+        if (latestStep is ReviewStepType.Approval)
+        {
+            submission.RecommendedByUser = recommender;
+            submission.RecommendedForDate = DateTimeOffset.UtcNow;
+            submission.ApprovedByUser = approver;
+            submission.AcceptedDate = DateTimeOffset.UtcNow;
+        }
+
+        _dbContext.Users.AddRangeAsync(applicant, recommender, approver);
+        _dbContext.Organizations.Add(organization);
+        _dbContext.WaterConservationApplications.Add(application);
+        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(
+            new ApplicantConservationApplicationLoadRequest
+            {
+                ApplicationId = application.Id
+            });
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        if (latestStep is ReviewStepType.ApplicantSubmitted)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(1);
+            var step1 = response.Application.ReviewPipeline.ReviewSteps[0];
+
+            step1.ReviewStepType.Should().Be(ReviewStepType.ApplicantSubmitted);
+            step1.ReviewStepStatus.Should().Be(ReviewStepStatus.Submitted);
+            step1.ParticipantName.Should().Be($"{applicant.UserProfile.FirstName} {applicant.UserProfile.LastName}");
+            step1.ReviewDate.Should().Be(application.Submission.SubmittedDate);
+        }
+
+        if (latestStep is ReviewStepType.Recommendation)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
+
+            var step2 = response.Application.ReviewPipeline.ReviewSteps[1];
+            step2.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
+            step2.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
+            step2.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
+            step2.ReviewDate.Should().Be(submission.RecommendedForDate);
+        }
+
+        if (latestStep is ReviewStepType.Approval)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
+
+            var step3 = response.Application.ReviewPipeline.ReviewSteps[2];
+            step3.ReviewStepType.Should().Be(ReviewStepType.Approval);
+            step3.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
+            step3.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
+            step3.ReviewDate.Should().Be(submission.AcceptedDate);
+        }
     }
 
     [DataTestMethod]
@@ -998,7 +1150,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbSubmissionNote.Note.Should().Be(request.Note);
             dbSubmissionNote.UserId.Should().Be(user.Id);
             dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
-            
+
             // verify the returned note has all the required information
             response.Note.Note.Should().BeEquivalentTo(request.Note);
             response.Note.SubmittedDate.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
@@ -1051,7 +1203,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Act
         var response = await _applicationManager
-            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest,
+                CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().NotBeNull();
