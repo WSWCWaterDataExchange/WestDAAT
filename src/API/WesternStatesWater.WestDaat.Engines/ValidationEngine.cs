@@ -173,6 +173,7 @@ internal class ValidationEngine : IValidationEngine
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             WaterConservationApplicationRecommendationRequest req => await ValidateWaterConservationApplicationRecommendationRequest(req, context),
+            WaterConservationApplicationApprovalRequest req => await ValidateWaterConservationApplicationApprovalRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -348,6 +349,47 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateWaterConservationApplicationApprovalRequest(WaterConservationApplicationApprovalRequest request, ContextBase context)
+    {
+        // verify the user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify the application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify the application has been through Technical Review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
+                "Application must be in final review status to be accepted or denied by a funding organization member.");
+        }
+
+        // verify the user has permissions to approve/deny an application
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationApprove))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+    
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
     {
         return request switch

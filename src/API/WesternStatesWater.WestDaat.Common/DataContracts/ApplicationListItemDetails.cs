@@ -17,6 +17,10 @@ public class ApplicationListItemDetails
     required public int EstimatedCompensationDollars { get; set; }
 
     required public string OrganizationName { get; set; }
+    
+    public DateTimeOffset? RecommendedAgainstDate { get; set; }
+    
+    public DateTimeOffset? RecommendedForDate { get; set; }
 
     public DateTimeOffset? RejectedDate { get; set; }
 
