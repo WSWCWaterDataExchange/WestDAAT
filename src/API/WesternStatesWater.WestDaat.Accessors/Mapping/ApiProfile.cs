@@ -412,6 +412,37 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<ApplicationSubmissionFieldDetail, EFWD.WaterConservationApplicationEstimateLocation>(MemberList.Source)
                 .ForSourceMember(src => src.WaterConservationApplicationEstimateLocationId, opt => opt.DoNotValidate());
 
+            CreateMap<(EFWD.WaterConservationApplicationEstimate Estimate, ApplicationEstimateStoreControlLocationDetails ControlLocationDetails), EFWD.WaterConservationApplicationEstimateControlLocation>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.MapFrom(src => src.Estimate.Id))
+                .ForMember(dest => dest.PointWkt, opt => opt.MapFrom(src => src.ControlLocationDetails.PointWkt))
+                .ForMember(dest => dest.WaterMeasurements, opt => opt.MapFrom(src => src.ControlLocationDetails.WaterMeasurements));
+
+            CreateMap<(EFWD.WaterConservationApplicationEstimateControlLocation ControlLocation, ApplicationEstimateStoreControlLocationWaterMeasurementsDetails WaterMeasurementDetails), EFWD.ControlLocationWaterMeasurement>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateControlLocationId, opt => opt.MapFrom(src => src.ControlLocation.Id))
+                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.WaterMeasurementDetails.Year))
+                .ForMember(dest => dest.TotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.TotalEtInInches));
+
+            CreateMap<(ApplicationEstimateUpdateLocationDetails LocationDetails, EFWD.WaterConservationApplicationEstimate Estimate), EFWD.WaterConservationApplicationEstimateLocation>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.MapFrom(src => src.Estimate.Id))
+                .ForMember(dest => dest.PolygonWkt, opt => opt.MapFrom(src => src.LocationDetails.PolygonWkt))
+                .ForMember(dest => dest.DrawToolType, opt => opt.MapFrom(src => src.LocationDetails.DrawToolType))
+                .ForMember(dest => dest.PolygonAreaInAcres, opt => opt.MapFrom(src => src.LocationDetails.PolygonAreaInAcres))
+                .ForMember(dest => dest.WaterMeasurements, opt => opt.MapFrom(src => src.LocationDetails.ConsumptiveUses));
+
+            CreateMap<(EFWD.WaterConservationApplicationEstimateLocation Location, ApplicationEstimateStoreLocationConsumptiveUseDetails WaterMeasurementDetails), EFWD.LocationWaterMeasurement>()
+                .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Location.Id))
+                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.WaterMeasurementDetails.Year))
+                .ForMember(dest => dest.TotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.TotalEtInInches))
+                .ForMember(dest => dest.EffectivePrecipitationInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.EffectivePrecipitationInInches))
+                .ForMember(dest => dest.NetEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.NetEtInInches));
+
+            CreateMap<ApplicationEstimateUpdateLocationDetails, EFWD.WaterConservationApplicationEstimateLocation>(MemberList.Source);
+
+            CreateMap<ApplicationEstimateUpdateRequest, EFWD.WaterConservationApplicationEstimate>(MemberList.Source)
+                // these fields are being managed manually
+                .ForMember(dest => dest.Locations, opt => opt.Ignore())
+                .ForMember(dest => dest.ControlLocations, opt => opt.Ignore());
+
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, ApplicationEstimateLocationDetails>()
                 .ForMember(dest => dest.WaterConservationApplicationEstimateLocationId, opt => opt.MapFrom(src => src.Id));
 

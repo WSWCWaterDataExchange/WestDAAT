@@ -382,7 +382,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         // locations
         dbEstimate.Locations.Should().HaveCount(request.Locations.Length);
 
-        var unreferencedLocationWasDeleted = dbEstimate.Locations.Any(location => location.Id == locations[1].Id);
+        var unreferencedLocationWasDeleted = dbEstimate.Locations.All(location => location.Id != locations[1].Id);
         unreferencedLocationWasDeleted.Should().BeTrue();
 
         var updatedLocation = dbEstimate.Locations.Single(l => l.Id == locations[0].Id);
@@ -391,6 +391,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         updatedLocation.PolygonAreaInAcres.Should().Be(request.Locations[0].PolygonAreaInAcres);
 
         var newLocation = dbEstimate.Locations.Single(l => l.Id != locations[0].Id);
+        newLocation.Id.Should().NotBe(locations[1].Id); // location 1 was deleted; just sanity-checking that it wasn't accidentally updated
         newLocation.PolygonWkt.Should().Be(polygonWkt);
         newLocation.DrawToolType.Should().Be(request.Locations[1].DrawToolType);
         newLocation.PolygonAreaInAcres.Should().Be(request.Locations[1].PolygonAreaInAcres);

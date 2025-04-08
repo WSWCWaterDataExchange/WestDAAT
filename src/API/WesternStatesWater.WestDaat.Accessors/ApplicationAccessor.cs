@@ -263,20 +263,11 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         else
         {
             // add new Control Location + related data
-            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>(request.ControlLocation);
+            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>((existingEntity, request.ControlLocation));
             await db.WaterConservationApplicationEstimateControlLocations.AddAsync(requestControlLocation);
         }
 
         // merge Locations:
-        // - create new entries for locations that do not already exist
-        var requestLocationsToBeCreated = request.Locations
-            .Where(l => !l.WaterConservationApplicationEstimateLocationId.HasValue)
-            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>((l, existingEntity)))
-            .ToArray();
-
-        // (this also creates the WaterMeasurements for each location)
-        await db.WaterConservationApplicationEstimateLocations.AddRangeAsync(requestLocationsToBeCreated);
-
         // - delete entries for locations that no longer exist
         var requestLocationIds = request.Locations
             .Where(l => l.WaterConservationApplicationEstimateLocationId.HasValue)
@@ -290,6 +281,15 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             db.LocationWaterMeasurements.RemoveRange(location.WaterMeasurements);
             db.WaterConservationApplicationEstimateLocations.Remove(location);
         }
+
+        // - create new entries for locations that do not already exist
+        var requestLocationsToBeCreated = request.Locations
+            .Where(l => !l.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>((l, existingEntity)))
+            .ToArray();
+
+        // (this also creates the WaterMeasurements for each location)
+        await db.WaterConservationApplicationEstimateLocations.AddRangeAsync(requestLocationsToBeCreated);
 
         // - update entries for locations that remain
         var existingLocationsToBeUpdated = existingEntity.Locations
