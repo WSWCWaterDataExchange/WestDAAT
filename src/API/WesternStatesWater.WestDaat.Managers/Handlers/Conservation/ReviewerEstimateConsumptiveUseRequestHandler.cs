@@ -51,7 +51,7 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
         var estimateConservationPaymentRequest = DtoMapper.Map<EstimateConservationPaymentRequest>((originalEstimate, evapotranspirationResponse));
         var estimateConservationPaymentResponse = (EstimateConservationPaymentResponse)await CalculationEngine.Calculate(estimateConservationPaymentRequest);
 
-        if (request.OverwriteEstimate)
+        if (request.UpdateEstimate)
         {
             // store estimate
             var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((

@@ -803,7 +803,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             var request = new ReviewerEstimateConsumptiveUseRequest
             {
                 WaterConservationApplicationId = application.Id,
-                OverwriteEstimate = shouldOverwriteApplicantsEstimate,
+                UpdateEstimate = shouldOverwriteApplicantsEstimate,
                 Polygons =
                 [
                     new CLI.MapPolygon
@@ -1004,7 +1004,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new ReviewerEstimateConsumptiveUseRequest
         {
             WaterConservationApplicationId = application.Id,
-            OverwriteEstimate = false,
+            UpdateEstimate = false,
             Polygons =
             [
                 new CLI.MapPolygon
