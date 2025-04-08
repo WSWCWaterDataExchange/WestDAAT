@@ -54,6 +54,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         response.ApplicationExists.Should().BeTrue();
         response.ApplicationId.Should().Be(application.Id);
         response.ApplicationDisplayId.Should().Be(application.ApplicationDisplayId);
+        response.EstimateLocationIds.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -83,6 +84,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         response.ApplicationExists.Should().BeFalse();
         response.ApplicationId.Should().BeNull();
         response.ApplicationDisplayId.Should().BeNull();
+        response.EstimateLocationIds.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -109,6 +111,7 @@ public class ApplicationAccessorTests : AccessorTestBase
         response.ApplicationExists.Should().BeFalse();
         response.ApplicationId.Should().BeNull();
         response.ApplicationDisplayId.Should().BeNull();
+        response.EstimateLocationIds.Should().BeEmpty();
     }
 
     [DataTestMethod]
@@ -137,6 +140,13 @@ public class ApplicationAccessorTests : AccessorTestBase
             application = applicationFaker.Generate();
 
             await _westDaatDb.WaterConservationApplications.AddAsync(application);
+
+            var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+            await _westDaatDb.WaterConservationApplicationEstimates.AddAsync(estimate);
+
+            var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(3);
+            await _westDaatDb.WaterConservationApplicationEstimateLocations.AddRangeAsync(locations);
+
             await _westDaatDb.SaveChangesAsync();
         }
 
@@ -158,11 +168,13 @@ public class ApplicationAccessorTests : AccessorTestBase
         {
             response.ApplicantUserId.Should().Be(application.ApplicantUserId);
             response.FundingOrganizationId.Should().Be(application.FundingOrganizationId);
+            response.EstimateLocationIds.Should().BeEquivalentTo(application.Estimate.Locations.Select(loc => loc.Id).ToArray());
         }
         else
         {
             response.ApplicantUserId.Should().BeNull();
             response.FundingOrganizationId.Should().BeNull();
+            response.EstimateLocationIds.Should().BeEmpty();
         }
     }
 
