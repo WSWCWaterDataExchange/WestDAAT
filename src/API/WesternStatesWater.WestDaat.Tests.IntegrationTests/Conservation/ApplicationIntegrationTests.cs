@@ -1033,6 +1033,88 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task Store_ReviewerEstimateConsumptiveUse_AttemptsToUpdateEstimateLocationWhichDoesNotExist_Failure()
+    {
+        // Arrange
+        const int startYear = 2015;
+        const int yearRange = 10;
+
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker()
+            .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
+            .Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.SaveChangesAsync();
+
+        var application = new WaterConservationApplicationFaker()
+            .RuleFor(a => a.ApplicantUserId, () => user.Id)
+            .RuleFor(a => a.FundingOrganizationId, () => organization.Id)
+            .Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application)
+            .RuleFor(est => est.CompensationRateUnits, () => CompensationRateUnits.AcreFeet)
+            .GenerateMetadataFromOrganization(organization)
+            .Generate();
+        var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole()
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [Roles.TechnicalReviewer],
+                    }
+            ],
+            ExternalAuthId = ""
+        });
+
+        var request = new ReviewerEstimateConsumptiveUseRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            UpdateEstimate = true,
+            Polygons =
+            [
+                new CLI.MapPolygon
+                {
+                    // id is not null, but does not match an existing EstimateLocation -> Error
+                    WaterConservationApplicationEstimateLocationId = Guid.NewGuid(),
+                    PolygonWkt = memorialStadiumFootballField,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
+            ControlLocation = new CLI.MapPoint
+            {
+                PointWkt = "POINT (0 0)",
+            },
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            ReviewerEstimateConsumptiveUseRequest,
+            ReviewerEstimateConsumptiveUseResponse>(
+            request);
+
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<NotFoundError>();
+        response.Error.PublicMessage.Should().Contain($"EstimateLocations with Ids {request.Polygons[0].WaterConservationApplicationEstimateLocationId}");
+    }
+
+    [TestMethod]
     public async Task Store_CreateWaterConservationApplication_Success()
     {
         // Arrange
