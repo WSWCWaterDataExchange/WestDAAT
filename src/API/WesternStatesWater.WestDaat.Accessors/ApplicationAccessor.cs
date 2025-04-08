@@ -78,7 +78,6 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         await using var db = _westDaatDatabaseContextFactory.Create();
 
         IQueryable<EFWD.WaterConservationApplication> applicationQuery = db.WaterConservationApplications
-            .Include(app => app.Estimate).ThenInclude(est => est.Locations)
             .Include(app => app.Submission)
             .AsNoTracking();
 
