@@ -252,4 +252,181 @@ public class ApplicationAccessorTests : AccessorTestBase
         application.WaterRightNativeId.Should().Be(request.WaterRightNativeId);
         application.ApplicationDisplayId.Should().Be(request.ApplicationDisplayId);
     }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Store_UpdateApplicationEstimate_Success(bool shouldInitializeControlLocation)
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+        await _westDaatDb.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
+        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(2);
+        var locationWaterMeasurements = locations.Select(location =>
+            new LocationWaterMeasurementFaker(location).Generate(5)
+        ).SelectMany(waterMeasurements => waterMeasurements)
+        .ToArray();
+        await _westDaatDb.LocationWaterMeasurements.AddRangeAsync(locationWaterMeasurements);
+
+        WaterConservationApplicationEstimateControlLocation controlLocation = null;
+        if (shouldInitializeControlLocation)
+        {
+            controlLocation = new WaterConservationApplicationEstimateControlLocationFaker(estimate).Generate();
+            var controlLocationWaterMeasurements = new ControlLocationWaterMeasurementFaker(controlLocation).Generate(5);
+            await _westDaatDb.ControlLocationWaterMeasurements.AddRangeAsync(controlLocationWaterMeasurements);
+        }
+
+        await _westDaatDb.SaveChangesAsync();
+
+        string pointWkt = "POINT (5 5)",
+               polygonWkt = "POLYGON ((1 1), (3 3), (5 5))";
+
+        var request = new ApplicationEstimateUpdateRequest
+        {
+            // estimate data will be updated
+            WaterConservationApplicationId = application.Id,
+            CumulativeTotalEtInAcreFeet = 1000,
+            CumulativeNetEtInAcreFeet = 800,
+            EstimatedCompensationDollars = 5000,
+
+            // control location will be updated, water measurements will be overwritten
+            ControlLocation = new ApplicationEstimateStoreControlLocationDetails
+            {
+                PointWkt = pointWkt,
+                WaterMeasurements = [
+                    new ApplicationEstimateStoreControlLocationWaterMeasurementsDetails
+                    {
+                        Year = 2025,
+                        TotalEtInInches = 5
+                    }
+                ]
+            },
+
+            // locations will be created/deleted/updated, water measurements will be created/deleted (not updated)
+            Locations =
+            [
+                // update location
+                new ApplicationEstimateUpdateLocationDetails
+                {
+                    WaterConservationApplicationEstimateLocationId = locations[0].Id,
+                    PolygonWkt = polygonWkt,
+                    DrawToolType = DrawToolType.Freeform,
+                    PolygonAreaInAcres = 1,
+                    ConsumptiveUses =
+                    [
+                        new ApplicationEstimateStoreLocationConsumptiveUseDetails
+                        {
+                            Year = 2025,
+                            TotalEtInInches = 5,
+                            EffectivePrecipitationInInches = 1,
+                            NetEtInInches = 4
+                        }
+                    ]
+                },
+                // create new location
+                new ApplicationEstimateUpdateLocationDetails
+                {
+                    WaterConservationApplicationEstimateLocationId = null,
+                    PolygonWkt = polygonWkt,
+                    DrawToolType = DrawToolType.Rectangle,
+                    PolygonAreaInAcres = 2,
+                    ConsumptiveUses =
+                    [
+                        new ApplicationEstimateStoreLocationConsumptiveUseDetails
+                        {
+                            Year = 2025,
+                            TotalEtInInches = 10,
+                            EffectivePrecipitationInInches = 2,
+                            NetEtInInches = 8
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Act
+        var response = (ApplicationEstimateUpdateResponse)await _accessor.Store(request);
+
+        // Assert
+        // validate response object
+        response.Should().NotBeNull();
+        response.Details.Should().NotBeNullOrEmpty();
+        response.Details.Length.Should().Be(2);
+
+        foreach (var location in response.Details)
+        {
+            location.WaterConservationApplicationEstimateLocationId.Should().NotBe(Guid.Empty);
+            location.PolygonWkt.Should().Be(polygonWkt);
+        }
+
+        response.ControlLocationDetails.Should().NotBeNull();
+        response.ControlLocationDetails.WaterConservationApplicationEstimateControlLocationId.Should().NotBe(Guid.Empty);
+        response.ControlLocationDetails.PointWkt.Should().Be(pointWkt);
+
+        // validate database entries
+        var dbEstimate = await _westDaatDb.WaterConservationApplicationEstimates
+            .Include(est => est.Locations).ThenInclude(location => location.WaterMeasurements)
+            .Include(est => est.ControlLocations).ThenInclude(clocation => clocation.WaterMeasurements)
+            .SingleOrDefaultAsync(est => est.Id == estimate.Id);
+
+        // estiamte
+        dbEstimate.Should().NotBeNull();
+        dbEstimate.CumulativeTotalEtInAcreFeet.Should().Be(request.CumulativeTotalEtInAcreFeet);
+        dbEstimate.CumulativeNetEtInAcreFeet.Should().Be(request.CumulativeNetEtInAcreFeet);
+        dbEstimate.EstimatedCompensationDollars.Should().Be(request.EstimatedCompensationDollars);
+
+        // locations
+        dbEstimate.Locations.Should().HaveCount(request.Locations.Length);
+
+        var unreferencedLocationWasDeleted = dbEstimate.Locations.Any(location => location.Id == locations[1].Id);
+        unreferencedLocationWasDeleted.Should().BeTrue();
+
+        var updatedLocation = dbEstimate.Locations.Single(l => l.Id == locations[0].Id);
+        updatedLocation.PolygonWkt.Should().Be(polygonWkt);
+        updatedLocation.DrawToolType.Should().Be(request.Locations[0].DrawToolType);
+        updatedLocation.PolygonAreaInAcres.Should().Be(request.Locations[0].PolygonAreaInAcres);
+
+        var newLocation = dbEstimate.Locations.Single(l => l.Id != locations[0].Id);
+        newLocation.PolygonWkt.Should().Be(polygonWkt);
+        newLocation.DrawToolType.Should().Be(request.Locations[1].DrawToolType);
+        newLocation.PolygonAreaInAcres.Should().Be(request.Locations[1].PolygonAreaInAcres);
+
+        // location water measurements
+        updatedLocation.WaterMeasurements.Should().HaveCount(1);
+
+        var measurement1 = updatedLocation.WaterMeasurements.Single();
+        measurement1.Year.Should().Be(request.Locations[0].ConsumptiveUses[0].Year);
+        measurement1.TotalEtInInches.Should().Be(request.Locations[0].ConsumptiveUses[0].TotalEtInInches);
+        measurement1.EffectivePrecipitationInInches.Should().Be(request.Locations[0].ConsumptiveUses[0].EffectivePrecipitationInInches);
+        measurement1.NetEtInInches.Should().Be(request.Locations[0].ConsumptiveUses[0].NetEtInInches);
+
+        var measurement2 = newLocation.WaterMeasurements.Single();
+        measurement2.Year.Should().Be(request.Locations[1].ConsumptiveUses[0].Year);
+        measurement2.TotalEtInInches.Should().Be(request.Locations[1].ConsumptiveUses[0].TotalEtInInches);
+        measurement2.EffectivePrecipitationInInches.Should().Be(request.Locations[1].ConsumptiveUses[0].EffectivePrecipitationInInches);
+        measurement2.NetEtInInches.Should().Be(request.Locations[1].ConsumptiveUses[0].NetEtInInches);
+
+        // control location
+        var dbControlLocation = dbEstimate.ControlLocations.Single();
+        dbControlLocation.PointWkt.Should().Be(request.ControlLocation.PointWkt);
+
+        if (shouldInitializeControlLocation)
+        {
+            dbControlLocation.Id.Should().Be(controlLocation.Id);
+        }
+        else
+        {
+            controlLocation.Should().BeNull();
+            dbControlLocation.Id.Should().NotBe(Guid.Empty);
+        }
+
+        // control location water measurements
+        var clMeasurement = dbControlLocation.WaterMeasurements.Single();
+        clMeasurement.Year.Should().Be(request.ControlLocation.WaterMeasurements[0].Year);
+        clMeasurement.TotalEtInInches.Should().Be(request.ControlLocation.WaterMeasurements[0].TotalEtInInches);
+    }
 }
