@@ -295,10 +295,12 @@ public class ApplicationAccessorTests : AccessorTestBase
             CumulativeNetEtInAcreFeet = 800,
             EstimatedCompensationDollars = 5000,
 
-            // control location will be updated, water measurements will be overwritten
+            // control location will be updated
             ControlLocation = new ApplicationEstimateStoreControlLocationDetails
             {
                 PointWkt = pointWkt,
+                // if control location did not already exist, new water measurements will be created
+                // if control location did exist, existing water measurements will be deleted and new water measurements will be created
                 WaterMeasurements = [
                     new ApplicationEstimateStoreControlLocationWaterMeasurementsDetails
                     {
@@ -308,7 +310,11 @@ public class ApplicationAccessorTests : AccessorTestBase
                 ]
             },
 
-            // locations will be created/deleted/updated, water measurements will be created/deleted (not updated)
+            // locations will be created/deleted/updated
+            // water measurements are conditional:
+            // if a location is deleted, its water measurements will be deleted too
+            // if a location is created, its water measurements will be created too
+            // if a location is updated, its water measurements will be deleted and new water measurements will be created
             Locations =
             [
                 // update location
