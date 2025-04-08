@@ -169,7 +169,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
-            ReviewerEstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseReviewerRequest(req, context),
+            ReviewerEstimateConsumptiveUseRequest req => await ValidateReviewerEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -236,7 +236,7 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseReviewerRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
+    private async Task<ErrorBase> ValidateReviewerEstimateConsumptiveUseRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
     {
         // user must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
