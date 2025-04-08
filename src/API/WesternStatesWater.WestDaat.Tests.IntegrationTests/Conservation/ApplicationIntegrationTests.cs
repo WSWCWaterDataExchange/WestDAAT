@@ -388,7 +388,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         });
 
         // Act
-
         var response = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(
             new ApplicantConservationApplicationLoadRequest
             {
