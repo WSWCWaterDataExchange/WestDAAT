@@ -346,6 +346,93 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
+    [DataRow(ReviewStepType.ApplicantSubmitted, DisplayName = "Recently submitted application")]
+    [DataRow(ReviewStepType.Recommendation, DisplayName = "Recently recommended application")]
+    [DataRow(ReviewStepType.Approval, DisplayName = "Recently approved application")]
+    public async Task Load_ConservationApplicationLoadRequest_ShouldHaveReviewPipeline(ReviewStepType latestStep)
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var recommender = new UserFaker().Generate();
+        var approver = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        if (latestStep is ReviewStepType.Recommendation)
+        {
+            submission.RecommendedByUser = recommender;
+            submission.RecommendedForDate = DateTimeOffset.UtcNow;
+        }
+
+        if (latestStep is ReviewStepType.Approval)
+        {
+            submission.RecommendedByUser = recommender;
+            submission.RecommendedForDate = DateTimeOffset.UtcNow;
+            submission.ApprovedByUser = approver;
+            submission.AcceptedDate = DateTimeOffset.UtcNow;
+        }
+
+        _dbContext.Users.AddRangeAsync(applicant, recommender, approver);
+        _dbContext.Organizations.Add(organization);
+        _dbContext.WaterConservationApplications.Add(application);
+        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+
+        var response = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(
+            new ApplicantConservationApplicationLoadRequest
+            {
+                ApplicationId = application.Id
+            });
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        if (latestStep is ReviewStepType.ApplicantSubmitted)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(1);
+            var step1 = response.Application.ReviewPipeline.ReviewSteps[0];
+
+            step1.ReviewStepType.Should().Be(ReviewStepType.ApplicantSubmitted);
+            step1.ReviewStepStatus.Should().Be(ReviewStepStatus.Submitted);
+            step1.ParticipantName.Should().Be($"{applicant.UserProfile.FirstName} {applicant.UserProfile.LastName}");
+            step1.ReviewDate.Should().Be(application.Submission.SubmittedDate);
+        }
+
+        if (latestStep is ReviewStepType.Recommendation)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
+            
+            var step2 = response.Application.ReviewPipeline.ReviewSteps[1];
+            step2.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
+            step2.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
+            step2.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
+            step2.ReviewDate.Should().Be(submission.RecommendedForDate);
+        }
+        
+        if (latestStep is ReviewStepType.Approval)
+        {
+            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
+            
+            var step3 = response.Application.ReviewPipeline.ReviewSteps[2];
+            step3.ReviewStepType.Should().Be(ReviewStepType.Approval);
+            step3.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
+            step3.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
+            step3.ReviewDate.Should().Be(submission.AcceptedDate);
+        }
+    }
+
+    [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
     [DataRow(false, false, DisplayName = "Request without compensation should not save estimate")]
@@ -998,7 +1085,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbSubmissionNote.Note.Should().Be(request.Note);
             dbSubmissionNote.UserId.Should().Be(user.Id);
             dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
-            
+
             // verify the returned note has all the required information
             response.Note.Note.Should().BeEquivalentTo(request.Note);
             response.Note.SubmittedDate.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
