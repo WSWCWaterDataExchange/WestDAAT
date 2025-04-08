@@ -107,7 +107,7 @@ function ReviewMap(props: ReviewMapProps) {
     if (pointFeatures.length > 1) {
       toast.error('You may only select one control location.');
     }
-    const controlLocationFeature = pointFeatures[0];
+    const [controlLocationFeature] = pointFeatures;
 
     // check if polygons intersect with each other
     const doPolygonsOverlap = doPolygonsIntersect(polygonFeatures);
@@ -116,18 +116,21 @@ function ReviewMap(props: ReviewMapProps) {
     }
 
     // check if control location is contained within any polygon
-
-    const doesControlLocationOverlapWithPolygons = polygonFeatures.some((polygonFeature) =>
-      doesPointIntersectWithPolygon(controlLocationFeature, polygonFeature),
-    );
+    let doesControlLocationOverlapWithPolygons: boolean | undefined;
+    if (controlLocationFeature) {
+      doesControlLocationOverlapWithPolygons = polygonFeatures.some((polygonFeature) =>
+        doesPointIntersectWithPolygon(controlLocationFeature, polygonFeature),
+      );
+    }
 
     if (doesControlLocationOverlapWithPolygons) {
       toast.error('Control location must not be contained within any polygon. Please move the control location.');
     }
 
     const polygonData: MapSelectionPolygonData[] = polygonFeatures.map(fromGeometryFeatureToMapSelectionPolygonData);
-    const controlLocationData: MapSelectionPointData =
-      fromGeometryFeatureToMapSelectionPointData(controlLocationFeature);
+    const controlLocationData: MapSelectionPointData | undefined = controlLocationFeature
+      ? fromGeometryFeatureToMapSelectionPointData(controlLocationFeature)
+      : undefined;
 
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
