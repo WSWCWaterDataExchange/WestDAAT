@@ -1,5 +1,9 @@
 @import '../../../styles/colors';
 
+.application-status-icon-submitted {
+  color: $primary-color;
+}
+
 .application-status-icon-approved {
   color: $app-review-status-approved;
 }

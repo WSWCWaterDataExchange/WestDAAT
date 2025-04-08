@@ -25,6 +25,7 @@ import { CompensationRateUnitsLabelsPlural } from '../../../data-contracts/Compe
 import {
   ConservationApplicationStatus,
   ConservationApplicationStatusDisplayNames,
+  getApplicationStatusIconClass,
 } from '../../../data-contracts/ConservationApplicationStatus';
 import { useOrganizationQuery } from '../../../hooks/queries';
 import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
@@ -90,20 +91,6 @@ export function OrganizationDashboardPage() {
 
   const dateFormatter = (date: Date) => {
     return formatDateString(date, 'MM/DD/YYYY');
-  };
-
-  const getApplicationStatusIconClass = (status: ConservationApplicationStatus): string => {
-    switch (status) {
-      case ConservationApplicationStatus.Accepted:
-        return 'application-status-icon-approved';
-      case ConservationApplicationStatus.Rejected:
-        return 'application-status-icon-rejected';
-      case ConservationApplicationStatus.InTechnicalReview:
-      case ConservationApplicationStatus.InFinalReview:
-        return 'application-status-icon-inReview';
-      case ConservationApplicationStatus.Unknown:
-        return 'application-status-icon-unknown';
-    }
   };
 
   const renderHeader = (params: GridColumnHeaderParams) => (

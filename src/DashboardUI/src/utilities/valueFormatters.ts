@@ -14,6 +14,9 @@ export function formatNumber(value: number | null | undefined, decimals?: number
   return value.toLocaleString(undefined, opts);
 }
 
+// docs: https://momentjs.com/docs/#/displaying/
+export const momentJsLocalizedDateFormatString = 'llll';
+
 export function formatDateString(date: Date | string, dateFormat: string): string {
   return moment(date).format(dateFormat);
 }
