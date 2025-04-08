@@ -114,7 +114,8 @@ export type ApplicationAction =
   | ApplicationDocumentRemovedAction
   | ApplicationLoadingAction
   | ApplicationLoadedAction
-  | ApplicationLoadErroredAction;
+  | ApplicationLoadErroredAction
+  | ApplicationReviewerNoteAddedAction;
 
 export interface DashboardApplicationsLoadedAction {
   type: 'DASHBOARD_APPLICATIONS_LOADED';
@@ -242,6 +243,13 @@ export interface ApplicationLoadErroredAction {
   type: 'APPLICATION_LOAD_ERRORED';
 }
 
+export interface ApplicationReviewerNoteAddedAction {
+  type: 'APPLICATION_NOTE_ADDED';
+  payload: {
+    note: ApplicationReviewNote;
+  };
+}
+
 export const reducer = (
   state: ConservationApplicationState,
   action: ApplicationAction,
@@ -292,6 +300,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationLoaded(draftState, action);
     case 'APPLICATION_LOAD_ERRORED':
       return onApplicationLoadErrored(draftState);
+    case 'APPLICATION_NOTE_ADDED':
+      return onApplicationReviewerNoteAdded(draftState, action);
   }
 };
 
@@ -712,4 +722,12 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
   }
 
   draftState.conservationApplication.polygonAcreageSum = polygonAcreageSum;
+};
+
+const onApplicationReviewerNoteAdded = (
+  draftState: ConservationApplicationState,
+  action: ApplicationReviewerNoteAddedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.reviewerNotes.push(action.payload.note);
+  return draftState;
 };

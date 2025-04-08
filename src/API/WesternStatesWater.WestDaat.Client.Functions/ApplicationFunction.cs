@@ -102,7 +102,7 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
             new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, WaterConservationApplicationSubmissionUpdateResponse>(request);
         return await CreateResponse(req, results);
     }
 

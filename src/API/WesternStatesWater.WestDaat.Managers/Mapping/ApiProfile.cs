@@ -229,6 +229,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     CommonContracts.WaterConservationApplicationSubmissionUpdateRequest>()
                 .ForMember(dest => dest.UpdatedByUserId, opt => opt.Ignore());
 
+            CreateMap<CommonContracts.WaterConservationApplicationSubmissionUpdateResponse,
+                ClientContracts.Responses.Conservation.WaterConservationApplicationSubmissionUpdateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationDocument, CommonContracts.WaterConservationApplicationDocument>()
