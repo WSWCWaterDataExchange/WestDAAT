@@ -20,7 +20,7 @@ function ApplicationReviewPipelineSection() {
         {state.conservationApplication.reviewPipeline.reviewSteps.map((step) => (
           <div key={step.reviewDate} className="row mb-1">
             <div className="col-xl-3 col-sm-6 d-flex align-items-center gap-2 text-nowrap">
-              <Icon size={0.7} path={mdiCircle} className={'flex-shrink-0 ' + getApplicationReviewStepIconClass(step.reviewStepStatus)} />
+              <Icon size={0.7} path={mdiCircle} className={`flex-shrink-0 ` + getApplicationReviewStepIconClass(step.reviewStepStatus)} />
               {ReviewStepStatusDisplayNames[step.reviewStepStatus]}
             </div>
             <div className="col-xl-2 col-sm-6">
