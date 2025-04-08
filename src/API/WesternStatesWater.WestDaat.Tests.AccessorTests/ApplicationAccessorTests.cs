@@ -265,7 +265,9 @@ public class ApplicationAccessorTests : AccessorTestBase
         await _westDaatDb.WaterConservationApplications.AddAsync(application);
 
         var estimate = new WaterConservationApplicationEstimateFaker(application).Generate();
-        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate(2);
+        var locations = new WaterConservationApplicationEstimateLocationFaker(estimate)
+            .RuleFor(loc => loc.AdditionalDetails, () => "Custom additional details")
+            .Generate(2);
         var locationWaterMeasurements = locations.Select(location =>
             new LocationWaterMeasurementFaker(location).Generate(5)
         ).SelectMany(waterMeasurements => waterMeasurements)
@@ -389,12 +391,15 @@ public class ApplicationAccessorTests : AccessorTestBase
         updatedLocation.PolygonWkt.Should().Be(polygonWkt);
         updatedLocation.DrawToolType.Should().Be(request.Locations[0].DrawToolType);
         updatedLocation.PolygonAreaInAcres.Should().Be(request.Locations[0].PolygonAreaInAcres);
+        // *important* this field should be carried over since the Location entry already existed
+        updatedLocation.AdditionalDetails.Should().Be("Custom additional details");
 
         var newLocation = dbEstimate.Locations.Single(l => l.Id != locations[0].Id);
         newLocation.Id.Should().NotBe(locations[1].Id); // location 1 was deleted; just sanity-checking that it wasn't accidentally updated
         newLocation.PolygonWkt.Should().Be(polygonWkt);
         newLocation.DrawToolType.Should().Be(request.Locations[1].DrawToolType);
         newLocation.PolygonAreaInAcres.Should().Be(request.Locations[1].PolygonAreaInAcres);
+        newLocation.AdditionalDetails.Should().BeNullOrEmpty();
 
         // location water measurements
         updatedLocation.WaterMeasurements.Should().HaveCount(1);
