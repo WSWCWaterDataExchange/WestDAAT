@@ -245,6 +245,72 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task Load_OrganizationApplicationDashboardRequest_ShouldHaveEachStatus()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var admin = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        var submittedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var recommendedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var approvedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var rejectedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+
+        var submittedSubmission = new WaterConservationApplicationSubmissionFaker(submittedApplication).Generate();
+
+        var recommendedSubmission = new WaterConservationApplicationSubmissionFaker(recommendedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var approvedSubmission = new WaterConservationApplicationSubmissionFaker(approvedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.AcceptedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var rejectedSubmission = new WaterConservationApplicationSubmissionFaker(rejectedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.RejectedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        _dbContext.Organizations.Add(organization);
+        _dbContext.Users.AddRange(applicant, admin);
+        _dbContext.WaterConservationApplications.AddRange(submittedApplication, recommendedApplication, approvedApplication, rejectedApplication);
+        _dbContext.WaterConservationApplicationSubmissions.AddRange(submittedSubmission, recommendedSubmission, approvedSubmission, rejectedSubmission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(
+            new OrganizationApplicationDashboardLoadRequest());
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        response.Applications.Should().HaveCount(4);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InTechnicalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InFinalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Accepted);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Rejected);
+    }
+
+    [TestMethod]
     public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
     {
         // Arrange
