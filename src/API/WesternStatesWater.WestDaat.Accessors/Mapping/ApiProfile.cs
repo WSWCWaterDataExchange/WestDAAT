@@ -356,7 +356,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
-                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedByUser, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUser, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmission>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -368,7 +371,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
-                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedByUser, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUser, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

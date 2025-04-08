@@ -243,8 +243,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+            
             CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
+                .ForMember(dest => dest.ReviewPipeline, opt => opt.MapFrom(src => src.Application.ReviewPipeline))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
