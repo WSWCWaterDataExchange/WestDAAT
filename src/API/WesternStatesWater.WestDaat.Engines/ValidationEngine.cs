@@ -287,9 +287,11 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify application is in review
-        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
         {
-            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), "Application must be in review to be updated.");
+            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId),
+                "Application must be in review to be updated.");
         }
 
         // verify user belongs to the funding organization that is handling the application
@@ -327,7 +329,8 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify the application is in review
-        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
         {
             return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
                 "Application must be in review status to receive a recommendation for final review.");
@@ -443,9 +446,9 @@ internal class ValidationEngine : IValidationEngine
 
         // Verify the user's email domain matches the organization's
         var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
-        { UserId = request.UserId });
+            { UserId = request.UserId });
         var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
-        { OrganizationId = request.OrganizationId });
+            { OrganizationId = request.OrganizationId });
 
         // There is validation to ensure the user email includes an '@'.
         // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.

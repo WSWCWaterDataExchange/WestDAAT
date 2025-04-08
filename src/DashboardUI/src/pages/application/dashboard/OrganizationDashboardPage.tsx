@@ -94,11 +94,12 @@ export function OrganizationDashboardPage() {
 
   const getApplicationStatusIconClass = (status: ConservationApplicationStatus): string => {
     switch (status) {
-      case ConservationApplicationStatus.Approved:
+      case ConservationApplicationStatus.Accepted:
         return 'application-status-icon-approved';
       case ConservationApplicationStatus.Rejected:
         return 'application-status-icon-rejected';
-      case ConservationApplicationStatus.InReview:
+      case ConservationApplicationStatus.InTechnicalReview:
+      case ConservationApplicationStatus.InFinalReview:
         return 'application-status-icon-inReview';
       case ConservationApplicationStatus.Unknown:
         return 'application-status-icon-unknown';

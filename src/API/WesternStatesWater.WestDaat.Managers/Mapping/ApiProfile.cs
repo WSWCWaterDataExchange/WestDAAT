@@ -163,7 +163,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<CommonContracts.ApplicationListItemDetails, ClientContracts.Responses.Conservation.ApplicationDashboardListItem>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.AcceptedDate, src.RejectedDate)))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
+                    src.RecommendedByUserId,
+                    src.AcceptedDate,
+                    src.RejectedDate
+                )))
                 .ForMember(dest => dest.TotalObligationDollars, opt => opt.MapFrom(src => src.EstimatedCompensationDollars))
                 .ForMember(dest => dest.TotalWaterVolumeSavingsAcreFeet, opt => opt.MapFrom(src => src.CumulativeTotalEtInAcreFeet));
 
@@ -230,7 +234,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.UpdatedByUserId, opt => opt.Ignore());
 
             CreateMap<CommonContracts.WaterConservationApplicationSubmissionUpdateResponse,
-                ClientContracts.Responses.Conservation.WaterConservationApplicationSubmissionUpdateResponse>()
+                    ClientContracts.Responses.Conservation.WaterConservationApplicationSubmissionUpdateResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
 
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
@@ -243,7 +247,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ApplicantConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
-            
+
             CreateMap<CommonContracts.ApplicationLoadSingleResponse, ClientContracts.Responses.Conservation.ReviewerConservationApplicationLoadResponse>()
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Application.Notes))
                 .ForMember(dest => dest.ReviewPipeline, opt => opt.MapFrom(src => src.Application.ReviewPipeline))
@@ -260,19 +264,20 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
-            
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
         }
 
-        public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        public static DTO.ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommenedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            return (acceptedDate, rejectedDate) switch
+            return (recommenedByUserId, acceptedDate, rejectedDate) switch
             {
-                (null, null) => CommonContracts.ConservationApplicationStatus.InReview,
-                (not null, null) => CommonContracts.ConservationApplicationStatus.Approved,
-                (null, not null) => CommonContracts.ConservationApplicationStatus.Rejected,
-                _ => CommonContracts.ConservationApplicationStatus.Unknown
+                (null, null, null) => DTO.ConservationApplicationStatus.InTechnicalReview,
+                (not null, null, null) => DTO.ConservationApplicationStatus.InFinalReview,
+                (_, not null, null) => DTO.ConservationApplicationStatus.Accepted,
+                (_, null, not null) => DTO.ConservationApplicationStatus.Rejected,
+                _ => DTO.ConservationApplicationStatus.Unknown
             };
         }
     }

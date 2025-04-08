@@ -163,7 +163,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = acceptedEstimate.CompensationRateDollars,
             CompensationRateUnits = acceptedEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.Approved,
+            Status = ConservationApplicationStatus.Accepted,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
@@ -195,7 +195,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = inReviewEstimate.CompensationRateDollars,
             CompensationRateUnits = inReviewEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.InReview,
+            Status = ConservationApplicationStatus.InTechnicalReview,
             SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
@@ -411,18 +411,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         if (latestStep is ReviewStepType.Recommendation)
         {
             response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
-            
+
             var step2 = response.Application.ReviewPipeline.ReviewSteps[1];
             step2.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
             step2.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
             step2.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
             step2.ReviewDate.Should().Be(submission.RecommendedForDate);
         }
-        
+
         if (latestStep is ReviewStepType.Approval)
         {
             response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
-            
+
             var step3 = response.Application.ReviewPipeline.ReviewSteps[2];
             step3.ReviewStepType.Should().Be(ReviewStepType.Approval);
             step3.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
@@ -1137,7 +1137,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Act
         var response = await _applicationManager
-            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest,
+                CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().NotBeNull();

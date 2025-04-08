@@ -449,17 +449,22 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
                 .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(_ => true))
                 .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
+                    src.Submission.RecommendedByUserId,
+                    src.Submission.AcceptedDate,
+                    src.Submission.RejectedDate
+                )));
         }
 
         // duplicated in other ApiProfile.cs
-        public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommenedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            return (acceptedDate, rejectedDate) switch
+            return (recommenedByUserId, acceptedDate, rejectedDate) switch
             {
-                (null, null) => ConservationApplicationStatus.InReview,
-                (not null, null) => ConservationApplicationStatus.Approved,
-                (null, not null) => ConservationApplicationStatus.Rejected,
+                (null, null, null) => ConservationApplicationStatus.InTechnicalReview,
+                (not null, null, null) => ConservationApplicationStatus.InFinalReview,
+                (_, not null, null) => ConservationApplicationStatus.Accepted,
+                (_, null, not null) => ConservationApplicationStatus.Rejected,
                 _ => ConservationApplicationStatus.Unknown
             };
         }
