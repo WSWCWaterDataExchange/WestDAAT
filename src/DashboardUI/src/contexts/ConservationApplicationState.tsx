@@ -17,6 +17,7 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -43,6 +44,7 @@ export interface ConservationApplicationState {
     polygonAcreageSum: number;
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
   };
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
@@ -85,6 +87,9 @@ export const defaultState = (): ConservationApplicationState => ({
     polygonAcreageSum: 0,
     supportingDocuments: [],
     reviewerNotes: [],
+    reviewPipeline: {
+      reviewSteps: [],
+    },
   },
   isCreatingApplication: false,
   isUploadingDocument: false,
@@ -236,6 +241,7 @@ export interface ApplicationLoadedAction {
   payload: {
     application: ApplicationDetails;
     notes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
   };
 }
 
@@ -329,7 +335,9 @@ const onDashboardApplicationsFiltered = (
 function calculateApplicationStatistics(applications: ApplicationDashboardListItem[]): ApplicationDashboardStatistics {
   const submittedApps = applications.length;
   const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Accepted).length;
-  const inTechReview = applications.filter((app) => app?.status === ConservationApplicationStatus.InTechnicalReview).length;
+  const inTechReview = applications.filter(
+    (app) => app?.status === ConservationApplicationStatus.InTechnicalReview,
+  ).length;
   const inFinalRevew = applications.filter((app) => app?.status === ConservationApplicationStatus.InFinalReview).length;
   const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
   const inReviewApps = inTechReview + inFinalRevew;
@@ -598,6 +606,8 @@ const onApplicationLoaded = (
     }),
   );
   draftApplication.reviewerNotes = payload.notes;
+
+  draftApplication.reviewPipeline = payload.reviewPipeline;
 
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
