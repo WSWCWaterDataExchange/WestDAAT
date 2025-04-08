@@ -266,6 +266,20 @@ internal class ValidationEngine : IValidationEngine
             return CreateForbiddenError(request, context);
         }
 
+        // if user provides an id in an attempt to update an existing location, then a location must already exist with that id
+        var requestLocationIds = request.Polygons
+            .Select(location => location.WaterConservationApplicationEstimateLocationId)
+            .Where(id => id != null)
+            .Select(id => id.Value);
+        var databaseLocationIds = applicationExistsResponse.EstimateLocationIds;
+
+        var requestLocationIdsNotInDatabase = requestLocationIds.Except(databaseLocationIds);
+
+        if (requestLocationIdsNotInDatabase.Any())
+        {
+            return CreateNotFoundError(context, $"EstimateLocations with Ids {string.Join(',', requestLocationIdsNotInDatabase)}");
+        }
+
         // control location must not intersect with any polygons
         // polygons must not intersect with each other
         var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
