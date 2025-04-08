@@ -258,6 +258,9 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
+            
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
+                .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
