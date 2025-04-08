@@ -1,7 +1,9 @@
 using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
@@ -22,12 +24,10 @@ public class WaterConservationApplicationApprovalRequestHandler : IRequestHandle
 
     public async Task<ApplicationStoreResponseBase> Handle(WaterConservationApplicationApprovalRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("made it to handler");
-        // var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        // var accessorRequest = request.Map<Common.DataContracts.WaterConservationApplicationRecommendationRequest>();
-        // accessorRequest.RecommendedByUserId = userContext.UserId;
-        //
-        // await _applicationAccessor.Store(accessorRequest);
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        var accessorRequest = request.Map<Common.DataContracts.WaterConservationApplicationApprovalRequest>();
+        accessorRequest.ApprovedByUserId = userContext.UserId;
+        await _applicationAccessor.Store(accessorRequest);
+        return new ApplicationStoreResponseBase();
     }
 }

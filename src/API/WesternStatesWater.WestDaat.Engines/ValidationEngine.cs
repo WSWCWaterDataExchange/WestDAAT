@@ -374,7 +374,7 @@ internal class ValidationEngine : IValidationEngine
         // verify the application has been through Technical Review
         if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
         {
-            return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
+            return CreateValidationError(request, nameof(WaterConservationApplicationApprovalRequest.WaterConservationApplicationId),
                 "Application must be in final review status to be accepted or denied by a funding organization member.");
         }
 
