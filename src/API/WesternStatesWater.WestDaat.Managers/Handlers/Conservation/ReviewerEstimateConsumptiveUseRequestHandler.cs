@@ -53,30 +53,27 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
 
         if (request.UpdateEstimate)
         {
-            // store estimate
-            var storeEstimateRequest = DtoMapper.Map<ApplicationEstimateStoreRequest>((
+            var updateEstimateRequest = DtoMapper.Map<ApplicationEstimateUpdateRequest>((
                 request,
-                fundingOrgDetailsResponse.Organization,
-                originalEstimate,
                 evapotranspirationResponse,
                 estimateConservationPaymentResponse
             ));
 
-            var storeEstimateResponse = (ApplicationEstimateStoreResponse)await ApplicationAccessor.Store(storeEstimateRequest);
+            var updateEstimateResponse = (ApplicationEstimateUpdateResponse)await ApplicationAccessor.Store(updateEstimateRequest);
 
             // connect the EstimateLocation Ids to the ET data
             foreach (var collection in responseLocationsEtData)
             {
-                var matchingEstimateLocation = storeEstimateResponse.Details.Single(detail => detail.PolygonWkt == collection.PolygonWkt);
+                var matchingEstimateLocation = updateEstimateResponse.Details.Single(detail => detail.PolygonWkt == collection.PolygonWkt);
                 collection.WaterConservationApplicationEstimateLocationId = matchingEstimateLocation.WaterConservationApplicationEstimateLocationId;
             }
 
             // connect the EstimateControlLocation Ids to the ET data
-            var matchingEstimateControlLocationId = storeEstimateResponse.ControlLocationDetails.WaterConservationApplicationEstimateControlLocationId;
+            var matchingEstimateControlLocationId = updateEstimateResponse.ControlLocationDetails.WaterConservationApplicationEstimateControlLocationId;
             responseControlLocationEtData.WaterConservationApplicationEstimateControlLocationId = matchingEstimateControlLocationId;
         }
 
-        return new ReviewerEstimateConsumptiveUseResponse
+        var response = new ReviewerEstimateConsumptiveUseResponse
         {
             ConservationPayment = estimateConservationPaymentResponse.EstimatedCompensationDollars,
             CumulativeTotalEtInAcreFeet = evapotranspirationResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet),
@@ -84,5 +81,7 @@ public class ReviewerEstimateConsumptiveUseRequestHandler : IRequestHandler<Revi
             DataCollections = responseLocationsEtData,
             ControlDataCollection = responseControlLocationEtData,
         };
+
+        return response;
     }
 }

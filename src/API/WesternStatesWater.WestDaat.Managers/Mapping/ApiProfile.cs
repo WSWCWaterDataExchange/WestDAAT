@@ -235,6 +235,30 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     };
                 });
 
+            CreateMap<CommonContracts.PolygonEtDataCollection, CommonContracts.ApplicationEstimateUpdateLocationDetails>()
+                .ConvertUsing((src, dest) =>
+                {
+                    var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(src.PolygonWkt));
+                    return new CommonContracts.ApplicationEstimateUpdateLocationDetails
+                    {
+                        // mapping from Guid to Guid? -> default values should be treated as null
+                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId != Guid.Empty
+                            ? src.WaterConservationApplicationEstimateLocationId
+                            : null,
+                        PolygonWkt = src.PolygonWkt,
+                        DrawToolType = src.DrawToolType,
+                        PolygonAreaInAcres = polygonAreaInAcres,
+                        ConsumptiveUses = src.Datapoints.Select(y => new CommonContracts.ApplicationEstimateStoreLocationConsumptiveUseDetails
+                        {
+                            Year = y.Year,
+                            TotalEtInInches = y.TotalEtInInches,
+                            EffectivePrecipitationInInches = y.EffectivePrecipitationInInches,
+                            NetEtInInches = y.NetEtInInches
+                        }).ToArray()
+                    };
+                });
+
+
             CreateMap<CommonContracts.PointEtDataCollection, CommonContracts.ApplicationEstimateStoreControlLocationDetails>()
                 .ConvertUsing((src, dest) =>
                 {
@@ -272,21 +296,14 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<(
                 ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest Request,
-                CommonContracts.OrganizationFundingDetails Organization,
-                CommonContracts.EstimateDetails OriginalEstimate,
                 CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
-                CommonContracts.EstimateConservationPaymentResponse PaymentResponse),
-                CommonContracts.ApplicationEstimateStoreRequest>()
+                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
+                ), CommonContracts.ApplicationEstimateUpdateRequest>()
                 .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.MapFrom(src => src.Request.WaterConservationApplicationId))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
-                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
-                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd))
-                .ForMember(dest => dest.DesiredCompensationDollars, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateDollars))
-                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateUnits))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
-                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
                 .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
                 .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyNetEtInAcreFeet)))
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
                 .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.EtResponse.ControlLocationDataCollection));
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
