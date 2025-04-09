@@ -5,5 +5,7 @@ export interface PolygonEtDataCollection {
   polygonWkt: string;
   averageYearlyTotalEtInInches: number;
   averageYearlyTotalEtInAcreFeet: number;
+  averageYearlyNetEtInInches: number;
+  averageYearlyNetEtInAcreFeet: number;
   datapoints: GeometryEtDatapoint[];
 }
