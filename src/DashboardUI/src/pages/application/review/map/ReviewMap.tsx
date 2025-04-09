@@ -15,6 +15,7 @@ import Spinner from 'react-bootstrap/esm/Spinner';
 import { area as areaInSquareMeters } from '@turf/area';
 import {
   fromGeometryFeatureToMapSelectionPolygonData,
+  fromPartialPointDataToPointFeature,
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
 
@@ -41,6 +42,13 @@ function ReviewMap(props: ReviewMapProps) {
     return state.conservationApplication.estimateLocations.map(fromPartialPolygonDataToPolygonFeature);
   }, [state.conservationApplication.estimateLocations]);
 
+  const controlLocationFeature: Feature<Point, GeoJsonProperties> | undefined = useMemo(() => {
+    if (!state.conservationApplication.controlLocation) {
+      return undefined;
+    }
+    return fromPartialPointDataToPointFeature(state.conservationApplication.controlLocation);
+  }, [state.conservationApplication.controlLocation]);
+
   const userDrawnPolygonLabelFeatures: Feature<Point, GeoJsonProperties>[] = useMemo(() => {
     return userDrawnPolygonFeatures
       .filter((polygonFeature) => !!polygonFeature.properties?.title)
@@ -59,9 +67,12 @@ function ReviewMap(props: ReviewMapProps) {
       return;
     }
 
-    // display user-drawn polygons on map
+    // display user-drawn polygons + control location point on map
     // side note: labels are handled separately
-    setUserDrawnPolygonData(userDrawnPolygonFeatures);
+    const allFeatures: Feature<Geometry, GeoJsonProperties>[] = (
+      userDrawnPolygonFeatures as Feature<Geometry, GeoJsonProperties>[]
+    ).concat(controlLocationFeature ? [controlLocationFeature] : []);
+    setUserDrawnPolygonData(allFeatures);
 
     // zoom map in to focus on polygons
     const userDrawnPolygonFeatureCollection: FeatureCollection<Geometry, GeoJsonProperties> = {
