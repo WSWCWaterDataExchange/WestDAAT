@@ -170,23 +170,51 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             CreateMap<ClientContracts.MapPolygon, CommonContracts.MapPolygon>()
                 .ReverseMap();
 
+            CreateMap<ClientContracts.MapPoint, CommonContracts.MapPoint>()
+                .ReverseMap();
+
+            CreateMap<ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest, CommonContracts.ApplicationLoadSingleRequest>()
+                .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.WaterConservationApplicationId));
+
+            CreateMap<CommonContracts.ApplicationLoadSingleResponse, CommonContracts.OrganizationFundingDetailsRequest>()
+                .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Application.FundingOrganizationId));
+
             CreateMap<
-                    (ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
-                    CommonContracts.MultiPolygonYearlyEtRequest>()
+                (ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
+                CommonContracts.MultiPolygonYearlyEtRequest>()
                 .ForMember(dest => dest.Polygons, opt => opt.MapFrom(src => src.Request.Polygons))
+                .ForMember(dest => dest.ControlLocation, opt => opt.Ignore())
                 .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
                 .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
                 .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd));
 
-            CreateMap<(ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
-                    CommonContracts.EstimateConservationPaymentRequest>()
+            CreateMap<
+                (ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest Request, CommonContracts.OrganizationFundingDetails Organization),
+                CommonContracts.MultiPolygonYearlyEtRequest>()
+                .ForMember(dest => dest.Polygons, opt => opt.MapFrom(src => src.Request.Polygons))
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.Request.ControlLocation))
+                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Organization.OpenEtModel))
+                .ForMember(dest => dest.DateRangeStart, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeStart))
+                .ForMember(dest => dest.DateRangeEnd, opt => opt.MapFrom(src => src.Organization.OpenEtDateRangeEnd));
+
+            CreateMap<
+                (ClientContracts.Requests.Conservation.ApplicantEstimateConsumptiveUseRequest Request, CommonContracts.MultiPolygonYearlyEtResponse EtData),
+                CommonContracts.EstimateConservationPaymentRequest>()
                 .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.Request.CompensationRateDollars))
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units))
                 .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
 
-            CreateMap<CommonContracts.PolygonEtDatapoint, ClientContracts.PolygonEtDatapoint>();
+            CreateMap<
+                (CommonContracts.EstimateDetails OriginalEstimate, CommonContracts.MultiPolygonYearlyEtResponse EtData),
+                CommonContracts.EstimateConservationPaymentRequest>()
+                .ForMember(dest => dest.CompensationRateDollars, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateDollars))
+                .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.OriginalEstimate.CompensationRateUnits))
+                .ForMember(dest => dest.DataCollections, opt => opt.MapFrom(src => src.EtData.DataCollections));
+
+            CreateMap<CommonContracts.GeometryEtDatapoint, ClientContracts.GeometryEtDatapoint>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, ClientContracts.PolygonEtDataCollection>();
+            CreateMap<CommonContracts.PointEtDataCollection, ClientContracts.PointEtDataCollection>();
 
             CreateMap<CommonContracts.PolygonEtDataCollection, CommonContracts.ApplicationEstimateStoreLocationDetails>()
                 .ConvertUsing((src, dest) =>
@@ -201,6 +229,46 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                         {
                             Year = y.Year,
                             TotalEtInInches = y.TotalEtInInches,
+                            EffectivePrecipitationInInches = y.EffectivePrecipitationInInches,
+                            NetEtInInches = y.NetEtInInches
+                        }).ToArray()
+                    };
+                });
+
+            CreateMap<CommonContracts.PolygonEtDataCollection, CommonContracts.ApplicationEstimateUpdateLocationDetails>()
+                .ConvertUsing((src, dest) =>
+                {
+                    var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(src.PolygonWkt));
+                    return new CommonContracts.ApplicationEstimateUpdateLocationDetails
+                    {
+                        // mapping from Guid to Guid? -> default values should be treated as null
+                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId != Guid.Empty
+                            ? src.WaterConservationApplicationEstimateLocationId
+                            : null,
+                        PolygonWkt = src.PolygonWkt,
+                        DrawToolType = src.DrawToolType,
+                        PolygonAreaInAcres = polygonAreaInAcres,
+                        ConsumptiveUses = src.Datapoints.Select(y => new CommonContracts.ApplicationEstimateStoreLocationConsumptiveUseDetails
+                        {
+                            Year = y.Year,
+                            TotalEtInInches = y.TotalEtInInches,
+                            EffectivePrecipitationInInches = y.EffectivePrecipitationInInches,
+                            NetEtInInches = y.NetEtInInches
+                        }).ToArray()
+                    };
+                });
+
+
+            CreateMap<CommonContracts.PointEtDataCollection, CommonContracts.ApplicationEstimateStoreControlLocationDetails>()
+                .ConvertUsing((src, dest) =>
+                {
+                    return new CommonContracts.ApplicationEstimateStoreControlLocationDetails
+                    {
+                        PointWkt = src.PointWkt,
+                        WaterMeasurements = src.Datapoints.Select(datapoint => new CommonContracts.ApplicationEstimateStoreControlLocationWaterMeasurementsDetails
+                        {
+                            Year = datapoint.Year,
+                            TotalEtInInches = datapoint.TotalEtInInches,
                         }).ToArray()
                     };
                 });
@@ -222,6 +290,18 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
                 .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)));
+
+            CreateMap<(
+                ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest Request,
+                CommonContracts.MultiPolygonYearlyEtResponse EtResponse,
+                CommonContracts.EstimateConservationPaymentResponse PaymentResponse
+                ), CommonContracts.ApplicationEstimateUpdateRequest>()
+                .ForMember(dest => dest.WaterConservationApplicationId, opt => opt.MapFrom(src => src.Request.WaterConservationApplicationId))
+                .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
+                .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyNetEtInAcreFeet)))
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.EtResponse.ControlLocationDataCollection));
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionRequest, CommonContracts.WaterConservationApplicationSubmissionRequest>();
 
@@ -260,7 +340,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
-            
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
         }
