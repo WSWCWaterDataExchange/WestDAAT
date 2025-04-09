@@ -1,5 +1,5 @@
 import { Point } from 'geojson';
-import { PolygonEtDatapoint } from './PolygonEtDatapoint';
+import { GeometryEtDatapoint } from './GeometryEtDatapoint';
 import { DrawToolType } from './DrawToolType';
 
 type FullPolygonData = {
@@ -11,7 +11,7 @@ type FullPolygonData = {
   acreage: number;
   averageYearlyEtInInches: number;
   averageYearlyEtInAcreFeet: number;
-  datapoints: PolygonEtDatapoint[];
+  datapoints: GeometryEtDatapoint[];
   additionalDetails: string;
 };
 
