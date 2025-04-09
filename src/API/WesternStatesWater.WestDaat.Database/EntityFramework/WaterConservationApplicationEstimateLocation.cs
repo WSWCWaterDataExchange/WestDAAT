@@ -17,9 +17,9 @@ public class WaterConservationApplicationEstimateLocation
 
     public double PolygonAreaInAcres { get; set; }
 
-    public string AdditionalDetails { get; set; } = null!;
+    public string? AdditionalDetails { get; set; } = null!;
 
     public virtual WaterConservationApplicationEstimate Estimate { get; set; } = null!;
 
-    public virtual ICollection<LocationWaterMeasurement> ConsumptiveUses { get; set; } = null!;
+    public virtual ICollection<LocationWaterMeasurement> WaterMeasurements { get; set; } = null!;
 }
