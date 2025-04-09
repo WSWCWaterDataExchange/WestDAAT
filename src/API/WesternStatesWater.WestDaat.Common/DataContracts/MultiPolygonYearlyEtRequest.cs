@@ -4,6 +4,8 @@ public class MultiPolygonYearlyEtRequest : CalculateRequestBase
 {
     public MapPolygon[] Polygons { get; set; }
 
+    public MapPoint ControlLocation { get; set; }
+
     public RasterTimeSeriesModel Model { get; set; }
 
     /// <summary>

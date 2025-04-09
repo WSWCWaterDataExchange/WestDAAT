@@ -1,14 +1,11 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class MapPolygon
+public class MapPoint
 {
     /// <summary>
-    /// Polygon in "Well-known text" (WKT) format.
+    /// Point in "Well-known text" (WKT) format.
     /// <br />
     /// <see href="https://libgeos.org/specifications/wkt/">WKT Format Specification</see>.
     /// </summary>
-    public string PolygonWkt { get; set; } = null!;
-
-    public DrawToolType DrawToolType { get; set; }
+    public string PointWkt { get; set; } = null!;
 }
-
