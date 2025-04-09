@@ -1316,6 +1316,87 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Times.Exactly(2));
     }
 
+    [DataTestMethod]
+    // Member of a diff org
+    // Technical Reviewer of same org
+    // Org admin of a diff org
+    public async Task Store_SubmitApplicationApproval_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
+    {
+        // Arrange
+        // create an organization
+        // create a 2nd organization
+        // create an applicant user + profile
+        // create the reviewer user + profile
+        // create an application + submission w/ recommendation date & recommendation user id
+        
+        // create request object with valid properties
+        // set user context to reviewer user
+        // set user context user organization role - check params
+        
+        // Act
+        // call the application manager
+        
+        // Assert
+        // error should not be null
+        // error should be type ForbiddenError
+        // application in database should not have approval user id, accepted date, or rejected date
+        // application notes in database should be 0
+    }
+
+    [DataTestMethod]
+    // In Review
+    // Approved
+    // Rejected
+    public async Task Store_SubmitApplicationApproval_InvalidApplicationStatus_ShouldThrow(ConservationApplicationStatus status)
+    {
+        // Arrange
+        // create an organization
+        // create an applicant user + profile
+        // create the reviewer user + profile
+        // create an application + submission
+        //    in review - no recommendation dates, no recommended user id, no accepted date, no rejected date, no approved by user id
+        //    accepted / rejected: w/ recommendation date & recommendation user id & accepted date / rejected date & approved by user id
+        
+        // create request object with valid properties
+        // set user context to reviewer user
+        // set user context user organization role - same organization, member role
+
+        // Act
+        // call the application manager
+        
+        // Assert
+        // error should not be null
+        // error should be type ValidationError
+        // application in database should have the same recommendation/approval dates as ^ application above
+        // application notes in database should be 0
+    }
+
+    [TestMethod]
+    public async Task Store_SubmitApplicationApproval_Success()
+    {
+        // Arrange
+        // create an organization
+        // create an applicant user + profile
+        // create the reviewer user + profile
+        // create an application + submission
+        //    w/ recommendation date & recommendation user id
+        //    NO accepted date / rejected date & approved by user id
+        
+        // create request object with valid properties
+        // set user context to reviewer user
+        // set user context user organization role - same organization, member role
+
+        // Act
+        // call the application manager
+        
+        // Assert
+        // error SHOULD be null
+        // response should be type ApplicationStoreBaseResponse
+        // application in database should have the same recommendation dates as ^ application above
+        // application in database should now have approval date & reviewer's user id
+        // application notes in database should be 1 and match the note from request
+    }
+    
     [TestMethod]
     public async Task OnApplicationStatusChanged_ApplicationSubmitted_ShouldSendEmails()
     {
