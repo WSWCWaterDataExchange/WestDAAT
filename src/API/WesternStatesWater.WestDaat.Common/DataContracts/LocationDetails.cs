@@ -12,5 +12,5 @@ public class LocationDetails
 
     public string AdditionalDetails { get; set; } = null!;
 
-    public ConsumptiveUseDetails[] ConsumptiveUses { get; set; } = null!;
+    public ConsumptiveUseDetails[] WaterMeasurements { get; set; } = null!;
 }

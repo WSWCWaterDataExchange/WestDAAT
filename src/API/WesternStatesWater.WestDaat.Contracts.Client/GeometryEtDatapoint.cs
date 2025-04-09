@@ -1,6 +1,6 @@
-﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
+﻿namespace WesternStatesWater.WestDaat.Contracts.Client;
 
-public class PolygonEtDatapoint
+public class GeometryEtDatapoint
 {
     public int Year { get; set; }
 
