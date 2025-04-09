@@ -1,6 +1,6 @@
 ﻿namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class ConsumptiveUseDetails
+public class LocationWaterMeasurementDetails
 {
     public Guid Id { get; set; }
 

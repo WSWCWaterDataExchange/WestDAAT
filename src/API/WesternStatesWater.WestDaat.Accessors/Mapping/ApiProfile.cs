@@ -467,7 +467,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
 
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
 
-            CreateMap<EFWD.LocationWaterMeasurement, ConsumptiveUseDetails>();
+            CreateMap<EFWD.LocationWaterMeasurement, LocationWaterMeasurementDetails>();
 
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
 
