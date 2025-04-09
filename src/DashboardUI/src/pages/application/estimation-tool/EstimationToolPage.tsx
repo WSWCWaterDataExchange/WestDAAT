@@ -84,6 +84,8 @@ export function EstimationToolPage() {
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
       polygons: state.conservationApplication.estimateLocations.map(
         (polygon): MapPolygon => ({
+          // backend overwrites locations for applicant EstimateConsumptiveUse use case
+          waterConservationApplicationEstimateLocationId: null,
           polygonWkt: polygon.polygonWkt!,
           drawToolType: polygon.drawToolType!,
         }),
