@@ -345,7 +345,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlySubmittedApplication_ShouldHaveCorrectPipelineSteps()
     {
         // Arrange
@@ -380,7 +380,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         submittedStep.ReviewDate.Should().Be(submission.SubmittedDate);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyRecommendedApplication_ShouldHaveCorrectPipelineSteps()
     {
         // Arrange
@@ -418,7 +418,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         recommendationStep.ReviewDate.Should().Be(submission.RecommendedForDate);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyApprovedApplication_ShouldHaveCorrectPipelineSteps()
     {
         // Arrange
