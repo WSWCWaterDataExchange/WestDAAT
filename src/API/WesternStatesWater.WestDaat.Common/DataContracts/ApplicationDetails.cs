@@ -22,12 +22,11 @@ public class ApplicationDetails
 
     public ConservationApplicationStatus Status { get; set; }
 
-    // There are two use cases involving this contract:
-    // - Applicants should not be able to see the notes at all.
-    // - for Reviewers, these notes are transferred directly onto the response contract.
-    // Because neither use case needs these notes, we can - and should - ignore including them in the serialization.
+    // JsonIgnore so the json is never sent to the client.
+    // This is mapped to two separate client contracts.
     [JsonIgnore] public ApplicationReviewNote[] Notes { get; set; } = null!;
 
-    // Ignore this property for serialization. Only organization folks should be allowed to view.
+    // JsonIgnore so the json is never sent to the client.
+    // This is mapped to two separate client contracts.
     [JsonIgnore] public ReviewPipeline ReviewPipeline { get; set; } = null!;
 }
