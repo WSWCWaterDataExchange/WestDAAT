@@ -363,36 +363,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var wadeDb = Services.GetRequiredService<IDatabaseContextFactory>().Create();
 
         // necessary since we're using a custom transaction scope
-        var cleanupDatabase = async () =>
-        {
-            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
-            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
-            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
-            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
-            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
-            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
-            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
-            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
-            wadeDb.Variable.RemoveRange(wadeDb.Variable);
-            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
-            wadeDb.Units.RemoveRange(wadeDb.Units);
-            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
-            await wadeDb.SaveChangesAsync();
-
-            _dbContext.ControlLocationWaterMeasurements.RemoveRange(_dbContext.ControlLocationWaterMeasurements);
-            _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
-            _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
-            _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
-            _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
-            _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
-            _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
-            _dbContext.Users.RemoveRange(_dbContext.Users);
-            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
-            await _dbContext.SaveChangesAsync();
-        };
-
         // run prior to test initialization in case previous run failed
-        await cleanupDatabase();
+        await ClearDatabases(wadeDb, _dbContext);
 
         try
         {
@@ -592,7 +564,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         finally
         {
             // cleanup after test finishes to prevent issues with other tests
-            await cleanupDatabase();
+            await ClearDatabases(wadeDb, _dbContext);
         }
     }
 
@@ -668,38 +640,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var wadeDb = Services.GetRequiredService<IDatabaseContextFactory>().Create();
 
         // necessary since we're using a custom transaction scope
-        var cleanupDatabase = async () =>
-        {
-            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
-            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
-            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
-            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
-            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
-            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
-            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
-            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
-            wadeDb.Variable.RemoveRange(wadeDb.Variable);
-            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
-            wadeDb.Units.RemoveRange(wadeDb.Units);
-            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
-            await wadeDb.SaveChangesAsync();
-
-            _dbContext.ControlLocationWaterMeasurements.RemoveRange(_dbContext.ControlLocationWaterMeasurements);
-            _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
-            _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
-            _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
-            _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
-            _dbContext.WaterConservationApplicationSubmissionNotes.RemoveRange(_dbContext.WaterConservationApplicationSubmissionNotes);
-            _dbContext.WaterConservationApplicationSubmissions.RemoveRange(_dbContext.WaterConservationApplicationSubmissions);
-            _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
-            _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
-            _dbContext.Users.RemoveRange(_dbContext.Users);
-            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
-            await _dbContext.SaveChangesAsync();
-        };
-
         // run prior to test initialization in case previous run failed
-        await cleanupDatabase();
+        await ClearDatabases(wadeDb, _dbContext);
 
         try
         {
@@ -966,7 +908,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         finally
         {
             // cleanup after test finishes to prevent issues with other tests
-            await cleanupDatabase();
+            await ClearDatabases(wadeDb, _dbContext);
         }
     }
 
@@ -1842,5 +1784,35 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+    }
+
+    private async Task ClearDatabases(DatabaseContext wadeDb, WestDaatDatabaseContext westdaatDb)
+    {
+        wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
+        wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
+        wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
+        wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
+        wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
+        wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
+        wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
+        wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
+        wadeDb.Variable.RemoveRange(wadeDb.Variable);
+        wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
+        wadeDb.Units.RemoveRange(wadeDb.Units);
+        wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
+        await wadeDb.SaveChangesAsync();
+
+        _dbContext.ControlLocationWaterMeasurements.RemoveRange(_dbContext.ControlLocationWaterMeasurements);
+        _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
+        _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
+        _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
+        _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
+        _dbContext.WaterConservationApplicationSubmissionNotes.RemoveRange(_dbContext.WaterConservationApplicationSubmissionNotes);
+        _dbContext.WaterConservationApplicationSubmissions.RemoveRange(_dbContext.WaterConservationApplicationSubmissions);
+        _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
+        _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
+        _dbContext.Users.RemoveRange(_dbContext.Users);
+        _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
+        await _dbContext.SaveChangesAsync();
     }
 }
