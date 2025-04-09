@@ -20,7 +20,7 @@ public interface IApplicationManager : IServiceContractBase
         where TRequest : ApplicationStoreRequestBase
         where TResponse : ApplicationStoreResponseBase;
 
-    Task<TResponse> OnApplicationSubmitted<TRequest, TResponse>(TRequest request)
-        where TRequest : WaterConservationApplicationSubmittedEvent
+    Task<TResponse> OnApplicationStatusChanged<TRequest, TResponse>(TRequest request)
+        where TRequest : WaterConservationApplicationStatusChangedEventBase
         where TResponse : EventResponseBase;
 }

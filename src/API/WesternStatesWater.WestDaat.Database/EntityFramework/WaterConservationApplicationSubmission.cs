@@ -17,6 +17,8 @@ public class WaterConservationApplicationSubmission
 
     public DateTimeOffset? RejectedDate { get; set; }
     
+    public Guid? ApprovedByUserId { get; set; }
+    
     public DateTimeOffset? RecommendedForDate { get; set; }
     
     public DateTimeOffset? RecommendedAgainstDate { get; set; }

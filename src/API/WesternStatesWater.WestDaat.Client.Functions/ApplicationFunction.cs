@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Net;
+using System.Text.Json;
 using WesternStatesWater.WestDaat.Common.Constants;
 using WesternStatesWater.WestDaat.Contracts.Client;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
@@ -52,8 +53,10 @@ public class ApplicationFunction : FunctionBase
 
         ApplicationStoreResponseBase results = request switch
         {
-            ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager.Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
-            ReviewerEstimateConsumptiveUseRequest reviewerRequest => await _applicationManager.Store<ReviewerEstimateConsumptiveUseRequest, ReviewerEstimateConsumptiveUseResponse>(reviewerRequest),
+            ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager
+                .Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
+            ReviewerEstimateConsumptiveUseRequest reviewerRequest => await _applicationManager
+                .Store<ReviewerEstimateConsumptiveUseRequest, ReviewerEstimateConsumptiveUseResponse>(reviewerRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 
@@ -101,7 +104,7 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
             new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, WaterConservationApplicationSubmissionUpdateResponse>(request);
         return await CreateResponse(req, results);
     }
 
@@ -124,11 +127,12 @@ public class ApplicationFunction : FunctionBase
         return await CreateResponse(req, result);
     }
 
-    [Function(nameof(OnApplicationSubmitted))]
-    public async Task OnApplicationSubmitted(
-        [ServiceBusTrigger(queueName: Queues.ConservationApplicationSubmitted, Connection = "ServiceBusConnection")]
-        WaterConservationApplicationSubmittedEvent @event)
+    [Function(nameof(OnApplicationStatusChanged))]
+    public async Task OnApplicationStatusChanged(
+        [ServiceBusTrigger(queueName: Queues.ConservationApplicationStatusChanged, Connection = "ServiceBusConnection")]
+        string eventJson)
     {
-        await _applicationManager.OnApplicationSubmitted<WaterConservationApplicationSubmittedEvent, EventResponseBase>(@event);
+        var dto = JsonSerializer.Deserialize<WaterConservationApplicationStatusChangedEventBase>(eventJson, JsonSerializerOptions);
+        await _applicationManager.OnApplicationStatusChanged<WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(dto);
     }
 }

@@ -1,0 +1,2 @@
+ALTER TABLE dbo.WaterConservationApplicationSubmissions ADD
+    ApprovedByUserId     UNIQUEIDENTIFIER NULL CONSTRAINT FK_WaterConservationApplicationSubmissions_ApprovedByUserId FOREIGN KEY REFERENCES Users (Id);
