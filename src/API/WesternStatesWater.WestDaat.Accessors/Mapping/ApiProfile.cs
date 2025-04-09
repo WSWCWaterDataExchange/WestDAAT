@@ -412,7 +412,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForSourceMember(src => src.ApprovalDecision, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Accepted ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Rejected ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
-                
+
             CreateMap<WaterConservationApplicationApprovalRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
@@ -463,11 +463,16 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
                 });
 
-            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
+            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>()
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.ControlLocations.SingleOrDefault()));
 
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
 
             CreateMap<EFWD.LocationWaterMeasurement, LocationWaterMeasurementDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateControlLocation, ControlLocationDetails>();
+
+            CreateMap<EFWD.ControlLocationWaterMeasurement, ControlLocationWaterMeasurementDetails>();
 
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
 
