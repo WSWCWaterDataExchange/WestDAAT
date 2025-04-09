@@ -459,17 +459,15 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
     private async Task<ApplicationStoreResponseBase> SubmitApplicationApproval(WaterConservationApplicationApprovalRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
-        var application = await db.WaterConservationApplications
-            .Include(a => a.Submission)
-            .ThenInclude(sub => sub.SubmissionNotes)
-            .Where(a => a.Id == request.WaterConservationApplicationId)
+        var applicationSubmission = await db.WaterConservationApplicationSubmissions
+            .Include(sub => sub.SubmissionNotes)
+            .Where(s => s.WaterConservationApplicationId == request.WaterConservationApplicationId)
             .SingleAsync();
 
-        DtoMapper.Map(request, application.Submission);
+        DtoMapper.Map(request, applicationSubmission);
 
         var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();
-        note.WaterConservationApplicationSubmissionId = application.Submission.Id;
-        application.Submission.SubmissionNotes.Add(note);
+        applicationSubmission.SubmissionNotes.Add(note);
 
         await db.SaveChangesAsync();
 
