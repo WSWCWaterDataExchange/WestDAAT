@@ -241,8 +241,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     var polygonAreaInAcres = GeometryHelpers.GetGeometryAreaInAcres(GeometryHelpers.GetGeometryByWkt(src.PolygonWkt));
                     return new CommonContracts.ApplicationEstimateUpdateLocationDetails
                     {
-                        // todo: verify that empty guid ids are not carried over inappropriately
-                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId,
+                        // mapping from Guid to Guid? -> default values should be treated as null
+                        WaterConservationApplicationEstimateLocationId = src.WaterConservationApplicationEstimateLocationId != Guid.Empty
+                            ? src.WaterConservationApplicationEstimateLocationId
+                            : null,
                         PolygonWkt = src.PolygonWkt,
                         DrawToolType = src.DrawToolType,
                         PolygonAreaInAcres = polygonAreaInAcres,

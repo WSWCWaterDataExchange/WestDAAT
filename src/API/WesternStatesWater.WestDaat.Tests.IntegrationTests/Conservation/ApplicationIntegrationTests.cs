@@ -808,6 +808,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 [
                     new CLI.MapPolygon
                     {
+                        // null Id -> the existing location will be deleted, and a new location will be created for this polygon
+                        WaterConservationApplicationEstimateLocationId = null,
                         PolygonWkt = memorialStadiumFootballField,
                         DrawToolType = DrawToolType.Freeform,
                     }
