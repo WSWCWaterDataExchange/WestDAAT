@@ -66,7 +66,7 @@ export const createWaterConservationApplication = async (
   return data;
 };
 
-export const estimateConsumptiveUse = async (
+export const applicantEstimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
@@ -216,7 +216,10 @@ export const updateApplicationSubmission = async (
     note: data.note,
   };
 
-  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(`Applications/${data.waterConservationApplicationId}`, request);
+  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(
+    `Applications/${data.waterConservationApplicationId}`,
+    request,
+  );
 
   return response;
 };
@@ -235,11 +238,11 @@ export const submitApplicationRecommendation = async (
     $type: 'WaterConservationApplicationRecommendationRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     recommendationDecision: data.recommendationDecision,
-    recommendationNotes: data.recommendationNotes
+    recommendationNotes: data.recommendationNotes,
   };
 
   await api.post<void>('Applications/Submit', request);
-}
+};
 
 export const getApplication = async (
   context: IMsalContext,
