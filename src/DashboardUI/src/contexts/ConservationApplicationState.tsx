@@ -17,6 +17,8 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { PartialPointData } from '../data-contracts/CombinedPointData';
+import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -37,7 +39,9 @@ export interface ConservationApplicationState {
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
+    controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
+    doesControlLocationOverlapWithPolygons: boolean;
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
@@ -80,7 +84,9 @@ export const defaultState = (): ConservationApplicationState => ({
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
+    controlLocation: undefined,
     doPolygonsOverlap: false,
+    doesControlLocationOverlapWithPolygons: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
     supportingDocuments: [],
@@ -583,6 +589,22 @@ const onApplicationLoaded = (
     }),
   );
   draftApplication.doPolygonsOverlap = false;
+
+  const controlLocation = application.estimate.controlLocation;
+  draftApplication.controlLocation = {
+    waterConservationApplicationEstimateControlLocationId: controlLocation.id,
+    pointWkt: controlLocation.pointWkt,
+    datapoints: application.estimate.controlLocation.waterMeasurements.map(
+      (measurement): GeometryEtDatapoint => ({
+        year: measurement.year,
+        totalEtInInches: measurement.totalEtInInches,
+        effectivePrecipitationInInches: null,
+        netEtInInches: null,
+      }),
+    ),
+  };
+  draftApplication.doesControlLocationOverlapWithPolygons = false;
+
   draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
     (sum, location) => sum + location.polygonAreaInAcres,
     0,
