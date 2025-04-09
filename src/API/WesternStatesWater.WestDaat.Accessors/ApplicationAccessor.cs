@@ -319,11 +319,13 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         await db.SaveChangesAsync();
 
-        return new ApplicationEstimateUpdateResponse
+        var response = new ApplicationEstimateUpdateResponse
         {
             Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(existingEntity.Locations),
             ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails[]>(existingEntity.ControlLocations).SingleOrDefault()
         };
+
+        return response;
     }
 
     private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)
