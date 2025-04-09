@@ -251,9 +251,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             // overwrite water measurements
             db.ControlLocationWaterMeasurements.RemoveRange(existingControlLocation.WaterMeasurements);
 
-            var newControlLocationWaterMeasurements = request.ControlLocation.WaterMeasurements.Select(measurement =>
-                DtoMapper.Map<EFWD.ControlLocationWaterMeasurement>(measurement)
-            ).ToArray();
+            var newControlLocationWaterMeasurements = DtoMapper.Map<EFWD.ControlLocationWaterMeasurement[]>(request.ControlLocation.WaterMeasurements);
 
             foreach (var newWaterMeasurement in newControlLocationWaterMeasurements)
             {
@@ -309,10 +307,12 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             // add new water measurements
             var matchingRequestLocation = request.Locations.Single(l => l.WaterConservationApplicationEstimateLocationId == location.Id);
 
-            var newWaterMeasurements = matchingRequestLocation.ConsumptiveUses.Select(cu =>
-                DtoMapper.Map<EFWD.LocationWaterMeasurement>((location, cu))
-            ).ToArray();
-            await db.LocationWaterMeasurements.AddRangeAsync(newWaterMeasurements);
+            var newWaterMeasurements = DtoMapper.Map<EFWD.LocationWaterMeasurement[]>(matchingRequestLocation.ConsumptiveUses);
+
+            foreach (var newWaterMeasurement in newWaterMeasurements)
+            {
+                location.WaterMeasurements.Add(newWaterMeasurement);
+            }
 
             // update the location itself
             DtoMapper.Map(matchingRequestLocation, location);
