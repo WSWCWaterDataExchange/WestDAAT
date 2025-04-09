@@ -812,10 +812,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
 
 
-            // Model, DateRangeStart, and DateRangeEnd are all populated based on the Organization.
-            // In a real world use case, they should always match regardless of the `OverwriteEstimate` parameter.
-            // For this test, they only match regardless of the `OverwriteEstimate` parameter because we're generating the Estimate
-            // - with the correct data in the first place.
+            // sanity check - these values are populated via the faker extension `GenerateMetadataFromOrganization`
+            //   (they may be set in the call chain too if `UpdateEstimate == true`,
+            //   but they should be set to the same values they already have because of the faker)
             dbEstimate.Model.Should().Be(organization.OpenEtModel);
             dbEstimate.DateRangeStart.Should().Be(
                 DateOnly.FromDateTime(
