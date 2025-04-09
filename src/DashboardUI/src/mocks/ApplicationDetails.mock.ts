@@ -32,6 +32,17 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
         ],
       },
     ],
+    controlLocation: {
+      id: 'control-location-guid',
+      pointWkt: 'POINT(0 0)',
+      waterMeasurements: [
+        {
+          id: 'control-location-water-measurement-guid',
+          year: 2025,
+          totalEtInInches: 1,
+        },
+      ],
+    },
   },
   submission: {
     id: 'submission-guid',
