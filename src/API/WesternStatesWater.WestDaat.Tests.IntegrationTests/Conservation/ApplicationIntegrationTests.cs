@@ -460,21 +460,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         approvalStep.ReviewDate.Should().Be(submission.AcceptedDate);
     }
 
-    private WaterConservationApplicationSubmission SetupApplicationSubmission()
-    {
-        var applicant = new UserFaker().Generate();
-        var organization = new OrganizationFaker().Generate();
-        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
-        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
-
-        _dbContext.Users.AddRangeAsync(applicant);
-        _dbContext.Organizations.Add(organization);
-        _dbContext.WaterConservationApplications.Add(application);
-        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
-
-        return submission;
-    }
-
     [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
@@ -1511,5 +1496,20 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+    }
+
+    private WaterConservationApplicationSubmission SetupApplicationSubmission()
+    {
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        _dbContext.Users.AddRangeAsync(applicant);
+        _dbContext.Organizations.Add(organization);
+        _dbContext.WaterConservationApplications.Add(application);
+        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
+
+        return submission;
     }
 }
