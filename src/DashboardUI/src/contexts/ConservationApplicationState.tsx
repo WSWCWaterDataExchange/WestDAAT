@@ -45,6 +45,7 @@ export interface ConservationApplicationState {
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[];
     reviewPipeline: ReviewPipeline;
+    status: ConservationApplicationStatus;
   };
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
@@ -90,6 +91,7 @@ export const defaultState = (): ConservationApplicationState => ({
     reviewPipeline: {
       reviewSteps: [],
     },
+    status: ConservationApplicationStatus.Unknown,
   },
   isCreatingApplication: false,
   isUploadingDocument: false,
@@ -608,6 +610,7 @@ const onApplicationLoaded = (
   draftApplication.reviewerNotes = payload.notes;
 
   draftApplication.reviewPipeline = payload.reviewPipeline;
+  draftApplication.status = application.status;
 
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
