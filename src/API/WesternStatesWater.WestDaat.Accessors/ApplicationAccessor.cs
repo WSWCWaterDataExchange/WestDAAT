@@ -67,9 +67,102 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ProjectTo<ApplicationDetails>(DtoMapper.Configuration)
             .SingleAsync();
 
+
+        var reviewPipeline = await GetReviewPipeline(request.ApplicationId);
+        application.ReviewPipeline = reviewPipeline;
+
         return new ApplicationLoadSingleResponse
         {
-            Application = application
+            Application = application,
+        };
+    }
+
+    private async Task<ReviewPipeline> GetReviewPipeline(Guid applicationId)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var reviewPipelineSrc = await db.WaterConservationApplications
+            .AsNoTracking()
+            .Include(app => app.ApplicantUser).ThenInclude(applicant => applicant.UserProfile)
+            .Include(app => app.Submission).ThenInclude(submission => submission.RecommendedByUser).ThenInclude(recUser => recUser.UserProfile)
+            .Include(app => app.Submission).ThenInclude(submission => submission.ApprovedByUser).ThenInclude(approver => approver.UserProfile)
+            .SingleAsync(app => app.Id == applicationId);
+
+
+        var applicant = reviewPipelineSrc.ApplicantUser.UserProfile;
+        var submission = reviewPipelineSrc.Submission;
+        var recommender = submission.RecommendedByUser?.UserProfile;
+        var approver = submission.ApprovedByUser?.UserProfile;
+
+
+        var reviewSteps = new List<ReviewStep>();
+
+
+        // Applicant submit step
+        reviewSteps.Add(new ReviewStep
+        {
+            ReviewStepType = ReviewStepType.ApplicantSubmitted,
+            ReviewStepStatus = ReviewStepStatus.Submitted,
+            ParticipantName = $"{applicant.FirstName} {applicant.LastName}",
+            ReviewDate = reviewPipelineSrc.Submission.SubmittedDate
+        });
+
+
+        // Recommendation step (if exists)
+        if (reviewPipelineSrc.Submission.RecommendedByUserId.HasValue)
+        {
+            var status = (submission.RecommendedForDate.HasValue, submission.RecommendedAgainstDate.HasValue) switch
+            {
+                (true, false) => ReviewStepStatus.RecommendedForApproval,
+                (false, true) => ReviewStepStatus.RecommendedAgainstApproval,
+                _ => throw new WestDaatException("Invalid recommendation status."),
+            };
+
+            var reviewDate = status switch
+            {
+                ReviewStepStatus.RecommendedForApproval => submission.RecommendedForDate,
+                ReviewStepStatus.RecommendedAgainstApproval => submission.RecommendedAgainstDate,
+                _ => throw new WestDaatException("Invalid recommendation status."),
+            };
+
+            reviewSteps.Add(new ReviewStep
+            {
+                ReviewStepType = ReviewStepType.Recommendation,
+                ReviewStepStatus = status,
+                ParticipantName = $"{recommender.FirstName} {recommender.LastName}",
+                ReviewDate = reviewDate.Value,
+            });
+        }
+
+        // Approval step (if exists)
+        if (reviewPipelineSrc.Submission.ApprovedByUserId.HasValue)
+        {
+            var status = (submission.AcceptedDate.HasValue, submission.RejectedDate.HasValue) switch
+            {
+                (true, false) => ReviewStepStatus.Approved,
+                (false, true) => ReviewStepStatus.Denied,
+                _ => throw new WestDaatException("Invalid approval status."),
+            };
+
+            var approveDate = status switch
+            {
+                ReviewStepStatus.Approved => submission.AcceptedDate,
+                ReviewStepStatus.Denied => submission.RejectedDate,
+                _ => throw new WestDaatException("Invalid approval status."),
+            };
+
+            reviewSteps.Add(new ReviewStep
+            {
+                ReviewStepType = ReviewStepType.Approval,
+                ReviewStepStatus = status,
+                ParticipantName = $"{approver.FirstName} {approver.LastName}",
+                ReviewDate = approveDate.Value,
+            });
+        }
+
+        return new ReviewPipeline
+        {
+            ReviewSteps = reviewSteps.ToArray()
         };
     }
 

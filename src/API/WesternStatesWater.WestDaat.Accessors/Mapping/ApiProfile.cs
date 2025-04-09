@@ -366,7 +366,10 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
-                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedByUser, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUser, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmission>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -378,7 +381,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmittedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.RecommendedForDate, opt => opt.Ignore())
-                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore());
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedByUser, opt => opt.Ignore())
+                .ForMember(dest => dest.RecommendedByUser, opt => opt.Ignore());
 
             CreateMap<WaterConservationApplicationSubmissionUpdateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -412,7 +417,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForSourceMember(src => src.ApprovalDecision, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Accepted ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Rejected ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
-                
+
             CreateMap<WaterConservationApplicationApprovalRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationSubmission, opt => opt.Ignore())
@@ -461,23 +466,19 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 {
                     opt.PreCondition(src => src.Submission != null);
                     opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
-                });
+                })
+                // Mapped in accessor
+                .ForMember(dest => dest.ReviewPipeline, opt => opt.Ignore());
 
             CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
-
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
-
             CreateMap<EFWD.LocationWaterMeasurement, ConsumptiveUseDetails>();
-
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
-
             CreateMap<EFWD.WaterConservationApplicationDocument, SupportingDocumentDetails>();
-
             CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Timestamp))
                 .ForMember(dest => dest.SubmittedByUserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.SubmittedByFullName, opt => opt.MapFrom(src => $"{src.User.UserProfile.FirstName} {src.User.UserProfile.LastName}"));
-
             CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
                 .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(_ => true))
                 .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
