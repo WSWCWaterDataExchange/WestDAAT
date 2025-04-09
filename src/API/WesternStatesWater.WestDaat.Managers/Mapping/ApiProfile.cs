@@ -289,10 +289,7 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.CompensationRateUnits, opt => opt.MapFrom(src => src.Request.Units.Value))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.PaymentResponse.EstimatedCompensationDollars))
                 .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.EtResponse.DataCollections))
-                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)))
-                // applicant does not provide a control location, thus no Net ET estimate is calculated
-                .ForMember(dest => dest.CumulativeNetEtInAcreFeet, opt => opt.Ignore())
-                .ForMember(dest => dest.ControlLocation, opt => opt.Ignore());
+                .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.EtResponse.DataCollections.Sum(dc => dc.AverageYearlyTotalEtInAcreFeet)));
 
             CreateMap<(
                 ClientContracts.Requests.Conservation.ReviewerEstimateConsumptiveUseRequest Request,
