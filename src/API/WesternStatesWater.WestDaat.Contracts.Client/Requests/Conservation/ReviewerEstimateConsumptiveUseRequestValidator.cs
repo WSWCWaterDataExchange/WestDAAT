@@ -17,6 +17,6 @@ public class ReviewerEstimateConsumptiveUseRequestValidator : AbstractValidator<
         });
 
         RuleFor(x => x.ControlLocation).NotEmpty();
-        RuleFor(x => x.ControlLocation.PointWkt).NotEmpty().MaximumLength(100).Must(pointWkt => pointWkt.Contains("POINT"));
+        RuleFor(x => x.ControlLocation.PointWkt).NotEmpty().MaximumLength(100);
     }
 }
