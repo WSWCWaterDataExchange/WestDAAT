@@ -1036,7 +1036,6 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_ReviewerEstimateConsumptiveUse_AttemptsToUpdateEstimateLocationWhichDoesNotExist_Failure()
     {
         // Arrange
-        const int startYear = 2015;
         const int yearRange = 10;
 
         var user = new UserFaker().Generate();
@@ -1460,7 +1459,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             dbSubmissionNote.Note.Should().Be(request.Note);
             dbSubmissionNote.UserId.Should().Be(user.Id);
             dbSubmissionNote.WaterConservationApplicationSubmissionId.Should().Be(dbApplication.Submission.Id);
-            
+
             // verify the returned note has all the required information
             response.Note.Note.Should().BeEquivalentTo(request.Note);
             response.Note.SubmittedDate.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
