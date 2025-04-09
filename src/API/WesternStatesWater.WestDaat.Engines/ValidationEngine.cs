@@ -268,9 +268,9 @@ internal class ValidationEngine : IValidationEngine
 
         // if user provides an id in an attempt to update an existing location, then a location must already exist with that id
         var requestLocationIds = request.Polygons
-            .Select(location => location.WaterConservationApplicationEstimateLocationId)
-            .Where(id => id != null)
-            .Select(id => id.Value);
+            .Where(location => location.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(location => location.WaterConservationApplicationEstimateLocationId.Value);
+
         var databaseLocationIds = applicationExistsResponse.EstimateLocationIds;
 
         var requestLocationIdsNotInDatabase = requestLocationIds.Except(databaseLocationIds);
