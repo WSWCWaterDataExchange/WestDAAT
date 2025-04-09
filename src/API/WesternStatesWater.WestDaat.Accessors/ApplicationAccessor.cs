@@ -252,9 +252,13 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             db.ControlLocationWaterMeasurements.RemoveRange(existingControlLocation.WaterMeasurements);
 
             var newControlLocationWaterMeasurements = request.ControlLocation.WaterMeasurements.Select(measurement =>
-                DtoMapper.Map<EFWD.ControlLocationWaterMeasurement>((existingControlLocation, measurement))
+                DtoMapper.Map<EFWD.ControlLocationWaterMeasurement>(measurement)
             ).ToArray();
-            await db.ControlLocationWaterMeasurements.AddRangeAsync(newControlLocationWaterMeasurements);
+
+            foreach (var newWaterMeasurement in newControlLocationWaterMeasurements)
+            {
+                existingControlLocation.WaterMeasurements.Add(newWaterMeasurement);
+            }
 
             // update Control Location
             DtoMapper.Map(request.ControlLocation, existingControlLocation);

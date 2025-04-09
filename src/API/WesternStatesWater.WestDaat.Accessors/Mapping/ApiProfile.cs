@@ -412,13 +412,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<ApplicationSubmissionFieldDetail, EFWD.WaterConservationApplicationEstimateLocation>(MemberList.Source)
                 .ForSourceMember(src => src.WaterConservationApplicationEstimateLocationId, opt => opt.DoNotValidate());
 
-            CreateMap<(EFWD.WaterConservationApplicationEstimateControlLocation ControlLocation, ApplicationEstimateStoreControlLocationWaterMeasurementsDetails WaterMeasurementDetails), EFWD.ControlLocationWaterMeasurement>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Location, opt => opt.Ignore())
-                .ForMember(dest => dest.WaterConservationApplicationEstimateControlLocationId, opt => opt.MapFrom(src => src.ControlLocation.Id))
-                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.WaterMeasurementDetails.Year))
-                .ForMember(dest => dest.TotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.TotalEtInInches));
-
             CreateMap<(EFWD.WaterConservationApplicationEstimateLocation Location, ApplicationEstimateStoreLocationConsumptiveUseDetails WaterMeasurementDetails), EFWD.LocationWaterMeasurement>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Location, opt => opt.Ignore())
