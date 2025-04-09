@@ -169,7 +169,7 @@ internal class ValidationEngine : IValidationEngine
         return request switch
         {
             ApplicantEstimateConsumptiveUseRequest req => await ValidateApplicantEstimateConsumptiveUseRequest(req, context),
-            ReviewerEstimateConsumptiveUseRequest req => await ValidateEstimateConsumptiveUseReviewerRequest(req, context),
+            ReviewerEstimateConsumptiveUseRequest req => await ValidateReviewerEstimateConsumptiveUseRequest(req, context),
             WaterConservationApplicationCreateRequest req => await ValidateWaterConservationApplicationCreateRequest(req, context),
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
@@ -236,7 +236,7 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
-    private async Task<ErrorBase> ValidateEstimateConsumptiveUseReviewerRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
+    private async Task<ErrorBase> ValidateReviewerEstimateConsumptiveUseRequest(ReviewerEstimateConsumptiveUseRequest request, ContextBase context)
     {
         // user must be logged in
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
@@ -264,6 +264,20 @@ internal class ValidationEngine : IValidationEngine
         if (!permissions.Contains(Permissions.ApplicationUpdate))
         {
             return CreateForbiddenError(request, context);
+        }
+
+        // if user provides an id in an attempt to update an existing location, then a location must already exist with that id
+        var requestLocationIds = request.Polygons
+            .Where(location => location.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(location => location.WaterConservationApplicationEstimateLocationId.Value);
+
+        var databaseLocationIds = applicationExistsResponse.EstimateLocationIds;
+
+        var requestLocationIdsNotInDatabase = requestLocationIds.Except(databaseLocationIds);
+
+        if (requestLocationIdsNotInDatabase.Any())
+        {
+            return CreateNotFoundError(context, $"EstimateLocations with Ids {string.Join(',', requestLocationIdsNotInDatabase)}");
         }
 
         // control location must not intersect with any polygons

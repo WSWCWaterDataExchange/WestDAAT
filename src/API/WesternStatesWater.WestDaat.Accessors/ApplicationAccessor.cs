@@ -189,6 +189,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
+            ApplicationEstimateUpdateRequest req => await UpdateApplicationEstimate(req),
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
@@ -231,6 +232,104 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations),
             ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails[]>(entity.ControlLocations).SingleOrDefault()
         };
+    }
+
+    private async Task<ApplicationEstimateUpdateResponse> UpdateApplicationEstimate(ApplicationEstimateUpdateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingEntity = await db.WaterConservationApplicationEstimates
+            .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
+            .Include(estimate => estimate.ControlLocations).ThenInclude(controlLocation => controlLocation.WaterMeasurements)
+            .SingleAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
+
+        // update Control Location if it exists, else create new Control Location
+        if (existingEntity.ControlLocations.Any())
+        {
+            var existingControlLocation = existingEntity.ControlLocations.Single();
+
+            // overwrite water measurements
+            db.ControlLocationWaterMeasurements.RemoveRange(existingControlLocation.WaterMeasurements);
+
+            var newControlLocationWaterMeasurements = DtoMapper.Map<EFWD.ControlLocationWaterMeasurement[]>(request.ControlLocation.WaterMeasurements);
+
+            foreach (var newWaterMeasurement in newControlLocationWaterMeasurements)
+            {
+                existingControlLocation.WaterMeasurements.Add(newWaterMeasurement);
+            }
+
+            // update Control Location
+            DtoMapper.Map(request.ControlLocation, existingControlLocation);
+        }
+        else
+        {
+            // add new Control Location + related data
+            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>(request.ControlLocation);
+            existingEntity.ControlLocations.Add(requestControlLocation);
+        }
+
+        // merge Locations:
+        // - delete entries for locations that no longer exist
+        var requestLocationIds = request.Locations
+            .Where(l => l.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(l => l.WaterConservationApplicationEstimateLocationId.Value)
+            .ToHashSet();
+        var existingLocationsToBeDeleted = existingEntity.Locations
+            .Where(l => !requestLocationIds.Contains(l.Id))
+            .ToArray();
+        foreach (var location in existingLocationsToBeDeleted)
+        {
+            db.LocationWaterMeasurements.RemoveRange(location.WaterMeasurements);
+            db.WaterConservationApplicationEstimateLocations.Remove(location);
+        }
+
+        // - create new entries for locations that do not already exist
+        var requestLocationsToBeCreated = request.Locations
+            .Where(l => l.WaterConservationApplicationEstimateLocationId is null)
+            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>(l))
+            .ToArray();
+
+        // (this also creates the WaterMeasurements for each location)
+        foreach (var location in requestLocationsToBeCreated)
+        {
+            existingEntity.Locations.Add(location);
+        }
+
+        // - update entries for locations that remain
+        var existingLocationsToBeUpdated = existingEntity.Locations
+            .Where(l => requestLocationIds.Contains(l.Id))
+            .ToArray();
+        foreach (var location in existingLocationsToBeUpdated)
+        {
+            // remove old water measurements
+            db.LocationWaterMeasurements.RemoveRange(location.WaterMeasurements);
+
+            // add new water measurements
+            var matchingRequestLocation = request.Locations.Single(l => l.WaterConservationApplicationEstimateLocationId == location.Id);
+
+            var newWaterMeasurements = DtoMapper.Map<EFWD.LocationWaterMeasurement[]>(matchingRequestLocation.ConsumptiveUses);
+
+            foreach (var newWaterMeasurement in newWaterMeasurements)
+            {
+                location.WaterMeasurements.Add(newWaterMeasurement);
+            }
+
+            // update the location itself
+            DtoMapper.Map(matchingRequestLocation, location);
+        }
+
+        // update the Estimate itself
+        DtoMapper.Map(request, existingEntity);
+
+        await db.SaveChangesAsync();
+
+        var response = new ApplicationEstimateUpdateResponse
+        {
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(existingEntity.Locations),
+            ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails[]>(existingEntity.ControlLocations).SingleOrDefault()
+        };
+
+        return response;
     }
 
     private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)

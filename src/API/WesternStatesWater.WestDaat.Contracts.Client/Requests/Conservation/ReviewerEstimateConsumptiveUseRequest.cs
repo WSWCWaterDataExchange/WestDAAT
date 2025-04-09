@@ -8,5 +8,5 @@ public class ReviewerEstimateConsumptiveUseRequest : ApplicationStoreRequestBase
 
     public MapPoint ControlLocation { get; set; }
 
-    public bool OverwriteEstimate { get; set; }
+    public bool UpdateEstimate { get; set; }
 }
