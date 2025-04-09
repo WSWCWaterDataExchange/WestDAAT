@@ -426,16 +426,6 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.WaterMeasurementDetails.Year))
                 .ForMember(dest => dest.TotalEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.TotalEtInInches));
 
-            CreateMap<(ApplicationEstimateUpdateLocationDetails LocationDetails, EFWD.WaterConservationApplicationEstimate Estimate), EFWD.WaterConservationApplicationEstimateLocation>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Estimate, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalDetails, opt => opt.Ignore())
-                .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.MapFrom(src => src.Estimate.Id))
-                .ForMember(dest => dest.PolygonWkt, opt => opt.MapFrom(src => src.LocationDetails.PolygonWkt))
-                .ForMember(dest => dest.DrawToolType, opt => opt.MapFrom(src => src.LocationDetails.DrawToolType))
-                .ForMember(dest => dest.PolygonAreaInAcres, opt => opt.MapFrom(src => src.LocationDetails.PolygonAreaInAcres))
-                .ForMember(dest => dest.WaterMeasurements, opt => opt.MapFrom(src => src.LocationDetails.ConsumptiveUses));
-
             CreateMap<(EFWD.WaterConservationApplicationEstimateLocation Location, ApplicationEstimateStoreLocationConsumptiveUseDetails WaterMeasurementDetails), EFWD.LocationWaterMeasurement>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Location, opt => opt.Ignore())
@@ -446,11 +436,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.NetEtInInches, opt => opt.MapFrom(src => src.WaterMeasurementDetails.NetEtInInches));
 
             CreateMap<ApplicationEstimateUpdateLocationDetails, EFWD.WaterConservationApplicationEstimateLocation>()
+                .ForMember(dest => dest.WaterMeasurements, opt => opt.MapFrom(src => src.ConsumptiveUses))
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterConservationApplicationEstimateId, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalDetails, opt => opt.Ignore()) // special case; this property is carried over
-                .ForMember(dest => dest.Estimate, opt => opt.Ignore())
-                .ForMember(dest => dest.WaterMeasurements, opt => opt.Ignore());
+                .ForMember(dest => dest.Estimate, opt => opt.Ignore());
 
             CreateMap<ApplicationEstimateUpdateRequest, EFWD.WaterConservationApplicationEstimate>()
                 // these fields are being managed manually

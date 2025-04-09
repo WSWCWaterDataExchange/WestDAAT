@@ -283,12 +283,15 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         // - create new entries for locations that do not already exist
         var requestLocationsToBeCreated = request.Locations
-            .Where(l => !l.WaterConservationApplicationEstimateLocationId.HasValue)
-            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>((l, existingEntity)))
+            .Where(l => l.WaterConservationApplicationEstimateLocationId is null)
+            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>(l))
             .ToArray();
 
         // (this also creates the WaterMeasurements for each location)
-        await db.WaterConservationApplicationEstimateLocations.AddRangeAsync(requestLocationsToBeCreated);
+        foreach (var location in requestLocationsToBeCreated)
+        {
+            existingEntity.Locations.Add(location);
+        }
 
         // - update entries for locations that remain
         var existingLocationsToBeUpdated = existingEntity.Locations
