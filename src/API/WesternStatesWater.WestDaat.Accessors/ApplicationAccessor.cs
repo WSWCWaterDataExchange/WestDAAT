@@ -262,8 +262,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         else
         {
             // add new Control Location + related data
-            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>((existingEntity, request.ControlLocation));
-            await db.WaterConservationApplicationEstimateControlLocations.AddAsync(requestControlLocation);
+            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>(request.ControlLocation);
+            existingEntity.ControlLocations.Add(requestControlLocation);
         }
 
         // merge Locations:
