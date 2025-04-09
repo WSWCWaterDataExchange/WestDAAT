@@ -575,7 +575,7 @@ const onApplicationLoaded = (
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
       fieldName: `Field ${index + 1}`,
-      datapoints: location.consumptiveUses,
+      datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
       averageYearlyEtInAcreFeet: undefined,

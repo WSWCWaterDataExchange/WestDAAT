@@ -7,5 +7,5 @@ export interface LocationDetails {
   drawToolType: DrawToolType;
   polygonAreaInAcres: number;
   additionalDetails: string | null;
-  consumptiveUses: ConsumptiveUseDetails[];
+  waterMeasurements: ConsumptiveUseDetails[];
 }

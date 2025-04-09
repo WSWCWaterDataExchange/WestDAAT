@@ -684,8 +684,8 @@ describe('ConservationApplicationState reducer', () => {
 
       // application estimate location consumptive uses
       const consumptiveUse = location.datapoints![0];
-      const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
-      expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
+      const expectedConsumptiveUse = expectedLocation.waterMeasurements[0];
+      expect(location.datapoints!.length).toEqual(expectedLocation.waterMeasurements.length);
       expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
       expect(consumptiveUse.totalEtInInches).toEqual(expectedConsumptiveUse.totalEtInInches);
 

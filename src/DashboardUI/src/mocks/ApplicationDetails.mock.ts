@@ -21,7 +21,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
         drawToolType: DrawToolType.Rectangle,
         polygonAreaInAcres: 1,
         additionalDetails: 'I, the user, have some things to say about this field.',
-        consumptiveUses: [
+        waterMeasurements: [
           {
             id: 'consumptive-use-guid',
             year: 2025,
