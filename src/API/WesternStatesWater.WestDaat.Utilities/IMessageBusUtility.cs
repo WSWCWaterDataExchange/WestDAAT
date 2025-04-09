@@ -8,5 +8,5 @@ namespace WesternStatesWater.WestDaat.Utilities;
 /// </summary>
 public interface IMessageBusUtility
 {
-    Task SendMessageAsync<T>(string queueOrTopicName, T messageObject) where T : RequestBase;
+    Task SendMessageAsync<T>(string queueOrTopicName, T messageObject) where T : EventBase;
 }

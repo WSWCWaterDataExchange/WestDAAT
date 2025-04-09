@@ -18,6 +18,8 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                     group.Cast<DTO.WaterConservationApplicationSubmittedFundingOrganizationNotificationMeta>().ToArray()),
                 DTO.WaterConservationApplicationSubmittedAdminNotificationMeta => ApplicationSubmittedAdminNotifications(
                     group.Cast<DTO.WaterConservationApplicationSubmittedAdminNotificationMeta>().ToArray()),
+                DTO.WaterConservationApplicationRecommendedNotificationMeta => ApplicationRecommendedNotifications(
+                    group.Cast<DTO.WaterConservationApplicationRecommendedNotificationMeta>().ToArray()),
                 _ => throw new NotImplementedException(
                     $"Formatting notifications for type {group.Key.Name} has not been implemented."
                 )
@@ -132,6 +134,40 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                 Subject = "New Water Conservation Application Submitted",
                 TextContent = $"A {meta.FundingOrganizationName} water conservation application has been submitted.",
                 Body = $"A {meta.FundingOrganizationName} water conservation application has been submitted. "
+                       + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
+            }
+        };
+    }
+    
+    private DTO.NotificationBase[] ApplicationRecommendedNotifications(
+        DTO.WaterConservationApplicationRecommendedNotificationMeta[] metas)
+    {
+        var notifications = metas.Select(
+            meta => meta.Type switch
+            {
+                DTO.NotificationType.Email => FormatApplicationRecommendedEmailNotification(meta),
+                _ => throw new NotImplementedException("Formatting notifications of type " +
+                                                       $"'{meta.Type}' has not been implemented.")
+            }).ToArray();
+
+        return notifications;
+    }
+    
+    private DTO.EmailNotification FormatApplicationRecommendedEmailNotification(
+        DTO.WaterConservationApplicationRecommendedNotificationMeta meta)
+    {
+        var applicationUrl = $"{_environmentConfiguration.SiteUrl}/application/{meta.ApplicationId}/approve";
+
+        return new DTO.EmailNotification
+        {
+            EmailRequest = new DTO.EmailRequest
+            {
+                To = [meta.ToUser.EmailAddress],
+                From = _emailServiceConfiguration.NotificationFrom,
+                FromName = _emailServiceConfiguration.NotificationFromName,
+                Subject = "Water Conservation Application Recommendation",
+                TextContent = "A water conservation application has a new recommendation.",
+                Body = "A recommendation has been made on a water conservation application. "
                        + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
             }
         };

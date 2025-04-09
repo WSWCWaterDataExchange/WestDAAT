@@ -542,7 +542,7 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
 //   AzureNames.Queues list
 //   sb-emulator.config.json
 var queueNames = [
-  'conservation-application-submitted'
+  'conservation-application-status-changed'
 ]
 
 resource sbQueues 'Microsoft.ServiceBus/namespaces/queues@2021-06-01-preview' = [

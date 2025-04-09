@@ -309,6 +309,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                     CommonContracts.WaterConservationApplicationSubmissionUpdateRequest>()
                 .ForMember(dest => dest.UpdatedByUserId, opt => opt.Ignore());
 
+            CreateMap<CommonContracts.WaterConservationApplicationSubmissionUpdateResponse,
+                ClientContracts.Responses.Conservation.WaterConservationApplicationSubmissionUpdateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
+
             CreateMap<ClientContracts.ApplicationSubmissionFieldDetail, CommonContracts.ApplicationSubmissionFieldDetail>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationDocument, CommonContracts.WaterConservationApplicationDocument>()
@@ -325,10 +329,18 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Admin.ApplicationDocumentDownloadSasTokenRequest, CommonContracts.ApplicationDocumentLoadSingleRequest>();
 
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase,
+                    CommonContracts.WaterConservationApplicationStatusChangedEventBase>()
+                .IncludeAllDerived();
+
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmittedEvent, CommonContracts.WaterConservationApplicationSubmittedEvent>();
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendedEvent, CommonContracts.WaterConservationApplicationRecommendedEvent>();
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CommonContracts.WaterConservationApplicationRecommendationRequest>()
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.Ignore());
+
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
+                .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
         }
 
         public static CommonContracts.ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)

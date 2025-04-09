@@ -1,6 +1,5 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class WaterConservationApplicationSubmittedEvent
+public class WaterConservationApplicationSubmittedEvent : WaterConservationApplicationStatusChangedEventBase
 {
-    public Guid ApplicationId { get; set; }
 }

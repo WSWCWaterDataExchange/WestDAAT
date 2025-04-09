@@ -27,6 +27,7 @@ import westDaatApi from './westDaatApi';
 import { MapPolygon } from '../data-contracts/MapPolygon';
 import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
 import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
+import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -179,7 +180,7 @@ export const updateApplicationSubmission = async (
     supportingDocuments: ApplicationDocument[];
     note: string;
   },
-): Promise<void> => {
+): Promise<WaterConservationApplicationSubmissionUpdateResponse> => {
   const api = await westDaatApi(context);
 
   const request: WaterConservationApplicationSubmissionUpdateRequest = {
@@ -215,7 +216,9 @@ export const updateApplicationSubmission = async (
     note: data.note,
   };
 
-  await api.put<void>(`Applications/${data.waterConservationApplicationId}`, request);
+  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(`Applications/${data.waterConservationApplicationId}`, request);
+
+  return response;
 };
 
 export const submitApplicationRecommendation = async (

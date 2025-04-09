@@ -379,7 +379,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationStoreResponseBase();
     }
 
-    private async Task<ApplicationStoreResponseBase> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
+    private async Task<WaterConservationApplicationSubmissionUpdateResponse> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
@@ -425,7 +425,16 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         await db.SaveChangesAsync();
 
-        return new ApplicationStoreResponseBase();
+        var savedNote = await db.WaterConservationApplicationSubmissionNotes
+            .Include(n => n.User).ThenInclude(user => user.UserProfile)
+            .Where(n => n.Id == note.Id)
+            .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
+            .SingleAsync();
+
+        return new WaterConservationApplicationSubmissionUpdateResponse
+        {
+            Note = savedNote
+        };
     }
 
     private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
