@@ -16,7 +16,7 @@ export function ApplicationDocumentDownload() {
       throw new Error('File ID is required to download the document');
     }
 
-    toast.info(`Downloading ${fileName}`);
+    toast.info(`Downloading ${fileName}`, { autoClose: 1000 });
 
     await downloadApplicationDocuments(msalContext, fileId).catch(() =>
       toast.error(`An error occurred while downloading ${fileName}`, {
