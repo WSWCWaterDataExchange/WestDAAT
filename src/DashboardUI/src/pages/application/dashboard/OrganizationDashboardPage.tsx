@@ -31,11 +31,12 @@ import { useOrganizationQuery } from '../../../hooks/queries';
 import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
-import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
+import { getUserOrganization, hasPermission, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
 
 import './organization-dashboard-page.scss';
+import { Permission } from '../../../roleConfig';
 
 interface ApplicationDataGridColumns {
   applicant: string;
@@ -68,7 +69,7 @@ export function OrganizationDashboardPage() {
   const getKeysFromLookup = (obj: GridFilterState['filteredRowsLookup']) => {
     const keys = [];
     for (const key in obj) {
-      if (obj.hasOwnProperty(key) && obj[key]) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key]) {
         keys.push(key);
       }
     }
@@ -118,15 +119,8 @@ export function OrganizationDashboardPage() {
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
     const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
 
-    const canReview =
-      hasUserRole(user, Role.GlobalAdmin) ||
-      hasUserRole(user, Role.TechnicalReviewer) ||
-      hasUserRole(user, Role.OrganizationAdmin);
-
-    const canApprove =
-      hasUserRole(user, Role.GlobalAdmin) ||
-      hasUserRole(user, Role.Member) ||
-      hasUserRole(user, Role.OrganizationAdmin);
+    const canReview = hasPermission(user, Permission.ApplicationReview);
+    const canApprove = hasPermission(user, Permission.ApplicationApprove);
 
     let navLinkPageSlug = 'approve';
 

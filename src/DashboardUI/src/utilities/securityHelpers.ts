@@ -7,6 +7,17 @@ export const getUserOrganization = (user: User | null): string | null => {
   return user?.organizationRoles?.[0]?.organizationId ?? null;
 };
 
+export const hasUserRole = (user: User | null, role: Role): boolean => {
+  return user?.roles?.some((userRole) => userRole === role) ?? false;
+};
+
+export const hasOrganizationRole = (user: User | null, role: Role): boolean => {
+  return (
+    user?.organizationRoles?.some((organizationRole) => organizationRole.roles.some((userRole) => userRole === role)) ??
+    false
+  );
+};
+
 export const hasPermission = (user: User | null, permission: Permission): boolean => {
   if (!user) {
     return false;
@@ -21,9 +32,4 @@ export const hasPermission = (user: User | null, permission: Permission): boolea
   const userRoles = [...nonOrgRoles, ...orgRoles];
 
   return userRoles.some((role) => RolePermissions[role].includes(permission));
-};
-
-// Keep as private method. Rely on hasPermission for checking access to permissions instead
-const hasUserRole = (user: User | null, role: Role): boolean => {
-  return user?.roles?.some((userRole) => userRole === role) ?? false;
 };
