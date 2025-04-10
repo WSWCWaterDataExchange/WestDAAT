@@ -16,16 +16,17 @@ export function ApplicationDocumentDownload() {
       throw new Error('File ID is required to download the document');
     }
 
-    toast.info(`Downloading ${fileName}`, { autoClose: 1000 });
+    toast.info(`Downloading ${fileName}`);
 
     await downloadApplicationDocuments(msalContext, fileId).catch(() =>
-      toast.error(`An error occurred while downloading ${fileName}`, { autoClose: 3000 }),
+      toast.error(`An error occurred while downloading ${fileName}`, {
+        autoClose: 3000,
+      }),
     );
   };
 
   return (
     <div className="col">
-      <ToastContainer></ToastContainer>
       {state.conservationApplication.supportingDocuments.length === 0 && (
         <div className="text-muted">(No supporting documents have been provided)</div>
       )}

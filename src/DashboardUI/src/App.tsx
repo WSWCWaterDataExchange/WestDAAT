@@ -87,59 +87,61 @@ function App({ msalInstance }: AppProps) {
   }, []);
 
   return (
-    <MsalProvider instance={msalInstance}>
-      <AppProvider>
-        <QueryClientProvider client={queryClient}>
-          <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
-                <Route path="details" element={<DetailLayout />}>
-                  <Route path="site/:id" element={<SiteDetailsPage />} />
-                  <Route path="right/:id" element={<WaterRightDetailsPage />} />
-                  <Route path="overlay/:id" element={<OverlayDetailsPage />} />
-                </Route>
-                <Route path="account" element={<AuthGuard />}>
-                  <Route element={<AccountLayout />}>
-                    <Route index element={<AccountInformationPage />} />
-                    <Route path="signup" element={<SignupPage />} />
+    <>
+      <MsalProvider instance={msalInstance}>
+        <AppProvider>
+          <QueryClientProvider client={queryClient}>
+            <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="details" element={<DetailLayout />}>
+                    <Route path="site/:id" element={<SiteDetailsPage />} />
+                    <Route path="right/:id" element={<WaterRightDetailsPage />} />
+                    <Route path="overlay/:id" element={<OverlayDetailsPage />} />
                   </Route>
-                </Route>
-                <Route path="application" element={<AuthGuard />}>
-                  <Route element={<ApplicationLayout />}>
-                    <Route path="organization">
-                      <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                  <Route path="account" element={<AuthGuard />}>
+                    <Route element={<AccountLayout />}>
+                      <Route index element={<AccountInformationPage />} />
+                      <Route path="signup" element={<SignupPage />} />
                     </Route>
-                    <Route path=":applicationId">
-                      <Route path="create" element={<ApplicationCreatePage />} />
-                      <Route path="submit" element={<ApplicationSubmitPage />} />
-                      <Route path="review" element={<ApplicationReviewGuard />}>
-                        <Route element={<ApplicationReviewPage />}>
-                          <Route index element={<ApplicationReviewFormPage />} />
-                          <Route path="map" element={<ApplicationReviewMapPage />} />
+                  </Route>
+                  <Route path="application" element={<AuthGuard />}>
+                    <Route element={<ApplicationLayout />}>
+                      <Route path="organization">
+                        <Route path="dashboard" element={<OrganizationDashboardPage />} />
+                      </Route>
+                      <Route path=":applicationId">
+                        <Route path="create" element={<ApplicationCreatePage />} />
+                        <Route path="submit" element={<ApplicationSubmitPage />} />
+                        <Route path="review" element={<ApplicationReviewGuard />}>
+                          <Route element={<ApplicationReviewPage />}>
+                            <Route index element={<ApplicationReviewFormPage />} />
+                            <Route path="map" element={<ApplicationReviewMapPage />} />
+                          </Route>
+                        </Route>
+                        <Route path="approve" element={<ApplicationReviewGuard />}>
+                          <Route index element={<ApplicationApprovePage />} />
                         </Route>
                       </Route>
-                      <Route path="approve" element={<ApplicationReviewGuard />}>
-                        <Route index element={<ApplicationApprovePage />} />
-                      </Route>
+                      <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
                     </Route>
-                    <Route path=":waterRightNativeId/estimation" element={<EstimationToolPage />} />
+                  </Route>
+                  <Route path="admin" element={<AdminGuard />}>
+                    <Route element={<AdminLayout />}>
+                      <Route path="organizations" element={<AdminOrganizationsPage />} />
+                      <Route path=":organizationId/users" element={<AdminOrganizationsUsersPage />} />
+                    </Route>
                   </Route>
                 </Route>
-                <Route path="admin" element={<AdminGuard />}>
-                  <Route element={<AdminLayout />}>
-                    <Route path="organizations" element={<AdminOrganizationsPage />} />
-                    <Route path=":organizationId/users" element={<AdminOrganizationsUsersPage />} />
-                  </Route>
-                </Route>
-              </Route>
-            </Routes>
-            <ReactQueryDevtools initialIsOpen={false} />
-            <ToastContainer containerId="app-toast-container" />
-          </DndProvider>
-        </QueryClientProvider>
-      </AppProvider>
-    </MsalProvider>
+              </Routes>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </DndProvider>
+          </QueryClientProvider>
+        </AppProvider>
+      </MsalProvider>
+      <ToastContainer />
+    </>
   );
 }
 
