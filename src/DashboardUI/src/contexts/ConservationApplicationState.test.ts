@@ -262,6 +262,8 @@ describe('ConservationApplicationState reducer', () => {
             polygonWkt: polygonWkt,
             averageYearlyTotalEtInAcreFeet: 50,
             averageYearlyTotalEtInInches: 400,
+            averageYearlyNetEtInInches: null,
+            averageYearlyNetEtInAcreFeet: null,
             datapoints: [
               {
                 year: 2025,
@@ -621,6 +623,8 @@ describe('ConservationApplicationState reducer', () => {
               polygonWkt: 'POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))',
               averageYearlyTotalEtInAcreFeet: 50,
               averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,
@@ -793,6 +797,8 @@ describe('ConservationApplicationState reducer', () => {
               polygonWkt: polygonWkt,
               averageYearlyTotalEtInAcreFeet: 50,
               averageYearlyTotalEtInInches: 400,
+              averageYearlyNetEtInInches: null,
+              averageYearlyNetEtInAcreFeet: null,
               datapoints: [
                 {
                   year: 2025,

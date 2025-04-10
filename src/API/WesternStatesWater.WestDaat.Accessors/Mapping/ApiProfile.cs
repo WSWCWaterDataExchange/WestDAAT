@@ -478,9 +478,17 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 // Mapped in accessor
                 .ForMember(dest => dest.ReviewPipeline, opt => opt.Ignore());
 
-            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>();
+            CreateMap<EFWD.WaterConservationApplicationEstimate, EstimateDetails>()
+                .ForMember(dest => dest.ControlLocation, opt => opt.MapFrom(src => src.ControlLocations.SingleOrDefault()));
+
             CreateMap<EFWD.WaterConservationApplicationEstimateLocation, LocationDetails>();
-            CreateMap<EFWD.LocationWaterMeasurement, ConsumptiveUseDetails>();
+
+            CreateMap<EFWD.LocationWaterMeasurement, LocationWaterMeasurementDetails>();
+
+            CreateMap<EFWD.WaterConservationApplicationEstimateControlLocation, ControlLocationDetails>();
+
+            CreateMap<EFWD.ControlLocationWaterMeasurement, ControlLocationWaterMeasurementDetails>();
+
             CreateMap<EFWD.WaterConservationApplicationSubmission, SubmissionDetails>();
             CreateMap<EFWD.WaterConservationApplicationDocument, SupportingDocumentDetails>();
             CreateMap<EFWD.WaterConservationApplicationSubmissionNote, ApplicationReviewNote>()

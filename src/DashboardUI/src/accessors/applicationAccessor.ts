@@ -30,6 +30,9 @@ import { WaterConservationApplicationRecommendationRequest } from '../data-contr
 import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
 import { ApprovalDecision } from '../data-contracts/ApprovalDecision';
 import { WaterConservationApplicationApprovalRequest } from '../data-contracts/WaterConservationApplicationApprovalRequest';
+import { MapPoint } from '../data-contracts/MapPoint';
+import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
+import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export const applicationSearch = async (
@@ -69,7 +72,7 @@ export const createWaterConservationApplication = async (
   return data;
 };
 
-export const estimateConsumptiveUse = async (
+export const applicantEstimateConsumptiveUse = async (
   context: IMsalContext,
   fields: {
     waterConservationApplicationId: string;
@@ -90,6 +93,32 @@ export const estimateConsumptiveUse = async (
 
   const api = await westDaatApi(context);
   const { data } = await api.post<ApplicantEstimateConsumptiveUseResponse>(
+    'Applications/EstimateConsumptiveUse',
+    request,
+  );
+
+  return data;
+};
+
+export const reviewerEstimateConsumptiveUse = async (
+  context: IMsalContext,
+  fields: {
+    waterConservationApplicationId: string;
+    polygons: MapPolygon[];
+    controlLocation: MapPoint;
+    updateEstimate: boolean;
+  },
+): Promise<ReviewerEstimateConsumptiveUseResponse> => {
+  const request: ReviewerEstimateConsumptiveUseRequest = {
+    $type: 'ReviewerEstimateConsumptiveUseRequest',
+    waterConservationApplicationId: fields.waterConservationApplicationId,
+    polygons: fields.polygons,
+    controlLocation: fields.controlLocation,
+    updateEstimate: fields.updateEstimate,
+  };
+
+  const api = await westDaatApi(context);
+  const { data } = await api.post<ReviewerEstimateConsumptiveUseResponse>(
     'Applications/EstimateConsumptiveUse',
     request,
   );
