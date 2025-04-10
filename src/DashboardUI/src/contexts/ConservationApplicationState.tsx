@@ -591,18 +591,20 @@ const onApplicationLoaded = (
   draftApplication.doPolygonsOverlap = false;
 
   const controlLocation = application.estimate.controlLocation;
-  draftApplication.controlLocation = {
-    waterConservationApplicationEstimateControlLocationId: controlLocation.id,
-    pointWkt: controlLocation.pointWkt,
-    datapoints: application.estimate.controlLocation.waterMeasurements.map(
-      (measurement): GeometryEtDatapoint => ({
-        year: measurement.year,
-        totalEtInInches: measurement.totalEtInInches,
-        effectivePrecipitationInInches: null,
-        netEtInInches: null,
-      }),
-    ),
-  };
+  if (controlLocation) {
+    draftApplication.controlLocation = {
+      waterConservationApplicationEstimateControlLocationId: controlLocation.id,
+      pointWkt: controlLocation.pointWkt,
+      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+        (measurement): GeometryEtDatapoint => ({
+          year: measurement.year,
+          totalEtInInches: measurement.totalEtInInches,
+          effectivePrecipitationInInches: null,
+          netEtInInches: null,
+        }),
+      ),
+    };
+  }
   draftApplication.doesControlLocationOverlapWithPolygons = false;
 
   draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
