@@ -54,6 +54,7 @@ export function ApplicationApprovePage() {
   };
 
   const isApplicationFinalized =
+    state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
     state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
     state.conservationApplication.status === ConservationApplicationStatus.Rejected;
 
@@ -65,7 +66,7 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
-        rightButtonDisplayed={canApproveApplication}
+        rightButtonDisplayed={canApproveApplication && !isApplicationFinalized}
         rightButtonText="Edit Application"
         onRightButtonClick={navigateToReviewPage}
       />
