@@ -121,7 +121,7 @@ export type ApplicationAction =
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction
+  | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -197,8 +197,8 @@ export interface ApplicationCreatedAction {
   };
 }
 
-export interface ConsumptiveUseEstimatedAction {
-  type: 'CONSUMPTIVE_USE_ESTIMATED';
+export interface ApplicantConsumptiveUseEstimatedAction {
+  type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED';
   payload: {
     cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
@@ -298,7 +298,7 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
-    case 'CONSUMPTIVE_USE_ESTIMATED':
+    case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
       return onConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
@@ -459,7 +459,7 @@ const onEstimationFormUpdated = (
 
 const onConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
-  { payload }: ConsumptiveUseEstimatedAction,
+  { payload }: ApplicantConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 

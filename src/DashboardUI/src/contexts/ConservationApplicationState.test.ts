@@ -252,7 +252,7 @@ describe('ConservationApplicationState reducer', () => {
 
     // Act
     newState = reducer(newState, {
-      type: 'CONSUMPTIVE_USE_ESTIMATED',
+      type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
       payload: {
         cumulativeTotalEtInAcreFeet: 100,
         conservationPayment: 200,
@@ -613,7 +613,7 @@ describe('ConservationApplicationState reducer', () => {
       });
 
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
           cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
@@ -804,7 +804,7 @@ describe('ConservationApplicationState reducer', () => {
 
       // user then requests an estimate for said polygons
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
           cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
