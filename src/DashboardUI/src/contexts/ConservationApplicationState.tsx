@@ -17,7 +17,7 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
-import { PartialPointData } from '../data-contracts/CombinedPointData';
+import { MapSelectionPointData, PartialPointData } from '../data-contracts/CombinedPointData';
 import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 
 export interface ConservationApplicationState {
@@ -110,6 +110,7 @@ export type ApplicationAction =
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
   | MapPolygonsUpdatedAction
+  | ReviewerMapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ConsumptiveUseEstimatedAction
@@ -169,6 +170,16 @@ export interface MapPolygonsUpdatedAction {
   payload: {
     polygons: MapSelectionPolygonData[];
     doPolygonsOverlap: boolean;
+  };
+}
+
+export interface ReviewerMapPolygonsUpdatedAction {
+  type: 'REVIEWER_MAP_POLYGONS_UPDATED';
+  payload: {
+    polygons: MapSelectionPolygonData[];
+    doPolygonsOverlap: boolean;
+    controlLocation: MapSelectionPointData | undefined;
+    doesControlLocationOverlapWithPolygons: boolean | undefined;
   };
 }
 
@@ -286,6 +297,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
+    case 'REVIEWER_MAP_POLYGONS_UPDATED':
+      return onReviewerMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'CONSUMPTIVE_USE_ESTIMATED':
@@ -360,7 +373,7 @@ const onEstimationToolPageLoaded = (
 ): ConservationApplicationState => {
   draftState.conservationApplication.waterRightNativeId = payload.waterRightNativeId;
 
-  checkCanEstimateConsumptiveUse(draftState);
+  checkCanApplicantEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -387,7 +400,7 @@ const onFundingOrganizationLoaded = (
   draftState.isLoadingFundingOrganization = false;
   draftState.loadFundingOrganizationErrored = false;
 
-  checkCanEstimateConsumptiveUse(draftState);
+  checkCanApplicantEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -408,7 +421,7 @@ const onApplicationCreated = (
 
   draftState.isCreatingApplication = true;
 
-  checkCanEstimateConsumptiveUse(draftState);
+  checkCanApplicantEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -421,9 +434,18 @@ const onMapPolygonsUpdated = (
   draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
   resetConsumptiveUseEstimation(draftState);
-  checkCanEstimateConsumptiveUse(draftState);
+  checkCanApplicantEstimateConsumptiveUse(draftState);
   computeCombinedPolygonData(draftState);
   resetApplicationFormLocationDetails(draftState);
+
+  return draftState;
+};
+
+const onReviewerMapPolygonsUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: ReviewerMapPolygonsUpdatedAction,
+): ConservationApplicationState => {
+  // todo
 
   return draftState;
 };
@@ -438,7 +460,7 @@ const onEstimationFormUpdated = (
   application.desiredCompensationUnits = payload.desiredCompensationUnits;
 
   resetConsumptiveUseEstimation(draftState);
-  checkCanEstimateConsumptiveUse(draftState);
+  checkCanApplicantEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
@@ -633,7 +655,7 @@ const onApplicationLoadErrored = (draftState: ConservationApplicationState): Con
   return draftState;
 };
 
-const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
+const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
   const app = draftState.conservationApplication;
 
   const dollarsHasValue = !!app.desiredCompensationDollars;
@@ -652,6 +674,19 @@ const checkCanEstimateConsumptiveUse = (draftState: ConservationApplicationState
     app.estimateLocations.length <= 20 &&
     app.estimateLocations.every((p) => p.acreage! <= 50000) &&
     !app.doPolygonsOverlap;
+};
+
+const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
+  checkCanApplicantEstimateConsumptiveUse(draftState);
+
+  // if an applicant could not, then neither can a reviewer
+  if (!draftState.canEstimateConsumptiveUse) {
+    return;
+  }
+
+  // these rules only apply to reviewers:
+  const app = draftState.conservationApplication;
+  draftState.canEstimateConsumptiveUse = !!app.controlLocation && !app.doesControlLocationOverlapWithPolygons;
 };
 
 const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
