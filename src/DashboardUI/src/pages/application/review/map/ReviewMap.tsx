@@ -88,6 +88,7 @@ function ReviewMap(props: ReviewMapProps) {
     setHasInitializedMap(true);
   }, [
     userDrawnPolygonFeatures,
+    controlLocationFeature,
     isMapLoaded,
     convertWktToGeometry,
     getLatsLongsFromFeatureCollection,
