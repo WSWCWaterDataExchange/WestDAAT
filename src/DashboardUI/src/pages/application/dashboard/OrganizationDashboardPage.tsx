@@ -130,7 +130,33 @@ export function OrganizationDashboardPage() {
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
     const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
-    return <NavLink to={`/application/${application.applicationId}/review`}>{params.value}</NavLink>;
+
+    const canReview =
+      hasUserRole(user, Role.GlobalAdmin) ||
+      hasUserRole(user, Role.TechnicalReviewer) ||
+      hasUserRole(user, Role.OrganizationAdmin);
+
+    const canApprove =
+      hasUserRole(user, Role.GlobalAdmin) ||
+      hasUserRole(user, Role.Member) ||
+      hasUserRole(user, Role.OrganizationAdmin);
+
+    let navLinkPageSlug = 'approve';
+
+    switch (application.status) {
+      case ConservationApplicationStatus.Accepted:
+      case ConservationApplicationStatus.Rejected:
+        navLinkPageSlug = 'approve';
+        break;
+      case ConservationApplicationStatus.InTechnicalReview:
+        navLinkPageSlug = canReview ? 'review' : 'approve';
+        break;
+      case ConservationApplicationStatus.InFinalReview:
+        navLinkPageSlug = canApprove ? 'approve' : 'review';
+        break;
+    }
+
+    return <NavLink to={`/application/${application.applicationId}/${navLinkPageSlug}`}>{params.value}</NavLink>;
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
