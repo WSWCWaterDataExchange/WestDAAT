@@ -158,7 +158,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 <InputGroup.Text id="dollar-sign-addon">$</InputGroup.Text>
                 <Form.Control
                   type="number"
-                  placeholder="100"
+                  placeholder=""
                   min={1}
                   aria-describedby="dollar-sign-addon"
                   aria-label="Desired compensation in dollars"

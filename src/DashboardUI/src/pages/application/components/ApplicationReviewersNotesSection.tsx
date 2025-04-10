@@ -24,7 +24,7 @@ function ApplicationReviewersNotesSection() {
             >
               <div className="d-flex gap-3">
                 <div>
-                  <span className="text-primary">{note.submittedByFullName}</span>
+                  <span className="text-primary fw-bold">{note.submittedByFullName}</span>
                 </div>
                 <div>
                   <span className="text-muted fst-italic">
