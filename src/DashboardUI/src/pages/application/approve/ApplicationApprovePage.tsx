@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import Alert from 'react-bootstrap/esm/Alert';
+import { useMutation } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApprovalDecision } from '../../../data-contracts/ApprovalDecision';
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import ApplicationDocumentSection from '../components/ApplicationDocumentSection';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
@@ -13,8 +16,6 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
-import { useMutation } from 'react-query';
-import { ApprovalDecision } from '../../../data-contracts/ApprovalDecision';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -51,22 +52,23 @@ export function ApplicationApprovePage() {
 
   const submitApplicationApprovalMutation = useMutation({
     mutationFn: async (approval: { decision: ApprovalDecision; notes: string }) => {
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
+      await new Promise((resolve, reject) => setTimeout(reject, 2000)); // Simulate network delay
       alert(`Application is ${approval.decision} with notes: ${approval.notes}`);
-      // call accessor
     },
     onSuccess: () => {
-      // set is loading to false
-      // set toast notification
+      toast.success('Application approval decision submitted successfully.', {
+        autoClose: 1000,
+      });
       setShowAcceptModal(false);
       setShowDenyModal(false);
-      // redirect to org dashboard
+      navigateBack();
     },
     onError: () => {
-      // set is loading to false
-      alert('error');
-      // leave modals open
-      // set toast notification
+      toast.error('Error submitting application approval decision.', {
+        position: 'top-center',
+        theme: 'colored',
+        autoClose: 3000,
+      });
     },
   });
 
