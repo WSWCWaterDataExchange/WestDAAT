@@ -13,11 +13,15 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
+import { hasPermission } from '../../../utilities/securityHelpers';
+import { Permission } from '../../../roleConfig';
+import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+  const { user } = useAuthenticationContext();
 
   const navigateBack = () => {
     navigate(`/application/organization/dashboard`);
@@ -39,6 +43,15 @@ export function ApplicationApprovePage() {
     setShowDenyModal(true);
   };
 
+  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+  
+  const navigateToReviewPage = () => {
+    const id = state.conservationApplication.waterConservationApplicationId;
+    if (id) {
+      navigate(`/application/${id}/review`);
+    }
+  };
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -47,6 +60,9 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
+        rightButtonDisplayed={canApproveApplication}
+        rightButtonText="Edit Application"
+        onRightButtonClick={navigateToReviewPage}
       />
       <div className="overflow-y-auto">
         {!state.loadApplicationErrored && !state.loadFundingOrganizationErrored && (
