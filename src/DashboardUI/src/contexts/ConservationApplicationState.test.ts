@@ -9,6 +9,8 @@ import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { applicationDetailsMock } from '../mocks/ApplicationDetails.mock';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { DrawToolType } from '../data-contracts/DrawToolType';
+import { ReviewStepStatus } from '../data-contracts/ReviewStepStatus';
+import { ReviewStepType } from '../data-contracts/ReviewStepType';
 
 const shouldBeAbleToPerformConsumptiveUseEstimate = (state: ConservationApplicationState, expected: boolean): void => {
   expect(state.canEstimateConsumptiveUse).toEqual(expected);
@@ -43,14 +45,18 @@ describe('ConservationApplicationState reducer', () => {
   it('filtering dashboard applications should update state', () => {
     // Arrange
     state.dashboardApplications = [
-      { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Approved },
+      { ...mockApplication, applicationId: 'application-guid-1', status: ConservationApplicationStatus.Accepted },
       { ...mockApplication, applicationId: 'application-guid-2', status: ConservationApplicationStatus.Rejected },
-      { ...mockApplication, applicationId: 'application-guid-3', status: ConservationApplicationStatus.InReview },
-      { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Approved },
+      {
+        ...mockApplication,
+        applicationId: 'application-guid-3',
+        status: ConservationApplicationStatus.InTechnicalReview,
+      },
+      { ...mockApplication, applicationId: 'application-guid-4', status: ConservationApplicationStatus.Accepted },
       {
         ...mockApplication,
         applicationId: 'application-guid-5',
-        status: ConservationApplicationStatus.Approved,
+        status: ConservationApplicationStatus.Accepted,
         compensationRateUnits: CompensationRateUnits.Acres,
       },
     ];
@@ -103,7 +109,7 @@ describe('ConservationApplicationState reducer', () => {
     compensationRateDollars: 100,
     compensationRateUnits: 1,
     organizationName: 'Mock Funding Organization',
-    status: ConservationApplicationStatus.Approved,
+    status: ConservationApplicationStatus.Accepted,
     submittedDate: new Date('2025-01-01T00:00:00.0000000 +00:00'),
     totalObligationDollars: 200,
     totalWaterVolumeSavingsAcreFeet: 300,
@@ -651,6 +657,16 @@ describe('ConservationApplicationState reducer', () => {
         payload: {
           application: applicationDetails,
           notes: [note],
+          reviewPipeline: {
+            reviewSteps: [
+              {
+                reviewStepType: ReviewStepType.Approval,
+                reviewStepStatus: ReviewStepStatus.Approved,
+                participantName: 'Reviewer 1',
+                reviewDate: '2025-01-01T00:00:00.0000000 +00:00',
+              },
+            ],
+          },
         },
       });
 
@@ -664,9 +680,7 @@ describe('ConservationApplicationState reducer', () => {
 
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
-      expect(application.cumulativeTotalEtInAcreFeet).toEqual(
-        applicationDetails.estimate.cumulativeTotalEtInAcreFeet,
-      );
+      expect(application.cumulativeTotalEtInAcreFeet).toEqual(applicationDetails.estimate.cumulativeTotalEtInAcreFeet);
       expect(application.conservationPayment).toEqual(applicationDetails.estimate.estimatedCompensationDollars);
 
       // application estimate locations
