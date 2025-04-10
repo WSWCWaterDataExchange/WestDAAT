@@ -174,6 +174,7 @@ internal class ValidationEngine : IValidationEngine
             WaterConservationApplicationSubmissionRequest req => await ValidateWaterConservationApplicationSubmissionRequest(req, context),
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             WaterConservationApplicationRecommendationRequest req => await ValidateWaterConservationApplicationRecommendationRequest(req, context),
+            WaterConservationApplicationApprovalRequest req => await ValidateWaterConservationApplicationApprovalRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -356,9 +357,11 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify application is in review
-        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
         {
-            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), "Application must be in review to be updated.");
+            return CreateValidationError(request, nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId),
+                "Application must be in review to be updated.");
         }
 
         // verify user belongs to the funding organization that is handling the application
@@ -396,7 +399,8 @@ internal class ValidationEngine : IValidationEngine
         }
 
         // verify the application is in review
-        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InReview)
+        if (submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InTechnicalReview &&
+            submittedApplicationExistsResponse.Status is not DTO.ConservationApplicationStatus.InFinalReview)
         {
             return CreateValidationError(request, nameof(WaterConservationApplicationRecommendationRequest.WaterConservationApplicationId),
                 "Application must be in review status to receive a recommendation for final review.");
@@ -417,6 +421,47 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateWaterConservationApplicationApprovalRequest(WaterConservationApplicationApprovalRequest request, ContextBase context)
+    {
+        // verify the user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify the application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+
+        // verify the application has been through Technical Review
+        if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
+        {
+            return CreateValidationError(request, nameof(WaterConservationApplicationApprovalRequest.WaterConservationApplicationId),
+                "Application must be in final review status to be accepted or denied by a funding organization member.");
+        }
+
+        // verify the user has permissions to approve/deny an application
+        var permissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!permissions.Contains(Permissions.ApplicationApprove))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
+    }
+    
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
     {
         return request switch
@@ -512,9 +557,9 @@ internal class ValidationEngine : IValidationEngine
 
         // Verify the user's email domain matches the organization's
         var userProfileResponse = (DTO.UserProfileResponse)await _userAccessor.Load(new DTO.UserProfileRequest
-        { UserId = request.UserId });
+            { UserId = request.UserId });
         var organizationEmailDomainResponse = (DTO.OrganizationLoadDetailsResponse)await _organizationAccessor.Load(new DTO.OrganizationLoadDetailsRequest
-        { OrganizationId = request.OrganizationId });
+            { OrganizationId = request.OrganizationId });
 
         // There is validation to ensure the user email includes an '@'.
         // There isn't any validation or enforcement on whether the organization email domain includes an '@' or not, so we need to check for it.

@@ -5,12 +5,17 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { useFundingOrganizationQuery, useGetApplicationQuery } from '../../../hooks/queries/useApplicationQuery';
 import { ApplicationNavbar } from '../components/ApplicationNavbar';
 import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
+import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
+import { hasPermission } from '../../../utilities/securityHelpers';
+import { Permission } from '../../../roleConfig';
+import { mdiArrowRight } from '@mdi/js';
 
 function ApplicationReviewPage() {
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const location = useLocation();
   const { state } = useConservationApplicationContext();
+  const { user } = useAuthenticationContext();
 
   const isOnMapPage = location.pathname.includes('map');
 
@@ -29,6 +34,15 @@ function ApplicationReviewPage() {
   useGetApplicationQuery(applicationId, 'reviewer', true);
   useFundingOrganizationQuery(state.conservationApplication.waterRightNativeId);
 
+  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+
+  const navigateToApprovalPage = () => {
+    const id = state.conservationApplication.waterConservationApplicationId;
+    if (id) {
+      navigate(`/application/${id}/approve`);
+    }
+  };
+
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
       <ApplicationNavbar
@@ -37,6 +51,10 @@ function ApplicationReviewPage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
+        rightButtonDisplayed={canApproveApplication}
+        rightButtonText="Continue to Final Approval"
+        rightButtonIcon={mdiArrowRight}
+        onRightButtonClick={navigateToApprovalPage}
       />
 
       <div className="overflow-y-auto">

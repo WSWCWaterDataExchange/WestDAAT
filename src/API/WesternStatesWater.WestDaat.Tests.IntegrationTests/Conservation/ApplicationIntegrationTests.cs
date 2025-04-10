@@ -163,7 +163,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = acceptedEstimate.CompensationRateDollars,
             CompensationRateUnits = acceptedEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.Approved,
+            Status = ConservationApplicationStatus.Accepted,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
@@ -195,7 +195,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = inReviewEstimate.CompensationRateDollars,
             CompensationRateUnits = inReviewEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.InReview,
+            Status = ConservationApplicationStatus.InTechnicalReview,
             SubmittedDate = inReviewApp.SubmittedDate,
             WaterRightNativeId = appFour.WaterRightNativeId,
             WaterRightState = inReviewApp.WaterRightState,
@@ -242,6 +242,72 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         {
             Applications = expectedApplications.OrderByDescending(x => x.SubmittedDate).ToArray(),
         });
+    }
+
+    [TestMethod]
+    public async Task Load_OrganizationApplicationDashboardRequest_ShouldHaveEachStatus()
+    {
+        // Arrange
+        var applicant = new UserFaker().Generate();
+        var admin = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+
+        var submittedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var recommendedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var approvedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+        var rejectedApplication = new WaterConservationApplicationFaker(applicant, organization)
+            .RuleFor(a => a.Estimate, _ => new WaterConservationApplicationEstimateFaker()).Generate();
+
+        var submittedSubmission = new WaterConservationApplicationSubmissionFaker(submittedApplication).Generate();
+
+        var recommendedSubmission = new WaterConservationApplicationSubmissionFaker(recommendedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var approvedSubmission = new WaterConservationApplicationSubmissionFaker(approvedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.AcceptedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        var rejectedSubmission = new WaterConservationApplicationSubmissionFaker(rejectedApplication)
+            .RuleFor(sub => sub.RecommendedByUser, _ => admin)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedByUser, _ => admin)
+            .RuleFor(sub => sub.RejectedDate, _ => DateTimeOffset.UtcNow)
+            .Generate();
+
+        _dbContext.Organizations.Add(organization);
+        _dbContext.Users.AddRange(applicant, admin);
+        _dbContext.WaterConservationApplications.AddRange(submittedApplication, recommendedApplication, approvedApplication, rejectedApplication);
+        _dbContext.WaterConservationApplicationSubmissions.AddRange(submittedSubmission, recommendedSubmission, approvedSubmission, rejectedSubmission);
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = applicant.Id,
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<OrganizationApplicationDashboardLoadRequest, OrganizationApplicationDashboardLoadResponse>(
+            new OrganizationApplicationDashboardLoadRequest());
+
+        // Assert
+        response.Error.Should().BeNull();
+
+        response.Applications.Should().HaveCount(4);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InTechnicalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InFinalReview);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Accepted);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Rejected);
     }
 
     [TestMethod]
@@ -1586,7 +1652,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // Act
         var response = await _applicationManager
-            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationRecommendationRequest,
+                CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
 
         // Assert
         response.Error.Should().NotBeNull();
@@ -1698,6 +1765,286 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             Times.Exactly(2));
     }
 
+    [DataTestMethod]
+    [DataRow(Roles.Member, false, DisplayName = "A Member should not be able to approve a different funding organization's application")]
+    [DataRow(Roles.OrganizationAdmin, false, DisplayName = "An Organization Admin should not be able to approve a different funding organization's application")]
+    [DataRow(Roles.TechnicalReviewer, true, DisplayName = "A Technical Reviewer should not be able to approve their own funding organization's applications")]
+    public async Task Store_SubmitApplicationApproval_InvalidPermissions_ShouldThrow(string role, bool isPartOfOrg)
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var technicalReviewerId = Guid.NewGuid();
+        var technicalReviewer = new UserFaker()
+            .RuleFor(user => user.Id, _ => technicalReviewerId).Generate();
+        var approvalReviewer = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.Now)
+            .RuleFor(sub => sub.RecommendedByUserId, _ => technicalReviewerId)
+            .Generate();
+        await _dbContext.Users.AddRangeAsync(waterUser, technicalReviewer, approvalReviewer);
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalNotes = "This application is approved, way to go."
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = approvalReviewer.Id,
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = isPartOfOrg ? organization.Id : diffOrganization.Id,
+                RoleNames = [role]
+            }]
+        });
+
+        // Act
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+        var applicationInDb = await _dbContext.WaterConservationApplications.Where(app => app.Id == request.WaterConservationApplicationId)
+            .Include(app => app.Submission)
+            .ThenInclude(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync();
+        applicationInDb.Submission!.RecommendedForDate.Should().Be(submission.RecommendedForDate);
+        applicationInDb.Submission!.RecommendedByUserId.Should().Be(submission.RecommendedByUserId);
+        applicationInDb.Submission!.AcceptedDate.Should().BeNull();
+        applicationInDb.Submission!.RejectedDate.Should().BeNull();
+        applicationInDb.Submission!.ApprovedByUserId.Should().BeNull();
+        applicationInDb.Submission!.SubmissionNotes.Should().HaveCount(0);
+    }
+
+    [TestMethod]
+    public async Task Store_SubmitApplicationApproval_AppSubmissionDoesntExist_ShouldThrow()
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        await _dbContext.Users.AddAsync(waterUser);
+        await _dbContext.Organizations.AddRangeAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.SaveChangesAsync();
+        
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalNotes = "Some notes with my approval"
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = Guid.NewGuid(),
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = organization.Id,
+                RoleNames = [Roles.Member]
+            }]
+        });
+        
+        // Act
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<NotFoundError>();
+    }
+    
+    [DataTestMethod]
+    [DataRow(ConservationApplicationStatus.Unknown, DisplayName = "An application with an Unknown (invalid) status cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.InTechnicalReview, DisplayName = "An application that hasn't received a Recommendation yet cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.Accepted, DisplayName = "An application that has already been Accepted cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.Rejected, DisplayName = "An application that has already been Rejected cannot be Accepted or Rejected")]
+    public async Task Store_SubmitApplicationApproval_InvalidApplicationStatus_ShouldThrow(ConservationApplicationStatus status)
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var technicalReviewerId = Guid.NewGuid();
+        var technicalReviewer = new UserFaker()
+            .RuleFor(user => user.Id, _ => technicalReviewerId).Generate();
+        var approvalReviewerId = Guid.NewGuid();
+        var approvalReviewer = new UserFaker()
+            .RuleFor(user => user.Id, _ => approvalReviewerId).Generate();
+        var organization = new OrganizationFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        var oldTimestamp = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
+        
+        switch (status)
+        {
+            case ConservationApplicationStatus.InTechnicalReview:
+                submission.RecommendedForDate = null;
+                submission.RecommendedByUserId = null;
+                submission.AcceptedDate = null;
+                submission.ApprovedByUserId = null;
+                break;
+            case ConservationApplicationStatus.Accepted:
+                submission.RecommendedForDate = oldTimestamp;
+                submission.RecommendedByUserId = technicalReviewerId;
+                submission.AcceptedDate = oldTimestamp;
+                submission.ApprovedByUserId = approvalReviewerId;
+                break;
+            case ConservationApplicationStatus.Rejected:
+                submission.RecommendedForDate = oldTimestamp;
+                submission.RecommendedByUserId = technicalReviewerId;
+                submission.RejectedDate = oldTimestamp;
+                submission.ApprovedByUserId = approvalReviewerId;
+                break;
+            case ConservationApplicationStatus.Unknown:
+                submission.RejectedDate = oldTimestamp;
+                submission.AcceptedDate = oldTimestamp;
+                submission.ApprovedByUserId = approvalReviewerId;
+                break;
+        }
+        
+        await _dbContext.Users.AddRangeAsync(waterUser, technicalReviewer, approvalReviewer);
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+        
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalNotes = "Some notes with my approval"
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = approvalReviewer.Id,
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = organization.Id,
+                RoleNames = [Roles.Member]
+            }]
+        });
+        
+        // Act
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        
+        // Assert
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ValidationError>();
+
+        var applicationInDb = await _dbContext.WaterConservationApplications.Where(app => app.Id == request.WaterConservationApplicationId)
+            .Include(app => app.Submission)
+            .ThenInclude(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync();
+        applicationInDb.Submission!.RecommendedForDate.Should().Be(submission.RecommendedForDate);
+        applicationInDb.Submission!.RecommendedAgainstDate.Should().Be(submission.RecommendedAgainstDate);
+        applicationInDb.Submission!.RecommendedByUserId.Should().Be(submission.RecommendedByUserId);
+        applicationInDb.Submission!.AcceptedDate.Should().Be(submission.AcceptedDate);
+        applicationInDb.Submission!.RejectedDate.Should().Be(submission.RejectedDate);
+        applicationInDb.Submission!.ApprovedByUserId.Should().Be(submission.ApprovedByUserId);
+        applicationInDb.Submission!.SubmissionNotes.Should().HaveCount(0); 
+    }
+
+    [DataTestMethod]
+    [DataRow(ApprovalDecision.Accepted)]
+    [DataRow(ApprovalDecision.Rejected)]
+    public async Task Store_SubmitApplicationApproval_Success(ApprovalDecision decision)
+    {
+        // Arrange
+        var waterUser = new UserFaker().Generate();
+        var technicalReviewerId = Guid.NewGuid();
+        var technicalReviewer = new UserFaker()
+            .RuleFor(user => user.Id, _ => technicalReviewerId).Generate();
+        var approvalReviewerId = Guid.NewGuid();
+        var approvalReviewer = new UserFaker()
+            .RuleFor(user => user.Id, _ => approvalReviewerId).Generate();
+        var organization = new OrganizationFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application)
+            .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.Now)
+            .RuleFor(sub => sub.RecommendedByUserId, _ => technicalReviewerId).Generate();
+        
+        await _dbContext.Users.AddRangeAsync(waterUser, technicalReviewer, approvalReviewer);
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+        
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            ApprovalDecision = decision,
+            ApprovalNotes = "Some notes with my approval decision"
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = approvalReviewer.Id,
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = organization.Id,
+                RoleNames = [Roles.Member]
+            }]
+        });
+        
+        // Act
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest, CLI.Responses.Conservation.ApplicationStoreResponseBase>(request);
+        
+        // Assert
+        var applicationInDb = await _dbContext.WaterConservationApplications.Where(app => app.Id == request.WaterConservationApplicationId)
+            .Include(app => app.Submission)
+            .ThenInclude(sub => sub.SubmissionNotes)
+            .SingleOrDefaultAsync();
+
+        response.Error.Should().BeNull();
+        response.Should().BeOfType<CLI.Responses.Conservation.ApplicationStoreResponseBase>();
+        
+        // recommendation info shouldn't have changed
+        applicationInDb.Submission!.RecommendedForDate.Should().Be(submission.RecommendedForDate);
+        applicationInDb.Submission!.RecommendedAgainstDate.Should().Be(submission.RecommendedAgainstDate);
+        applicationInDb.Submission!.RecommendedByUserId.Should().Be(submission.RecommendedByUserId);
+        
+        // approval info should match the request
+        applicationInDb.Submission!.ApprovedByUserId.Should().Be(approvalReviewer.Id);
+        if (decision == ApprovalDecision.Accepted)
+        {
+            applicationInDb.Submission!.AcceptedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
+            applicationInDb.Submission!.RejectedDate.Should().Be(null);
+        }
+        if (decision == ApprovalDecision.Rejected)
+        {
+            applicationInDb.Submission!.AcceptedDate.Should().Be(null);
+            applicationInDb.Submission!.RejectedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
+        }
+        
+        // application submission notes from the request should have been added
+        applicationInDb.Submission!.SubmissionNotes.Should().HaveCount(1);
+        applicationInDb.Submission!.SubmissionNotes.First().UserId.Should().Be(approvalReviewer.Id);
+        applicationInDb.Submission!.SubmissionNotes.First().Note.Should().Be(request.ApprovalNotes);
+    }
+    
     [TestMethod]
     public async Task OnApplicationStatusChanged_ApplicationSubmitted_ShouldSendEmails()
     {
