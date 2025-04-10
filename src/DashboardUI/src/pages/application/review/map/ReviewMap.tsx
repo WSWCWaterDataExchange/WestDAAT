@@ -135,7 +135,7 @@ function ReviewMap(props: ReviewMapProps) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = mapGeometries.map(fromGeometryFeatureToMapSelectionPolygonData);
+    const polygonData: MapSelectionPolygonData[] = polygonFeatures.map(fromGeometryFeatureToMapSelectionPolygonData);
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
     }
@@ -162,7 +162,7 @@ function ReviewMap(props: ReviewMapProps) {
     }
 
     dispatch({
-      type: 'REVIEWER_MAP_POLYGONS_UPDATED',
+      type: 'REVIEWER_MAP_DATA_UPDATED',
       payload: {
         polygons: polygonData,
         doPolygonsOverlap,
