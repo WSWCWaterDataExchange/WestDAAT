@@ -345,6 +345,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             loc.WaterMeasurements.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
         ).Should().BeTrue();
 
+        applicantResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().NotBeNull();
+        applicantResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().Be(estimate.CumulativeNetEtInAcreFeet);
+
+        reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().NotBeNull();
+        reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().Be(estimate.CumulativeNetEtInAcreFeet);
+
         // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
         {

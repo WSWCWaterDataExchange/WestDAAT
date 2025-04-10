@@ -20,6 +20,11 @@ public class WaterConservationApplicationEstimateFaker : Faker<EFWD.WaterConserv
 
         RuleFor(wcas => wcas.EstimatedCompensationDollars, f => f.Random.Int(100, 1000));
 
+        RuleFor(wcae => wcae.CumulativeTotalEtInAcreFeet, f => f.Random.Int(10, 1000));
+
+        // net et should be smaller than total et, but shouldn't be negative
+        RuleFor(wcae => wcae.CumulativeNetEtInAcreFeet, (f, estimate) => Math.Max(estimate.CumulativeTotalEtInAcreFeet - f.Random.Int(10, 1000), 5));
+
         if (application != null)
         {
             RuleFor(wcae => wcae.WaterConservationApplication, () => application);
