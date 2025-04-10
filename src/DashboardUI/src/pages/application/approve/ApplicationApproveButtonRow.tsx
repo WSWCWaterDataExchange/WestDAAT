@@ -8,7 +8,7 @@ export interface ApplicationApproveButtonRowProps {
 }
 
 export function ApplicationApproveButtonRow(props: ApplicationApproveButtonRowProps) {
-  const { disableButtons: isFormSubmitting, handleAcceptClicked, handleDenyClicked } = props;
+  const { disableButtons, handleAcceptClicked, handleDenyClicked } = props;
 
   if (props.isHidden) {
     return null;
@@ -16,11 +16,11 @@ export function ApplicationApproveButtonRow(props: ApplicationApproveButtonRowPr
 
   return (
     <div className="d-flex justify-content-end p-3 gap-3">
-      <Button variant="danger" onClick={handleDenyClicked} disabled={isFormSubmitting} className="px-3">
+      <Button variant="danger" onClick={handleDenyClicked} disabled={disableButtons} className="px-3">
         Deny
       </Button>
 
-      <Button variant="success" onClick={handleAcceptClicked} disabled={isFormSubmitting} className="px-3">
+      <Button variant="success" onClick={handleAcceptClicked} disabled={disableButtons} className="px-3">
         Accept
       </Button>
     </div>
