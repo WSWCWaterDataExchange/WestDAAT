@@ -12,6 +12,8 @@ public class EstimateDetails
 
     public double CumulativeTotalEtInAcreFeet { get; set; }
 
+    public double? CumulativeNetEtInAcreFeet { get; set; }
+
     public LocationDetails[] Locations { get; set; } = null!;
 
     public ControlLocationDetails ControlLocation { get; set; } = null!;
