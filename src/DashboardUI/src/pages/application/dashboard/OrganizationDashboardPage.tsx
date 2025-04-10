@@ -34,9 +34,9 @@ import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid
 import { getUserOrganization, hasPermission, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
+import { Permission } from '../../../roleConfig';
 
 import './organization-dashboard-page.scss';
-import { Permission } from '../../../roleConfig';
 
 interface ApplicationDataGridColumns {
   applicant: string;
