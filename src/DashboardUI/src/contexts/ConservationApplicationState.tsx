@@ -471,43 +471,51 @@ const onReviewerMapPolygonsUpdated = (
   // * map polygons updated
   // * map control location updated
 
-  const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
-  const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
+  const handlePolygonChanges = () => {
+    const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
+    const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
 
-  const anyPolygonsAddedOrRemoved = existingPolygonWkts.size !== newPolygonWkts.size;
-  const anyPolygonsChanged = existingPolygonWkts.symmetricDifference(newPolygonWkts).size > 0;
+    const anyPolygonsAddedOrRemoved = existingPolygonWkts.size !== newPolygonWkts.size;
+    const anyPolygonsChanged = existingPolygonWkts.symmetricDifference(newPolygonWkts).size > 0;
 
-  const shouldDispatchMapPolygonsUpdatedAction = anyPolygonsAddedOrRemoved || anyPolygonsChanged;
+    const shouldDispatchMapPolygonsUpdatedAction = anyPolygonsAddedOrRemoved || anyPolygonsChanged;
 
-  if (shouldDispatchMapPolygonsUpdatedAction) {
-    const action: MapPolygonsUpdatedAction = {
-      type: 'MAP_POLYGONS_UPDATED',
-      payload: {
-        polygons: payload.polygons,
-        doPolygonsOverlap: payload.doPolygonsOverlap,
-      },
-    };
+    if (shouldDispatchMapPolygonsUpdatedAction) {
+      const action: MapPolygonsUpdatedAction = {
+        type: 'MAP_POLYGONS_UPDATED',
+        payload: {
+          polygons: payload.polygons,
+          doPolygonsOverlap: payload.doPolygonsOverlap,
+        },
+      };
 
-    draftState = reducer(draftState, action);
-  }
+      draftState = reducer(draftState, action);
+    }
+  };
 
-  const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
-  const newControlLocationWkt = payload.controlLocation?.pointWkt;
+  handlePolygonChanges();
 
-  // this check covers the control location being added, deleted, or moved
-  const controlLocationUpdated = existingControlLocationWkt !== newControlLocationWkt;
+  const handleControlLocationChanges = () => {
+    const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
+    const newControlLocationWkt = payload.controlLocation?.pointWkt;
 
-  if (controlLocationUpdated) {
-    const action: MapControlLocationUpdatedAction = {
-      type: 'MAP_CONTROL_LOCATION_UPDATED',
-      payload: {
-        controlLocation: payload.controlLocation,
-        doesControlLocationOverlapWithPolygons: payload.doesControlLocationOverlapWithPolygons,
-      },
-    };
+    // this check covers the control location being added, deleted, or moved
+    const controlLocationUpdated = existingControlLocationWkt !== newControlLocationWkt;
 
-    draftState = reducer(draftState, action);
-  }
+    if (controlLocationUpdated) {
+      const action: MapControlLocationUpdatedAction = {
+        type: 'MAP_CONTROL_LOCATION_UPDATED',
+        payload: {
+          controlLocation: payload.controlLocation,
+          doesControlLocationOverlapWithPolygons: payload.doesControlLocationOverlapWithPolygons,
+        },
+      };
+
+      draftState = reducer(draftState, action);
+    }
+  };
+
+  handleControlLocationChanges();
 
   // todo: do any other methods need to be called here?
   checkCanReviewerEstimateConsumptiveUse(draftState);
