@@ -2,22 +2,26 @@ import { Feature, FeatureCollection, GeoJsonProperties, Geometry, Point, Polygon
 import Map from '../../../../components/map/Map';
 import EstimationToolTableView from '../../estimation-tool/EstimationToolTableView';
 import { toast } from 'react-toastify';
-import { doPolygonsIntersect, getLatsLongsFromFeatureCollection } from '../../../../utilities/geometryHelpers';
+import {
+  doesPointExistWithinPolygon,
+  doPolygonsIntersect,
+  getLatsLongsFromFeatureCollection,
+} from '../../../../utilities/geometryHelpers';
 import { MapSelectionPolygonData } from '../../../../data-contracts/CombinedPolygonData';
-import { convertGeometryToWkt, convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
-import { convertSquareMetersToAcres } from '../../../../utilities/valueConverters';
+import { convertWktToGeometry } from '../../../../utilities/geometryWktConverter';
 import { useConservationApplicationContext } from '../../../../contexts/ConservationApplicationProvider';
 import { MapStyle, useMapContext } from '../../../../contexts/MapProvider';
 import Button from 'react-bootstrap/esm/Button';
 import { useEffect, useMemo, useState } from 'react';
 import centerOfMass from '@turf/center-of-mass';
 import Spinner from 'react-bootstrap/esm/Spinner';
-import { area as areaInSquareMeters } from '@turf/area';
 import {
+  fromGeometryFeatureToMapSelectionPointData,
   fromGeometryFeatureToMapSelectionPolygonData,
   fromPartialPointDataToPointFeature,
   fromPartialPolygonDataToPolygonFeature,
 } from '../../../../utilities/mapUtility';
+import { MapSelectionPointData } from '../../../../data-contracts/CombinedPointData';
 
 interface ReviewMapProps {
   waterRightNativeId: string | undefined;
@@ -113,30 +117,57 @@ function ReviewMap(props: ReviewMapProps) {
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
 
-  const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
-    console.log('polygons changed');
-    if (polygons.length > 20) {
+  const handleMapDrawnPolygonChange = (mapGeometries: Feature<Geometry, GeoJsonProperties>[]) => {
+    // irrigated field locations
+    const polygonFeatures: Feature<Polygon, GeoJsonProperties>[] = mapGeometries
+      .filter((feature) => feature.geometry.type === 'Polygon')
+      .map((feature) => feature as Feature<Polygon, GeoJsonProperties>);
+
+    // validate irrigated field locations
+    if (polygonFeatures.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
       );
     }
 
-    const doPolygonsOverlap = doPolygonsIntersect(polygons);
+    const doPolygonsOverlap = doPolygonsIntersect(polygonFeatures);
     if (doPolygonsOverlap) {
       toast.error('Polygons may not intersect. Please redraw the polygons so they do not overlap.');
     }
 
-    const polygonData: MapSelectionPolygonData[] = polygons.map(fromGeometryFeatureToMapSelectionPolygonData);
-
+    const polygonData: MapSelectionPolygonData[] = mapGeometries.map(fromGeometryFeatureToMapSelectionPolygonData);
     if (polygonData.some((p) => p.acreage > 50000)) {
       toast.error('Polygons may not exceed 50,000 acres.');
     }
 
+    // control location (non-irrigated field location)
+    const pointFeatures: Feature<Point, GeoJsonProperties>[] = mapGeometries
+      .filter((feature) => feature.geometry.type === 'Point')
+      .map((feature) => feature as Feature<Point, GeoJsonProperties>);
+
+    // validate control location
+    if (pointFeatures.length > 1) {
+      toast.error('You may only select one control location.');
+    }
+    const [controlLocationFeature] = pointFeatures;
+
+    let doesControlLocationOverlapWithPolygons: boolean | undefined;
+    let controlLocationData: MapSelectionPointData | undefined;
+    if (controlLocationFeature) {
+      doesControlLocationOverlapWithPolygons = polygonFeatures.some((polygonFeature) =>
+        doesPointExistWithinPolygon(controlLocationFeature, polygonFeature),
+      );
+
+      controlLocationData = fromGeometryFeatureToMapSelectionPointData(controlLocationFeature);
+    }
+
     dispatch({
-      type: 'MAP_POLYGONS_UPDATED',
+      type: 'REVIEWER_MAP_POLYGONS_UPDATED',
       payload: {
         polygons: polygonData,
         doPolygonsOverlap,
+        controlLocation: controlLocationData,
+        doesControlLocationOverlapWithPolygons,
       },
     });
   };
