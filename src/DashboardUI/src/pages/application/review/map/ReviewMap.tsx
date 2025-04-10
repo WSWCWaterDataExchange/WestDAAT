@@ -110,10 +110,8 @@ function ReviewMap(props: ReviewMapProps) {
     // the control location selection tool is only enabled if there is no control location on the map
     if (!controlLocationFeature) {
       setIsControlLocationSelectionToolEnabled(true);
-      console.log('enable control location selection tool');
     } else {
       setIsControlLocationSelectionToolEnabled(false);
-      console.log('disable control location selection tool');
     }
   }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
 
