@@ -20,6 +20,8 @@ public class ApplicationDetails
 
     public SupportingDocumentDetails[] SupportingDocuments { get; set; } = null!;
 
+    public ConservationApplicationStatus Status { get; set; }
+
     // JsonIgnore so the json is never sent to the client.
     // This is mapped to two separate client contracts.
     [JsonIgnore] public ApplicationReviewNote[] Notes { get; set; } = null!;

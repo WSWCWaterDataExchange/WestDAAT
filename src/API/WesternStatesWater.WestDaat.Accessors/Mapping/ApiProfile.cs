@@ -470,6 +470,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt.PreCondition(src => src.Submission != null);
                     opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
                 })
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
+                    src.Submission.RecommendedByUserId,
+                    src.Submission.AcceptedDate,
+                    src.Submission.RejectedDate
+                )))
                 // Mapped in accessor
                 .ForMember(dest => dest.ReviewPipeline, opt => opt.Ignore());
 
