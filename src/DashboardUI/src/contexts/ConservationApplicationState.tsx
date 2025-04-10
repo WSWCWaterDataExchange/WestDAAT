@@ -109,6 +109,7 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
+  | MapControlLocationUpdatedAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
@@ -170,6 +171,14 @@ export interface MapPolygonsUpdatedAction {
   payload: {
     polygons: MapSelectionPolygonData[];
     doPolygonsOverlap: boolean;
+  };
+}
+
+export interface MapControlLocationUpdatedAction {
+  type: 'MAP_CONTROL_LOCATION_UPDATED';
+  payload: {
+    controlLocation: MapSelectionPointData | undefined;
+    doesControlLocationOverlapWithPolygons: boolean | undefined;
   };
 }
 
@@ -297,6 +306,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
+    case 'MAP_CONTROL_LOCATION_UPDATED':
+      return onMapControlLocationUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
@@ -441,6 +452,17 @@ const onMapPolygonsUpdated = (
   return draftState;
 };
 
+const onMapControlLocationUpdated = (
+  draftState: ConservationApplicationState,
+  { payload }: MapControlLocationUpdatedAction,
+): ConservationApplicationState => {
+  draftState.conservationApplication.controlLocation = payload.controlLocation;
+  draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
+    payload.doesControlLocationOverlapWithPolygons ?? false;
+
+  return draftState;
+};
+
 const onReviewerMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerMapDataUpdatedAction,
@@ -469,10 +491,26 @@ const onReviewerMapPolygonsUpdated = (
     draftState = reducer(draftState, action);
   }
 
-  // todo: dispatch control location updated action
-  // draftState.conservationApplication.controlLocation = payload.controlLocation;
-  // draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
-  //   payload.doesControlLocationOverlapWithPolygons ?? false;
+  const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
+  const newControlLocationWkt = payload.controlLocation?.pointWkt;
+
+  // this check covers the control location being added, deleted, or moved
+  const controlLocationUpdated = existingControlLocationWkt !== newControlLocationWkt;
+
+  if (controlLocationUpdated) {
+    const action: MapControlLocationUpdatedAction = {
+      type: 'MAP_CONTROL_LOCATION_UPDATED',
+      payload: {
+        controlLocation: payload.controlLocation,
+        doesControlLocationOverlapWithPolygons: payload.doesControlLocationOverlapWithPolygons,
+      },
+    };
+
+    draftState = reducer(draftState, action);
+  }
+
+  // todo: do any other methods need to be called here?
+  checkCanReviewerEstimateConsumptiveUse(draftState);
 
   return draftState;
 };
