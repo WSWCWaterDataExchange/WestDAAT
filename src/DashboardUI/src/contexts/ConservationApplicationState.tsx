@@ -19,6 +19,7 @@ import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { MapSelectionPointData, PartialPointData } from '../data-contracts/CombinedPointData';
 import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -36,6 +37,7 @@ export interface ConservationApplicationState {
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     cumulativeTotalEtInAcreFeet: number | undefined;
+    cumulativeNetEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
@@ -47,6 +49,8 @@ export interface ConservationApplicationState {
     polygonAcreageSum: number;
     supportingDocuments: ApplicationDocument[];
     reviewerNotes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
+    status: ConservationApplicationStatus;
   };
   isCreatingApplication: boolean;
   isUploadingDocument: boolean;
@@ -81,6 +85,7 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
     cumulativeTotalEtInAcreFeet: undefined,
+    cumulativeNetEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
@@ -91,6 +96,10 @@ export const defaultState = (): ConservationApplicationState => ({
     polygonAcreageSum: 0,
     supportingDocuments: [],
     reviewerNotes: [],
+    reviewPipeline: {
+      reviewSteps: [],
+    },
+    status: ConservationApplicationStatus.Unknown,
   },
   isCreatingApplication: false,
   isUploadingDocument: false,
@@ -114,7 +123,7 @@ export type ApplicationAction =
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction
+  | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -208,8 +217,8 @@ export interface ApplicationCreatedAction {
   };
 }
 
-export interface ConsumptiveUseEstimatedAction {
-  type: 'CONSUMPTIVE_USE_ESTIMATED';
+export interface ApplicantConsumptiveUseEstimatedAction {
+  type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED';
   payload: {
     cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
@@ -262,6 +271,7 @@ export interface ApplicationLoadedAction {
   payload: {
     application: ApplicationDetails;
     notes: ApplicationReviewNote[];
+    reviewPipeline: ReviewPipeline;
   };
 }
 
@@ -312,8 +322,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onReviewerMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
-    case 'CONSUMPTIVE_USE_ESTIMATED':
-      return onConsumptiveUseEstimated(draftState, action);
+    case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
+      return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -358,15 +368,19 @@ const onDashboardApplicationsFiltered = (
 
 function calculateApplicationStatistics(applications: ApplicationDashboardListItem[]): ApplicationDashboardStatistics {
   const submittedApps = applications.length;
-  const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Approved).length;
-  const inReviewApps = applications.filter((app) => app?.status === ConservationApplicationStatus.InReview).length;
+  const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Accepted).length;
+  const inTechReview = applications.filter(
+    (app) => app?.status === ConservationApplicationStatus.InTechnicalReview,
+  ).length;
+  const inFinalRevew = applications.filter((app) => app?.status === ConservationApplicationStatus.InFinalReview).length;
   const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
+  const inReviewApps = inTechReview + inFinalRevew;
   const waterSavings = applications
-    .filter((app) => app?.status === ConservationApplicationStatus.Approved)
+    .filter((app) => app?.status === ConservationApplicationStatus.Accepted)
     .filter((app) => app?.compensationRateUnits === CompensationRateUnits.AcreFeet)
     .reduce((sum, app) => sum + (app?.totalWaterVolumeSavingsAcreFeet ?? 0), 0);
   const totalObligation = applications
-    .filter((app) => app?.status === ConservationApplicationStatus.Approved)
+    .filter((app) => app?.status === ConservationApplicationStatus.Accepted)
     .reduce((sum, app) => sum + (app?.totalObligationDollars ?? 0), 0);
 
   return {
@@ -538,9 +552,9 @@ const onEstimationFormUpdated = (
   return draftState;
 };
 
-const onConsumptiveUseEstimated = (
+const onApplicantConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
-  { payload }: ConsumptiveUseEstimatedAction,
+  { payload }: ApplicantConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 
@@ -646,6 +660,7 @@ const onApplicationLoaded = (
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
   draftApplication.cumulativeTotalEtInAcreFeet = application.estimate.cumulativeTotalEtInAcreFeet;
+  draftApplication.cumulativeNetEtInAcreFeet = application.estimate.cumulativeNetEtInAcreFeet ?? undefined;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,
@@ -716,6 +731,9 @@ const onApplicationLoaded = (
   );
   draftApplication.reviewerNotes = payload.notes;
 
+  draftApplication.reviewPipeline = payload.reviewPipeline;
+  draftApplication.status = application.status;
+
   draftState.isLoadingApplication = false;
   draftState.loadApplicationErrored = false;
 
@@ -784,6 +802,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
   draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
   // this `reset` method is activated when the user:

@@ -312,6 +312,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate))
+                .ForMember(dest => dest.RecommendedForDate, opt => opt.MapFrom(src => src.Submission.RecommendedForDate))
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.MapFrom(src => src.Submission.RecommendedAgainstDate))
+                .ForMember(dest => dest.RecommendedByUserId, opt => opt.MapFrom(src => src.Submission.RecommendedByUserId))
                 .ForMember(dest => dest.WaterRightState, opt => opt.MapFrom(src => src.Submission.WaterRightState))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.Estimate.EstimatedCompensationDollars))
                 .ForMember(dest => dest.CumulativeTotalEtInAcreFeet, opt => opt.MapFrom(src => src.Estimate.CumulativeTotalEtInAcreFeet));
@@ -467,6 +470,11 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                     opt.PreCondition(src => src.Submission != null);
                     opt.MapFrom(src => src.Submission.SubmissionNotes.OrderBy(note => note.Timestamp));
                 })
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
+                    src.Submission.RecommendedByUserId,
+                    src.Submission.AcceptedDate,
+                    src.Submission.RejectedDate
+                )))
                 // Mapped in accessor
                 .ForMember(dest => dest.ReviewPipeline, opt => opt.Ignore());
 
@@ -490,18 +498,23 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             CreateMap<EFWD.WaterConservationApplication, ApplicationExistsLoadResponse>()
                 .ForMember(dest => dest.ApplicationExists, opt => opt.MapFrom(_ => true))
                 .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(src.Submission.AcceptedDate, src.Submission.RejectedDate)))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => EvaluateApplicationStatus(
+                    src.Submission.RecommendedByUserId,
+                    src.Submission.AcceptedDate,
+                    src.Submission.RejectedDate
+                )))
                 .ForMember(dest => dest.EstimateLocationIds, opt => opt.MapFrom(src => src.Estimate.Locations.Select(loc => loc.Id).ToArray()));
         }
 
         // duplicated in other ApiProfile.cs
-        public static ConservationApplicationStatus EvaluateApplicationStatus(DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            return (acceptedDate, rejectedDate) switch
+            return (recommenedByUserId: recommendedByUserId, acceptedDate, rejectedDate) switch
             {
-                (null, null) => ConservationApplicationStatus.InReview,
-                (not null, null) => ConservationApplicationStatus.Approved,
-                (null, not null) => ConservationApplicationStatus.Rejected,
+                (null, null, null) => ConservationApplicationStatus.InTechnicalReview,
+                (not null, null, null) => ConservationApplicationStatus.InFinalReview,
+                (_, not null, null) => ConservationApplicationStatus.Accepted,
+                (_, null, not null) => ConservationApplicationStatus.Rejected,
                 _ => ConservationApplicationStatus.Unknown
             };
         }

@@ -121,10 +121,12 @@ export function useGetApplicationQuery(
           payload: {
             application: result.application,
             notes: result.notes ?? [],
+            reviewPipeline: result.reviewPipeline ?? { reviewSteps: [] },
           },
         });
       },
       onError: (error: Error) => {
+        console.error('Error loading application data:', error);
         toast.error('Failed to load Application data. Please try again later.');
         dispatch({ type: 'APPLICATION_LOAD_ERRORED' });
       },

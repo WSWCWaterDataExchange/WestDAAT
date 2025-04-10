@@ -8,4 +8,12 @@
     color: $estimate-tool-water-icon-fill-color;
     stroke: $estimate-tool-water-icon-outline-color;
   }
+
+  // This makes it so the center text is always centered in the navbar
+  // even if the content of the left/right sections is different.
+  .left,
+  .right {
+    flex-grow: 1;
+    flex-basis: 0;
+  }
 }

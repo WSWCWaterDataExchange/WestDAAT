@@ -1,5 +1,6 @@
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { CompensationRateUnits } from '../data-contracts/CompensationRateUnits';
+import { ConservationApplicationStatus } from '../data-contracts/ConservationApplicationStatus';
 import { DrawToolType } from '../data-contracts/DrawToolType';
 
 export const applicationDetailsMock = (): ApplicationDetails => ({
@@ -14,6 +15,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
     cumulativeTotalEtInAcreFeet: 300,
+    cumulativeNetEtInAcreFeet: 250,
     locations: [
       {
         id: 'location-guid',
@@ -90,4 +92,5 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
       description: 'Document description',
     },
   ],
+  status: ConservationApplicationStatus.InTechnicalReview,
 });
