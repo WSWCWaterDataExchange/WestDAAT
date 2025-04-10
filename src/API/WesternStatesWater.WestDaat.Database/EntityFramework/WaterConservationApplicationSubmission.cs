@@ -16,13 +16,13 @@ public class WaterConservationApplicationSubmission
     public DateTimeOffset? AcceptedDate { get; set; }
 
     public DateTimeOffset? RejectedDate { get; set; }
-    
+
     public Guid? ApprovedByUserId { get; set; }
-    
+
     public DateTimeOffset? RecommendedForDate { get; set; }
-    
+
     public DateTimeOffset? RecommendedAgainstDate { get; set; }
-    
+
     public Guid? RecommendedByUserId { get; set; }
 
     public string AgentName { get; set; } = null!;
@@ -80,6 +80,10 @@ public class WaterConservationApplicationSubmission
     public string WaterUseDescription { get; set; } = null!;
 
     public virtual WaterConservationApplication WaterConservationApplication { get; set; } = null!;
+
+    public virtual User? RecommendedByUser { get; set; }
+
+    public virtual User? ApprovedByUser { get; set; }
 
     public virtual ICollection<WaterConservationApplicationSubmissionNote> SubmissionNotes { get; set; } = null!;
 }

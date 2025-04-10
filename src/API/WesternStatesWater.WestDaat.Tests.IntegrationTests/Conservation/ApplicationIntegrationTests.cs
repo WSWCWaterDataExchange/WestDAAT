@@ -245,7 +245,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
+    public async Task Load_ReviewerConservationApplicationLoadRequest_MultipleRequestTypes_Success()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -343,6 +343,121 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // verify notes are returned in order
         var expectedNoteOrder = reviewerResponse.Notes.Select(n => n.SubmittedDate).OrderBy(date => date);
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
+    }
+
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlySubmittedApplication_ShouldHaveCorrectPipelineSteps()
+    {
+        // Arrange
+        var submission = SetupApplicationSubmission();
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
+            {
+                ApplicationId = submission.WaterConservationApplicationId
+            });
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(1);
+
+        var submittedStep = response.Application.ReviewPipeline.ReviewSteps[0];
+        var applicantProfile = submission.WaterConservationApplication.ApplicantUser.UserProfile;
+        submittedStep.ParticipantName.Should().Be($"{applicantProfile.FirstName} {applicantProfile.LastName}");
+        submittedStep.ReviewStepType.Should().Be(ReviewStepType.ApplicantSubmitted);
+        submittedStep.ReviewStepStatus.Should().Be(ReviewStepStatus.Submitted);
+        submittedStep.ReviewDate.Should().Be(submission.SubmittedDate);
+    }
+
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyRecommendedApplication_ShouldHaveCorrectPipelineSteps()
+    {
+        // Arrange
+        var submission = SetupApplicationSubmission();
+
+        var recommender = new UserFaker().Generate();
+        submission.RecommendedByUser = recommender;
+        submission.RecommendedForDate = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
+            {
+                ApplicationId = submission.WaterConservationApplicationId
+            });
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
+
+        var recommendationStep = response.Application.ReviewPipeline.ReviewSteps[1];
+        recommendationStep.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
+        recommendationStep.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
+        recommendationStep.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
+        recommendationStep.ReviewDate.Should().Be(submission.RecommendedForDate);
+    }
+
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyApprovedApplication_ShouldHaveCorrectPipelineSteps()
+    {
+        // Arrange
+        var submission = SetupApplicationSubmission();
+
+        var recommender = new UserFaker().Generate();
+        var approver = new UserFaker().Generate();
+
+        submission.RecommendedByUser = recommender;
+        submission.RecommendedForDate = DateTimeOffset.UtcNow;
+        submission.ApprovedByUser = approver;
+        submission.AcceptedDate = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
+
+        // Act
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
+            {
+                ApplicationId = submission.WaterConservationApplicationId
+            });
+
+        // Assert
+        response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
+
+        var approvalStep = response.Application.ReviewPipeline.ReviewSteps[2];
+        approvalStep.ReviewStepType.Should().Be(ReviewStepType.Approval);
+        approvalStep.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
+        approvalStep.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
+        approvalStep.ReviewDate.Should().Be(submission.AcceptedDate);
     }
 
     [DataTestMethod]
@@ -682,8 +797,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             var estimateLocationConsumptiveUses = Enumerable.Range(0, yearRange)
                 .Select(yearOffset =>
                     new LocationWaterMeasurementFaker(estimateLocation)
-                    .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2015 - 2024
-                    .Generate()
+                        .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2015 - 2024
+                        .Generate()
                 )
                 .ToArray();
             await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
@@ -697,14 +812,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
                 {
                     Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
-                    {
-                        var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
-                        return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
                         {
-                            Time = time,
-                            Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
-                        });
-                    })
+                            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
+                            {
+                                Time = time,
+                                Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                            });
+                        })
                         .SelectMany(monthlyData => monthlyData)
                         .ToArray()
                 });
@@ -713,16 +828,16 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPointResponse
                 {
                     Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
-                    {
-                        var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
-                        return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
                         {
-                            Time = time,
-                            Evapotranspiration = 1, // 1in/month, 1ft/year
-                        });
-                    })
-                    .SelectMany(monthlyData => monthlyData)
-                    .ToArray()
+                            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
+                            {
+                                Time = time,
+                                Evapotranspiration = 1, // 1in/month, 1ft/year
+                            });
+                        })
+                        .SelectMany(monthlyData => monthlyData)
+                        .ToArray()
                 });
 
 
@@ -860,7 +975,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 }).Should().BeTrue();
 
                 dbEstimate.ControlLocations.Single().WaterMeasurements.All(measurement =>
-                    startYear <= measurement.Year && measurement.Year < startYear + yearRange)
+                        startYear <= measurement.Year && measurement.Year < startYear + yearRange)
                     .Should().BeTrue();
             }
 
@@ -1012,10 +1127,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             OrganizationRoles =
             [
                 new OrganizationRole()
-                    {
-                        OrganizationId = organization.Id,
-                        RoleNames = [Roles.TechnicalReviewer],
-                    }
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer],
+                }
             ],
             ExternalAuthId = ""
         });
@@ -1783,6 +1898,21 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+    }
+
+    private WaterConservationApplicationSubmission SetupApplicationSubmission()
+    {
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        _dbContext.Users.AddRangeAsync(applicant);
+        _dbContext.Organizations.Add(organization);
+        _dbContext.WaterConservationApplications.Add(application);
+        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
+
+        return submission;
     }
 
     private async Task ClearDatabases(DatabaseContext wadeDb, WestDaatDatabaseContext westdaatDb)
