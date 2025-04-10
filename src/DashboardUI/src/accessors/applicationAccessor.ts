@@ -31,6 +31,7 @@ import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-co
 import { MapPoint } from '../data-contracts/MapPoint';
 import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -279,7 +280,7 @@ export const getApplication = async (
     applicationId: string;
     perspective: ApplicationReviewPerspective;
   },
-): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
+): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[]; reviewPipeline?: ReviewPipeline }> => {
   const api = await westDaatApi(context);
 
   let request: ApplicationLoadRequestBase;
@@ -312,7 +313,11 @@ export const getApplication = async (
     }
     case 'reviewer': {
       const reviewerResponse = response as ReviewerConservationApplicationLoadResponse;
-      return { application: reviewerResponse.application, notes: reviewerResponse.notes };
+      return {
+        application: reviewerResponse.application,
+        notes: reviewerResponse.notes,
+        reviewPipeline: reviewerResponse.reviewPipeline,
+      };
     }
   }
 };

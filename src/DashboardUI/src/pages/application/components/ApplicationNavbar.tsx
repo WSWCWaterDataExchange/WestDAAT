@@ -12,15 +12,18 @@ interface ApplicationNavbarProps {
   centerText: string;
   centerTextIsLoading: boolean;
   displayWaterIcon: boolean;
+  rightButtonDisplayed?: boolean;
+  rightButtonText?: string;
+  rightButtonIcon?: string;
+  onRightButtonClick?: () => void;
 }
 
 export function ApplicationNavbar(props: ApplicationNavbarProps) {
   return (
     <Navbar className="application-navbar p-0">
-      <div className="container-fluid">
-        <Nav>
+      <div className="d-flex justify-content-between container-fluid">
+        <Nav className="left">
           <Nav.Item onClick={props.navigateBack}>
-            {/* render as <button> instead of <a role="button"> */}
             <Nav.Link as="button" className="text-dark d-print-none">
               <div className="d-flex align-items-center gap-2">
                 <Icon path={mdiArrowLeft} size="1em" />
@@ -30,7 +33,7 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
           </Nav.Item>
         </Nav>
 
-        <Navbar.Brand>
+        <Navbar.Brand className="justify-self-center">
           <div className="d-flex align-items-center gap-2">
             {props.centerTextIsLoading ? (
               <>
@@ -47,7 +50,18 @@ export function ApplicationNavbar(props: ApplicationNavbarProps) {
           </div>
         </Navbar.Brand>
 
-        <Nav>{/* placeholder element for flexbox alignment */}</Nav>
+        <Nav className="right d-flex justify-content-end">
+          {props.rightButtonDisplayed && (
+            <Nav.Item onClick={props.onRightButtonClick}>
+              <Nav.Link as="button" className="text-dark d-print-none">
+                <div className="d-flex align-items-center gap-2">
+                  <span>{props.rightButtonText}</span>
+                  {props.rightButtonIcon && <Icon path={props.rightButtonIcon} size="1em" />}
+                </div>
+              </Nav.Link>
+            </Nav.Item>
+          )}
+        </Nav>
       </div>
     </Navbar>
   );

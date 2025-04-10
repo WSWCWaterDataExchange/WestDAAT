@@ -89,6 +89,8 @@ public class ApplicationFunction : FunctionBase
                 .Store<WaterConservationApplicationSubmissionRequest, ApplicationStoreResponseBase>(submissionRequest),
             WaterConservationApplicationRecommendationRequest recommendationRequest => await _applicationManager
                 .Store<WaterConservationApplicationRecommendationRequest, ApplicationStoreResponseBase>(recommendationRequest),
+            WaterConservationApplicationApprovalRequest approvalRequest => await _applicationManager
+                .Store<WaterConservationApplicationApprovalRequest, ApplicationStoreResponseBase>(approvalRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
         return await CreateResponse(req, results);
