@@ -15,6 +15,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
     cumulativeTotalEtInAcreFeet: 300,
+    cumulativeNetEtInAcreFeet: 250,
     locations: [
       {
         id: 'location-guid',

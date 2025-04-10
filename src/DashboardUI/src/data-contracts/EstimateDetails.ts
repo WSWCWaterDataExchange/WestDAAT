@@ -8,6 +8,7 @@ export interface EstimateDetails {
   compensationRateUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
   estimatedCompensationDollars: number;
   cumulativeTotalEtInAcreFeet: number;
+  cumulativeNetEtInAcreFeet: number | null;
   locations: LocationDetails[];
   controlLocation: ControlLocationDetails;
 }

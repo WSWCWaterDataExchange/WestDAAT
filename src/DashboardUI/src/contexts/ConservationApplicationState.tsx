@@ -37,6 +37,7 @@ export interface ConservationApplicationState {
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     cumulativeTotalEtInAcreFeet: number | undefined;
+    cumulativeNetEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
@@ -84,6 +85,7 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
     cumulativeTotalEtInAcreFeet: undefined,
+    cumulativeNetEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
@@ -563,6 +565,7 @@ const onApplicationLoaded = (
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
   draftApplication.cumulativeTotalEtInAcreFeet = application.estimate.cumulativeTotalEtInAcreFeet;
+  draftApplication.cumulativeNetEtInAcreFeet = application.estimate.cumulativeNetEtInAcreFeet ?? undefined;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,
