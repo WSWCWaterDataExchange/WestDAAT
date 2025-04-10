@@ -13,6 +13,8 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
+import { useMutation } from 'react-query';
+import { ApprovalDecision } from '../../../data-contracts/ApprovalDecision';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -38,6 +40,35 @@ export function ApplicationApprovePage() {
   const handleDenyClicked = () => {
     setShowDenyModal(true);
   };
+
+  const handleApplicationAccepted = (approvalNotes: string) => {
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Accepted, notes: approvalNotes });
+  };
+
+  const handleApplicationDenied = (approvalNotes: string) => {
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Rejected, notes: approvalNotes });
+  };
+
+  const submitApplicationApprovalMutation = useMutation({
+    mutationFn: async (approval: { decision: ApprovalDecision; notes: string }) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
+      alert(`Application is ${approval.decision} with notes: ${approval.notes}`);
+      // call accessor
+    },
+    onSuccess: () => {
+      // set is loading to false
+      // set toast notification
+      setShowAcceptModal(false);
+      setShowDenyModal(false);
+      // redirect to org dashboard
+    },
+    onError: () => {
+      // set is loading to false
+      alert('error');
+      // leave modals open
+      // set toast notification
+    },
+  });
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -75,8 +106,18 @@ export function ApplicationApprovePage() {
           </div>
         )}
 
-        <ApplicationAcceptModal show={showAcceptModal} onCancel={() => setShowAcceptModal(false)} />
-        <ApplicationDenyModal show={showDenyModal} onCancel={() => setShowDenyModal(false)} />
+        <ApplicationAcceptModal
+          show={showAcceptModal}
+          onCancel={() => setShowAcceptModal(false)}
+          onAccept={handleApplicationAccepted}
+          disableButtons={submitApplicationApprovalMutation.isLoading}
+        />
+        <ApplicationDenyModal
+          show={showDenyModal}
+          onCancel={() => setShowDenyModal(false)}
+          onDeny={handleApplicationDenied}
+          disableButtons={submitApplicationApprovalMutation.isLoading}
+        />
       </div>
     </div>
   );
