@@ -14,5 +14,7 @@ public class ApplicationExistsLoadResponse : ApplicationLoadResponseBase
 
     public string FundingOrganizationName { get; set; } = null!;
 
+    public Guid[] EstimateLocationIds { get; set; } = [];
+
     public ConservationApplicationStatus? Status { get; set; }
 }

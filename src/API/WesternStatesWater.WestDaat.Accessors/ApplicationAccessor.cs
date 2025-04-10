@@ -67,9 +67,102 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ProjectTo<ApplicationDetails>(DtoMapper.Configuration)
             .SingleAsync();
 
+
+        var reviewPipeline = await GetReviewPipeline(request.ApplicationId);
+        application.ReviewPipeline = reviewPipeline;
+
         return new ApplicationLoadSingleResponse
         {
-            Application = application
+            Application = application,
+        };
+    }
+
+    private async Task<ReviewPipeline> GetReviewPipeline(Guid applicationId)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var reviewPipelineSrc = await db.WaterConservationApplications
+            .AsNoTracking()
+            .Include(app => app.ApplicantUser).ThenInclude(applicant => applicant.UserProfile)
+            .Include(app => app.Submission).ThenInclude(submission => submission.RecommendedByUser).ThenInclude(recUser => recUser.UserProfile)
+            .Include(app => app.Submission).ThenInclude(submission => submission.ApprovedByUser).ThenInclude(approver => approver.UserProfile)
+            .SingleAsync(app => app.Id == applicationId);
+
+
+        var applicant = reviewPipelineSrc.ApplicantUser.UserProfile;
+        var submission = reviewPipelineSrc.Submission;
+        var recommender = submission.RecommendedByUser?.UserProfile;
+        var approver = submission.ApprovedByUser?.UserProfile;
+
+
+        var reviewSteps = new List<ReviewStep>();
+
+
+        // Applicant submit step
+        reviewSteps.Add(new ReviewStep
+        {
+            ReviewStepType = ReviewStepType.ApplicantSubmitted,
+            ReviewStepStatus = ReviewStepStatus.Submitted,
+            ParticipantName = $"{applicant.FirstName} {applicant.LastName}",
+            ReviewDate = reviewPipelineSrc.Submission.SubmittedDate
+        });
+
+
+        // Recommendation step (if exists)
+        if (reviewPipelineSrc.Submission.RecommendedByUserId.HasValue)
+        {
+            var status = (submission.RecommendedForDate.HasValue, submission.RecommendedAgainstDate.HasValue) switch
+            {
+                (true, false) => ReviewStepStatus.RecommendedForApproval,
+                (false, true) => ReviewStepStatus.RecommendedAgainstApproval,
+                _ => throw new WestDaatException("Invalid recommendation status."),
+            };
+
+            var reviewDate = status switch
+            {
+                ReviewStepStatus.RecommendedForApproval => submission.RecommendedForDate,
+                ReviewStepStatus.RecommendedAgainstApproval => submission.RecommendedAgainstDate,
+                _ => throw new WestDaatException("Invalid recommendation status."),
+            };
+
+            reviewSteps.Add(new ReviewStep
+            {
+                ReviewStepType = ReviewStepType.Recommendation,
+                ReviewStepStatus = status,
+                ParticipantName = $"{recommender.FirstName} {recommender.LastName}",
+                ReviewDate = reviewDate.Value,
+            });
+        }
+
+        // Approval step (if exists)
+        if (reviewPipelineSrc.Submission.ApprovedByUserId.HasValue)
+        {
+            var status = (submission.AcceptedDate.HasValue, submission.RejectedDate.HasValue) switch
+            {
+                (true, false) => ReviewStepStatus.Approved,
+                (false, true) => ReviewStepStatus.Denied,
+                _ => throw new WestDaatException("Invalid approval status."),
+            };
+
+            var approveDate = status switch
+            {
+                ReviewStepStatus.Approved => submission.AcceptedDate,
+                ReviewStepStatus.Denied => submission.RejectedDate,
+                _ => throw new WestDaatException("Invalid approval status."),
+            };
+
+            reviewSteps.Add(new ReviewStep
+            {
+                ReviewStepType = ReviewStepType.Approval,
+                ReviewStepStatus = status,
+                ParticipantName = $"{approver.FirstName} {approver.LastName}",
+                ReviewDate = approveDate.Value,
+            });
+        }
+
+        return new ReviewPipeline
+        {
+            ReviewSteps = reviewSteps.ToArray()
         };
     }
 
@@ -189,6 +282,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return request switch
         {
             ApplicationEstimateStoreRequest req => await StoreApplicationEstimate(req),
+            ApplicationEstimateUpdateRequest req => await UpdateApplicationEstimate(req),
             WaterConservationApplicationCreateRequest req => await CreateWaterConservationApplication(req),
             WaterConservationApplicationSubmissionRequest req => await SubmitApplication(req),
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
@@ -204,14 +298,13 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         var existingEntity = await db.WaterConservationApplicationEstimates
             .AsNoTracking()
-            .Include(estimate => estimate.Locations)
-            .ThenInclude(location => location.ConsumptiveUses)
+            .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
             .FirstOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
 
         if (existingEntity != null)
         {
             db.LocationWaterMeasurements
-                .RemoveRange(existingEntity.Locations.SelectMany(location => location.ConsumptiveUses));
+                .RemoveRange(existingEntity.Locations.SelectMany(location => location.WaterMeasurements));
 
             db.WaterConservationApplicationEstimateLocations.RemoveRange(existingEntity.Locations);
 
@@ -225,8 +318,106 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         return new ApplicationEstimateStoreResponse
         {
-            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations)
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(entity.Locations),
         };
+    }
+
+    private async Task<ApplicationEstimateUpdateResponse> UpdateApplicationEstimate(ApplicationEstimateUpdateRequest request)
+    {
+        await using var db = _westDaatDatabaseContextFactory.Create();
+
+        var existingEntity = await db.WaterConservationApplicationEstimates
+            .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
+            .Include(estimate => estimate.ControlLocations).ThenInclude(controlLocation => controlLocation.WaterMeasurements)
+            .SingleAsync(estimate => estimate.WaterConservationApplicationId == request.WaterConservationApplicationId);
+
+        // update Control Location if it exists, else create new Control Location
+        if (existingEntity.ControlLocations.Any())
+        {
+            var existingControlLocation = existingEntity.ControlLocations.Single();
+
+            // overwrite water measurements
+            db.ControlLocationWaterMeasurements.RemoveRange(existingControlLocation.WaterMeasurements);
+
+            var newControlLocationWaterMeasurements = DtoMapper.Map<EFWD.ControlLocationWaterMeasurement[]>(request.ControlLocation.WaterMeasurements);
+
+            foreach (var newWaterMeasurement in newControlLocationWaterMeasurements)
+            {
+                existingControlLocation.WaterMeasurements.Add(newWaterMeasurement);
+            }
+
+            // update Control Location
+            DtoMapper.Map(request.ControlLocation, existingControlLocation);
+        }
+        else
+        {
+            // add new Control Location + related data
+            var requestControlLocation = DtoMapper.Map<EFWD.WaterConservationApplicationEstimateControlLocation>(request.ControlLocation);
+            existingEntity.ControlLocations.Add(requestControlLocation);
+        }
+
+        // merge Locations:
+        // - delete entries for locations that no longer exist
+        var requestLocationIds = request.Locations
+            .Where(l => l.WaterConservationApplicationEstimateLocationId.HasValue)
+            .Select(l => l.WaterConservationApplicationEstimateLocationId.Value)
+            .ToHashSet();
+        var existingLocationsToBeDeleted = existingEntity.Locations
+            .Where(l => !requestLocationIds.Contains(l.Id))
+            .ToArray();
+        foreach (var location in existingLocationsToBeDeleted)
+        {
+            db.LocationWaterMeasurements.RemoveRange(location.WaterMeasurements);
+            db.WaterConservationApplicationEstimateLocations.Remove(location);
+        }
+
+        // - create new entries for locations that do not already exist
+        var requestLocationsToBeCreated = request.Locations
+            .Where(l => l.WaterConservationApplicationEstimateLocationId is null)
+            .Select(l => DtoMapper.Map<EFWD.WaterConservationApplicationEstimateLocation>(l))
+            .ToArray();
+
+        // (this also creates the WaterMeasurements for each location)
+        foreach (var location in requestLocationsToBeCreated)
+        {
+            existingEntity.Locations.Add(location);
+        }
+
+        // - update entries for locations that remain
+        var existingLocationsToBeUpdated = existingEntity.Locations
+            .Where(l => requestLocationIds.Contains(l.Id))
+            .ToArray();
+        foreach (var location in existingLocationsToBeUpdated)
+        {
+            // remove old water measurements
+            db.LocationWaterMeasurements.RemoveRange(location.WaterMeasurements);
+
+            // add new water measurements
+            var matchingRequestLocation = request.Locations.Single(l => l.WaterConservationApplicationEstimateLocationId == location.Id);
+
+            var newWaterMeasurements = DtoMapper.Map<EFWD.LocationWaterMeasurement[]>(matchingRequestLocation.ConsumptiveUses);
+
+            foreach (var newWaterMeasurement in newWaterMeasurements)
+            {
+                location.WaterMeasurements.Add(newWaterMeasurement);
+            }
+
+            // update the location itself
+            DtoMapper.Map(matchingRequestLocation, location);
+        }
+
+        // update the Estimate itself
+        DtoMapper.Map(request, existingEntity);
+
+        await db.SaveChangesAsync();
+
+        var response = new ApplicationEstimateUpdateResponse
+        {
+            Details = DtoMapper.Map<ApplicationEstimateLocationDetails[]>(existingEntity.Locations),
+            ControlLocationDetails = DtoMapper.Map<ApplicationEstimateControlLocationDetails[]>(existingEntity.ControlLocations).SingleOrDefault()
+        };
+
+        return response;
     }
 
     private async Task<WaterConservationApplicationCreateResponse> CreateWaterConservationApplication(WaterConservationApplicationCreateRequest request)
@@ -281,7 +472,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationStoreResponseBase();
     }
 
-    private async Task<ApplicationStoreResponseBase> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
+    private async Task<WaterConservationApplicationSubmissionUpdateResponse> UpdateApplicationSubmission(WaterConservationApplicationSubmissionUpdateRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
 
@@ -327,7 +518,16 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
         await db.SaveChangesAsync();
 
-        return new ApplicationStoreResponseBase();
+        var savedNote = await db.WaterConservationApplicationSubmissionNotes
+            .Include(n => n.User).ThenInclude(user => user.UserProfile)
+            .Where(n => n.Id == note.Id)
+            .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
+            .SingleAsync();
+
+        return new WaterConservationApplicationSubmissionUpdateResponse
+        {
+            Note = savedNote
+        };
     }
 
     private async Task<ApplicationStoreResponseBase> SubmitApplicationRecommendation(WaterConservationApplicationRecommendationRequest request)
@@ -338,9 +538,9 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ThenInclude(sub => sub.SubmissionNotes)
             .Where(a => a.Id == request.WaterConservationApplicationId)
             .SingleAsync();
-        
+
         DtoMapper.Map(request, application.Submission);
-        
+
         if (!string.IsNullOrEmpty(request.RecommendationNotes))
         {
             var note = request.Map<EFWD.WaterConservationApplicationSubmissionNote>();

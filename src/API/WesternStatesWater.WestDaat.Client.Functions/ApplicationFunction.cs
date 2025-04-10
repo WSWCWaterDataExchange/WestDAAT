@@ -51,10 +51,12 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<ApplicationStoreRequestBase>(req);
 
-        var results = request switch
+        ApplicationStoreResponseBase results = request switch
         {
             ApplicantEstimateConsumptiveUseRequest applicantRequest => await _applicationManager
                 .Store<ApplicantEstimateConsumptiveUseRequest, ApplicantEstimateConsumptiveUseResponse>(applicantRequest),
+            ReviewerEstimateConsumptiveUseRequest reviewerRequest => await _applicationManager
+                .Store<ReviewerEstimateConsumptiveUseRequest, ReviewerEstimateConsumptiveUseResponse>(reviewerRequest),
             _ => throw new NotImplementedException($"Request type {request.GetType()} is not implemented.")
         };
 
@@ -102,7 +104,7 @@ public class ApplicationFunction : FunctionBase
     {
         var request = await ParseRequestBody<WaterConservationApplicationSubmissionUpdateRequest>(req,
             new Dictionary<string, object> { { nameof(WaterConservationApplicationSubmissionUpdateRequest.WaterConservationApplicationId), id } });
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, ApplicationStoreResponseBase>(request);
+        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionUpdateRequest, WaterConservationApplicationSubmissionUpdateResponse>(request);
         return await CreateResponse(req, results);
     }
 
