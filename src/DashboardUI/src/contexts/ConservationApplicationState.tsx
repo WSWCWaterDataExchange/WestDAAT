@@ -299,7 +299,7 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
-      return onConsumptiveUseEstimated(draftState, action);
+      return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -457,7 +457,7 @@ const onEstimationFormUpdated = (
   return draftState;
 };
 
-const onConsumptiveUseEstimated = (
+const onApplicantConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
   { payload }: ApplicantConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
@@ -694,6 +694,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
   draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
   // this `reset` method is activated when the user:
