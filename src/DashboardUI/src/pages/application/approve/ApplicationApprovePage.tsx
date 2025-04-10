@@ -16,8 +16,11 @@ import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissio
 import { ApplicationAcceptModal } from './ApplicationAcceptModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
+import { submitApplicationApproval } from '../../../accessors/applicationAccessor';
+import { useMsal } from '@azure/msal-react';
 
 export function ApplicationApprovePage() {
+  const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
@@ -55,8 +58,11 @@ export function ApplicationApprovePage() {
 
   const submitApplicationApprovalMutation = useMutation({
     mutationFn: async (approval: { decision: ApprovalDecision; notes: string }) => {
-      await new Promise((resolve, reject) => setTimeout(reject, 2000)); // Simulate network delay
-      alert(`Application is ${approval.decision} with notes: ${approval.notes}`);
+      await submitApplicationApproval(context, {
+        waterConservationApplicationId: applicationId!,
+        approvalDecision: approval.decision,
+        approvalNotes: approval.notes,
+      });
     },
     onSuccess: () => {
       toast.success('Application approval decision submitted successfully.', {
