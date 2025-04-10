@@ -677,11 +677,12 @@ describe('ConservationApplicationState reducer', () => {
       // Assert
       const application = newState.conservationApplication;
 
-      // application / application estimate
+      // application
       expect(application.waterConservationApplicationId).toEqual(applicationDetails.id);
       expect(application.waterRightNativeId).toEqual(applicationDetails.waterRightNativeId);
       expect(application.fundingOrganizationId).toEqual(applicationDetails.fundingOrganizationId);
 
+      // application estimate
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
       expect(application.cumulativeTotalEtInAcreFeet).toEqual(applicationDetails.estimate.cumulativeTotalEtInAcreFeet);
