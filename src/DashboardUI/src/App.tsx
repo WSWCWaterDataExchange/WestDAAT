@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AppProvider from './contexts/AppProvider';
 import { AccountInformationPage } from './pages/account/AccountInformationPage';
 import { AccountLayout } from './pages/account/AccountLayout';
-import { RoleGuard } from './pages/admin/AdminGuard';
+import { RoleGuard } from './pages/admin/RoleGuard';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminOrganizationsUsersPage } from './pages/admin/AdminOrganizationUsersPage';
