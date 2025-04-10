@@ -10,7 +10,7 @@ import {
 } from '../../../hooks/queries/useApplicationQuery';
 import { useMutation } from 'react-query';
 import { CompensationRateUnits } from '../../../data-contracts/CompensationRateUnits';
-import { estimateConsumptiveUse } from '../../../accessors/applicationAccessor';
+import { applicantEstimateConsumptiveUse } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
 import { ApplicantEstimateConsumptiveUseResponse } from '../../../data-contracts/EstimateConsumptiveUseApplicantResponse';
 import { toast } from 'react-toastify';
@@ -51,7 +51,7 @@ export function EstimationToolPage() {
     mutationFn: async (fields: EstimateConsumptiveUseApiCallFields) => {
       validateFields(fields);
 
-      const apiCallFields: Parameters<typeof estimateConsumptiveUse>[1] = {
+      const apiCallFields: Parameters<typeof applicantEstimateConsumptiveUse>[1] = {
         waterRightNativeId: fields.waterRightNativeId!,
         waterConservationApplicationId: fields.waterConservationApplicationId!,
         polygons: fields.polygons!,
@@ -59,7 +59,7 @@ export function EstimationToolPage() {
         units: fields.units,
       };
 
-      return await estimateConsumptiveUse(context, apiCallFields);
+      return await applicantEstimateConsumptiveUse(context, apiCallFields);
     },
     onSuccess: (result: ApplicantEstimateConsumptiveUseResponse) => {
       if (result) {
@@ -84,6 +84,8 @@ export function EstimationToolPage() {
       waterConservationApplicationId: state.conservationApplication.waterConservationApplicationId,
       polygons: state.conservationApplication.estimateLocations.map(
         (polygon): MapPolygon => ({
+          // backend overwrites locations for applicant EstimateConsumptiveUse use case
+          waterConservationApplicationEstimateLocationId: null,
           polygonWkt: polygon.polygonWkt!,
           drawToolType: polygon.drawToolType!,
         }),

@@ -1,4 +1,4 @@
-export interface PolygonEtDatapoint {
+export interface GeometryEtDatapoint {
   year: number;
   totalEtInInches: number;
   effectivePrecipitationInInches: number | null;

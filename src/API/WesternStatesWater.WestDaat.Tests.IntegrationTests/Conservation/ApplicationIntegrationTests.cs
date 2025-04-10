@@ -332,6 +332,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             await _dbContext.LocationWaterMeasurements.AddRangeAsync(locationWaterMeasurements);
         }
 
+        var controlLocation = new WaterConservationApplicationEstimateControlLocationFaker(estimate).Generate();
+        await _dbContext.WaterConservationApplicationEstimateControlLocations.AddAsync(controlLocation);
+
+        var controlLocationWaterMeasurements = new ControlLocationWaterMeasurementFaker(controlLocation).Generate(2);
+        await _dbContext.ControlLocationWaterMeasurements.AddRangeAsync(controlLocationWaterMeasurements);
+
         var documents = new WaterConservationApplicationDocumentsFaker(application).Generate(2);
         await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
 
@@ -382,12 +388,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
 
+        // although an applicant cannot create a control location, if one exists then it should be included in the response
+        applicantResponse.Application.Estimate.ControlLocation.Should().BeEquivalentTo(controlLocation, options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.ControlLocation.WaterMeasurements.Should().BeEquivalentTo(controlLocationWaterMeasurements, options => options.ExcludingMissingMembers());
+
         reviewerResponse.Should().NotBeNull();
         reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.WaterMeasurements).Should()
             .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.ControlLocation.Should().BeEquivalentTo(controlLocation, options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.ControlLocation.WaterMeasurements.Should().BeEquivalentTo(controlLocationWaterMeasurements, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
@@ -398,6 +410,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Estimate.Locations.All(loc =>
             loc.WaterMeasurements.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
         ).Should().BeTrue();
+
+        applicantResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().NotBeNull();
+        applicantResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().Be(estimate.CumulativeNetEtInAcreFeet);
+
+        reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().NotBeNull();
+        reviewerResponse.Application.Estimate.CumulativeNetEtInAcreFeet.Should().Be(estimate.CumulativeNetEtInAcreFeet);
 
         // verify note fields with custom mappings are translated correctly
         foreach (var note in reviewerResponse.Notes)
