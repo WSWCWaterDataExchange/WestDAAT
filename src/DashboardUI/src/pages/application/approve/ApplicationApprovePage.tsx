@@ -34,6 +34,9 @@ export function ApplicationApprovePage() {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
 
+  const isPageLoading = isApplicationLoading || isFundingOrganizationLoading;
+  const isModalOpen = showAcceptModal || showDenyModal;
+
   const handleAcceptClicked = () => {
     setShowAcceptModal(true);
   };
@@ -92,7 +95,7 @@ export function ApplicationApprovePage() {
               <ApplicationReviewersNotesSection />
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
-                isFormSubmitting={showAcceptModal || showDenyModal}
+                disableButtons={isPageLoading || isModalOpen}
                 handleAcceptClicked={handleAcceptClicked}
                 handleDenyClicked={handleDenyClicked}
               />

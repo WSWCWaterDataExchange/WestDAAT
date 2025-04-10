@@ -1,13 +1,13 @@
 import Button from 'react-bootstrap/esm/Button';
 
 export interface ApplicationApproveButtonRowProps {
-  isFormSubmitting: boolean;
+  disableButtons: boolean;
   handleAcceptClicked: () => void;
   handleDenyClicked: () => void;
 }
 
 export function ApplicationApproveButtonRow(props: ApplicationApproveButtonRowProps) {
-  const { isFormSubmitting, handleAcceptClicked, handleDenyClicked } = props;
+  const { disableButtons: isFormSubmitting, handleAcceptClicked, handleDenyClicked } = props;
 
   return (
     <div className="d-flex justify-content-end p-3 gap-3">
