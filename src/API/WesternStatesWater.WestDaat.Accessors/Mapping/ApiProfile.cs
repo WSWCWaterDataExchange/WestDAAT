@@ -312,6 +312,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForMember(dest => dest.SubmittedDate, opt => opt.MapFrom(src => src.Submission.SubmittedDate))
                 .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.Submission.AcceptedDate))
                 .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.Submission.RejectedDate))
+                .ForMember(dest => dest.RecommendedForDate, opt => opt.MapFrom(src => src.Submission.RecommendedForDate))
+                .ForMember(dest => dest.RecommendedAgainstDate, opt => opt.MapFrom(src => src.Submission.RecommendedAgainstDate))
                 .ForMember(dest => dest.RecommendedByUserId, opt => opt.MapFrom(src => src.Submission.RecommendedByUserId))
                 .ForMember(dest => dest.WaterRightState, opt => opt.MapFrom(src => src.Submission.WaterRightState))
                 .ForMember(dest => dest.EstimatedCompensationDollars, opt => opt.MapFrom(src => src.Estimate.EstimatedCompensationDollars))
@@ -497,9 +499,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         }
 
         // duplicated in other ApiProfile.cs
-        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommenedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
         {
-            return (recommenedByUserId, acceptedDate, rejectedDate) switch
+            return (recommenedByUserId: recommendedByUserId, acceptedDate, rejectedDate) switch
             {
                 (null, null, null) => ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => ConservationApplicationStatus.InFinalReview,
