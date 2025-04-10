@@ -27,16 +27,16 @@ import ReactDOM from 'react-dom';
 import { FeatureCollection, Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import { useHomePageContext } from '../home-page/Provider';
 import { createRoot } from 'react-dom/client';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { CustomCircleDrawMode } from './CustomCircleDrawMode';
 import { CustomDirectSelectMode } from './CustomDirectSelectMode/CustomDirectSelectMode';
 import { CustomRectangleDrawMode } from './CustomRectangleDrawMode';
 import { Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { isFeatureEnabled } from '../../config/features';
+import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 import './map.scss';
-import { ExtendedMapboxDraw } from './ExtendedMapboxDraw';
 
 interface mapProps {
   handleMapDrawnPolygonChange?: (polygons: Feature<Geometry, GeoJsonProperties>[]) => void;
@@ -66,6 +66,7 @@ function Map({
     visibleLayers,
     geoJsonData,
     userDrawnPolygonData,
+    isControlLocationSelectionToolEnabled,
     filters,
     circleColors,
     circleRadii,
@@ -138,6 +139,7 @@ function Map({
     if (!handleMapDrawnPolygonChange) {
       return;
     }
+
     const dc = new ExtendedMapboxDraw({
       props: {
         displayControlsDefault: false,
@@ -156,6 +158,19 @@ function Map({
       },
       // these buttons are rendered in reverse order
       buttons: [
+        {
+          on: 'click',
+          title: 'Control Location tool',
+          buttonIconPath: mdiMapMarker,
+          action: () => {
+            console.log('clicked; isControlLocationSelectionToolEnabled', isControlLocationSelectionToolEnabled);
+            if (isControlLocationSelectionToolEnabled) {
+              drawControlStateRef.current?.changeMode('draw_point');
+            } else {
+              toast.error('Only one Control Location is allowed.');
+            }
+          },
+        },
         {
           on: 'click',
           title: 'Rectangle tool',

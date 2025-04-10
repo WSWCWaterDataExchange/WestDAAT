@@ -27,7 +27,13 @@ interface ReviewMapProps {
 
 function ReviewMap(props: ReviewMapProps) {
   const { state, dispatch } = useConservationApplicationContext();
-  const { isMapLoaded, setMapBoundSettings, setMapStyle, setUserDrawnPolygonData } = useMapContext();
+  const {
+    isMapLoaded,
+    setMapBoundSettings,
+    setMapStyle,
+    setUserDrawnPolygonData,
+    setIsControlLocationSelectionToolEnabled,
+  } = useMapContext();
 
   const [hasInitializedMap, setHasInitializedMap] = useState(false);
 
@@ -95,7 +101,20 @@ function ReviewMap(props: ReviewMapProps) {
     setMapBoundSettings,
   ]);
 
+  useEffect(() => {
+    // to avoid possible issues where a user tries to add multiple control locations,
+    // the control location selection tool is only enabled if there is no control location on the map
+    if (!controlLocationFeature) {
+      setIsControlLocationSelectionToolEnabled(true);
+      console.log('enable control location selection tool');
+    } else {
+      setIsControlLocationSelectionToolEnabled(false);
+      console.log('disable control location selection tool');
+    }
+  }, [controlLocationFeature, setIsControlLocationSelectionToolEnabled]);
+
   const handleMapDrawnPolygonChange = (polygons: Feature<Geometry, GeoJsonProperties>[]) => {
+    console.log('polygons changed');
     if (polygons.length > 20) {
       toast.error(
         'You may only select up to 20 fields at a time. Please redraw the polygons so there are 20 or fewer.',
