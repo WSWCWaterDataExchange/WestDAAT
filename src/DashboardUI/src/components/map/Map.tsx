@@ -96,6 +96,7 @@ function Map({
   const currentMapPopup = useRef<mapboxgl.Popup | null>(null);
 
   const drawControlStateRef = useRef<MapboxDraw | null>(null);
+  const isControlLocationSelectionToolEnabledRef = useRef<boolean>(isControlLocationSelectionToolEnabled);
 
   const geocoderControl = useRef(
     new MapboxGeocoder({
@@ -135,6 +136,10 @@ function Map({
     }
   };
 
+  useEffect(() => {
+    isControlLocationSelectionToolEnabledRef.current = isControlLocationSelectionToolEnabled;
+  }, [isControlLocationSelectionToolEnabled]);
+
   const mapboxDrawControl = (mapInstance: mapboxgl.Map): void => {
     if (!handleMapDrawnPolygonChange) {
       return;
@@ -163,8 +168,9 @@ function Map({
           title: 'Control Location tool',
           buttonIconPath: mdiMapMarker,
           action: () => {
-            console.log('clicked; isControlLocationSelectionToolEnabled', isControlLocationSelectionToolEnabled);
-            if (isControlLocationSelectionToolEnabled) {
+            // cannot reference the state variable directly inside of an inline function
+            const isEnabled: boolean = isControlLocationSelectionToolEnabledRef.current;
+            if (isEnabled) {
               drawControlStateRef.current?.changeMode('draw_point');
             } else {
               toast.error('Only one Control Location is allowed.');
