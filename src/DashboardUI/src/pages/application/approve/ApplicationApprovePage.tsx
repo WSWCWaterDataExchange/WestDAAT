@@ -16,6 +16,7 @@ import { ApplicationDenyModal } from './ApplicationDenyModal';
 import { hasPermission } from '../../../utilities/securityHelpers';
 import { Permission } from '../../../roleConfig';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
+import { ConservationApplicationStatus } from '../../../data-contracts/ConservationApplicationStatus';
 
 export function ApplicationApprovePage() {
   const navigate = useNavigate();
@@ -44,13 +45,17 @@ export function ApplicationApprovePage() {
   };
 
   const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
-  
+
   const navigateToReviewPage = () => {
     const id = state.conservationApplication.waterConservationApplicationId;
     if (id) {
       navigate(`/application/${id}/review`);
     }
   };
+
+  const isApplicationFinalized =
+    state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
+    state.conservationApplication.status === ConservationApplicationStatus.Rejected;
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -75,6 +80,7 @@ export function ApplicationApprovePage() {
               <ApplicationReviewersNotesSection />
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
+                isHidden={!canApproveApplication || isApplicationFinalized}
                 isFormSubmitting={showAcceptModal || showDenyModal}
                 handleAcceptClicked={handleAcceptClicked}
                 handleDenyClicked={handleDenyClicked}
