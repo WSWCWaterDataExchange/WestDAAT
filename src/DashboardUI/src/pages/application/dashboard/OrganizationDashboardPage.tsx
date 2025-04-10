@@ -31,9 +31,10 @@ import { useOrganizationQuery } from '../../../hooks/queries';
 import { useLoadDashboardApplications } from '../../../hooks/queries/useApplicationQuery';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { DataGridColumns, DataGridRows } from '../../../typings/TypeSafeDataGrid';
-import { getUserOrganization, hasUserRole } from '../../../utilities/securityHelpers';
+import { getUserOrganization, hasPermission, hasUserRole } from '../../../utilities/securityHelpers';
 import { formatDateString, formatNumberToLargestUnit } from '../../../utilities/valueFormatters';
 import { dataGridDateRangeFilter } from './DataGridDateRangeFilter';
+import { Permission } from '../../../roleConfig';
 
 import './organization-dashboard-page.scss';
 
@@ -68,7 +69,7 @@ export function OrganizationDashboardPage() {
   const getKeysFromLookup = (obj: GridFilterState['filteredRowsLookup']) => {
     const keys = [];
     for (const key in obj) {
-      if (obj.hasOwnProperty(key) && obj[key]) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key]) {
         keys.push(key);
       }
     }
@@ -117,7 +118,26 @@ export function OrganizationDashboardPage() {
 
   const renderAppIdCell = (params: GridRenderCellParams<any, string>) => {
     const application = state.dashboardApplications.find((app) => app.applicationDisplayId === params.value)!;
-    return <NavLink to={`/application/${application.applicationId}/review`}>{params.value}</NavLink>;
+
+    const canReview = hasPermission(user, Permission.ApplicationReview);
+    const canApprove = hasPermission(user, Permission.ApplicationApprove);
+
+    let navLinkPageSlug = 'approve';
+
+    switch (application.status) {
+      case ConservationApplicationStatus.Accepted:
+      case ConservationApplicationStatus.Rejected:
+        navLinkPageSlug = 'approve';
+        break;
+      case ConservationApplicationStatus.InTechnicalReview:
+        navLinkPageSlug = canReview ? 'review' : 'approve';
+        break;
+      case ConservationApplicationStatus.InFinalReview:
+        navLinkPageSlug = canApprove ? 'approve' : 'review';
+        break;
+    }
+
+    return <NavLink to={`/application/${application.applicationId}/${navLinkPageSlug}`}>{params.value}</NavLink>;
   };
 
   const renderStatisticsCard = (description: string, value: number | string | null, subtitle?: string) => {
