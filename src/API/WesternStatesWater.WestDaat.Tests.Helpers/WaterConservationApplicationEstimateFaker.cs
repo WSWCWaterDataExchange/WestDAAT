@@ -26,3 +26,31 @@ public class WaterConservationApplicationEstimateFaker : Faker<EFWD.WaterConserv
         }
     }
 }
+
+public static class WaterConservationApplicationEstimateFakerExtensions
+{
+    public static Faker<EFWD.WaterConservationApplicationEstimate> GenerateMetadataFromOrganization(
+        this Faker<EFWD.WaterConservationApplicationEstimate> faker,
+        EFWD.Organization organization
+    )
+    {
+        faker.RuleFor(est => est.Model, () => organization.OpenEtModel);
+
+        faker.RuleFor(est => est.DateRangeStart, () =>
+            DateOnly.FromDateTime(
+                new DateTimeOffset(DateTimeOffset.UtcNow.Year - organization.OpenEtDateRangeInYears, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                .UtcDateTime
+            )
+        );
+
+        faker.RuleFor(est => est.DateRangeEnd, () =>
+            DateOnly.FromDateTime(
+                new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                .AddMinutes(-1)
+                .UtcDateTime
+            )
+        );
+
+        return faker;
+    }
+}

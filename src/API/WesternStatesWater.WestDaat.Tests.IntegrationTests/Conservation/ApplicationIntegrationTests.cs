@@ -311,7 +311,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task Load_ConservationApplicationLoadRequest_MultipleRequestTypes_Success()
+    public async Task Load_ReviewerConservationApplicationLoadRequest_MultipleRequestTypes_Success()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -377,8 +377,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // but are included for completeness just in case something changes in the future
         applicantResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         applicantResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
-            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        applicantResponse.Application.Estimate.Locations.SelectMany(l => l.WaterMeasurements).Should()
+            .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         applicantResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         applicantResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
 
@@ -386,8 +386,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Application.Should().BeEquivalentTo(application, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Should().BeEquivalentTo(estimate, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Estimate.Locations.Should().BeEquivalentTo(locations, options => options.ExcludingMissingMembers());
-        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.ConsumptiveUses).Should()
-            .BeEquivalentTo(locations.SelectMany(l => l.ConsumptiveUses), options => options.ExcludingMissingMembers());
+        reviewerResponse.Application.Estimate.Locations.SelectMany(l => l.WaterMeasurements).Should()
+            .BeEquivalentTo(locations.SelectMany(l => l.WaterMeasurements), options => options.ExcludingMissingMembers());
         reviewerResponse.Application.Submission.Should().BeEquivalentTo(submission, options => options.ExcludingMissingMembers());
         reviewerResponse.Application.SupportingDocuments.Should().BeEquivalentTo(documents, options => options.ExcludingMissingMembers());
         reviewerResponse.Notes.Should().BeEquivalentTo(notes, options => options.ExcludingMissingMembers());
@@ -396,7 +396,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
         // verify that new fields are included in response
         reviewerResponse.Application.Estimate.Locations.All(loc =>
-            loc.ConsumptiveUses.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
+            loc.WaterMeasurements.All(cu => cu.EffectivePrecipitationInInches != null && cu.NetEtInInches != null)
         ).Should().BeTrue();
 
         // verify note fields with custom mappings are translated correctly
@@ -411,97 +411,126 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         reviewerResponse.Notes.Select(n => n.SubmittedDate).Should().BeEquivalentTo(expectedNoteOrder, opt => opt.WithStrictOrdering());
     }
 
-    [DataTestMethod]
-    [DataRow(ReviewStepType.ApplicantSubmitted, DisplayName = "Recently submitted application")]
-    [DataRow(ReviewStepType.Recommendation, DisplayName = "Recently recommended application")]
-    [DataRow(ReviewStepType.Approval, DisplayName = "Recently approved application")]
-    public async Task Load_ConservationApplicationLoadRequest_ShouldHaveReviewPipeline(ReviewStepType latestStep)
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlySubmittedApplication_ShouldHaveCorrectPipelineSteps()
     {
         // Arrange
-        var applicant = new UserFaker().Generate();
-        var recommender = new UserFaker().Generate();
-        var approver = new UserFaker().Generate();
-        var organization = new OrganizationFaker().Generate();
-        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
-        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        var submission = SetupApplicationSubmission();
 
-        if (latestStep is ReviewStepType.Recommendation)
-        {
-            submission.RecommendedByUser = recommender;
-            submission.RecommendedForDate = DateTimeOffset.UtcNow;
-        }
-
-        if (latestStep is ReviewStepType.Approval)
-        {
-            submission.RecommendedByUser = recommender;
-            submission.RecommendedForDate = DateTimeOffset.UtcNow;
-            submission.ApprovedByUser = approver;
-            submission.AcceptedDate = DateTimeOffset.UtcNow;
-        }
-
-        _dbContext.Users.AddRangeAsync(applicant, recommender, approver);
-        _dbContext.Organizations.Add(organization);
-        _dbContext.WaterConservationApplications.Add(application);
-        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
         await _dbContext.SaveChangesAsync();
 
         UseUserContext(new UserContext
         {
-            UserId = applicant.Id,
+            UserId = Guid.NewGuid(),
             Roles = [Roles.GlobalAdmin],
             OrganizationRoles = [],
             ExternalAuthId = ""
         });
 
         // Act
-        var response = await _applicationManager.Load<ApplicantConservationApplicationLoadRequest, ApplicantConservationApplicationLoadResponse>(
-            new ApplicantConservationApplicationLoadRequest
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
             {
-                ApplicationId = application.Id
+                ApplicationId = submission.WaterConservationApplicationId
             });
 
         // Assert
         response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(1);
 
-        if (latestStep is ReviewStepType.ApplicantSubmitted)
+        var submittedStep = response.Application.ReviewPipeline.ReviewSteps[0];
+        var applicantProfile = submission.WaterConservationApplication.ApplicantUser.UserProfile;
+        submittedStep.ParticipantName.Should().Be($"{applicantProfile.FirstName} {applicantProfile.LastName}");
+        submittedStep.ReviewStepType.Should().Be(ReviewStepType.ApplicantSubmitted);
+        submittedStep.ReviewStepStatus.Should().Be(ReviewStepStatus.Submitted);
+        submittedStep.ReviewDate.Should().Be(submission.SubmittedDate);
+    }
+
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyRecommendedApplication_ShouldHaveCorrectPipelineSteps()
+    {
+        // Arrange
+        var submission = SetupApplicationSubmission();
+
+        var recommender = new UserFaker().Generate();
+        submission.RecommendedByUser = recommender;
+        submission.RecommendedForDate = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
         {
-            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(1);
-            var step1 = response.Application.ReviewPipeline.ReviewSteps[0];
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
 
-            step1.ReviewStepType.Should().Be(ReviewStepType.ApplicantSubmitted);
-            step1.ReviewStepStatus.Should().Be(ReviewStepStatus.Submitted);
-            step1.ParticipantName.Should().Be($"{applicant.UserProfile.FirstName} {applicant.UserProfile.LastName}");
-            step1.ReviewDate.Should().Be(application.Submission.SubmittedDate);
-        }
+        // Act
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
+            {
+                ApplicationId = submission.WaterConservationApplicationId
+            });
 
-        if (latestStep is ReviewStepType.Recommendation)
+        // Assert
+        response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
+
+        var recommendationStep = response.Application.ReviewPipeline.ReviewSteps[1];
+        recommendationStep.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
+        recommendationStep.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
+        recommendationStep.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
+        recommendationStep.ReviewDate.Should().Be(submission.RecommendedForDate);
+    }
+
+    [TestMethod]
+    public async Task Load_ReviewerConservationApplicationLoadRequest_RecentlyApprovedApplication_ShouldHaveCorrectPipelineSteps()
+    {
+        // Arrange
+        var submission = SetupApplicationSubmission();
+
+        var recommender = new UserFaker().Generate();
+        var approver = new UserFaker().Generate();
+
+        submission.RecommendedByUser = recommender;
+        submission.RecommendedForDate = DateTimeOffset.UtcNow;
+        submission.ApprovedByUser = approver;
+        submission.AcceptedDate = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
         {
-            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(2);
+            UserId = Guid.NewGuid(),
+            Roles = [Roles.GlobalAdmin],
+            OrganizationRoles = [],
+            ExternalAuthId = ""
+        });
 
-            var step2 = response.Application.ReviewPipeline.ReviewSteps[1];
-            step2.ReviewStepType.Should().Be(ReviewStepType.Recommendation);
-            step2.ReviewStepStatus.Should().Be(ReviewStepStatus.RecommendedForApproval);
-            step2.ParticipantName.Should().Be($"{recommender.UserProfile.FirstName} {recommender.UserProfile.LastName}");
-            step2.ReviewDate.Should().Be(submission.RecommendedForDate);
-        }
+        // Act
+        var response = await _applicationManager.Load<ReviewerConservationApplicationLoadRequest, ReviewerConservationApplicationLoadResponse>(
+            new ReviewerConservationApplicationLoadRequest
+            {
+                ApplicationId = submission.WaterConservationApplicationId
+            });
 
-        if (latestStep is ReviewStepType.Approval)
-        {
-            response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
+        // Assert
+        response.Error.Should().BeNull();
+        response.Application.ReviewPipeline.ReviewSteps.Should().HaveCount(3);
 
-            var step3 = response.Application.ReviewPipeline.ReviewSteps[2];
-            step3.ReviewStepType.Should().Be(ReviewStepType.Approval);
-            step3.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
-            step3.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
-            step3.ReviewDate.Should().Be(submission.AcceptedDate);
-        }
+        var approvalStep = response.Application.ReviewPipeline.ReviewSteps[2];
+        approvalStep.ReviewStepType.Should().Be(ReviewStepType.Approval);
+        approvalStep.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
+        approvalStep.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
+        approvalStep.ReviewDate.Should().Be(submission.AcceptedDate);
     }
 
     [DataTestMethod]
     [DataRow(false, true, DisplayName = "Create new estimate")]
     [DataRow(true, true, DisplayName = "Overwrite existing estimate")]
     [DataRow(false, false, DisplayName = "Request without compensation should not save estimate")]
-    public async Task Store_EstimateConsumptiveUse_AsUser_Success(
+    public async Task Store_ApplicantEstimateConsumptiveUse_AsUser_Success(
         bool shouldInitializePreviousEstimate,
         bool requestShouldIncludeCompensationInfo
     )
@@ -515,34 +544,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var wadeDb = Services.GetRequiredService<IDatabaseContextFactory>().Create();
 
         // necessary since we're using a custom transaction scope
-        var cleanupDatabase = async () =>
-        {
-            wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
-            wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
-            wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
-            wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
-            wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
-            wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
-            wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
-            wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
-            wadeDb.Variable.RemoveRange(wadeDb.Variable);
-            wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
-            wadeDb.Units.RemoveRange(wadeDb.Units);
-            wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
-            await wadeDb.SaveChangesAsync();
-
-            _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
-            _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
-            _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
-            _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
-            _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
-            _dbContext.Users.RemoveRange(_dbContext.Users);
-            _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
-            await _dbContext.SaveChangesAsync();
-        };
-
         // run prior to test initialization in case previous run failed
-        await cleanupDatabase();
+        await ClearDatabases(wadeDb, _dbContext);
 
         try
         {
@@ -674,17 +677,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             // verify db entries were either created, created and overwritten, or not created at all
             var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
                 .Include(estimate => estimate.Locations)
-                .ThenInclude(location => location.ConsumptiveUses)
+                .ThenInclude(location => location.WaterMeasurements)
                 .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
             var dbEstimateLocation = dbEstimate?.Locations.First();
-            var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.ConsumptiveUses;
+            var dbEstimateLocationConsumptiveUses = dbEstimateLocation?.WaterMeasurements;
 
             if (requestShouldIncludeCompensationInfo)
             {
                 // verify db entries were created successfully
                 dbEstimate.Should().NotBeNull();
                 dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
-                dbEstimate.Locations.First().ConsumptiveUses.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
+                dbEstimate.Locations.First().WaterMeasurements.Should().HaveCount(yearRange); // monthly datapoints are grouped by year
 
                 // verify db fields all match expectations
                 dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
@@ -728,7 +731,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
 
                     dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
 
-                    var previousConsumptiveUsesIds = estimate.Locations.First().ConsumptiveUses.Select(cu => cu.Id).ToHashSet();
+                    var previousConsumptiveUsesIds = estimate.Locations.First().WaterMeasurements.Select(cu => cu.Id).ToHashSet();
                     dbEstimateLocationConsumptiveUses.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
                         .Should().BeFalse();
                 }
@@ -742,12 +745,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         finally
         {
             // cleanup after test finishes to prevent issues with other tests
-            await cleanupDatabase();
+            await ClearDatabases(wadeDb, _dbContext);
         }
     }
 
     [TestMethod]
-    public async Task Store_EstimateConsumptiveUse_AsAnonymous_Failure()
+    public async Task Store_ApplicantEstimateConsumptiveUse_AsAnonymous_Failure()
     {
         // Arrange
         var user = new UserFaker().Generate();
@@ -802,6 +805,434 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Error.Should().NotBeNull();
 
         ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Store_ReviewerEstimateConsumptiveUse_AsUser_Success(bool shouldUpdateApplicantsEstimate)
+    {
+        // perform db setup in custom transaction scope to avoid implicit distributed transactions error
+        using var transactionScope = new TransactionScope(TransactionScopeOption.Suppress, new TransactionOptions
+        {
+            IsolationLevel = IsolationLevel.ReadCommitted,
+        }, TransactionScopeAsyncFlowOption.Enabled);
+
+        var wadeDb = Services.GetRequiredService<IDatabaseContextFactory>().Create();
+
+        // necessary since we're using a custom transaction scope
+        // run prior to test initialization in case previous run failed
+        await ClearDatabases(wadeDb, _dbContext);
+
+        try
+        {
+            // Arrange
+            const int monthsInYear = 12;
+            const int startYear = 2015;
+            const int yearRange = 10;
+
+            var user = new UserFaker().Generate();
+            var organization = new OrganizationFaker()
+                .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
+                .Generate();
+            await _dbContext.Users.AddAsync(user);
+            await _dbContext.Organizations.AddAsync(organization);
+            await _dbContext.SaveChangesAsync();
+
+            var waterRight = new AllocationAmountFactFaker()
+                .RuleFor(aaf => aaf.ConservationApplicationFundingOrganizationId, () => organization.Id)
+                .Generate();
+            await wadeDb.AllocationAmountsFact.AddAsync(waterRight);
+            await wadeDb.SaveChangesAsync();
+
+
+            var application = new WaterConservationApplicationFaker()
+                .RuleFor(a => a.ApplicantUserId, () => user.Id)
+                .RuleFor(a => a.FundingOrganizationId, () => organization.Id)
+                .RuleFor(a => a.WaterRightNativeId, () => waterRight.AllocationUuid)
+                .Generate();
+
+            await _dbContext.WaterConservationApplications.AddAsync(application);
+
+            var estimate = new WaterConservationApplicationEstimateFaker(application)
+                .RuleFor(est => est.CompensationRateUnits, () => CompensationRateUnits.AcreFeet)
+                .GenerateMetadataFromOrganization(organization)
+                .Generate();
+            var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
+
+            var estimateLocationConsumptiveUses = Enumerable.Range(0, yearRange)
+                .Select(yearOffset =>
+                    new LocationWaterMeasurementFaker(estimateLocation)
+                        .RuleFor(measurement => measurement.Year, () => startYear + yearOffset) // 2015 - 2024
+                        .Generate()
+                )
+                .ToArray();
+            await _dbContext.LocationWaterMeasurements.AddRangeAsync(estimateLocationConsumptiveUses);
+
+            var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+            await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+            await _dbContext.SaveChangesAsync();
+
+            OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<Common.DataContracts.RasterTimeSeriesPolygonRequest>()))
+                .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPolygonResponse
+                {
+                    Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
+                        {
+                            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
+                            {
+                                Time = time,
+                                Evapotranspiration = 5, // 5in/month = 60in/year = 5ft/year
+                            });
+                        })
+                        .SelectMany(monthlyData => monthlyData)
+                        .ToArray()
+                });
+
+            OpenEtSdkMock.Setup(x => x.RasterTimeseriesPoint(It.IsAny<Common.DataContracts.RasterTimeSeriesPointRequest>()))
+                .ReturnsAsync(new Common.DataContracts.RasterTimeSeriesPointResponse
+                {
+                    Data = Enumerable.Range(0, yearRange).Select(yearOffset =>
+                        {
+                            var time = DateOnly.FromDateTime(new DateTime(startYear + yearOffset, 1, 1));
+                            return Enumerable.Range(0, monthsInYear).Select(_ => new Common.DataContracts.RasterTimeSeriesDatapoint
+                            {
+                                Time = time,
+                                Evapotranspiration = 1, // 1in/month, 1ft/year
+                            });
+                        })
+                        .SelectMany(monthlyData => monthlyData)
+                        .ToArray()
+                });
+
+
+            UseUserContext(new UserContext
+            {
+                UserId = user.Id,
+                Roles = [],
+                OrganizationRoles =
+                [
+                    new OrganizationRole()
+                    {
+                        OrganizationId = organization.Id,
+                        RoleNames = [Roles.TechnicalReviewer],
+                    }
+                ],
+                ExternalAuthId = ""
+            });
+
+            var request = new ReviewerEstimateConsumptiveUseRequest
+            {
+                WaterConservationApplicationId = application.Id,
+                UpdateEstimate = shouldUpdateApplicantsEstimate,
+                Polygons =
+                [
+                    new CLI.MapPolygon
+                    {
+                        // null Id -> the existing location will be deleted, and a new location will be created for this polygon
+                        WaterConservationApplicationEstimateLocationId = null,
+                        PolygonWkt = memorialStadiumFootballField,
+                        DrawToolType = DrawToolType.Freeform,
+                    }
+                ],
+                ControlLocation = new CLI.MapPoint
+                {
+                    PointWkt = "POINT (0 0)",
+                },
+            };
+
+            // Act
+            var response = await _applicationManager.Store<
+                ReviewerEstimateConsumptiveUseRequest,
+                ReviewerEstimateConsumptiveUseResponse>(
+                request);
+
+
+            // Assert
+            response.Should().NotBeNull();
+            response.Error.Should().BeNull();
+
+
+            // verify response calculations are correct:
+            // - verify Total ET
+            const int locationsCumulativeTotalEtInInches = 60;
+            var locationsCumulativeTotalEtInFeet = locationsCumulativeTotalEtInInches / 12;
+            var expectedLocationsCumulativeTotalEtInAcreFeet = locationsCumulativeTotalEtInFeet * memorialStadiumApproximateAreaInAcres;
+            response.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeTotalEtInAcreFeet, 0.01);
+
+            // - verify Net ET
+            const int controlCumulativeTotalEtInInches = 12;
+            var locationsCumulativeNetEtInInches = locationsCumulativeTotalEtInInches - controlCumulativeTotalEtInInches;
+            var locationsCumulativeNetEtInFeet = locationsCumulativeNetEtInInches / 12;
+            var expectedLocationsCumulativeNetEtInAcreFeet = locationsCumulativeNetEtInFeet * memorialStadiumApproximateAreaInAcres;
+            response.CumulativeNetEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeNetEtInAcreFeet, 0.01);
+
+            // - verify payment reuses original estimate's desired compensation dollars
+            // - verify payment calculates using Net ET instead of Total ET
+            var expectedConservationPayment = estimate.CompensationRateDollars * response.CumulativeNetEtInAcreFeet;
+            response.ConservationPayment.Should().Be((int)expectedConservationPayment);
+
+            var dbEstimate = await _dbContext.WaterConservationApplicationEstimates
+                .Include(estimate => estimate.Locations).ThenInclude(location => location.WaterMeasurements)
+                .Include(estimate => estimate.ControlLocations).ThenInclude(cLocation => cLocation.WaterMeasurements)
+                .SingleOrDefaultAsync(estimate => estimate.WaterConservationApplicationId == application.Id);
+            var dbEstimateLocation = dbEstimate?.Locations.First();
+            var dbEstimateLocationWaterMeasurements = dbEstimateLocation?.WaterMeasurements;
+            var dbEstimateControlLocation = dbEstimate?.ControlLocations?.FirstOrDefault();
+            var dbEstimateControlLocationWaterMeasurements = dbEstimateControlLocation?.WaterMeasurements;
+
+            // estimate should always exist; it was either:
+            // * created by the applicant
+            // * overwritten by the technical reviewer
+            dbEstimate.Should().NotBeNull();
+            dbEstimate.Locations.Should().HaveCount(1); // 1 polygon
+            dbEstimate.Locations.First().WaterMeasurements.Should().HaveCount(yearRange);
+
+            // verify db fields all match expectations
+            dbEstimate.WaterConservationApplicationId.Should().Be(application.Id);
+
+
+            // sanity check - these values are populated via the faker extension `GenerateMetadataFromOrganization`
+            //   (they may be set in the call chain too if `UpdateEstimate == true`,
+            //   but they should be set to the same values they already have because of the faker)
+            dbEstimate.Model.Should().Be(organization.OpenEtModel);
+            dbEstimate.DateRangeStart.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year - yearRange, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                        .UtcDateTime
+                )
+            );
+            dbEstimate.DateRangeEnd.Should().Be(
+                DateOnly.FromDateTime(
+                    new DateTimeOffset(DateTimeOffset.UtcNow.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                        .AddMinutes(-1)
+                        .UtcDateTime
+                )
+            );
+
+            // desired dollars/units should not be modified from the original estimate
+            dbEstimate.CompensationRateDollars.Should().Be(estimate.CompensationRateDollars);
+            dbEstimate.CompensationRateUnits.Should().Be(estimate.CompensationRateUnits);
+
+            if (shouldUpdateApplicantsEstimate)
+            {
+                // these values are not generated by the faker, so they are only populated on the Estimate
+                // if the Estimate is overwritten.
+                dbEstimate.CumulativeTotalEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeTotalEtInAcreFeet, 0.01);
+                dbEstimate.CumulativeNetEtInAcreFeet.Should().BeApproximately(expectedLocationsCumulativeNetEtInAcreFeet, 0.01);
+
+
+                // these remaining values are randomly generated, so the Estimate only matches
+                // if the Estimate is overwritten.
+                dbEstimateLocation.PolygonWkt.Should().Be(request.Polygons[0].PolygonWkt);
+                dbEstimateLocation.DrawToolType.Should().Be(request.Polygons[0].DrawToolType);
+                dbEstimateLocation.PolygonAreaInAcres.Should().BeApproximately(memorialStadiumApproximateAreaInAcres, 0.01);
+
+                // double-check that the response data was cross-referenced successfully with the db EstimateLocations and EstimateControlLocation
+                response.DataCollections.First().WaterConservationApplicationEstimateLocationId.Should().Be(dbEstimateLocation.Id);
+                response.ControlDataCollection.WaterConservationApplicationEstimateControlLocationId.Should().Be(dbEstimateControlLocation.Id);
+
+                // verify that the dates are all in the correct range
+                dbEstimateLocationWaterMeasurements.All(waterMeasurement =>
+                {
+                    var yearMatches = startYear <= waterMeasurement.Year && waterMeasurement.Year < startYear + yearRange;
+                    return yearMatches;
+                }).Should().BeTrue();
+
+                dbEstimate.ControlLocations.Single().WaterMeasurements.All(measurement =>
+                        startYear <= measurement.Year && measurement.Year < startYear + yearRange)
+                    .Should().BeTrue();
+            }
+
+
+            var previousConsumptiveUsesIds = estimate.Locations.First().WaterMeasurements.Select(cu => cu.Id).ToHashSet();
+
+            // estimate should be the same regardless of an update
+            dbEstimate.Id.Should().Be(estimate.Id);
+
+            if (shouldUpdateApplicantsEstimate)
+            {
+                // conservation payment was updated to reflect changed polygons
+                dbEstimate.EstimatedCompensationDollars.Should().Be(response.ConservationPayment);
+
+                // we did not provide the location id in our request,
+                // so the location should have been overwritten (deleted and recreated)
+                dbEstimateLocation.Id.Should().NotBe(estimate.Locations.First().Id);
+
+                // water measurements were overwritten
+                dbEstimateLocationWaterMeasurements.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
+                    .Should().BeFalse();
+
+                // control location and its water measurements were created
+                dbEstimateControlLocation.Should().NotBeNull();
+                dbEstimateControlLocationWaterMeasurements.Should().NotBeNullOrEmpty();
+            }
+            else
+            {
+                // conservation payment remains unchanged
+                dbEstimate.EstimatedCompensationDollars.Should().Be(estimate.EstimatedCompensationDollars);
+
+                // locations remain unchanged
+                dbEstimateLocation.Id.Should().Be(estimate.Locations.First().Id);
+
+                // water measurements remain unchanged
+                dbEstimateLocationWaterMeasurements.All(cu => previousConsumptiveUsesIds.Contains(cu.Id))
+                    .Should().BeTrue();
+
+                // control location and its water measurements were not created
+                dbEstimateControlLocation.Should().BeNull();
+                dbEstimateControlLocationWaterMeasurements.Should().BeNull();
+            }
+        }
+        finally
+        {
+            // cleanup after test finishes to prevent issues with other tests
+            await ClearDatabases(wadeDb, _dbContext);
+        }
+    }
+
+    [TestMethod]
+    public async Task Store_ReviewerEstimateConsumptiveUse_AsAnonymous_Failure()
+    {
+        // Arrange
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(user, organization).Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        await _dbContext.SaveChangesAsync();
+
+        const int startYear = 2024;
+        OpenEtSdkMock.Setup(x => x.RasterTimeseriesPolygon(It.IsAny<RasterTimeSeriesPolygonRequest>()))
+            .ReturnsAsync(new RasterTimeSeriesPolygonResponse
+            {
+                Data =
+                [
+                    new RasterTimeSeriesDatapoint
+                    {
+                        Time = DateOnly.FromDateTime(new DateTime(startYear, 1, 1)),
+                        Evapotranspiration = 5,
+                    }
+                ]
+            });
+
+        ContextUtilityMock.Setup(x => x.GetRequiredContext<UserContext>())
+            .Throws(new InvalidOperationException("User context is required for this operation"));
+
+        UseAnonymousContext();
+
+        var request = new ReviewerEstimateConsumptiveUseRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            UpdateEstimate = false,
+            Polygons =
+            [
+                new CLI.MapPolygon
+                {
+                    PolygonWkt = memorialStadiumFootballField,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
+            ControlLocation = new CLI.MapPoint
+            {
+                PointWkt = "POINT (0 0)",
+            }
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            ReviewerEstimateConsumptiveUseRequest,
+            ReviewerEstimateConsumptiveUseResponse>(
+            request);
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+
+        ContextUtilityMock.Verify(x => x.GetRequiredContext<UserContext>(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task Store_ReviewerEstimateConsumptiveUse_AttemptsToUpdateEstimateLocationWhichDoesNotExist_Failure()
+    {
+        // Arrange
+        const int yearRange = 10;
+
+        var user = new UserFaker().Generate();
+        var organization = new OrganizationFaker()
+            .RuleFor(org => org.OpenEtDateRangeInYears, () => yearRange)
+            .Generate();
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.SaveChangesAsync();
+
+        var application = new WaterConservationApplicationFaker()
+            .RuleFor(a => a.ApplicantUserId, () => user.Id)
+            .RuleFor(a => a.FundingOrganizationId, () => organization.Id)
+            .Generate();
+
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+
+        var estimate = new WaterConservationApplicationEstimateFaker(application)
+            .RuleFor(est => est.CompensationRateUnits, () => CompensationRateUnits.AcreFeet)
+            .GenerateMetadataFromOrganization(organization)
+            .Generate();
+        var estimateLocation = new WaterConservationApplicationEstimateLocationFaker(estimate).Generate();
+
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+
+        await _dbContext.SaveChangesAsync();
+
+        UseUserContext(new UserContext
+        {
+            UserId = user.Id,
+            Roles = [],
+            OrganizationRoles =
+            [
+                new OrganizationRole()
+                {
+                    OrganizationId = organization.Id,
+                    RoleNames = [Roles.TechnicalReviewer],
+                }
+            ],
+            ExternalAuthId = ""
+        });
+
+        var request = new ReviewerEstimateConsumptiveUseRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            UpdateEstimate = true,
+            Polygons =
+            [
+                new CLI.MapPolygon
+                {
+                    // id is not null, but does not match an existing EstimateLocation -> Error
+                    WaterConservationApplicationEstimateLocationId = Guid.NewGuid(),
+                    PolygonWkt = memorialStadiumFootballField,
+                    DrawToolType = DrawToolType.Freeform,
+                }
+            ],
+            ControlLocation = new CLI.MapPoint
+            {
+                PointWkt = "POINT (0 0)",
+            },
+        };
+
+        // Act
+        var response = await _applicationManager.Store<
+            ReviewerEstimateConsumptiveUseRequest,
+            ReviewerEstimateConsumptiveUseResponse>(
+            request);
+
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<NotFoundError>();
+        response.Error.PublicMessage.Should().Contain($"EstimateLocations with Ids {request.Polygons[0].WaterConservationApplicationEstimateLocationId}");
     }
 
     [TestMethod]
@@ -1814,5 +2245,50 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 )
             ), Times.Once
         );
+    }
+
+    private WaterConservationApplicationSubmission SetupApplicationSubmission()
+    {
+        var applicant = new UserFaker().Generate();
+        var organization = new OrganizationFaker().Generate();
+        var application = new WaterConservationApplicationFaker(applicant, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application).Generate();
+
+        _dbContext.Users.AddRangeAsync(applicant);
+        _dbContext.Organizations.Add(organization);
+        _dbContext.WaterConservationApplications.Add(application);
+        _dbContext.WaterConservationApplicationSubmissions.Add(submission);
+
+        return submission;
+    }
+
+    private async Task ClearDatabases(DatabaseContext wadeDb, WestDaatDatabaseContext westdaatDb)
+    {
+        wadeDb.AllocationAmountsFact.RemoveRange(wadeDb.AllocationAmountsFact);
+        wadeDb.OrganizationsDim.RemoveRange(wadeDb.OrganizationsDim);
+        wadeDb.DateDim.RemoveRange(wadeDb.DateDim);
+        wadeDb.MethodsDim.RemoveRange(wadeDb.MethodsDim);
+        wadeDb.MethodType.RemoveRange(wadeDb.MethodType);
+        wadeDb.ApplicableResourceType.RemoveRange(wadeDb.ApplicableResourceType);
+        wadeDb.VariablesDim.RemoveRange(wadeDb.VariablesDim);
+        wadeDb.VariableSpecific.RemoveRange(wadeDb.VariableSpecific);
+        wadeDb.Variable.RemoveRange(wadeDb.Variable);
+        wadeDb.AggregationStatistic.RemoveRange(wadeDb.AggregationStatistic);
+        wadeDb.Units.RemoveRange(wadeDb.Units);
+        wadeDb.ReportYearType.RemoveRange(wadeDb.ReportYearType);
+        await wadeDb.SaveChangesAsync();
+
+        _dbContext.ControlLocationWaterMeasurements.RemoveRange(_dbContext.ControlLocationWaterMeasurements);
+        _dbContext.LocationWaterMeasurements.RemoveRange(_dbContext.LocationWaterMeasurements);
+        _dbContext.WaterConservationApplicationEstimateControlLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateControlLocations);
+        _dbContext.WaterConservationApplicationEstimateLocations.RemoveRange(_dbContext.WaterConservationApplicationEstimateLocations);
+        _dbContext.WaterConservationApplicationEstimates.RemoveRange(_dbContext.WaterConservationApplicationEstimates);
+        _dbContext.WaterConservationApplicationSubmissionNotes.RemoveRange(_dbContext.WaterConservationApplicationSubmissionNotes);
+        _dbContext.WaterConservationApplicationSubmissions.RemoveRange(_dbContext.WaterConservationApplicationSubmissions);
+        _dbContext.WaterConservationApplications.RemoveRange(_dbContext.WaterConservationApplications);
+        _dbContext.UserProfiles.RemoveRange(_dbContext.UserProfiles);
+        _dbContext.Users.RemoveRange(_dbContext.Users);
+        _dbContext.Organizations.RemoveRange(_dbContext.Organizations);
+        await _dbContext.SaveChangesAsync();
     }
 }

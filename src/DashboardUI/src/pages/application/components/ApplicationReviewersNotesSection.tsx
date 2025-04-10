@@ -1,7 +1,7 @@
 import { ApplicationFormSectionRule } from '../../../components/ApplicationFormSectionRule';
 import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
-import { formatDateString } from '../../../utilities/valueFormatters';
+import { formatDateString, momentJsLocalizedDateFormatString } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
 
 import './ApplicationReviewersNotesSection.scss';
@@ -11,9 +11,6 @@ function ApplicationReviewersNotesSection() {
   const notes = state.conservationApplication.reviewerNotes;
 
   const { user } = useAuthenticationContext();
-
-  // docs: https://momentjs.com/docs/#/displaying/
-  const momentJsLocalizedDateFormatString = 'llll';
 
   return (
     <>
@@ -27,7 +24,7 @@ function ApplicationReviewersNotesSection() {
             >
               <div className="d-flex gap-3">
                 <div>
-                  <span className="text-primary">{note.submittedByFullName}</span>
+                  <span className="text-primary fw-bold">{note.submittedByFullName}</span>
                 </div>
                 <div>
                   <span className="text-muted fst-italic">

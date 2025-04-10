@@ -30,6 +30,7 @@ import { WaterConservationApplicationRecommendationRequest } from '../data-contr
 import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
 import { ApprovalDecision } from '../data-contracts/ApprovalDecision';
 import { WaterConservationApplicationApprovalRequest } from '../data-contracts/WaterConservationApplicationApprovalRequest';
+import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -218,7 +219,10 @@ export const updateApplicationSubmission = async (
     note: data.note,
   };
 
-  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(`Applications/${data.waterConservationApplicationId}`, request);
+  const { data: response } = await api.put<WaterConservationApplicationSubmissionUpdateResponse>(
+    `Applications/${data.waterConservationApplicationId}`,
+    request,
+  );
 
   return response;
 };
@@ -237,11 +241,11 @@ export const submitApplicationRecommendation = async (
     $type: 'WaterConservationApplicationRecommendationRequest',
     waterConservationApplicationId: data.waterConservationApplicationId,
     recommendationDecision: data.recommendationDecision,
-    recommendationNotes: data.recommendationNotes
+    recommendationNotes: data.recommendationNotes,
   };
 
   await api.post<void>('Applications/Submit', request);
-}
+};
 
 export const submitApplicationApproval = async (
   context: IMsalContext,
@@ -269,7 +273,7 @@ export const getApplication = async (
     applicationId: string;
     perspective: ApplicationReviewPerspective;
   },
-): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[] }> => {
+): Promise<{ application: ApplicationDetails; notes?: ApplicationReviewNote[]; reviewPipeline?: ReviewPipeline }> => {
   const api = await westDaatApi(context);
 
   let request: ApplicationLoadRequestBase;
@@ -302,7 +306,11 @@ export const getApplication = async (
     }
     case 'reviewer': {
       const reviewerResponse = response as ReviewerConservationApplicationLoadResponse;
-      return { application: reviewerResponse.application, notes: reviewerResponse.notes };
+      return {
+        application: reviewerResponse.application,
+        notes: reviewerResponse.notes,
+        reviewPipeline: reviewerResponse.reviewPipeline,
+      };
     }
   }
 };

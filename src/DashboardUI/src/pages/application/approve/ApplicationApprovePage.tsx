@@ -18,12 +18,17 @@ import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
 import { submitApplicationApproval } from '../../../accessors/applicationAccessor';
 import { useMsal } from '@azure/msal-react';
+import { ConservationApplicationStatus } from '../../../data-contracts/ConservationApplicationStatus';
+import { hasPermission } from '../../../utilities/securityHelpers';
+import { Permission } from '../../../roleConfig';
+import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 
 export function ApplicationApprovePage() {
   const context = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state } = useConservationApplicationContext();
+  const { user } = useAuthenticationContext();
 
   const navigateBack = () => {
     navigate(`/application/organization/dashboard`);
@@ -80,6 +85,19 @@ export function ApplicationApprovePage() {
       });
     },
   });
+  const canApproveApplication = hasPermission(user, Permission.ApplicationApprove);
+
+  const navigateToReviewPage = () => {
+    const id = state.conservationApplication.waterConservationApplicationId;
+    if (id) {
+      navigate(`/application/${id}/review`);
+    }
+  };
+
+  const isApplicationFinalized =
+    state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
+    state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
+    state.conservationApplication.status === ConservationApplicationStatus.Rejected;
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -89,6 +107,9 @@ export function ApplicationApprovePage() {
         centerText="Application Review"
         centerTextIsLoading={false}
         displayWaterIcon={false}
+        rightButtonDisplayed={canApproveApplication && !isApplicationFinalized}
+        rightButtonText="Edit Application"
+        onRightButtonClick={navigateToReviewPage}
       />
       <div className="overflow-y-auto">
         {!state.loadApplicationErrored && !state.loadFundingOrganizationErrored && (
@@ -101,6 +122,7 @@ export function ApplicationApprovePage() {
               <ApplicationReviewersNotesSection />
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
+                isHidden={!canApproveApplication || isApplicationFinalized}
                 disableButtons={isPageLoading || isModalOpen}
                 handleAcceptClicked={handleAcceptClicked}
                 handleDenyClicked={handleDenyClicked}
