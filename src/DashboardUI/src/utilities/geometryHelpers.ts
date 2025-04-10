@@ -61,7 +61,7 @@ export const doPolygonsIntersect = (polygons: Feature<Geometry, GeoJsonPropertie
   return false;
 };
 
-export const doesPointIntersectWithPolygon = (
+export const doesPointExistWithinPolygon = (
   point: Feature<Point, GeoJsonProperties>,
   polygon: Feature<Polygon, GeoJsonProperties>,
 ): boolean => {
