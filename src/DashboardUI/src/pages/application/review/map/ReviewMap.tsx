@@ -159,6 +159,12 @@ function ReviewMap(props: ReviewMapProps) {
       controlLocationData = fromGeometryFeatureToMapSelectionPointData(controlLocationFeature);
     }
 
+    if (doesControlLocationOverlapWithPolygons) {
+      toast.error(
+        'The control location may not be within any of the irrigated field locations. Please replace the control location.',
+      );
+    }
+
     dispatch({
       type: 'REVIEWER_MAP_DATA_UPDATED',
       payload: {
