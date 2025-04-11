@@ -344,19 +344,19 @@ const onDashboardApplicationsFiltered = (
 
 function calculateApplicationStatistics(applications: ApplicationDashboardListItem[]): ApplicationDashboardStatistics {
   const submittedApps = applications.length;
-  const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Accepted).length;
+  const approvedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Approved).length;
   const inTechReview = applications.filter(
     (app) => app?.status === ConservationApplicationStatus.InTechnicalReview,
   ).length;
   const inFinalRevew = applications.filter((app) => app?.status === ConservationApplicationStatus.InFinalReview).length;
-  const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Rejected).length;
+  const rejectedApps = applications.filter((app) => app?.status === ConservationApplicationStatus.Denied).length;
   const inReviewApps = inTechReview + inFinalRevew;
   const waterSavings = applications
-    .filter((app) => app?.status === ConservationApplicationStatus.Accepted)
+    .filter((app) => app?.status === ConservationApplicationStatus.Approved)
     .filter((app) => app?.compensationRateUnits === CompensationRateUnits.AcreFeet)
     .reduce((sum, app) => sum + (app?.totalWaterVolumeSavingsAcreFeet ?? 0), 0);
   const totalObligation = applications
-    .filter((app) => app?.status === ConservationApplicationStatus.Accepted)
+    .filter((app) => app?.status === ConservationApplicationStatus.Approved)
     .reduce((sum, app) => sum + (app?.totalObligationDollars ?? 0), 0);
 
   return {

@@ -108,8 +108,8 @@ export function ApplicationApprovePage() {
 
   const isApplicationFinalized =
     state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
-    state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
-    state.conservationApplication.status === ConservationApplicationStatus.Rejected;
+    state.conservationApplication.status === ConservationApplicationStatus.Approved ||
+    state.conservationApplication.status === ConservationApplicationStatus.Denied;
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
