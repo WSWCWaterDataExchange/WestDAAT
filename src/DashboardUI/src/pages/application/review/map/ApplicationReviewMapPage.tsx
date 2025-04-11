@@ -10,7 +10,7 @@ import { ReviewerEstimateConsumptiveUseResponse } from '../../../../data-contrac
 import { toast } from 'react-toastify';
 
 export function ApplicationReviewMapPage() {
-  const { state } = useConservationApplicationContext();
+  const { state, dispatch } = useConservationApplicationContext();
   const msalContext = useMsal();
 
   const estimateConsumptiveUseMutation = useMutation({
@@ -35,7 +35,16 @@ export function ApplicationReviewMapPage() {
     },
     onSuccess: (result: ReviewerEstimateConsumptiveUseResponse) => {
       if (result) {
-        // todo: dispatch
+        dispatch({
+          type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED',
+          payload: {
+            cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
+            cumulativeNetEtInAcreFeet: result.cumulativeNetEtInAcreFeet,
+            conservationPayment: result.conservationPayment,
+            dataCollections: result.dataCollections,
+            controlDataCollection: result.controlDataCollection,
+          },
+        });
       }
     },
     onError: (error: Error) => {
