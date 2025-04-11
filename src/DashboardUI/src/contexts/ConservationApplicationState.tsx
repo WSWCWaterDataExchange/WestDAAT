@@ -118,12 +118,12 @@ export type ApplicationAction =
   | FundingOrganizationLoadingAction
   | FundingOrganizationLoadedAction
   | FundingOrganizationLoadErrored
-  | MapControlLocationUpdatedAction
   | MapPolygonsUpdatedAction
   | ReviewerMapDataUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
+  // | ReviewerConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -183,14 +183,6 @@ export interface MapPolygonsUpdatedAction {
   };
 }
 
-export interface MapControlLocationUpdatedAction {
-  type: 'MAP_CONTROL_LOCATION_UPDATED';
-  payload: {
-    controlLocation: MapSelectionPointData | undefined;
-    doesControlLocationOverlapWithPolygons: boolean | undefined;
-  };
-}
-
 export interface ReviewerMapDataUpdatedAction {
   type: 'REVIEWER_MAP_DATA_UPDATED';
   payload: {
@@ -225,6 +217,17 @@ export interface ApplicantConsumptiveUseEstimatedAction {
     dataCollections: PolygonEtDataCollection[];
   };
 }
+
+// export interface ReviewerConsumptiveUseEstimatedAction {
+//   type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED';
+//   payload: {
+//     cumulativeTotalEtInAcreFeet: number;
+//     cumulativeNetEtInAcreFeet: number;
+//     conservationPayment: number;
+//     dataCollections: PolygonEtDataCollection[];
+//     controlDataCollection: PointEtDataCollection;
+//   };
+// }
 
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
@@ -316,14 +319,14 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onApplicationCreated(draftState, action);
     case 'MAP_POLYGONS_UPDATED':
       return onMapPolygonsUpdated(draftState, action);
-    case 'MAP_CONTROL_LOCATION_UPDATED':
-      return onMapControlLocationUpdated(draftState, action);
     case 'REVIEWER_MAP_DATA_UPDATED':
       return onReviewerMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
       return onApplicantConsumptiveUseEstimated(draftState, action);
+    // case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED':
+    //   return onReviewerConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -466,17 +469,6 @@ const onMapPolygonsUpdated = (
   return draftState;
 };
 
-const onMapControlLocationUpdated = (
-  draftState: ConservationApplicationState,
-  { payload }: MapControlLocationUpdatedAction,
-): ConservationApplicationState => {
-  draftState.conservationApplication.controlLocation = payload.controlLocation;
-  draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
-    payload.doesControlLocationOverlapWithPolygons ?? false;
-
-  return draftState;
-};
-
 const onReviewerMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerMapDataUpdatedAction,
@@ -495,15 +487,15 @@ const onReviewerMapPolygonsUpdated = (
     const shouldDispatchMapPolygonsUpdatedAction = anyPolygonsAddedOrRemoved || anyPolygonsChanged;
 
     if (shouldDispatchMapPolygonsUpdatedAction) {
-      const action: MapPolygonsUpdatedAction = {
-        type: 'MAP_POLYGONS_UPDATED',
-        payload: {
-          polygons: payload.polygons,
-          doPolygonsOverlap: payload.doPolygonsOverlap,
-        },
-      };
+      draftState.conservationApplication.estimateLocations = payload.polygons;
+      draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
 
-      draftState = reducer(draftState, action);
+      // do not reset consumptive use data
+      checkCanReviewerEstimateConsumptiveUse(draftState);
+      computeCombinedPolygonData(draftState);
+
+      // todo: is this necessary?
+      // resetApplicationFormLocationDetails(draftState);
     }
   };
 
@@ -517,15 +509,9 @@ const onReviewerMapPolygonsUpdated = (
     const controlLocationUpdated = existingControlLocationWkt !== newControlLocationWkt;
 
     if (controlLocationUpdated) {
-      const action: MapControlLocationUpdatedAction = {
-        type: 'MAP_CONTROL_LOCATION_UPDATED',
-        payload: {
-          controlLocation: payload.controlLocation,
-          doesControlLocationOverlapWithPolygons: payload.doesControlLocationOverlapWithPolygons,
-        },
-      };
-
-      draftState = reducer(draftState, action);
+      draftState.conservationApplication.controlLocation = payload.controlLocation;
+      draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
+        payload.doesControlLocationOverlapWithPolygons ?? false;
     }
   };
 
@@ -579,6 +565,19 @@ const onApplicantConsumptiveUseEstimated = (
 
   return draftState;
 };
+
+// const onReviewerConsumptiveUseEstimated = (
+//   draftState: ConservationApplicationState,
+//   { payload }: ReviewerConsumptiveUseEstimatedAction,
+// ): ConservationApplicationState => {
+//   const application = draftState.conservationApplication;
+
+//   application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
+//   application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
+//   application.conservationPayment = payload.conservationPayment;
+
+//   // combine polygon data
+// };
 
 const onApplicationFormUpdated = (
   draftState: ConservationApplicationState,
