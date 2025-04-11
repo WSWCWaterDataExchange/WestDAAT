@@ -444,7 +444,7 @@ internal class ValidationEngine : IValidationEngine
         if (submittedApplicationExistsResponse.Status != DTO.ConservationApplicationStatus.InFinalReview)
         {
             return CreateValidationError(request, nameof(WaterConservationApplicationApprovalRequest.WaterConservationApplicationId),
-                "Application must be in final review status to be accepted or denied by a funding organization member.");
+                "Application must be in final review status to be approved or denied by a funding organization member.");
         }
 
         // verify the user has permissions to approve/deny an application

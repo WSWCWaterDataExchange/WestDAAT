@@ -13,7 +13,7 @@ import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
-import { ApplicationAcceptModal } from './ApplicationAcceptModal';
+import { ApplicationApproveModal } from './ApplicationApproveModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
 import { submitApplicationApproval } from '../../../accessors/applicationAccessor';
@@ -39,26 +39,26 @@ export function ApplicationApprovePage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
 
   const isPageLoading = isApplicationLoading || isFundingOrganizationLoading;
-  const isModalOpen = showAcceptModal || showDenyModal;
+  const isModalOpen = showApproveModal || showDenyModal;
 
-  const handleAcceptClicked = () => {
-    setShowAcceptModal(true);
+  const handleApproveClicked = () => {
+    setShowApproveModal(true);
   };
 
   const handleDenyClicked = () => {
     setShowDenyModal(true);
   };
 
-  const handleApplicationAccepted = (approvalNotes: string) => {
-    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Accepted, notes: approvalNotes });
+  const handleApplicationApproved = (approvalNotes: string) => {
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Approved, notes: approvalNotes });
   };
 
   const handleApplicationDenied = (approvalNotes: string) => {
-    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Rejected, notes: approvalNotes });
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Denied, notes: approvalNotes });
   };
 
   const submitApplicationApprovalMutation = useMutation({
@@ -73,11 +73,11 @@ export function ApplicationApprovePage() {
     onSuccess: (decision: ApprovalDecision) => {
       let toastMessage = '';
 
-      if (decision === ApprovalDecision.Accepted) {
+      if (decision === ApprovalDecision.Approved) {
         toastMessage = 'Application approved successfully.';
       }
 
-      if (decision === ApprovalDecision.Rejected) {
+      if (decision === ApprovalDecision.Denied) {
         toastMessage = 'Application denied successfully.';
       }
 
@@ -85,12 +85,22 @@ export function ApplicationApprovePage() {
         autoClose: 1000,
       });
 
-      setShowAcceptModal(false);
+      setShowApproveModal(false);
       setShowDenyModal(false);
       navigateBack();
     },
-    onError: () => {
-      toast.error('Error submitting application approval decision.', {
+    onError: (decision: ApprovalDecision) => {
+      let toastMessage = '';
+
+      if (decision === ApprovalDecision.Approved) {
+        toastMessage = 'Error submitting application approval.';
+      }
+
+      if (decision === ApprovalDecision.Denied) {
+        toastMessage = 'Error submitting application denial.';
+      }
+
+      toast.error(toastMessage, {
         position: 'top-center',
         theme: 'colored',
         autoClose: 3000,
@@ -108,8 +118,8 @@ export function ApplicationApprovePage() {
 
   const isApplicationFinalized =
     state.conservationApplication.status === ConservationApplicationStatus.Unknown ||
-    state.conservationApplication.status === ConservationApplicationStatus.Accepted ||
-    state.conservationApplication.status === ConservationApplicationStatus.Rejected;
+    state.conservationApplication.status === ConservationApplicationStatus.Approved ||
+    state.conservationApplication.status === ConservationApplicationStatus.Denied;
 
   return (
     <div className="d-flex flex-column flex-grow-1 h-100">
@@ -136,7 +146,7 @@ export function ApplicationApprovePage() {
               <ApplicationApproveButtonRow
                 isHidden={!canApproveApplication || isApplicationFinalized}
                 disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
-                handleAcceptClicked={handleAcceptClicked}
+                handleApproveClicked={handleApproveClicked}
                 handleDenyClicked={handleDenyClicked}
               />
             </div>
@@ -151,10 +161,10 @@ export function ApplicationApprovePage() {
           </div>
         )}
 
-        <ApplicationAcceptModal
-          show={showAcceptModal}
-          onCancel={() => setShowAcceptModal(false)}
-          onAccept={handleApplicationAccepted}
+        <ApplicationApproveModal
+          show={showApproveModal}
+          onCancel={() => setShowApproveModal(false)}
+          onApprove={handleApplicationApproved}
           disableButtons={submitApplicationApprovalMutation.isLoading}
         />
         <ApplicationDenyModal
