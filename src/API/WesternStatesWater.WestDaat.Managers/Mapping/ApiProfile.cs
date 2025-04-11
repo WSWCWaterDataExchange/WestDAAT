@@ -355,8 +355,8 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
             {
                 (null, null, null) => DTO.ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => DTO.ConservationApplicationStatus.InFinalReview,
-                (_, not null, null) => DTO.ConservationApplicationStatus.Accepted,
-                (_, null, not null) => DTO.ConservationApplicationStatus.Rejected,
+                (_, not null, null) => DTO.ConservationApplicationStatus.Approved,
+                (_, null, not null) => DTO.ConservationApplicationStatus.Denied,
                 _ => DTO.ConservationApplicationStatus.Unknown
             };
         }

@@ -513,8 +513,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
             {
                 (null, null, null) => ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => ConservationApplicationStatus.InFinalReview,
-                (_, not null, null) => ConservationApplicationStatus.Accepted,
-                (_, null, not null) => ConservationApplicationStatus.Rejected,
+                (_, not null, null) => ConservationApplicationStatus.Approved,
+                (_, null, not null) => ConservationApplicationStatus.Denied,
                 _ => ConservationApplicationStatus.Unknown
             };
         }

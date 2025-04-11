@@ -163,7 +163,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = acceptedEstimate.CompensationRateDollars,
             CompensationRateUnits = acceptedEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
-            Status = ConservationApplicationStatus.Accepted,
+            Status = ConservationApplicationStatus.Approved,
             SubmittedDate = acceptedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
             WaterRightState = acceptedApp.WaterRightState,
@@ -179,7 +179,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateDollars = rejectedEstimate.CompensationRateDollars,
             CompensationRateUnits = rejectedEstimate.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
-            Status = ConservationApplicationStatus.Rejected,
+            Status = ConservationApplicationStatus.Denied,
             SubmittedDate = rejectedApp.SubmittedDate,
             WaterRightNativeId = appTwo.WaterRightNativeId,
             WaterRightState = rejectedApp.WaterRightState,
@@ -306,8 +306,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         response.Applications.Should().HaveCount(4);
         response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InTechnicalReview);
         response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.InFinalReview);
-        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Accepted);
-        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Rejected);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Approved);
+        response.Applications.Should().ContainSingle(app => app.Status == ConservationApplicationStatus.Denied);
     }
 
     [TestMethod]
@@ -1871,8 +1871,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     [DataTestMethod]
     [DataRow(ConservationApplicationStatus.Unknown, DisplayName = "An application with an Unknown (invalid) status cannot be Accepted or Rejected")]
     [DataRow(ConservationApplicationStatus.InTechnicalReview, DisplayName = "An application that hasn't received a Recommendation yet cannot be Accepted or Rejected")]
-    [DataRow(ConservationApplicationStatus.Accepted, DisplayName = "An application that has already been Accepted cannot be Accepted or Rejected")]
-    [DataRow(ConservationApplicationStatus.Rejected, DisplayName = "An application that has already been Rejected cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.Approved, DisplayName = "An application that has already been Accepted cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.Denied, DisplayName = "An application that has already been Rejected cannot be Accepted or Rejected")]
     public async Task Store_SubmitApplicationApproval_InvalidApplicationStatus_ShouldThrow(ConservationApplicationStatus status)
     {
         // Arrange
@@ -1898,13 +1898,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 submission.AcceptedDate = null;
                 submission.ApprovedByUserId = null;
                 break;
-            case ConservationApplicationStatus.Accepted:
+            case ConservationApplicationStatus.Approved:
                 submission.RecommendedForDate = oldTimestamp;
                 submission.RecommendedByUserId = technicalReviewerId;
                 submission.AcceptedDate = oldTimestamp;
                 submission.ApprovedByUserId = approvalReviewerId;
                 break;
-            case ConservationApplicationStatus.Rejected:
+            case ConservationApplicationStatus.Denied:
                 submission.RecommendedForDate = oldTimestamp;
                 submission.RecommendedByUserId = technicalReviewerId;
                 submission.RejectedDate = oldTimestamp;
