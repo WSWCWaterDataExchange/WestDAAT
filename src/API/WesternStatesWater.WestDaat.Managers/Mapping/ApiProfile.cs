@@ -349,9 +349,10 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
         }
 
-        public static DTO.ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommenedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        // duplicated in other ApiProfile.cs
+        public static DTO.ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? approvedDate, DateTimeOffset? deniedDate)
         {
-            return (recommenedByUserId, acceptedDate, rejectedDate) switch
+            return (recommendedByUserId, approvedDate, deniedDate) switch
             {
                 (null, null, null) => DTO.ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => DTO.ConservationApplicationStatus.InFinalReview,

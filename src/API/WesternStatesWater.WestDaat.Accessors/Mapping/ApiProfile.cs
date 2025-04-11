@@ -507,9 +507,9 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
         }
 
         // duplicated in other ApiProfile.cs
-        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? acceptedDate, DateTimeOffset? rejectedDate)
+        public static ConservationApplicationStatus EvaluateApplicationStatus(Guid? recommendedByUserId, DateTimeOffset? approvedDate, DateTimeOffset? deniedDate)
         {
-            return (recommenedByUserId: recommendedByUserId, acceptedDate, rejectedDate) switch
+            return (recommendedByUserId, approvedDate, deniedDate) switch
             {
                 (null, null, null) => ConservationApplicationStatus.InTechnicalReview,
                 (not null, null, null) => ConservationApplicationStatus.InFinalReview,
