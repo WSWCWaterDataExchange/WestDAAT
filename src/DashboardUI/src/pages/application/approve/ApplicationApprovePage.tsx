@@ -54,11 +54,11 @@ export function ApplicationApprovePage() {
   };
 
   const handleApplicationAccepted = (approvalNotes: string) => {
-    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Accepted, notes: approvalNotes });
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Approved, notes: approvalNotes });
   };
 
   const handleApplicationDenied = (approvalNotes: string) => {
-    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Rejected, notes: approvalNotes });
+    submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Denied, notes: approvalNotes });
   };
 
   const submitApplicationApprovalMutation = useMutation({
@@ -73,11 +73,11 @@ export function ApplicationApprovePage() {
     onSuccess: (decision: ApprovalDecision) => {
       let toastMessage = '';
 
-      if (decision === ApprovalDecision.Accepted) {
+      if (decision === ApprovalDecision.Approved) {
         toastMessage = 'Application approved successfully.';
       }
 
-      if (decision === ApprovalDecision.Rejected) {
+      if (decision === ApprovalDecision.Denied) {
         toastMessage = 'Application denied successfully.';
       }
 
