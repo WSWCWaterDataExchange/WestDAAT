@@ -137,7 +137,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         // Approval step (if exists)
         if (reviewPipelineSrc.Submission.ApprovedByUserId.HasValue)
         {
-            var status = (submission.AcceptedDate.HasValue, submission.RejectedDate.HasValue) switch
+            var status = (submission.ApprovedDate.HasValue, submission.DeniedDate.HasValue) switch
             {
                 (true, false) => ReviewStepStatus.Approved,
                 (false, true) => ReviewStepStatus.Denied,
@@ -146,8 +146,8 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
 
             var approveDate = status switch
             {
-                ReviewStepStatus.Approved => submission.AcceptedDate,
-                ReviewStepStatus.Denied => submission.RejectedDate,
+                ReviewStepStatus.Approved => submission.ApprovedDate,
+                ReviewStepStatus.Denied => submission.DeniedDate,
                 _ => throw new WestDaatException("Invalid approval status."),
             };
 

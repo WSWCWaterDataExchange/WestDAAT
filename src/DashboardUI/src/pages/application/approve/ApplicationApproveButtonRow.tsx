@@ -3,12 +3,12 @@ import Button from 'react-bootstrap/esm/Button';
 export interface ApplicationApproveButtonRowProps {
   isHidden: boolean;
   disableButtons: boolean;
-  handleAcceptClicked: () => void;
+  handleApproveClicked: () => void;
   handleDenyClicked: () => void;
 }
 
 export function ApplicationApproveButtonRow(props: ApplicationApproveButtonRowProps) {
-  const { disableButtons, handleAcceptClicked, handleDenyClicked } = props;
+  const { disableButtons, handleApproveClicked, handleDenyClicked } = props;
 
   if (props.isHidden) {
     return null;
@@ -20,8 +20,8 @@ export function ApplicationApproveButtonRow(props: ApplicationApproveButtonRowPr
         Deny
       </Button>
 
-      <Button variant="success" onClick={handleAcceptClicked} disabled={disableButtons} className="px-3">
-        Accept
+      <Button variant="success" onClick={handleApproveClicked} disabled={disableButtons} className="px-3">
+        Approve
       </Button>
     </div>
   );

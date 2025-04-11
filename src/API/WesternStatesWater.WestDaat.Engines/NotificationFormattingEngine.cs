@@ -196,8 +196,8 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
 
         var decisionVerb = meta.ApplicationStatus switch
         {
-            DTO.ConservationApplicationStatus.Accepted => "Approved",
-            DTO.ConservationApplicationStatus.Rejected => "Denied",
+            DTO.ConservationApplicationStatus.Approved => "Approved",
+            DTO.ConservationApplicationStatus.Denied => "Denied",
             _ => "Reviewed" // Fallback for any other status
         };
 

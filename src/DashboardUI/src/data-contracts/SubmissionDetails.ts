@@ -3,8 +3,8 @@ import { CompensationRateUnits } from './CompensationRateUnits';
 export interface SubmissionDetails {
   id: string;
   submittedDate: string;
-  acceptedDate: string | null;
-  rejectedDate: string | null;
+  approvedDate: string | null;
+  deniedDate: string | null;
 
   agentName: string | null;
   agentEmail: string | null;
