@@ -2,17 +2,19 @@ namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
 public class ApplicationListItemDetails
 {
-    public DateTimeOffset? AcceptedDate { get; set; }
-
     required public string ApplicantFullName { get; set; }
 
     required public string ApplicationDisplayId { get; set; }
 
     required public Guid ApplicationId { get; set; }
 
+    public DateTimeOffset? ApprovedDate { get; set; }
+
     required public int CompensationRateDollars { get; set; }
 
     required public CompensationRateUnits CompensationRateUnits { get; set; }
+
+    public DateTimeOffset? DeniedDate { get; set; }
 
     required public int EstimatedCompensationDollars { get; set; }
 
@@ -21,8 +23,6 @@ public class ApplicationListItemDetails
     public DateTimeOffset? RecommendedAgainstDate { get; set; }
     
     public DateTimeOffset? RecommendedForDate { get; set; }
-
-    public DateTimeOffset? RejectedDate { get; set; }
 
     required public DateTimeOffset SubmittedDate { get; set; }
 
