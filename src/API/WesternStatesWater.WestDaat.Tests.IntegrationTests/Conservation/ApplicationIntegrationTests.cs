@@ -2290,6 +2290,61 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         );
     }
 
+    [TestMethod]
+    public async Task OnApplicationStatusChanged_ApplicationApproved_ShouldSendEmail()
+    {
+        // Arrange
+        var orgAdmin = new UserFaker().Generate();
+        await _dbContext.Users.AddAsync(orgAdmin);
+        await _dbContext.SaveChangesAsync();
+
+        var submission = SetupApplicationSubmission();
+
+        orgAdmin.UserOrganizations =
+        [
+            new UserOrganizationFaker(orgAdmin, submission.WaterConservationApplication.FundingOrganization)
+                .RuleFor(uo => uo.UserOrganizationRoles, _ => new List<UserOrganizationRole>
+                {
+                    new()
+                    {
+                        Role = Roles.OrganizationAdmin,
+                    }
+                }).Generate()
+        ];
+
+        submission.AcceptedDate = DateTimeOffset.UtcNow;
+        submission.ApprovedByUserId = orgAdmin.Id;
+
+        await _dbContext.SaveChangesAsync();
+
+        UseSystemContext();
+
+        // Act
+        var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
+            new CLI.Requests.Conservation.WaterConservationApplicationApprovedEvent
+            {
+                ApplicationId = submission.WaterConservationApplication.Id,
+            });
+
+        // Assert
+        result.Error.Should().BeNull();
+
+        var expectedSubject = "Water Conservation Application Approved";
+        var expectedUrlSlug = $"{submission.WaterConservationApplication.Id}/submit"; // Link to final submit page
+
+        EmailNotificationSdkMock.Verify(
+            mock => mock.SendEmail(
+                It.Is<EmailRequest>(req =>
+                    req.To.Single() == submission.WaterConservationApplication.ApplicantUser.Email &&
+                    req.Subject == expectedSubject &&
+                    req.Body.Contains("application has been approved.") &&
+                    req.Body.Contains(expectedUrlSlug)
+                )
+            ),
+            Times.Once
+        );
+    }
+
     private WaterConservationApplicationSubmission SetupApplicationSubmission()
     {
         var applicant = new UserFaker().Generate();

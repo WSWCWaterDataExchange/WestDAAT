@@ -190,6 +190,7 @@ internal class ValidationEngine : IValidationEngine
         {
             WaterConservationApplicationSubmittedEvent => null,
             WaterConservationApplicationRecommendedEvent => null,
+            WaterConservationApplicationApprovedEvent => null,
             _ => throw new NotImplementedException(
                 $"Validation for event type '{request.GetType().Name}' is not implemented."
             )
@@ -285,7 +286,8 @@ internal class ValidationEngine : IValidationEngine
         // control location must not intersect with any polygons
         // polygons must not intersect with each other
         var controlLocationGeometry = GeometryHelpers.GetGeometryByWkt(request.ControlLocation.PointWkt) as NetTopologySuite.Geometries.Point;
-        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon).ToArray();
+        var polygonGeometries = request.Polygons.Select((polygonDetails) => GeometryHelpers.GetGeometryByWkt(polygonDetails.PolygonWkt) as NetTopologySuite.Geometries.Polygon)
+            .ToArray();
 
         for (int i = 0; i < polygonGeometries.Length; i++)
         {
@@ -432,7 +434,7 @@ internal class ValidationEngine : IValidationEngine
             HasSubmission = true,
             ApplicationId = request.WaterConservationApplicationId
         };
-        
+
         var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
 
         if (!submittedApplicationExistsResponse.ApplicationExists)
@@ -461,7 +463,7 @@ internal class ValidationEngine : IValidationEngine
 
         return null;
     }
-    
+
     private ErrorBase ValidateOrganizationLoadRequest(OrganizationLoadRequestBase request, ContextBase context)
     {
         return request switch
