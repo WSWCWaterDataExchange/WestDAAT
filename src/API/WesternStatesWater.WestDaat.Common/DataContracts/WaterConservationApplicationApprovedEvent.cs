@@ -1,0 +1,5 @@
+namespace WesternStatesWater.WestDaat.Common.DataContracts;
+
+public class WaterConservationApplicationApprovedEvent : WaterConservationApplicationStatusChangedEventBase
+{
+}
