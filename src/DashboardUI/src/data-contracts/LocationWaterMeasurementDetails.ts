@@ -1,4 +1,4 @@
-export interface ConsumptiveUseDetails {
+export interface LocationWaterMeasurementDetails {
   id: string;
   year: number;
   totalEtInInches: number;

@@ -15,6 +15,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
     compensationRateUnits: CompensationRateUnits.AcreFeet,
     estimatedCompensationDollars: 200,
     cumulativeTotalEtInAcreFeet: 300,
+    cumulativeNetEtInAcreFeet: 250,
     locations: [
       {
         id: 'location-guid',
@@ -22,7 +23,7 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
         drawToolType: DrawToolType.Rectangle,
         polygonAreaInAcres: 1,
         additionalDetails: 'I, the user, have some things to say about this field.',
-        consumptiveUses: [
+        waterMeasurements: [
           {
             id: 'consumptive-use-guid',
             year: 2025,
@@ -33,6 +34,17 @@ export const applicationDetailsMock = (): ApplicationDetails => ({
         ],
       },
     ],
+    controlLocation: {
+      id: 'control-location-guid',
+      pointWkt: 'POINT(0 0)',
+      waterMeasurements: [
+        {
+          id: 'control-location-water-measurement-guid',
+          year: 2025,
+          totalEtInInches: 1,
+        },
+      ],
+    },
   },
   submission: {
     id: 'submission-guid',

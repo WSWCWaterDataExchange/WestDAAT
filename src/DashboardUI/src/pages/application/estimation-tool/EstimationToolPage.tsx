@@ -64,7 +64,7 @@ export function EstimationToolPage() {
     onSuccess: (result: ApplicantEstimateConsumptiveUseResponse) => {
       if (result) {
         dispatch({
-          type: 'CONSUMPTIVE_USE_ESTIMATED',
+          type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
           payload: {
             cumulativeTotalEtInAcreFeet: result.cumulativeTotalEtInAcreFeet,
             conservationPayment: result.conservationPayment,

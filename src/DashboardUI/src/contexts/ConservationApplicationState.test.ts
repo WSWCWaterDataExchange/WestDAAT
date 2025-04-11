@@ -252,7 +252,7 @@ describe('ConservationApplicationState reducer', () => {
 
     // Act
     newState = reducer(newState, {
-      type: 'CONSUMPTIVE_USE_ESTIMATED',
+      type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
       payload: {
         cumulativeTotalEtInAcreFeet: 100,
         conservationPayment: 200,
@@ -613,7 +613,7 @@ describe('ConservationApplicationState reducer', () => {
       });
 
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
           cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,
@@ -677,11 +677,12 @@ describe('ConservationApplicationState reducer', () => {
       // Assert
       const application = newState.conservationApplication;
 
-      // application / application estimate
+      // application
       expect(application.waterConservationApplicationId).toEqual(applicationDetails.id);
       expect(application.waterRightNativeId).toEqual(applicationDetails.waterRightNativeId);
       expect(application.fundingOrganizationId).toEqual(applicationDetails.fundingOrganizationId);
 
+      // application estimate
       expect(application.desiredCompensationDollars).toEqual(applicationDetails.estimate.compensationRateDollars);
       expect(application.desiredCompensationUnits).toEqual(applicationDetails.estimate.compensationRateUnits);
       expect(application.cumulativeTotalEtInAcreFeet).toEqual(applicationDetails.estimate.cumulativeTotalEtInAcreFeet);
@@ -698,12 +699,29 @@ describe('ConservationApplicationState reducer', () => {
       expect(location.fieldName).toEqual('Field 1');
       expect(location.additionalDetails).toEqual(expectedLocation.additionalDetails);
 
-      // application estimate location consumptive uses
+      // application estimate location water measurements
       const consumptiveUse = location.datapoints![0];
-      const expectedConsumptiveUse = expectedLocation.consumptiveUses[0];
-      expect(location.datapoints!.length).toEqual(expectedLocation.consumptiveUses.length);
+      const expectedConsumptiveUse = expectedLocation.waterMeasurements[0];
+      expect(location.datapoints!.length).toEqual(expectedLocation.waterMeasurements.length);
       expect(consumptiveUse.year).toEqual(expectedConsumptiveUse.year);
       expect(consumptiveUse.totalEtInInches).toEqual(expectedConsumptiveUse.totalEtInInches);
+
+      // application estimate control location
+      const controlLocation = application.controlLocation!;
+      const expectedControlLocation = applicationDetails.estimate.controlLocation;
+      expect(controlLocation.waterConservationApplicationEstimateControlLocationId).toBe(expectedControlLocation.id);
+      expect(controlLocation.pointWkt).toEqual(expectedControlLocation.pointWkt);
+      expect(controlLocation.datapoints!.length).toBe(expectedControlLocation.waterMeasurements.length);
+
+      // application estimate control location water measurements
+      const controlLocationWaterMeasurement = controlLocation.datapoints![0];
+      const expectedControlLocationWaterMeasurement = expectedControlLocation.waterMeasurements[0];
+      expect(controlLocationWaterMeasurement.year).toEqual(expectedControlLocationWaterMeasurement.year);
+      expect(controlLocationWaterMeasurement.totalEtInInches).toEqual(
+        expectedControlLocationWaterMeasurement.totalEtInInches,
+      );
+      expect(controlLocationWaterMeasurement.effectivePrecipitationInInches).toEqual(null);
+      expect(controlLocationWaterMeasurement.netEtInInches).toEqual(null);
 
       // application supporting documents
       const document = application.supportingDocuments[0];
@@ -787,7 +805,7 @@ describe('ConservationApplicationState reducer', () => {
 
       // user then requests an estimate for said polygons
       newState = reducer(newState, {
-        type: 'CONSUMPTIVE_USE_ESTIMATED',
+        type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED',
         payload: {
           cumulativeTotalEtInAcreFeet: 100,
           conservationPayment: 200,

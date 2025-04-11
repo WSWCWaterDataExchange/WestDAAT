@@ -17,6 +17,8 @@ import { ApplicationDocument } from '../data-contracts/ApplicationDocuments';
 import { MapSelectionPolygonData, PartialPolygonData } from '../data-contracts/CombinedPolygonData';
 import { ApplicationDetails } from '../data-contracts/ApplicationDetails';
 import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
+import { PartialPointData } from '../data-contracts/CombinedPointData';
+import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
 
 export interface ConservationApplicationState {
@@ -35,10 +37,13 @@ export interface ConservationApplicationState {
     desiredCompensationDollars: number | undefined;
     desiredCompensationUnits: Exclude<CompensationRateUnits, CompensationRateUnits.None> | undefined;
     cumulativeTotalEtInAcreFeet: number | undefined;
+    cumulativeNetEtInAcreFeet: number | undefined;
     conservationPayment: number | undefined;
     applicationSubmissionForm: ApplicationSubmissionFormData;
     estimateLocations: PartialPolygonData[];
+    controlLocation: PartialPointData | undefined;
     doPolygonsOverlap: boolean;
+    doesControlLocationOverlapWithPolygons: boolean;
     // derived/computed state
     isApplicationSubmissionFormValid: boolean;
     polygonAcreageSum: number;
@@ -80,10 +85,13 @@ export const defaultState = (): ConservationApplicationState => ({
     desiredCompensationDollars: undefined,
     desiredCompensationUnits: undefined,
     cumulativeTotalEtInAcreFeet: undefined,
+    cumulativeNetEtInAcreFeet: undefined,
     conservationPayment: undefined,
     applicationSubmissionForm: defaultApplicationSubmissionFormData(),
     estimateLocations: [],
+    controlLocation: undefined,
     doPolygonsOverlap: false,
+    doesControlLocationOverlapWithPolygons: false,
     isApplicationSubmissionFormValid: false,
     polygonAcreageSum: 0,
     supportingDocuments: [],
@@ -113,7 +121,7 @@ export type ApplicationAction =
   | MapPolygonsUpdatedAction
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
-  | ConsumptiveUseEstimatedAction
+  | ApplicantConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -189,8 +197,8 @@ export interface ApplicationCreatedAction {
   };
 }
 
-export interface ConsumptiveUseEstimatedAction {
-  type: 'CONSUMPTIVE_USE_ESTIMATED';
+export interface ApplicantConsumptiveUseEstimatedAction {
+  type: 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED';
   payload: {
     cumulativeTotalEtInAcreFeet: number;
     conservationPayment: number | undefined;
@@ -290,8 +298,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onMapPolygonsUpdated(draftState, action);
     case 'ESTIMATION_FORM_UPDATED':
       return onEstimationFormUpdated(draftState, action);
-    case 'CONSUMPTIVE_USE_ESTIMATED':
-      return onConsumptiveUseEstimated(draftState, action);
+    case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
+      return onApplicantConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -449,9 +457,9 @@ const onEstimationFormUpdated = (
   return draftState;
 };
 
-const onConsumptiveUseEstimated = (
+const onApplicantConsumptiveUseEstimated = (
   draftState: ConservationApplicationState,
-  { payload }: ConsumptiveUseEstimatedAction,
+  { payload }: ApplicantConsumptiveUseEstimatedAction,
 ): ConservationApplicationState => {
   const application = draftState.conservationApplication;
 
@@ -557,6 +565,7 @@ const onApplicationLoaded = (
   draftApplication.desiredCompensationDollars = application.estimate.compensationRateDollars;
   draftApplication.desiredCompensationUnits = application.estimate.compensationRateUnits;
   draftApplication.cumulativeTotalEtInAcreFeet = application.estimate.cumulativeTotalEtInAcreFeet;
+  draftApplication.cumulativeNetEtInAcreFeet = application.estimate.cumulativeNetEtInAcreFeet ?? undefined;
   draftApplication.conservationPayment = application.estimate.estimatedCompensationDollars;
   draftApplication.applicationSubmissionForm = {
     ...application.submission,
@@ -587,7 +596,7 @@ const onApplicationLoaded = (
       acreage: location.polygonAreaInAcres,
       additionalDetails: location.additionalDetails ?? '',
       fieldName: `Field ${index + 1}`,
-      datapoints: location.consumptiveUses,
+      datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
       averageYearlyEtInAcreFeet: undefined,
@@ -595,6 +604,24 @@ const onApplicationLoaded = (
     }),
   );
   draftApplication.doPolygonsOverlap = false;
+
+  const controlLocation = application.estimate.controlLocation;
+  if (controlLocation) {
+    draftApplication.controlLocation = {
+      waterConservationApplicationEstimateControlLocationId: controlLocation.id,
+      pointWkt: controlLocation.pointWkt,
+      datapoints: application.estimate.controlLocation.waterMeasurements.map(
+        (measurement): GeometryEtDatapoint => ({
+          year: measurement.year,
+          totalEtInInches: measurement.totalEtInInches,
+          effectivePrecipitationInInches: null,
+          netEtInInches: null,
+        }),
+      ),
+    };
+  }
+  draftApplication.doesControlLocationOverlapWithPolygons = false;
+
   draftApplication.polygonAcreageSum = application.estimate.locations.reduce(
     (sum, location) => sum + location.polygonAreaInAcres,
     0,
@@ -667,6 +694,7 @@ const checkCanContinueToApplication = (draftState: ConservationApplicationState)
 
 const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState): void => {
   draftState.conservationApplication.cumulativeTotalEtInAcreFeet = undefined;
+  draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
   // this `reset` method is activated when the user:
