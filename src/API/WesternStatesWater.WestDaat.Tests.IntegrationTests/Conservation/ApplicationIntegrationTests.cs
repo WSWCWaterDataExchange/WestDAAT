@@ -142,9 +142,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .RuleFor(est => est.CompensationRateDollars, _ => 2000)
             .Generate();
 
-        var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
+        var approvedApp = new WaterConservationApplicationSubmissionFaker(appOne)
             .RuleFor(app => app.ApprovedDate, _ => DateTimeOffset.Now).Generate();
-        var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
+        var deniedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
             .RuleFor(app => app.DeniedDate, _ => DateTimeOffset.Now).Generate();
         var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour).Generate();
 
@@ -152,10 +152,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         await _dbContext.Users.AddRangeAsync(userOne, userTwo, userThree);
         await _dbContext.WaterConservationApplications.AddRangeAsync(appOne, appTwo, appThree, appFour);
         await _dbContext.WaterConservationApplicationEstimates.AddRangeAsync(acceptedEstimate, rejectedEstimate, inReviewEstimate);
-        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(acceptedApp, rejectedApp, inReviewApp);
+        await _dbContext.WaterConservationApplicationSubmissions.AddRangeAsync(approvedApp, deniedApp, inReviewApp);
         await _dbContext.SaveChangesAsync();
 
-        var acceptedAppResponse = new ApplicationDashboardListItem
+        var approvedAppResponse = new ApplicationDashboardListItem
         {
             ApplicationId = appOne.Id,
             ApplicationDisplayId = appOne.ApplicationDisplayId,
@@ -164,14 +164,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateUnits = acceptedEstimate.CompensationRateUnits,
             OrganizationName = orgOne.Name,
             Status = ConservationApplicationStatus.Approved,
-            SubmittedDate = acceptedApp.SubmittedDate,
+            SubmittedDate = approvedApp.SubmittedDate,
             WaterRightNativeId = appOne.WaterRightNativeId,
-            WaterRightState = acceptedApp.WaterRightState,
+            WaterRightState = approvedApp.WaterRightState,
             TotalObligationDollars = acceptedEstimate.EstimatedCompensationDollars,
             TotalWaterVolumeSavingsAcreFeet = acceptedEstimate.CumulativeTotalEtInAcreFeet
         };
 
-        var rejectedAppResponse = new ApplicationDashboardListItem
+        var deniedAppResponse = new ApplicationDashboardListItem
         {
             ApplicationId = appTwo.Id,
             ApplicationDisplayId = appTwo.ApplicationDisplayId,
@@ -180,9 +180,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             CompensationRateUnits = rejectedEstimate.CompensationRateUnits,
             OrganizationName = orgTwo.Name,
             Status = ConservationApplicationStatus.Denied,
-            SubmittedDate = rejectedApp.SubmittedDate,
+            SubmittedDate = deniedApp.SubmittedDate,
             WaterRightNativeId = appTwo.WaterRightNativeId,
-            WaterRightState = rejectedApp.WaterRightState,
+            WaterRightState = deniedApp.WaterRightState,
             TotalObligationDollars = rejectedEstimate.EstimatedCompensationDollars,
             TotalWaterVolumeSavingsAcreFeet = rejectedEstimate.CumulativeTotalEtInAcreFeet
         };
@@ -231,11 +231,11 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Assert
         response.Error.Should().BeNull();
 
-        var expectedApplications = new List<ApplicationDashboardListItem> { acceptedAppResponse, inReviewAppResponse };
+        var expectedApplications = new List<ApplicationDashboardListItem> { approvedAppResponse, inReviewAppResponse };
 
         if (isGlobalUser)
         {
-            expectedApplications = expectedApplications.Append(rejectedAppResponse).ToList();
+            expectedApplications = expectedApplications.Append(deniedAppResponse).ToList();
         }
 
         response.Should().BeEquivalentTo(new OrganizationApplicationDashboardLoadResponse
@@ -1869,10 +1869,10 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
     
     [DataTestMethod]
-    [DataRow(ConservationApplicationStatus.Unknown, DisplayName = "An application with an Unknown (invalid) status cannot be Accepted or Rejected")]
-    [DataRow(ConservationApplicationStatus.InTechnicalReview, DisplayName = "An application that hasn't received a Recommendation yet cannot be Accepted or Rejected")]
-    [DataRow(ConservationApplicationStatus.Approved, DisplayName = "An application that has already been Accepted cannot be Accepted or Rejected")]
-    [DataRow(ConservationApplicationStatus.Denied, DisplayName = "An application that has already been Rejected cannot be Accepted or Rejected")]
+    [DataRow(ConservationApplicationStatus.Unknown, DisplayName = "An application with an Unknown (invalid) status cannot be Approved or Denied")]
+    [DataRow(ConservationApplicationStatus.InTechnicalReview, DisplayName = "An application that hasn't received a Recommendation yet cannot be Approved or Denied")]
+    [DataRow(ConservationApplicationStatus.Approved, DisplayName = "An application that has already been Approved cannot be Approved or Denied")]
+    [DataRow(ConservationApplicationStatus.Denied, DisplayName = "An application that has already been Denied cannot be Approved or Denied")]
     public async Task Store_SubmitApplicationApproval_InvalidApplicationStatus_ShouldThrow(ConservationApplicationStatus status)
     {
         // Arrange
