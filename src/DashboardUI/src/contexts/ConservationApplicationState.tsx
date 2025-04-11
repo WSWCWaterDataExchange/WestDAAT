@@ -510,7 +510,16 @@ const onReviewerMapPolygonsUpdated = (
     const controlLocationUpdated = existingControlLocationWkt !== newControlLocationWkt;
 
     if (controlLocationUpdated) {
-      draftState.conservationApplication.controlLocation = payload.controlLocation;
+      draftState.conservationApplication.controlLocation = {
+        // new data
+        pointWkt: payload.controlLocation?.pointWkt,
+        // preserve id if we have it
+        waterConservationApplicationEstimateControlLocationId:
+          draftState.conservationApplication.controlLocation?.waterConservationApplicationEstimateControlLocationId,
+        // unavoidable data loss
+        averageYearlyTotalEtInInches: undefined,
+        datapoints: [],
+      };
       draftState.conservationApplication.doesControlLocationOverlapWithPolygons =
         payload.doesControlLocationOverlapWithPolygons ?? false;
     }
@@ -786,16 +795,25 @@ const checkCanApplicantEstimateConsumptiveUse = (draftState: ConservationApplica
 };
 
 const checkCanReviewerEstimateConsumptiveUse = (draftState: ConservationApplicationState): void => {
-  checkCanApplicantEstimateConsumptiveUse(draftState);
-
-  // if an applicant could not, then neither can a reviewer
-  if (!draftState.canEstimateConsumptiveUse) {
-    return;
-  }
-
-  // these rules only apply to reviewers:
   const app = draftState.conservationApplication;
-  draftState.canEstimateConsumptiveUse = !!app.controlLocation && !app.doesControlLocationOverlapWithPolygons;
+
+  // a few differences between applicant and reviewer estimates:
+  // * reviewers do not need sidebar inputs (dollars, units)
+  // * reviewers must have a control location
+
+  // and then this isn't really a business requirement, but we can skip checking:
+  // * water right native id
+  // * funding org details (OpenET model name, date range start/end, compensation rate model)
+  // --- because these are already set in the application
+  draftState.canEstimateConsumptiveUse =
+    !!app.waterConservationApplicationId &&
+    !!app.estimateLocations &&
+    app.estimateLocations.length > 0 &&
+    app.estimateLocations.length <= 20 &&
+    app.estimateLocations.every((p) => p.acreage! <= 50000) &&
+    !app.doPolygonsOverlap &&
+    !!app.controlLocation &&
+    !app.doesControlLocationOverlapWithPolygons;
 };
 
 const checkCanContinueToApplication = (draftState: ConservationApplicationState): void => {
