@@ -20,6 +20,7 @@ import { ApplicationReviewNote } from '../data-contracts/ApplicationReviewNote';
 import { MapSelectionPointData, PartialPointData } from '../data-contracts/CombinedPointData';
 import { GeometryEtDatapoint } from '../data-contracts/GeometryEtDatapoint';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
+import { PointEtDataCollection } from '../data-contracts/PointEtDataCollection';
 
 export interface ConservationApplicationState {
   dashboardApplications: ApplicationDashboardListItem[];
@@ -123,7 +124,7 @@ export type ApplicationAction =
   | EstimationFormUpdatedAction
   | ApplicationCreatedAction
   | ApplicantConsumptiveUseEstimatedAction
-  // | ReviewerConsumptiveUseEstimatedAction
+  | ReviewerConsumptiveUseEstimatedAction
   | ApplicationSubmissionFormUpdatedAction
   | ApplicationDocumentUpdatedAction
   | ApplicationDocumentUploadingAction
@@ -218,16 +219,16 @@ export interface ApplicantConsumptiveUseEstimatedAction {
   };
 }
 
-// export interface ReviewerConsumptiveUseEstimatedAction {
-//   type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED';
-//   payload: {
-//     cumulativeTotalEtInAcreFeet: number;
-//     cumulativeNetEtInAcreFeet: number;
-//     conservationPayment: number;
-//     dataCollections: PolygonEtDataCollection[];
-//     controlDataCollection: PointEtDataCollection;
-//   };
-// }
+export interface ReviewerConsumptiveUseEstimatedAction {
+  type: 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED';
+  payload: {
+    cumulativeTotalEtInAcreFeet: number;
+    cumulativeNetEtInAcreFeet: number;
+    conservationPayment: number;
+    dataCollections: PolygonEtDataCollection[];
+    controlDataCollection: PointEtDataCollection;
+  };
+}
 
 export interface ApplicationSubmissionFormUpdatedAction {
   type: 'APPLICATION_SUBMISSION_FORM_UPDATED';
@@ -325,8 +326,8 @@ const reduce = (draftState: ConservationApplicationState, action: ApplicationAct
       return onEstimationFormUpdated(draftState, action);
     case 'APPLICANT_CONSUMPTIVE_USE_ESTIMATED':
       return onApplicantConsumptiveUseEstimated(draftState, action);
-    // case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED':
-    //   return onReviewerConsumptiveUseEstimated(draftState, action);
+    case 'REVIEWER_CONSUMPTIVE_USE_ESTIMATED':
+      return onReviewerConsumptiveUseEstimated(draftState, action);
     case 'APPLICATION_SUBMISSION_FORM_UPDATED':
       return onApplicationFormUpdated(draftState, action);
     case 'APPLICATION_DOCUMENT_UPDATED':
@@ -555,8 +556,8 @@ const onApplicantConsumptiveUseEstimated = (
     polygon.fieldName = `Field ${i + 1}`;
     polygon.waterConservationApplicationEstimateLocationId =
       matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
-    polygon.averageYearlyEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
-    polygon.averageYearlyEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
   }
 
@@ -566,18 +567,36 @@ const onApplicantConsumptiveUseEstimated = (
   return draftState;
 };
 
-// const onReviewerConsumptiveUseEstimated = (
-//   draftState: ConservationApplicationState,
-//   { payload }: ReviewerConsumptiveUseEstimatedAction,
-// ): ConservationApplicationState => {
-//   const application = draftState.conservationApplication;
+const onReviewerConsumptiveUseEstimated = (
+  draftState: ConservationApplicationState,
+  { payload }: ReviewerConsumptiveUseEstimatedAction,
+): ConservationApplicationState => {
+  const application = draftState.conservationApplication;
 
-//   application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
-//   application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
-//   application.conservationPayment = payload.conservationPayment;
+  application.cumulativeTotalEtInAcreFeet = payload.cumulativeTotalEtInAcreFeet;
+  application.cumulativeNetEtInAcreFeet = payload.cumulativeNetEtInAcreFeet;
+  application.conservationPayment = payload.conservationPayment;
 
-//   // combine polygon data
-// };
+  // combine polygon data
+  for (let i = 0; i < application.estimateLocations.length; i++) {
+    const polygon = application.estimateLocations[i];
+    const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
+
+    // leave field name as-is
+    // associate the polygon with its db entry
+    polygon.waterConservationApplicationEstimateLocationId =
+      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
+    polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
+    polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
+    polygon.averageYearlyNetEtInInches = matchingConsumptiveUseData.averageYearlyNetEtInInches;
+    polygon.averageYearlyNetEtInAcreFeet = matchingConsumptiveUseData.averageYearlyNetEtInAcreFeet;
+    polygon.datapoints = matchingConsumptiveUseData.datapoints;
+  }
+
+  computeCombinedPolygonData(draftState);
+
+  return draftState;
+};
 
 const onApplicationFormUpdated = (
   draftState: ConservationApplicationState,
@@ -693,8 +712,8 @@ const onApplicationLoaded = (
       datapoints: location.waterMeasurements,
       centerPoint: truncate(center(convertWktToGeometry(location.polygonWkt))).geometry,
       // this info is not stored in the db, so it cannot be hydrated into state. it comes from the ET data
-      averageYearlyEtInAcreFeet: undefined,
-      averageYearlyEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyTotalEtInInches: undefined,
     }),
   );
   draftApplication.doPolygonsOverlap = false;
@@ -860,8 +879,8 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
       polygonWkt: polygon.polygonWkt,
       drawToolType: polygon.drawToolType,
       acreage: polygon.acreage,
-      averageYearlyEtInInches: polygon.averageYearlyEtInInches,
-      averageYearlyEtInAcreFeet: polygon.averageYearlyEtInAcreFeet,
+      averageYearlyTotalEtInInches: polygon.averageYearlyTotalEtInInches,
+      averageYearlyTotalEtInAcreFeet: polygon.averageYearlyTotalEtInAcreFeet,
       fieldName: polygon.fieldName,
       datapoints: polygon.datapoints,
     };
