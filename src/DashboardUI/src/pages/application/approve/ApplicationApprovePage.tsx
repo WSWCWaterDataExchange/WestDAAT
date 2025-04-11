@@ -123,7 +123,7 @@ export function ApplicationApprovePage() {
               <ApplicationFormSectionRule width={1} />
               <ApplicationApproveButtonRow
                 isHidden={!canApproveApplication || isApplicationFinalized}
-                disableButtons={isPageLoading || isModalOpen}
+                disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
                 handleAcceptClicked={handleAcceptClicked}
                 handleDenyClicked={handleDenyClicked}
               />
