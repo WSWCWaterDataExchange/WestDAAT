@@ -36,7 +36,7 @@ export function ApplicationReviewButtonRow(props: ApplicationReviewButtonRowProp
           onClick={handleSubmitForFinalReviewClicked}
           disabled={isFormSubmitting || state.isUploadingDocument}
         >
-          Submit for Final Review
+          Submit Recommendation
         </Button>
       </div>
     </div>

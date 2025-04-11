@@ -2332,6 +2332,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var expectedSubject = "Water Conservation Application Approved";
         var expectedUrlSlug = $"{submission.WaterConservationApplication.Id}/submit"; // Link to final submit page
 
+        EmailNotificationSdkMock.Verify(mock => mock.SendEmail(It.IsAny<EmailRequest>()), Times.Once);
         EmailNotificationSdkMock.Verify(
             mock => mock.SendEmail(
                 It.Is<EmailRequest>(req =>
