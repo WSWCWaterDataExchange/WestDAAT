@@ -591,15 +591,10 @@ const onReviewerConsumptiveUseEstimated = (
     const polygon = application.estimateLocations[i];
     const matchingConsumptiveUseData = payload.dataCollections.find((data) => data.polygonWkt === polygon.polygonWkt)!;
 
-    // leave field name as-is
-    // associate the polygon with its db entry
-    polygon.waterConservationApplicationEstimateLocationId =
-      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
-    polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
-    polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
-    polygon.averageYearlyNetEtInInches = matchingConsumptiveUseData.averageYearlyNetEtInInches;
-    polygon.averageYearlyNetEtInAcreFeet = matchingConsumptiveUseData.averageYearlyNetEtInAcreFeet;
-    polygon.datapoints = matchingConsumptiveUseData.datapoints;
+    application.estimateLocations[i] = {
+      ...application.estimateLocations[i],
+      ...matchingConsumptiveUseData,
+    };
   }
 
   computeCombinedPolygonData(draftState);
@@ -878,14 +873,16 @@ const computeCombinedPolygonData = (draftState: ConservationApplicationState): v
     const centerPoint = truncate(center(convertWktToGeometry(polygon.polygonWkt!))).geometry;
 
     // find the additional details for this polygon, which are provided by the user on the Application Create form
-    let additionalDetailsTrackedFormValue = undefined;
-    if (polygon.waterConservationApplicationEstimateLocationId) {
-      additionalDetailsTrackedFormValue =
-        draftState.conservationApplication.applicationSubmissionForm.fieldDetails.find(
-          (fieldDetail) =>
-            fieldDetail.waterConservationApplicationEstimateLocationId ===
-            polygon.waterConservationApplicationEstimateLocationId,
-        )?.additionalDetails ?? '';
+    let additionalDetailsTrackedFormValue = polygon.additionalDetails;
+    if (!polygon.additionalDetails) {
+      if (polygon.waterConservationApplicationEstimateLocationId) {
+        additionalDetailsTrackedFormValue =
+          draftState.conservationApplication.applicationSubmissionForm.fieldDetails.find(
+            (fieldDetail) =>
+              fieldDetail.waterConservationApplicationEstimateLocationId ===
+              polygon.waterConservationApplicationEstimateLocationId,
+          )?.additionalDetails ?? '';
+      }
     }
 
     draftState.conservationApplication.estimateLocations[i] = {
