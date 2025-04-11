@@ -143,9 +143,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .Generate();
 
         var acceptedApp = new WaterConservationApplicationSubmissionFaker(appOne)
-            .RuleFor(app => app.AcceptedDate, _ => DateTimeOffset.Now).Generate();
+            .RuleFor(app => app.ApprovedDate, _ => DateTimeOffset.Now).Generate();
         var rejectedApp = new WaterConservationApplicationSubmissionFaker(appTwo)
-            .RuleFor(app => app.RejectedDate, _ => DateTimeOffset.Now).Generate();
+            .RuleFor(app => app.DeniedDate, _ => DateTimeOffset.Now).Generate();
         var inReviewApp = new WaterConservationApplicationSubmissionFaker(appFour).Generate();
 
         await _dbContext.Organizations.AddRangeAsync(orgOne, orgTwo, orgThree);
@@ -272,14 +272,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .RuleFor(sub => sub.RecommendedByUser, _ => admin)
             .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
             .RuleFor(sub => sub.ApprovedByUser, _ => admin)
-            .RuleFor(sub => sub.AcceptedDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.ApprovedDate, _ => DateTimeOffset.UtcNow)
             .Generate();
 
         var rejectedSubmission = new WaterConservationApplicationSubmissionFaker(rejectedApplication)
             .RuleFor(sub => sub.RecommendedByUser, _ => admin)
             .RuleFor(sub => sub.RecommendedForDate, _ => DateTimeOffset.UtcNow)
             .RuleFor(sub => sub.ApprovedByUser, _ => admin)
-            .RuleFor(sub => sub.RejectedDate, _ => DateTimeOffset.UtcNow)
+            .RuleFor(sub => sub.DeniedDate, _ => DateTimeOffset.UtcNow)
             .Generate();
 
         _dbContext.Organizations.Add(organization);
@@ -514,7 +514,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         submission.RecommendedByUser = recommender;
         submission.RecommendedForDate = DateTimeOffset.UtcNow;
         submission.ApprovedByUser = approver;
-        submission.AcceptedDate = DateTimeOffset.UtcNow;
+        submission.ApprovedDate = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync();
 
@@ -541,7 +541,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         approvalStep.ReviewStepType.Should().Be(ReviewStepType.Approval);
         approvalStep.ReviewStepStatus.Should().Be(ReviewStepStatus.Approved);
         approvalStep.ParticipantName.Should().Be($"{approver.UserProfile.FirstName} {approver.UserProfile.LastName}");
-        approvalStep.ReviewDate.Should().Be(submission.AcceptedDate);
+        approvalStep.ReviewDate.Should().Be(submission.ApprovedDate);
     }
 
     [DataTestMethod]
@@ -1507,7 +1507,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             await _dbContext.WaterConservationApplicationDocuments.AddRangeAsync(documents);
 
             var submission = new WaterConservationApplicationSubmissionFaker(application)
-                .RuleFor(sub => sub.AcceptedDate, () => applicationIsInReview ? null : DateTimeOffset.UtcNow)
+                .RuleFor(sub => sub.ApprovedDate, () => applicationIsInReview ? null : DateTimeOffset.UtcNow)
                 .Generate();
             await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
         }
@@ -1822,8 +1822,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             .SingleOrDefaultAsync();
         applicationInDb.Submission!.RecommendedForDate.Should().Be(submission.RecommendedForDate);
         applicationInDb.Submission!.RecommendedByUserId.Should().Be(submission.RecommendedByUserId);
-        applicationInDb.Submission!.AcceptedDate.Should().BeNull();
-        applicationInDb.Submission!.RejectedDate.Should().BeNull();
+        applicationInDb.Submission!.ApprovedDate.Should().BeNull();
+        applicationInDb.Submission!.DeniedDate.Should().BeNull();
         applicationInDb.Submission!.ApprovedByUserId.Should().BeNull();
         applicationInDb.Submission!.SubmissionNotes.Should().HaveCount(0);
     }
@@ -1895,24 +1895,24 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             case ConservationApplicationStatus.InTechnicalReview:
                 submission.RecommendedForDate = null;
                 submission.RecommendedByUserId = null;
-                submission.AcceptedDate = null;
+                submission.ApprovedDate = null;
                 submission.ApprovedByUserId = null;
                 break;
             case ConservationApplicationStatus.Approved:
                 submission.RecommendedForDate = oldTimestamp;
                 submission.RecommendedByUserId = technicalReviewerId;
-                submission.AcceptedDate = oldTimestamp;
+                submission.ApprovedDate = oldTimestamp;
                 submission.ApprovedByUserId = approvalReviewerId;
                 break;
             case ConservationApplicationStatus.Denied:
                 submission.RecommendedForDate = oldTimestamp;
                 submission.RecommendedByUserId = technicalReviewerId;
-                submission.RejectedDate = oldTimestamp;
+                submission.DeniedDate = oldTimestamp;
                 submission.ApprovedByUserId = approvalReviewerId;
                 break;
             case ConservationApplicationStatus.Unknown:
-                submission.RejectedDate = oldTimestamp;
-                submission.AcceptedDate = oldTimestamp;
+                submission.DeniedDate = oldTimestamp;
+                submission.ApprovedDate = oldTimestamp;
                 submission.ApprovedByUserId = approvalReviewerId;
                 break;
         }
@@ -1957,8 +1957,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicationInDb.Submission!.RecommendedForDate.Should().Be(submission.RecommendedForDate);
         applicationInDb.Submission!.RecommendedAgainstDate.Should().Be(submission.RecommendedAgainstDate);
         applicationInDb.Submission!.RecommendedByUserId.Should().Be(submission.RecommendedByUserId);
-        applicationInDb.Submission!.AcceptedDate.Should().Be(submission.AcceptedDate);
-        applicationInDb.Submission!.RejectedDate.Should().Be(submission.RejectedDate);
+        applicationInDb.Submission!.ApprovedDate.Should().Be(submission.ApprovedDate);
+        applicationInDb.Submission!.DeniedDate.Should().Be(submission.DeniedDate);
         applicationInDb.Submission!.ApprovedByUserId.Should().Be(submission.ApprovedByUserId);
         applicationInDb.Submission!.SubmissionNotes.Should().HaveCount(0); 
     }
@@ -2030,13 +2030,13 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicationInDb.Submission!.ApprovedByUserId.Should().Be(approvalReviewer.Id);
         if (decision == ApprovalDecision.Approved)
         {
-            applicationInDb.Submission!.AcceptedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
-            applicationInDb.Submission!.RejectedDate.Should().Be(null);
+            applicationInDb.Submission!.ApprovedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
+            applicationInDb.Submission!.DeniedDate.Should().Be(null);
         }
         if (decision == ApprovalDecision.Denied)
         {
-            applicationInDb.Submission!.AcceptedDate.Should().Be(null);
-            applicationInDb.Submission!.RejectedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
+            applicationInDb.Submission!.ApprovedDate.Should().Be(null);
+            applicationInDb.Submission!.DeniedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
         }
         
         // application submission notes from the request should have been added
