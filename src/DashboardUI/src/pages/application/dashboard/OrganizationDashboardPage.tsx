@@ -267,8 +267,8 @@ export function OrganizationDashboardPage() {
         {dashboardTitle()}
         <div className="row my-4">
           {renderStatisticsCard('Submitted Applications', state.dashboardApplicationsStatistics.submittedApplications)}
-          {renderStatisticsCard('Approved Applications', state.dashboardApplicationsStatistics.acceptedApplications)}
-          {renderStatisticsCard('Denied Applications', state.dashboardApplicationsStatistics.rejectedApplications)}
+          {renderStatisticsCard('Approved Applications', state.dashboardApplicationsStatistics.approvedApplications)}
+          {renderStatisticsCard('Denied Applications', state.dashboardApplicationsStatistics.deniedApplications)}
           {renderStatisticsCard('Applications In Review', state.dashboardApplicationsStatistics.inReviewApplications)}
           {renderStatisticsCard(
             'Cumulative Est. Savings',

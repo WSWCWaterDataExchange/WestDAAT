@@ -72,8 +72,8 @@ describe('ConservationApplicationState reducer', () => {
     // Assert
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 4,
-      acceptedApplications: 2,
-      rejectedApplications: 1,
+      approvedApplications: 2,
+      deniedApplications: 1,
       inReviewApplications: 1,
       cumulativeEstimatedSavingsAcreFeet: 300,
       totalObligationDollars: 400,
@@ -94,8 +94,8 @@ describe('ConservationApplicationState reducer', () => {
     expect(newState.dashboardApplications).toEqual([]);
     expect(newState.dashboardApplicationsStatistics).toEqual({
       submittedApplications: 0,
-      acceptedApplications: 0,
-      rejectedApplications: 0,
+      approvedApplications: 0,
+      deniedApplications: 0,
       inReviewApplications: 0,
       cumulativeEstimatedSavingsAcreFeet: 0,
       totalObligationDollars: 0,

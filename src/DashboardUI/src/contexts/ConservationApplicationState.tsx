@@ -66,8 +66,8 @@ export const defaultState = (): ConservationApplicationState => ({
   dashboardApplications: [],
   dashboardApplicationsStatistics: {
     submittedApplications: null,
-    acceptedApplications: null,
-    rejectedApplications: null,
+    approvedApplications: null,
+    deniedApplications: null,
     inReviewApplications: null,
     cumulativeEstimatedSavingsAcreFeet: null,
     totalObligationDollars: null,
@@ -361,8 +361,8 @@ function calculateApplicationStatistics(applications: ApplicationDashboardListIt
 
   return {
     submittedApplications: submittedApps,
-    acceptedApplications: approvedApps,
-    rejectedApplications: rejectedApps,
+    approvedApplications: approvedApps,
+    deniedApplications: rejectedApps,
     inReviewApplications: inReviewApps,
     cumulativeEstimatedSavingsAcreFeet: waterSavings,
     totalObligationDollars: totalObligation,
