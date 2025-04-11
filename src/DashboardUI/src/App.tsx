@@ -146,7 +146,7 @@ function App({ msalInstance }: AppProps) {
           </QueryClientProvider>
         </AppProvider>
       </MsalProvider>
-      <ToastContainer containerId="app-toast-container" />
+      <ToastContainer />
     </>
   );
 }

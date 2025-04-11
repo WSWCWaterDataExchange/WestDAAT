@@ -68,11 +68,23 @@ export function ApplicationApprovePage() {
         approvalDecision: approval.decision,
         approvalNotes: approval.notes,
       });
+      return approval.decision;
     },
-    onSuccess: () => {
-      toast.success('Application approval decision submitted successfully.', {
+    onSuccess: (decision: ApprovalDecision) => {
+      let toastMessage = '';
+
+      if (decision === ApprovalDecision.Accepted) {
+        toastMessage = 'Application approved successfully.';
+      }
+
+      if (decision === ApprovalDecision.Rejected) {
+        toastMessage = 'Application denied successfully.';
+      }
+
+      toast.success(toastMessage, {
         autoClose: 1000,
       });
+
       setShowAcceptModal(false);
       setShowDenyModal(false);
       navigateBack();
