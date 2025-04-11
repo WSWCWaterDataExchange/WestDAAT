@@ -3,14 +3,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/esm/Form';
 import Modal from 'react-bootstrap/Modal';
 
-export interface ApplicationAcceptModalProps {
+export interface ApplicationApproveModalProps {
   show: boolean;
   onCancel: () => void;
-  onAccept: (notes: string) => void;
+  onApprove: (notes: string) => void;
   disableButtons: boolean;
 }
 
-export function ApplicationAcceptModal(props: ApplicationAcceptModalProps) {
+export function ApplicationApproveModal(props: ApplicationApproveModalProps) {
   const [approvalNotes, setApprovalNotes] = useState<string | undefined>(undefined);
 
   const handleCancelClicked = () => {
@@ -18,29 +18,29 @@ export function ApplicationAcceptModal(props: ApplicationAcceptModalProps) {
     setApprovalNotes(undefined);
   };
 
-  const handleAcceptClicked = () => {
+  const handleApproveClicked = () => {
     if (!approvalNotes || approvalNotes.trim().length === 0) {
       throw new Error('Application approval notes are required.');
     }
-    props.onAccept(approvalNotes);
+    props.onApprove(approvalNotes);
     setApprovalNotes(undefined);
   };
 
   return (
     <Modal show={props.show} centered>
       <Modal.Header closeButton onClick={props.onCancel}>
-        <Modal.Title>Accept this application?</Modal.Title>
+        <Modal.Title>Approve this application?</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want to accept this application? If so, leave a note for the applicant below, then, click
-        ACCEPT. The applicant will receive notice of your decision via email with any notes included below.
+        Are you sure you want to approve this application? If so, leave a note for the applicant below, then, click
+        APPROVE. The applicant will receive notice of your decision via email with any notes included below.
         <Form>
           <Form.Group>
             <Form.Control
               required
-              id="application-approval-accept-notes"
+              id="application-approval-notes"
               placeholder="Type a note for the applicant (required)"
-              aria-label="Application Acceptance Notes"
+              aria-label="Application Approval Notes"
               className="mt-3"
               as="textarea"
               type="text"
@@ -56,10 +56,10 @@ export function ApplicationAcceptModal(props: ApplicationAcceptModalProps) {
         </Button>
         <Button
           variant="primary"
-          onClick={handleAcceptClicked}
+          onClick={handleApproveClicked}
           disabled={!approvalNotes || approvalNotes?.trim().length === 0 || props.disableButtons}
         >
-          Accept
+          Approve
         </Button>
       </Modal.Footer>
     </Modal>

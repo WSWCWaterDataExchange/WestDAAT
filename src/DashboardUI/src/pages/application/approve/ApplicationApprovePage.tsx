@@ -13,7 +13,7 @@ import ApplicationReviewHeader from '../components/ApplicationReviewHeader';
 import ApplicationReviewPipelineSection from '../components/ApplicationReviewPipelineSection';
 import ApplicationReviewersNotesSection from '../components/ApplicationReviewersNotesSection';
 import ApplicationSubmissionFormDisplay from '../components/ApplicationSubmissionFormDisplay';
-import { ApplicationAcceptModal } from './ApplicationAcceptModal';
+import { ApplicationApproveModal } from './ApplicationApproveModal';
 import { ApplicationApproveButtonRow } from './ApplicationApproveButtonRow';
 import { ApplicationDenyModal } from './ApplicationDenyModal';
 import { submitApplicationApproval } from '../../../accessors/applicationAccessor';
@@ -39,21 +39,21 @@ export function ApplicationApprovePage() {
     state.conservationApplication.waterRightNativeId,
   );
 
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
 
   const isPageLoading = isApplicationLoading || isFundingOrganizationLoading;
-  const isModalOpen = showAcceptModal || showDenyModal;
+  const isModalOpen = showApproveModal || showDenyModal;
 
-  const handleAcceptClicked = () => {
-    setShowAcceptModal(true);
+  const handleApproveClicked = () => {
+    setShowApproveModal(true);
   };
 
   const handleDenyClicked = () => {
     setShowDenyModal(true);
   };
 
-  const handleApplicationAccepted = (approvalNotes: string) => {
+  const handleApplicationApproved = (approvalNotes: string) => {
     submitApplicationApprovalMutation.mutate({ decision: ApprovalDecision.Approved, notes: approvalNotes });
   };
 
@@ -85,12 +85,22 @@ export function ApplicationApprovePage() {
         autoClose: 1000,
       });
 
-      setShowAcceptModal(false);
+      setShowApproveModal(false);
       setShowDenyModal(false);
       navigateBack();
     },
-    onError: () => {
-      toast.error('Error submitting application approval decision.', {
+    onError: (decision: ApprovalDecision) => {
+      let toastMessage = '';
+
+      if (decision === ApprovalDecision.Approved) {
+        toastMessage = 'Error submitting application approval.';
+      }
+
+      if (decision === ApprovalDecision.Denied) {
+        toastMessage = 'Error submitting application denial.';
+      }
+
+      toast.error(toastMessage, {
         position: 'top-center',
         theme: 'colored',
         autoClose: 3000,
@@ -136,7 +146,7 @@ export function ApplicationApprovePage() {
               <ApplicationApproveButtonRow
                 isHidden={!canApproveApplication || isApplicationFinalized}
                 disableButtons={isPageLoading || isModalOpen || submitApplicationApprovalMutation.isLoading}
-                handleAcceptClicked={handleAcceptClicked}
+                handleApproveClicked={handleApproveClicked}
                 handleDenyClicked={handleDenyClicked}
               />
             </div>
@@ -151,10 +161,10 @@ export function ApplicationApprovePage() {
           </div>
         )}
 
-        <ApplicationAcceptModal
-          show={showAcceptModal}
-          onCancel={() => setShowAcceptModal(false)}
-          onAccept={handleApplicationAccepted}
+        <ApplicationApproveModal
+          show={showApproveModal}
+          onCancel={() => setShowApproveModal(false)}
+          onApprove={handleApplicationApproved}
           disableButtons={submitApplicationApprovalMutation.isLoading}
         />
         <ApplicationDenyModal
