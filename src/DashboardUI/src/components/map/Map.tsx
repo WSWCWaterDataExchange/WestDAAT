@@ -623,7 +623,6 @@ function Map({
           dropRef(el);
         }}
       ></div>
-      <ToastContainer />
     </div>
   );
 }
