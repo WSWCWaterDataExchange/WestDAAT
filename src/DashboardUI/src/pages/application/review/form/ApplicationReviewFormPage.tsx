@@ -134,7 +134,7 @@ export function ApplicationReviewFormPage() {
         show={showSaveChangesModal}
         onCancel={() => setShowSaveChangesModal(false)}
         onConfirm={async (documentedChanges: string) =>
-          await updateApplicationSubmissionMutation.mutateAsync(documentedChanges)
+          await updateApplicationSubmissionMutation.mutate(documentedChanges)
         }
         disableActionButtons={updateApplicationSubmissionMutation.isLoading}
       />

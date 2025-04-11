@@ -19,7 +19,6 @@ export function AdminLayout() {
       </div>
 
       <SiteFooter />
-      <ToastContainer />
     </div>
   );
 }

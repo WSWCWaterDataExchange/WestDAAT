@@ -28,6 +28,8 @@ import { MapPolygon } from '../data-contracts/MapPolygon';
 import { RecommendationDecision } from '../data-contracts/RecommendationDecision';
 import { WaterConservationApplicationRecommendationRequest } from '../data-contracts/WaterConservationApplicationRecommendationRequest';
 import { WaterConservationApplicationSubmissionUpdateResponse } from '../data-contracts/WaterConservationApplicationSubmissionUpdateResponse';
+import { ApprovalDecision } from '../data-contracts/ApprovalDecision';
+import { WaterConservationApplicationApprovalRequest } from '../data-contracts/WaterConservationApplicationApprovalRequest';
 import { MapPoint } from '../data-contracts/MapPoint';
 import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
@@ -273,6 +275,26 @@ export const submitApplicationRecommendation = async (
 
   await api.post<void>('Applications/Submit', request);
 };
+
+export const submitApplicationApproval = async (
+  context: IMsalContext,
+  data: {
+    waterConservationApplicationId: string;
+    approvalDecision: ApprovalDecision;
+    approvalNotes: string;
+  }
+): Promise<void> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationApprovalRequest = {
+    $type: 'WaterConservationApplicationApprovalRequest',
+    waterConservationApplicationId: data.waterConservationApplicationId,
+    approvalDecision: data.approvalDecision,
+    approvalNotes: data.approvalNotes
+  }
+
+  await api.post<void>('Applications/Submit', request);
+}
 
 export const getApplication = async (
   context: IMsalContext,
