@@ -79,9 +79,11 @@ function ReviewMap(props: ReviewMapProps) {
 
     // display user-drawn polygons + control location point on map
     // side note: labels are handled separately
-    const allFeatures: Feature<Geometry, GeoJsonProperties>[] = (
-      userDrawnPolygonFeatures as Feature<Geometry, GeoJsonProperties>[]
-    ).concat(controlLocationFeature ? [controlLocationFeature] : []);
+    const controlLocationFeatures = controlLocationFeature ? [controlLocationFeature] : [];
+    const allFeatures: Feature<Geometry, GeoJsonProperties>[] = [
+      ...userDrawnPolygonFeatures,
+      ...controlLocationFeatures,
+    ];
     setUserDrawnPolygonData(allFeatures);
 
     // zoom map in to focus on polygons
