@@ -9,8 +9,6 @@ interface EstimationToolFieldDataTableProps {
 }
 
 function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) {
-  const convertFieldEtInInchesToAcreFeet = (etInInches: number) => (etInInches / 12) * props.fieldAcreage;
-
   const renderCard = (value: number | undefined, title: string, units: string) => (
     <Card className="flex-grow-1 rounded-3 shadow-sm col-xxl-2 col-lg-3 col-4">
       <Card.Body>
@@ -26,8 +24,8 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
     <>
       <div className="d-flex justify-content-around gap-3 mb-3">
         {renderCard(props.fieldAcreage, 'Field Area', 'acres')}
-        {renderCard(props.data?.averageYearlyTotalEtInInches, 'Average Yearly ET', 'inches')}
-        {renderCard(props.data?.averageYearlyTotalEtInAcreFeet, 'Average Yearly ET', 'acre-feet')}
+        {renderCard(props.data?.averageYearlyTotalEtInInches, 'Average Yearly Total ET', 'inches')}
+        {renderCard(props.data?.averageYearlyNetEtInInches ?? undefined, 'Average Yearly Net ET', 'inches')}
       </div>
 
       <Table>
@@ -35,7 +33,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
           <tr>
             <th>Year</th>
             <th>Total ET (inches)</th>
-            <th>Total ET (acre-feet)</th>
+            <th>Net ET (inches)</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +41,7 @@ function EstimationToolFieldDataTable(props: EstimationToolFieldDataTableProps) 
             <tr key={item.year}>
               <td>{item.year}</td>
               <td>{formatNumber(item.totalEtInInches, 2)}</td>
-              <td>{formatNumber(convertFieldEtInInchesToAcreFeet(item.totalEtInInches), 2)}</td>
+              <td>{formatNumber(item.netEtInInches, 2)}</td>
             </tr>
           ))}
         </tbody>
