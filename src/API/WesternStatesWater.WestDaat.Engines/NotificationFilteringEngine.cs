@@ -11,6 +11,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
         {
             DTO.WaterConservationApplicationSubmittedEvent e => await FilterWaterConservationApplicationSubmittedEvent(e),
             DTO.WaterConservationApplicationRecommendedEvent e => await FilterWaterConservationApplicationRecommendedEvent(e),
+            DTO.WaterConservationApplicationApprovedEvent e => await FilterWaterConservationApplicationApprovedEvent(e),
             _ => throw new NotImplementedException($"Filtering for type {typeof(T).Name} has not been implemented.")
         };
     }
@@ -169,5 +170,44 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             .ToArray();
 
         return fundingOrganizationNotifications;
+    }
+
+    private async Task<DTO.NotificationMetaBase[]> FilterWaterConservationApplicationApprovedEvent(
+        DTO.WaterConservationApplicationApprovedEvent @event)
+    {
+        var application = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(new DTO.ApplicationExistsLoadRequest
+        {
+            ApplicationId = @event.ApplicationId,
+            HasSubmission = true
+        });
+
+        if (application?.ApplicantUserId == null)
+        {
+            throw new WestDaatException("Application not found, or it does contain an applicant user.");
+        }
+
+        var applicantNotification = await BuildApplicationApprovedApplicantNotification(@event, application);
+        return [applicantNotification];
+    }
+
+    private async Task<DTO.WaterConservationApplicationApprovedApplicantNotificationMeta> BuildApplicationApprovedApplicantNotification(
+        DTO.WaterConservationApplicationApprovedEvent @event,
+        DTO.ApplicationExistsLoadResponse application
+    )
+    {
+        var notificationUserResponse = (DTO.NotificationUserResponse)await _userAccessor.Load(new DTO.NotificationUserRequest
+        {
+            UserId = application.ApplicantUserId.Value,
+        });
+
+        var applicantNotification = new DTO.WaterConservationApplicationApprovedApplicantNotificationMeta
+        {
+            ApplicationId = @event.ApplicationId,
+            ToUser = notificationUserResponse.User,
+            Type = DTO.NotificationType.Email,
+            ApplicationStatus = application.Status.Value,
+        };
+
+        return applicantNotification;
     }
 }
