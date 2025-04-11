@@ -1793,7 +1793,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
         {
             WaterConservationApplicationId = application.Id,
-            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalDecision = ApprovalDecision.Approved,
             ApprovalNotes = "This application is approved, way to go."
         };
         
@@ -1843,7 +1843,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
         {
             WaterConservationApplicationId = application.Id,
-            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalDecision = ApprovalDecision.Approved,
             ApprovalNotes = "Some notes with my approval"
         };
         
@@ -1926,7 +1926,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var request = new CLI.Requests.Conservation.WaterConservationApplicationApprovalRequest
         {
             WaterConservationApplicationId = application.Id,
-            ApprovalDecision = ApprovalDecision.Accepted,
+            ApprovalDecision = ApprovalDecision.Approved,
             ApprovalNotes = "Some notes with my approval"
         };
         
@@ -1964,8 +1964,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow(ApprovalDecision.Accepted)]
-    [DataRow(ApprovalDecision.Rejected)]
+    [DataRow(ApprovalDecision.Approved)]
+    [DataRow(ApprovalDecision.Denied)]
     public async Task Store_SubmitApplicationApproval_Success(ApprovalDecision decision)
     {
         // Arrange
@@ -2028,12 +2028,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         
         // approval info should match the request
         applicationInDb.Submission!.ApprovedByUserId.Should().Be(approvalReviewer.Id);
-        if (decision == ApprovalDecision.Accepted)
+        if (decision == ApprovalDecision.Approved)
         {
             applicationInDb.Submission!.AcceptedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));
             applicationInDb.Submission!.RejectedDate.Should().Be(null);
         }
-        if (decision == ApprovalDecision.Rejected)
+        if (decision == ApprovalDecision.Denied)
         {
             applicationInDb.Submission!.AcceptedDate.Should().Be(null);
             applicationInDb.Submission!.RejectedDate.Should().BeCloseTo(DateTimeOffset.Now, TimeSpan.FromMinutes(1));

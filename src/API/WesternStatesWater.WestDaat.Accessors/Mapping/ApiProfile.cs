@@ -418,8 +418,8 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 .ForSourceMember(src => src.WaterConservationApplicationId, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ApprovalNotes, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ApprovalDecision, opt => opt.DoNotValidate())
-                .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Accepted ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
-                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Rejected ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
+                .ForMember(dest => dest.AcceptedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Approved ? DateTimeOffset.UtcNow : (DateTimeOffset?)null))
+                .ForMember(dest => dest.RejectedDate, opt => opt.MapFrom(src => src.ApprovalDecision == ApprovalDecision.Denied ? DateTimeOffset.UtcNow : (DateTimeOffset?)null));
 
             CreateMap<WaterConservationApplicationApprovalRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
