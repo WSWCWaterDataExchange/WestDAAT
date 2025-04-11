@@ -6,9 +6,9 @@ public class SubmissionDetails
 
     public DateTimeOffset SubmittedDate { get; set; }
 
-    public DateTimeOffset? AcceptedDate { get; set; }
+    public DateTimeOffset? ApprovedDate { get; set; }
 
-    public DateTimeOffset? RejectedDate { get; set; }
+    public DateTimeOffset? DeniedDate { get; set; }
     
     public Guid? ApprovedByUserId { get; set; }
     
