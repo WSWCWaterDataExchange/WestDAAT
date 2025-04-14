@@ -2044,7 +2044,47 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         applicationInDb.Submission!.SubmissionNotes.First().UserId.Should().Be(approvalReviewer.Id);
         applicationInDb.Submission!.SubmissionNotes.First().Note.Should().Be(request.ApprovalNotes);
     }
-    
+
+    [DataTestMethod]
+    [DataRow()]
+    public async Task Store_CreateApplicationNote_InvalidPermissions_ShouldThrow(string role)
+    {
+        // Arrange
+        // create an organization
+        // create a water user
+        // create a reviewer
+        // create an application + submission
+        // set user context - reviewer is in a diff organization
+        // create a request object
+     
+        // Act
+        // call the manager
+        
+        // Assert
+        // error = ForbiddenError
+        // number of notes in the database should be 0
+    }
+
+    [TestMethod]
+    public async Task Store_CreateApplicationNote_Success()
+    {
+        // Arrange
+        // create an organization
+        // create a water user
+        // create a reviewer
+        // create an application + submission
+        // set user context - reviewer is in same organization
+        // create a request object
+        
+        // Act
+        // call the manager
+        
+        // Assert
+        // no errors
+        // response has the note and reviewer's name formatted properly
+        // number of notes in the database should be 1
+    }
+
     [TestMethod]
     public async Task OnApplicationStatusChanged_ApplicationSubmitted_ShouldSendEmails()
     {
@@ -2264,7 +2304,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             ), Times.Once
         );
     }
-
+    
     private WaterConservationApplicationSubmission SetupApplicationSubmission()
     {
         var applicant = new UserFaker().Generate();

@@ -801,8 +801,35 @@ internal class ValidationEngine : IValidationEngine
 
     private async Task<ErrorBase> ValidateApplicationNoteCreateRequest(WaterConservationApplicationSubmissionNoteCreateRequest request, ContextBase context)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("made it to validation engine");
+        // verify user is logged in
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+
+        // verify application exists
+        var submittedApplicationExistsRequest = new DTO.ApplicationExistsLoadRequest
+        {
+            HasSubmission = true,
+            ApplicationId = request.WaterConservationApplicationId
+        };
+        var submittedApplicationExistsResponse = (DTO.ApplicationExistsLoadResponse)await _applicationAccessor.Load(submittedApplicationExistsRequest);
+
+        if (!submittedApplicationExistsResponse.ApplicationExists)
+        {
+            return CreateNotFoundError(context, $"WaterConservationApplication with Id {request.WaterConservationApplicationId}");
+        }
+        
+        // verify user belongs to the funding organization
+        var orgPermissions = _securityUtility.Get(new DTO.UserOrganizationPermissionsGetRequest
+        {
+            Context = context,
+            OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
+        });
+
+        if (!orgPermissions.Contains(Permissions.ApplicationUpdate))
+        {
+            return CreateForbiddenError(request, context);
+        }
+
+        return null;
     }
     
     private ConflictError CreateConflictError(

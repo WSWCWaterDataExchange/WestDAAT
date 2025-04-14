@@ -8,6 +8,7 @@ public static class Permissions
     public const string ApplicationUpdate = "Application_Update";
     public const string ApplicationRecommendation = "Application_Recommendation";
     public const string ApplicationApprove = "Application_Approve";
+    public const string ApplicationNoteCreate = "ApplicationNote_Create";
     public const string OrganizationApplicationDashboardLoad = "Organization_Application_Dashboard_Load";
     public const string OrganizationDetailsList = "Organization_List_Details";
     public const string OrganizationMemberAdd = "Organization_Member_Add";
