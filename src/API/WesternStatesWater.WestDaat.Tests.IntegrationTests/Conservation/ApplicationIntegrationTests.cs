@@ -2046,43 +2046,107 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [DataTestMethod]
-    [DataRow()]
+    [DataRow(Roles.Member, DisplayName = "Members of a different funding organization should not be able to create notes on an application")]
+    [DataRow(Roles.TechnicalReviewer, DisplayName = "Technical Reviewers of a different funding organization should not be able to create notes on an application")]
+    [DataRow(Roles.OrganizationAdmin, DisplayName = "Organization Admins of a different funding organization should not be able to create notes on an application")]
     public async Task Store_CreateApplicationNote_InvalidPermissions_ShouldThrow(string role)
     {
         // Arrange
-        // create an organization
-        // create a water user
-        // create a reviewer
-        // create an application + submission
-        // set user context - reviewer is in a diff organization
-        // create a request object
-     
+        var organization = new OrganizationFaker().Generate();
+        var diffOrganization = new OrganizationFaker().Generate();
+        var waterUser = new UserFaker().Generate();
+        var reviewer = new UserFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application);
+        
+        await _dbContext.Users.AddRangeAsync(waterUser, reviewer);
+        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            Note = "Some notes for this application"
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = reviewer.Id,
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = diffOrganization.Id,
+                RoleNames = [role]
+            }]
+        });
+        
         // Act
-        // call the manager
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>(request);
         
         // Assert
-        // error = ForbiddenError
-        // number of notes in the database should be 0
+        response.Error.Should().NotBeNull();
+        response.Error.Should().BeOfType<ForbiddenError>();
+        var applicationNotesInDb = _dbContext.WaterConservationApplicationSubmissionNotes
+            .Include(note => note.WaterConservationApplicationSubmission)
+            .Where(note => note.WaterConservationApplicationSubmission.WaterConservationApplicationId == request.WaterConservationApplicationId);
+        applicationNotesInDb.Should().HaveCount(0);
     }
 
     [TestMethod]
     public async Task Store_CreateApplicationNote_Success()
     {
         // Arrange
-        // create an organization
-        // create a water user
-        // create a reviewer
-        // create an application + submission
-        // set user context - reviewer is in same organization
-        // create a request object
+        var organization = new OrganizationFaker().Generate();
+        var waterUser = new UserFaker().Generate();
+        var reviewer = new UserFaker().Generate();
+        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
+        var submission = new WaterConservationApplicationSubmissionFaker(application);
         
+        await _dbContext.Users.AddRangeAsync(waterUser, reviewer);
+        await _dbContext.Organizations.AddAsync(organization);
+        await _dbContext.WaterConservationApplications.AddAsync(application);
+        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest
+        {
+            WaterConservationApplicationId = application.Id,
+            Note = "Some notes for this application"
+        };
+        
+        UseUserContext(new UserContext
+        {
+            Roles = [],
+            ExternalAuthId = "",
+            UserId = reviewer.Id,
+            OrganizationRoles = [new OrganizationRole
+            {
+                OrganizationId = organization.Id,
+                RoleNames = [Roles.Member]
+            }]
+        });
+      
         // Act
-        // call the manager
+        var response = await _applicationManager
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>(request);
         
         // Assert
-        // no errors
-        // response has the note and reviewer's name formatted properly
-        // number of notes in the database should be 1
+        response.Error.Should().BeNull();
+        response.Should().BeOfType<CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>();
+        response.Note.Note.Should().Be("Some notes for this application");
+        
+        var applicationNoteInDb = await _dbContext.WaterConservationApplicationSubmissionNotes
+            .Include(note => note.WaterConservationApplicationSubmission)
+            .Where(note => note.WaterConservationApplicationSubmission.WaterConservationApplicationId == request.WaterConservationApplicationId)
+            .SingleOrDefaultAsync();
+
+        applicationNoteInDb.UserId.Should().Be(reviewer.Id);
+        applicationNoteInDb.Note.Should().Be(request.Note);
+        applicationNoteInDb.Timestamp.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMinutes(1));
     }
 
     [TestMethod]

@@ -824,7 +824,7 @@ internal class ValidationEngine : IValidationEngine
             OrganizationId = submittedApplicationExistsResponse.FundingOrganizationId
         });
 
-        if (!orgPermissions.Contains(Permissions.ApplicationUpdate))
+        if (!orgPermissions.Contains(Permissions.ApplicationNoteCreate))
         {
             return CreateForbiddenError(request, context);
         }
