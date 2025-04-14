@@ -175,6 +175,7 @@ internal class ValidationEngine : IValidationEngine
             WaterConservationApplicationSubmissionUpdateRequest req => await ValidateWaterConservationApplicationSubmissionUpdateRequest(req, context),
             WaterConservationApplicationRecommendationRequest req => await ValidateWaterConservationApplicationRecommendationRequest(req, context),
             WaterConservationApplicationApprovalRequest req => await ValidateWaterConservationApplicationApprovalRequest(req, context),
+            WaterConservationApplicationSubmissionNoteCreateRequest req => await ValidateApplicationNoteCreateRequest(req, context),
             _ => throw new NotImplementedException(
                 $"Validation for request type '{request.GetType().Name}' is not implemented."
             )
@@ -798,6 +799,12 @@ internal class ValidationEngine : IValidationEngine
         return null;
     }
 
+    private async Task<ErrorBase> ValidateApplicationNoteCreateRequest(WaterConservationApplicationSubmissionNoteCreateRequest request, ContextBase context)
+    {
+        await Task.CompletedTask;
+        throw new NotImplementedException("made it to validation engine");
+    }
+    
     private ConflictError CreateConflictError(
         RequestBase request,
         ContextBase context,
