@@ -1,6 +1,6 @@
 namespace WesternStatesWater.WestDaat.Common.DataContracts;
 
-public class WaterConservationApplicationSubmissionNoteCreateRequest : ApplicationStoreRequestBase
+public class WaterConservationApplicationNoteCreateRequest : ApplicationStoreRequestBase
 {
     public Guid WaterConservationApplicationId { get; set; }
     

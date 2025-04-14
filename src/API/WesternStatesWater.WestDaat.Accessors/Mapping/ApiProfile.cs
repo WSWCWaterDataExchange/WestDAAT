@@ -505,7 +505,7 @@ namespace WesternStatesWater.WestDaat.Accessors.Mapping
                 )))
                 .ForMember(dest => dest.EstimateLocationIds, opt => opt.MapFrom(src => src.Estimate.Locations.Select(loc => loc.Id).ToArray()));
 
-            CreateMap<WaterConservationApplicationSubmissionNoteCreateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
+            CreateMap<WaterConservationApplicationNoteCreateRequest, EFWD.WaterConservationApplicationSubmissionNote>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.CreatedByUserId))

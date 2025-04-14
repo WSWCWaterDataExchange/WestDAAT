@@ -2077,22 +2077,17 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_CreateApplicationNote_InvalidPermissions_ShouldThrow(string role)
     {
         // Arrange
-        var organization = new OrganizationFaker().Generate();
-        var diffOrganization = new OrganizationFaker().Generate();
-        var waterUser = new UserFaker().Generate();
         var reviewer = new UserFaker().Generate();
-        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
-        var submission = new WaterConservationApplicationSubmissionFaker(application);
+        var reviewerOrg = new OrganizationFaker().Generate();
+        var submission = SetupApplicationSubmission();
         
-        await _dbContext.Users.AddRangeAsync(waterUser, reviewer);
-        await _dbContext.Organizations.AddRangeAsync(organization, diffOrganization);
-        await _dbContext.WaterConservationApplications.AddAsync(application);
-        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.Users.AddAsync(reviewer);
+        await _dbContext.Organizations.AddAsync(reviewerOrg);
         await _dbContext.SaveChangesAsync();
 
-        var request = new CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest
         {
-            WaterConservationApplicationId = application.Id,
+            WaterConservationApplicationId = submission.WaterConservationApplicationId,
             Note = "Some notes for this application"
         };
         
@@ -2103,14 +2098,14 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             UserId = reviewer.Id,
             OrganizationRoles = [new OrganizationRole
             {
-                OrganizationId = diffOrganization.Id,
+                OrganizationId = reviewerOrg.Id,
                 RoleNames = [role]
             }]
         });
         
         // Act
         var response = await _applicationManager
-            .Store<CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>(request);
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>(request);
         
         // Assert
         response.Error.Should().NotBeNull();
@@ -2125,21 +2120,21 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     public async Task Store_CreateApplicationNote_Success()
     {
         // Arrange
-        var organization = new OrganizationFaker().Generate();
-        var waterUser = new UserFaker().Generate();
         var reviewer = new UserFaker().Generate();
-        var application = new WaterConservationApplicationFaker(waterUser, organization).Generate();
-        var submission = new WaterConservationApplicationSubmissionFaker(application);
+        var submission = SetupApplicationSubmission();
         
-        await _dbContext.Users.AddRangeAsync(waterUser, reviewer);
-        await _dbContext.Organizations.AddAsync(organization);
-        await _dbContext.WaterConservationApplications.AddAsync(application);
-        await _dbContext.WaterConservationApplicationSubmissions.AddAsync(submission);
+        await _dbContext.Users.AddAsync( reviewer);
         await _dbContext.SaveChangesAsync();
 
-        var request = new CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest
+        var organizationId = _dbContext.WaterConservationApplicationSubmissions
+            .Where(sub => sub.Id == submission.Id)
+            .Include(sub => sub.WaterConservationApplication)
+            .FirstOrDefault()
+            .WaterConservationApplication.FundingOrganizationId;
+
+        var request = new CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest
         {
-            WaterConservationApplicationId = application.Id,
+            WaterConservationApplicationId = submission.WaterConservationApplicationId,
             Note = "Some notes for this application"
         };
         
@@ -2150,18 +2145,18 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             UserId = reviewer.Id,
             OrganizationRoles = [new OrganizationRole
             {
-                OrganizationId = organization.Id,
+                OrganizationId = organizationId,
                 RoleNames = [Roles.Member]
             }]
         });
       
         // Act
         var response = await _applicationManager
-            .Store<CLI.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>(request);
+            .Store<CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>(request);
         
         // Assert
         response.Error.Should().BeNull();
-        response.Should().BeOfType<CLI.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>();
+        response.Should().BeOfType<CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>();
         response.Note.Note.Should().Be("Some notes for this application");
         
         var applicationNoteInDb = await _dbContext.WaterConservationApplicationSubmissionNotes

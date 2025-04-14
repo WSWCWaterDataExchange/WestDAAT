@@ -288,7 +288,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             WaterConservationApplicationSubmissionUpdateRequest req => await UpdateApplicationSubmission(req),
             WaterConservationApplicationRecommendationRequest req => await SubmitApplicationRecommendation(req),
             WaterConservationApplicationApprovalRequest req => await SubmitApplicationApproval(req),
-            WaterConservationApplicationSubmissionNoteCreateRequest req => await CreateApplicationNote(req),
+            WaterConservationApplicationNoteCreateRequest req => await CreateApplicationNote(req),
             _ => throw new NotImplementedException(
                 $"Handling of request type '{request.GetType().Name}' is not implemented.")
         };
@@ -573,7 +573,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
         return new ApplicationStoreResponseBase();
     }
 
-    private async Task<WaterConservationApplicationSubmissionNoteCreateResponse> CreateApplicationNote(WaterConservationApplicationSubmissionNoteCreateRequest request)
+    private async Task<WaterConservationApplicationNoteCreateResponse> CreateApplicationNote(WaterConservationApplicationNoteCreateRequest request)
     {
         await using var db = _westDaatDatabaseContextFactory.Create();
         
@@ -594,7 +594,7 @@ internal class ApplicationAccessor : AccessorBase, IApplicationAccessor
             .ProjectTo<ApplicationReviewNote>(DtoMapper.Configuration)
             .SingleAsync();
         
-        return new WaterConservationApplicationSubmissionNoteCreateResponse
+        return new WaterConservationApplicationNoteCreateResponse
         {
             Note = savedNote
         };
