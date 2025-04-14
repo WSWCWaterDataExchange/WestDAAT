@@ -206,6 +206,7 @@ public sealed partial class FilteringEngine : INotificationFilteringEngine
             ToUser = notificationUserResponse.User,
             Type = DTO.NotificationType.Email,
             ApplicationStatus = application.Status.Value,
+            ApprovalNote = @event.ApprovalNote
         };
 
         return applicantNotification;

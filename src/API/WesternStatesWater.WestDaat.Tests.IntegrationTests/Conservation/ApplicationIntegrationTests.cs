@@ -2320,10 +2320,12 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseSystemContext();
 
         // Act
+        var approvalNote = "Your payment will be processed in the next 42 business days.";
         var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
             new CLI.Requests.Conservation.WaterConservationApplicationApprovedEvent
             {
                 ApplicationId = submission.WaterConservationApplication.Id,
+                ApprovalNote = approvalNote
             });
 
         // Assert
@@ -2338,7 +2340,8 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                 It.Is<EmailRequest>(req =>
                     req.To.Single() == submission.WaterConservationApplication.ApplicantUser.Email &&
                     req.Subject == expectedSubject &&
-                    req.Body.Contains("application has been approved.") &&
+                    req.Body.Contains("application has been approved with the following note:") &&
+                    req.Body.Contains(approvalNote) &&
                     req.Body.Contains(expectedUrlSlug)
                 )
             ),
