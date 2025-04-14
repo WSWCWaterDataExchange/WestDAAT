@@ -7,6 +7,7 @@ public class WaterConservationApplicationSubmissionNoteCreateRequestValidator : 
     public WaterConservationApplicationSubmissionNoteCreateRequestValidator()
     {
         RuleFor(x => x.WaterConservationApplicationId).NotEmpty();
+
         RuleFor(x => x.Note).NotEmpty().MaximumLength(4000);
     }
 }
