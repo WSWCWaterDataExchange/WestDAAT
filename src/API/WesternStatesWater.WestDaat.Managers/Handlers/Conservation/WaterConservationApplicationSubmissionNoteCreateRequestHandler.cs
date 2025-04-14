@@ -1,7 +1,9 @@
 using WesternStatesWater.Shared.Resolver;
 using WesternStatesWater.WestDaat.Accessors;
+using WesternStatesWater.WestDaat.Common.Context;
 using WesternStatesWater.WestDaat.Contracts.Client.Requests.Conservation;
 using WesternStatesWater.WestDaat.Contracts.Client.Responses.Conservation;
+using WesternStatesWater.WestDaat.Managers.Mapping;
 using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
@@ -22,7 +24,10 @@ public class WaterConservationApplicationSubmissionNoteCreateRequestHandler : IR
     
     public async Task<WaterConservationApplicationSubmissionNoteCreateResponse> Handle(WaterConservationApplicationSubmissionNoteCreateRequest request)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException("made it to handler");
+        var userContext = _contextUtility.GetRequiredContext<UserContext>();
+        var accessorRequest = request.Map<Common.DataContracts.WaterConservationApplicationSubmissionNoteCreateRequest>();
+        accessorRequest.CreatedByUserId = userContext.UserId;
+        var accessorResponse = await _applicationAccessor.Store(accessorRequest);
+        return accessorResponse.Map<WaterConservationApplicationSubmissionNoteCreateResponse>();
     }
 }

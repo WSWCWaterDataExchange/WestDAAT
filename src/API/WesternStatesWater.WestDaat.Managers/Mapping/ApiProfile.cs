@@ -347,6 +347,11 @@ namespace WesternStatesWater.WestDaat.Managers.Mapping
 
             CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationApprovalRequest, CommonContracts.WaterConservationApplicationApprovalRequest>()
                 .ForMember(dest => dest.ApprovedByUserId, opt => opt.Ignore());
+            
+            CreateMap<ClientContracts.Requests.Conservation.WaterConservationApplicationSubmissionNoteCreateRequest, CommonContracts.WaterConservationApplicationSubmissionNoteCreateRequest>();
+            
+            CreateMap<CommonContracts.WaterConservationApplicationSubmissionNoteCreateResponse, ClientContracts.Responses.Conservation.WaterConservationApplicationSubmissionNoteCreateResponse>()
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
 
         // duplicated in other ApiProfile.cs
