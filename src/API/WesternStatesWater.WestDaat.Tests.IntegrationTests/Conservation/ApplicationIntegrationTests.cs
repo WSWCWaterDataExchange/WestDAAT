@@ -2390,7 +2390,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
     }
 
     [TestMethod]
-    public async Task OnApplicationStatusChanged_ApplicationApproved_ShouldSendEmail()
+    public async Task OnApplicationStatusChanged_ApplicationApproved_ShouldSendSanitizedNote()
     {
         // Arrange
         var orgAdmin = new UserFaker().Generate();
@@ -2419,7 +2419,9 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         UseSystemContext();
 
         // Act
-        var approvalNote = "Your payment will be processed in the next 42 business days.";
+        var approvalNote = "This has special character's. This has html <a href=\"#\">Click here.</a>";
+        var sanitizedNote = "This has special character's. This has html ";
+
         var result = await _applicationManager.OnApplicationStatusChanged<CLI.Requests.Conservation.WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(
             new CLI.Requests.Conservation.WaterConservationApplicationApprovedEvent
             {
@@ -2440,7 +2442,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
                     req.To.Single() == submission.WaterConservationApplication.ApplicantUser.Email &&
                     req.Subject == expectedSubject &&
                     req.Body.Contains("application has been approved with the following note:") &&
-                    req.Body.Contains(approvalNote) &&
+                    req.Body.Contains(sanitizedNote) &&
                     req.Body.Contains(expectedUrlSlug)
                 )
             ),
