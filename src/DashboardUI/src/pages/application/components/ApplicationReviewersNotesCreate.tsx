@@ -1,19 +1,15 @@
-import { useRef, useState } from 'react';
-import { Icon } from '@mdi/react';
-import { mdiSend } from '@mdi/js';
-import { useMutation } from 'react-query';
 import { useMsal } from '@azure/msal-react';
-import { createApplicationReviewerNote } from '../../../accessors/applicationAccessor';
-import { ApplicationReviewNote } from '../../../data-contracts/ApplicationReviewNote';
-import { toast } from 'react-toastify';
-import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { mdiSend } from '@mdi/js';
+import { Icon } from '@mdi/react';
+import { useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-
-export interface ApplicationReviewersNotesCreateProps {
-  applicationId: string;
-}
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
+import { createApplicationReviewerNote } from '../../../accessors/applicationAccessor';
+import { useConservationApplicationContext } from '../../../contexts/ConservationApplicationProvider';
+import { ApplicationReviewNote } from '../../../data-contracts/ApplicationReviewNote';
 
 export function ApplicationReviewersNotesCreate() {
   const context = useMsal();
