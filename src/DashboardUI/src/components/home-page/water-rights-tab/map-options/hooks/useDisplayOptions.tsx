@@ -5,32 +5,29 @@ import { mapLayerNames } from '../../../../../config/maps';
 import { useMapContext } from '../../../../../contexts/MapProvider';
 import { useMapLegend } from './useMapLegend';
 import { useMapPointScaling } from './useMapPointScaling';
-import useNldiMapPopup from '../../../../../hooks/map-popups/useNldiMapPopup';
-import useSiteDigestMapPopup from '../../../../../hooks/map-popups/useSiteDigestMapPopup';
-import useOverlayDigestMapPopup from '../../../../../hooks/map-popups/useOverlayDigestMapPopup';
+import useMultiFeatureMapPopup from '../../../../../hooks/map-popups/useMultiFeatureMapPopup'; // new aggregator hook
 import { useAlerts } from '../../useAlerts';
 import { useTimeSeriesFilter } from '../../sidebar-filtering/time-series/hooks/useTimeSeriesFilter';
 
-const baseLayers = [mapLayerNames.waterRightsPointsLayer, mapLayerNames.waterRightsPolygonsLayer];
-
-const nldiLayers = [
-  mapLayerNames.nldiFlowlinesLayer,
-  mapLayerNames.nldiUsgsLocationLayer,
-  mapLayerNames.nldiUsgsPointsLayer,
+const baseLayers = [
+  mapLayerNames.waterRightsPointsLayer,
+  mapLayerNames.waterRightsPolygonsLayer,
 ];
 
-const overlayLayers = [mapLayerNames.overlayTypesPolygonsLayer, mapLayerNames.overlayTypesPolygonsBorderLayer];
+const overlayLayers = [
+  mapLayerNames.overlayTypesPolygonsLayer,
+  mapLayerNames.overlayTypesPolygonsBorderLayer,
+];
 
 const timeSeriesLayers = [
   mapLayerNames.timeSeriesPointsLayer,
-  mapLayerNames.timeSeriesPolygonsLayer
+  mapLayerNames.timeSeriesPolygonsLayer,
 ];
 
 export function useDisplayOptions() {
   const {
     filters: { riverBasinNames, isNldiFilterActive, isWaterRightsFilterActive },
   } = useWaterRightsContext();
-
   const { isOverlayFilterActive } = useOverlaysContext();
   const { isTimeSeriesFilterActive } = useTimeSeriesFilter();
   const { setVisibleLayers } = useMapContext();
@@ -44,10 +41,6 @@ export function useDisplayOptions() {
 
     if ((riverBasinNames?.length ?? 0) > 0) {
       visible.push(mapLayerNames.riverBasinsLayer);
-    }
-
-    if (isNldiFilterActive) {
-      visible.push(...nldiLayers);
     }
 
     if (isOverlayFilterActive) {
@@ -70,8 +63,8 @@ export function useDisplayOptions() {
 
   useMapLegend();
   useMapPointScaling();
-  useNldiMapPopup();
-  useOverlayDigestMapPopup();
-  useSiteDigestMapPopup();
+
+  useMultiFeatureMapPopup();
+
   useAlerts();
 }
