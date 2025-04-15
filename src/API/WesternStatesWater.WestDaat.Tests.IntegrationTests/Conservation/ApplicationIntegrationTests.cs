@@ -2080,7 +2080,7 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         var reviewer = new UserFaker().Generate();
         var reviewerOrg = new OrganizationFaker().Generate();
         var submission = SetupApplicationSubmission();
-        
+
         await _dbContext.Users.AddAsync(reviewer);
         await _dbContext.Organizations.AddAsync(reviewerOrg);
         await _dbContext.SaveChangesAsync();
@@ -2090,23 +2090,26 @@ public class ApplicationIntegrationTests : IntegrationTestBase
             WaterConservationApplicationId = submission.WaterConservationApplicationId,
             Note = "Some notes for this application"
         };
-        
+
         UseUserContext(new UserContext
         {
             Roles = [],
             ExternalAuthId = "",
             UserId = reviewer.Id,
-            OrganizationRoles = [new OrganizationRole
-            {
-                OrganizationId = reviewerOrg.Id,
-                RoleNames = [role]
-            }]
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = reviewerOrg.Id,
+                    RoleNames = [role]
+                }
+            ]
         });
-        
+
         // Act
         var response = await _applicationManager
             .Store<CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>(request);
-        
+
         // Assert
         response.Error.Should().NotBeNull();
         response.Error.Should().BeOfType<ForbiddenError>();
@@ -2122,43 +2125,40 @@ public class ApplicationIntegrationTests : IntegrationTestBase
         // Arrange
         var reviewer = new UserFaker().Generate();
         var submission = SetupApplicationSubmission();
-        
-        await _dbContext.Users.AddAsync( reviewer);
-        await _dbContext.SaveChangesAsync();
 
-        var organizationId = _dbContext.WaterConservationApplicationSubmissions
-            .Where(sub => sub.Id == submission.Id)
-            .Include(sub => sub.WaterConservationApplication)
-            .FirstOrDefault()
-            .WaterConservationApplication.FundingOrganizationId;
+        await _dbContext.Users.AddAsync(reviewer);
+        await _dbContext.SaveChangesAsync();
 
         var request = new CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest
         {
             WaterConservationApplicationId = submission.WaterConservationApplicationId,
             Note = "Some notes for this application"
         };
-        
+
         UseUserContext(new UserContext
         {
             Roles = [],
             ExternalAuthId = "",
             UserId = reviewer.Id,
-            OrganizationRoles = [new OrganizationRole
-            {
-                OrganizationId = organizationId,
-                RoleNames = [Roles.Member]
-            }]
+            OrganizationRoles =
+            [
+                new OrganizationRole
+                {
+                    OrganizationId = submission.WaterConservationApplication.FundingOrganizationId,
+                    RoleNames = [Roles.Member]
+                }
+            ]
         });
-      
+
         // Act
         var response = await _applicationManager
             .Store<CLI.Requests.Conservation.WaterConservationApplicationNoteCreateRequest, CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>(request);
-        
+
         // Assert
         response.Error.Should().BeNull();
         response.Should().BeOfType<CLI.Responses.Conservation.WaterConservationApplicationNoteCreateResponse>();
         response.Note.Note.Should().Be("Some notes for this application");
-        
+
         var applicationNoteInDb = await _dbContext.WaterConservationApplicationSubmissionNotes
             .Include(note => note.WaterConservationApplicationSubmission)
             .Where(note => note.WaterConservationApplicationSubmission.WaterConservationApplicationId == request.WaterConservationApplicationId)
