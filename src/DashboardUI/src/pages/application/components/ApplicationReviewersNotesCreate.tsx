@@ -44,10 +44,6 @@ export function ApplicationReviewersNotesCreate() {
       throw new Error('Application must be loaded in order to submit reviewer notes');
     }
 
-    if (!reviewerNotes || reviewerNotes.trim().length === 0) {
-      throw new Error('Reviewer notes cannot be empty');
-    }
-
     createNoteMutation.mutate();
   };
 
