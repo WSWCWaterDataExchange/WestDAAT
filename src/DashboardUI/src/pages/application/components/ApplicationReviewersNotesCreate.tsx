@@ -48,32 +48,30 @@ export function ApplicationReviewersNotesCreate() {
   };
 
   return (
-    <>
-      <Form ref={formRef} className="p-0">
-        <Form.Group>
-          <InputGroup className="mb-3 mt-4">
-            <Form.Control
-              required
-              id="application-reviewer-notes"
-              placeholder="Type to add a note"
-              aria-label="Application Reviewer Notes"
-              className="border-end-0 border-secondary-subtle resize-none"
-              as="textarea"
-              type="text"
-              maxLength={4000}
-              onChange={(e) => setReviewerNotes(e.target.value)}
-            />
-            <Button
-              variant="outline-primary"
-              className="border-start-0 px-3 border-secondary-subtle"
-              aria-label="Create new reviewer note"
-              onClick={handleAddNoteClick}
-            >
-              <Icon path={mdiSend} size="1.3em" />
-            </Button>
-          </InputGroup>
-        </Form.Group>
-      </Form>
-    </>
+    <Form ref={formRef} className="p-0">
+      <Form.Group>
+        <InputGroup className="mb-3 mt-4">
+          <Form.Control
+            required
+            id="application-reviewer-notes"
+            placeholder="Type to add a note"
+            aria-label="Application Reviewer Notes"
+            className="border-end-0 border-secondary-subtle resize-none"
+            as="textarea"
+            type="text"
+            maxLength={4000}
+            onChange={(e) => setReviewerNotes(e.target.value)}
+          />
+          <Button
+            variant="outline-primary"
+            className="border-start-0 px-3 border-secondary-subtle"
+            aria-label="Create new reviewer note"
+            onClick={handleAddNoteClick}
+          >
+            <Icon path={mdiSend} size="1.3em" />
+          </Button>
+        </InputGroup>
+      </Form.Group>
+    </Form>
   );
 }
