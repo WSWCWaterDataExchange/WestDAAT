@@ -34,6 +34,8 @@ import { MapPoint } from '../data-contracts/MapPoint';
 import { ReviewerEstimateConsumptiveUseResponse } from '../data-contracts/ReviewerEstimateConsumptiveUseResponse';
 import { ReviewerEstimateConsumptiveUseRequest } from '../data-contracts/ReviewerEstimateConsumptiveUseRequest';
 import { ReviewPipeline } from '../data-contracts/ReviewPipeline';
+import { WaterConservationApplicationNoteCreateResponse } from '../data-contracts/WaterConservationApplicationNoteCreateResponse';
+import { WaterConservationApplicationNoteCreateRequest } from '../data-contracts/WaterConservationApplicationNoteCreateRequest';
 
 export const applicationSearch = async (
   msalContext: IMsalContext,
@@ -343,3 +345,26 @@ export const getApplication = async (
     }
   }
 };
+
+export const createApplicationReviewerNote = async (
+  context: IMsalContext,
+  data: {
+    applicationId: string;
+    note: string;
+  },
+): Promise<WaterConservationApplicationNoteCreateResponse> => {
+  const api = await westDaatApi(context);
+
+  const request: WaterConservationApplicationNoteCreateRequest = {
+    $type: 'WaterConservationApplicationNoteCreateRequest',
+    waterConservationApplicationId: data.applicationId,
+    note: data.note,
+  };
+
+  const { data: response } = await api.post<WaterConservationApplicationNoteCreateResponse>(
+    'Applications/Notes',
+    request,
+  );
+
+  return response;
+}
