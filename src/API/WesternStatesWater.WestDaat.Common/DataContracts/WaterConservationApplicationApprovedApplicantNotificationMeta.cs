@@ -7,4 +7,6 @@ public class WaterConservationApplicationApprovedApplicantNotificationMeta : Not
     required public NotificationUser ToUser { get; init; }
 
     required public ConservationApplicationStatus ApplicationStatus { get; init; }
+
+    required public string ApprovalNote { get; set; }
 }
