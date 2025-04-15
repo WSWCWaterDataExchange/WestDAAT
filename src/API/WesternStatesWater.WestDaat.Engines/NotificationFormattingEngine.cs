@@ -1,3 +1,4 @@
+using Ganss.Xss;
 using WesternStatesWater.WestDaat.Common;
 
 namespace WesternStatesWater.WestDaat.Engines;
@@ -201,6 +202,19 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
             _ => "Reviewed" // Fallback for any other status
         };
 
+        // Prevent user submitted HTML from being executed in email body.
+        // This prevents XSS attacks.
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedTags.Remove("a");
+        sanitizer.Sanitize(applicationUrl);
+        var sanitizedNote = sanitizer.Sanitize(meta.ApprovalNote);
+
+        var bodyContent = $"Your water conservation application has been {decisionVerb.ToLower()} with the following note:"
+                          + "<br/><br/>"
+                          + sanitizedNote
+                          + "<br/><br/>"
+                          + $"Click <a href=\"{applicationUrl}\">here</a> to view the application.";
+
         return new DTO.EmailNotification
         {
             EmailRequest = new DTO.EmailRequest
@@ -210,8 +224,7 @@ public sealed partial class FormattingEngine : INotificationFormattingEngine
                 FromName = _emailServiceConfiguration.NotificationFromName,
                 Subject = $"Water Conservation Application {decisionVerb}",
                 TextContent = $"Your water conservation application has been {decisionVerb.ToLower()}.",
-                Body = $"Your water conservation application has been {decisionVerb.ToLower()}. "
-                       + $"Click <a href=\"{applicationUrl}\">here</a> to view the application."
+                Body = bodyContent
             }
         };
     }

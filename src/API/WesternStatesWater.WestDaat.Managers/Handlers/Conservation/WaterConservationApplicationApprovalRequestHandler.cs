@@ -44,6 +44,7 @@ public class WaterConservationApplicationApprovalRequestHandler : IRequestHandle
                 new WaterConservationApplicationApprovedEvent
                 {
                     ApplicationId = request.WaterConservationApplicationId,
+                    ApprovalNote = request.ApprovalNotes
                 });
         }
         catch (Exception ex)

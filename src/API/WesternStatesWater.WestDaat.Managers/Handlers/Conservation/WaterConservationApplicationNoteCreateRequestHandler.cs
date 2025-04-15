@@ -8,12 +8,12 @@ using WesternStatesWater.WestDaat.Utilities;
 
 namespace WesternStatesWater.WestDaat.Managers.Handlers.Conservation;
 
-public class WaterConservationApplicationSubmissionNoteCreateRequestHandler : IRequestHandler<WaterConservationApplicationSubmissionNoteCreateRequest, WaterConservationApplicationSubmissionNoteCreateResponse>
+public class WaterConservationApplicationNoteCreateRequestHandler : IRequestHandler<WaterConservationApplicationNoteCreateRequest, WaterConservationApplicationNoteCreateResponse>
 {
     private readonly IApplicationAccessor _applicationAccessor;
     private readonly IContextUtility _contextUtility;
 
-    public WaterConservationApplicationSubmissionNoteCreateRequestHandler(
+    public WaterConservationApplicationNoteCreateRequestHandler(
         IContextUtility contextUtility,
         IApplicationAccessor applicationAccessor
     )
@@ -22,12 +22,12 @@ public class WaterConservationApplicationSubmissionNoteCreateRequestHandler : IR
         _applicationAccessor = applicationAccessor;
     }
     
-    public async Task<WaterConservationApplicationSubmissionNoteCreateResponse> Handle(WaterConservationApplicationSubmissionNoteCreateRequest request)
+    public async Task<WaterConservationApplicationNoteCreateResponse> Handle(WaterConservationApplicationNoteCreateRequest request)
     {
         var userContext = _contextUtility.GetRequiredContext<UserContext>();
-        var accessorRequest = request.Map<Common.DataContracts.WaterConservationApplicationSubmissionNoteCreateRequest>();
+        var accessorRequest = request.Map<Common.DataContracts.WaterConservationApplicationNoteCreateRequest>();
         accessorRequest.CreatedByUserId = userContext.UserId;
         var accessorResponse = await _applicationAccessor.Store(accessorRequest);
-        return accessorResponse.Map<WaterConservationApplicationSubmissionNoteCreateResponse>();
+        return accessorResponse.Map<WaterConservationApplicationNoteCreateResponse>();
     }
 }

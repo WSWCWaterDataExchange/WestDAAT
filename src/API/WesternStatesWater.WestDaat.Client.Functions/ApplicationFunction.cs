@@ -140,13 +140,13 @@ public class ApplicationFunction : FunctionBase
 
     [Function(nameof(CreateApplicationNotes))]
     [OpenApiOperation(nameof(CreateApplicationNotes))]
-    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterConservationApplicationSubmissionNoteCreateResponse))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterConservationApplicationNoteCreateResponse))]
     public async Task<HttpResponseData> CreateApplicationNotes(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Notes")]
         HttpRequestData req)
     {
-        var request = await ParseRequestBody<WaterConservationApplicationSubmissionNoteCreateRequest>(req);
-        var results = await _applicationManager.Store<WaterConservationApplicationSubmissionNoteCreateRequest, WaterConservationApplicationSubmissionNoteCreateResponse>(request);
+        var request = await ParseRequestBody<WaterConservationApplicationNoteCreateRequest>(req);
+        var results = await _applicationManager.Store<WaterConservationApplicationNoteCreateRequest, WaterConservationApplicationNoteCreateResponse>(request);
         return await CreateResponse(req, results);
     }
 }
