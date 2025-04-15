@@ -19,20 +19,23 @@ export function ApplicationReviewersNotesCreate() {
   const { state, dispatch } = useConservationApplicationContext();
 
   const context = useMsal();
+  const [validated, setValidated] = useState(false);
 
-  const [reviewerNotes, setReviewerNotes] = useState<string | undefined>(undefined);
+  //   const [reviewerNotes, setReviewerNotes] = useState<string | undefined>(undefined);
+  const formRef = useRef<HTMLFormElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   const createNoteMutation = useMutation({
     mutationFn: async () => {
       const response = await createApplicationReviewerNote(context, {
         applicationId: state.conservationApplication.waterConservationApplicationId!,
-        note: reviewerNotes!,
+        note: notesRef.current?.value!,
       });
       return response.note;
     },
     onSuccess: (note: ApplicationReviewNote) => {
       dispatch({ type: 'APPLICATION_NOTE_ADDED', payload: { note } });
-      setReviewerNotes(undefined);
+      //   setReviewerNotes(undefined);
     },
     onError: () => {
       toast.error('Error adding application note. Please try again.');
@@ -40,20 +43,34 @@ export function ApplicationReviewersNotesCreate() {
   });
 
   const handleAddNoteClick = () => {
-    if (!state.conservationApplication.waterConservationApplicationId) {
-      throw new Error('Application must be loaded in order to submit reviewer notes');
-    }
+    // if (!state.conservationApplication.waterConservationApplicationId) {
+    //   throw new Error('Application must be loaded in order to submit reviewer notes');
+    // }
 
-    if (!reviewerNotes || reviewerNotes.trim().length === 0) {
-      throw new Error('Reviewer notes cannot be empty');
+    // if (!reviewerNotes || reviewerNotes.trim().length === 0) {
+    //   throw new Error('Reviewer notes cannot be empty');
+    // }
+    const isFormValid = formRef.current!.checkValidity();
+    setValidated(true);
+    console.log(`form validitiy: ${JSON.stringify(formRef.current?.checkValidity())}`);
+    if (isFormValid) {
+      createNoteMutation.mutate();
+      formRef.current?.reset();
+      setValidated(false);
     }
-
-    createNoteMutation.mutate();
   };
 
   return (
     <>
-      <Form>
+      {'is Validated? ' + validated}
+      <br />
+      {'is form valid? ' + formRef.current?.checkValidity()}
+      <Form
+        noValidate
+        ref={formRef}
+        validated={validated}
+        //   onChange={() => setValidated(false)}
+      >
         <Form.Group>
           <InputGroup>
             <Form.Control
@@ -65,12 +82,14 @@ export function ApplicationReviewersNotesCreate() {
               as="textarea"
               type="text"
               maxLength={4000}
-              onChange={(e) => setReviewerNotes(e.target.value)}
+              ref={notesRef}
+              //   onChange={(e) => setReviewerNotes(e.target.value)}
             />
+            <Form.Control.Feedback type="invalid">A message is required.</Form.Control.Feedback>
             <InputGroup.Text className="py-0">
               <Button
                 onClick={handleAddNoteClick}
-                disabled={!reviewerNotes || reviewerNotes.trim().length === 0 || createNoteMutation.isLoading}
+                disabled={createNoteMutation.isLoading}
                 variant="link"
                 className="px-1 py-0 text-primary"
                 aria-label="Create reviewer note"
