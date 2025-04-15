@@ -137,4 +137,16 @@ public class ApplicationFunction : FunctionBase
         var dto = JsonSerializer.Deserialize<WaterConservationApplicationStatusChangedEventBase>(eventJson, JsonSerializerOptions);
         await _applicationManager.OnApplicationStatusChanged<WaterConservationApplicationStatusChangedEventBase, EventResponseBase>(dto);
     }
+
+    [Function(nameof(CreateApplicationNotes))]
+    [OpenApiOperation(nameof(CreateApplicationNotes))]
+    [OpenApiResponseWithBody(HttpStatusCode.OK, "OK", typeof(WaterConservationApplicationNoteCreateResponse))]
+    public async Task<HttpResponseData> CreateApplicationNotes(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = $"{RouteBase}/Notes")]
+        HttpRequestData req)
+    {
+        var request = await ParseRequestBody<WaterConservationApplicationNoteCreateRequest>(req);
+        var results = await _applicationManager.Store<WaterConservationApplicationNoteCreateRequest, WaterConservationApplicationNoteCreateResponse>(request);
+        return await CreateResponse(req, results);
+    }
 }
