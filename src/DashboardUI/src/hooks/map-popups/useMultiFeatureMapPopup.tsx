@@ -28,7 +28,6 @@ function useMultiFeatureMapPopup() {
       element: popupElement,
     });
   }, [mapClickedFeatures, setMapPopup]);
-
 }
 
 export default useMultiFeatureMapPopup;

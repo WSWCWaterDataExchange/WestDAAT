@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import SiteDigestCard from "../../components/map-popups/SiteDigestCard";
 import OverlayDigestCard from "../../components/map-popups/OverlayDigestCard";
 import ErrorCard from "../../components/map-popups/ErrorCard";
+import LoadingCard from "../../components/map-popups/LoadingCard";
+import { useSiteDigest, useOverlayDigests } from '../queries';
 
 interface MultiFeaturePopupProps {
   features: Feature<Geometry, GeoJsonProperties>[];
@@ -32,6 +34,27 @@ export default function MultiFeaturePopup({
   // Get current feature
   const currentFeature = useMemo(() => features[currentIndex], [features, currentIndex]);
 
+  // Determine feature type
+  const featureType = useMemo(() => {
+    if (!currentFeature || !currentFeature.properties) return null;
+    if (currentFeature.properties.oType) return 'overlay';
+    if (currentFeature.properties.siteUuid || currentFeature.properties.uuid) return 'site';
+    return null;
+  }, [currentFeature]);
+
+  // Extract identifiers for data fetching
+  const siteUuid = currentFeature?.properties?.siteUuid || currentFeature?.properties?.uuid;
+  const overlayUuid = currentFeature?.properties?.uuid;
+
+  // Fetch data based on feature type
+  const { data: siteData, isFetching: isSiteFetching, error: siteError } = featureType === 'site'
+    ? useSiteDigest(siteUuid)
+    : { data: null, isFetching: false, error: null };
+
+  const { data: overlayData, isFetching: isOverlayFetching, error: overlayError } = featureType === 'overlay'
+    ? useOverlayDigests(overlayUuid)
+    : { data: null, isFetching: false, error: null };
+
   const goPrev = useCallback(() => {
     setCurrentIndex((prev) => (prev + features.length - 1) % features.length);
   }, [features.length]);
@@ -40,71 +63,53 @@ export default function MultiFeaturePopup({
     setCurrentIndex((prev) => (prev + 1) % features.length);
   }, [features.length]);
 
-  // Determine popup content based on feature type
+  // Determine popup content
   const popupContent = useMemo(() => {
-    if (!currentFeature || !currentFeature.properties) {
+    if (!currentFeature || !featureType) {
       return <ErrorCard onClosePopup={onClose} errorText="No feature selected." />;
     }
 
-    const { properties } = currentFeature;
-
-    // Check if the feature is an overlay (has oType)
-    if (properties.oType) {
-      // Map properties to OverlayDigest interface
-      const overlayData = {
-        waDeAreaReportingUuid: properties.uuid || '',
-        reportingAreaNativeId: properties.reportingAreaNativeId || '',
-        reportingAreaName: properties.reportingAreaName || '',
-        waDeOverlayAreaType: Array.isArray(properties.oType)
-          ? properties.oType
-          : JSON.parse(properties.oType || '[]'),
-        nativeOverlayAreaType: properties.nativeOverlayAreaType || '',
-      };
-
+    if (featureType === 'site') {
+      if (isSiteFetching) {
+        return <LoadingCard onClosePopup={onClose} loadingText={`Retrieving site data for ${siteUuid}`} />;
+      }
+      if (siteError || !siteData) {
+        return <ErrorCard onClosePopup={onClose} errorText={`Unable to find site data for ${siteUuid}`} />;
+      }
       return (
-        <OverlayDigestCard
-          overlay={overlayData}
+        <SiteDigestCard
+          site={siteData}
+          currentIndex={0}
+          onSelectedIndexChanged={() => {}}
           onClosePopup={onClose}
         />
       );
     }
 
-    // Treat as a site (water right or time series)
-    // Map properties to SiteDigest interface
-    const hasTimeSeriesData = !!properties.variableType;
-    const siteData = {
-      siteUuid: properties.uuid || properties.siteUuid || '',
-      siteType: properties.siteType || '',
-      waterRightsDigests: properties.allocationUuid
-        ? [
-          {
-            allocationUuid: properties.allocationUuid || '',
-            nativeId: properties.nativeId || '',
-            beneficialUses: Array.isArray(properties.primaryUseCategory)
-              ? properties.primaryUseCategory
-              : JSON.parse(properties.primaryUseCategory || '[]'),
-            priorityDate: properties.priorityDate || null,
-            hasTimeSeriesData: hasTimeSeriesData, // Add this property
-          },
-        ]
-        : [],
-      hasTimeSeriesData,
-      timeSeriesVariableTypes: Array.isArray(properties.variableType)
-        ? properties.variableType
-        : JSON.parse(properties.variableType || '[]'),
-      siteNativeId: properties.siteNativeId || '',
-      siteName: properties.siteName || '',
-    };
+    if (featureType === 'overlay') {
+      if (isOverlayFetching) {
+        return <LoadingCard onClosePopup={onClose} loadingText={`Retrieving overlay digest for ${overlayUuid}`} />;
+      }
+      if (overlayError || !overlayData || overlayData.length === 0) {
+        return <ErrorCard onClosePopup={onClose} errorText={`No overlay digest found for ${overlayUuid}`} />;
+      }
+      return <OverlayDigestCard overlay={overlayData[0]} onClosePopup={onClose} />;
+    }
 
-    return (
-      <SiteDigestCard
-        site={siteData}
-        currentIndex={0}
-        onSelectedIndexChanged={() => {}}
-        onClosePopup={onClose}
-      />
-    );
-  }, [currentFeature, onClose]);
+    return <ErrorCard onClosePopup={onClose} errorText="Unknown feature type." />;
+  }, [
+    currentFeature,
+    featureType,
+    isSiteFetching,
+    siteError,
+    siteData,
+    isOverlayFetching,
+    overlayError,
+    overlayData,
+    onClose,
+    siteUuid,
+    overlayUuid,
+  ]);
 
   return (
     <div className="multi-feature-popup">
