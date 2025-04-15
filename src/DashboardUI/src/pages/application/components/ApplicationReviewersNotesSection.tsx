@@ -3,6 +3,7 @@ import { useConservationApplicationContext } from '../../../contexts/Conservatio
 import { useAuthenticationContext } from '../../../hooks/useAuthenticationContext';
 import { formatDateString, momentJsLocalizedDateFormatString } from '../../../utilities/valueFormatters';
 import ApplicationFormSection from './ApplicationFormSection';
+import { ApplicationReviewersNotesCreate } from './ApplicationReviewersNotesCreate';
 
 import './ApplicationReviewersNotesSection.scss';
 
@@ -41,6 +42,7 @@ function ApplicationReviewersNotesSection() {
         ) : (
           <p>No notes from reviewers.</p>
         )}
+        <ApplicationReviewersNotesCreate />
       </ApplicationFormSection>
     </>
   );
