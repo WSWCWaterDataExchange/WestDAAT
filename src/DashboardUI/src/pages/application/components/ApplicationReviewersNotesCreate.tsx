@@ -61,7 +61,7 @@ export function ApplicationReviewersNotesCreate() {
               id="application-reviewer-notes"
               placeholder="Type to add a note"
               aria-label="Application Reviewer Notes"
-              className="mt-3"
+              className="mt-3 border-end-0 border-secondary-subtle"
               as="textarea"
               type="text"
               maxLength={4000}
@@ -69,7 +69,7 @@ export function ApplicationReviewersNotesCreate() {
             />
             <Button
               variant="outline-primary"
-              className="border-left-0"
+              className="border-start-0 mt-3 border-secondary-subtle"
               aria-label="Create new reviewer note"
               disabled={!reviewerNotes || reviewerNotes.trim().length === 0 || createNoteMutation.isLoading}
               onClick={handleAddNoteClick}
