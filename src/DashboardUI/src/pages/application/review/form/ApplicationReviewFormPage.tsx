@@ -21,7 +21,7 @@ import { ApplicationReviewNote } from '../../../../data-contracts/ApplicationRev
 const perspective: ApplicationReviewPerspective = 'reviewer';
 
 export function ApplicationReviewFormPage() {
-  const context = useMsal();
+  const msalContext = useMsal();
   const navigate = useNavigate();
   const { applicationId } = useParams();
   const { state, dispatch } = useConservationApplicationContext();
@@ -85,7 +85,7 @@ export function ApplicationReviewFormPage() {
 
   const updateApplicationSubmissionMutation = useMutation({
     mutationFn: async (documentedChanges: string) => {
-      const response = await updateApplicationSubmission(context, {
+      const response = await updateApplicationSubmission(msalContext, {
         waterConservationApplicationId: applicationId!,
         form: state.conservationApplication.applicationSubmissionForm,
         supportingDocuments: state.conservationApplication.supportingDocuments,
