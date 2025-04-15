@@ -40,6 +40,10 @@ export function ApplicationReviewersNotesCreate() {
   });
 
   const handleAddNoteClick = () => {
+    if (!reviewerNotes || reviewerNotes.trim().length === 0 || createNoteMutation.isLoading) {
+      return;
+    }
+
     if (!state.conservationApplication.waterConservationApplicationId) {
       throw new Error('Application must be loaded in order to submit reviewer notes');
     }
@@ -53,15 +57,15 @@ export function ApplicationReviewersNotesCreate() {
 
   return (
     <>
-      <Form ref={formRef}>
+      <Form ref={formRef} className="p-0">
         <Form.Group>
-          <InputGroup className="mb-3">
+          <InputGroup className="mb-3 mt-4">
             <Form.Control
               required
               id="application-reviewer-notes"
               placeholder="Type to add a note"
               aria-label="Application Reviewer Notes"
-              className="mt-3 border-end-0 border-secondary-subtle"
+              className="border-end-0 border-secondary-subtle resize-none"
               as="textarea"
               type="text"
               maxLength={4000}
@@ -69,12 +73,11 @@ export function ApplicationReviewersNotesCreate() {
             />
             <Button
               variant="outline-primary"
-              className="border-start-0 mt-3 border-secondary-subtle"
+              className="border-start-0 px-3 border-secondary-subtle"
               aria-label="Create new reviewer note"
-              disabled={!reviewerNotes || reviewerNotes.trim().length === 0 || createNoteMutation.isLoading}
               onClick={handleAddNoteClick}
             >
-              <Icon path={mdiSend} size="1em" />
+              <Icon path={mdiSend} size="1.3em" />
             </Button>
           </InputGroup>
         </Form.Group>
