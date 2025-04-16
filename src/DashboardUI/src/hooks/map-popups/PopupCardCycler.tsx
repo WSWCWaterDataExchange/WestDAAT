@@ -1,16 +1,18 @@
 import React from 'react';
-import SiteDigestCard from "../../components/map-popups/SiteDigestCard";
-import OverlayDigestCard from "../../components/map-popups/OverlayDigestCard";
-import LoadingCard from "../../components/map-popups/LoadingCard";
-import ErrorCard from "../../components/map-popups/ErrorCard";
-
-import SiteDigest from "../../data-contracts/SiteDigest";
-import { OverlayDigest } from "@data-contracts";
+import SiteDigestCard from '../../components/map-popups/SiteDigestCard';
+import OverlayDigestCard from '../../components/map-popups/OverlayDigestCard';
+import NldiSiteCard from '../../components/map-popups/NldiSiteCard';
+import LoadingCard from '../../components/map-popups/LoadingCard';
+import ErrorCard from '../../components/map-popups/ErrorCard';
+import SiteDigest from '../../data-contracts/SiteDigest';
+import { OverlayDigest } from '@data-contracts';
+import { NldiSiteData } from '../../hooks/map-popups/useNldiClickedOnMap';
 
 interface PopupCardCyclerProps {
-  type: 'site' | 'overlay' | 'loading' | 'error';
+  type: 'site' | 'overlay' | 'loading' | 'error' | 'nldi';
   siteData?: SiteDigest;
   overlayData?: OverlayDigest;
+  nldiData?: NldiSiteData;
   currentIndex: number;
   total: number;
   goToNext: () => void;
@@ -24,6 +26,7 @@ function PopupCardCycler(props: PopupCardCyclerProps) {
     type,
     siteData,
     overlayData,
+    nldiData,
     currentIndex,
     total,
     goToNext,
@@ -71,6 +74,18 @@ function PopupCardCycler(props: PopupCardCyclerProps) {
         total={total}
         goToNext={goToNext}
         goToPrevious={goToPrevious}
+        onClosePopup={onClosePopup}
+      />
+    );
+  }
+
+  if (type === 'nldi' && nldiData) {
+    return (
+      <NldiSiteCard
+        sourceName={nldiData.sourceName}
+        identifier={nldiData.identifier}
+        uri={nldiData.uri}
+        name={nldiData.name}
         onClosePopup={onClosePopup}
       />
     );
