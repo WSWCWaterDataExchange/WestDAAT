@@ -4,29 +4,22 @@ import useMapPopupOnClick from './useMapPopupOnClick';
 
 function useSiteClickedOnMap() {
   const { updatePopup, clickedFeatures } = useMapPopupOnClick();
-  const { siteUuid, oType } = useMemo(() => {
-    if (!clickedFeatures || clickedFeatures.length === 0) {
-      return { siteUuid: undefined, oType: undefined };
-    }
 
-    const siteFeature = clickedFeatures.find(
-      (a) =>
-        a.properties &&
-        (a.properties[waterRightsProperties.siteUuid as string] ||
-          a.properties[overlayProperties.overlayType as string]),
-    );
+  const features = useMemo(() => {
+    if (!clickedFeatures || clickedFeatures.length === 0) return [];
 
-    if (!siteFeature || !siteFeature.properties) {
-      return { siteUuid: undefined, oType: undefined };
-    }
-
-    return {
-      siteUuid: siteFeature.properties[waterRightsProperties.siteUuid as string],
-      oType: siteFeature.properties[overlayProperties.overlayType as string],
-    };
+    return clickedFeatures.map((feature) => {
+      const siteUuid = feature.properties?.[waterRightsProperties.siteUuid as string];
+      const oType = feature.properties?.[overlayProperties.overlayType as string];
+      return {
+        rawFeature: feature,
+        siteUuid,
+        oType,
+      };
+    });
   }, [clickedFeatures]);
 
-  return { updatePopup, siteUuid, oType };
+  return { updatePopup, features };
 }
 
 export default useSiteClickedOnMap;

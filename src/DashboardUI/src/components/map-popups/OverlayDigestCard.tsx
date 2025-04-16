@@ -1,15 +1,26 @@
 import React from 'react';
 import MapPopupCard from './MapPopupCard';
-import { mdiOpenInNew } from '@mdi/js';
+import { mdiOpenInNew, mdiChevronLeftBox, mdiChevronRightBox } from '@mdi/js';
 import Icon from '@mdi/react';
 import { OverlayDigest } from '@data-contracts';
 
 interface OverlayDigestCardProps {
   overlay: OverlayDigest;
   onClosePopup: () => void;
+  currentIndex?: number;
+  total?: number;
+  goToNext?: () => void;
+  goToPrevious?: () => void;
 }
 
-function OverlayDigestCard({ overlay, onClosePopup }: OverlayDigestCardProps) {
+function OverlayDigestCard({
+                             overlay,
+                             onClosePopup,
+                             currentIndex,
+                             total,
+                             goToNext,
+                             goToPrevious,
+                           }: OverlayDigestCardProps) {
   const {
     waDeAreaReportingUuid,
     reportingAreaNativeId,
@@ -18,16 +29,31 @@ function OverlayDigestCard({ overlay, onClosePopup }: OverlayDigestCardProps) {
     nativeOverlayAreaType,
   } = overlay;
 
+  const showNavigation = total && total > 1;
+
   return (
     <MapPopupCard onClosePopup={onClosePopup}>
       {{
         header: (
-          <div>
-            <strong> Overlay ID: </strong>
-            <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
-              {waDeAreaReportingUuid}
-              <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
-            </a>
+          <div className="flex justify-between items-center">
+            <div>
+              <strong>Overlay ID:</strong>{' '}
+              <a href={`/details/overlay/${waDeAreaReportingUuid}`} target="_blank" rel="noopener noreferrer">
+                {waDeAreaReportingUuid}
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+              </a>
+            </div>
+            {showNavigation && (
+              <div className="flex items-center gap-2">
+                <button onClick={goToPrevious} className="nav-prev-feature">
+                  <Icon path={mdiChevronLeftBox} />
+                </button>
+                <span>{(currentIndex ?? 0) + 1} of {total}</span>
+                <button onClick={goToNext} className="nav-next-feature">
+                  <Icon path={mdiChevronRightBox} />
+                </button>
+              </div>
+            )}
           </div>
         ),
         body: (
