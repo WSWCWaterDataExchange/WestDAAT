@@ -1,7 +1,6 @@
-import React from 'react';
 import { Placeholder } from 'react-bootstrap';
 
-const GenericLoadingForm: React.FC = () => {
+function GenericLoadingForm() {
   const renderPlaceholders = () => {
     const groups = [];
     const placeholdersPerGroup = 10;
@@ -34,6 +33,6 @@ const GenericLoadingForm: React.FC = () => {
   };
 
   return <div>{renderPlaceholders()}</div>;
-};
+}
 
 export default GenericLoadingForm;
