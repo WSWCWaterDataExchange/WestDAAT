@@ -614,7 +614,7 @@ const onApplicantConsumptiveUseEstimated = (
 
     polygon.fieldName = `Field ${i + 1}`;
     polygon.waterConservationApplicationEstimateLocationId =
-      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId;
+      matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ?? undefined;
     polygon.averageYearlyTotalEtInInches = matchingConsumptiveUseData.averageYearlyTotalEtInInches;
     polygon.averageYearlyTotalEtInAcreFeet = matchingConsumptiveUseData.averageYearlyTotalEtInAcreFeet;
     polygon.datapoints = matchingConsumptiveUseData.datapoints;
@@ -644,6 +644,10 @@ const onReviewerConsumptiveUseEstimated = (
     application.estimateLocations[i] = {
       ...application.estimateLocations[i],
       ...matchingConsumptiveUseData,
+      // preserve Id if possible
+      waterConservationApplicationEstimateLocationId:
+        matchingConsumptiveUseData.waterConservationApplicationEstimateLocationId ??
+        application.estimateLocations[i].waterConservationApplicationEstimateLocationId,
     };
   }
 

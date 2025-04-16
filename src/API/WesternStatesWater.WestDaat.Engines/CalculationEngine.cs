@@ -149,6 +149,7 @@ internal class CalculationEngine : ICalculationEngine
 
             var result = new PolygonEtDataCollection
             {
+                WaterConservationApplicationEstimateLocationId = null,
                 PolygonWkt = polygon.PolygonWkt,
                 DrawToolType = polygon.DrawToolType,
                 AverageYearlyTotalEtInInches = averageTotalEtInInches,
