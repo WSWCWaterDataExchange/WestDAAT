@@ -166,6 +166,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                   aria-label="Desired compensation in dollars"
                   defaultValue={state.conservationApplication.desiredCompensationDollars}
                   ref={desiredDollarsRef}
+                  disabled={props.perspective !== 'applicant'}
                 ></Form.Control>
               </InputGroup>
 
@@ -173,6 +174,7 @@ Conservation Estimate: Conservation Estimate refers to the projected monetary ($
                 aria-label="Desired compensation units"
                 defaultValue={state.conservationApplication.desiredCompensationUnits}
                 ref={desiredUnitsRef}
+                disabled={props.perspective !== 'applicant'}
               >
                 <option value={0}>Select an option</option>
                 {CompensationRateUnitsOptions.map((value) => (
