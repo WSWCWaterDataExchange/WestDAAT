@@ -647,6 +647,15 @@ const onReviewerConsumptiveUseEstimated = (
     };
   }
 
+  // update control location
+  application.controlLocation = {
+    ...application.controlLocation,
+    waterConservationApplicationEstimateControlLocationId:
+      payload.controlDataCollection.waterConservationApplicationEstimateControlLocationId,
+    averageYearlyTotalEtInInches: payload.controlDataCollection.averageYearlyTotalEtInInches,
+    datapoints: payload.controlDataCollection.datapoints,
+  };
+
   computeCombinedPolygonData(draftState);
 
   return draftState;
