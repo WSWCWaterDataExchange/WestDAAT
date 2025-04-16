@@ -35,28 +35,9 @@ function SiteDigestCard({
               <strong>Site ID:</strong>{' '}
               <a href={`/details/site/${siteUuid}`} target="_blank" rel="noopener noreferrer">
                 {siteUuid}{' '}
-                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon" />
+                <Icon path={mdiOpenInNew} className="map-popup-card-water-rights-link-icon inline" />
               </a>
             </div>
-            {showNavigation && (
-              <div className="flex items-center gap-1 text-xs text-gray-700">
-                <button
-                  onClick={goToPrevious}
-                  className="p-0.5 hover:bg-gray-100 rounded transition"
-                  aria-label="Previous"
-                >
-                  <Icon path={mdiChevronLeft} size={0.8} />
-                </button>
-                <span className="px-1">{(currentIndex ?? 0) + 1} of {total}</span>
-                <button
-                  onClick={goToNext}
-                  className="p-0.5 hover:bg-gray-100 rounded transition"
-                  aria-label="Next"
-                >
-                  <Icon path={mdiChevronRight} size={0.8} />
-                </button>
-              </div>
-            )}
           </div>
         ),
         body: (
@@ -124,6 +105,25 @@ function SiteDigestCard({
                 )}
               </div>
             </div>
+          </div>
+        ),
+        footer: showNavigation && (
+          <div className="flex justify-between items-center text-xs text-gray-700">
+            <button
+              onClick={goToPrevious}
+              className="hover:bg-gray-100 transition"
+              aria-label="Previous"
+            >
+              <Icon path={mdiChevronLeft} size={0.5} />
+            </button>
+            <span className="px-1">{(currentIndex ?? 0) + 1} of {total}</span>
+            <button
+              onClick={goToNext}
+              className="hover:bg-gray-100 transition"
+              aria-label="Next"
+            >
+              <Icon path={mdiChevronRight} size={0.5} />
+            </button>
           </div>
         ),
       }}
