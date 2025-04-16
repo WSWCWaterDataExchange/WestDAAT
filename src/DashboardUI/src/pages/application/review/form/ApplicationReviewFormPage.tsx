@@ -26,6 +26,9 @@ export function ApplicationReviewFormPage() {
   const { applicationId } = useParams();
   const { state, dispatch } = useConservationApplicationContext();
 
+  const isApplicationLoading = state.isLoadingApplication;
+  const isFundingOrganizationLoading = state.isLoadingFundingOrganization;
+
   const [showCancelConfirmationModal, setShowCancelConfirmationModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
