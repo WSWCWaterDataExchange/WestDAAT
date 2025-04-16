@@ -19,4 +19,5 @@ type FullPolygonData = {
 
 export type PartialPolygonData = Partial<FullPolygonData>;
 
-export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'drawToolType' | 'acreage'>;
+export type MapSelectionPolygonData = Pick<FullPolygonData, 'polygonWkt' | 'drawToolType' | 'acreage'> &
+  Pick<PartialPolygonData, 'waterConservationApplicationEstimateLocationId'>;

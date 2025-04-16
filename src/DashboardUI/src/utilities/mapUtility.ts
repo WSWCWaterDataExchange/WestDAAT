@@ -30,6 +30,7 @@ export const fromPartialPointDataToPointFeature = (item: PartialPointData): Feat
 export const fromGeometryFeatureToMapSelectionPolygonData = (
   polygonFeature: Feature<Geometry, GeoJsonProperties>,
 ): MapSelectionPolygonData => ({
+  waterConservationApplicationEstimateLocationId: polygonFeature.properties?.id,
   polygonWkt: convertGeometryToWkt(polygonFeature.geometry),
   drawToolType: parseDrawToolTypeFromFeature(polygonFeature),
   acreage: convertSquareMetersToAcres(areaInSquareMeters(polygonFeature)),
