@@ -474,33 +474,79 @@ const onReviewerMapPolygonsUpdated = (
   draftState: ConservationApplicationState,
   { payload }: ReviewerMapDataUpdatedAction,
 ): ConservationApplicationState => {
-  // this action manages dispatching "sub-actions":
+  // this action handles these scenarios:
   // * map polygons updated
   // * map control location updated
+
+  // important: this method assumes that only one polygon or point can change at a time,
+  // because this method is fired every time the user adjusts a feature on the map
 
   const handlePolygonChanges = () => {
     const existingPolygonWkts = new Set(draftState.conservationApplication.estimateLocations.map((p) => p.polygonWkt!));
     const newPolygonWkts = new Set(payload.polygons.map((p) => p.polygonWkt));
 
     const anyPolygonsAddedOrRemoved = existingPolygonWkts.size !== newPolygonWkts.size;
-    const anyPolygonsChanged = existingPolygonWkts.symmetricDifference(newPolygonWkts).size > 0;
 
-    const shouldDispatchMapPolygonsUpdatedAction = anyPolygonsAddedOrRemoved || anyPolygonsChanged;
+    const allPolygonWkts = [...new Set([...existingPolygonWkts, ...newPolygonWkts])];
+    // symmetric difference: the set of elements that exist in either set A or set B, but not in both sets
+    // set operations are not defined :')
+    const polygonWktsSymmetricDifference = new Set(
+      allPolygonWkts.filter((wkt) => !(existingPolygonWkts.has(wkt) && newPolygonWkts.has(wkt))),
+    );
+    const anyPolygonsPositionChanged = polygonWktsSymmetricDifference.size > 0;
 
-    if (shouldDispatchMapPolygonsUpdatedAction) {
-      draftState.conservationApplication.estimateLocations = payload.polygons;
-      draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
+    const anyChangeInPolygons = anyPolygonsAddedOrRemoved || anyPolygonsPositionChanged;
 
-      // do not reset consumptive use data
-      checkCanReviewerEstimateConsumptiveUse(draftState);
-      computeCombinedPolygonData(draftState);
-
-      // todo: is this necessary?
-      // resetApplicationFormLocationDetails(draftState);
+    if (!anyChangeInPolygons) {
+      return;
     }
-  };
 
-  handlePolygonChanges();
+    if (anyPolygonsAddedOrRemoved) {
+      if (newPolygonWkts.size > existingPolygonWkts.size) {
+        // polygon added
+        const newPolygon = payload.polygons.find((p) => !existingPolygonWkts.has(p.polygonWkt!))!;
+
+        draftState.conservationApplication.estimateLocations.push({
+          ...newPolygon,
+        });
+      } else {
+        // polygon removed
+        const removedPolygon = draftState.conservationApplication.estimateLocations.find(
+          (p) => !newPolygonWkts.has(p.polygonWkt!),
+        )!;
+
+        draftState.conservationApplication.estimateLocations =
+          draftState.conservationApplication.estimateLocations.filter(
+            (p) => p.polygonWkt !== removedPolygon.polygonWkt,
+          );
+      }
+    } else {
+      // polygon modified
+      // find the wkt that changed
+      const estimateLocation = draftState.conservationApplication.estimateLocations.find(
+        (p) => !newPolygonWkts.has(p.polygonWkt!),
+      )!;
+      const modifiedPolygon = payload.polygons.find((p) => !existingPolygonWkts.has(p.polygonWkt!))!;
+
+      // sanity check (is this needed?)
+      if (
+        !!estimateLocation.waterConservationApplicationEstimateLocationId &&
+        !!modifiedPolygon.waterConservationApplicationEstimateLocationId &&
+        estimateLocation.waterConservationApplicationEstimateLocationId !==
+          modifiedPolygon.waterConservationApplicationEstimateLocationId
+      ) {
+        throw new Error('Polygon ID mismatch. This should not happen.');
+      }
+
+      // update the state data
+      Object.assign(estimateLocation, modifiedPolygon);
+    }
+
+    draftState.conservationApplication.doPolygonsOverlap = payload.doPolygonsOverlap;
+
+    // todo: is this necessary?
+    // resetApplicationFormLocationDetails(draftState);
+  };
 
   const handleControlLocationChanges = () => {
     const existingControlLocationWkt = draftState.conservationApplication.controlLocation?.pointWkt;
@@ -525,9 +571,13 @@ const onReviewerMapPolygonsUpdated = (
     }
   };
 
+  // perform the updates
+  handlePolygonChanges();
   handleControlLocationChanges();
 
+  // side effects
   // todo: do any other methods need to be called here?
+  resetConsumptiveUseEstimation(draftState);
   checkCanReviewerEstimateConsumptiveUse(draftState);
 
   return draftState;
@@ -836,25 +886,53 @@ const resetConsumptiveUseEstimation = (draftState: ConservationApplicationState)
   draftState.conservationApplication.cumulativeNetEtInAcreFeet = undefined;
   draftState.conservationApplication.conservationPayment = undefined;
 
-  // this `reset` method is activated when the user:
-  // * updates polygons on the map
-  // * modifies a form value in the Estimation Tool sidebar
+  // this `reset` method is activated when:
+  // * the user updates polygons on the map
+  // * the reviewer updates polygons or the control location on the map
+  // * the user modifies a form value in the Estimation Tool sidebar
 
+  // polygon data:
   // for the first case, all polygon data will be overwritten. nothing needs to happen here.
-  // for the second case, any data on the map will remain the same, but the consumptive use data needs to be reset
+  // for the second case and for the third case, any data on the map will remain the same,
+  // - but the consumptive use data needs to be reset.
   const combinedPolygonDataCopy = [...draftState.conservationApplication.estimateLocations];
   for (let i = 0; i < combinedPolygonDataCopy.length; i++) {
     const polygon = combinedPolygonDataCopy[i];
 
     const polygonPostMapSelection: MapSelectionPolygonData = {
+      waterConservationApplicationEstimateLocationId: polygon.waterConservationApplicationEstimateLocationId,
       polygonWkt: polygon.polygonWkt!,
       drawToolType: polygon.drawToolType!,
       acreage: polygon.acreage!,
     };
 
-    combinedPolygonDataCopy[i] = polygonPostMapSelection;
+    combinedPolygonDataCopy[i] = {
+      // preserve data related to the map
+      ...polygonPostMapSelection,
+      // preserve if possible
+      additionalDetails: polygon.additionalDetails,
+      centerPoint: polygon.centerPoint,
+      fieldName: polygon.fieldName,
+      // reset consumptive use data
+      averageYearlyTotalEtInInches: undefined,
+      averageYearlyTotalEtInAcreFeet: undefined,
+      averageYearlyNetEtInInches: undefined,
+      averageYearlyNetEtInAcreFeet: undefined,
+      datapoints: [],
+    };
   }
   draftState.conservationApplication.estimateLocations = combinedPolygonDataCopy;
+
+  // control location data:
+  // for the first case and the third case, the control location should not exist. nothing needs to happen
+  // for the second case, the control location must have its consumptive use data reset
+  if (draftState.conservationApplication.controlLocation) {
+    draftState.conservationApplication.controlLocation = {
+      ...draftState.conservationApplication.controlLocation,
+      averageYearlyTotalEtInInches: undefined,
+      datapoints: [],
+    };
+  }
 
   draftState.canContinueToApplication = false;
 };
