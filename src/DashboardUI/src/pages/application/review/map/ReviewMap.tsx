@@ -53,7 +53,7 @@ function ReviewMap(props: ReviewMapProps) {
   }, [state.conservationApplication.estimateLocations]);
 
   const controlLocationFeature: Feature<Point, GeoJsonProperties> | undefined = useMemo(() => {
-    if (!state.conservationApplication.controlLocation) {
+    if (!state.conservationApplication.controlLocation?.pointWkt) {
       return undefined;
     }
     return fromPartialPointDataToPointFeature(state.conservationApplication.controlLocation);
