@@ -611,7 +611,11 @@ function Map({
         setExportToPngFn(() => (options: MapExportOptions) => {
           console.log('Export to PNG function called', options);
 
-          const mapContainer = document.getElementById('map');
+          const originalMapContainer = document.getElementById('map');
+
+          const mapContainer = originalMapContainer!.cloneNode(true) as HTMLElement;
+          document.body.appendChild(mapContainer);
+
           if (!mapContainer) {
             throw new Error('Map container not found');
           }
